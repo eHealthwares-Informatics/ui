@@ -66,6 +66,7 @@ import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as ApmAdminRouteRouteImport } from './routes/apm/admin/route'
 import { Route as DamorexPurchasesIndexRouteImport } from './routes/damorex/purchases/index'
 import { Route as AuthenticatedLisIndexRouteImport } from './routes/_authenticated/lis/index'
+import { Route as AuthenticatedEmrIndexRouteImport } from './routes/_authenticated/emr/index'
 import { Route as AuthenticatedConversationIndexRouteImport } from './routes/_authenticated/conversation/index'
 import { Route as AuthenticatedCodingConceptIndexRouteImport } from './routes/_authenticated/coding-concept/index'
 import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index'
@@ -169,7 +170,16 @@ import { Route as AuthenticatedLisMethodsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedLisLoincIndexRouteImport } from './routes/_authenticated/lis/loinc/index'
 import { Route as AuthenticatedLisLocationsIndexRouteImport } from './routes/_authenticated/lis/locations/index'
 import { Route as AuthenticatedLisLocationTypesIndexRouteImport } from './routes/_authenticated/lis/location-types/index'
+import { Route as AuthenticatedLisEqaResultsIndexRouteImport } from './routes/_authenticated/lis/eqa-results/index'
+import { Route as AuthenticatedLisEqaProgramsIndexRouteImport } from './routes/_authenticated/lis/eqa-programs/index'
+import { Route as AuthenticatedLisEqaEnrollmentsIndexRouteImport } from './routes/_authenticated/lis/eqa-enrollments/index'
 import { Route as AuthenticatedLisAttributeDefinitionsIndexRouteImport } from './routes/_authenticated/lis/attribute-definitions/index'
+import { Route as AuthenticatedEmrVisitsIndexRouteImport } from './routes/_authenticated/emr/visits/index'
+import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_authenticated/emr/requests/index'
+import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
+import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
+import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index'
+import { Route as AuthenticatedEmrAppointmentsIndexRouteImport } from './routes/_authenticated/emr/appointments/index'
 import { Route as AuthenticatedConversationWorkflowsIndexRouteImport } from './routes/_authenticated/conversation/workflows/index'
 import { Route as AuthenticatedConversationWorkflowInstancesIndexRouteImport } from './routes/_authenticated/conversation/workflow-instances/index'
 import { Route as AuthenticatedConversationWorkflowEventsIndexRouteImport } from './routes/_authenticated/conversation/workflow-events/index'
@@ -193,10 +203,13 @@ import { Route as AuthenticatedRxsoftSettingsDisplayRouteImport } from './routes
 import { Route as AuthenticatedRxsoftSettingsAppearanceRouteImport } from './routes/_authenticated/rxsoft/settings/appearance'
 import { Route as AuthenticatedRxsoftSettingsAccountRouteImport } from './routes/_authenticated/rxsoft/settings/account'
 import { Route as AuthenticatedRxsoftItemsCreateRouteImport } from './routes/_authenticated/rxsoft/items/create'
+import { Route as AuthenticatedLisOrdersDashboardRouteImport } from './routes/_authenticated/lis/orders/dashboard'
+import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
 import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
 import { Route as AuthenticatedPageIdEditRouteImport } from './routes/_authenticated/$page/$id/edit'
 import { Route as AuthenticatedModuleIdPageCreateRouteImport } from './routes/_authenticated/$moduleId/$page/create'
 import { Route as AuthenticatedModuleIdPageIdRouteImport } from './routes/_authenticated/$moduleId/$page/$id'
+import { Route as AuthenticatedLisOrdersNewRouteRouteImport } from './routes/_authenticated/lis/orders/new/route'
 import { Route as AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport } from './routes/_authenticated/rxsoft/reports/trial-balance/index'
 import { Route as AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport } from './routes/_authenticated/rxsoft/reports/income-statement/index'
 import { Route as AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport } from './routes/_authenticated/rxsoft/reports/balance-sheet/index'
@@ -206,6 +219,12 @@ import { Route as AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport } f
 import { Route as AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/lgas/index'
 import { Route as AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/levels/index'
 import { Route as AuthenticatedRxsoftUomsUomIdEditRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId/edit'
+import { Route as AuthenticatedLisOrdersNewQaRouteImport } from './routes/_authenticated/lis/orders/new/qa'
+import { Route as AuthenticatedLisOrdersNewOrderRouteImport } from './routes/_authenticated/lis/orders/new/order'
+import { Route as AuthenticatedLisOrdersNewLabelRouteImport } from './routes/_authenticated/lis/orders/new/label'
+import { Route as AuthenticatedLisOrdersNewEnterRouteImport } from './routes/_authenticated/lis/orders/new/enter'
+import { Route as AuthenticatedLisOrdersNewCollectRouteImport } from './routes/_authenticated/lis/orders/new/collect'
+import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
 import { Route as AuthenticatedConversationPageIdEditRouteImport } from './routes/_authenticated/conversation/$page/$id/edit'
 import { Route as AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport } from './routes/_authenticated/rxsoft/roles/$id/permissions/index'
 
@@ -492,6 +511,11 @@ const DamorexPurchasesIndexRoute = DamorexPurchasesIndexRouteImport.update({
 const AuthenticatedLisIndexRoute = AuthenticatedLisIndexRouteImport.update({
   id: '/lis/',
   path: '/lis/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEmrIndexRoute = AuthenticatedEmrIndexRouteImport.update({
+  id: '/emr/',
+  path: '/emr/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedConversationIndexRoute =
@@ -1088,10 +1112,64 @@ const AuthenticatedLisLocationTypesIndexRoute =
     path: '/lis/location-types/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLisEqaResultsIndexRoute =
+  AuthenticatedLisEqaResultsIndexRouteImport.update({
+    id: '/lis/eqa-results/',
+    path: '/lis/eqa-results/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisEqaProgramsIndexRoute =
+  AuthenticatedLisEqaProgramsIndexRouteImport.update({
+    id: '/lis/eqa-programs/',
+    path: '/lis/eqa-programs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisEqaEnrollmentsIndexRoute =
+  AuthenticatedLisEqaEnrollmentsIndexRouteImport.update({
+    id: '/lis/eqa-enrollments/',
+    path: '/lis/eqa-enrollments/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisAttributeDefinitionsIndexRoute =
   AuthenticatedLisAttributeDefinitionsIndexRouteImport.update({
     id: '/lis/attribute-definitions/',
     path: '/lis/attribute-definitions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrVisitsIndexRoute =
+  AuthenticatedEmrVisitsIndexRouteImport.update({
+    id: '/emr/visits/',
+    path: '/emr/visits/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrRequestsIndexRoute =
+  AuthenticatedEmrRequestsIndexRouteImport.update({
+    id: '/emr/requests/',
+    path: '/emr/requests/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrPatientsIndexRoute =
+  AuthenticatedEmrPatientsIndexRouteImport.update({
+    id: '/emr/patients/',
+    path: '/emr/patients/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrFormsIndexRoute =
+  AuthenticatedEmrFormsIndexRouteImport.update({
+    id: '/emr/forms/',
+    path: '/emr/forms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrEncountersIndexRoute =
+  AuthenticatedEmrEncountersIndexRouteImport.update({
+    id: '/emr/encounters/',
+    path: '/emr/encounters/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrAppointmentsIndexRoute =
+  AuthenticatedEmrAppointmentsIndexRouteImport.update({
+    id: '/emr/appointments/',
+    path: '/emr/appointments/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConversationWorkflowsIndexRoute =
@@ -1231,6 +1309,18 @@ const AuthenticatedRxsoftItemsCreateRoute =
     path: '/rxsoft/items/create',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLisOrdersDashboardRoute =
+  AuthenticatedLisOrdersDashboardRouteImport.update({
+    id: '/lis/orders/dashboard',
+    path: '/lis/orders/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationExchangesExchangeIdRoute =
+  AuthenticatedConversationExchangesExchangeIdRouteImport.update({
+    id: '/conversation/exchanges/$exchangeId',
+    path: '/conversation/exchanges/$exchangeId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationConversationIdEditRoute =
   AuthenticatedConversationConversationIdEditRouteImport.update({
     id: '/conversation/$conversationId/edit',
@@ -1253,6 +1343,12 @@ const AuthenticatedModuleIdPageIdRoute =
     id: '/$page/$id',
     path: '/$page/$id',
     getParentRoute: () => AuthenticatedModuleIdRoute,
+  } as any)
+const AuthenticatedLisOrdersNewRouteRoute =
+  AuthenticatedLisOrdersNewRouteRouteImport.update({
+    id: '/lis/orders/new',
+    path: '/lis/orders/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftReportsTrialBalanceIndexRoute =
   AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport.update({
@@ -1307,6 +1403,42 @@ const AuthenticatedRxsoftUomsUomIdEditRoute =
     id: '/edit',
     path: '/edit',
     getParentRoute: () => AuthenticatedRxsoftUomsUomIdRoute,
+  } as any)
+const AuthenticatedLisOrdersNewQaRoute =
+  AuthenticatedLisOrdersNewQaRouteImport.update({
+    id: '/qa',
+    path: '/qa',
+    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersNewOrderRoute =
+  AuthenticatedLisOrdersNewOrderRouteImport.update({
+    id: '/order',
+    path: '/order',
+    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersNewLabelRoute =
+  AuthenticatedLisOrdersNewLabelRouteImport.update({
+    id: '/label',
+    path: '/label',
+    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersNewEnterRoute =
+  AuthenticatedLisOrdersNewEnterRouteImport.update({
+    id: '/enter',
+    path: '/enter',
+    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersNewCollectRoute =
+  AuthenticatedLisOrdersNewCollectRouteImport.update({
+    id: '/collect',
+    path: '/collect',
+    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersOrderIdReportRoute =
+  AuthenticatedLisOrdersOrderIdReportRouteImport.update({
+    id: '/lis/orders/$orderId/report',
+    path: '/lis/orders/$orderId/report',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConversationPageIdEditRoute =
   AuthenticatedConversationPageIdEditRouteImport.update({
@@ -1421,12 +1553,16 @@ export interface FileRoutesByFullPath {
   '/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
   '/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute
   '/conversation/': typeof AuthenticatedConversationIndexRoute
+  '/emr/': typeof AuthenticatedEmrIndexRoute
   '/lis/': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases/': typeof DamorexPurchasesIndexRoute
+  '/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
@@ -1450,7 +1586,16 @@ export interface FileRoutesByFullPath {
   '/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute
   '/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
   '/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute
   '/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute
   '/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
   '/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
@@ -1508,6 +1653,12 @@ export interface FileRoutesByFullPath {
   '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
+  '/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
+  '/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
+  '/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
+  '/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -1617,12 +1768,16 @@ export interface FileRoutesByTo {
   '/$moduleId': typeof AuthenticatedModuleIdIndexRoute
   '/coding-concept': typeof AuthenticatedCodingConceptIndexRoute
   '/conversation': typeof AuthenticatedConversationIndexRoute
+  '/emr': typeof AuthenticatedEmrIndexRoute
   '/lis': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases': typeof DamorexPurchasesIndexRoute
+  '/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
@@ -1646,7 +1801,16 @@ export interface FileRoutesByTo {
   '/conversation/workflow-events': typeof AuthenticatedConversationWorkflowEventsIndexRoute
   '/conversation/workflow-instances': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/conversation/workflows': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/emr/appointments': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/visits': typeof AuthenticatedEmrVisitsIndexRoute
   '/lis/attribute-definitions': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/lis/eqa-enrollments': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/lis/eqa-programs': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/lis/eqa-results': typeof AuthenticatedLisEqaResultsIndexRoute
   '/lis/location-types': typeof AuthenticatedLisLocationTypesIndexRoute
   '/lis/locations': typeof AuthenticatedLisLocationsIndexRoute
   '/lis/loinc': typeof AuthenticatedLisLoincIndexRoute
@@ -1704,6 +1868,12 @@ export interface FileRoutesByTo {
   '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
+  '/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
+  '/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
+  '/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
+  '/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/coding-concept/facilities/levels': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -1819,12 +1989,16 @@ export interface FileRoutesById {
   '/_authenticated/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
   '/_authenticated/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute
   '/_authenticated/conversation/': typeof AuthenticatedConversationIndexRoute
+  '/_authenticated/emr/': typeof AuthenticatedEmrIndexRoute
   '/_authenticated/lis/': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases/': typeof DamorexPurchasesIndexRoute
+  '/_authenticated/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
   '/_authenticated/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/_authenticated/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/_authenticated/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/_authenticated/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/_authenticated/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/_authenticated/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
@@ -1848,7 +2022,16 @@ export interface FileRoutesById {
   '/_authenticated/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute
   '/_authenticated/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/_authenticated/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/_authenticated/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/_authenticated/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
   '/_authenticated/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/_authenticated/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/_authenticated/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/_authenticated/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute
   '/_authenticated/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute
   '/_authenticated/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
   '/_authenticated/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
@@ -1906,6 +2089,12 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/_authenticated/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
+  '/_authenticated/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
+  '/_authenticated/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
+  '/_authenticated/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
+  '/_authenticated/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
   '/_authenticated/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/_authenticated/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/_authenticated/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -2019,12 +2208,16 @@ export interface FileRouteTypes {
     | '/$moduleId/'
     | '/coding-concept/'
     | '/conversation/'
+    | '/emr/'
     | '/lis/'
     | '/damorex/purchases/'
+    | '/lis/orders/new'
     | '/$moduleId/$page/$id'
     | '/$moduleId/$page/create'
     | '/$page/$id/edit'
     | '/conversation/$conversationId/edit'
+    | '/conversation/exchanges/$exchangeId'
+    | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/settings/account'
     | '/rxsoft/settings/appearance'
@@ -2048,7 +2241,16 @@ export interface FileRouteTypes {
     | '/conversation/workflow-events/'
     | '/conversation/workflow-instances/'
     | '/conversation/workflows/'
+    | '/emr/appointments/'
+    | '/emr/encounters/'
+    | '/emr/forms/'
+    | '/emr/patients/'
+    | '/emr/requests/'
+    | '/emr/visits/'
     | '/lis/attribute-definitions/'
+    | '/lis/eqa-enrollments/'
+    | '/lis/eqa-programs/'
+    | '/lis/eqa-results/'
     | '/lis/location-types/'
     | '/lis/locations/'
     | '/lis/loinc/'
@@ -2106,6 +2308,12 @@ export interface FileRouteTypes {
     | '/rxsoft/warehouses/'
     | '/rxsoft/website-orders/'
     | '/conversation/$page/$id/edit'
+    | '/lis/orders/$orderId/report'
+    | '/lis/orders/new/collect'
+    | '/lis/orders/new/enter'
+    | '/lis/orders/new/label'
+    | '/lis/orders/new/order'
+    | '/lis/orders/new/qa'
     | '/rxsoft/uoms/$uomId/edit'
     | '/coding-concept/facilities/levels/'
     | '/coding-concept/facilities/lgas/'
@@ -2215,12 +2423,16 @@ export interface FileRouteTypes {
     | '/$moduleId'
     | '/coding-concept'
     | '/conversation'
+    | '/emr'
     | '/lis'
     | '/damorex/purchases'
+    | '/lis/orders/new'
     | '/$moduleId/$page/$id'
     | '/$moduleId/$page/create'
     | '/$page/$id/edit'
     | '/conversation/$conversationId/edit'
+    | '/conversation/exchanges/$exchangeId'
+    | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/settings/account'
     | '/rxsoft/settings/appearance'
@@ -2244,7 +2456,16 @@ export interface FileRouteTypes {
     | '/conversation/workflow-events'
     | '/conversation/workflow-instances'
     | '/conversation/workflows'
+    | '/emr/appointments'
+    | '/emr/encounters'
+    | '/emr/forms'
+    | '/emr/patients'
+    | '/emr/requests'
+    | '/emr/visits'
     | '/lis/attribute-definitions'
+    | '/lis/eqa-enrollments'
+    | '/lis/eqa-programs'
+    | '/lis/eqa-results'
     | '/lis/location-types'
     | '/lis/locations'
     | '/lis/loinc'
@@ -2302,6 +2523,12 @@ export interface FileRouteTypes {
     | '/rxsoft/warehouses'
     | '/rxsoft/website-orders'
     | '/conversation/$page/$id/edit'
+    | '/lis/orders/$orderId/report'
+    | '/lis/orders/new/collect'
+    | '/lis/orders/new/enter'
+    | '/lis/orders/new/label'
+    | '/lis/orders/new/order'
+    | '/lis/orders/new/qa'
     | '/rxsoft/uoms/$uomId/edit'
     | '/coding-concept/facilities/levels'
     | '/coding-concept/facilities/lgas'
@@ -2416,12 +2643,16 @@ export interface FileRouteTypes {
     | '/_authenticated/$moduleId/'
     | '/_authenticated/coding-concept/'
     | '/_authenticated/conversation/'
+    | '/_authenticated/emr/'
     | '/_authenticated/lis/'
     | '/damorex/purchases/'
+    | '/_authenticated/lis/orders/new'
     | '/_authenticated/$moduleId/$page/$id'
     | '/_authenticated/$moduleId/$page/create'
     | '/_authenticated/$page/$id/edit'
     | '/_authenticated/conversation/$conversationId/edit'
+    | '/_authenticated/conversation/exchanges/$exchangeId'
+    | '/_authenticated/lis/orders/dashboard'
     | '/_authenticated/rxsoft/items/create'
     | '/_authenticated/rxsoft/settings/account'
     | '/_authenticated/rxsoft/settings/appearance'
@@ -2445,7 +2676,16 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/workflow-events/'
     | '/_authenticated/conversation/workflow-instances/'
     | '/_authenticated/conversation/workflows/'
+    | '/_authenticated/emr/appointments/'
+    | '/_authenticated/emr/encounters/'
+    | '/_authenticated/emr/forms/'
+    | '/_authenticated/emr/patients/'
+    | '/_authenticated/emr/requests/'
+    | '/_authenticated/emr/visits/'
     | '/_authenticated/lis/attribute-definitions/'
+    | '/_authenticated/lis/eqa-enrollments/'
+    | '/_authenticated/lis/eqa-programs/'
+    | '/_authenticated/lis/eqa-results/'
     | '/_authenticated/lis/location-types/'
     | '/_authenticated/lis/locations/'
     | '/_authenticated/lis/loinc/'
@@ -2503,6 +2743,12 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/warehouses/'
     | '/_authenticated/rxsoft/website-orders/'
     | '/_authenticated/conversation/$page/$id/edit'
+    | '/_authenticated/lis/orders/$orderId/report'
+    | '/_authenticated/lis/orders/new/collect'
+    | '/_authenticated/lis/orders/new/enter'
+    | '/_authenticated/lis/orders/new/label'
+    | '/_authenticated/lis/orders/new/order'
+    | '/_authenticated/lis/orders/new/qa'
     | '/_authenticated/rxsoft/uoms/$uomId/edit'
     | '/_authenticated/coding-concept/facilities/levels/'
     | '/_authenticated/coding-concept/facilities/lgas/'
@@ -2973,6 +3219,13 @@ declare module '@tanstack/react-router' {
       path: '/lis'
       fullPath: '/lis/'
       preLoaderRoute: typeof AuthenticatedLisIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/': {
+      id: '/_authenticated/emr/'
+      path: '/emr'
+      fullPath: '/emr/'
+      preLoaderRoute: typeof AuthenticatedEmrIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/': {
@@ -3696,11 +3949,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLisLocationTypesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lis/eqa-results/': {
+      id: '/_authenticated/lis/eqa-results/'
+      path: '/lis/eqa-results'
+      fullPath: '/lis/eqa-results/'
+      preLoaderRoute: typeof AuthenticatedLisEqaResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lis/eqa-programs/': {
+      id: '/_authenticated/lis/eqa-programs/'
+      path: '/lis/eqa-programs'
+      fullPath: '/lis/eqa-programs/'
+      preLoaderRoute: typeof AuthenticatedLisEqaProgramsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lis/eqa-enrollments/': {
+      id: '/_authenticated/lis/eqa-enrollments/'
+      path: '/lis/eqa-enrollments'
+      fullPath: '/lis/eqa-enrollments/'
+      preLoaderRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/attribute-definitions/': {
       id: '/_authenticated/lis/attribute-definitions/'
       path: '/lis/attribute-definitions'
       fullPath: '/lis/attribute-definitions/'
       preLoaderRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/visits/': {
+      id: '/_authenticated/emr/visits/'
+      path: '/emr/visits'
+      fullPath: '/emr/visits/'
+      preLoaderRoute: typeof AuthenticatedEmrVisitsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/requests/': {
+      id: '/_authenticated/emr/requests/'
+      path: '/emr/requests'
+      fullPath: '/emr/requests/'
+      preLoaderRoute: typeof AuthenticatedEmrRequestsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/patients/': {
+      id: '/_authenticated/emr/patients/'
+      path: '/emr/patients'
+      fullPath: '/emr/patients/'
+      preLoaderRoute: typeof AuthenticatedEmrPatientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/forms/': {
+      id: '/_authenticated/emr/forms/'
+      path: '/emr/forms'
+      fullPath: '/emr/forms/'
+      preLoaderRoute: typeof AuthenticatedEmrFormsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/encounters/': {
+      id: '/_authenticated/emr/encounters/'
+      path: '/emr/encounters'
+      fullPath: '/emr/encounters/'
+      preLoaderRoute: typeof AuthenticatedEmrEncountersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/appointments/': {
+      id: '/_authenticated/emr/appointments/'
+      path: '/emr/appointments'
+      fullPath: '/emr/appointments/'
+      preLoaderRoute: typeof AuthenticatedEmrAppointmentsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/workflows/': {
@@ -3864,6 +4180,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftItemsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lis/orders/dashboard': {
+      id: '/_authenticated/lis/orders/dashboard'
+      path: '/lis/orders/dashboard'
+      fullPath: '/lis/orders/dashboard'
+      preLoaderRoute: typeof AuthenticatedLisOrdersDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/exchanges/$exchangeId': {
+      id: '/_authenticated/conversation/exchanges/$exchangeId'
+      path: '/conversation/exchanges/$exchangeId'
+      fullPath: '/conversation/exchanges/$exchangeId'
+      preLoaderRoute: typeof AuthenticatedConversationExchangesExchangeIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/$conversationId/edit': {
       id: '/_authenticated/conversation/$conversationId/edit'
       path: '/conversation/$conversationId/edit'
@@ -3891,6 +4221,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$moduleId/$page/$id'
       preLoaderRoute: typeof AuthenticatedModuleIdPageIdRouteImport
       parentRoute: typeof AuthenticatedModuleIdRoute
+    }
+    '/_authenticated/lis/orders/new': {
+      id: '/_authenticated/lis/orders/new'
+      path: '/lis/orders/new'
+      fullPath: '/lis/orders/new'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/reports/trial-balance/': {
       id: '/_authenticated/rxsoft/reports/trial-balance/'
@@ -3954,6 +4291,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/rxsoft/uoms/$uomId/edit'
       preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdEditRouteImport
       parentRoute: typeof AuthenticatedRxsoftUomsUomIdRoute
+    }
+    '/_authenticated/lis/orders/new/qa': {
+      id: '/_authenticated/lis/orders/new/qa'
+      path: '/qa'
+      fullPath: '/lis/orders/new/qa'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewQaRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+    }
+    '/_authenticated/lis/orders/new/order': {
+      id: '/_authenticated/lis/orders/new/order'
+      path: '/order'
+      fullPath: '/lis/orders/new/order'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewOrderRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+    }
+    '/_authenticated/lis/orders/new/label': {
+      id: '/_authenticated/lis/orders/new/label'
+      path: '/label'
+      fullPath: '/lis/orders/new/label'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewLabelRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+    }
+    '/_authenticated/lis/orders/new/enter': {
+      id: '/_authenticated/lis/orders/new/enter'
+      path: '/enter'
+      fullPath: '/lis/orders/new/enter'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewEnterRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+    }
+    '/_authenticated/lis/orders/new/collect': {
+      id: '/_authenticated/lis/orders/new/collect'
+      path: '/collect'
+      fullPath: '/lis/orders/new/collect'
+      preLoaderRoute: typeof AuthenticatedLisOrdersNewCollectRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+    }
+    '/_authenticated/lis/orders/$orderId/report': {
+      id: '/_authenticated/lis/orders/$orderId/report'
+      path: '/lis/orders/$orderId/report'
+      fullPath: '/lis/orders/$orderId/report'
+      preLoaderRoute: typeof AuthenticatedLisOrdersOrderIdReportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/$page/$id/edit': {
       id: '/_authenticated/conversation/$page/$id/edit'
@@ -4027,6 +4406,29 @@ const AuthenticatedPageIdRouteChildren: AuthenticatedPageIdRouteChildren = {
 const AuthenticatedPageIdRouteWithChildren =
   AuthenticatedPageIdRoute._addFileChildren(AuthenticatedPageIdRouteChildren)
 
+interface AuthenticatedLisOrdersNewRouteRouteChildren {
+  AuthenticatedLisOrdersNewCollectRoute: typeof AuthenticatedLisOrdersNewCollectRoute
+  AuthenticatedLisOrdersNewEnterRoute: typeof AuthenticatedLisOrdersNewEnterRoute
+  AuthenticatedLisOrdersNewLabelRoute: typeof AuthenticatedLisOrdersNewLabelRoute
+  AuthenticatedLisOrdersNewOrderRoute: typeof AuthenticatedLisOrdersNewOrderRoute
+  AuthenticatedLisOrdersNewQaRoute: typeof AuthenticatedLisOrdersNewQaRoute
+}
+
+const AuthenticatedLisOrdersNewRouteRouteChildren: AuthenticatedLisOrdersNewRouteRouteChildren =
+  {
+    AuthenticatedLisOrdersNewCollectRoute:
+      AuthenticatedLisOrdersNewCollectRoute,
+    AuthenticatedLisOrdersNewEnterRoute: AuthenticatedLisOrdersNewEnterRoute,
+    AuthenticatedLisOrdersNewLabelRoute: AuthenticatedLisOrdersNewLabelRoute,
+    AuthenticatedLisOrdersNewOrderRoute: AuthenticatedLisOrdersNewOrderRoute,
+    AuthenticatedLisOrdersNewQaRoute: AuthenticatedLisOrdersNewQaRoute,
+  }
+
+const AuthenticatedLisOrdersNewRouteRouteWithChildren =
+  AuthenticatedLisOrdersNewRouteRoute._addFileChildren(
+    AuthenticatedLisOrdersNewRouteRouteChildren,
+  )
+
 interface AuthenticatedRxsoftUomsUomIdRouteChildren {
   AuthenticatedRxsoftUomsUomIdEditRoute: typeof AuthenticatedRxsoftUomsUomIdEditRoute
 }
@@ -4066,8 +4468,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunicationTraceExplorerRoute: typeof AuthenticatedCommunicationTraceExplorerRoute
   AuthenticatedCodingConceptIndexRoute: typeof AuthenticatedCodingConceptIndexRoute
   AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute
+  AuthenticatedEmrIndexRoute: typeof AuthenticatedEmrIndexRoute
   AuthenticatedLisIndexRoute: typeof AuthenticatedLisIndexRoute
+  AuthenticatedLisOrdersNewRouteRoute: typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
   AuthenticatedConversationConversationIdEditRoute: typeof AuthenticatedConversationConversationIdEditRoute
+  AuthenticatedConversationExchangesExchangeIdRoute: typeof AuthenticatedConversationExchangesExchangeIdRoute
+  AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
   AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute
   AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   AuthenticatedCodingConceptDrugComponentsIndexRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
@@ -4085,7 +4491,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationWorkflowEventsIndexRoute: typeof AuthenticatedConversationWorkflowEventsIndexRoute
   AuthenticatedConversationWorkflowInstancesIndexRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   AuthenticatedConversationWorkflowsIndexRoute: typeof AuthenticatedConversationWorkflowsIndexRoute
+  AuthenticatedEmrAppointmentsIndexRoute: typeof AuthenticatedEmrAppointmentsIndexRoute
+  AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
+  AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
+  AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
+  AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
+  AuthenticatedEmrVisitsIndexRoute: typeof AuthenticatedEmrVisitsIndexRoute
   AuthenticatedLisAttributeDefinitionsIndexRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  AuthenticatedLisEqaEnrollmentsIndexRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  AuthenticatedLisEqaProgramsIndexRoute: typeof AuthenticatedLisEqaProgramsIndexRoute
+  AuthenticatedLisEqaResultsIndexRoute: typeof AuthenticatedLisEqaResultsIndexRoute
   AuthenticatedLisLocationTypesIndexRoute: typeof AuthenticatedLisLocationTypesIndexRoute
   AuthenticatedLisLocationsIndexRoute: typeof AuthenticatedLisLocationsIndexRoute
   AuthenticatedLisLoincIndexRoute: typeof AuthenticatedLisLoincIndexRoute
@@ -4142,6 +4557,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute
   AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   AuthenticatedConversationPageIdEditRoute: typeof AuthenticatedConversationPageIdEditRoute
+  AuthenticatedLisOrdersOrderIdReportRoute: typeof AuthenticatedLisOrdersOrderIdReportRoute
   AuthenticatedCodingConceptFacilitiesLevelsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   AuthenticatedCodingConceptFacilitiesLgasIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
   AuthenticatedCodingConceptFacilitiesStatesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute
@@ -4192,9 +4608,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCommunicationTraceExplorerRoute,
   AuthenticatedCodingConceptIndexRoute: AuthenticatedCodingConceptIndexRoute,
   AuthenticatedConversationIndexRoute: AuthenticatedConversationIndexRoute,
+  AuthenticatedEmrIndexRoute: AuthenticatedEmrIndexRoute,
   AuthenticatedLisIndexRoute: AuthenticatedLisIndexRoute,
+  AuthenticatedLisOrdersNewRouteRoute:
+    AuthenticatedLisOrdersNewRouteRouteWithChildren,
   AuthenticatedConversationConversationIdEditRoute:
     AuthenticatedConversationConversationIdEditRoute,
+  AuthenticatedConversationExchangesExchangeIdRoute:
+    AuthenticatedConversationExchangesExchangeIdRoute,
+  AuthenticatedLisOrdersDashboardRoute: AuthenticatedLisOrdersDashboardRoute,
   AuthenticatedRxsoftItemsCreateRoute: AuthenticatedRxsoftItemsCreateRoute,
   AuthenticatedRxsoftUomsUomIdRoute:
     AuthenticatedRxsoftUomsUomIdRouteWithChildren,
@@ -4228,8 +4650,19 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationWorkflowInstancesIndexRoute,
   AuthenticatedConversationWorkflowsIndexRoute:
     AuthenticatedConversationWorkflowsIndexRoute,
+  AuthenticatedEmrAppointmentsIndexRoute:
+    AuthenticatedEmrAppointmentsIndexRoute,
+  AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
+  AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
+  AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
+  AuthenticatedEmrRequestsIndexRoute: AuthenticatedEmrRequestsIndexRoute,
+  AuthenticatedEmrVisitsIndexRoute: AuthenticatedEmrVisitsIndexRoute,
   AuthenticatedLisAttributeDefinitionsIndexRoute:
     AuthenticatedLisAttributeDefinitionsIndexRoute,
+  AuthenticatedLisEqaEnrollmentsIndexRoute:
+    AuthenticatedLisEqaEnrollmentsIndexRoute,
+  AuthenticatedLisEqaProgramsIndexRoute: AuthenticatedLisEqaProgramsIndexRoute,
+  AuthenticatedLisEqaResultsIndexRoute: AuthenticatedLisEqaResultsIndexRoute,
   AuthenticatedLisLocationTypesIndexRoute:
     AuthenticatedLisLocationTypesIndexRoute,
   AuthenticatedLisLocationsIndexRoute: AuthenticatedLisLocationsIndexRoute,
@@ -4318,6 +4751,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftWebsiteOrdersIndexRoute,
   AuthenticatedConversationPageIdEditRoute:
     AuthenticatedConversationPageIdEditRoute,
+  AuthenticatedLisOrdersOrderIdReportRoute:
+    AuthenticatedLisOrdersOrderIdReportRoute,
   AuthenticatedCodingConceptFacilitiesLevelsIndexRoute:
     AuthenticatedCodingConceptFacilitiesLevelsIndexRoute,
   AuthenticatedCodingConceptFacilitiesLgasIndexRoute:

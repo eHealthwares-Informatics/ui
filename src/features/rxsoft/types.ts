@@ -205,6 +205,7 @@ export type Column = {
   render?: (row: Record<string, unknown>, actionCellProps?: ActionCellProps) => React.ReactNode;
   dataType?: ColumnDataType;
   filters?: ColumnFilter[];
+  sortable?: boolean;
   field?: Field;
   editable?: boolean;
   error?: (row: Record<string, unknown>) => string | undefined;
@@ -270,6 +271,7 @@ export type Field = {
   itemLabelKey?: string;
   itemRender?: (item: any) => React.ReactNode;
   itemEditConfig?: any;
+  relationshipId?: string;
 };
 
 export type FieldGroup = {

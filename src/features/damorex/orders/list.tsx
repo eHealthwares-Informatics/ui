@@ -1,6 +1,6 @@
-import { Badge, Box, Container, Group, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Badge, Box, Container, Group, Paper, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
-import { Package, ChevronRight } from 'lucide-react';
+import { Package, ChevronRight, AlertTriangle } from 'lucide-react';
 import { EmptyOrders } from '../website/empty-states';
 import { useOrders } from '../website/hooks';
 import { WebsiteLayout, green, ink, muted, line, soft } from '../website/layout';
@@ -57,6 +57,11 @@ export default function OrdersPage() {
                         <Badge radius="xl" color={statusColors[order.orderStatus] || 'gray'}>
                           {statusLabel(order.orderStatus)}
                         </Badge>
+                        {order.items?.some((i: any) => !i.itemId) ? (
+                          <Tooltip label="Contains freetext items — needs reconciliation">
+                            <AlertTriangle size={16} color="orange" />
+                          </Tooltip>
+                        ) : null}
                       </Group>
                       <Text size="sm" c={muted}>
                         {new Date(order.createdAt).toLocaleDateString()}

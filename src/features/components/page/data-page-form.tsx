@@ -6,6 +6,7 @@ import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleContext } from '@/context/module-context';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { collectFields, normalizeMultiSelectIds } from '@/features/shared/payload-utils';
 import { FieldGroup } from '../form/FieldGroup';
 import { TabGroups } from '../form/tab-groups';
 import { RxPage } from './rx-page';
@@ -17,12 +18,7 @@ type DataPageFormProps = {
   onSave?: () => void;
 };
 
-export function DataPageForm({
-  config,
-  initialData,
-  mode = 'create',
-  onSave,
-}: DataPageFormProps) {
+export function DataPageForm({ config, initialData, mode = 'create', onSave }: DataPageFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const moduleContext = useModuleContext();
@@ -43,9 +39,12 @@ export function DataPageForm({
   } = config;
 
   const fieldGroups = createFieldGroups ?? (createFields ? [{ fields: createFields }] : []);
+  const fields = collectFields({ createFields, createFieldGroups, tabGroups });
 
-  const [formState, setFormState] = useState<Record<string, unknown>>(
-    () => (mode === 'edit' && initialData && buildFormState ? buildFormState(initialData) : defaultState ?? {}),
+  const [formState, setFormState] = useState<Record<string, unknown>>(() =>
+    mode === 'edit' && initialData && buildFormState
+      ? buildFormState(initialData)
+      : (defaultState ?? {})
   );
 
   useEffect(() => {
@@ -62,7 +61,8 @@ export function DataPageForm({
 
   const mutation = useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      const payload = buildCreatePayload ? buildCreatePayload(values) : values;
+      const normalized = normalizeMultiSelectIds(values, fields);
+      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
       if (mode === 'edit') {
         const id = initialData?.id ?? (values as any).id;
         const response = await apiProvider!.put(`${endpoint}/${String(id)}`, payload);
@@ -97,7 +97,8 @@ export function DataPageForm({
   });
 
   const handleStepSubmit = async (stepIndex: number): Promise<Record<string, unknown> | void> => {
-    const payload = buildCreatePayload ? buildCreatePayload(formState) : formState;
+    const normalized = normalizeMultiSelectIds(formState, fields);
+    const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
     try {
       if (mode === 'edit') {
         const id = initialData?.id ?? (formState as any).id;
@@ -118,7 +119,7 @@ export function DataPageForm({
     }
   };
 
-  const pageTitle = mode === 'edit' ? `Edit ${title}` : modalTitle ?? `Create ${title}`;
+  const pageTitle = mode === 'edit' ? `Edit ${title}` : (modalTitle ?? `Create ${title}`);
 
   return (
     <RxPage title={pageTitle} description={description}>
@@ -140,8 +141,11 @@ export function DataPageForm({
                   ? () => {
                       const action = mode === 'edit' ? 'updated' : 'created';
                       notifications.show({ message: `${title} record ${action}` });
-                      if (onSave) {onSave();}
-                      else {navigate({ to: '..' });}
+                      if (onSave) {
+                        onSave();
+                      } else {
+                        navigate({ to: '..' });
+                      }
                     }
                   : () => mutation.mutate(formState)
               }

@@ -1,5 +1,12 @@
 import { Text } from '@mantine/core';
-import type { Column, Field, FieldGroup, Option } from '@/features/rxsoft/types';
+import {
+  ColumnDataType,
+  ColumnTypeFilters,
+  EQUALS_WITH_OPTIONS,
+  type Field,
+  type FieldGroup,
+  type Option,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import {
@@ -15,6 +22,7 @@ import {
   WORKFLOW_STATUS_OPTIONS,
   WORKFLOW_STEP_TYPE_OPTIONS,
 } from '../types/constants';
+import { ParticipantCell } from './participant-cell';
 
 const option = (value?: unknown, fallbackLabel?: unknown): Option | null => {
   if (value == null || value === '') {
@@ -106,6 +114,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   description: 'Manage delivery channels, providers, activation, and metadata.',
   endpoint: '/channels',
   columns: [
+    { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name' },
     { key: 'type', label: 'Type' },
     { key: 'provider', label: 'Provider' },
@@ -122,7 +131,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   ]),
   defaultState: {
     name: '',
-    type: option('MOCK'),
+    type: option('WEB'),
     provider: '',
     externalId: '',
     metadata: {},
@@ -147,11 +156,16 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   buildUpdatePayload: (values) => channelPageSchema.buildCreatePayload?.(values),
 });
 
-const shortId = (value: unknown) => {
+const shortText = (value: unknown) => {
   const id = String(value ?? '');
   const short = id.length > 10 ? `${id.slice(0, 4)}...${id.slice(-4)}` : id;
   return (
-    <Text component="span" title={id} size="sm" style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+    <Text
+      component="span"
+      title={id}
+      size="sm"
+      style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}
+    >
       {short}
     </Text>
   );
@@ -299,10 +313,22 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
   endpoint: '/conversations',
   editPathBuilder: (row) => `/conversation/${String(row.id)}/edit`,
   columns: [
-    { key: 'id', label: 'Conversation ID', render: (row) => shortId(row.id) },
-    { key: 'questionnaireId', label: 'Questionnaire', render: (row) => (row as any).questionnaire?.name ?? shortId(row.questionnaireId) },
-    { key: 'channelId', label: 'Channel', render: (row) => (row as any).channel?.name ?? shortId(row.channelId) },
-    { key: 'currentQuestionId', label: 'Current Question', render: (row) => (row as any).currentQuestion?.text ?? shortId(row.currentQuestionId) },
+    { key: 'id', label: 'Conversation ID', render: (row) => shortText(row.id) },
+    {
+      key: 'questionnaireId',
+      label: 'Questionnaire',
+      render: (row) => (row as any).questionnaire?.name ?? shortText(row.questionnaireId),
+    },
+    {
+      key: 'channelId',
+      label: 'Channel',
+      render: (row) => (row as any).channel?.name ?? shortText(row.channelId),
+    },
+    {
+      key: 'currentQuestionId',
+      label: 'Current Question',
+      render: (row) => (row as any).currentQuestion?.text ?? shortText(row.currentQuestionId),
+    },
     { key: 'status', label: 'Status' },
     { key: 'state', label: 'State' },
   ],
@@ -422,8 +448,22 @@ export const stepPageSchema: ModelConfig = withDefaultActions({
     selectField('type', 'Type', WORKFLOW_STEP_TYPE_OPTIONS),
     jsonField('config', 'Config'),
     jsonField('transitions', 'Transitions'),
-    selectField('onEnter', 'On Enter', ['HTTP_POST', 'SERVICE_CALL', 'EMIT_EVENT', 'DELAY', 'NOOP'].map((v) => ({ value: v, label: v }))),
-    selectField('onExit', 'On Exit', ['HTTP_POST', 'SERVICE_CALL', 'EMIT_EVENT', 'DELAY', 'NOOP'].map((v) => ({ value: v, label: v }))),
+    selectField(
+      'onEnter',
+      'On Enter',
+      ['HTTP_POST', 'SERVICE_CALL', 'EMIT_EVENT', 'DELAY', 'NOOP'].map((v) => ({
+        value: v,
+        label: v,
+      }))
+    ),
+    selectField(
+      'onExit',
+      'On Exit',
+      ['HTTP_POST', 'SERVICE_CALL', 'EMIT_EVENT', 'DELAY', 'NOOP'].map((v) => ({
+        value: v,
+        label: v,
+      }))
+    ),
   ]),
   defaultState: {
     id: '',
@@ -524,7 +564,7 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
   editPathBuilder: (row) => `/conversation/questionnaires/${String(row.id)}/edit`,
   columns: [
     { key: 'code', label: 'Code' },
-    { key: 'name', label: 'Name' },
+    { key: 'name', label: 'Name', sortable: true },
     { key: 'processingStrategy', label: 'Strategy' },
     { key: 'isActive', label: 'Active' },
     { key: 'workflowId', label: 'Workflow' },
@@ -540,6 +580,19 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
         switchField('isActive', 'Active'),
         switchField('allowBackNavigation', 'Allow Back Navigation'),
         switchField('allowMultipleSessions', 'Allow Multiple Sessions'),
+        {
+          name: 'channelIds',
+          label: 'Channels',
+          type: 'multi-async-select',
+          col: 12,
+          searchParam: {
+            endpoint: '/channels',
+            queryParam: 'search',
+            minChars: 0,
+            valueKey: 'id',
+            labelKey: 'name',
+          },
+        },
         jsonField('tags', 'Tags'),
         jsonField('metadata', 'Metadata'),
       ],
@@ -553,7 +606,8 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
           type: 'accordion-array',
           col: 12,
           itemLabelKey: 'text',
-          itemRender: (item: any) => `${item.index ?? '?'}: ${item.text ?? '-'} : ${item.attribute}`,
+          itemRender: (item: any) =>
+            `${item.index ?? '?'}: ${item.text ?? '-'} : ${item.attribute}`,
           itemEditConfig: questionPageSchema,
         },
       ],
@@ -586,6 +640,7 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     allowBackNavigation: true,
     allowMultipleSessions: false,
     processingStrategy: option('STATIC'),
+    channelIds: [],
     tags: [],
     metadata: {},
     isActive: true,
@@ -599,6 +654,7 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     allowBackNavigation: bool(row.allowBackNavigation, true),
     allowMultipleSessions: bool(row.allowMultipleSessions),
     processingStrategy: option(row.processingStrategy || 'STATIC'),
+    channelIds: jsonArray(row.channelIds),
     tags: jsonArray(row.tags),
     metadata: jsonObject(row.metadata),
     isActive: bool(row.isActive, true),
@@ -612,6 +668,7 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     allowBackNavigation: bool(values.allowBackNavigation, true),
     allowMultipleSessions: bool(values.allowMultipleSessions),
     processingStrategy: optionValue(values.processingStrategy),
+    channelIds: jsonArray(values.channelIds),
     metadata: jsonObject(values.metadata),
     tags: jsonArray(values.tags),
     questions: jsonArray(values.questions),
@@ -622,7 +679,6 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
   }),
   buildUpdatePayload: (values) => questionnairePageSchema.buildCreatePayload?.(values),
 });
-
 
 export const workflowInstancePageSchema: ModelConfig = {
   id: 'workflow-instances',
@@ -706,7 +762,7 @@ export const projectionPageSchema: ModelConfig = {
     {
       key: 'conversationId',
       label: 'Conversation',
-      render: (row) => shortId(row.conversationId),
+      render: (row) => shortText(row.conversationId),
     },
     { key: 'role', label: 'Role' },
     { key: 'status', label: 'Status' },
@@ -715,10 +771,14 @@ export const projectionPageSchema: ModelConfig = {
       label: 'Primary',
       render: (row) => (row.isPrimary ? 'Yes' : 'No'),
     },
-    { key: 'lastMessageText', label: 'Last Message', render: (row) => {
-      const text = String(row.lastMessageText ?? '');
-      return text.length < 60 ? text : `${text.slice(0, 60)}...`;
-    }},
+    {
+      key: 'lastMessageText',
+      label: 'Last Message',
+      render: (row) => {
+        const text = String(row.lastMessageText ?? '');
+        return text.length < 60 ? text : `${text.slice(0, 60)}...`;
+      },
+    },
     { key: 'lastMessageAt', label: 'Last Activity' },
     { key: 'unreadCount', label: 'Unread' },
   ],
@@ -731,61 +791,54 @@ export const exchangePageSchema: ModelConfig = withDefaultActions({
     'Review inbound and outbound channel exchanges, message lifecycle, and payload metadata.',
   endpoint: '/exchanges',
   columns: [
-    { key: 'channelType', label: 'Channel' },
-    { key: 'direction', label: 'Direction' },
-    { key: 'status', label: 'Status' },
-    { key: 'conversationId', label: 'Conversation ID' },
-    { key: 'senderId', label: 'Sender' },
-    { key: 'receiverId', label: 'Receiver' },
-    { key: 'messageId', label: 'Message ID' },
-    { key: 'message', label: 'Message', render: (row) => (row.message as string).length < 80 ? row.message  as string : `${(row.message  as string)?.slice(0, 80)  }...`},
-    { key: 'createdAt', label: 'CreatedAt' },
+    {
+      key: 'channelType',
+      label: 'Channel',
+      filters: EQUALS_WITH_OPTIONS(CHANNEL_TYPE_OPTIONS),
+    },
+    {
+      key: 'direction',
+      label: 'Direction',
+      filters: EQUALS_WITH_OPTIONS(EXCHANGE_DIRECTION_OPTIONS),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      filters: EQUALS_WITH_OPTIONS(EXCHANGE_STATUS_OPTIONS),
+    },
+    { key: 'conversationId', label: 'Conversation ID', filters: ColumnTypeFilters.STRING },
+    {
+      key: 'senderId',
+      label: 'Sender',
+      filters: ColumnTypeFilters.STRING,
+      render: (row) => <ParticipantCell participantId={String(row.senderId ?? '')} />,
+    },
+    {
+      key: 'receiverId',
+      label: 'Receiver',
+      filters: ColumnTypeFilters.STRING,
+      render: (row) => <ParticipantCell participantId={String(row.receiverId ?? '')} />,
+    },
+    {
+      key: 'messageId',
+      label: 'Message ID',
+      filters: ColumnTypeFilters.STRING,
+      render: (row) => shortText(row.messageId),
+    },
+    {
+      key: 'message',
+      label: 'Message',
+      filters: ColumnTypeFilters.STRING,
+      render: (row) => shortText(row.message),
+    },
+    {
+      key: 'createdAt',
+      label: 'CreatedAt',
+      dataType: ColumnDataType.DATE,
+      filters: ColumnTypeFilters.DATE,
+    },
   ],
-  createFieldGroups: buildFields([
-    selectField('channelType', 'Channel Type', CHANNEL_TYPE_OPTIONS),
-    selectField('direction', 'Direction', EXCHANGE_DIRECTION_OPTIONS),
-    selectField('status', 'Status', EXCHANGE_STATUS_OPTIONS),
-    textField('conversationId', 'Conversation ID'),
-    textField('senderId', 'Sender ID'),
-    textField('receiverId', 'Receiver ID'),
-    textField('messageId', 'Message ID'),
-    { name: 'message', label: 'Message', type: 'textarea', col: 12 },
-    textField('questionnaireCode', 'Questionnaire Code'),
-  ]),
-  defaultState: {
-    channelType: option('MOCK'),
-    direction: option('INBOUND'),
-    status: option('RECEIVED'),
-    conversationId: '',
-    senderId: '',
-    receiverId: '',
-    messageId: '',
-    message: '',
-    questionnaireCode: '',
-  },
-  buildFormState: (row) => ({
-    channelType: option(row.channelType),
-    direction: option(row.direction),
-    status: option(row.status),
-    conversationId: text(row.conversationId),
-    senderId: text(row.senderId),
-    receiverId: text(row.receiverId),
-    messageId: text(row.messageId),
-    message: text(row.message),
-    questionnaireCode: text(row.questionnaireCode),
-  }),
-  buildCreatePayload: (values) => ({
-    channelType: optionValue(values.channelType),
-    direction: optionValue(values.direction),
-    status: optionValue(values.status),
-    conversationId: text(values.conversationId).trim() || undefined,
-    senderId: text(values.senderId).trim() || undefined,
-    receiverId: text(values.receiverId).trim() || undefined,
-    messageId: text(values.messageId).trim(),
-    message: text(values.message).trim(),
-    questionnaireCode: text(values.questionnaireCode).trim() || undefined,
-  }),
-  buildUpdatePayload: (values) => exchangePageSchema.buildCreatePayload?.(values),
+  detailPathBuilder: (row) => `/conversation/exchanges/${String(row.id)}`,
 });
 
 export const workflowAttachmentPageSchema: ModelConfig = withDefaultActions({

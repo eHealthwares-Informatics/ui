@@ -1,6 +1,7 @@
 export * from './components/channels';
 export * from './components/conversations';
 export * from './components/exchanges';
+export * from './components/exchange-detail';
 export * from './components/participants';
 export * from './components/questionnaires';
 export * from './components/questions';

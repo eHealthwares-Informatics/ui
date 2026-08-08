@@ -23,9 +23,10 @@ import { AsyncSelectField } from './async-field';
 type AccordionArrayProps = {
   field: Field;
   items: any[];
+  parentFormState?: Record<string, unknown>;
 };
 
-export function AccordionArrayField({ field, items }: AccordionArrayProps) {
+export function AccordionArrayField({ field, items, parentFormState }: AccordionArrayProps) {
   const [editItem, setEditItem] = useState<{ item: any } | null>(null);
 
   return (
@@ -52,7 +53,10 @@ export function AccordionArrayField({ field, items }: AccordionArrayProps) {
                         color="gray"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
-                          setEditItem({ item });
+                          const itemWithParent = field.relationshipId
+                            ? { ...item, [field.relationshipId]: parentFormState?.id }
+                            : item;
+                          setEditItem({ item: itemWithParent });
                         }}
                         style={{ cursor: 'pointer' }}
                       >
@@ -66,7 +70,7 @@ export function AccordionArrayField({ field, items }: AccordionArrayProps) {
                     {Object.entries(item)
                       .filter(
                         ([key]) =>
-                          !['id', '_id', field.itemLabelKey ?? 'name'].includes(key),
+                          !['id', '_id', field.itemLabelKey ?? 'name', field.relationshipId].includes(key),
                       )
                       .map(([key, val]) => (
                         <Grid.Col key={key} span={6}>

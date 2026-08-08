@@ -181,6 +181,11 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
             </Text>
           ) : null}
         </Box>
+        {product.unitPrice != null && (
+          <Text fw={700} size="lg" c={green}>
+            ₦{product.unitPrice.toLocaleString()}
+          </Text>
+        )}
         <Text size="xs" c={muted}>
           {gp?.isPrescriptionRequired ? 'Prescription required' : 'No prescription needed'}
         </Text>

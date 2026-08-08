@@ -6,14 +6,12 @@ export const Route = createFileRoute('/')({
     useAuthStore.getState().bootstrap();
     const { user, modules: userModules } = useAuthStore.getState();
     if (!user) {
-      throw redirect({ to: '/damorex' });
+      throw redirect({ to: '/sign-in' });
     }
 
     const hasRxsoft = userModules.some((m) => m.id === 'rxsoft');
     if (hasRxsoft) {
       throw redirect({ to: '/rxsoft/items' });
     }
-
-    throw redirect({ to: '/damorex' });
   },
 });

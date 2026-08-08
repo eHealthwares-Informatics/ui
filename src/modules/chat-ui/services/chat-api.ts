@@ -50,7 +50,7 @@ export async function sendConversationMessage(input: {
   senderPhone: string;
   text: string;
 }) {
-  await conversationApi.post('/webhooks/mock', {
+  await conversationApi.post('/webhooks/web', {
     channelId: input.channelId,
     senderPhone: input.senderPhone,
     text: input.text,

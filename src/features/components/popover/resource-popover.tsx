@@ -1,6 +1,6 @@
-import { Popover, Skeleton, Stack, Text } from '@mantine/core';
+import { HoverCard, Skeleton, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
+import { memo, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
 type ResourcePopoverProps = {
@@ -11,16 +11,13 @@ type ResourcePopoverProps = {
   fallback?: React.ReactNode;
 };
 
-const HOVER_DELAY = 300;
-
 function shortenId(id: string) {
   if (id.length <= 8) {return id;}
   return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
-export function ResourcePopover({ resourceId, endpoint, children, render, fallback }: ResourcePopoverProps) {
-  const [opened, setOpened] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+function ResourcePopoverInner({ resourceId, endpoint, children, render, fallback }: ResourcePopoverProps) {
+  const [isHovered, setIsHovered] = useState(false);
 
   const { data, isFetching } = useQuery({
     queryKey: [endpoint, resourceId],
@@ -28,51 +25,27 @@ export function ResourcePopover({ resourceId, endpoint, children, render, fallba
       const { data } = await rxsoftApi.get(`${endpoint}/${resourceId}`);
       return data;
     },
-    enabled: opened && !!resourceId,
+    enabled: isHovered && !!resourceId,
   });
-
-  const clearTimer = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
-  const handleOpen = () => {
-    clearTimer();
-    timerRef.current = setTimeout(() => {
-      if (resourceId) {setOpened(true);}
-    }, HOVER_DELAY);
-  };
-
-  const handleClose = () => {
-    clearTimer();
-    timerRef.current = setTimeout(() => {
-      setOpened(false);
-    }, HOVER_DELAY);
-  };
 
   if (!resourceId) {return <>{fallback ?? '-'}</>;}
 
   return (
-    <Popover
-      opened={opened}
-      onChange={setOpened}
+    <HoverCard
       position="top"
       withArrow
       shadow="md"
-      withinPortal
+      openDelay={300}
+      closeDelay={300}
+      onOpen={() => setIsHovered(true)}
+      onClose={() => setIsHovered(false)}
     >
-      <Popover.Target>
-        <span
-          onMouseEnter={handleOpen}
-          onMouseLeave={handleClose}
-          style={{ cursor: 'pointer', borderBottom: '1px dashed var(--mantine-color-gray-5)' }}
-        >
+      <HoverCard.Target>
+        <span style={{ cursor: 'pointer', borderBottom: '1px dashed var(--mantine-color-gray-5)' }}>
           {children ?? shortenId(resourceId)}
         </span>
-      </Popover.Target>
-      <Popover.Dropdown onMouseEnter={clearTimer} onMouseLeave={handleClose}>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
         {isFetching ? (
           <Stack gap="xs" miw={180}>
             <Skeleton height={14} width="60%" />
@@ -83,7 +56,9 @@ export function ResourcePopover({ resourceId, endpoint, children, render, fallba
         ) : (
           <Text size="sm" c="dimmed">No data</Text>
         )}
-      </Popover.Dropdown>
-    </Popover>
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }
+
+export const ResourcePopover = memo(ResourcePopoverInner);

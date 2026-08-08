@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { communicationApi } from '@/lib/communication-api';
 import { conversationApi } from '@/lib/conversation-api';
+import { emrApi } from '@/lib/emr-api';
 import { lisApi } from '@/lib/lis-api';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
@@ -10,6 +11,7 @@ export type ModuleId =
   | 'communication'
   | 'coding-concept'
   | 'lis'
+  | 'emr'
   | 'rxsoft'
   | 'admin';
 
@@ -188,6 +190,31 @@ export const modules: ModuleDefinition[] = [
     ],
   },
   {
+    id: 'emr',
+    title: 'EMR',
+    description: 'Electronic Medical Record: appointments, visits, encounters, dynamic forms and clinical requests.',
+    root: '/emr',
+    apiProvider: emrApi,
+    routes: [
+      '/emr',
+      '/emr/dashboard',
+      '/emr/appointments',
+      '/emr/patients',
+      '/emr/visits',
+      '/emr/encounters',
+      '/emr/forms',
+      '/emr/requests',
+    ],
+    resources: [
+      'emr-patients',
+      'emr-appointments',
+      'emr-visits',
+      'emr-encounters',
+      'emr-form-definitions',
+      'emr-requests',
+    ],
+  },
+  {
     id: 'admin',
     title: 'Admin Console',
     description: 'Full shadcn-admin workspace with the normal menu and shared controls.',
@@ -204,8 +231,8 @@ export const moduleMap: Record<ModuleId, ModuleDefinition> = {
   'coding-concept': modules[2],
   rxsoft: modules[3],
   lis: modules[4],
-  admin: modules[5],
-
+  emr: modules[5],
+  admin: modules[6],
 };
 
 export const defaultModule: ModuleId = 'rxsoft';

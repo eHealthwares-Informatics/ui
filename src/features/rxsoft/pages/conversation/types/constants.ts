@@ -48,7 +48,7 @@ export const WORKFLOW_STATUS_OPTIONS = ['ACTIVE', 'COMPLETED', 'STOPPED'].map((v
 }));
 
 export const CHANNEL_TYPE_OPTIONS = [
-  'MOCK',
+  'WEB',
   'WHATSAPP',
   'SMS',
   'EMAIL',

@@ -10,24 +10,53 @@ import {
   Select,
 } from '@mantine/core';
 import { DatePickerInput, DateTimePicker } from '@mantine/dates';
-import { SlidersHorizontal } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Column, ColumnDataType, ColumnFilter, FilterType, FilterValue } from '../../rxsoft/types';
 import { resolveAutoFilterValue } from './utils';
 import { AsyncSelectField } from '../form/async-field';
 
+export type SortOrder = 'asc' | 'desc' | null;
+
 export const TableHeader = ({
-  column: { label, dataType, filters },
+  column,
   filterValue,
   onFilterValueChange,
+  sortBy,
+  sortOrder,
+  onSortChange,
 }: {
   column: Column;
   filterValue?: FilterValue | null;
   onFilterValueChange?: (filterValue: FilterValue | null) => void;
+  sortBy?: string | null;
+  sortOrder?: SortOrder;
+  onSortChange?: (key: string, order: SortOrder) => void;
 }) => {
+  const { label, dataType, filters, sortable } = column;
   const [open, setOpen] = useState(false);
   const [menuOpened, setMenuOpened] = useState(false);
   const [tempFilter, setTempFilter] = useState<FilterValue | null>(filterValue || null);
+
+  const isSorted = sortable && sortBy === column.key && !!sortOrder;
+  const sortIcon = !sortable
+    ? null
+    : sortOrder === 'asc' && sortBy === column.key
+      ? <ArrowUp size={14} />
+      : sortOrder === 'desc' && sortBy === column.key
+        ? <ArrowDown size={14} />
+        : <ArrowUpDown size={14} />;
+
+  const handleSortClick = () => {
+    if (!onSortChange) return;
+    const next: SortOrder =
+      sortBy !== column.key || !sortOrder
+        ? 'asc'
+        : sortOrder === 'asc'
+          ? 'desc'
+          : null;
+    onSortChange(column.key, next);
+  };
 
   // ------------------------
   // HANDLE FILTER CLICK
@@ -65,6 +94,18 @@ export const TableHeader = ({
     <>
       <Group gap="xs">
         {label}
+
+        {sortable && onSortChange && (
+          <ActionIcon
+            size="sm"
+            variant={isSorted ? 'light' : 'subtle'}
+            color={isSorted ? 'blue' : undefined}
+            onClick={handleSortClick}
+            aria-label={`Sort by ${label}`}
+          >
+            {sortIcon}
+          </ActionIcon>
+        )}
 
         {filters && onFilterValueChange && filters?.length > 0 && (
           <Menu shadow="md" width={220} opened={menuOpened} onChange={setMenuOpened}>

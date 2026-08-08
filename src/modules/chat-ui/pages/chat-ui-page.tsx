@@ -519,9 +519,10 @@ function ConversationThread(props: {
     [messagesQuery.data],
   );
   const groupedMessages = useMemo(() => groupMessagesByDate(messages), [messages]);
+  console.log({props})
   const senderId =
     props.mode === 'admin'
-      ? props.conversation?.moderator?.id
+      ? projections.find(p => p.isPrimary)?.participant.id
       : props.conversation?.participant.id;
 
   const hasMyProjection = projections.some((p) => p.participant.id === props.adminParticipantId);
@@ -564,6 +565,7 @@ function ConversationThread(props: {
   }
 
   const conversation = props.conversation;
+    console.log({conversation})
 
   const submit = () => {
     if (!draft.trim() || !senderId || sendMessage.isPending || inputDisabled) {return;}
@@ -725,6 +727,7 @@ function ConversationThread(props: {
             style={{ flex: 1 }}
             value={draft}
           />
+          {draft}-senderId({senderId})inputDisabled-{inputDisabled}
           <Button
             disabled={!draft.trim() || !senderId || inputDisabled}
             leftSection={<Send size={16} />}

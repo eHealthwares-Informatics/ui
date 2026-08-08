@@ -1,8 +1,8 @@
 import { ActionIcon, Badge, Grid, Group, SimpleGrid, Switch } from '@mantine/core';
 import { memo, useCallback } from 'react';
 import { LabelField } from '@/features/communication/components/shared';
-import { Field, Option } from '@/features/rxsoft/types';
 import { ImageUploader } from '@/features/rxsoft/pages/products/components/image-uploader';
+import { Field, Option } from '@/features/rxsoft/types';
 import { AccordionArrayField, AccordionSingleField } from './accordion-fields';
 import { AsyncSelectField } from './async-field';
 import { DebouncedTextInput } from './debounced-text-input';
@@ -58,6 +58,7 @@ function RenderFieldComponent({
       const fieldState = useFormField(field.name);
       fieldValue = fieldState.value;
       fieldError = fieldState.error;
+      formState = fieldState.formState as Record<string, unknown>;
       handleChange = useCallback(
         (v: any) => {
           fieldState.setValue(v);
@@ -65,8 +66,6 @@ function RenderFieldComponent({
         },
         [fieldState, onChange]
       );
-      // Lazy access to formState — useFormField already gave us the context
-      formState = undefined;
     } catch (err) {
       // FormProvider not available, use props
       // console.debug('FormProvider not available, using prop-based mode');
@@ -110,7 +109,6 @@ function RenderFieldComponent({
   }
 
   if (field.type === 'multi-async-select') {
-    
     const raw = (fieldValue || []) as (string | Option)[];
     const current: Option[] = field.toOptions
       ? field.toOptions(raw)
@@ -130,6 +128,8 @@ function RenderFieldComponent({
           onBlur={onBlur}
           onFocus={onFocus}
           error={fieldError}
+          clearAfterSelect
+          selectedValues={current.map((item) => (item as Option).value)}
         />
         <Group gap="xs">
           {current.map((item: string | Option) => (
@@ -303,7 +303,7 @@ function RenderFieldComponent({
 
   if (field.type === 'accordion-array') {
     const items: any[] = (fieldValue as any[]) || [];
-    return <AccordionArrayField field={field} items={items} />;
+    return <AccordionArrayField field={field} items={items} parentFormState={formState} />;
   }
 
   if (field.type === 'accordion') {

@@ -1,18 +1,18 @@
+import { ActionIcon, Select, Tooltip } from '@mantine/core';
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
-import { ActionIcon, Select, Tooltip } from '@mantine/core';
 import { HelpCircle } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ModuleContext, useModuleContext } from '@/context/module-context';
+import { entityInfoMap } from '@/features/lis/schema/entity-info';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { collectFields } from '@/features/shared/payload-utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { JsonPreviewDialog } from '../../rxsoft';
 import type { FilterValue } from '../../rxsoft/types';
 import { useFormContext } from '../form/form-context';
 import { ModalDataForm } from '../form/ModalDataForm';
-import { InfoDrawer } from './info-drawer';
-import { entityInfoMap } from '@/features/lis/schema/entity-info';
 import {
   useCreateMutation,
   useDeleteMutation,
@@ -24,6 +24,7 @@ import { MetricsBar } from '../table/MetricsBar';
 import { Pagination } from '../table/pagination';
 import { DataTable } from '../table/table';
 import { getArrayPayload } from '../utils';
+import { InfoDrawer } from './info-drawer';
 import { RxPage } from './rx-page';
 
 function getRowsFromPayload(payload: unknown): Record<string, unknown>[] {
@@ -145,6 +146,14 @@ export function DataPageShell(props: DataPageShellProps) {
   const [helpOpen, setHelpOpen] = useState(false);
   const helpInfo = entityInfoMap[config.id] ?? null;
 
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const handleSortChange = (key: string, order: 'asc' | 'desc' | null) => {
+    setSortBy(order ? key : null);
+    setSortOrder(order);
+    setPageIndex(1);
+  };
+
   const [appliedFilters, setAppliedFilters] = useState<Record<string, FilterValue | null>>({});
   const handleApplyFilter = (columnKey: string, filterValue: FilterValue | null) => {
     setAppliedFilters((prev) => ({
@@ -172,6 +181,10 @@ export function DataPageShell(props: DataPageShellProps) {
   const hasFilterableColumns = columns.some((c) => c.filters && c.filters.length > 0);
 
   const fieldGroups = createFieldGroups ?? (createFields ? [{ fields: createFields }] : []);
+  const fields = useMemo(
+    () => collectFields({ createFields, createFieldGroups, tabGroups }),
+    [createFields, createFieldGroups, tabGroups]
+  );
 
   // -----------------------------
   // QUERY PARAMS
@@ -195,6 +208,11 @@ export function DataPageShell(props: DataPageShellProps) {
       params.search = search.trim();
     }
 
+    if (sortBy) {
+      params.sortBy = sortBy;
+      params.sortOrder = sortOrder ?? 'desc';
+    }
+
     if (isSuperAdmin && superAdminOrgFilter && selectedOrgId) {
       params.organizationId = selectedOrgId;
     }
@@ -203,14 +221,27 @@ export function DataPageShell(props: DataPageShellProps) {
     params.limit = pageSize;
 
     return params;
-  }, [search, searchBy, appliedFilters, pageIndex, pageSize, isSuperAdmin, superAdminOrgFilter, selectedOrgId]);
+  }, [
+    search,
+    searchBy,
+    appliedFilters,
+    sortBy,
+    sortOrder,
+    pageIndex,
+    pageSize,
+    isSuperAdmin,
+    superAdminOrgFilter,
+    selectedOrgId,
+  ]);
 
   useEffect(() => {
     setPageIndex(1);
   }, [search]);
 
   useEffect(() => {
-    if (!showModal) {setInitialFormState(null);}
+    if (!showModal) {
+      setInitialFormState(null);
+    }
   }, [showModal]);
 
   // -----------------------------
@@ -221,9 +252,14 @@ export function DataPageShell(props: DataPageShellProps) {
     queryFn: async () => {
       let params: any = queryParams;
       if (moduleId === 'rxsoft' && Object.keys(queryParams).length > 2) {
-        const { page, limit, ...rest } = queryParams;
+        const { page, limit, sortBy: sort, sortOrder: order, ...rest } = queryParams;
         const search = JSON.stringify(rest);
-        params = { page, limit, search };
+        params = {
+          page,
+          limit,
+          ...(sort ? { sortBy: sort, sortOrder: order ?? 'desc' } : {}),
+          search,
+        };
       }
       const response = await apiProvider.get(endpoint, { params });
       const meta = response.data?.meta;
@@ -239,6 +275,14 @@ export function DataPageShell(props: DataPageShellProps) {
     ? transformRows(getRowsFromPayload(query.data))
     : getRowsFromPayload(query.data);
 
+  // Store LIS order IDs in localStorage for Prev/Next navigation on report page
+  useEffect(() => {
+    if (endpoint === '/lis/orders' && rows.length > 0) {
+      const ids = rows.map((r) => String(r.id)).filter(Boolean);
+      localStorage.setItem('lis_orders_ids', JSON.stringify(ids));
+    }
+  }, [endpoint, rows]);
+
   // -----------------------------
   // MUTATIONS
   // -----------------------------
@@ -250,6 +294,7 @@ export function DataPageShell(props: DataPageShellProps) {
     setShowModal,
     title,
     apiProvider,
+    fields,
   });
 
   const updateMutation = useUpdateMutation({
@@ -263,6 +308,7 @@ export function DataPageShell(props: DataPageShellProps) {
     editingRow,
     apiProvider,
     initialFormState: initialFormState ?? undefined,
+    fields,
   });
 
   const deleteMutation = useDeleteMutation({
@@ -321,10 +367,13 @@ export function DataPageShell(props: DataPageShellProps) {
               Object.entries(appliedFilters)
                 .filter(([, v]) => v)
                 .forEach(([key, val]) => {
-                  filterParams[key] = `${val!.filter.type}|${val!.value ?? ''}|${val!.valueTo ?? ''}`;
+                  filterParams[key] =
+                    `${val!.filter.type}|${val!.value ?? ''}|${val!.valueTo ?? ''}`;
                 });
               const filtStr = JSON.stringify(filterParams);
-              if (filtStr !== '{}') {p.search = filtStr;}
+              if (filtStr !== '{}') {
+                p.search = filtStr;
+              }
             } else if (search) {
               p.search = search;
             }
@@ -388,6 +437,9 @@ export function DataPageShell(props: DataPageShellProps) {
         }
         appliedFilters={appliedFilters}
         applyColumnFilter={handleApplyFilter}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
       />
       <Pagination
         pageIndex={pageIndex}

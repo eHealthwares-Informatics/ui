@@ -12,5 +12,5 @@ export function getSubdomain(): string {
 }
 
 export function getDefaultRoute(): string {
-  return SUBDOMAIN_ROUTES[getSubdomain()] ?? '/damorex'
+  return SUBDOMAIN_ROUTES[getSubdomain()] ?? '/'
 }

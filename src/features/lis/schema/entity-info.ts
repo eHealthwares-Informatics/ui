@@ -189,6 +189,36 @@ export const entityInfoMap: Record<string, EntityInfo> = {
       { name: 'inControl', description: 'Automatically set based on Westgard evaluation' },
     ],
   },
+  'eqa-programs': {
+    title: 'EQA Programs',
+    description: 'External Quality Assessment (EQA) programs that the laboratory participates in to validate testing accuracy. Programs like CAP, RIQAS, and NEQAS periodically send unknown samples for testing and compare results across laboratories.',
+    openelisTable: 'EQA_PROGRAM',
+    fields: [
+      { name: 'code', description: 'Short identifier (e.g. CAP, RIQAS)' },
+    ],
+  },
+  'eqa-enrollments': {
+    title: 'EQA Enrollments',
+    description: 'Links a specific test to an EQA program round for a participation period. Tracks the full lifecycle: ENROLLED → SAMPLES_RECEIVED → RESULTS_SUBMITTED → EVALUATED.',
+    openelisTable: 'EQA_USE / EQA_USE_TEST',
+    fields: [
+      { name: 'programId', description: 'The EQA program' },
+      { name: 'testDefinitionId', description: 'The test being enrolled' },
+      { name: 'roundLabel', description: 'The round/period identifier (e.g. 2025-A)' },
+      { name: 'status', description: 'Current lifecycle stage of enrollment' },
+    ],
+  },
+  'eqa-results': {
+    title: 'EQA Results',
+    description: 'Individual sample results submitted for an EQA program round. After submission, the program evaluates performance — providing expected values, z-scores, and pass/fail assessments.',
+    openelisTable: 'EQA_RESULT / EQA_RETURN_ITEM',
+    fields: [
+      { name: 'sampleNumber', description: 'Sample identifier assigned by the EQA provider' },
+      { name: 'value', description: 'Result value submitted by the lab' },
+      { name: 'zScore', description: 'Normalized deviation from the peer group mean' },
+      { name: 'evaluation', description: 'PASS, FAIL, or WARNING based on program criteria' },
+    ],
+  },
   'qc-alerts': {
     title: 'QC Alerts',
     description: 'Alerts automatically created when a QC result violates one or more Westgard rules. WARNING-level alerts (1-2s) require attention; REJECT-level alerts indicate the run is out of control and results should not be reported.',

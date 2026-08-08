@@ -19,7 +19,7 @@ const tabGroups: TabGroup[] = [
         fields: [
           { name: 'patientId', label: 'MRN', type: 'text', required: true, col: 4 },
           { name: 'patientName', label: 'Patient Name', type: 'text', required: true, col: 8 },
-          { name: 'patientGender', label: 'Gender', type: 'select', options: ['MALE', 'FEMALE', 'OTHER', 'UNKNOWN'], col: 3 },
+          { name: 'patientGender', label: 'Gender', type: 'select', options: [{value: 'MALE', label: 'MALE'}, {value: 'FEMALE', label:'FEMALE'}, {value: 'OTHER', label: 'OTHER'}, {value:'UNKNOWN', label: 'UNKNOWN'}], col: 3 },
           { name: 'patientDateOfBirth', label: 'Date of Birth', type: 'text', col: 3 },
           { name: 'patientAge', label: 'Age', type: 'number', col: 3 },
           { name: 'internalReference', label: 'Internal Reference', type: 'text', col: 3 },
@@ -50,4 +50,5 @@ export const ordersConfig: ModelConfig = {
   buildCreatePayload: (v) => v,
   buildUpdatePayload: (v) => v,
   canDelete: true,
+  detailPathBuilder: (row) => `/lis/orders/${row.id}/report`,
 };

@@ -1,7 +1,7 @@
 import { Table, Text, Loader, Center } from '@mantine/core';
 import { Column, FilterValue } from '../../rxsoft/types';
 import { ActionCell, ActionCellProps } from './action-cell';
-import { TableHeader } from './table-header';
+import { TableHeader, SortOrder } from './table-header';
 import { renderCell } from './utils';
 
 type DataTableProps = {
@@ -12,6 +12,9 @@ type DataTableProps = {
   actionCellProps?: ActionCellProps;
   appliedFilters?: Record<string, FilterValue | null>;
   applyColumnFilter?: (columnKey: string, filterValue: FilterValue | null) => void;
+  sortBy?: string | null;
+  sortOrder?: SortOrder;
+  onSortChange?: (key: string, order: SortOrder) => void;
 };
 
 export const DataTable = ({
@@ -22,6 +25,9 @@ export const DataTable = ({
   errorLoading,
   appliedFilters,
   applyColumnFilter,
+  sortBy,
+  sortOrder,
+  onSortChange,
 }: DataTableProps) => {
   const colSpan = columns.length + (actionCellProps ? 1 : 0);
 
@@ -38,6 +44,9 @@ export const DataTable = ({
                 onFilterValueChange={(filterValue) => {
                   applyColumnFilter && applyColumnFilter(column.key, filterValue);
                 }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={onSortChange}
               />
             </Table.Th>
           ))}

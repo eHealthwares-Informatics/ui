@@ -26,6 +26,7 @@ export interface WebsiteProduct {
   smallImageUrl?: string;
   mediumImageUrl?: string;
   largeImageUrl?: string;
+  unitPrice?: number | null;
 }
 
 export interface CategoryView {
@@ -189,7 +190,8 @@ export interface OrderView {
 
 export interface OrderItemView {
   id: string;
-  itemId: string;
+  itemId?: string;
+  freetextName?: string;
   quantity: number;
   unitPrice: number;
 }

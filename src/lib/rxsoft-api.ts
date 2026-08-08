@@ -40,11 +40,6 @@ rxsoftApi.interceptors.response.use(
 
     // Network error (connection refused, timeout, etc.)
     if (!error.response) {
-      const currentPath = window.location.pathname;
-      const failedUrl = originalRequest.url || '';
-      if (!currentPath.includes('service-unavailable')) {
-        window.location.href = `/service-unavailable?return=${encodeURIComponent(currentPath)}&url=${encodeURIComponent(failedUrl)}`;
-      }
       return Promise.reject(error);
     }
 

@@ -165,7 +165,7 @@ export const websiteApi = {
     paymentMethod: string;
     prescriptionIds?: string[];
     notes?: string;
-    items: Array<{ itemId: string; quantity: number; unitPrice?: number }>;
+    items: Array<{ itemId?: string; freetextName?: string; quantity: number; unitPrice?: number }>;
     delivery?: {
       address: string;
       city?: string;

@@ -1,0 +1,98 @@
+import { Badge } from '@mantine/core';
+import type { EmrResourceConfig } from '../pages/resource-page';
+
+export const emrResources: Record<string, EmrResourceConfig> = {
+  patients: {
+    key: 'patients',
+    title: 'Patients',
+    description: 'Search and manage patient demographic records.',
+    endpoint: '/patients',
+    badgeKey: 'gender',
+    columns: [
+      { key: 'patientId', label: 'EMR ID', render: (r) => <Badge variant="light">{String(r.patientId)}</Badge> },
+      {
+        key: 'patientName',
+        label: 'Name',
+        render: (r) => `${r.firstName} ${r.lastName}`,
+      },
+      { key: 'gender', label: 'Gender' },
+      { key: 'dateOfBirth', label: 'Date of Birth' },
+      { key: 'phone', label: 'Phone' },
+      { key: 'isActive', label: 'Active', render: (r) => String(r.isActive ?? '—') },
+    ],
+  },
+  appointments: {
+    key: 'appointments',
+    title: 'Appointments',
+    description: 'Schedule and manage patient appointments.',
+    endpoint: '/appointments',
+    badgeKey: 'status',
+    columns: [
+      { key: 'appointmentNumber', label: 'Appt #' },
+      { key: 'patientName', label: 'Patient' },
+      { key: 'appointmentType', label: 'Type' },
+      { key: 'date', label: 'Date' },
+      { key: 'startTime', label: 'Start' },
+      { key: 'providerName', label: 'Provider' },
+      { key: 'status', label: 'Status' },
+    ],
+  },
+  visits: {
+    key: 'visits',
+    title: 'Visits',
+    description: 'Active and historical patient visits.',
+    endpoint: '/visits',
+    badgeKey: 'status',
+    columns: [
+      { key: 'visitNumber', label: 'Visit #' },
+      { key: 'patientName', label: 'Patient' },
+      { key: 'visitType', label: 'Type' },
+      { key: 'providerName', label: 'Provider' },
+      { key: 'startDatetime', label: 'Started' },
+      { key: 'status', label: 'Status' },
+    ],
+  },
+  encounters: {
+    key: 'encounters',
+    title: 'Encounters',
+    description: 'Clinical encounters linked to visits.',
+    endpoint: '/encounters',
+    badgeKey: 'encounterType',
+    columns: [
+      { key: 'encounterNumber', label: 'Enc #' },
+      { key: 'patientName', label: 'Patient' },
+      { key: 'encounterType', label: 'Type' },
+      { key: 'encounterDatetime', label: 'Datetime' },
+      { key: 'providerName', label: 'Provider' },
+    ],
+  },
+  forms: {
+    key: 'forms',
+    title: 'Forms',
+    description: 'Dynamic clinical form definitions and submissions.',
+    endpoint: '/forms/definitions',
+    badgeKey: 'category',
+    columns: [
+      { key: 'code', label: 'Code' },
+      { key: 'name', label: 'Name' },
+      { key: 'version', label: 'Version' },
+      { key: 'category', label: 'Category' },
+      { key: 'isPublished', label: 'Published', render: (r) => String(r.isPublished ?? '—') },
+    ],
+  },
+  requests: {
+    key: 'requests',
+    title: 'Clinical Requests',
+    description: 'Prescriptions, lab, radiology and other test orders.',
+    endpoint: '/requests',
+    badgeKey: 'status',
+    columns: [
+      { key: 'requestNumber', label: 'Request #' },
+      { key: 'patientName', label: 'Patient' },
+      { key: 'requestType', label: 'Type' },
+      { key: 'priority', label: 'Priority' },
+      { key: 'status', label: 'Status' },
+      { key: 'requestedAt', label: 'Requested' },
+    ],
+  },
+};

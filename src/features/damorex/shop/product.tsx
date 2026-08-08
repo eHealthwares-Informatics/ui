@@ -108,6 +108,11 @@ export default function ProductDetailPage() {
                         {gp.name}
                       </Text>
                     ) : null}
+                    {product.unitPrice != null && (
+                      <Text fw={700} size="28px" c={green}>
+                        ₦{product.unitPrice.toLocaleString()}
+                      </Text>
+                    )}
                   </Box>
 
                   {pharm ? (

@@ -23,19 +23,26 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   useModuleFavicon(moduleId);
   useModuleTitle(moduleId);
 
-  // Sync selected module from URL pathname
-  useEffect(() => {
-    const inferred = getModuleFromPath(pathname);
-    if (inferred && inferred !== moduleId) {
-      setSelectedModule(inferred);
-    }
-  }, [pathname, moduleId, setSelectedModule]);
+  // // Sync selected module from URL pathname
+  // useEffect(() => {
+  //   const inferred = getModuleFromPath(pathname);
+  //   if (inferred && inferred !== moduleId) {
+  //     setSelectedModule(inferred);
+  //   }
+  // }, [pathname, moduleId, setSelectedModule]);
 
   // Guard: Check if current route is allowed for active module
   useEffect(() => {
-    if (!isRouteAllowedForModule(pathname, moduleId)) {
-      navigate({ to: getModuleDashboard(moduleId) });
+    const inferred = getModuleFromPath(pathname);
+    if (inferred && inferred !== moduleId) {
+      if (inferred && inferred !== moduleId) {
+        setSelectedModule(inferred);
+      }
+      if (!isRouteAllowedForModule(pathname, inferred)) {
+        navigate({ to: getModuleDashboard(inferred) });
+      }
     }
+
   }, [pathname, moduleId, navigate]);
 
   return (

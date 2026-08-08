@@ -1,6 +1,8 @@
 import { notifications } from '@mantine/notifications';
 import { useMutation } from '@tanstack/react-query';
 import type { AxiosInstance } from 'axios';
+import { Field } from '@/features/rxsoft/types';
+import { normalizeMultiSelectIds } from '@/features/shared/payload-utils';
 import { useApiProvider } from '../../../context/module-context';
 import { getDirtyFields } from '../utils';
 
@@ -10,6 +12,7 @@ type MutationProps = {
   queryClient: any;
   title: any;
   apiProvider?: AxiosInstance;
+  fields?: Field[];
 };
 
 type CreateMutationProps = MutationProps & {
@@ -54,13 +57,15 @@ export const useCreateMutation = ({
   title,
   apiProvider,
   keepModalOpenOnSuccess = false,
+  fields,
 }: CreateMutationProps) => {
   const contextApiProvider = useApiProvider();
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
 
   return useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      const payload = buildCreatePayload ? buildCreatePayload(values) : values;
+      const normalized = normalizeMultiSelectIds(values, fields ?? []);
+      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
       const response = await effectiveApiProvider!.post(endpoint, payload);
       return response.data as Record<string, unknown>;
     },
@@ -96,21 +101,23 @@ export const useUpdateMutation = ({
   setShowModal,
   apiProvider,
   initialFormState,
+  fields,
 }: UpdateMutationProps) => {
   const contextApiProvider = useApiProvider();
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
   return useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      if (!editingRow?.id) {throw new Error('Missing record id');}
-      const changedValues = initialFormState
-        ? getDirtyFields(values, initialFormState)
-        : values;
+      if (!editingRow?.id) {
+        throw new Error('Missing record id');
+      }
+      const changedValues = initialFormState ? getDirtyFields(values, initialFormState) : values;
+      const normalized = normalizeMultiSelectIds(changedValues, fields ?? []);
       const payload = buildUpdatePayload
-        ? buildUpdatePayload(changedValues, editingRow)
+        ? buildUpdatePayload(normalized, editingRow)
         : buildCreatePayload
-          ? buildCreatePayload(changedValues)
-          : changedValues;
-      const response = await effectiveApiProvider!.put(
+          ? buildCreatePayload(normalized)
+          : normalized;
+      const response = await effectiveApiProvider!.patch(
         `${endpoint}/${String(editingRow.id)}`,
         payload
       );
@@ -168,7 +175,9 @@ export const useExportMutation = ({ csvEndpoint, title, apiProvider }: ExportMut
 
   return useMutation({
     mutationFn: async () => {
-      if (!csvEndpoint) {return;}
+      if (!csvEndpoint) {
+        return;
+      }
       // await downloadBlob(
       //     { method: 'GET', url: csvEndpoint },
       //     `${title.toLowerCase().replace(/\s+/g, '_')}.csv`

@@ -109,7 +109,7 @@ export default function OrderDetailPage() {
                   {order.items.map((item, i) => (
                     <Group key={item.id || i} justify="space-between">
                       <Text>
-                        {item.itemId ? `Product #${item.itemId.slice(0, 8)}` : 'Item'}
+                        {item.freetextName ?? (item.itemId ? `Product #${item.itemId.slice(0, 8)}` : 'Item')}
                       </Text>
                       <Group gap="md">
                         <Text c={muted}>x{item.quantity}</Text>

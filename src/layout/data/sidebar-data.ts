@@ -38,6 +38,15 @@ import {
   MessagesSquare,
   Braces,
   Building2,
+  ClipboardCheck,
+  Stethoscope,
+  CalendarDays,
+  UserRound,
+  Bed,
+  FileSpreadsheet,
+  FilePlus2,
+  Hourglass,
+  ClipboardList,
 } from 'lucide-react';
 import type { ModuleId } from '@/features/shared/module-data';
 import { NavItem, type SidebarData } from '../types';
@@ -91,6 +100,12 @@ export const sidebarData: SidebarData = {
       logo: Microscope,
       plan: 'Laboratory',
       moduleId: 'lis',
+    },
+    {
+      name: 'EMR',
+      logo: HeartPulse,
+      plan: 'Electronic Medical Record',
+      moduleId: 'emr',
     },
   ],
   navGroups: [
@@ -611,6 +626,8 @@ export const sidebarData: SidebarData = {
       icon: FileText,
       items: [
         { title: 'Orders', url: '/lis/orders', icon: FileText, modules: ['lis', 'admin'] },
+        { title: 'Orders Dashboard', url: '/lis/orders/dashboard', icon: LayoutDashboard, modules: ['lis', 'admin'] },
+        { title: 'New Order', url: '/lis/orders/new/enter', icon: FileText, modules: ['lis', 'admin'] },
         { title: 'Patients', url: '/lis/patients', icon: FileText, modules: ['lis', 'admin'] },
         { title: 'Priorities', url: '/lis/priorities', icon: FileText, modules: ['lis', 'admin'] },
         { title: 'Programs', url: '/lis/programs', icon: FileText, modules: ['lis', 'admin'] },
@@ -646,11 +663,33 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
+      title: 'EQA',
+      icon: ClipboardCheck,
+      items: [
+        { title: 'EQA Programs', url: '/lis/eqa-programs', icon: ClipboardCheck, modules: ['lis', 'admin'] },
+        { title: 'EQA Enrollments', url: '/lis/eqa-enrollments', icon: ClipboardCheck, modules: ['lis', 'admin'] },
+        { title: 'EQA Results', url: '/lis/eqa-results', icon: ClipboardCheck, modules: ['lis', 'admin'] },
+      ],
+    },
+    {
       title: 'Configuration',
       icon: Cog,
       items: [
         { title: 'Statuses', url: '/lis/statuses', icon: Cog, modules: ['lis', 'admin'] },
         { title: 'Attribute Definitions', url: '/lis/attribute-definitions', icon: Cog, modules: ['lis', 'admin'] },
+      ],
+    },
+    {
+      title: 'EMR',
+      icon: HeartPulse,
+      items: [
+        { title: 'Dashboard', url: '/emr', icon: LayoutDashboard, modules: ['emr', 'admin'] },
+        { title: 'Appointments', url: '/emr/appointments', icon: CalendarDays, modules: ['emr', 'admin'] },
+        { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr', 'admin'] },
+        { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr', 'admin'] },
+        { title: 'Encounters', url: '/emr/encounters', icon: Stethoscope, modules: ['emr', 'admin'] },
+        { title: 'Forms', url: '/emr/forms', icon: FileSpreadsheet, modules: ['emr', 'admin'] },
+        { title: 'Clinical Requests', url: '/emr/requests', icon: FilePlus2, modules: ['emr', 'admin'] },
       ],
     },
   ],

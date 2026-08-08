@@ -13,7 +13,6 @@ export function UserPopover({ userId, children, fallback }: UserPopoverProps) {
       resourceId={userId}
       endpoint="/users"
       fallback={fallback}
-      children={children}
       render={(data) => {
         const user = data as {
           username: string;
@@ -47,6 +46,8 @@ export function UserPopover({ userId, children, fallback }: UserPopoverProps) {
           </Stack>
         );
       }}
-    />
+    >
+      {children}
+    </ResourcePopover>
   );
 }

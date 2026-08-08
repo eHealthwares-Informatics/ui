@@ -4,7 +4,7 @@ import { conversationApi, CONVERSATION_API_BASE_URL } from '@/lib/conversation-a
 import { getAccessToken } from '@/lib/auth-tokens';
 
 const ANON_PHONE_KEY = 'damorex-chatbot-phone';
-const MOCK_CHANNEL_ID = '69bd061c11bf835d976c4e2f';
+const WEB_CHANNEL_ID = '69bd061c11bf835d976c4e2f';
 
 let cachedAnonPhone: string | null = localStorage.getItem(ANON_PHONE_KEY);
 
@@ -111,14 +111,14 @@ export function useChatbotSession(senderPhone: string) {
       setSending(true);
       try {
         const body: Record<string, any> = {
-          channelId: MOCK_CHANNEL_ID,
+          channelId: WEB_CHANNEL_ID,
           senderPhone: phone,
           text,
         };
         if (questionnaireCode) {body.questionnaireCode = questionnaireCode;}
         if (conversationIdRef.current) {body.conversationId = conversationIdRef.current;}
 
-        await conversationApi.post('/webhooks/mock', body);
+        await conversationApi.post('/webhooks/web', body);
       } catch {
         setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       } finally {

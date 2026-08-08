@@ -1,6 +1,6 @@
-import { Combobox, InputBase, Text, useCombobox } from '@mantine/core';
+import { Combobox, Group, InputBase, Text, useCombobox } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { Loader } from 'lucide-react';
+import { Check, Loader } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApiProvider } from '@/context/module-context';
 import { Field, Option } from '@/features/rxsoft/types';
@@ -16,6 +16,10 @@ type Props = {
   onBlur?: () => void;
   onFocus?: () => void;
   formState?: Record<string, unknown>;
+  /** Clears the input and keeps the dropdown open after selecting (multi-select mode) */
+  clearAfterSelect?: boolean;
+  /** Option values that are currently selected (renders a check mark on dropdown rows) */
+  selectedValues?: string[];
 };
 
 const STATIC_SELECT_THRESHOLD = 50;
@@ -27,6 +31,8 @@ export function AsyncSelectField({
   disabled = false,
   error,
   formState,
+  clearAfterSelect = false,
+  selectedValues,
   ...props
 }: Props) {
   const apiProvider = useApiProvider();
@@ -92,12 +98,13 @@ export function AsyncSelectField({
           }
         });
       }
-      const hasFilter = field.searchParam?.filter || (field.searchParam?.staticFilters?.length ?? 0) > 0;
+      const hasFilter =
+        field.searchParam?.filter || (field.searchParam?.staticFilters?.length ?? 0) > 0;
       params =
         field.searchParam.queryParam && hasFilter
           ? { [field.searchParam.queryParam]: JSON.stringify(params) }
           : params;
-      console.log({params,field}, field.searchParam.queryParam , field.searchParam?.filter)
+      console.log({ params, field }, field.searchParam.queryParam, field.searchParam?.filter);
       const listResponse = await apiProvider.get(field.searchParam.endpoint, { params });
       const payload = getArrayPayload(listResponse.data);
 
@@ -212,8 +219,12 @@ export function AsyncSelectField({
           (option) => option.value === selectedValue
         );
         onChange(selected || null);
-        setInputValue(selected?.label || '');
-        combobox.closeDropdown();
+        if (clearAfterSelect) {
+          setInputValue('');
+        } else {
+          setInputValue(selected?.label || '');
+          combobox.closeDropdown();
+        }
       }}
       position="bottom"
       middlewares={{ flip: false }}
@@ -257,11 +268,17 @@ export function AsyncSelectField({
             </Combobox.Empty>
           ) : null}
 
-          {(selectQuery.data?.options ?? []).map((option) => (
-            <Combobox.Option key={option.value} value={option.value}>
-              {option.label}
-            </Combobox.Option>
-          ))}
+          {(selectQuery.data?.options ?? []).map((option) => {
+            const isSelected = selectedValues?.includes(option.value) ?? false;
+            return (
+              <Combobox.Option key={option.value} value={option.value}>
+                <Group justify="space-between" gap="xs" w="100%">
+                  <Text size="sm">{option.label}</Text>
+                  {isSelected ? <Check size={14} /> : null}
+                </Group>
+              </Combobox.Option>
+            );
+          })}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

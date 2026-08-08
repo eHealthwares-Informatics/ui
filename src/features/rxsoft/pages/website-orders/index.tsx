@@ -1,10 +1,10 @@
 import {
-  Badge, Button, Card, Group, Modal, Select, Stack, Table, Text, Timeline,
+  Badge, Button, Card, Group, Modal, Select, Stack, Table, Text, Timeline, ActionIcon, Tooltip, TextInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { ShoppingCart, CircleCheck, CircleX, Truck, MapPin, PackageSearch } from 'lucide-react';
+import { ShoppingCart, CircleCheck, CircleX, Truck, MapPin, PackageSearch, AlertTriangle, Search } from 'lucide-react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { RxPage } from '../../../components/page/rx-page';
 
@@ -51,6 +51,10 @@ export function RxWebsiteOrdersPage() {
   const [postSaleOpen, setPostSaleOpen] = useState(false);
   const [postSaleOrderId, setPostSaleOrderId] = useState<string | null>(null);
   const [stockLocationId, setStockLocationId] = useState<string | null>(null);
+
+  // Reconciliation state
+  const [reconcileOpen, setReconcileOpen] = useState(false);
+  const [reconcileOrder, setReconcileOrder] = useState<any>(null);
 
   const limit = 20;
 
@@ -113,6 +117,11 @@ export function RxWebsiteOrdersPage() {
     setDetailOpen(true);
   }
 
+  function openReconcile(order: any) {
+    setReconcileOrder(order);
+    setReconcileOpen(true);
+  }
+
   return (
     <RxPage title="Website Orders" description="Manage and fulfill orders placed via the website.">
       <Stack gap="md">
@@ -143,6 +152,7 @@ export function RxWebsiteOrdersPage() {
                     <Table.Th>Order #</Table.Th>
                     <Table.Th>Date</Table.Th>
                     <Table.Th>Items</Table.Th>
+                    <Table.Th>Freetext</Table.Th>
                     <Table.Th>Total</Table.Th>
                     <Table.Th>Status</Table.Th>
                     <Table.Th>Location</Table.Th>
@@ -151,65 +161,83 @@ export function RxWebsiteOrdersPage() {
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {orders.map((o: any) => (
-                    <Table.Tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => openDetail(o)}>
-                      <Table.Td>{o.orderNumber}</Table.Td>
-                      <Table.Td>{o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '-'}</Table.Td>
-                      <Table.Td>{o.items?.length ?? 0}</Table.Td>
-                      <Table.Td>{(+o.totalAmount).toLocaleString()}</Table.Td>
-                      <Table.Td>
-                        <Badge color={STATUS_COLORS[o.orderStatus ?? 'pending'] ?? 'gray'}>
-                          {statusLabel(o.orderStatus ?? 'pending')}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td>
-                        {o.sale?.stockLocationId ? (
-                          <Badge color="blue" variant="light" size="sm">
-                            {o.sale.stockLocationId.slice(0, 8)}...
-                          </Badge>
-                        ) : (
-                          <Text size="sm" c="dimmed">—</Text>
-                        )}
-                      </Table.Td>
-                      <Table.Td>
-                        {o.saleId ? (
-                          <Badge color="green" variant="light" size="sm">Posted</Badge>
-                        ) : (
-                          <Badge color="gray" variant="light" size="sm">—</Badge>
-                        )}
-                      </Table.Td>
-                      <Table.Td onClick={(e) => e.stopPropagation()}>
-                        <Group gap="xs">
-                          {o.orderStatus === 'confirmed' && !o.saleId ? (
-                            <Button
-                              size="compact-xs" variant="filled" color="green"
-                              onClick={() => {
-                                setPostSaleOrderId(o.id);
-                                setStockLocationId(null);
-                                setPostSaleOpen(true);
-                              }}
-                            >
-                              Post as Sale
-                            </Button>
-                          ) : null}
-                          {(STATUS_TRANSITIONS[o.orderStatus ?? 'pending']?.length ?? 0) > 0 ? (
-                            <Select
-                              size="xs"
-                              placeholder="Change"
-                              data={STATUS_TRANSITIONS[o.orderStatus ?? 'pending']?.map((s) => ({
-                                value: s, label: statusLabel(s),
-                              })) ?? []}
-                              onChange={(v) => v && statusUpdateMutation.mutate({ id: o.id, status: v })}
-                              clearable
-                              style={{ width: 110 }}
-                            />
+                  {orders.map((o: any) => {
+                    const hasFreetext = o.items?.some((i: any) => !i.itemId);
+                    return (
+                      <Table.Tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => openDetail(o)}>
+                        <Table.Td>{o.orderNumber}</Table.Td>
+                        <Table.Td>{o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '-'}</Table.Td>
+                        <Table.Td>{o.items?.length ?? 0}</Table.Td>
+                        <Table.Td>
+                          {hasFreetext ? (
+                            <Tooltip label="Contains freetext items — click to reconcile">
+                              <ActionIcon
+                                color="orange"
+                                variant="light"
+                                onClick={(e) => { e.stopPropagation(); openReconcile(o); }}
+                              >
+                                <AlertTriangle size={16} />
+                              </ActionIcon>
+                            </Tooltip>
                           ) : (
-                            <Text size="xs" c="dimmed">No transitions</Text>
+                            <Text size="sm" c="dimmed">—</Text>
                           )}
-                        </Group>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
+                        </Table.Td>
+                        <Table.Td>{(+o.totalAmount).toLocaleString()}</Table.Td>
+                        <Table.Td>
+                          <Badge color={STATUS_COLORS[o.orderStatus ?? 'pending'] ?? 'gray'}>
+                            {statusLabel(o.orderStatus ?? 'pending')}
+                          </Badge>
+                        </Table.Td>
+                        <Table.Td>
+                          {o.sale?.stockLocationId ? (
+                            <Badge color="blue" variant="light" size="sm">
+                              {o.sale.stockLocationId.slice(0, 8)}...
+                            </Badge>
+                          ) : (
+                            <Text size="sm" c="dimmed">—</Text>
+                          )}
+                        </Table.Td>
+                        <Table.Td>
+                          {o.saleId ? (
+                            <Badge color="green" variant="light" size="sm">Posted</Badge>
+                          ) : (
+                            <Badge color="gray" variant="light" size="sm">—</Badge>
+                          )}
+                        </Table.Td>
+                        <Table.Td onClick={(e) => e.stopPropagation()}>
+                          <Group gap="xs">
+                            {o.orderStatus === 'confirmed' && !o.saleId ? (
+                              <Button
+                                size="compact-xs" variant="filled" color="green"
+                                onClick={() => {
+                                  setPostSaleOrderId(o.id);
+                                  setStockLocationId(null);
+                                  setPostSaleOpen(true);
+                                }}
+                              >
+                                Post as Sale
+                              </Button>
+                            ) : null}
+                            {(STATUS_TRANSITIONS[o.orderStatus ?? 'pending']?.length ?? 0) > 0 ? (
+                              <Select
+                                size="xs"
+                                placeholder="Change"
+                                data={STATUS_TRANSITIONS[o.orderStatus ?? 'pending']?.map((s) => ({
+                                  value: s, label: statusLabel(s),
+                                })) ?? []}
+                                onChange={(v) => v && statusUpdateMutation.mutate({ id: o.id, status: v })}
+                                clearable
+                                style={{ width: 110 }}
+                              />
+                            ) : (
+                              <Text size="xs" c="dimmed">No transitions</Text>
+                            )}
+                          </Group>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })}
                 </Table.Tbody>
               </Table>
 
@@ -255,6 +283,16 @@ export function RxWebsiteOrdersPage() {
         </Stack>
       </Modal>
 
+      <ReconcileModal
+        order={reconcileOrder}
+        opened={reconcileOpen}
+        onClose={() => { setReconcileOpen(false); setReconcileOrder(null); }}
+        onReconciled={() => {
+          qc.invalidateQueries({ queryKey: ['website-orders'] });
+          qc.invalidateQueries({ queryKey: ['website-order-detail'] });
+        }}
+      />
+
       <DetailModal
         orderId={selectedOrder?.id}
         opened={detailOpen}
@@ -262,6 +300,146 @@ export function RxWebsiteOrdersPage() {
         onStatusChange={() => qc.invalidateQueries({ queryKey: ['website-orders'] })}
       />
     </RxPage>
+  );
+}
+
+function ReconcileModal({
+  order, opened, onClose, onReconciled,
+}: {
+  order: any; opened: boolean; onClose: () => void; onReconciled: () => void;
+}) {
+  const qc = useQueryClient();
+  const [itemSelections, setItemSelections] = useState<Record<string, string>>({});
+  const [itemSearch, setItemSearch] = useState('');
+
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ['items-search', itemSearch],
+    queryFn: async () => {
+      if (!itemSearch || itemSearch.length < 2) return [];
+      const { data } = await rxsoftApi.get('/items', { params: { search: itemSearch, page: 1, limit: 20 } });
+      return data?.data ?? [];
+    },
+    enabled: itemSearch.length >= 2,
+  });
+
+  const freetextItems = order?.items?.filter((i: any) => !i.itemId) ?? [];
+
+  const reconcileMutation = useMutation({
+    mutationFn: async ({ orderItemId, itemId }: { orderItemId: string; itemId: string }) => {
+      await rxsoftApi.post(`/orders/admin/orders/${order.id}/items/${orderItemId}/reconcile`, { itemId });
+    },
+    onSuccess: () => {
+      notifications.show({ message: 'Item reconciled.', color: 'green' });
+      qc.invalidateQueries({ queryKey: ['website-orders'] });
+      qc.invalidateQueries({ queryKey: ['website-order-detail'] });
+      onReconciled();
+    },
+    onError: (err: any) => {
+      notifications.show({ message: err?.response?.data?.message ?? 'Reconciliation failed.', color: 'red' });
+    },
+  });
+
+  const reconcileAllMutation = useMutation({
+    mutationFn: async () => {
+      const itemIds = freetextItems.reduce((acc: Record<string, string>, item: any) => {
+        if (itemSelections[item.id]) acc[item.id] = itemSelections[item.id];
+        return acc;
+      }, {});
+      if (!Object.keys(itemIds).length) throw new Error('No items selected');
+
+      await rxsoftApi.post(`/orders/admin/orders/${order.id}/reconcile-all`, { itemIds });
+    },
+    onSuccess: () => {
+      notifications.show({ message: 'All items reconciled.', color: 'green' });
+      qc.invalidateQueries({ queryKey: ['website-orders'] });
+      qc.invalidateQueries({ queryKey: ['website-order-detail'] });
+      onReconciled();
+      setItemSelections({});
+    },
+    onError: (err: any) => {
+      notifications.show({ message: err?.response?.data?.message ?? 'Bulk reconciliation failed.', color: 'red' });
+    },
+  });
+
+  const allSelected = freetextItems.every((i: any) => itemSelections[i.id]);
+
+  return (
+    <Modal opened={opened} onClose={onClose} title={`Reconcile Freetext Items — ${order?.orderNumber ?? ''}`} size="xl" centered>
+      <Stack>
+        <Text size="sm" c="dimmed">
+          Link freetext items to real products. Each item must be linked before the order can be posted as a sale.
+        </Text>
+
+        <TextInput
+          placeholder="Search items..."
+          value={itemSearch}
+          onChange={(e) => setItemSearch(e.currentTarget.value)}
+          leftSection={<Search size={14} />}
+        />
+
+        {freetextItems.length === 0 ? (
+          <Text c="dimmed" size="sm">No freetext items in this order.</Text>
+        ) : (
+          <Table striped withTableBorder>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Freetext Name</Table.Th>
+                <Table.Th>Qty</Table.Th>
+                <Table.Th>Amount</Table.Th>
+                <Table.Th>Link to Item</Table.Th>
+                <Table.Th w={80}></Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {freetextItems.map((item: any) => (
+                <Table.Tr key={item.id}>
+                  <Table.Td>
+                    <Text fw={500}>{item.freetextName}</Text>
+                  </Table.Td>
+                  <Table.Td>{item.quantity}</Table.Td>
+                  <Table.Td>{(+item.unitPrice * +item.quantity).toLocaleString()}</Table.Td>
+                  <Table.Td>
+                    <Select
+                      size="xs"
+                      placeholder="Select item..."
+                      value={itemSelections[item.id] ?? null}
+                      onChange={(v) => setItemSelections((prev) => ({ ...prev, [item.id]: v ?? '' }))}
+                      data={searchResults.map((r: any) => ({ value: r.id, label: `${r.name} (${r.code})` }))}
+                      searchable
+                      clearable
+                      style={{ minWidth: 220 }}
+                    />
+                  </Table.Td>
+                  <Table.Td>
+                    <Button
+                      size="compact-xs"
+                      color="green"
+                      disabled={!itemSelections[item.id]}
+                      loading={reconcileMutation.isPending}
+                      onClick={() => reconcileMutation.mutate({ orderItemId: item.id, itemId: itemSelections[item.id] })}
+                    >
+                      Link
+                    </Button>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        )}
+
+        <Group justify="flex-end">
+          <Button variant="light" onClick={onClose}>Close</Button>
+          <Button
+            color="orange"
+            disabled={!allSelected || freetextItems.length === 0}
+            loading={reconcileAllMutation.isPending}
+            onClick={() => reconcileAllMutation.mutate()}
+          >
+            Link All at Once
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
   );
 }
 
@@ -319,6 +497,12 @@ function DetailModal({
             </Badge>
           </Group>
 
+          {order.items?.some((i: any) => !i.itemId) && (
+            <Badge color="orange" variant="light" size="lg">
+              Contains freetext items — reconcile before posting
+            </Badge>
+          )}
+
           <Timeline active={currentIdx} bulletSize={24} lineWidth={2}>
             {timelineOrder.map((s) => (
               <Timeline.Item key={s} bullet={STATUS_ICONS[s]} title={statusLabel(s)}>
@@ -370,7 +554,7 @@ function DetailModal({
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>#</Table.Th>
-                    <Table.Th>Item ID</Table.Th>
+                    <Table.Th>Item</Table.Th>
                     <Table.Th>Qty</Table.Th>
                     <Table.Th>Price</Table.Th>
                     <Table.Th>Total</Table.Th>
@@ -380,7 +564,13 @@ function DetailModal({
                   {order.items.map((l: any, i: number) => (
                     <Table.Tr key={l.id}>
                       <Table.Td>{i + 1}</Table.Td>
-                      <Table.Td>{l.itemId}</Table.Td>
+                      <Table.Td>
+                        {l.freetextName ? (
+                          <Text c="orange" size="sm">{l.freetextName}</Text>
+                        ) : (
+                          l.itemId
+                        )}
+                      </Table.Td>
                       <Table.Td>{l.quantity}</Table.Td>
                       <Table.Td>{(+l.unitPrice).toLocaleString()}</Table.Td>
                       <Table.Td>{(+l.unitPrice * +l.quantity).toLocaleString()}</Table.Td>

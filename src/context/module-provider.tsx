@@ -72,9 +72,15 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
   function AppBootstrap({ children }: { children: React.ReactNode }) {
     const pathname = typeof window === 'undefined' ? '' : window.location.pathname;
     const isPublicWebsiteRoute = pathname === '/' || pathname.startsWith('/damorex');
-    const attributeDefs = useAttributeDefinitionsBootstrap('LOINC');
+    const [isReady, setIsReady] = useState(false);
+    // const attributeDefs = useAttributeDefinitionsBootstrap('LOINC');
+    useEffect(() => {
+    // This runs AFTER the initial DOM render is complete
+    setIsReady(true);
+    console.log("React app is fully loaded and mounted!");
+  }, []);
 
-    const isReady = isPublicWebsiteRoute || attributeDefs.isSuccess;
+    // const isReady = isPublicWebsiteRoute //|| //attributeDefs.isSuccess;
 
     // if (!isReady) {
     //   return <FullScreenLoader />;

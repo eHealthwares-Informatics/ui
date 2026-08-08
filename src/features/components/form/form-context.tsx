@@ -293,6 +293,7 @@ export function useFormField<T extends FormState = FormState, K extends keyof T 
 
   return {
     value,
+    formState: form.formState,
     setValue: (newValue: T[K]) => form.setField(name, newValue),
     isDirty: form.isFieldDirty(String(name)),
     isTouched: form.isFieldTouched(String(name)),
