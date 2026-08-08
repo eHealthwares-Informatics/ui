@@ -836,6 +836,7 @@ export const exchangePageSchema: ModelConfig = withDefaultActions({
       label: 'CreatedAt',
       dataType: ColumnDataType.DATE,
       filters: ColumnTypeFilters.DATE,
+      sortable: true
     },
   ],
   detailPathBuilder: (row) => `/conversation/exchanges/${String(row.id)}`,

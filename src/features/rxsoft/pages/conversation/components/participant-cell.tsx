@@ -61,7 +61,7 @@ function ParticipantCellInner({ participantId, fallback }: ParticipantCellProps)
             {label && <Text fw={600} size="sm">{label}</Text>}
             {data.phone && <Text size="xs" c="dimmed">Phone: {data.phone}</Text>}
             {data.email && <Text size="xs" c="dimmed">Email: {data.email}</Text>}
-            <Text size="xs" c="dimmed">ID: {shortenId(String(participantId))}</Text>
+            <Text size="xs" c="dimmed">ID: {(String(participantId))}</Text>
           </Stack>
         ) : (
           <Text size="sm" c="dimmed">No data</Text>
