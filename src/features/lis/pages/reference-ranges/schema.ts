@@ -16,7 +16,7 @@ const columns: Column[] = [
 const allFields: FieldGroup['fields'] = [
   { name: 'alias', label: 'Alias', type: 'text', required: true, col: 6 },
   { name: 'testId', label: 'Test Definition', type: 'async-select', searchParam: { endpoint: '/lis/test-definitions', valueKey: 'id', labelKey: 'name' }, required: true, col: 6 },
-  { name: 'gender', label: 'Gender', type: 'select', options: ['MALE', 'FEMALE', 'DEFAULT'], col: 3 },
+  { name: 'gender', label: 'Gender', type: 'select', options: [{ value: 'MALE', label: 'Male' }, { value: 'FEMALE', label: 'Female' }, { value: 'DEFAULT', label: 'Default' }], col: 3 },
   { name: 'active', label: 'Active', type: 'switch', col: 3 },
   { name: 'minAge', label: 'Min Age (days)', type: 'number', col: 3 },
   { name: 'maxAge', label: 'Max Age (days)', type: 'number', col: 3 },

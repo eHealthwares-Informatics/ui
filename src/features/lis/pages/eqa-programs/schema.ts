@@ -12,10 +12,10 @@ const createFieldGroups: FieldGroup[] = [
   {
     title: 'Program Details',
     fields: [
-      { name: 'code', label: 'Code', type: 'text', required: true, col: 4 },
+      { name: 'code', label: 'Code', type: 'text', required: true, col: 4, generateCode: { scope: 'eqa-programs' } },
       { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
       { name: 'provider', label: 'Provider', type: 'text', col: 6 },
-      { name: 'active', label: 'Active', type: 'boolean', col: 6 },
+      { name: 'active', label: 'Active', type: 'switch', col: 6 },
       { name: 'description', label: 'Description', type: 'text', col: 12 },
     ],
   },

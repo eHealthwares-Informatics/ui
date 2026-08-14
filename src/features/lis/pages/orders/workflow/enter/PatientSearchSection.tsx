@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   ActionIcon,
   Button,
@@ -13,8 +12,9 @@ import {
   Paper,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { Search, UserCheck, Plus } from 'lucide-react';
 import { useDebouncedValue } from '@mantine/hooks';
+import { Search, UserCheck, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
@@ -73,15 +73,27 @@ export function PatientSearchSection() {
 
   const selectPatient = (p: Patient) => {
     dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientId', value: p.patientId } });
-    dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientName', value: `${p.firstName} ${p.lastName}` } });
+    dispatch({
+      type: 'UPDATE_FIELD',
+      payload: { name: 'patientName', value: `${p.firstName} ${p.lastName}` },
+    });
     dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientGender', value: p.gender } });
-    dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientDateOfBirth', value: p.dateOfBirth } });
-    dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientAge', value: ageFromDob(p.dateOfBirth) } });
+    dispatch({
+      type: 'UPDATE_FIELD',
+      payload: { name: 'patientDateOfBirth', value: p.dateOfBirth },
+    });
+    dispatch({
+      type: 'UPDATE_FIELD',
+      payload: { name: 'patientAge', value: ageFromDob(p.dateOfBirth) },
+    });
     dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientSelected', value: true } });
   };
 
   const handleDobChange = (value: string | null) => {
-    dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientDateOfBirth', value: value || null } });
+    dispatch({
+      type: 'UPDATE_FIELD',
+      payload: { name: 'patientDateOfBirth', value: value || null },
+    });
     dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientAge', value: ageFromDob(value) } });
   };
 
@@ -90,7 +102,10 @@ export function PatientSearchSection() {
     dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientAge', value: age } });
     dispatch({
       type: 'UPDATE_FIELD',
-      payload: { name: 'patientDateOfBirth', value: age != null && Number.isFinite(age) ? dobFromAge(age) : null },
+      payload: {
+        name: 'patientDateOfBirth',
+        value: age != null && Number.isFinite(age) ? dobFromAge(age) : null,
+      },
     });
   };
 
@@ -149,7 +164,12 @@ export function PatientSearchSection() {
                         <Table.Td>{p.gender ?? '—'}</Table.Td>
                         <Table.Td>{p.dateOfBirth ?? '—'}</Table.Td>
                         <Table.Td>
-                          <Button size="xs" variant="light" onClick={() => selectPatient(p)} leftSection={<UserCheck size={14} />}>
+                          <Button
+                            size="xs"
+                            variant="light"
+                            onClick={() => selectPatient(p)}
+                            leftSection={<UserCheck size={14} />}
+                          >
                             Select
                           </Button>
                         </Table.Td>
@@ -160,7 +180,11 @@ export function PatientSearchSection() {
               </Paper>
             )}
 
-            {searching && <Text size="sm" c="dimmed">Searching...</Text>}
+            {searching && (
+              <Text size="sm" c="dimmed">
+                Searching...
+              </Text>
+            )}
           </>
         ) : (
           <Paper withBorder p="sm" bg="blue.0">
@@ -170,7 +194,8 @@ export function PatientSearchSection() {
                 <div>
                   <Text fw={500}>{state.patientName}</Text>
                   <Text size="sm" c="dimmed">
-                    MRN: {state.patientId} | Gender: {state.patientGender ?? '—'} | DOB: {state.patientDateOfBirth ?? '—'}
+                    MRN: {state.patientId} | Gender: {state.patientGender ?? '—'} | DOB:{' '}
+                    {state.patientDateOfBirth ?? '—'}
                   </Text>
                 </div>
               </Group>
@@ -178,11 +203,20 @@ export function PatientSearchSection() {
                 variant="subtle"
                 size="xs"
                 onClick={() => {
-                  dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientSelected', value: false } });
+                  dispatch({
+                    type: 'UPDATE_FIELD',
+                    payload: { name: 'patientSelected', value: false },
+                  });
                   dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientId', value: '' } });
                   dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientName', value: '' } });
-                  dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientGender', value: null } });
-                  dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientDateOfBirth', value: null } });
+                  dispatch({
+                    type: 'UPDATE_FIELD',
+                    payload: { name: 'patientGender', value: null },
+                  });
+                  dispatch({
+                    type: 'UPDATE_FIELD',
+                    payload: { name: 'patientDateOfBirth', value: null },
+                  });
                   dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientAge', value: null } });
                 }}
               >
@@ -205,14 +239,24 @@ export function PatientSearchSection() {
               label="Patient Name"
               placeholder="e.g. John Doe"
               value={state.patientName}
-              onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientName', value: e.currentTarget.value } })}
+              onChange={(e) =>
+                dispatch({
+                  type: 'UPDATE_FIELD',
+                  payload: { name: 'patientName', value: e.currentTarget.value },
+                })
+              }
               required
             />
             <TextInput
               label="MRN"
               placeholder="Medical record number"
               value={state.patientId}
-              onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientId', value: e.currentTarget.value } })}
+              onChange={(e) =>
+                dispatch({
+                  type: 'UPDATE_FIELD',
+                  payload: { name: 'patientId', value: e.currentTarget.value },
+                })
+              }
               required
             />
           </Group>
@@ -222,7 +266,9 @@ export function PatientSearchSection() {
               placeholder="Select gender"
               data={['MALE', 'FEMALE', 'OTHER', 'UNKNOWN']}
               value={state.patientGender}
-              onChange={(v) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientGender', value: v } })}
+              onChange={(v) =>
+                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'patientGender', value: v } })
+              }
               clearable
             />
             <DatePickerInput

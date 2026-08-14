@@ -8,6 +8,7 @@ import {
   Boxes,
   Microscope,
   Shield,
+  HeartPulse,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
@@ -21,6 +22,7 @@ const moduleIcons: Record<string, React.ElementType> = {
   conversation: MessageSquare,
   'coding-concept': Boxes,
   lis: Microscope,
+  emr: HeartPulse,
   admin: Shield,
 };
 
@@ -30,6 +32,7 @@ const modulePlans: Record<string, string> = {
   conversation: 'Workflow Chat',
   'coding-concept': 'Terminology',
   lis: 'Laboratory',
+  emr: 'Electronic Health Record',
   admin: 'Administration',
 };
 

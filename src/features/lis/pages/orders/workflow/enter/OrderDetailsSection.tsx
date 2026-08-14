@@ -29,14 +29,21 @@ export function OrderDetailsSection() {
             placeholder="Select priority"
             data={priorities.map((p) => ({ value: p.id, label: p.name }))}
             value={state.priorityId}
-            onChange={(v) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'priorityId', value: v } })}
+            onChange={(v) =>
+              dispatch({ type: 'UPDATE_FIELD', payload: { name: 'priorityId', value: v } })
+            }
             clearable
           />
           <TextInput
             label="Requested Date"
             type="date"
             value={state.requestedDate ?? ''}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'requestedDate', value: e.currentTarget.value || null } })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                payload: { name: 'requestedDate', value: e.currentTarget.value || null },
+              })
+            }
           />
         </Group>
 
@@ -48,13 +55,23 @@ export function OrderDetailsSection() {
             label="Requester Name"
             placeholder="Referring physician or provider"
             value={state.requesterName ?? ''}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'requesterName', value: e.currentTarget.value || null } })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                payload: { name: 'requesterName', value: e.currentTarget.value || null },
+              })
+            }
           />
           <TextInput
             label="Requester Phone"
             placeholder="Contact number"
             value={state.requesterPhone ?? ''}
-            onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'requesterPhone', value: e.currentTarget.value || null } })}
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_FIELD',
+                payload: { name: 'requesterPhone', value: e.currentTarget.value || null },
+              })
+            }
           />
         </Group>
 
@@ -65,13 +82,23 @@ export function OrderDetailsSection() {
           label="Diagnosis"
           placeholder="Provisional diagnosis"
           value={state.diagnosis ?? ''}
-          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'diagnosis', value: e.currentTarget.value || null } })}
+          onChange={(e) =>
+            dispatch({
+              type: 'UPDATE_FIELD',
+              payload: { name: 'diagnosis', value: e.currentTarget.value || null },
+            })
+          }
         />
         <Textarea
           label="Clinical Notes"
           placeholder="Additional clinical notes"
           value={state.clinicalNotes ?? ''}
-          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'clinicalNotes', value: e.currentTarget.value || null } })}
+          onChange={(e) =>
+            dispatch({
+              type: 'UPDATE_FIELD',
+              payload: { name: 'clinicalNotes', value: e.currentTarget.value || null },
+            })
+          }
           minRows={2}
         />
 
@@ -79,7 +106,12 @@ export function OrderDetailsSection() {
           label="Order Notes"
           placeholder="Internal notes"
           value={state.notes ?? ''}
-          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', payload: { name: 'notes', value: e.currentTarget.value || null } })}
+          onChange={(e) =>
+            dispatch({
+              type: 'UPDATE_FIELD',
+              payload: { name: 'notes', value: e.currentTarget.value || null },
+            })
+          }
           minRows={2}
         />
       </Stack>

@@ -17,7 +17,7 @@ const createFieldGroups: FieldGroup[] = [
       { name: 'lotNumber', label: 'Lot Number', type: 'text', required: true, col: 6 },
       { name: 'expiryDate', label: 'Expiry Date', type: 'date', col: 4 },
       { name: 'manufacturer', label: 'Manufacturer', type: 'text', col: 4 },
-      { name: 'active', label: 'Active', type: 'boolean', col: 4 },
+      { name: 'active', label: 'Active', type: 'switch', col: 4 },
       { name: 'notes', label: 'Notes', type: 'text', col: 12 },
     ],
   },

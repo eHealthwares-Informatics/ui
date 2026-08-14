@@ -67,7 +67,9 @@ export type ChatMode = 'admin' | 'user';
 
 export type InboxMode = 'admin' | 'all' | 'individual' | 'group';
 
-export type ParticipantRole = 'USER' | 'PATIENT' | 'DOCTOR' | 'NURSE' | 'BOT';
+export type InboxStatus = 'ACTIVE' | 'COMPLETED' | 'STOPPED' | 'CANCELLED';
+
+export type ParticipantRole = 'USER' | 'PATIENT' | 'DOCTOR' | 'NURSE' | 'BOT' | 'AGENT';
 
 export type ConversationProjection = {
   _id: string;

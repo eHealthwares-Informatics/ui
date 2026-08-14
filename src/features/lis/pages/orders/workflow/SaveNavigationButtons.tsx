@@ -1,9 +1,15 @@
 import { Button, Group } from '@mantine/core';
-import { useNavigate } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
 import { useOrderContext } from './OrderContext';
 
-const STEP_ROUTES = ['/lis/orders/new/enter', '/lis/orders/new/collect', '/lis/orders/new/label', '/lis/orders/new/qa', '/lis/orders/new/order'];
+const STEP_ROUTES = [
+  '/lis/orders/workflow/enter',
+  '/lis/orders/workflow/collect',
+  '/lis/orders/workflow/label',
+  '/lis/orders/workflow/qa',
+  '/lis/orders/workflow/order',
+];
 
 interface Props {
   onSaveAndNext?: () => Promise<void>;
@@ -14,14 +20,17 @@ interface Props {
 export function SaveNavigationButtons({ onSaveAndNext, onSaveOnly, hideBack }: Props) {
   const { state } = useOrderContext();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
-  const isLastStep = state.currentStep === 4;
-  const isFirstStep = state.currentStep === 0;
+  const currentStep = Math.max(0, STEP_ROUTES.indexOf(pathname));
+
+  const isLastStep = currentStep === 4;
+  const isFirstStep = currentStep === 0;
 
   const handleBack = () => {
-    if (state.currentStep > 0) {
+    if (currentStep > 0) {
       navigate({
-        to: STEP_ROUTES[state.currentStep - 1],
+        to: STEP_ROUTES[currentStep - 1],
         search: { orderNumber: state.orderNumber ?? '' },
       });
     }
@@ -31,9 +40,9 @@ export function SaveNavigationButtons({ onSaveAndNext, onSaveOnly, hideBack }: P
     if (onSaveAndNext) {
       await onSaveAndNext();
     }
-    if (state.currentStep < 4) {
+    if (currentStep < 4) {
       navigate({
-        to: STEP_ROUTES[state.currentStep + 1],
+        to: STEP_ROUTES[currentStep + 1],
         search: { orderNumber: state.orderNumber ?? '' },
       });
     }
@@ -49,21 +58,40 @@ export function SaveNavigationButtons({ onSaveAndNext, onSaveOnly, hideBack }: P
     <Group justify="space-between" mt="xl">
       <Group>
         {!hideBack && !isFirstStep && (
-          <Button variant="outline" leftSection={<ChevronLeft size={16} />} onClick={handleBack} disabled={state.isSubmitting}>
+          <Button
+            variant="outline"
+            leftSection={<ChevronLeft size={16} />}
+            onClick={handleBack}
+            disabled={state.isSubmitting}
+          >
             Back
           </Button>
         )}
       </Group>
       <Group>
-        <Button variant="light" leftSection={<Save size={16} />} onClick={handleSave} loading={state.isSubmitting}>
+        <Button
+          variant="light"
+          leftSection={<Save size={16} />}
+          onClick={handleSave}
+          loading={state.isSubmitting}
+        >
           Save
         </Button>
         {isLastStep ? (
-          <Button color="green" leftSection={<ChevronRight size={16} />} onClick={handleNext} loading={state.isSubmitting}>
+          <Button
+            color="green"
+            leftSection={<ChevronRight size={16} />}
+            onClick={handleNext}
+            loading={state.isSubmitting}
+          >
             Complete
           </Button>
         ) : (
-          <Button leftSection={<ChevronRight size={16} />} onClick={handleNext} loading={state.isSubmitting}>
+          <Button
+            leftSection={<ChevronRight size={16} />}
+            onClick={handleNext}
+            loading={state.isSubmitting}
+          >
             Save & Next
           </Button>
         )}

@@ -161,6 +161,7 @@ import { Route as AuthenticatedLisReferenceRangesIndexRouteImport } from './rout
 import { Route as AuthenticatedLisQcResultsIndexRouteImport } from './routes/_authenticated/lis/qc-results/index'
 import { Route as AuthenticatedLisQcLotsIndexRouteImport } from './routes/_authenticated/lis/qc-lots/index'
 import { Route as AuthenticatedLisQcAlertsIndexRouteImport } from './routes/_authenticated/lis/qc-alerts/index'
+import { Route as AuthenticatedLisQaChecklistItemsIndexRouteImport } from './routes/_authenticated/lis/qa-checklist-items/index'
 import { Route as AuthenticatedLisProgramsIndexRouteImport } from './routes/_authenticated/lis/programs/index'
 import { Route as AuthenticatedLisPrioritiesIndexRouteImport } from './routes/_authenticated/lis/priorities/index'
 import { Route as AuthenticatedLisPatientsIndexRouteImport } from './routes/_authenticated/lis/patients/index'
@@ -188,6 +189,7 @@ import { Route as AuthenticatedConversationQuestionsIndexRouteImport } from './r
 import { Route as AuthenticatedConversationQuestionnairesIndexRouteImport } from './routes/_authenticated/conversation/questionnaires/index'
 import { Route as AuthenticatedConversationProjectionsIndexRouteImport } from './routes/_authenticated/conversation/projections/index'
 import { Route as AuthenticatedConversationParticipantsIndexRouteImport } from './routes/_authenticated/conversation/participants/index'
+import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index'
 import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index'
 import { Route as AuthenticatedConversationChatsIndexRouteImport } from './routes/_authenticated/conversation/chats/index'
 import { Route as AuthenticatedConversationChannelsIndexRouteImport } from './routes/_authenticated/conversation/channels/index'
@@ -209,7 +211,7 @@ import { Route as AuthenticatedConversationConversationIdEditRouteImport } from 
 import { Route as AuthenticatedPageIdEditRouteImport } from './routes/_authenticated/$page/$id/edit'
 import { Route as AuthenticatedModuleIdPageCreateRouteImport } from './routes/_authenticated/$moduleId/$page/create'
 import { Route as AuthenticatedModuleIdPageIdRouteImport } from './routes/_authenticated/$moduleId/$page/$id'
-import { Route as AuthenticatedLisOrdersNewRouteRouteImport } from './routes/_authenticated/lis/orders/new/route'
+import { Route as AuthenticatedLisOrdersWorkflowRouteRouteImport } from './routes/_authenticated/lis/orders/workflow/route'
 import { Route as AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport } from './routes/_authenticated/rxsoft/reports/trial-balance/index'
 import { Route as AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport } from './routes/_authenticated/rxsoft/reports/income-statement/index'
 import { Route as AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport } from './routes/_authenticated/rxsoft/reports/balance-sheet/index'
@@ -219,11 +221,11 @@ import { Route as AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport } f
 import { Route as AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/lgas/index'
 import { Route as AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/levels/index'
 import { Route as AuthenticatedRxsoftUomsUomIdEditRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId/edit'
-import { Route as AuthenticatedLisOrdersNewQaRouteImport } from './routes/_authenticated/lis/orders/new/qa'
-import { Route as AuthenticatedLisOrdersNewOrderRouteImport } from './routes/_authenticated/lis/orders/new/order'
-import { Route as AuthenticatedLisOrdersNewLabelRouteImport } from './routes/_authenticated/lis/orders/new/label'
-import { Route as AuthenticatedLisOrdersNewEnterRouteImport } from './routes/_authenticated/lis/orders/new/enter'
-import { Route as AuthenticatedLisOrdersNewCollectRouteImport } from './routes/_authenticated/lis/orders/new/collect'
+import { Route as AuthenticatedLisOrdersWorkflowQaRouteImport } from './routes/_authenticated/lis/orders/workflow/qa'
+import { Route as AuthenticatedLisOrdersWorkflowOrderRouteImport } from './routes/_authenticated/lis/orders/workflow/order'
+import { Route as AuthenticatedLisOrdersWorkflowLabelRouteImport } from './routes/_authenticated/lis/orders/workflow/label'
+import { Route as AuthenticatedLisOrdersWorkflowEnterRouteImport } from './routes/_authenticated/lis/orders/workflow/enter'
+import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect'
 import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
 import { Route as AuthenticatedConversationPageIdEditRouteImport } from './routes/_authenticated/conversation/$page/$id/edit'
 import { Route as AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport } from './routes/_authenticated/rxsoft/roles/$id/permissions/index'
@@ -1058,6 +1060,12 @@ const AuthenticatedLisQcAlertsIndexRoute =
     path: '/lis/qc-alerts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLisQaChecklistItemsIndexRoute =
+  AuthenticatedLisQaChecklistItemsIndexRouteImport.update({
+    id: '/lis/qa-checklist-items/',
+    path: '/lis/qa-checklist-items/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisProgramsIndexRoute =
   AuthenticatedLisProgramsIndexRouteImport.update({
     id: '/lis/programs/',
@@ -1220,6 +1228,12 @@ const AuthenticatedConversationParticipantsIndexRoute =
     path: '/conversation/participants/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConversationOptionListsIndexRoute =
+  AuthenticatedConversationOptionListsIndexRouteImport.update({
+    id: '/conversation/option-lists/',
+    path: '/conversation/option-lists/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationExchangesIndexRoute =
   AuthenticatedConversationExchangesIndexRouteImport.update({
     id: '/conversation/exchanges/',
@@ -1344,10 +1358,10 @@ const AuthenticatedModuleIdPageIdRoute =
     path: '/$page/$id',
     getParentRoute: () => AuthenticatedModuleIdRoute,
   } as any)
-const AuthenticatedLisOrdersNewRouteRoute =
-  AuthenticatedLisOrdersNewRouteRouteImport.update({
-    id: '/lis/orders/new',
-    path: '/lis/orders/new',
+const AuthenticatedLisOrdersWorkflowRouteRoute =
+  AuthenticatedLisOrdersWorkflowRouteRouteImport.update({
+    id: '/lis/orders/workflow',
+    path: '/lis/orders/workflow',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftReportsTrialBalanceIndexRoute =
@@ -1404,35 +1418,35 @@ const AuthenticatedRxsoftUomsUomIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthenticatedRxsoftUomsUomIdRoute,
   } as any)
-const AuthenticatedLisOrdersNewQaRoute =
-  AuthenticatedLisOrdersNewQaRouteImport.update({
+const AuthenticatedLisOrdersWorkflowQaRoute =
+  AuthenticatedLisOrdersWorkflowQaRouteImport.update({
     id: '/qa',
     path: '/qa',
-    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
-const AuthenticatedLisOrdersNewOrderRoute =
-  AuthenticatedLisOrdersNewOrderRouteImport.update({
+const AuthenticatedLisOrdersWorkflowOrderRoute =
+  AuthenticatedLisOrdersWorkflowOrderRouteImport.update({
     id: '/order',
     path: '/order',
-    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
-const AuthenticatedLisOrdersNewLabelRoute =
-  AuthenticatedLisOrdersNewLabelRouteImport.update({
+const AuthenticatedLisOrdersWorkflowLabelRoute =
+  AuthenticatedLisOrdersWorkflowLabelRouteImport.update({
     id: '/label',
     path: '/label',
-    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
-const AuthenticatedLisOrdersNewEnterRoute =
-  AuthenticatedLisOrdersNewEnterRouteImport.update({
+const AuthenticatedLisOrdersWorkflowEnterRoute =
+  AuthenticatedLisOrdersWorkflowEnterRouteImport.update({
     id: '/enter',
     path: '/enter',
-    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
-const AuthenticatedLisOrdersNewCollectRoute =
-  AuthenticatedLisOrdersNewCollectRouteImport.update({
+const AuthenticatedLisOrdersWorkflowCollectRoute =
+  AuthenticatedLisOrdersWorkflowCollectRouteImport.update({
     id: '/collect',
     path: '/collect',
-    getParentRoute: () => AuthenticatedLisOrdersNewRouteRoute,
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
 const AuthenticatedLisOrdersOrderIdReportRoute =
   AuthenticatedLisOrdersOrderIdReportRouteImport.update({
@@ -1556,7 +1570,7 @@ export interface FileRoutesByFullPath {
   '/emr/': typeof AuthenticatedEmrIndexRoute
   '/lis/': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases/': typeof DamorexPurchasesIndexRoute
-  '/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
+  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
@@ -1578,6 +1592,7 @@ export interface FileRoutesByFullPath {
   '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
   '/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
   '/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
   '/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute
@@ -1605,6 +1620,7 @@ export interface FileRoutesByFullPath {
   '/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
   '/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute
   '/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute
+  '/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute
   '/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute
   '/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute
   '/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute
@@ -1654,11 +1670,11 @@ export interface FileRoutesByFullPath {
   '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
-  '/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
-  '/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
-  '/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
-  '/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
-  '/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
+  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -1771,7 +1787,7 @@ export interface FileRoutesByTo {
   '/emr': typeof AuthenticatedEmrIndexRoute
   '/lis': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases': typeof DamorexPurchasesIndexRoute
-  '/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
+  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
@@ -1793,6 +1809,7 @@ export interface FileRoutesByTo {
   '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute
   '/conversation/participants': typeof AuthenticatedConversationParticipantsIndexRoute
   '/conversation/projections': typeof AuthenticatedConversationProjectionsIndexRoute
   '/conversation/questionnaires': typeof AuthenticatedConversationQuestionnairesIndexRoute
@@ -1820,6 +1837,7 @@ export interface FileRoutesByTo {
   '/lis/patients': typeof AuthenticatedLisPatientsIndexRoute
   '/lis/priorities': typeof AuthenticatedLisPrioritiesIndexRoute
   '/lis/programs': typeof AuthenticatedLisProgramsIndexRoute
+  '/lis/qa-checklist-items': typeof AuthenticatedLisQaChecklistItemsIndexRoute
   '/lis/qc-alerts': typeof AuthenticatedLisQcAlertsIndexRoute
   '/lis/qc-lots': typeof AuthenticatedLisQcLotsIndexRoute
   '/lis/qc-results': typeof AuthenticatedLisQcResultsIndexRoute
@@ -1869,11 +1887,11 @@ export interface FileRoutesByTo {
   '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
-  '/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
-  '/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
-  '/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
-  '/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
-  '/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
+  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/coding-concept/facilities/levels': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -1992,7 +2010,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/': typeof AuthenticatedEmrIndexRoute
   '/_authenticated/lis/': typeof AuthenticatedLisIndexRoute
   '/damorex/purchases/': typeof DamorexPurchasesIndexRoute
-  '/_authenticated/lis/orders/new': typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
+  '/_authenticated/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/_authenticated/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
   '/_authenticated/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
   '/_authenticated/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
@@ -2014,6 +2032,7 @@ export interface FileRoutesById {
   '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
   '/_authenticated/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
   '/_authenticated/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
   '/_authenticated/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute
@@ -2041,6 +2060,7 @@ export interface FileRoutesById {
   '/_authenticated/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
   '/_authenticated/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute
   '/_authenticated/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute
+  '/_authenticated/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute
   '/_authenticated/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute
   '/_authenticated/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute
   '/_authenticated/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute
@@ -2090,11 +2110,11 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
-  '/_authenticated/lis/orders/new/collect': typeof AuthenticatedLisOrdersNewCollectRoute
-  '/_authenticated/lis/orders/new/enter': typeof AuthenticatedLisOrdersNewEnterRoute
-  '/_authenticated/lis/orders/new/label': typeof AuthenticatedLisOrdersNewLabelRoute
-  '/_authenticated/lis/orders/new/order': typeof AuthenticatedLisOrdersNewOrderRoute
-  '/_authenticated/lis/orders/new/qa': typeof AuthenticatedLisOrdersNewQaRoute
+  '/_authenticated/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/_authenticated/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/_authenticated/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/_authenticated/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/_authenticated/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/_authenticated/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
   '/_authenticated/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/_authenticated/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
@@ -2211,7 +2231,7 @@ export interface FileRouteTypes {
     | '/emr/'
     | '/lis/'
     | '/damorex/purchases/'
-    | '/lis/orders/new'
+    | '/lis/orders/workflow'
     | '/$moduleId/$page/$id'
     | '/$moduleId/$page/create'
     | '/$page/$id/edit'
@@ -2233,6 +2253,7 @@ export interface FileRouteTypes {
     | '/conversation/channels/'
     | '/conversation/chats/'
     | '/conversation/exchanges/'
+    | '/conversation/option-lists/'
     | '/conversation/participants/'
     | '/conversation/projections/'
     | '/conversation/questionnaires/'
@@ -2260,6 +2281,7 @@ export interface FileRouteTypes {
     | '/lis/patients/'
     | '/lis/priorities/'
     | '/lis/programs/'
+    | '/lis/qa-checklist-items/'
     | '/lis/qc-alerts/'
     | '/lis/qc-lots/'
     | '/lis/qc-results/'
@@ -2309,11 +2331,11 @@ export interface FileRouteTypes {
     | '/rxsoft/website-orders/'
     | '/conversation/$page/$id/edit'
     | '/lis/orders/$orderId/report'
-    | '/lis/orders/new/collect'
-    | '/lis/orders/new/enter'
-    | '/lis/orders/new/label'
-    | '/lis/orders/new/order'
-    | '/lis/orders/new/qa'
+    | '/lis/orders/workflow/collect'
+    | '/lis/orders/workflow/enter'
+    | '/lis/orders/workflow/label'
+    | '/lis/orders/workflow/order'
+    | '/lis/orders/workflow/qa'
     | '/rxsoft/uoms/$uomId/edit'
     | '/coding-concept/facilities/levels/'
     | '/coding-concept/facilities/lgas/'
@@ -2426,7 +2448,7 @@ export interface FileRouteTypes {
     | '/emr'
     | '/lis'
     | '/damorex/purchases'
-    | '/lis/orders/new'
+    | '/lis/orders/workflow'
     | '/$moduleId/$page/$id'
     | '/$moduleId/$page/create'
     | '/$page/$id/edit'
@@ -2448,6 +2470,7 @@ export interface FileRouteTypes {
     | '/conversation/channels'
     | '/conversation/chats'
     | '/conversation/exchanges'
+    | '/conversation/option-lists'
     | '/conversation/participants'
     | '/conversation/projections'
     | '/conversation/questionnaires'
@@ -2475,6 +2498,7 @@ export interface FileRouteTypes {
     | '/lis/patients'
     | '/lis/priorities'
     | '/lis/programs'
+    | '/lis/qa-checklist-items'
     | '/lis/qc-alerts'
     | '/lis/qc-lots'
     | '/lis/qc-results'
@@ -2524,11 +2548,11 @@ export interface FileRouteTypes {
     | '/rxsoft/website-orders'
     | '/conversation/$page/$id/edit'
     | '/lis/orders/$orderId/report'
-    | '/lis/orders/new/collect'
-    | '/lis/orders/new/enter'
-    | '/lis/orders/new/label'
-    | '/lis/orders/new/order'
-    | '/lis/orders/new/qa'
+    | '/lis/orders/workflow/collect'
+    | '/lis/orders/workflow/enter'
+    | '/lis/orders/workflow/label'
+    | '/lis/orders/workflow/order'
+    | '/lis/orders/workflow/qa'
     | '/rxsoft/uoms/$uomId/edit'
     | '/coding-concept/facilities/levels'
     | '/coding-concept/facilities/lgas'
@@ -2646,7 +2670,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/'
     | '/_authenticated/lis/'
     | '/damorex/purchases/'
-    | '/_authenticated/lis/orders/new'
+    | '/_authenticated/lis/orders/workflow'
     | '/_authenticated/$moduleId/$page/$id'
     | '/_authenticated/$moduleId/$page/create'
     | '/_authenticated/$page/$id/edit'
@@ -2668,6 +2692,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/channels/'
     | '/_authenticated/conversation/chats/'
     | '/_authenticated/conversation/exchanges/'
+    | '/_authenticated/conversation/option-lists/'
     | '/_authenticated/conversation/participants/'
     | '/_authenticated/conversation/projections/'
     | '/_authenticated/conversation/questionnaires/'
@@ -2695,6 +2720,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lis/patients/'
     | '/_authenticated/lis/priorities/'
     | '/_authenticated/lis/programs/'
+    | '/_authenticated/lis/qa-checklist-items/'
     | '/_authenticated/lis/qc-alerts/'
     | '/_authenticated/lis/qc-lots/'
     | '/_authenticated/lis/qc-results/'
@@ -2744,11 +2770,11 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/website-orders/'
     | '/_authenticated/conversation/$page/$id/edit'
     | '/_authenticated/lis/orders/$orderId/report'
-    | '/_authenticated/lis/orders/new/collect'
-    | '/_authenticated/lis/orders/new/enter'
-    | '/_authenticated/lis/orders/new/label'
-    | '/_authenticated/lis/orders/new/order'
-    | '/_authenticated/lis/orders/new/qa'
+    | '/_authenticated/lis/orders/workflow/collect'
+    | '/_authenticated/lis/orders/workflow/enter'
+    | '/_authenticated/lis/orders/workflow/label'
+    | '/_authenticated/lis/orders/workflow/order'
+    | '/_authenticated/lis/orders/workflow/qa'
     | '/_authenticated/rxsoft/uoms/$uomId/edit'
     | '/_authenticated/coding-concept/facilities/levels/'
     | '/_authenticated/coding-concept/facilities/lgas/'
@@ -3886,6 +3912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLisQcAlertsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lis/qa-checklist-items/': {
+      id: '/_authenticated/lis/qa-checklist-items/'
+      path: '/lis/qa-checklist-items'
+      fullPath: '/lis/qa-checklist-items/'
+      preLoaderRoute: typeof AuthenticatedLisQaChecklistItemsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/programs/': {
       id: '/_authenticated/lis/programs/'
       path: '/lis/programs'
@@ -4075,6 +4108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationParticipantsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/conversation/option-lists/': {
+      id: '/_authenticated/conversation/option-lists/'
+      path: '/conversation/option-lists'
+      fullPath: '/conversation/option-lists/'
+      preLoaderRoute: typeof AuthenticatedConversationOptionListsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/exchanges/': {
       id: '/_authenticated/conversation/exchanges/'
       path: '/conversation/exchanges'
@@ -4222,11 +4262,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModuleIdPageIdRouteImport
       parentRoute: typeof AuthenticatedModuleIdRoute
     }
-    '/_authenticated/lis/orders/new': {
-      id: '/_authenticated/lis/orders/new'
-      path: '/lis/orders/new'
-      fullPath: '/lis/orders/new'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewRouteRouteImport
+    '/_authenticated/lis/orders/workflow': {
+      id: '/_authenticated/lis/orders/workflow'
+      path: '/lis/orders/workflow'
+      fullPath: '/lis/orders/workflow'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/reports/trial-balance/': {
@@ -4292,40 +4332,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdEditRouteImport
       parentRoute: typeof AuthenticatedRxsoftUomsUomIdRoute
     }
-    '/_authenticated/lis/orders/new/qa': {
-      id: '/_authenticated/lis/orders/new/qa'
+    '/_authenticated/lis/orders/workflow/qa': {
+      id: '/_authenticated/lis/orders/workflow/qa'
       path: '/qa'
-      fullPath: '/lis/orders/new/qa'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewQaRouteImport
-      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+      fullPath: '/lis/orders/workflow/qa'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowQaRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
-    '/_authenticated/lis/orders/new/order': {
-      id: '/_authenticated/lis/orders/new/order'
+    '/_authenticated/lis/orders/workflow/order': {
+      id: '/_authenticated/lis/orders/workflow/order'
       path: '/order'
-      fullPath: '/lis/orders/new/order'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewOrderRouteImport
-      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+      fullPath: '/lis/orders/workflow/order'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
-    '/_authenticated/lis/orders/new/label': {
-      id: '/_authenticated/lis/orders/new/label'
+    '/_authenticated/lis/orders/workflow/label': {
+      id: '/_authenticated/lis/orders/workflow/label'
       path: '/label'
-      fullPath: '/lis/orders/new/label'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewLabelRouteImport
-      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+      fullPath: '/lis/orders/workflow/label'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowLabelRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
-    '/_authenticated/lis/orders/new/enter': {
-      id: '/_authenticated/lis/orders/new/enter'
+    '/_authenticated/lis/orders/workflow/enter': {
+      id: '/_authenticated/lis/orders/workflow/enter'
       path: '/enter'
-      fullPath: '/lis/orders/new/enter'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewEnterRouteImport
-      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+      fullPath: '/lis/orders/workflow/enter'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowEnterRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
-    '/_authenticated/lis/orders/new/collect': {
-      id: '/_authenticated/lis/orders/new/collect'
+    '/_authenticated/lis/orders/workflow/collect': {
+      id: '/_authenticated/lis/orders/workflow/collect'
       path: '/collect'
-      fullPath: '/lis/orders/new/collect'
-      preLoaderRoute: typeof AuthenticatedLisOrdersNewCollectRouteImport
-      parentRoute: typeof AuthenticatedLisOrdersNewRouteRoute
+      fullPath: '/lis/orders/workflow/collect'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowCollectRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
     '/_authenticated/lis/orders/$orderId/report': {
       id: '/_authenticated/lis/orders/$orderId/report'
@@ -4406,27 +4446,31 @@ const AuthenticatedPageIdRouteChildren: AuthenticatedPageIdRouteChildren = {
 const AuthenticatedPageIdRouteWithChildren =
   AuthenticatedPageIdRoute._addFileChildren(AuthenticatedPageIdRouteChildren)
 
-interface AuthenticatedLisOrdersNewRouteRouteChildren {
-  AuthenticatedLisOrdersNewCollectRoute: typeof AuthenticatedLisOrdersNewCollectRoute
-  AuthenticatedLisOrdersNewEnterRoute: typeof AuthenticatedLisOrdersNewEnterRoute
-  AuthenticatedLisOrdersNewLabelRoute: typeof AuthenticatedLisOrdersNewLabelRoute
-  AuthenticatedLisOrdersNewOrderRoute: typeof AuthenticatedLisOrdersNewOrderRoute
-  AuthenticatedLisOrdersNewQaRoute: typeof AuthenticatedLisOrdersNewQaRoute
+interface AuthenticatedLisOrdersWorkflowRouteRouteChildren {
+  AuthenticatedLisOrdersWorkflowCollectRoute: typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  AuthenticatedLisOrdersWorkflowEnterRoute: typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  AuthenticatedLisOrdersWorkflowLabelRoute: typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  AuthenticatedLisOrdersWorkflowOrderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  AuthenticatedLisOrdersWorkflowQaRoute: typeof AuthenticatedLisOrdersWorkflowQaRoute
 }
 
-const AuthenticatedLisOrdersNewRouteRouteChildren: AuthenticatedLisOrdersNewRouteRouteChildren =
+const AuthenticatedLisOrdersWorkflowRouteRouteChildren: AuthenticatedLisOrdersWorkflowRouteRouteChildren =
   {
-    AuthenticatedLisOrdersNewCollectRoute:
-      AuthenticatedLisOrdersNewCollectRoute,
-    AuthenticatedLisOrdersNewEnterRoute: AuthenticatedLisOrdersNewEnterRoute,
-    AuthenticatedLisOrdersNewLabelRoute: AuthenticatedLisOrdersNewLabelRoute,
-    AuthenticatedLisOrdersNewOrderRoute: AuthenticatedLisOrdersNewOrderRoute,
-    AuthenticatedLisOrdersNewQaRoute: AuthenticatedLisOrdersNewQaRoute,
+    AuthenticatedLisOrdersWorkflowCollectRoute:
+      AuthenticatedLisOrdersWorkflowCollectRoute,
+    AuthenticatedLisOrdersWorkflowEnterRoute:
+      AuthenticatedLisOrdersWorkflowEnterRoute,
+    AuthenticatedLisOrdersWorkflowLabelRoute:
+      AuthenticatedLisOrdersWorkflowLabelRoute,
+    AuthenticatedLisOrdersWorkflowOrderRoute:
+      AuthenticatedLisOrdersWorkflowOrderRoute,
+    AuthenticatedLisOrdersWorkflowQaRoute:
+      AuthenticatedLisOrdersWorkflowQaRoute,
   }
 
-const AuthenticatedLisOrdersNewRouteRouteWithChildren =
-  AuthenticatedLisOrdersNewRouteRoute._addFileChildren(
-    AuthenticatedLisOrdersNewRouteRouteChildren,
+const AuthenticatedLisOrdersWorkflowRouteRouteWithChildren =
+  AuthenticatedLisOrdersWorkflowRouteRoute._addFileChildren(
+    AuthenticatedLisOrdersWorkflowRouteRouteChildren,
   )
 
 interface AuthenticatedRxsoftUomsUomIdRouteChildren {
@@ -4470,7 +4514,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute
   AuthenticatedEmrIndexRoute: typeof AuthenticatedEmrIndexRoute
   AuthenticatedLisIndexRoute: typeof AuthenticatedLisIndexRoute
-  AuthenticatedLisOrdersNewRouteRoute: typeof AuthenticatedLisOrdersNewRouteRouteWithChildren
+  AuthenticatedLisOrdersWorkflowRouteRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   AuthenticatedConversationConversationIdEditRoute: typeof AuthenticatedConversationConversationIdEditRoute
   AuthenticatedConversationExchangesExchangeIdRoute: typeof AuthenticatedConversationExchangesExchangeIdRoute
   AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
@@ -4483,6 +4527,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
   AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute
   AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute
+  AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute
   AuthenticatedConversationParticipantsIndexRoute: typeof AuthenticatedConversationParticipantsIndexRoute
   AuthenticatedConversationProjectionsIndexRoute: typeof AuthenticatedConversationProjectionsIndexRoute
   AuthenticatedConversationQuestionnairesIndexRoute: typeof AuthenticatedConversationQuestionnairesIndexRoute
@@ -4510,6 +4555,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLisPatientsIndexRoute: typeof AuthenticatedLisPatientsIndexRoute
   AuthenticatedLisPrioritiesIndexRoute: typeof AuthenticatedLisPrioritiesIndexRoute
   AuthenticatedLisProgramsIndexRoute: typeof AuthenticatedLisProgramsIndexRoute
+  AuthenticatedLisQaChecklistItemsIndexRoute: typeof AuthenticatedLisQaChecklistItemsIndexRoute
   AuthenticatedLisQcAlertsIndexRoute: typeof AuthenticatedLisQcAlertsIndexRoute
   AuthenticatedLisQcLotsIndexRoute: typeof AuthenticatedLisQcLotsIndexRoute
   AuthenticatedLisQcResultsIndexRoute: typeof AuthenticatedLisQcResultsIndexRoute
@@ -4610,8 +4656,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConversationIndexRoute: AuthenticatedConversationIndexRoute,
   AuthenticatedEmrIndexRoute: AuthenticatedEmrIndexRoute,
   AuthenticatedLisIndexRoute: AuthenticatedLisIndexRoute,
-  AuthenticatedLisOrdersNewRouteRoute:
-    AuthenticatedLisOrdersNewRouteRouteWithChildren,
+  AuthenticatedLisOrdersWorkflowRouteRoute:
+    AuthenticatedLisOrdersWorkflowRouteRouteWithChildren,
   AuthenticatedConversationConversationIdEditRoute:
     AuthenticatedConversationConversationIdEditRoute,
   AuthenticatedConversationExchangesExchangeIdRoute:
@@ -4634,6 +4680,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationChatsIndexRoute,
   AuthenticatedConversationExchangesIndexRoute:
     AuthenticatedConversationExchangesIndexRoute,
+  AuthenticatedConversationOptionListsIndexRoute:
+    AuthenticatedConversationOptionListsIndexRoute,
   AuthenticatedConversationParticipantsIndexRoute:
     AuthenticatedConversationParticipantsIndexRoute,
   AuthenticatedConversationProjectionsIndexRoute:
@@ -4673,6 +4721,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLisPatientsIndexRoute: AuthenticatedLisPatientsIndexRoute,
   AuthenticatedLisPrioritiesIndexRoute: AuthenticatedLisPrioritiesIndexRoute,
   AuthenticatedLisProgramsIndexRoute: AuthenticatedLisProgramsIndexRoute,
+  AuthenticatedLisQaChecklistItemsIndexRoute:
+    AuthenticatedLisQaChecklistItemsIndexRoute,
   AuthenticatedLisQcAlertsIndexRoute: AuthenticatedLisQcAlertsIndexRoute,
   AuthenticatedLisQcLotsIndexRoute: AuthenticatedLisQcLotsIndexRoute,
   AuthenticatedLisQcResultsIndexRoute: AuthenticatedLisQcResultsIndexRoute,

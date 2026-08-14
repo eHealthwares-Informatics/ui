@@ -1,5 +1,6 @@
 import type { Column, FieldGroup, TabGroup } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { unwrapSelectValue } from '@/features/shared/payload-utils';
 
 const columns: Column[] = [
   { key: 'code', label: 'Code' },
@@ -18,10 +19,23 @@ const tabGroups: TabGroup[] = [
         fields: [
           { name: 'code', label: 'Code', type: 'text', required: true, col: 4 },
           { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
-          { name: 'typeId', label: 'Location Type', type: 'async-select', searchParam: { endpoint: '/lis/location-types', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'parentId', label: 'Parent Location', type: 'async-select', searchParam: { endpoint: '/lis/locations', valueKey: 'id', labelKey: 'name' }, col: 4 },
+          {
+            name: 'typeId',
+            label: 'Location Type',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/location-types', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'parentId',
+            label: 'Parent Location',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/locations', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
           { name: 'description', label: 'Description', type: 'text', col: 12 },
           { name: 'active', label: 'Active', type: 'switch', col: 3 },
+          { name: 'storageAssignment', label: 'Storage Assignment', type: 'switch', col: 3 },
         ],
       },
     ],
@@ -35,7 +49,15 @@ export const locationsConfig: ModelConfig = {
   endpoint: '/lis/locations',
   columns,
   tabGroups,
-  buildCreatePayload: (v: any) => ({...v, typeId: v.typeId.value}),
-  buildUpdatePayload: (v) => v,
+  buildCreatePayload: toApiPayload,
+  buildUpdatePayload: toApiPayload,
   canDelete: true,
 };
+
+function toApiPayload(v: any) {
+  return {
+    ...v,
+    typeId: unwrapSelectValue(v.typeId),
+    parentId: unwrapSelectValue(v.parentId) ?? null,
+  };
+}

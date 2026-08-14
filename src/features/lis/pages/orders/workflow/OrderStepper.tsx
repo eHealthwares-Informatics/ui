@@ -3,11 +3,11 @@ import { useNavigate } from '@tanstack/react-router';
 import { useOrderContext } from './OrderContext';
 
 const STEPS = [
-  { label: 'Enter', description: 'Patient & Tests', route: '/lis/orders/new/enter' },
-  { label: 'Collect', description: 'Sample Collection', route: '/lis/orders/new/collect' },
-  { label: 'Label', description: 'Labels & Storage', route: '/lis/orders/new/label' },
-  { label: 'QA', description: 'Review & Approve', route: '/lis/orders/new/qa' },
-  { label: 'Order', description: 'Review Order', route: '/lis/orders/new/order' },
+  { label: 'Enter', description: 'Patient & Tests', route: '/lis/orders/workflow/enter' },
+  { label: 'Collect', description: 'Sample Collection', route: '/lis/orders/workflow/collect' },
+  { label: 'Label', description: 'Labels & Storage', route: '/lis/orders/workflow/label' },
+  { label: 'QA', description: 'Review & Approve', route: '/lis/orders/workflow/qa' },
+  { label: 'Order', description: 'Review Order', route: '/lis/orders/workflow/order' },
 ] as const;
 
 const STEP_KEYS = ['enter', 'collect', 'label', 'qa', 'order'] as const;

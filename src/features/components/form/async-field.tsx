@@ -104,7 +104,6 @@ export function AsyncSelectField({
         field.searchParam.queryParam && hasFilter
           ? { [field.searchParam.queryParam]: JSON.stringify(params) }
           : params;
-      console.log({ params, field }, field.searchParam.queryParam, field.searchParam?.filter);
       const listResponse = await apiProvider.get(field.searchParam.endpoint, { params });
       const payload = getArrayPayload(listResponse.data);
 

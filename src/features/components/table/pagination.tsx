@@ -16,6 +16,7 @@ export function Pagination({
   onPageSizeChange,
 }: PaginationProps) {
   const totalPages = totalItems > 0 ? Math.ceil(totalItems / pageSize) : 0;
+  const activePage = Math.min(Math.max(pageIndex, 1), Math.max(totalPages, 1));
 
   return (
     <Group justify="space-between" align="center" wrap="wrap">
@@ -33,7 +34,7 @@ export function Pagination({
           </Text>
 
           {/* pagination */}
-          <MantinePagination value={pageIndex} onChange={onPageChange} total={totalPages} />
+          <MantinePagination value={activePage} onChange={onPageChange} total={totalPages} />
 
           {/* page size */}
           <Select

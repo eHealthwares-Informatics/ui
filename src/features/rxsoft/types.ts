@@ -250,7 +250,8 @@ export type Field = {
     | 'image'
     | 'multi-image'
     | 'accordion'
-    | 'accordion-array';
+    | 'accordion-array'
+    | 'json-accordion-array';
   hidden?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -272,6 +273,13 @@ export type Field = {
   itemRender?: (item: any) => React.ReactNode;
   itemEditConfig?: any;
   relationshipId?: string;
+  generateCode?: {
+    mode?: 'scope' | 'prefix' | 'name';
+    scope?: string;
+    prefix?: string;
+    seedField?: string;
+    maxLength?: number;
+  };
 };
 
 export type FieldGroup = {
@@ -450,6 +458,9 @@ export type View<T> = {
 
   // accordion sections
   accordions?: ViewAccordion<T>[];
+
+  // ModelConfig used to render the edit form for this view
+  editConfig?: any;
 };
 export const RELATION_FILTER = (searchParam: SearchConfig): ColumnFilter[] => [
   {

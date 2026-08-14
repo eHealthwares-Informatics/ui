@@ -33,6 +33,7 @@ export const ModalDataForm = ({
   fieldGroups,
   mutation,
   updateField,
+  editingRow,
   renderCreateExtras,
 }: FormProps) => {
   const isWizard = Boolean(tabGroups);
@@ -95,7 +96,7 @@ export const ModalDataForm = ({
               disabled={mutation.isPending}
               leftSection={mutation.isPending ? <Loader size={16} /> : null}
             >
-              {formState?.id ? 'Update' : 'Create'}
+              {editingRow ? 'Update' : 'Create'}
             </Button>
           </Group>
         )}

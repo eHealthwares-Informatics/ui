@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Group,
+  Menu,
   Modal,
   Paper,
   Select,
@@ -21,14 +22,19 @@ import {
   ChevronLeft,
   ChevronRight,
   FileUp,
+  Mail,
+  MessageCircle,
   Printer,
   Save,
+  Share2,
+  Smartphone,
   User,
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
+import { buildReportHtml, printReportHtml, type PrintReportData } from './report-print';
 
 const routeApi = getRouteApi('/_authenticated/lis/orders/$orderId/report');
 
@@ -59,6 +65,17 @@ interface Order {
   patientDateOfBirth: string | null;
   status: string;
   requestedDate: string | null;
+  collectedDate?: string | null;
+  completedDate?: string | null;
+  updatedAt?: string;
+  diagnosis?: string | null;
+  clinicalNotes?: string | null;
+  notes?: string | null;
+  internalReference?: string | null;
+  externalReference?: string | null;
+  requesterPhone?: string | null;
+  priority?: { name: string } | null;
+  samples?: Array<{ sampleTypeName?: string | null; barcode?: string }>;
   items: OrderItem[];
 }
 interface ResultItem {
@@ -81,7 +98,8 @@ interface RefRange {
   maxAge: number;
   criticalLow: string | null;
   criticalHigh: string | null;
-  unit: { name: string } | null;
+  unit: { id: string; name: string } | null;
+  unitId?: string | null;
 }
 interface SignaturesData {
   data: Array<{
@@ -133,7 +151,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
   const resultsQuery = useQuery({
     queryKey: ['results', orderId],
     queryFn: async () => {
-      const res = await lisApi.get('/lis/results', { params: { limit: 1000 } });
+      const res = await lisApi.get('/lis/results', { params: { limit: 200 } });
       return (res.data?.data ?? []) as ResultItem[];
     },
     enabled: !!orderId,
@@ -142,7 +160,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
   const rangesQuery = useQuery({
     queryKey: ['reference-ranges'],
     queryFn: async () => {
-      const res = await lisApi.get('/lis/reference-ranges', { params: { limit: 1000 } });
+      const res = await lisApi.get('/lis/reference-ranges', { params: { limit: 200 } });
       return (res.data?.data ?? []) as RefRange[];
     },
   });
@@ -153,7 +171,9 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
 
   /* ---------- Local state ---------- */
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [values, setValues] = useState<Record<string, { value: string; notes: string }>>({});
+  const [values, setValues] = useState<
+    Record<string, { value: string; notes: string; referenceRangeId?: string }>
+  >({});
   const [saving, setSaving] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [patientModalOpen, setPatientModalOpen] = useState(false);
@@ -188,19 +208,25 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
   /* ---------- Init form values when order/results load ---------- */
   useEffect(() => {
     if (!order?.items) return;
-    const map: Record<string, { value: string; notes: string }> = {};
+    const map: Record<string, { value: string; notes: string; referenceRangeId?: string }> = {};
     for (const item of order.items) {
       const result = allResults.find((r) => r.orderItemId === item.id);
+      const ranges = getRangesForItem(item);
       map[item.id] = {
         value: result?.value ?? item.resultValue ?? '',
         notes: result?.notes ?? item.notes ?? '',
+        referenceRangeId:
+          result?.referenceRangeId ??
+          pickDefaultRange(ranges, order)?.id ??
+          ranges[0]?.id,
       };
     }
     setValues(map);
     if (order.items.length > 0 && !activeTab) {
       setActiveTab(order.items[0].id);
     }
-  }, [order, allResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order, allResults, allRanges]);
 
   /* ---------- Helpers ---------- */
   const getRangesForItem = (item: OrderItem) => {
@@ -209,11 +235,136 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
     return allRanges.filter((r) => r.testId === testId);
   };
 
-  const formatRange = (ranges: RefRange[]) => {
-    if (!ranges.length) return '—';
-    return ranges
-      .map((r) => `${r.alias}: ${r.lowValue} - ${r.highValue} ${r.unit?.name ?? ''}`)
-      .join(' | ');
+  /** Picks the reference range that best matches the patient (gender, then age), falling back to the first range. */
+  const pickDefaultRange = (ranges: RefRange[], order: Order): RefRange | undefined => {
+    if (!ranges.length) {
+      return undefined;
+    }
+    const gender = order.patientGender;
+    const age = order.patientAge ?? undefined;
+    const genderRanges =
+      gender === 'MALE' || gender === 'FEMALE'
+        ? ranges.filter((r) => r.gender === gender)
+        : ranges.filter((r) => r.gender === 'DEFAULT');
+    const pool = genderRanges.length ? genderRanges : ranges;
+    const ageRanges = age !== undefined
+      ? pool.filter((r) => age >= r.minAge && (r.maxAge === 0 || age <= r.maxAge))
+      : pool;
+    return (ageRanges.length ? ageRanges : pool)[0];
+  };
+
+  /** Builds the printable report data from order + results + ranges + current form values. */
+  const buildPrintData = (
+    order: Order,
+    results: ResultItem[],
+    ranges: RefRange[],
+    vals: Record<string, { value: string; notes: string; referenceRangeId?: string }>
+  ): PrintReportData => {
+    const flagFor = (value: string, range: RefRange | undefined): PrintReportData['groups'][number]['rows'][number]['flag'] => {
+      const v = Number(value);
+      if (!range || value.trim() === '' || Number.isNaN(v)) {
+        return '';
+      }
+      const low = Number(range.lowValue);
+      const high = Number(range.highValue);
+      if (!Number.isNaN(low) && v < low) {
+        return 'Low';
+      }
+      if (!Number.isNaN(high) && v > high) {
+        return 'High';
+      }
+      return 'Normal';
+    };
+
+    const groups: PrintReportData['groups'] = [];
+    for (const item of order.items ?? []) {
+      const td = item.testDefinition;
+      const testId = item.testDefinitionId ?? td?.id;
+      const itemRanges = testId ? ranges.filter((r) => r.testId === testId) : [];
+      const result = results.find((r) => r.orderItemId === item.id);
+      const val = vals[item.id] ?? {};
+      const chosenRange =
+        itemRanges.find((r) => r.id === val.referenceRangeId) ?? pickDefaultRange(itemRanges, order);
+      const value = val.value ?? result?.value ?? item.resultValue ?? '';
+      const title = `${td?.name ?? 'Test'}:`;
+      const group = groups.find((g) => g.title === title) ?? { title, rows: [] };
+      if (!groups.includes(group)) {
+        groups.push(group);
+      }
+      group.rows.push({
+        name: td?.name ?? 'Test',
+        value,
+        range: chosenRange ? `${chosenRange.lowValue}-${chosenRange.highValue}` : '',
+        units: chosenRange?.unit?.name ?? td?.uom?.name ?? '',
+        flag: flagFor(value, chosenRange),
+      });
+    }
+
+    const fmt = (d: string | null | undefined): string => {
+      if (!d) {
+        return '—';
+      }
+      const date = new Date(d);
+      if (Number.isNaN(date.getTime())) {
+        return d;
+      }
+      return date.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    };
+
+    const spec = order.samples?.[0];
+
+    return {
+      brand: 'SYNLAB',
+      patient: {
+        name: order.patientName ?? '—',
+        sex: order.patientGender ?? '—',
+        idNumber: order.patientId ?? '—',
+        dateOfBirth: order.patientDateOfBirth ?? '—',
+        age: order.patientAge != null ? String(order.patientAge) : '—',
+        phone: order.requesterPhone ?? '—',
+        email: '—',
+        address: '—',
+      },
+      report: {
+        requisitionNumber: order.orderNumber ?? '—',
+        orderReference: order.internalReference ?? order.externalReference ?? '—',
+        collectionDate: fmt(order.collectedDate),
+        requestDate: fmt(order.requestedDate),
+        reportDate: fmt(order.completedDate ?? order.updatedAt),
+        reportUpdatedDate: 'N/A',
+        reportType: order.status === 'COMPLETED' ? 'FINAL REPORT' : order.status ?? '—',
+        priority: order.priority?.name ?? 'ROUTINE',
+        specimenType: spec?.sampleTypeName ?? '—',
+        comments: order.clinicalNotes ?? order.notes ?? '—',
+        diagnosis: order.diagnosis ?? '—',
+        testsRequested:
+          (order.items ?? []).map((i) => i.testDefinition?.name ?? 'Test').join(', ') || '—',
+      },
+      groups,
+    };
+  };
+
+  /** Maps the entered result against the selected reference range to a red→green background.
+   *  Below the low bound clamps to red, above the high bound clamps to green. */
+  const resultGradient = (value: string, range?: RefRange): string | undefined => {
+    const num = Number(value);
+    if (!range || value.trim() === '' || Number.isNaN(num)) {
+      return undefined;
+    }
+    const low = Number(range.lowValue);
+    const high = Number(range.highValue);
+    if (Number.isNaN(low) || Number.isNaN(high) || high <= low) {
+      return undefined;
+    }
+    const t = Math.max(0, Math.min(1, (num - low) / (high - low)));
+    const hue = Math.round(t * 120);
+    return `linear-gradient(90deg, hsl(${hue} 80% 92%), hsl(${hue} 80% 92%))`;
   };
 
   const statusColor = (status: string) => {
@@ -231,18 +382,26 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
 
   /* ---------- Mutations ---------- */
   const saveResult = useMutation({
-    mutationFn: async (payload: { orderItemId: string; value: string; notes: string }) => {
+    mutationFn: async (payload: {
+      orderItemId: string;
+      value: string;
+      notes: string;
+      referenceRangeId?: string;
+      unitId?: string;
+    }) => {
       const existing = allResults.find((r) => r.orderItemId === payload.orderItemId);
+      const body = {
+        value: payload.value,
+        notes: payload.notes,
+        referenceRangeId: payload.referenceRangeId,
+        unitId: payload.unitId,
+      };
       if (existing) {
-        await lisApi.patch(`/lis/results/${existing.id}`, {
-          value: payload.value,
-          notes: payload.notes,
-        });
+        await lisApi.patch(`/lis/results/${existing.id}`, body);
       } else {
         await lisApi.post('/lis/results', {
           orderItemId: payload.orderItemId,
-          value: payload.value,
-          notes: payload.notes,
+          ...body,
         });
       }
     },
@@ -297,9 +456,17 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
   const handleSave = async () => {
     setSaving(true);
     try {
-      const promises = Object.entries(values).map(([itemId, val]) =>
-        saveResult.mutateAsync({ orderItemId: itemId, value: val.value, notes: val.notes }),
-      );
+      const promises = Object.entries(values).map(([itemId, val]) => {
+        const item = order?.items.find((i) => i.id === itemId);
+        const selectedRange = item ? getRangesForItem(item).find((r) => r.id === val.referenceRangeId) : undefined;
+        return saveResult.mutateAsync({
+          orderItemId: itemId,
+          value: val.value,
+          notes: val.notes,
+          referenceRangeId: val.referenceRangeId,
+          unitId: selectedRange?.unit?.id ?? selectedRange?.unitId ?? undefined,
+        });
+      });
       await Promise.all(promises);
     } finally {
       setSaving(false);
@@ -307,7 +474,50 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
   };
 
   const handlePrint = () => {
-    window.print();
+    if (!order) {
+      return;
+    }
+    try {
+      printReportHtml(buildReportHtml(buildPrintData(order, allResults, allRanges, values)));
+    } catch (err: any) {
+      notifications.show({
+        title: 'Print',
+        message: err?.message ?? 'Unable to open print window',
+        color: 'red',
+      });
+    }
+  };
+
+  /* ---------- Send Via ---------- */
+  const sendVia = useMutation({
+    mutationFn: async (payload: {
+      via: 'whatsapp' | 'sms' | 'email';
+      phone?: string;
+      email?: string;
+    }) => {
+      await lisApi.post(`/lis/orders/${orderId}/send-report`, payload);
+    },
+    onSuccess: () => {
+      notifications.show({
+        title: 'Sent',
+        message: 'Report queued for delivery',
+        color: 'green',
+        icon: <CheckCircle2 size={16} />,
+      });
+    },
+    onError: (err: any) => {
+      notifications.show({
+        title: 'Send failed',
+        message: err?.response?.data?.message ?? err?.message ?? 'Failed to send report',
+        color: 'red',
+      });
+    },
+  });
+
+  const handleSendVia = (via: 'whatsapp' | 'sms' | 'email') => {
+    const phone = order?.requesterPhone || undefined;
+    const email = '';
+    sendVia.mutate({ via, phone, email });
   };
 
   /* ---------- Render ---------- */
@@ -318,7 +528,6 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
       </Paper>
     );
   }
-
   return (
     <>
       <Stack gap="md">
@@ -365,6 +574,39 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
           >
             Print Report
           </Button>
+          <Menu position="bottom-end" shadow="md" width={200}>
+            <Menu.Target>
+              <Button
+                color="indigo"
+                variant="light"
+                leftSection={<Share2 size={16} />}
+                loading={sendVia.isPending}
+              >
+                Send Via
+              </Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Label>Deliver report via</Menu.Label>
+              <Menu.Item
+                leftSection={<MessageCircle size={16} />}
+                onClick={() => handleSendVia('whatsapp')}
+              >
+                WhatsApp
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<Smartphone size={16} />}
+                onClick={() => handleSendVia('sms')}
+              >
+                SMS
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<Mail size={16} />}
+                onClick={() => handleSendVia('email')}
+              >
+                Email
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
 
         {/* Order summary header */}
@@ -414,7 +656,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
           <Group justify="space-between" align="center" mb="md">
             <Text fw={600}>Tests</Text>
           </Group>
-
+          
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Tabs.List>
               {order.items.map((item) => (
@@ -427,6 +669,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
             {order.items.map((item) => {
               const ranges = getRangesForItem(item);
               const val = values[item.id] ?? { value: '', notes: '' };
+              const selectedRange = ranges.find((r) => r.id === val.referenceRangeId);
               return (
                 <Tabs.Panel key={item.id} value={item.id} pt="md">
                   <Table striped highlightOnHover>
@@ -442,24 +685,48 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                     <Table.Tbody>
                       <Table.Tr>
                         <Table.Td>{item.testDefinition?.name ?? '—'}</Table.Td>
-                        <Table.Td>{item.testDefinition?.uom?.name ?? '—'}</Table.Td>
-                        <Table.Td style={{ maxWidth: 300 }}>
-                          <Text size="sm" c="dimmed">
-                            {formatRange(ranges)}
-                          </Text>
+                        <Table.Td>
+                          {selectedRange?.unit?.name ?? item.testDefinition?.uom?.name ?? '—'}
+                        </Table.Td>
+                        <Table.Td style={{ maxWidth: 260 }}>
+                          <Select
+                            size="sm"
+                            placeholder="Select reference range"
+                            data={ranges.map((r) => ({
+                              value: r.id,
+                              label: `${r.alias}: ${r.lowValue} - ${r.highValue}${r.unit?.name ? ` ${r.unit.name}` : ''}`,
+                            }))}
+                            value={val.referenceRangeId ?? null}
+                            onChange={(v) =>
+                              setValues((prev) => ({
+                                ...prev,
+                                [item.id]: { ...(prev[item.id] ?? {}), referenceRangeId: v ?? undefined },
+                              }))
+                            }
+                            clearable
+                            style={{ minWidth: 220 }}
+                          />
                         </Table.Td>
                         <Table.Td>
                           <TextInput
                             size="sm"
                             value={val.value}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              const value = e.currentTarget.value;
                               setValues((prev) => ({
                                 ...prev,
-                                [item.id]: { ...prev[item.id], value: e.currentTarget.value },
-                              }))
-                            }
+                                [item.id]: { ...(prev[item.id] ?? {}), value },
+                              }));
+                            }}
                             placeholder="Enter result"
-                            style={{ width: 120 }}
+                            style={{
+                              width: 120,
+                              ...(resultGradient(val.value, selectedRange)
+                                ? {
+                                    background: resultGradient(val.value, selectedRange),
+                                  }
+                                : {}),
+                            }}
                           />
                         </Table.Td>
                         <Table.Td>
@@ -470,14 +737,11 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                   </Table>
 
                   {/* Reference range summary */}
-                  {ranges.length > 0 && (
+                  {selectedRange && (
                     <Paper withBorder p="sm" mt="sm" bg="gray.0">
                       <Text size="sm" c="dimmed">
-                        {ranges.map((r) => (
-                          <span key={r.id}>
-                            {r.alias}: {r.lowValue} - {r.highValue} {r.unit?.name ?? ''} |{' '}
-                          </span>
-                        ))}
+                        {selectedRange.alias}: {selectedRange.lowValue} - {selectedRange.highValue}{' '}
+                        {selectedRange.unit?.name ?? ''} | {selectedRange.gender} (min {selectedRange.minAge} - max {selectedRange.maxAge} years)
                       </Text>
                     </Paper>
                   )}
@@ -487,12 +751,13 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                     mt="sm"
                     placeholder="Comment"
                     value={val.notes}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const notes = e.currentTarget.value;
                       setValues((prev) => ({
                         ...prev,
-                        [item.id]: { ...prev[item.id], notes: e.currentTarget.value },
-                      }))
-                    }
+                        [item.id]: { ...(prev[item.id] ?? {}), notes },
+                      }));
+                    }}
                     minRows={2}
                   />
 
@@ -512,7 +777,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                       if (v) {
                         setValues((prev) => ({
                           ...prev,
-                          [item.id]: { ...prev[item.id], notes: v },
+                          [item.id]: { ...(prev[item.id] ?? {}), notes: v },
                         }));
                       }
                     }}

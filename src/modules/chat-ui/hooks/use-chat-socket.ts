@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type {
   ConversationInboxResponse,
   ExchangeMessage,
@@ -8,18 +8,65 @@ import type {
 import { getConversationSocket } from '../websocket/chat-socket';
 import { chatKeys } from './use-chat-queries';
 
-export function useChatSocket(input: { conversationId?: string; participantId?: string }) {
+export function useChatSocket(input: {
+  conversationId?: string;
+  participantId?: string;
+  pendingConversationId?: string;
+  pendingParticipantId?: string;
+  onConversationCreated?: (conversationId: string) => void;
+}) {
+  const {
+    conversationId,
+    participantId,
+    pendingConversationId,
+    pendingParticipantId,
+    onConversationCreated,
+  } = input;
   const queryClient = useQueryClient();
   const [connected, setConnected] = useState(false);
   const [typingParticipantId, setTypingParticipantId] = useState<string>();
+  const [pendingMessages, setPendingMessages] = useState<ExchangeMessage[]>([]);
+
+  const onConversationCreatedRef = useRef(onConversationCreated);
+  onConversationCreatedRef.current = onConversationCreated;
+
+  const roomPayloadRef = useRef<{ conversationId?: string; participantId?: string }>({});
+  roomPayloadRef.current =
+    conversationId && participantId ? { conversationId, participantId } : {};
+  const pendingRoomPayloadRef = useRef<{ conversationId?: string; participantId?: string }>({});
+  pendingRoomPayloadRef.current =
+    pendingConversationId && pendingParticipantId
+      ? { conversationId: pendingConversationId, participantId: pendingParticipantId }
+      : {};
 
   useEffect(() => {
     const socket = getConversationSocket();
 
-    const onConnect = () => setConnected(true);
+    const onConnect = () => {
+      setConnected(true);
+      // socket.io reconnects automatically but room membership is not restored,
+      // so re-join the rooms for the selected conversation and the pending
+      // compose conversation on every (re)connect.
+      if (roomPayloadRef.current.conversationId) {
+        socket.emit('conversation.opened', roomPayloadRef.current);
+      }
+      if (pendingRoomPayloadRef.current.conversationId) {
+        socket.emit('conversation.opened', pendingRoomPayloadRef.current);
+      }
+    };
     const onDisconnect = () => setConnected(false);
     const onMessage = (message: ExchangeMessage) => {
       if (!message.conversationId) {return;}
+
+      // Messages routed through a "pending-" conversation id belong to the
+      // compose thread (no real conversation exists yet). Surface them there
+      // until a real conversation is created and the pending is backfilled.
+      if (message.conversationId.startsWith('pending-')) {
+        setPendingMessages((prev) =>
+          prev.some((item) => item.id === message.id) ? prev : [...prev, message]
+        );
+        return;
+      }
 
       queryClient.setQueryData<{
         pages: ExchangeMessagesResponse[];
@@ -39,9 +86,22 @@ export function useChatSocket(input: { conversationId?: string; participantId?: 
       });
 
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
+      onConversationCreatedRef.current?.(message.conversationId);
     };
-    const onUpdated = () => {
+    const onUpdated = (payload?: { conversationId?: string }) => {
+      if (payload?.conversationId?.startsWith('pending-')) {
+        // No real conversation exists yet; keep the compose thread fresh by
+        // refetching the pending exchanges (socket message event may have been
+        // missed if the client joined the pending room late).
+        if (payload.conversationId) {
+          queryClient.invalidateQueries({ queryKey: chatKeys.pending(payload.conversationId) });
+        }
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
+      if (payload?.conversationId) {
+        onConversationCreatedRef.current?.(payload.conversationId);
+      }
     };
     const onTypingStarted = (payload: { participantId?: string }) => {
       setTypingParticipantId(payload.participantId);
@@ -87,19 +147,40 @@ export function useChatSocket(input: { conversationId?: string; participantId?: 
   }, [queryClient]);
 
   useEffect(() => {
-    if (!input.conversationId || !input.participantId) {return;}
+    if (!conversationId || !participantId) {return;}
 
     const socket = getConversationSocket();
     const payload = {
-      conversationId: input.conversationId,
-      participantId: input.participantId,
+      conversationId,
+      participantId,
     };
     socket.emit('conversation.opened', payload);
 
     return () => {
       socket.emit('conversation.closed', payload);
     };
-  }, [input.conversationId, input.participantId]);
+  }, [conversationId, participantId]);
 
-  return { connected, typingParticipantId };
+  useEffect(() => {
+    if (!pendingConversationId || !pendingParticipantId) {return;}
+
+    const socket = getConversationSocket();
+    const payload = {
+      conversationId: pendingConversationId,
+      participantId: pendingParticipantId,
+    };
+    socket.emit('conversation.opened', payload);
+
+    return () => {
+      socket.emit('conversation.closed', payload);
+    };
+  }, [pendingConversationId, pendingParticipantId]);
+
+  useEffect(() => {
+    if (!pendingConversationId) {
+      setPendingMessages([]);
+    }
+  }, [pendingConversationId]);
+
+  return { connected, typingParticipantId, pendingMessages };
 }

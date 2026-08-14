@@ -12,7 +12,7 @@ const createFieldGroups: FieldGroup[] = [
   {
     title: 'Category Details',
     fields: [
-      { name: 'code', label: 'Code', type: 'text', col: 4 },
+      { name: 'code', label: 'Code', type: 'text', col: 4, generateCode: { scope: 'test-categories' } },
       { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
       { name: 'description', label: 'Description', type: 'text', col: 12 },
       { name: 'active', label: 'Active', type: 'switch', col: 3 },

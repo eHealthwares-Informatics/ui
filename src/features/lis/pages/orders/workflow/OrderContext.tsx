@@ -1,20 +1,34 @@
-import { createContext, useContext, useReducer, useCallback, useRef, useEffect, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useCallback,
+  useRef,
+  useEffect,
+  type ReactNode,
+} from 'react';
 import { lisApi } from '@/lib/lis-api';
 
 export interface OrderItem {
   testDefinitionId: string;
+  sampleId?: string | null;
   notes?: string;
 }
 
 export interface OrderSample {
+  id?: string;
   barcode: string;
-  sampleType?: string;
+  sampleTypeId?: string;
   collector?: string;
   collectionDate?: string | null;
   collectionMethod?: string | null;
   collectionConditions?: string | null;
   quantity?: number | null;
   notes?: string | null;
+  printStatus?: string;
+  printedAt?: string | null;
+  storageLocationId?: string | null;
+  storageNotes?: string | null;
 }
 
 export interface OrderState {
@@ -27,6 +41,7 @@ export interface OrderState {
   error: string | null;
   currentStep: number;
   stepProgress: { enter: boolean; collect: boolean; label: boolean; qa: boolean; order: boolean };
+  dirtyFields: string[];
 
   patientSelected: boolean;
 
@@ -50,6 +65,8 @@ export interface OrderState {
   samples: OrderSample[];
 
   assignments: Array<{ testDefinitionId: string; testName: string; sampleIndex: number }>;
+
+  qaChecks: Record<string, boolean>;
 }
 
 type Action =
@@ -60,7 +77,11 @@ type Action =
   | { type: 'UPDATE_FIELD'; payload: { name: string; value: unknown } }
   | { type: 'SET_ITEMS'; payload: OrderItem[] }
   | { type: 'SET_SAMPLES'; payload: OrderSample[] }
-  | { type: 'SET_ASSIGNMENTS'; payload: Array<{ testDefinitionId: string; testName: string; sampleIndex: number }> }
+  | {
+      type: 'SET_ASSIGNMENTS';
+      payload: Array<{ testDefinitionId: string; testName: string; sampleIndex: number }>;
+    }
+  | { type: 'SET_QA_CHECKS'; payload: Record<string, boolean> }
   | { type: 'MARK_DIRTY' }
   | { type: 'MARK_CLEAN' }
   | { type: 'MARK_STEP'; payload: 'enter' | 'collect' | 'label' | 'qa' | 'order' }
@@ -81,6 +102,7 @@ const initialState: OrderState = {
   error: null,
   currentStep: 0,
   stepProgress: { enter: false, collect: false, label: false, qa: false, order: false },
+  dirtyFields: [],
 
   patientSelected: false,
 
@@ -102,7 +124,12 @@ const initialState: OrderState = {
   items: [],
   samples: [],
   assignments: [],
+  qaChecks: {},
 };
+
+function markDirty(fields: string[], key: string): string[] {
+  return fields.includes(key) ? fields : [...fields, key];
+}
 
 function reducer(state: OrderState, action: Action): OrderState {
   switch (action.type) {
@@ -111,23 +138,59 @@ function reducer(state: OrderState, action: Action): OrderState {
     case 'SET_SUBMITTING':
       return { ...state, isSubmitting: action.payload };
     case 'SET_ORDER':
-      return { ...state, ...action.payload, isLoading: false };
+      return { ...state, ...action.payload, isLoading: false, dirtyFields: [] };
     case 'SET_ORDER_ID':
       return { ...state, orderId: action.payload.id, orderNumber: action.payload.number };
     case 'UPDATE_FIELD':
-      return { ...state, [action.payload.name]: action.payload.value, isDirty: true, saveStatus: 'unsaved' };
+      return {
+        ...state,
+        [action.payload.name]: action.payload.value,
+        isDirty: true,
+        saveStatus: 'unsaved',
+        dirtyFields: markDirty(state.dirtyFields, action.payload.name),
+      };
     case 'SET_ITEMS':
-      return { ...state, items: action.payload, isDirty: true, saveStatus: 'unsaved' };
+      return {
+        ...state,
+        items: action.payload,
+        isDirty: true,
+        saveStatus: 'unsaved',
+        dirtyFields: markDirty(state.dirtyFields, 'items'),
+      };
     case 'SET_SAMPLES':
-      return { ...state, samples: action.payload, isDirty: true, saveStatus: 'unsaved' };
+      return {
+        ...state,
+        samples: action.payload,
+        isDirty: true,
+        saveStatus: 'unsaved',
+        dirtyFields: markDirty(state.dirtyFields, 'samples'),
+      };
     case 'SET_ASSIGNMENTS':
-      return { ...state, assignments: action.payload, isDirty: true, saveStatus: 'unsaved' };
+      return {
+        ...state,
+        assignments: action.payload,
+        isDirty: true,
+        saveStatus: 'unsaved',
+        dirtyFields: markDirty(state.dirtyFields, 'assignments'),
+      };
+    case 'SET_QA_CHECKS':
+      return {
+        ...state,
+        qaChecks: action.payload,
+        isDirty: true,
+        saveStatus: 'unsaved',
+        dirtyFields: markDirty(state.dirtyFields, 'qaChecks'),
+      };
     case 'MARK_DIRTY':
       return { ...state, isDirty: true, saveStatus: 'unsaved' };
     case 'MARK_CLEAN':
-      return { ...state, isDirty: false, saveStatus: 'saved' };
+      return { ...state, isDirty: false, saveStatus: 'saved', dirtyFields: [] };
     case 'MARK_STEP':
-      return { ...state, stepProgress: { ...state.stepProgress, [action.payload]: true } };
+      return {
+        ...state,
+        stepProgress: { ...state.stepProgress, [action.payload]: true },
+        dirtyFields: markDirty(state.dirtyFields, 'stepProgress'),
+      };
     case 'SET_STEP':
       return { ...state, currentStep: action.payload };
     case 'SET_ERROR':
@@ -175,35 +238,63 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       clinicalNotes: s.clinicalNotes,
       notes: s.notes,
       stepProgress: s.stepProgress,
+      qaChecks: s.qaChecks,
       items: s.items,
+      assignments: s.assignments.map((a) => ({
+        testDefinitionId: a.testDefinitionId,
+        sampleIndex: a.sampleIndex,
+      })),
       samples: s.samples.map((samp) => ({
         barcode: samp.barcode,
-        sampleType: samp.sampleType,
+        sampleTypeId: samp.sampleTypeId,
         collector: samp.collector,
         collectionDate: samp.collectionDate,
         collectionMethod: samp.collectionMethod,
         collectionConditions: samp.collectionConditions,
         quantity: samp.quantity,
         notes: samp.notes,
+        printStatus: samp.printStatus,
+        printedAt: samp.printedAt,
+        storageLocationId: samp.storageLocationId ?? null,
+        storageNotes: samp.storageNotes ?? null,
       })),
     };
   }, []);
 
-  const saveOrder = useCallback(async (silent = false) => {
+  const buildDirtyPayload = useCallback(() => {
     const s = stateRef.current;
-    if (!s.orderId) return;
-    if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: true });
-    dispatch({ type: 'SET_ERROR', payload: null });
-    try {
-      await lisApi.patch(`/lis/orders/${s.orderId}`, buildPayload());
-      dispatch({ type: 'MARK_CLEAN' });
-    } catch (err: any) {
-      const msg = err?.response?.data?.message ?? err?.message ?? 'Save failed';
-      dispatch({ type: 'SET_ERROR', payload: msg });
-    } finally {
-      if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: false });
+    const full = buildPayload() as Record<string, unknown>;
+    const dirty = new Set(s.dirtyFields);
+    const payload: Record<string, unknown> = {};
+    for (const key of Object.keys(full)) {
+      if (dirty.has(key)) {
+        payload[key] = full[key];
+      }
     }
+    return payload;
   }, [buildPayload]);
+
+  const saveOrder = useCallback(
+    async (silent = false) => {
+      const s = stateRef.current;
+      if (!s.orderId) return;
+      const payload = buildDirtyPayload();
+      if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+      try {
+        if (Object.keys(payload).length > 0) {
+          await lisApi.patch(`/lis/orders/${s.orderId}`, payload);
+        }
+        dispatch({ type: 'MARK_CLEAN' });
+      } catch (err: any) {
+        const msg = err?.response?.data?.message ?? err?.message ?? 'Save failed';
+        dispatch({ type: 'SET_ERROR', payload: msg });
+      } finally {
+        if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: false });
+      }
+    },
+    [buildDirtyPayload]
+  );
 
   const saveOrderEntry = useCallback(async () => {
     dispatch({ type: 'SET_SUBMITTING', payload: true });
@@ -248,8 +339,49 @@ export function OrderProvider({ children }: { children: ReactNode }) {
           diagnosis: data.diagnosis ?? null,
           clinicalNotes: data.clinicalNotes ?? null,
           notes: data.notes ?? null,
-          stepProgress: data.stepProgress ?? { enter: false, collect: false, label: false, qa: false, order: false },
-          items: data.items?.map((i: any) => ({ testDefinitionId: i.testDefinitionId, notes: i.notes })) ?? [],
+          stepProgress: data.stepProgress ?? {
+            enter: false,
+            collect: false,
+            label: false,
+            qa: false,
+            order: false,
+          },
+          qaChecks: data.qaChecks ?? {},
+          items:
+            data.items?.map((i: any) => ({
+              testDefinitionId: i.testDefinitionId,
+              sampleId: i.sampleId ?? null,
+              notes: i.notes,
+            })) ?? [],
+          samples:
+            data.samples?.map((s: any) => ({
+              id: s.id,
+              barcode: s.barcode,
+              sampleTypeId: s.sampleTypeId,
+              collector: s.collector,
+              collectionDate: s.collectionDate,
+              collectionMethod: s.collectionMethod,
+              collectionConditions: s.collectionConditions,
+              quantity: s.quantity,
+              notes: s.notes,
+              printStatus: s.printStatus ?? 'PENDING',
+              printedAt: s.printedAt,
+              storageLocationId: s.storageLocationId ?? null,
+              storageNotes: s.storageNotes ?? null,
+            })) ?? [],
+          assignments:
+            (data.samples?.length
+              ? (data.items ?? [])
+                  .filter((i: any) => i.sampleId)
+                  .map((i: any) => {
+                    const sampleIndex = data.samples.findIndex((s: any) => s.id === i.sampleId);
+                    return {
+                      testDefinitionId: i.testDefinitionId,
+                      testName: i.testDefinition?.name ?? i.testDefinitionId,
+                      sampleIndex: sampleIndex >= 0 ? sampleIndex : 0,
+                    };
+                  })
+              : []) ?? [],
         },
       });
       return data;
@@ -288,7 +420,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   }, [state.orderId, state.isDirty, state.saveStatus, saveOrder]);
 
   return (
-    <OrderContext.Provider value={{ state, dispatch, saveOrder, saveOrderEntry, loadOrder, resetOrder }}>
+    <OrderContext.Provider
+      value={{ state, dispatch, saveOrder, saveOrderEntry, loadOrder, resetOrder }}
+    >
       {children}
     </OrderContext.Provider>
   );

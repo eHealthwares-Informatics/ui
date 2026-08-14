@@ -6,7 +6,11 @@ import { referenceRangesConfig } from '../reference-ranges/schema';
 const columns: Column[] = [
   { key: 'code', label: 'Code' },
   { key: 'name', label: 'Name' },
-  { key: 'testSectionId', label: 'Section', render: (row: any) => row.testSection?.name ?? row.testSectionId },
+  {
+    key: 'testSectionId',
+    label: 'Section',
+    render: (row: any) => row.testSection?.name ?? row.testSectionId,
+  },
   { key: 'active', label: 'Active' },
 ];
 
@@ -18,7 +22,14 @@ const tabGroups: TabGroup[] = [
       {
         title: 'Basic Information',
         fields: [
-          { name: 'code', label: 'Code', type: 'text', required: true, col: 4 },
+          {
+            name: 'code',
+            label: 'Code',
+            type: 'text',
+            required: true,
+            col: 4,
+            generateCode: { scope: 'test-definitions' },
+          },
           { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
           { name: 'description', label: 'Description', type: 'text', col: 12 },
           { name: 'active', label: 'Active', type: 'switch', col: 3 },
@@ -27,20 +38,79 @@ const tabGroups: TabGroup[] = [
       {
         title: 'Classification',
         fields: [
-          { name: 'testSectionId', label: 'Test Section', type: 'async-select', searchParam: { endpoint: '/lis/test-sections', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'testCategoryId', label: 'Test Category', type: 'async-select', searchParam: { endpoint: '/lis/test-categories', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'methodId', label: 'Method', type: 'async-select', searchParam: { endpoint: '/lis/methods', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'sampleTypeId', label: 'Sample Type', type: 'async-select', searchParam: { endpoint: '/lis/sample-types', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'programId', label: 'Program', type: 'async-select', searchParam: { endpoint: '/lis/programs', valueKey: 'id', labelKey: 'name' }, col: 4 },
+          {
+            name: 'testSectionId',
+            label: 'Test Section',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/test-sections', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'testCategoryId',
+            label: 'Test Category',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/test-categories', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'methodId',
+            label: 'Method',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/methods', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'sampleTypeId',
+            label: 'Sample Type',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/sample-types', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'programId',
+            label: 'Program',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/programs', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
         ],
       },
       {
         title: 'Result Configuration',
         fields: [
-          { name: 'unitId', label: 'Unit', type: 'async-select', searchParam: { endpoint: '/lis/uoms', valueKey: 'id', labelKey: 'name' }, col: 4 },
-          { name: 'loincIds', label: 'LOINC Codes', type: 'multi-async-select', searchParam: { endpoint: '/lis/loinc', valueKey: 'id', labelKey: 'code' }, col: 8 },
-          { name: 'resultType', label: 'Result Type', type: 'select', options: [{ value: 'NUMERIC', label: 'Numeric' }, { value: 'TEXT', label: 'Text' }, { value: 'CODED', label: 'Coded' }, { value: 'RANGE', label: 'Range' }], col: 3 },
+          {
+            name: 'unitId',
+            label: 'Unit',
+            type: 'async-select',
+            searchParam: { endpoint: '/lis/uoms', valueKey: 'id', labelKey: 'name' },
+            col: 4,
+          },
+          {
+            name: 'loincIds',
+            label: 'LOINC Codes',
+            type: 'multi-async-select',
+            searchParam: { endpoint: '/lis/loinc', valueKey: 'id', labelKey: 'code' },
+            col: 8,
+          },
+          {
+            name: 'resultType',
+            label: 'Result Type',
+            type: 'select',
+            options: [
+              { value: 'NUMERIC', label: 'Numeric' },
+              { value: 'TEXT', label: 'Text' },
+              { value: 'DICTIONARY', label: 'Dictionary' },
+              { value: 'BOOLEAN', label: 'Boolean' },
+              { value: 'DATE', label: 'Date' },
+              { value: 'RICH_TEXT', label: 'Rich Text' },
+              { value: 'ATTACHMENT', label: 'Attachment/Image' },
+              { value: 'TABLE', label: 'Table' },
+              { value: 'CALCULATED', label: 'Calculated' },
+            ],
+            col: 3,
+          },
           { name: 'reportable', label: 'Reportable', type: 'switch', col: 3 },
+          { name: 'validationRules', label: 'Validation Rules', type: 'json', col: 12 },
         ],
       },
     ],
@@ -59,7 +129,8 @@ const tabGroups: TabGroup[] = [
             col: 12,
             relationshipId: 'testId',
             itemLabelKey: 'alias',
-            itemRender: (item: any) => `${item.alias ?? '?'}: ${item.gender ?? 'DEFAULT'} (${item.minAge ?? 0}-${item.maxAge ?? '*'} days)`,
+            itemRender: (item: any) =>
+              `${item.alias ?? '?'}: ${item.gender ?? 'DEFAULT'} (${item.minAge ?? 0}-${item.maxAge ?? '*'} days)`,
             itemEditConfig: referenceRangesConfig,
           },
         ],
@@ -128,7 +199,9 @@ function toApiPayload(v: Record<string, unknown>) {
   if (Array.isArray(payload.loincIds)) {
     payload.loincIds = payload.loincIds.map(unwrapSelectValue);
   }
-  payload.loincId = Array.isArray(payload.loincIds) ? payload.loincIds[0] : unwrapSelectValue(payload.loincIds);
+  payload.loincId = Array.isArray(payload.loincIds)
+    ? payload.loincIds[0]
+    : unwrapSelectValue(payload.loincIds);
 
   payload.categoryId = payload.testCategoryId;
   payload.uomId = payload.unitId;
@@ -145,7 +218,7 @@ function toApiPayload(v: Record<string, unknown>) {
   delete payload.sampleTypeId;
   delete payload.programId;
   delete payload.loincIds;
-  payload.resultType = (payload.resultType as any).value
+  payload.resultType = (payload.resultType as any).value;
 
   return payload;
 }

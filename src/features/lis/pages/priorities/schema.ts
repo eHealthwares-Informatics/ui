@@ -9,7 +9,7 @@ const columns: Column[] = [
 ];
 
 const createFields: Field[] = [
-  { name: 'code', label: 'Code', type: 'text', col: 4 },
+  { name: 'code', label: 'Code', type: 'text', col: 4, generateCode: { scope: 'priorities' } },
   { name: 'name', label: 'Name', type: 'text', required: true, col: 6 },
   { name: 'index', label: 'Index', type: 'number', col: 2 },
   { name: 'active', label: 'Active', type: 'switch', col: 3 },

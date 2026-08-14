@@ -26,6 +26,7 @@ export { LisResultsPage } from './results';
 export { LisResultSignaturesPage } from './result-signatures';
 export { LisSamplesPage } from './samples';
 export { LisStatusesPage } from './statuses';
+export { LisQaChecklistItemsPage } from './qa-checklist-items';
 export { LisValidationDashboardPage } from './validation-dashboard';
 export { LisQcLotsPage } from './qc-lots';
 export { LisQcResultsPage } from './qc-results';

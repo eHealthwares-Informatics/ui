@@ -7,6 +7,7 @@ const moduleTitles: Record<string, string> = {
   admin: 'Admin Console',
   communication: 'Switch',
   'coding-concept': 'Coding Concept',
+  emr: 'EMR',
   damorex: 'Damorex Pharmacy',
 };
 

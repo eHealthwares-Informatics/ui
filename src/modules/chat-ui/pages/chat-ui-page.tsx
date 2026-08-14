@@ -11,10 +11,11 @@ import {
   Drawer,
   Group,
   Loader,
-  Menu,
   Paper,
+  Popover,
   ScrollArea,
   SegmentedControl,
+  Select,
   Skeleton,
   Stack,
   Text,
@@ -42,22 +43,45 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
+import { useChatPhoneStore } from '@/stores/chat-phone-store';
 import {
   useConversationInbox,
   useConversationMessages,
   useMarkConversationRead,
+  usePendingExchanges,
   useSendConversationMessage,
+  chatKeys,
 } from '../hooks/use-chat-queries';
 import { useChatSocket } from '../hooks/use-chat-socket';
-import { addProjection, findParticipantByPhone, createParticipant, listProjections } from '../services/chat-api';
-import { NewConversationModal } from '../components/new-conversation-modal';
+import { addProjection, findParticipantByPhone, createParticipant, listProjections, sendWebhookMessage } from '../services/chat-api';
+import { AddProjectionModal } from '../components/add-projection-modal';
 import { ParticipantModal } from '../components/participant-modal';
-import type { ChatMode, ConversationInboxItem, ConversationProjection, ExchangeMessage, InboxMode } from '../types';
+import { PhoneSetupModal } from '../components/phone-setup-modal';
+import type {
+  ChatMode,
+  ConversationInboxItem,
+  ConversationInboxResponse,
+  ConversationProjection,
+  ExchangeMessage,
+  InboxMode,
+  InboxStatus,
+} from '../types';
 import { getParticipantInitials, getParticipantName } from '../utils/participants';
 import { parseQuestionOptions } from '../utils/parse-options';
 
 dayjs.extend(relativeTime);
+
+const WEB_CHANNEL_ID = '69bd061c11bf835d976c4e2f';
+
+const INBOX_STATUSES: Array<{ value: InboxStatus | ''; label: string }> = [
+  { value: '', label: 'All' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'STOPPED', label: 'Stopped' },
+  { value: 'CANCELLED', label: 'Cancelled' },
+];
 
 type ChatUiPageProps = {
   mode?: ChatMode;
@@ -70,24 +94,71 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   const [selectedConversationId, setSelectedConversationId] = useState<string>();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inboxMode, setInboxMode] = useState<InboxMode>('admin');
+  const [statusByMode, setStatusByMode] = useState<Partial<Record<InboxMode, InboxStatus | ''>>>(
+    {},
+  );
   const [adminParticipantId, setAdminParticipantId] = useState<string | null>(null);
   const [adminParticipantLoaded, setAdminParticipantLoaded] = useState(false);
-  const [newChatOpened, { open: openNewChat, close: closeNewChat }] = useDisclosure(false);
+  const [addProjectionOpened, { open: openAddProjection, close: closeAddProjection }] =
+    useDisclosure(false);
   const [participantModalOpened, { open: openParticipantModal, close: closeParticipantModal }] =
     useDisclosure(false);
-  const [participantModalMode, setParticipantModalMode] = useState<'add' | 'remove'>('add');
   const [contextConversationId, setContextConversationId] = useState<string | undefined>();
+  const [contextChannelId, setContextChannelId] = useState<string | undefined>();
+  const [composing, setComposing] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
 
+  const chatPhone = useChatPhoneStore((state) => state.chatPhone);
+  const setChatPhone = useChatPhoneStore((state) => state.setChatPhone);
   const userPhone = useAuthStore((state) => state.user?.phone);
+  const effectivePhone = chatPhone || userPhone;
+
+  const status = statusByMode[inboxMode] ?? '';
+  const handleStatusChange = (value: InboxStatus | '') =>
+    setStatusByMode((prev) => ({ ...prev, [inboxMode]: value }));
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!userPhone || adminParticipantLoaded) {return;}
+    setPageIndex(0);
+  }, [search, inboxMode, status]);
+
+  const handlePrevPage = () => {
+    if (pageIndex <= 0) {return;}
+    queryClient.setQueryData<{
+      pages: ConversationInboxResponse[];
+      pageParams: Array<string | undefined>;
+    }>(chatKeys.inbox(search, inboxMode, status), (current) => {
+      if (!current) {return current;}
+      return {
+        ...current,
+        pages: current.pages.slice(0, -1),
+        pageParams: current.pageParams.slice(0, -1),
+      };
+    });
+    setPageIndex((index) => index - 1);
+  };
+
+  const handleNextPage = () => {
+    if (!inboxQuery.hasNextPage || inboxQuery.isFetchingNextPage) {return;}
+    inboxQuery.fetchNextPage();
+    setPageIndex((index) => index + 1);
+  };
+
+  const startCompose = () => {
+    setComposing(true);
+    setSelectedConversationId(undefined);
+    setSidebarOpen(false);
+  };
+
+  useEffect(() => {
+    if (!effectivePhone || adminParticipantLoaded) {return;}
 
     (async () => {
       try {
-        let participant = await findParticipantByPhone(userPhone);
+        let participant = await findParticipantByPhone(effectivePhone);
         if (!participant) {
-          participant = await createParticipant({ phone: userPhone, firstName: 'Admin' });
+          participant = await createParticipant({ phone: effectivePhone, firstName: 'Admin' });
         }
         if (participant?.id) {
           setAdminParticipantId(participant.id);
@@ -98,9 +169,14 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
         setAdminParticipantLoaded(true);
       }
     })();
-  }, [userPhone, adminParticipantLoaded]);
+  }, [effectivePhone, adminParticipantLoaded]);
 
-  const inboxQuery = useConversationInbox(search, inboxMode, adminParticipantId ?? undefined);
+  const inboxQuery = useConversationInbox(search, inboxMode, status, adminParticipantId ?? undefined);
+
+  useEffect(() => {
+    const pageCount = inboxQuery.data?.pages.length ?? 1;
+    setPageIndex((index) => (index >= pageCount ? Math.max(0, pageCount - 1) : index));
+  }, [inboxQuery.data?.pages.length]);
 
   const selectedConversation = useMemo(
     () =>
@@ -114,14 +190,30 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
     mode === 'admin'
       ? selectedConversation?.moderator?.id
       : selectedConversation?.participant.id;
+  const pendingConversationId = composing
+    ? adminParticipantId
+      ? `pending-${adminParticipantId}`
+      : undefined
+    : undefined;
   const socket = useChatSocket({
     conversationId: selectedConversationId,
     participantId: activeParticipantId,
+    pendingConversationId,
+    pendingParticipantId: adminParticipantId ?? undefined,
+    onConversationCreated: (conversationId) => {
+      // Auto-select the conversation created by the webhook flow. Ignore
+      // "pending-" ids which are not real conversations yet.
+      if (composing && conversationId && !conversationId.startsWith('pending-')) {
+        setComposing(false);
+        setSelectedConversationId(conversationId);
+        setSidebarOpen(false);
+      }
+    },
   });
   const markRead = useMarkConversationRead();
 
   useEffect(() => {
-    if (!selectedConversationId) {return;}
+    if (!selectedConversationId || selectedConversationId.startsWith('pending-')) {return;}
 
     markRead.mutate({
       conversationId: selectedConversationId,
@@ -130,10 +222,6 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   }, [activeParticipantId, selectedConversationId]);
 
   const conversations = inboxQuery.data?.pages.flatMap((page) => page.items) ?? [];
-
-  const handleNewChatCreated = useCallback((conversationId: string) => {
-    setSelectedConversationId(conversationId);
-  }, []);
 
   const handleAddMe = useCallback(async (conversationId: string) => {
     if (!adminParticipantId) {return;}
@@ -145,7 +233,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
           conversationId,
           participantId: adminParticipantId,
           channelId: '',
-          role: 'AGENT' as any,
+          role: 'AGENT',
         });
       }
     } catch {
@@ -154,37 +242,43 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   }, [adminParticipantId]);
 
   const inbox = (
-        <InboxSidebar
-          connected={socket.connected}
-          conversations={conversations}
-          error={inboxQuery.isError}
-          fetchNextPage={() => inboxQuery.fetchNextPage()}
-          hasNextPage={inboxQuery.hasNextPage}
-          isFetchingNextPage={inboxQuery.isFetchingNextPage}
-          loading={inboxQuery.isLoading}
-          onRetry={() => inboxQuery.refetch()}
-          onSearch={setSearch}
-          onSelect={(conversation) => {
-            setSelectedConversationId(conversation.conversationId);
-            setSidebarOpen(false);
-          }}
-          search={search}
-          selectedConversationId={selectedConversationId}
-          mode={inboxMode}
-          onModeChange={setInboxMode}
-          onNewChat={openNewChat}
-          onAddParticipant={(convId) => {
-            setContextConversationId(convId);
-            setParticipantModalMode('add');
-            openParticipantModal();
-          }}
-          onRemoveParticipant={(convId) => {
-            setContextConversationId(convId);
-            setParticipantModalMode('remove');
-            openParticipantModal();
-          }}
-          onAddMe={handleAddMe}
-        />
+          <InboxSidebar
+            connected={socket.connected}
+            conversations={conversations}
+            error={inboxQuery.isError}
+            isFetchingNextPage={inboxQuery.isFetchingNextPage}
+            loading={inboxQuery.isLoading}
+            onRetry={() => inboxQuery.refetch()}
+            onSearch={setSearch}
+            onSelect={(conversation) => {
+              setComposing(false);
+              setSelectedConversationId(conversation.conversationId);
+              setSidebarOpen(false);
+            }}
+            search={search}
+            selectedConversationId={selectedConversationId}
+            mode={inboxMode}
+            onModeChange={setInboxMode}
+            status={status}
+            onStatusChange={handleStatusChange}
+            onNewChat={startCompose}
+            onAddParticipant={(convId) => {
+              const item = conversations.find((c) => c.conversationId === convId);
+              setContextConversationId(convId);
+              setContextChannelId(item?.channelId);
+              openAddProjection();
+            }}
+            onRemoveParticipant={(convId) => {
+              setContextConversationId(convId);
+              openParticipantModal();
+            }}
+            onAddMe={handleAddMe}
+            pageIndex={pageIndex}
+            canPrev={pageIndex > 0}
+            canNext={inboxQuery.hasNextPage}
+            onPrev={handlePrevPage}
+            onNext={handleNextPage}
+          />
   );
 
   return (
@@ -209,11 +303,19 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
           <ConversationThread
             connected={socket.connected}
             conversation={selectedConversation}
+            composing={composing}
             mode={mode}
+            pendingConversationId={pendingConversationId}
+            pendingMessages={socket.pendingMessages}
+            onAddProjection={() => {
+              setContextConversationId(selectedConversationId);
+              setContextChannelId(selectedConversation?.channelId);
+              openAddProjection();
+            }}
             onBack={() => setSidebarOpen(true)}
             showMobileBack={Boolean(isMobile)}
             typingParticipantId={socket.typingParticipantId}
-            userPhone={userPhone}
+            userPhone={effectivePhone}
             adminParticipantId={adminParticipantId ?? undefined}
           />
         </Paper>
@@ -229,12 +331,15 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
         {inbox}
       </Drawer>
 
-      <NewConversationModal
-        opened={newChatOpened}
-        onClose={closeNewChat}
-        onCreated={handleNewChatCreated}
-        adminParticipantId={adminParticipantId ?? undefined}
-        adminPhone={userPhone}
+      <AddProjectionModal
+        opened={addProjectionOpened}
+        onClose={() => {
+          closeAddProjection();
+          setContextConversationId(undefined);
+          setContextChannelId(undefined);
+        }}
+        conversationId={contextConversationId}
+        defaultChannelId={contextChannelId}
       />
 
       <ParticipantModal
@@ -244,8 +349,9 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
           setContextConversationId(undefined);
         }}
         conversationId={contextConversationId}
-        defaultMode={participantModalMode}
       />
+
+      <PhoneSetupModal opened={!effectivePhone} onSave={setChatPhone} />
     </AppShell>
   );
 }
@@ -254,8 +360,6 @@ function InboxSidebar(props: {
   connected: boolean;
   conversations: ConversationInboxItem[];
   error: boolean;
-  fetchNextPage: () => void;
-  hasNextPage: boolean;
   isFetchingNextPage: boolean;
   loading: boolean;
   onRetry: () => void;
@@ -265,10 +369,17 @@ function InboxSidebar(props: {
   selectedConversationId?: string;
   mode: InboxMode;
   onModeChange: (mode: InboxMode) => void;
+  status: InboxStatus | '';
+  onStatusChange: (status: InboxStatus | '') => void;
   onNewChat: () => void;
   onAddParticipant: (conversationId: string) => void;
   onRemoveParticipant: (conversationId: string) => void;
   onAddMe: (conversationId: string) => void;
+  pageIndex: number;
+  canPrev: boolean;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
 }) {
   return (
     <Stack h="100%" gap="sm" p="sm">
@@ -276,7 +387,7 @@ function InboxSidebar(props: {
         <Group gap="xs" wrap="nowrap" style={{ flex: 1 }}>
           <SegmentedControl
             data={[
-              { value: 'admin', label: 'Admin' },
+              { value: 'admin', label: 'Inbox' },
               { value: 'all', label: 'All' },
               { value: 'individual', label: '1-on-1' },
               { value: 'group', label: 'Group' },
@@ -306,6 +417,14 @@ function InboxSidebar(props: {
         </Group>
       </Group>
 
+      <Select
+        allowDeselect={false}
+        data={INBOX_STATUSES}
+        onChange={(v) => props.onStatusChange((v || '') as InboxStatus | '')}
+        size="xs"
+        value={props.status}
+      />
+
       <TextInput
         leftSection={<Search size={15} />}
         onChange={(event) => props.onSearch(event.currentTarget.value)}
@@ -329,14 +448,7 @@ function InboxSidebar(props: {
         </Alert>
       )}
 
-      <ScrollArea
-        flex={1}
-        onScrollPositionChange={({ y }) => {
-          if (y > 200 && props.hasNextPage && !props.isFetchingNextPage) {
-            props.fetchNextPage();
-          }
-        }}
-      >
+      <ScrollArea flex={1}>
         <Stack gap={0}>
           {props.loading &&
             Array.from({ length: 8 }).map((_, index) => (
@@ -376,14 +488,31 @@ function InboxSidebar(props: {
               <Divider />
             </Fragment>
           ))}
-
-          {props.isFetchingNextPage && (
-            <Center py="md">
-              <Loader size="sm" />
-            </Center>
-          )}
         </Stack>
       </ScrollArea>
+
+      <Group justify="space-between" mt="xs" wrap="nowrap">
+        <Button
+          disabled={!props.canPrev}
+          onClick={props.onPrev}
+          size="xs"
+          variant="subtle"
+        >
+          Previous
+        </Button>
+        <Text c="dimmed" size="xs">
+          Page {props.pageIndex + 1}
+        </Text>
+        <Button
+          disabled={!props.canNext || props.isFetchingNextPage}
+          leftSection={props.isFetchingNextPage ? <Loader size={12} /> : undefined}
+          onClick={props.onNext}
+          size="xs"
+          variant="subtle"
+        >
+          Next
+        </Button>
+      </Group>
     </Stack>
   );
 }
@@ -404,22 +533,32 @@ function ConversationListItem(props: {
 
   const [contextMenuOpened, setContextMenuOpened] = useState(false);
 
+  const closeContextMenu = () => setContextMenuOpened(false);
+
   return (
-    <Menu
+    <Popover
+      onChange={setContextMenuOpened}
       opened={contextMenuOpened}
-      onClose={() => setContextMenuOpened(false)}
-      onOpen={() => setContextMenuOpened(true)}
+      position="bottom-start"
+      shadow="md"
+      withinPortal
     >
-      <Menu.Target>
+      <Popover.Target>
         <Button
           color="blue"
           fullWidth
           h={76}
           justify="flex-start"
-          onClick={props.onSelect}
+          onClick={() => {
+            closeContextMenu();
+            props.onSelect();
+          }}
           onContextMenu={(e) => {
             e.preventDefault();
             setContextMenuOpened(true);
+          }}
+          onMouseDown={(e) => {
+            if (e.button === 2) {e.preventDefault();}
           }}
           px="xs"
           radius={0}
@@ -461,48 +600,64 @@ function ConversationListItem(props: {
             )}
           </Group>
         </Button>
-      </Menu.Target>
+      </Popover.Target>
 
-      <Menu.Dropdown>
-        <Menu.Item
-          leftSection={<UserPlus size={14} />}
-          onClick={(e) => {
-            e.stopPropagation();
-            setContextMenuOpened(false);
-            props.onAddMe(props.conversation.conversationId);
-          }}
-        >
-          Add Me
-        </Menu.Item>
-        <Menu.Item
-          leftSection={<UserPlus size={14} />}
-          onClick={(e) => {
-            e.stopPropagation();
-            setContextMenuOpened(false);
-            props.onAddParticipant(props.conversation.conversationId);
-          }}
-        >
-          Add Participant
-        </Menu.Item>
-        <Menu.Item
-          leftSection={<UserX size={14} />}
-          onClick={(e) => {
-            e.stopPropagation();
-            setContextMenuOpened(false);
-            props.onRemoveParticipant(props.conversation.conversationId);
-          }}
-        >
-          Remove Participant
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+      <Popover.Dropdown p={4}>
+        <Stack gap={4} w={220}>
+          <Button
+            fullWidth
+            justify="flex-start"
+            leftSection={<UserPlus size={14} />}
+            onClick={() => {
+              closeContextMenu();
+              props.onAddMe(props.conversation.conversationId);
+            }}
+            size="sm"
+            variant="subtle"
+          >
+            Add Me
+          </Button>
+          <Button
+            fullWidth
+            justify="flex-start"
+            leftSection={<UserPlus size={14} />}
+            onClick={() => {
+              closeContextMenu();
+              props.onAddParticipant(props.conversation.conversationId);
+            }}
+            size="sm"
+            variant="subtle"
+          >
+            Add Participant
+          </Button>
+          <Button
+            color="red"
+            fullWidth
+            justify="flex-start"
+            leftSection={<UserX size={14} />}
+            onClick={() => {
+              closeContextMenu();
+              props.onRemoveParticipant(props.conversation.conversationId);
+            }}
+            size="sm"
+            variant="subtle"
+          >
+            Remove Participant
+          </Button>
+        </Stack>
+      </Popover.Dropdown>
+    </Popover>
   );
 }
 
 function ConversationThread(props: {
   connected: boolean;
   conversation?: ConversationInboxItem;
+  composing?: boolean;
   mode: ChatMode;
+  pendingConversationId?: string;
+  pendingMessages?: ExchangeMessage[];
+  onAddProjection?: () => void;
   onBack: () => void;
   showMobileBack: boolean;
   typingParticipantId?: string;
@@ -510,8 +665,12 @@ function ConversationThread(props: {
   adminParticipantId?: string;
 }) {
   const [draft, setDraft] = useState('');
+  const [composeSending, setComposeSending] = useState(false);
+  const [composeMessages, setComposeMessages] = useState<ExchangeMessage[]>([]);
   const [projections, setProjections] = useState<ConversationProjection[]>([]);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+  const pendingQuery = usePendingExchanges(props.pendingConversationId);
   const messagesQuery = useConversationMessages(props.conversation?.conversationId);
   const sendMessage = useSendConversationMessage();
   const messages = useMemo(
@@ -519,7 +678,6 @@ function ConversationThread(props: {
     [messagesQuery.data],
   );
   const groupedMessages = useMemo(() => groupMessagesByDate(messages), [messages]);
-  console.log({props})
   const senderId =
     props.mode === 'admin'
       ? projections.find(p => p.isPrimary)?.participant.id
@@ -527,7 +685,9 @@ function ConversationThread(props: {
 
   const hasMyProjection = projections.some((p) => p.participant.id === props.adminParticipantId);
   const isCompleted = props.conversation?.status === 'COMPLETED';
-  const inputDisabled = isCompleted || (!hasMyProjection && !!props.adminParticipantId);
+  const isWebChannel = props.conversation?.channelId === WEB_CHANNEL_ID;
+  const inputDisabled =
+    isCompleted || !isWebChannel || (!hasMyProjection && !!props.adminParticipantId);
 
   useEffect(() => {
     if (!props.conversation?.conversationId) {return;}
@@ -535,10 +695,153 @@ function ConversationThread(props: {
   }, [props.conversation?.conversationId]);
 
   useEffect(() => {
+    if (props.composing) {
+      setComposeMessages([]);
+    }
+  }, [props.composing]);
+
+  const sendComposeText = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || composeSending) {return;}
+    setComposeSending(true);
+
+    const optimistic: ExchangeMessage = {
+      id: `optimistic-${Date.now()}`,
+      conversationId: props.pendingConversationId ?? 'pending',
+      senderId: props.userPhone || '',
+      direction: 'inbound',
+      text: trimmed,
+      createdAt: new Date().toISOString(),
+      status: 'sent',
+      optimistic: true,
+    };
+    setComposeMessages((prev) => [...prev, optimistic]);
+
+    try {
+      await sendWebhookMessage({
+        channelId: WEB_CHANNEL_ID,
+        senderPhone: props.userPhone || '',
+        text: trimmed,
+      });
+      setDraft('');
+      if (props.pendingConversationId) {
+        queryClient.invalidateQueries({ queryKey: chatKeys.pending(props.pendingConversationId) });
+      }
+    } catch {
+      setComposeMessages((prev) =>
+        prev.map((message) =>
+          message.id === optimistic.id ? { ...message, status: 'failed', optimistic: false } : message
+        ),
+      );
+    } finally {
+      setComposeSending(false);
+    }
+  };
+
+  const submitCompose = () => {
+    if (!draft.trim() || composeSending) {return;}
+    void sendComposeText(draft);
+  };
+
+  const composeThread = useMemo(() => {
+    const byId = new Map<string, ExchangeMessage>();
+    for (const message of pendingQuery.data?.items ?? []) {
+      byId.set(message.id, message);
+    }
+    for (const message of props.pendingMessages ?? []) {
+      if (!byId.has(message.id)) {byId.set(message.id, message);}
+    }
+    const merged = [...byId.values()];
+    for (const message of composeMessages) {
+      const duplicate = merged.some(
+        (existing) =>
+          existing.direction === 'inbound' &&
+          existing.text === message.text &&
+          Math.abs(new Date(existing.createdAt).getTime() - new Date(message.createdAt).getTime()) < 5000,
+      );
+      if (!duplicate) {merged.push(message);}
+    }
+    return [...merged].sort(
+      (left, right) =>
+        new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
+    );
+  }, [composeMessages, pendingQuery.data?.items, props.pendingMessages]);
+
+  useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport || messagesQuery.isFetchingNextPage) {return;}
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
-  }, [messages.length, props.conversation?.conversationId]);
+  }, [messages.length, composeThread.length, props.conversation?.conversationId]);
+
+  if (props.composing) {
+    return (
+      <Stack h="100%" gap={0}>
+        <Group bg="white" justify="space-between" p="md" wrap="nowrap">
+          <Group wrap="nowrap">
+            {props.showMobileBack && (
+              <ActionIcon aria-label="Open inbox" onClick={props.onBack} variant="subtle">
+                <ArrowLeft size={18} />
+              </ActionIcon>
+            )}
+            <Avatar radius="xl">
+              <MessagesSquare size={18} />
+            </Avatar>
+            <Box>
+              <Text fw={700} lineClamp={1}>New message</Text>
+              <Text c="dimmed" size="xs">Send the first message to start a chat</Text>
+            </Box>
+          </Group>
+        </Group>
+        <ScrollArea flex={1} viewportRef={viewportRef}>
+          <Stack gap="sm" p="md">
+            {composeThread.length === 0 ? (
+              <Center h={320}>
+                <Text c="dimmed" maw={320} size="sm" ta="center">
+                  Type a message below. It will create a new conversation on the web channel.
+                </Text>
+              </Center>
+            ) : (
+              composeThread.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  onOptionSelect={(value) => {
+                    void sendComposeText(value);
+                  }}
+                />
+              ))
+            )}
+          </Stack>
+        </ScrollArea>
+        <Box bg="white" p="md">
+          <Group align="flex-end" gap="xs" wrap="nowrap">
+            <Textarea
+              autosize
+              maxRows={4}
+              minRows={1}
+              value={draft}
+              onChange={(event) => setDraft(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  submitCompose();
+                }
+              }}
+              placeholder="Type a message..."
+              style={{ flex: 1 }}
+            />
+            <Button
+              onClick={submitCompose}
+              disabled={!draft.trim() || composeSending}
+              leftSection={composeSending ? <Loader size={14} /> : <Send size={14} />}
+            >
+              Send
+            </Button>
+          </Group>
+        </Box>
+      </Stack>
+    );
+  }
 
   if (!props.conversation) {
     return (
@@ -565,7 +868,6 @@ function ConversationThread(props: {
   }
 
   const conversation = props.conversation;
-    console.log({conversation})
 
   const submit = () => {
     if (!draft.trim() || !senderId || sendMessage.isPending || inputDisabled) {return;}
@@ -614,7 +916,21 @@ function ConversationThread(props: {
             </Group>
           </Box>
         </Group>
-        <Badge variant="light">{conversation.status}</Badge>
+        <Group wrap="nowrap">
+          {props.onAddProjection && (
+            <Tooltip label="Add projection">
+              <ActionIcon
+                aria-label="Add projection"
+                onClick={props.onAddProjection}
+                size="lg"
+                variant="light"
+              >
+                <UserPlus size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+          <Badge variant="light">{conversation.status}</Badge>
+        </Group>
       </Group>
 
       <ScrollArea flex={1} viewportRef={viewportRef}>
@@ -727,7 +1043,6 @@ function ConversationThread(props: {
             style={{ flex: 1 }}
             value={draft}
           />
-          {draft}-senderId({senderId})inputDisabled-{inputDisabled}
           <Button
             disabled={!draft.trim() || !senderId || inputDisabled}
             leftSection={<Send size={16} />}

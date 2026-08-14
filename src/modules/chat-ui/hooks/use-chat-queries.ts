@@ -13,23 +13,32 @@ import type {
   ExchangeMessage,
   ExchangeMessagesResponse,
   InboxMode,
+  InboxStatus,
 } from '../types';
 
 export const chatKeys = {
-  inbox: (search: string, mode?: InboxMode) =>
-    ['conversation-inbox', { search, mode }] as const,
+  inbox: (search: string, mode?: InboxMode, status?: InboxStatus | '') =>
+    ['conversation-inbox', { search, mode, status }] as const,
   messages: (conversationId?: string) => ['conversation-messages', conversationId] as const,
   projections: (conversationId?: string) => ['projections', conversationId] as const,
+  pending: (conversationId?: string) => ['pending-exchanges', conversationId] as const,
 };
 
-export function useConversationInbox(search: string, mode?: InboxMode, adminParticipantId?: string) {
+export function useConversationInbox(
+  search: string,
+  mode?: InboxMode,
+  status?: InboxStatus | '',
+  adminParticipantId?: string,
+) {
   return useInfiniteQuery({
-    queryKey: chatKeys.inbox(search, mode),
+    queryKey: chatKeys.inbox(search, mode, status),
     queryFn: ({ pageParam }) =>
       fetchConversationInbox({
         cursor: pageParam,
         search: search.trim() || undefined,
         mode,
+        status: status || undefined,
+        activeOnly: mode !== 'all' && !status,
         participantId: mode === 'admin' ? adminParticipantId : undefined,
       }),
     initialPageParam: undefined as string | undefined,
@@ -48,6 +57,16 @@ export function useConversationMessages(conversationId?: string) {
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+}
+
+export function usePendingExchanges(conversationId?: string) {
+  return useQuery({
+    queryKey: chatKeys.pending(conversationId),
+    enabled: Boolean(conversationId),
+    queryFn: () => fetchConversationMessages({ conversationId: conversationId! }),
+    refetchInterval: conversationId ? 3000 : false,
+    select: (data) => ({ ...data, items: [...data.items].reverse() }),
   });
 }
 
@@ -118,23 +137,23 @@ export function useSendConversationMessage() {
       });
     },
     onSuccess: (_data, input, context) => {
+      const queryKey = chatKeys.messages(input.conversationId);
       queryClient.setQueryData<{
         pages: ExchangeMessagesResponse[];
         pageParams: Array<string | undefined>;
-      }>(chatKeys.messages(input.conversationId), (current) => {
-        if (!current) {return current;}
+      }>(queryKey, (current) => {
+        if (!current || !context) {return current;}
 
         return {
           ...current,
           pages: current.pages.map((page) => ({
             ...page,
-            items: page.items.map((message) =>
-              message.id === context?.optimisticId ? { ...message, optimistic: false } : message
-            ),
+            items: page.items.filter((message) => message.id !== context.optimisticId),
           })),
         };
       });
 
+      queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
     },
   });

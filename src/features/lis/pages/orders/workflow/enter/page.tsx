@@ -1,11 +1,11 @@
 import { Stack, Alert, Text } from '@mantine/core';
-import { AlertCircle } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
+import { AlertCircle } from 'lucide-react';
 import { useOrderContext } from '../OrderContext';
 import { SaveNavigationButtons } from '../SaveNavigationButtons';
+import { OrderDetailsSection } from './OrderDetailsSection';
 import { PatientSearchSection } from './PatientSearchSection';
 import { SampleTestSelectionSection } from './SampleTestSelectionSection';
-import { OrderDetailsSection } from './OrderDetailsSection';
 
 export function OrderEnterPage() {
   const { state, saveOrder, saveOrderEntry, dispatch } = useOrderContext();
@@ -19,7 +19,10 @@ export function OrderEnterPage() {
     if (result?.id) {
       dispatch({ type: 'MARK_STEP', payload: 'enter' });
       dispatch({ type: 'SET_STEP', payload: 1 });
-      navigate({ to: '/lis/orders/new/collect', search: { orderNumber: result.orderNumber ?? '' } });
+      navigate({
+        to: '/lis/orders/workflow/collect',
+        search: { orderNumber: result.orderNumber ?? '' },
+      });
     }
   };
 

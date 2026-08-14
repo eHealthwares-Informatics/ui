@@ -1,5 +1,16 @@
+import {
+  Card,
+  Stack,
+  Text,
+  Group,
+  Badge,
+  Table,
+  Select,
+  Modal,
+  Button,
+  Paper,
+} from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { Card, Stack, Text, Group, Badge, Table, Select, Modal, Button, Paper } from '@mantine/core';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
@@ -76,7 +87,12 @@ export function TestAssignmentSection() {
                       </Badge>
                     </Table.Td>
                     <Table.Td>
-                      <Button size="xs" variant="subtle" color="red" onClick={() => unassignTest(a.testDefinitionId)}>
+                      <Button
+                        size="xs"
+                        variant="subtle"
+                        color="red"
+                        onClick={() => unassignTest(a.testDefinitionId)}
+                      >
                         Remove
                       </Button>
                     </Table.Td>

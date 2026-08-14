@@ -2,6 +2,7 @@ import { Accordion, Badge, Card, Group, Stack, Table, Text } from '@mantine/core
 import { useEffect, useState } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
+import { useSampleTypeNameMap } from '../useSampleTypes';
 
 interface TestDefinition {
   id: string;
@@ -11,6 +12,7 @@ interface TestDefinition {
 
 export function OrderSummarySection() {
   const { state } = useOrderContext();
+  const sampleTypeNames = useSampleTypeNameMap();
   const [tests, setTests] = useState<TestDefinition[]>([]);
 
   useEffect(() => {
@@ -67,7 +69,9 @@ export function OrderSummarySection() {
                 <Group key={item.testDefinitionId} justify="space-between">
                   <Text size="sm">{getTestName(item.testDefinitionId)}</Text>
                   {(() => {
-                    const assignment = state.assignments.find((a) => a.testDefinitionId === item.testDefinitionId);
+                    const assignment = state.assignments.find(
+                      (a) => a.testDefinitionId === item.testDefinitionId
+                    );
                     return assignment ? (
                       <Badge size="sm" color="violet" variant="light">
                         Sample #{assignment.sampleIndex + 1}
@@ -98,7 +102,7 @@ export function OrderSummarySection() {
                     Sample #{i + 1}: {s.barcode}
                   </Text>
                   <Badge size="sm" color="blue" variant="light">
-                    {s.sampleType ?? '—'}
+                    {s.sampleTypeId ? (sampleTypeNames[s.sampleTypeId] ?? s.sampleTypeId) : '—'}
                   </Badge>
                 </Group>
               ))}

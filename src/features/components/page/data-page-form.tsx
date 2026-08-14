@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useModuleContext } from '@/context/module-context';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields, normalizeMultiSelectIds } from '@/features/shared/payload-utils';
+import { getDirtyFields } from '@/features/components/utils';
 import { FieldGroup } from '../form/FieldGroup';
 import { TabGroups } from '../form/tab-groups';
 import { RxPage } from './rx-page';
@@ -16,9 +17,16 @@ type DataPageFormProps = {
   initialData?: Record<string, unknown> | null;
   mode?: 'create' | 'edit';
   onSave?: () => void;
+  onSaved?: (data: Record<string, unknown>) => void;
 };
 
-export function DataPageForm({ config, initialData, mode = 'create', onSave }: DataPageFormProps) {
+export function DataPageForm({
+  config,
+  initialData,
+  mode = 'create',
+  onSave,
+  onSaved,
+}: DataPageFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const moduleContext = useModuleContext();
@@ -32,6 +40,7 @@ export function DataPageForm({ config, initialData, mode = 'create', onSave }: D
     createFieldGroups,
     tabGroups,
     buildCreatePayload,
+    buildUpdatePayload,
     buildFormState,
     defaultState,
     modalTitle,
@@ -59,15 +68,32 @@ export function DataPageForm({ config, initialData, mode = 'create', onSave }: D
 
   const isWizard = Boolean(tabGroups);
 
+  const [initialFormState, setInitialFormState] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    if (mode === 'edit' && initialData && buildFormState) {
+      setInitialFormState(buildFormState(initialData));
+    }
+  }, [initialData, mode, buildFormState]);
+
   const mutation = useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      const normalized = normalizeMultiSelectIds(values, fields);
-      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
       if (mode === 'edit') {
-        const id = initialData?.id ?? (values as any).id;
-        const response = await apiProvider!.put(`${endpoint}/${String(id)}`, payload);
+        const id = initialData?.id ?? (values as any).id ?? (initialData as any)?._id;
+        const changedValues = initialFormState
+          ? getDirtyFields(values, initialFormState)
+          : values;
+        const normalized = normalizeMultiSelectIds(changedValues, fields);
+        const payload = buildUpdatePayload
+          ? buildUpdatePayload(normalized, initialData ?? {})
+          : buildCreatePayload
+            ? buildCreatePayload(normalized)
+            : normalized;
+        const response = await apiProvider!.patch(`${endpoint}/${String(id)}`, payload);
         return response.data as Record<string, unknown>;
       }
+      const normalized = normalizeMultiSelectIds(values, fields);
+      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
       const response = await apiProvider!.post(endpoint, payload);
       return response.data as Record<string, unknown>;
     },
@@ -80,6 +106,7 @@ export function DataPageForm({ config, initialData, mode = 'create', onSave }: D
       } else {
         const action = mode === 'edit' ? 'updated' : 'created';
         notifications.show({ message: `${title} record ${action}` });
+        onSaved?.(data);
         if (onSave) {
           onSave();
         } else {
@@ -97,14 +124,23 @@ export function DataPageForm({ config, initialData, mode = 'create', onSave }: D
   });
 
   const handleStepSubmit = async (stepIndex: number): Promise<Record<string, unknown> | void> => {
-    const normalized = normalizeMultiSelectIds(formState, fields);
-    const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
     try {
       if (mode === 'edit') {
-        const id = initialData?.id ?? (formState as any).id;
-        const response = await apiProvider!.put(`${endpoint}/${String(id)}`, payload);
+        const id = initialData?.id ?? (formState as any).id ?? (initialData as any)?._id;
+        const changedValues = initialFormState
+          ? getDirtyFields(formState, initialFormState)
+          : formState;
+        const normalized = normalizeMultiSelectIds(changedValues, fields);
+        const payload = buildUpdatePayload
+          ? buildUpdatePayload(normalized, initialData ?? {})
+          : buildCreatePayload
+            ? buildCreatePayload(normalized)
+            : normalized;
+        const response = await apiProvider!.patch(`${endpoint}/${String(id)}`, payload);
         return response.data as Record<string, unknown>;
       }
+      const normalized = normalizeMultiSelectIds(formState, fields);
+      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
       const response = await apiProvider!.post(endpoint, payload);
       const data = response.data as Record<string, unknown>;
       setFormState((prev) => ({ ...prev, id: data.id as string }));

@@ -1,13 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Card, Stack, Text, TextInput, Group, Button, Select, Badge, Paper, NumberInput } from '@mantine/core';
+import {
+  Card,
+  Stack,
+  Text,
+  TextInput,
+  Group,
+  Button,
+  Select,
+  Badge,
+  Paper,
+  NumberInput,
+} from '@mantine/core';
 import { Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
 interface SampleType {
   id: string;
-  name: string;
   key: string;
+  name: string;
+  defaultQuantity?: number | null;
+  minimumQuantity?: number | null;
+  unit?: string | null;
+  containerType?: string | null;
 }
 
 interface Method {
@@ -33,9 +48,11 @@ export function SamplesCollectionSection() {
     lisApi.get('/lis/methods', { params: { limit: 100 } }).then((res) => {
       setMethods(res.data?.data ?? []);
     });
-    lisApi.get('/lis/test-definitions', { params: { limit: 200, fields: 'id,methodId' } }).then((res) => {
-      setTestDefs(res.data?.data ?? []);
-    });
+    lisApi
+      .get('/lis/test-definitions', { params: { limit: 200, fields: 'id,methodId' } })
+      .then((res) => {
+        setTestDefs(res.data?.data ?? []);
+      });
   }, []);
 
   const getDefaultCollectionMethod = (): string | null => {
@@ -48,18 +65,19 @@ export function SamplesCollectionSection() {
   };
 
   const addSample = () => {
+    const firstType = sampleTypes[0];
     dispatch({
       type: 'SET_SAMPLES',
       payload: [
         ...state.samples,
         {
           barcode: `S-${Date.now()}`,
-          sampleType: sampleTypes[0]?.key ?? '',
+          sampleTypeId: firstType?.id ?? '',
           collector: '',
           collectionDate: null,
           collectionMethod: getDefaultCollectionMethod(),
           collectionConditions: null,
-          quantity: null,
+          quantity: firstType?.defaultQuantity ?? null,
           notes: null,
         },
       ],
@@ -69,8 +87,15 @@ export function SamplesCollectionSection() {
   const updateSample = (index: number, field: string, value: unknown) => {
     const samples = [...state.samples];
     samples[index] = { ...samples[index], [field]: value };
+    if (field === 'sampleTypeId') {
+      const st = sampleTypes.find((t) => t.id === value);
+      samples[index].quantity = st?.defaultQuantity ?? null;
+    }
     dispatch({ type: 'SET_SAMPLES', payload: samples });
   };
+
+  const sampleTypeFor = (sample: (typeof state.samples)[number]) =>
+    sampleTypes.find((st) => st.id === sample.sampleTypeId);
 
   const removeSample = (index: number) => {
     dispatch({ type: 'SET_SAMPLES', payload: state.samples.filter((_, i) => i !== index) });
@@ -92,80 +117,105 @@ export function SamplesCollectionSection() {
           </Text>
         )}
 
-        {state.samples.map((sample, i) => (
-          <Paper key={i} withBorder p="sm" radius="md">
-            <Group justify="space-between" mb="xs">
-              <Badge color="violet" variant="light">
-                Sample #{i + 1}
-              </Badge>
-              <Button size="xs" color="red" variant="subtle" leftSection={<Trash2 size={14} />} onClick={() => removeSample(i)}>
-                Remove
-              </Button>
-            </Group>
+        {state.samples.map((sample, i) => {
+          const selectedType = sampleTypeFor(sample);
+          return (
+            <Paper key={i} withBorder p="sm" radius="md">
+              <Group justify="space-between" mb="xs">
+                <Badge color="violet" variant="light">
+                  Sample #{i + 1}
+                </Badge>
+                <Button
+                  size="xs"
+                  color="red"
+                  variant="subtle"
+                  leftSection={<Trash2 size={14} />}
+                  onClick={() => removeSample(i)}
+                >
+                  Remove
+                </Button>
+              </Group>
 
-            <Group grow>
+              <Group grow>
+                <TextInput
+                  label="Barcode"
+                  value={sample.barcode}
+                  onChange={(e) => updateSample(i, 'barcode', e.currentTarget.value)}
+                  required
+                />
+                <Select
+                  label="Sample Type"
+                  placeholder="Select sample type"
+                  data={sampleTypes.map((st) => ({ value: st.id, label: st.name }))}
+                  value={sample.sampleTypeId}
+                  onChange={(v) => updateSample(i, 'sampleTypeId', v)}
+                  searchable
+                />
+              </Group>
+              <Group grow mt="xs">
+                <TextInput
+                  label="Collector"
+                  placeholder="Name of collector"
+                  value={sample.collector ?? ''}
+                  onChange={(e) => updateSample(i, 'collector', e.currentTarget.value)}
+                />
+                <TextInput
+                  label="Collection Date"
+                  type="date"
+                  value={sample.collectionDate ?? ''}
+                  onChange={(e) => updateSample(i, 'collectionDate', e.currentTarget.value || null)}
+                />
+              </Group>
+              <Group grow mt="xs">
+                <div>
+                  <NumberInput
+                    label="Quantity"
+                    placeholder="Volume collected"
+                    value={sample.quantity ?? ''}
+                    onChange={(v) => updateSample(i, 'quantity', v === '' ? null : v)}
+                    min={0}
+                  />
+                  {selectedType && (
+                    <Text size="xs" c="dimmed" mt={4}>
+                      {selectedType.minimumQuantity != null &&
+                        `Min: ${selectedType.minimumQuantity}${selectedType.unit ?? ''} · `}
+                      {selectedType.defaultQuantity != null &&
+                        `Preferred: ${selectedType.defaultQuantity}${selectedType.unit ?? ''}`}
+                    </Text>
+                  )}
+                </div>
+                <Select
+                  label="Collection Method"
+                  placeholder="Select method"
+                  data={methods.map((m) => ({ value: m.name, label: m.name }))}
+                  value={sample.collectionMethod ?? ''}
+                  onChange={(v) => updateSample(i, 'collectionMethod', v)}
+                  clearable
+                  searchable
+                />
+              </Group>
+              {selectedType?.containerType && (
+                <Text size="xs" c="dimmed" mt="xs">
+                  Required container: {selectedType.containerType}
+                </Text>
+              )}
               <TextInput
-                label="Barcode"
-                value={sample.barcode}
-                onChange={(e) => updateSample(i, 'barcode', e.currentTarget.value)}
-                required
-              />
-              <Select
-                label="Sample Type"
-                placeholder="Select sample type"
-                data={sampleTypes.map((st) => ({ value: st.key, label: st.name }))}
-                value={sample.sampleType}
-                onChange={(v) => updateSample(i, 'sampleType', v)}
-              />
-            </Group>
-            <Group grow mt="xs">
-              <TextInput
-                label="Collector"
-                placeholder="Name of collector"
-                value={sample.collector ?? ''}
-                onChange={(e) => updateSample(i, 'collector', e.currentTarget.value)}
+                label="Collection Conditions"
+                placeholder="e.g. Fasting, Time since meal"
+                value={sample.collectionConditions ?? ''}
+                onChange={(e) => updateSample(i, 'collectionConditions', e.currentTarget.value)}
+                mt="xs"
               />
               <TextInput
-                label="Collection Date"
-                type="date"
-                value={sample.collectionDate ?? ''}
-                onChange={(e) => updateSample(i, 'collectionDate', e.currentTarget.value || null)}
+                label="Notes"
+                placeholder="Sample notes"
+                value={sample.notes ?? ''}
+                onChange={(e) => updateSample(i, 'notes', e.currentTarget.value)}
+                mt="xs"
               />
-            </Group>
-            <Group grow mt="xs">
-              <NumberInput
-                label="Quantity"
-                placeholder="Volume collected"
-                value={sample.quantity ?? ''}
-                onChange={(v) => updateSample(i, 'quantity', v === '' ? null : v)}
-                min={0}
-              />
-              <Select
-                label="Collection Method"
-                placeholder="Select method"
-                data={methods.map((m) => ({ value: m.name, label: m.name }))}
-                value={sample.collectionMethod ?? ''}
-                onChange={(v) => updateSample(i, 'collectionMethod', v)}
-                clearable
-                searchable
-              />
-            </Group>
-            <TextInput
-              label="Collection Conditions"
-              placeholder="e.g. Fasting, Time since meal"
-              value={sample.collectionConditions ?? ''}
-              onChange={(e) => updateSample(i, 'collectionConditions', e.currentTarget.value)}
-              mt="xs"
-            />
-            <TextInput
-              label="Notes"
-              placeholder="Sample notes"
-              value={sample.notes ?? ''}
-              onChange={(e) => updateSample(i, 'notes', e.currentTarget.value)}
-              mt="xs"
-            />
-          </Paper>
-        ))}
+            </Paper>
+          );
+        })}
       </Stack>
     </Card>
   );

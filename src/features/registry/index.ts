@@ -199,6 +199,10 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
     import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
       default: m.questionnairePageSchema as unknown as ModelConfig,
     })),
+  'option-lists': () =>
+    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
+      default: m.optionListsPageSchema as unknown as ModelConfig,
+    })),
   workflows: () =>
     import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
       default: m.workflowPageSchema as unknown as ModelConfig,

@@ -28,6 +28,7 @@ type AuthState = {
   logout: () => void;
   bootstrap: () => void;
   fetchModules: () => Promise<void>;
+  pendingModulesFetch: Promise<void> | null;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -39,6 +40,7 @@ export const useAuthStore = create<AuthState>()(
       modules: [],
       loading: false,
       error: null,
+      pendingModulesFetch: null,
 
       login: async (username, password) => {
         set({ loading: true, error: null });
@@ -94,6 +96,7 @@ export const useAuthStore = create<AuthState>()(
           modules: [],
           loading: false,
           error: null,
+          pendingModulesFetch: null,
         });
       },
 
@@ -112,23 +115,36 @@ export const useAuthStore = create<AuthState>()(
 
         set({ accessToken, refreshToken, user, loading: false, error: null });
 
-        // Fetch modules in background
-        get().fetchModules();
+        // Fetch modules in background only if not already loaded
+        if (get().modules.length === 0) {
+          get().fetchModules();
+        }
       },
 
       fetchModules: async () => {
-        try {
-          const meResponse = await identityApi.get<{
-            id: string;
-            username: string;
-            roles: string[];
-            permissions: string[];
-            modules: ModuleInfo[];
-          }>('/auth/me');
-          set({ modules: meResponse.data.modules });
-        } catch {
-          // Silently fail - modules will be empty until fetched
+        if (get().modules.length > 0 || get().pendingModulesFetch) {
+          return get().pendingModulesFetch ?? Promise.resolve();
         }
+
+        const pending = (async () => {
+          try {
+            const meResponse = await identityApi.get<{
+              id: string;
+              username: string;
+              roles: string[];
+              permissions: string[];
+              modules: ModuleInfo[];
+            }>('/auth/me');
+            set({ modules: meResponse.data.modules });
+          } catch {
+            // Silently fail - modules will be empty until fetched
+          } finally {
+            set({ pendingModulesFetch: null });
+          }
+        })();
+
+        set({ pendingModulesFetch: pending });
+        await pending;
       },
     }),
     { name: 'rxsoft-admin-auth' },

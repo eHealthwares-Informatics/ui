@@ -86,7 +86,7 @@ export function PaginatedDataTable({
         <Pagination
           pageIndex={pageIndex}
           pageSize={pageSize}
-          totalItems={totalPages}
+          totalItems={rows.length}
           onPageChange={setPageIndex}
           onPageSizeChange={setPageSize}
         />

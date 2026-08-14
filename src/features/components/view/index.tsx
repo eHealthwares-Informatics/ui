@@ -3,6 +3,7 @@ import {
   Accordion,
   ActionIcon,
   Box,
+  Button,
   Card,
   Center,
   Divider,
@@ -32,10 +33,22 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
     config: any;
   } | null>(null);
 
+  const [editOpen, setEditOpen] = useState(false);
+
   return (
     <Stack gap="lg">
       {/* PAGE TITLE */}
-      {view.title && <Title order={2}>{view.title}</Title>}
+      <Group justify="space-between" align="center">
+        {view.title && <Title order={2}>{view.title}</Title>}
+        {view.editConfig && !isLoading && (
+          <Button
+            leftSection={<Pencil size={16} />}
+            onClick={() => setEditOpen(true)}
+          >
+            Edit
+          </Button>
+        )}
+      </Group>
 
       {/* FIELD GROUPS */}
       {view.fieldGroups?.map((group, groupIndex) => (
@@ -152,7 +165,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
         const items: any[] = isLoading
           ? []
           : ((data as any)[accordionSection.key as string] as any[]) || [];
-
+        console.log({items})
         return (
           <Card key={sectionIndex} withBorder radius="md" p="lg">
             <Title order={4} mb="md">
@@ -169,7 +182,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
               </Text>
             ) : (
               <Accordion>
-                {items.map((item, itemIndex) => {
+                {(items).map((item, itemIndex) => {
                   const label = accordionSection.renderLabel
                     ? accordionSection.renderLabel(item)
                     : (item[accordionSection.labelKey ?? 'name'] ?? String(item.id ?? itemIndex));
@@ -245,6 +258,23 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
             initialData={editAccordionItem.item}
             mode="edit"
             onSave={() => setEditAccordionItem(null)}
+          />
+        </Modal>
+      )}
+
+      {/* RECORD EDIT MODAL */}
+      {view.editConfig && (
+        <Modal
+          opened={editOpen}
+          onClose={() => setEditOpen(false)}
+          title={`Edit ${view.editConfig?.title ?? 'Record'}`}
+          size="xl"
+        >
+          <DataPageForm
+            config={view.editConfig}
+            initialData={data as any}
+            mode="edit"
+            onSave={() => setEditOpen(false)}
           />
         </Modal>
       )}

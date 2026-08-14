@@ -1,6 +1,6 @@
 import { Stack, Alert, Text } from '@mantine/core';
-import { AlertCircle } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
+import { AlertCircle } from 'lucide-react';
 import { useOrderContext } from '../OrderContext';
 import { SaveNavigationButtons } from '../SaveNavigationButtons';
 import { PrintLabelsSection } from './PrintLabelsSection';
@@ -14,7 +14,7 @@ export function OrderLabelPage() {
     await saveOrder();
     dispatch({ type: 'MARK_STEP', payload: 'label' });
     dispatch({ type: 'SET_STEP', payload: 3 });
-    navigate({ to: '/lis/orders/new/qa', search: { orderNumber: state.orderNumber ?? '' } });
+    navigate({ to: '/lis/orders/workflow/qa', search: { orderNumber: state.orderNumber ?? '' } });
   };
 
   const handleSave = async () => {

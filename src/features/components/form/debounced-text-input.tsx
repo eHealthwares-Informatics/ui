@@ -1,5 +1,5 @@
 import { TextInput, Textarea } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDebouncedValue } from '../utils';
 
 type Props = {
@@ -18,12 +18,15 @@ export function DebouncedTextInput({
   ...props
 }: Props) {
   const [localValue, setLocalValue] = useState(value);
+  const focusRef = useRef(false);
   const debouncedValue = useDebouncedValue(localValue, debounceMs);
 
-  // Update local value when prop changes (from parent)
+  // Update local value when prop changes (from parent), but never while typing
   useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
+    if (!focusRef.current && value !== localValue) {
+      setLocalValue(value);
+    }
+  }, [value, localValue]);
 
   // Call onChange only for debounced value
   useEffect(() => {
@@ -38,6 +41,17 @@ export function DebouncedTextInput({
     <Component
       {...props}
       value={localValue}
+      onFocus={(event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        focusRef.current = true;
+        props.onFocus?.(event);
+      }}
+      onBlur={(event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        focusRef.current = false;
+        if (localValue !== value) {
+          onChange(localValue);
+        }
+        props.onBlur?.(event);
+      }}
       onChange={(e) => setLocalValue(e.currentTarget.value)}
     />
   );

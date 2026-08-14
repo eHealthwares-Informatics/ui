@@ -1,15 +1,37 @@
-import { useEffect } from 'react';
 import { Stack } from '@mantine/core';
-import { type ReactNode } from 'react';
+import { useLocation } from '@tanstack/react-router';
+import { useEffect, type ReactNode } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
-import { OrderStepper } from './OrderStepper';
-import { OrderContextCard } from './OrderContextCard';
+import { lisApi } from '@/lib/lis-api';
 import { BarcodeScannerBar } from './BarcodeScannerBar';
 import { useOrderContext } from './OrderContext';
-import { lisApi } from '@/lib/lis-api';
+import { OrderContextCard } from './OrderContextCard';
+import { OrderStepper } from './OrderStepper';
 
-export function OrderWorkflowLayout({ orderNumber, children }: { orderNumber?: string; children: ReactNode }) {
-  const { state, loadOrder } = useOrderContext();
+const STEP_ROUTES = [
+  '/lis/orders/workflow/enter',
+  '/lis/orders/workflow/collect',
+  '/lis/orders/workflow/label',
+  '/lis/orders/workflow/qa',
+  '/lis/orders/workflow/order',
+];
+
+export function OrderWorkflowLayout({
+  orderNumber,
+  children,
+}: {
+  orderNumber?: string;
+  children: ReactNode;
+}) {
+  const { state, loadOrder, dispatch } = useOrderContext();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const step = STEP_ROUTES.findIndex((route) => pathname.startsWith(route));
+    if (step >= 0) {
+      dispatch({ type: 'SET_STEP', payload: step });
+    }
+  }, [pathname, dispatch]);
 
   useEffect(() => {
     if (!orderNumber || state.orderNumber === orderNumber) {
@@ -35,12 +57,12 @@ export function OrderWorkflowLayout({ orderNumber, children }: { orderNumber?: s
 
   return (
     <RxPage
-      title="New Order"
+      title="Workflow"
       description="Multi-step order entry workflow"
       breadcrumbs={[
         { label: 'Home', href: '/' },
         { label: 'Orders', href: '/lis/orders' },
-        { label: 'New Order' },
+        { label: 'Workflow' },
       ]}
     >
       <Stack gap="md">

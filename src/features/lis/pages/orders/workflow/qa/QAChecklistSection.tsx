@@ -1,51 +1,86 @@
-import { useState } from 'react';
-import { Card, Stack, Text, Checkbox, Paper, Group, Badge } from '@mantine/core';
+import { Card, Stack, Text, Checkbox, Paper, Group, Badge, Loader, Alert } from '@mantine/core';
+import { AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
-const DEFAULT_CHECKS = [
-  { key: 'patient_verified', label: 'Patient identity verified' },
-  { key: 'samples_collected', label: 'All samples collected correctly' },
-  { key: 'tests_assigned', label: 'All tests assigned to samples' },
-  { key: 'labels_printed', label: 'Labels printed and affixed' },
-  { key: 'storage_assigned', label: 'Storage locations assigned' },
-  { key: 'consent_obtained', label: 'Consent obtained (if required)' },
-  { key: 'requester_verified', label: 'Requester information complete' },
-  { key: 'clinical_info', label: 'Clinical information recorded' },
-];
+interface QaChecklistItem {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  required: boolean;
+}
 
 export function QAChecklistSection() {
-  const { state } = useOrderContext();
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const { state, dispatch } = useOrderContext();
+  const [items, setItems] = useState<QaChecklistItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const allChecked = DEFAULT_CHECKS.every((c) => checked[c.key]);
-  const completedCount = Object.values(checked).filter(Boolean).length;
+  useEffect(() => {
+    lisApi
+      .get('/lis/qa-checklist-items', { params: { limit: 200 } })
+      .then((res) => {
+        setItems(res.data?.data ?? []);
+      })
+      .catch((err) => {
+        setError(err?.response?.data?.message ?? err?.message ?? 'Failed to load QA checklist');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const allChecked = items.length > 0 && items.every((c) => state.qaChecks[c.code] ?? false);
+  const completedCount = items.filter((c) => state.qaChecks[c.code] ?? false).length;
+
+  const toggle = (code: string, value: boolean) => {
+    dispatch({ type: 'SET_QA_CHECKS', payload: { ...state.qaChecks, [code]: value } });
+  };
 
   return (
     <Card withBorder p="md" radius="md">
       <Stack gap="sm">
         <Group justify="space-between">
           <Text fw={600}>QA Checklist</Text>
-          <Badge color={allChecked ? 'green' : 'yellow'} variant="light">
-            {completedCount}/{DEFAULT_CHECKS.length}
-          </Badge>
+          {!loading && items.length > 0 && (
+            <Badge color={allChecked ? 'green' : 'yellow'} variant="light">
+              {completedCount}/{items.length}
+            </Badge>
+          )}
         </Group>
 
         <Text size="sm" c="dimmed">
           Verify each item before finalizing the order.
         </Text>
 
-        <Paper withBorder p="sm">
-          <Stack gap="xs">
-            {DEFAULT_CHECKS.map((c) => (
-              <Checkbox
-                key={c.key}
-                label={c.label}
-                checked={checked[c.key] ?? false}
-                onChange={(e) => setChecked((prev) => ({ ...prev, [c.key]: e.currentTarget.checked }))}
-              />
-            ))}
-          </Stack>
-        </Paper>
+        {error && (
+          <Alert icon={<AlertCircle size={16} />} title="Error" color="red" variant="light">
+            {error}
+          </Alert>
+        )}
+
+        {loading ? (
+          <Loader size="sm" />
+        ) : (
+          <Paper withBorder p="sm">
+            <Stack gap="xs">
+              {items.map((c) => (
+                <Checkbox
+                  key={c.code}
+                  label={c.name}
+                  checked={state.qaChecks[c.code] ?? false}
+                  onChange={(e) => toggle(c.code, e.currentTarget.checked)}
+                />
+              ))}
+            </Stack>
+          </Paper>
+        )}
+
+        {!loading && items.length === 0 && !error && (
+          <Text size="sm" c="dimmed">
+            No QA checklist items configured.
+          </Text>
+        )}
 
         {allChecked && (
           <Badge color="green" variant="light" size="lg">

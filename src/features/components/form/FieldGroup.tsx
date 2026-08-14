@@ -1,6 +1,6 @@
 import { Stack, Text, Grid, Group, ActionIcon, Button } from '@mantine/core';
 import { Plus, Save } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useApiProvider } from '@/context/module-context';
 import { Field, FieldGroup as FieldGroupProp } from '@/features/rxsoft/types';
@@ -143,22 +143,14 @@ function FieldGroupComponent({ title, fieldGroup, formState, updateField, index 
                 validate: field.validate,
               }}
               render={({ field: controllerField }) => (
-                <RenderField
+                <FieldControl
                   field={field}
+                  controllerField={controllerField}
                   value={formState[field.name] as string}
-                  updateField={(_name, value) => {
-                    controllerField.onChange(value);
-
-                    // if (mutationMode === 'field') {
-                    //   // queueMicrotask(() => {
-                    //   //   updateField(_name, value)
-                    //   // })
-                    //  updateField(_name, value)
-                    // }
-                    updateField(_name, value);
-                  }}
+                  updateField={updateField}
                   disabled={field.disabled}
                   error={errors[field.name]?.message as string}
+                  parentFormState={formState}
                 />
               )}
             />
@@ -194,5 +186,44 @@ function FieldGroupComponent({ title, fieldGroup, formState, updateField, index 
     </Stack>
   );
 }
+
+type FieldControlProps = {
+  field: Field;
+  controllerField: { onChange: (value: unknown) => void };
+  value: string;
+  updateField: Props['updateField'];
+  disabled?: boolean;
+  error?: string;
+  parentFormState?: Record<string, unknown>;
+};
+
+const FieldControl = memo(function FieldControl({
+  field,
+  controllerField,
+  value,
+  updateField,
+  disabled,
+  error,
+  parentFormState,
+}: FieldControlProps) {
+  const handleFieldUpdate = useCallback(
+    (_name: string, v: unknown) => {
+      controllerField.onChange(v);
+      updateField(_name, v);
+    },
+    [controllerField, updateField]
+  );
+
+  return (
+    <RenderField
+      field={field}
+      value={value}
+      updateField={handleFieldUpdate}
+      disabled={disabled}
+      error={error}
+      parentFormState={parentFormState}
+    />
+  );
+});
 
 export const FieldGroup = memo(FieldGroupComponent);

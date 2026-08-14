@@ -1,5 +1,16 @@
+import {
+  Card,
+  Stack,
+  Text,
+  Select,
+  Group,
+  Textarea,
+  Badge,
+  Paper,
+  Autocomplete,
+  Button,
+} from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { Card, Stack, Text, Select, Group, Textarea, Badge, Paper } from '@mantine/core';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
@@ -9,32 +20,45 @@ interface Location {
   reference: string | null;
   type?: { name: string };
   children?: Location[];
+  storageAssignment?: boolean;
 }
 
 export function StorageSection() {
   const { state, dispatch } = useOrderContext();
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedSample, setSelectedSample] = useState<string | null>(null);
-  const [sampleStorage, setSampleStorage] = useState<Record<number, { locationId: string | null; notes: string | null }>>({});
 
   useEffect(() => {
     lisApi.get('/lis/locations', { params: { limit: 200 } }).then((res) => {
       const all: Location[] = res.data?.data ?? [];
-      setLocations(all.filter((l) => l.type?.name === 'Storage' || !l.type));
+      setLocations(all.filter((l) => l.storageAssignment));
     });
   }, []);
 
-  const updateSampleStorage = (index: number, field: 'locationId' | 'notes', value: string | null) => {
-    setSampleStorage((prev) => ({
-      ...prev,
-      [index]: { ...prev[index], [field]: value },
-    }));
+  const updateSampleStorage = (
+    index: number,
+    field: 'storageLocationId' | 'storageNotes',
+    value: string | null
+  ) => {
+    const samples = [...state.samples];
+    samples[index] = { ...samples[index], [field]: value };
+    dispatch({ type: 'SET_SAMPLES', payload: samples });
   };
 
   const locationOptions = locations.map((l) => ({
     value: l.id,
     label: `${l.name}${l.reference ? ` (${l.reference})` : ''}`,
   }));
+
+  const locationLabel = (id: string | null) =>
+    locationOptions.find((o) => o.value === id)?.label ?? '';
+
+  const storageFor = (index: number) => ({
+    storageLocationId: state.samples[index]?.storageLocationId ?? null,
+    storageNotes: state.samples[index]?.storageNotes ?? null,
+  });
+
+  const assignedCount = state.samples.filter((s) => s.storageLocationId).length;
 
   return (
     <Card withBorder p="md" radius="md">
@@ -55,7 +79,7 @@ export function StorageSection() {
             placeholder="Select a sample to assign storage..."
             data={state.samples.map((s, i) => ({
               value: String(i),
-              label: `Sample #${i + 1} - ${s.barcode}`,
+              label: `Sample #${i + 1} - ${s.barcode}${s.storageLocationId ? ' ✓' : ''}`,
             }))}
             onChange={setSelectedSample}
           />
@@ -67,32 +91,43 @@ export function StorageSection() {
               <Badge color="violet" variant="light">
                 Sample #{Number(selectedSample) + 1}
               </Badge>
+              <Button size="xs" variant="subtle" color="gray" onClick={() => setSelectedSample(null)}>
+                Back
+              </Button>
             </Group>
             <Stack gap="xs">
-              <Select
+              <Autocomplete
                 label="Storage Location"
-                placeholder="Select location..."
-                data={locationOptions}
-                value={sampleStorage[Number(selectedSample)]?.locationId ?? null}
-                onChange={(v) => updateSampleStorage(Number(selectedSample), 'locationId', v)}
-                searchable
-                clearable
+                placeholder="Type to search location..."
+                data={locationOptions.map((o) => o.label)}
+                value={locationLabel(storageFor(Number(selectedSample)).storageLocationId)}
+                onChange={(value) => {
+                  const loc = locationOptions.find((o) => o.label === value);
+                  updateSampleStorage(Number(selectedSample), 'storageLocationId', loc?.value ?? null);
+                }}
+                limit={20}
               />
               <Textarea
                 label="Storage Notes"
                 placeholder="Condition notes, position, etc."
-                value={sampleStorage[Number(selectedSample)]?.notes ?? ''}
-                onChange={(e) => updateSampleStorage(Number(selectedSample), 'notes', e.currentTarget.value || null)}
+                value={storageFor(Number(selectedSample)).storageNotes ?? ''}
+                onChange={(e) =>
+                  updateSampleStorage(
+                    Number(selectedSample),
+                    'storageNotes',
+                    e.currentTarget.value || null
+                  )
+                }
                 minRows={2}
               />
             </Stack>
           </Paper>
         )}
 
-        {Object.keys(sampleStorage).length > 0 && (
-          <Paper withBorder p="sm" bg="green.0">
+        {state.samples.length > 0 && (
+          <Paper withBorder p="sm" bg={assignedCount > 0 ? 'green.0' : 'gray.0'}>
             <Text size="sm" fw={500}>
-              Storage assigned for {Object.keys(sampleStorage).length} of {state.samples.length} samples
+              Storage assigned for {assignedCount} of {state.samples.length} samples
             </Text>
           </Paper>
         )}

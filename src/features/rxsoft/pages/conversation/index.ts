@@ -5,6 +5,7 @@ export * from './components/exchange-detail';
 export * from './components/participants';
 export * from './components/questionnaires';
 export * from './components/questions';
+export * from './components/option-lists';
 export * from './components/shared';
 export * from './components/projections';
 export * from './components/workflow-events';

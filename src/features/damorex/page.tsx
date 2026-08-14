@@ -1059,7 +1059,7 @@ export default function DamorexPage() {
 
       <Box py={{ base: 48, md: 64 }} style={{ background: soft }}>
         <Container size="xl">
-          <Grid gutter="xl" align="stretch">
+          <Grid gap="xl" align="stretch">
             <Grid.Col span={{ base: 12, lg: 8 }}>
               <Paper
                 radius={28}
@@ -1391,7 +1391,7 @@ export default function DamorexPage() {
 
       <Box py={{ base: 48, md: 76 }} style={{ background: '#0F172A', color: '#fff' }}>
         <Container size="xl">
-          <Grid gutter={48} align="center">
+          <Grid gap={48} align="center">
             <Grid.Col span={{ base: 12, lg: 6 }}>
               <Stack gap="lg">
                 <Badge radius="xl" color="green" variant="filled" size="lg" w="fit-content">

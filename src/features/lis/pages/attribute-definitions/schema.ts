@@ -16,9 +16,9 @@ const tabGroups: TabGroup[] = [
       {
         title: 'Basic Information',
         fields: [
-          { name: 'code', label: 'Code', type: 'text', col: 4 },
+          { name: 'code', label: 'Code', type: 'text', col: 4, generateCode: { scope: 'attribute-definitions' } },
           { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
-          { name: 'dataType', label: 'Data Type', type: 'select', options: ['TEXT', 'NUMBER', 'DATE', 'BOOLEAN', 'SELECT'], col: 4 },
+          { name: 'dataType', label: 'Data Type', type: 'select', options: [{ value: 'TEXT', label: 'Text' }, { value: 'NUMBER', label: 'Number' }, { value: 'DATE', label: 'Date' }, { value: 'BOOLEAN', label: 'Boolean' }, { value: 'SELECT', label: 'Select' }], col: 4 },
           { name: 'description', label: 'Description', type: 'text', col: 12 },
           { name: 'active', label: 'Active', type: 'switch', col: 3 },
           { name: 'options', label: 'Options (JSON array for SELECT type)', type: 'text', col: 12 },

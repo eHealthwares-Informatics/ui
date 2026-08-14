@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
 import { ActionIcon, Combobox, Group, Text, TextInput, Tooltip, useCombobox } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
+import { Scan, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from './OrderContext';
-import { Scan, X } from 'lucide-react';
 
 interface OrderSuggestion {
   id: string;
@@ -44,7 +44,7 @@ export function BarcodeScannerBar() {
     const data = await loadOrder(id);
     dispatch({ type: 'SET_STEP', payload: 0 });
     navigate({
-      to: '/lis/orders/new/enter',
+      to: '/lis/orders/workflow/enter',
       search: { orderNumber: data?.orderNumber ?? fallbackNumber ?? '' },
     });
   };

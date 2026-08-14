@@ -362,8 +362,8 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Conversation',
-      icon: MessagesSquare,
+      title: 'Question',
+      icon: CircleDashed,
       items: [
         {
           title: 'Questionnaires',
@@ -371,6 +371,24 @@ export const sidebarData: SidebarData = {
           icon: FileText,
           modules: ['conversation', 'admin'],
         },
+        {
+          title: 'Questions',
+          url: '/conversation/questions',
+          icon: CircleDashed,
+          modules: ['conversation', 'admin'],
+        },
+        {
+          title: 'Option Lists',
+          url: '/conversation/option-lists',
+          icon: ClipboardList,
+          modules: ['conversation', 'admin'],
+        },
+      ],
+    },
+    {
+      title: 'Conversation',
+      icon: MessagesSquare,
+      items: [
         {
           title: 'Conversations',
           url: '/conversation',
@@ -381,12 +399,6 @@ export const sidebarData: SidebarData = {
           title: 'Participants',
           url: '/conversation/participants',
           icon: ContactRound,
-          modules: ['conversation', 'admin'],
-        },
-        {
-          title: 'Questions',
-          url: '/conversation/questions',
-          icon: CircleDashed,
           modules: ['conversation', 'admin'],
         },
         {
@@ -611,10 +623,30 @@ export const sidebarData: SidebarData = {
       title: 'Tests',
       icon: Scale,
       items: [
-        { title: 'Test Definitions', url: '/lis/test-definitions', icon: Scale, modules: ['lis', 'admin'] },
-        { title: 'Reference Ranges', url: '/lis/reference-ranges', icon: Scale, modules: ['lis', 'admin'] },
-        { title: 'Test Categories', url: '/lis/test-categories', icon: Scale, modules: ['lis', 'admin'] },
-        { title: 'Test Sections', url: '/lis/test-sections', icon: Scale, modules: ['lis', 'admin'] },
+        {
+          title: 'Test Definitions',
+          url: '/lis/test-definitions',
+          icon: Scale,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Reference Ranges',
+          url: '/lis/reference-ranges',
+          icon: Scale,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Test Categories',
+          url: '/lis/test-categories',
+          icon: Scale,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Test Sections',
+          url: '/lis/test-sections',
+          icon: Scale,
+          modules: ['lis', 'admin'],
+        },
         { title: 'Methods', url: '/lis/methods', icon: Scale, modules: ['lis', 'admin'] },
         { title: 'Panels', url: '/lis/panels', icon: Scale, modules: ['lis', 'admin'] },
         { title: 'UOMs', url: '/lis/uoms', icon: Scale, modules: ['lis', 'admin'] },
@@ -626,8 +658,18 @@ export const sidebarData: SidebarData = {
       icon: FileText,
       items: [
         { title: 'Orders', url: '/lis/orders', icon: FileText, modules: ['lis', 'admin'] },
-        { title: 'Orders Dashboard', url: '/lis/orders/dashboard', icon: LayoutDashboard, modules: ['lis', 'admin'] },
-        { title: 'New Order', url: '/lis/orders/new/enter', icon: FileText, modules: ['lis', 'admin'] },
+        {
+          title: 'Orders Dashboard',
+          url: '/lis/orders/dashboard',
+          icon: LayoutDashboard,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Workflow',
+          url: '/lis/orders/workflow/enter',
+          icon: FileText,
+          modules: ['lis', 'admin'],
+        },
         { title: 'Patients', url: '/lis/patients', icon: FileText, modules: ['lis', 'admin'] },
         { title: 'Priorities', url: '/lis/priorities', icon: FileText, modules: ['lis', 'admin'] },
         { title: 'Programs', url: '/lis/programs', icon: FileText, modules: ['lis', 'admin'] },
@@ -638,8 +680,18 @@ export const sidebarData: SidebarData = {
       icon: NotebookPen,
       items: [
         { title: 'Results', url: '/lis/results', icon: NotebookPen, modules: ['lis', 'admin'] },
-        { title: 'Result Signatures', url: '/lis/result-signatures', icon: NotebookPen, modules: ['lis', 'admin'] },
-        { title: 'Validation Dashboard', url: '/lis/validation-dashboard', icon: NotebookPen, modules: ['lis', 'admin'] },
+        {
+          title: 'Result Signatures',
+          url: '/lis/result-signatures',
+          icon: NotebookPen,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Validation Dashboard',
+          url: '/lis/validation-dashboard',
+          icon: NotebookPen,
+          modules: ['lis', 'admin'],
+        },
       ],
     },
     {
@@ -649,16 +701,37 @@ export const sidebarData: SidebarData = {
         { title: 'Samples', url: '/lis/samples', icon: Boxes, modules: ['lis', 'admin'] },
         { title: 'Sample Types', url: '/lis/sample-types', icon: Boxes, modules: ['lis', 'admin'] },
         { title: 'Locations', url: '/lis/locations', icon: Boxes, modules: ['lis', 'admin'] },
-        { title: 'Location Types', url: '/lis/location-types', icon: Boxes, modules: ['lis', 'admin'] },
-        { title: 'Rejection Reasons', url: '/lis/rejection-reasons', icon: Boxes, modules: ['lis', 'admin'] },
+        {
+          title: 'Location Types',
+          url: '/lis/location-types',
+          icon: Boxes,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'Rejection Reasons',
+          url: '/lis/rejection-reasons',
+          icon: Boxes,
+          modules: ['lis', 'admin'],
+        },
       ],
     },
     {
       title: 'Quality Control',
       icon: ChartColumn,
       items: [
+        {
+          title: 'QA Checklist',
+          url: '/lis/qa-checklist-items',
+          icon: ClipboardCheck,
+          modules: ['lis', 'admin'],
+        },
         { title: 'QC Lots', url: '/lis/qc-lots', icon: ChartColumn, modules: ['lis', 'admin'] },
-        { title: 'QC Results', url: '/lis/qc-results', icon: ChartColumn, modules: ['lis', 'admin'] },
+        {
+          title: 'QC Results',
+          url: '/lis/qc-results',
+          icon: ChartColumn,
+          modules: ['lis', 'admin'],
+        },
         { title: 'QC Alerts', url: '/lis/qc-alerts', icon: ChartColumn, modules: ['lis', 'admin'] },
       ],
     },
@@ -666,9 +739,24 @@ export const sidebarData: SidebarData = {
       title: 'EQA',
       icon: ClipboardCheck,
       items: [
-        { title: 'EQA Programs', url: '/lis/eqa-programs', icon: ClipboardCheck, modules: ['lis', 'admin'] },
-        { title: 'EQA Enrollments', url: '/lis/eqa-enrollments', icon: ClipboardCheck, modules: ['lis', 'admin'] },
-        { title: 'EQA Results', url: '/lis/eqa-results', icon: ClipboardCheck, modules: ['lis', 'admin'] },
+        {
+          title: 'EQA Programs',
+          url: '/lis/eqa-programs',
+          icon: ClipboardCheck,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'EQA Enrollments',
+          url: '/lis/eqa-enrollments',
+          icon: ClipboardCheck,
+          modules: ['lis', 'admin'],
+        },
+        {
+          title: 'EQA Results',
+          url: '/lis/eqa-results',
+          icon: ClipboardCheck,
+          modules: ['lis', 'admin'],
+        },
       ],
     },
     {
@@ -676,7 +764,12 @@ export const sidebarData: SidebarData = {
       icon: Cog,
       items: [
         { title: 'Statuses', url: '/lis/statuses', icon: Cog, modules: ['lis', 'admin'] },
-        { title: 'Attribute Definitions', url: '/lis/attribute-definitions', icon: Cog, modules: ['lis', 'admin'] },
+        {
+          title: 'Attribute Definitions',
+          url: '/lis/attribute-definitions',
+          icon: Cog,
+          modules: ['lis', 'admin'],
+        },
       ],
     },
     {
@@ -684,12 +777,27 @@ export const sidebarData: SidebarData = {
       icon: HeartPulse,
       items: [
         { title: 'Dashboard', url: '/emr', icon: LayoutDashboard, modules: ['emr', 'admin'] },
-        { title: 'Appointments', url: '/emr/appointments', icon: CalendarDays, modules: ['emr', 'admin'] },
+        {
+          title: 'Appointments',
+          url: '/emr/appointments',
+          icon: CalendarDays,
+          modules: ['emr', 'admin'],
+        },
         { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr', 'admin'] },
         { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr', 'admin'] },
-        { title: 'Encounters', url: '/emr/encounters', icon: Stethoscope, modules: ['emr', 'admin'] },
+        {
+          title: 'Encounters',
+          url: '/emr/encounters',
+          icon: Stethoscope,
+          modules: ['emr', 'admin'],
+        },
         { title: 'Forms', url: '/emr/forms', icon: FileSpreadsheet, modules: ['emr', 'admin'] },
-        { title: 'Clinical Requests', url: '/emr/requests', icon: FilePlus2, modules: ['emr', 'admin'] },
+        {
+          title: 'Clinical Requests',
+          url: '/emr/requests',
+          icon: FilePlus2,
+          modules: ['emr', 'admin'],
+        },
       ],
     },
   ],

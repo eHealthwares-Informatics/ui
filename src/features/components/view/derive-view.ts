@@ -101,7 +101,7 @@ export function deriveView(config: ModelConfig): View<any> {
     }
   }
 
-  const result: View<any> = { endpoint, title, fieldGroups };
+  const result: View<any> = { endpoint, title, fieldGroups, editConfig: config };
   if (accordions.length) {
     result.accordions = accordions;
   }

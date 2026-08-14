@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { OrderLabelPage } from '@/features/lis/pages/orders/new/label/page';
+import { OrderLabelPage } from '@/features/lis/pages/orders/workflow/label/page';
 
-export const Route = createFileRoute('/_authenticated/lis/orders/new/label')({
+export const Route = createFileRoute('/_authenticated/lis/orders/workflow/label')({
   component: OrderLabelPage,
 });

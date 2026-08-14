@@ -57,6 +57,23 @@ const numberValue = (value: unknown, fallback: number) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+/**
+ * Builds an update payload containing ONLY keys present in `values`
+ * (i.e. the dirty-field subset), so PATCH only sends changed fields.
+ */
+const pickUpdatePayload = (
+  values: Record<string, unknown>,
+  map: Record<string, (value: unknown, values: Record<string, unknown>) => unknown>
+) => {
+  const payload: Record<string, unknown> = {};
+  Object.entries(map).forEach(([key, fn]) => {
+    if (key in values) {
+      payload[key] = fn(values[key], values);
+    }
+  });
+  return payload;
+};
+
 const asyncField = (name: string, label: string, endpoint: string, labelKey = 'name'): Field => ({
   name,
   label,
@@ -153,7 +170,15 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
     metadata: jsonObject(values.metadata),
     isActive: bool(values.isActive, true),
   }),
-  buildUpdatePayload: (values) => channelPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      type: (v) => optionValue(v),
+      provider: (v) => text(v).trim() || undefined,
+      externalId: (v) => text(v).trim() || undefined,
+      metadata: (v) => jsonObject(v),
+      isActive: (v) => bool(v, true),
+    }),
 });
 
 const shortText = (value: unknown) => {
@@ -174,7 +199,7 @@ export const questionOptionPageSchema: ModelConfig = withDefaultActions({
   id: 'question-options',
   title: 'Options',
   description: 'Define answer options for choice-type questions.',
-  endpoint: '/options',
+  endpoint: '/option-lists',
   columns: [
     { key: 'key', label: 'Key' },
     { key: 'value', label: 'Value' },
@@ -221,7 +246,77 @@ export const questionOptionPageSchema: ModelConfig = withDefaultActions({
     childQuestionnaireId: text(values.childQuestionnaireId).trim() || undefined,
     metadata: jsonObject(values.metadata),
   }),
-  buildUpdatePayload: (values) => questionOptionPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      key: (v) => text(v).trim(),
+      value: (v) => text(v).trim(),
+      label: (v) => text(v).trim(),
+      index: (v) => numberValue(v, 1),
+      jumpToQuestionId: (v) => text(v).trim() || undefined,
+      backToQuestionId: (v) => text(v).trim() || undefined,
+      childQuestionnaireId: (v) => text(v).trim() || undefined,
+      metadata: (v) => jsonObject(v),
+    }),
+});
+
+export const optionListsPageSchema: ModelConfig = withDefaultActions({
+  id: 'option-lists',
+  title: 'Option Lists',
+  description: 'Define reusable option lists that choice-type questions can reference.',
+  endpoint: '/option-lists',
+  columns: [
+    { key: 'name', label: 'Name', sortable: true },
+    {
+      key: 'options',
+      label: 'Options',
+      render: (row) => `${(row as any).options?.length ?? 0} options`,
+    },
+    {
+      key: 'createdAt',
+      label: 'Created At',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+  ],
+  createFieldGroups: buildFields([
+    textField('name', 'Name'),
+    {
+      name: 'options',
+      label: 'Options',
+      type: 'json-accordion-array',
+      col: 12,
+      itemLabelKey: 'label',
+      itemRender: (item: any) => `${item.key ?? '?'}: ${item.label ?? '-'}`,
+      itemEditConfig: questionOptionPageSchema,
+    },
+    jsonField('tags', 'Tags'),
+    jsonField('metadata', 'Metadata'),
+  ]),
+  defaultState: {
+    name: '',
+    options: [],
+    tags: [],
+    metadata: {},
+  },
+  buildFormState: (row) => ({
+    name: text(row.name),
+    options: jsonArray(row.options),
+    tags: jsonArray(row.tags),
+    metadata: jsonObject(row.metadata),
+  }),
+  buildCreatePayload: (values) => ({
+    name: text(values.name).trim(),
+    options: jsonArray(values.options),
+    tags: jsonArray(values.tags),
+    metadata: jsonObject(values.metadata),
+  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      options: (v) => jsonArray(v),
+      tags: (v) => jsonArray(v),
+      metadata: (v) => jsonObject(v),
+    }),
 });
 
 export const questionPageSchema: ModelConfig = withDefaultActions({
@@ -230,17 +325,19 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
   description: 'Browse and edit questionnaire questions with schema-based fields.',
   endpoint: '/questions',
   columns: [
-    { key: 'index', label: '#' },
-    { key: 'attribute', label: 'Attribute' },
-    { key: 'text', label: 'Text' },
-    { key: 'questionType', label: 'Type' },
+    { key: 'index', label: '#', sortable: true },
+    { key: 'attribute', label: 'Attribute', sortable: true },
+    { key: 'text', label: 'Text', sortable: true },
+    { key: 'questionType', label: 'Type', sortable: true },
     { key: 'renderMode', label: 'Render' },
     { key: 'processMode', label: 'Process' },
     { key: 'isRequired', label: 'Required' },
-    { key: 'isActive', label: 'Active' },
+    { key: 'isActive', label: 'Active', sortable: true },
+    { key: 'createdAt', label: 'Created At', dataType: ColumnDataType.DATE, sortable: true },
   ],
   createFieldGroups: buildFields([
     asyncField('questionnaireId', 'Questionnaire', '/questionnaires'),
+    asyncField('optionListId', 'Option List', '/option-lists'),
     { ...textField('index', 'Index'), type: 'number' },
     textField('attribute', 'Attribute'),
     { name: 'text', label: 'Text', type: 'textarea', col: 12 },
@@ -252,7 +349,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
     {
       name: 'options',
       label: 'Options',
-      type: 'accordion-array',
+      type: 'json-accordion-array',
       col: 12,
       itemLabelKey: 'label',
       itemRender: (item: any) => `${item.key ?? '?'}: ${item.label ?? '-'}`,
@@ -263,6 +360,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
   ]),
   defaultState: {
     questionnaireId: null,
+    optionListId: null,
     index: 1,
     attribute: '',
     text: '',
@@ -277,6 +375,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
   },
   buildFormState: (row) => ({
     questionnaireId: option(row.questionnaireId),
+    optionListId: option(row.optionListId),
     index: numberValue(row.index, 1),
     attribute: text(row.attribute),
     text: text(row.text),
@@ -291,6 +390,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
   }),
   buildCreatePayload: (values) => ({
     questionnaireId: optionValue(values.questionnaireId),
+    optionListId: optionValue(values.optionListId) || undefined,
     index: numberValue(values.index, 1),
     attribute: text(values.attribute).trim(),
     text: text(values.text).trim(),
@@ -303,7 +403,22 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
     validationRules: jsonArray(values.validationRules),
     metadata: jsonObject(values.metadata),
   }),
-  buildUpdatePayload: (values) => questionPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      questionnaireId: (v) => optionValue(v),
+      optionListId: (v) => optionValue(v) || undefined,
+      index: (v) => numberValue(v, 1),
+      attribute: (v) => text(v).trim(),
+      text: (v) => text(v).trim(),
+      questionType: (v) => optionValue(v),
+      renderMode: (v) => optionValue(v),
+      processMode: (v) => optionValue(v),
+      isRequired: (v) => bool(v),
+      isActive: (v) => bool(v, true),
+      options: (v) => jsonArray(v),
+      validationRules: (v) => jsonArray(v),
+      metadata: (v) => jsonObject(v),
+    }),
 });
 
 export const conversationPageSchema: ModelConfig = withDefaultActions({
@@ -389,7 +504,19 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
     state: optionValue(values.state),
     context: jsonObject(values.context),
   }),
-  buildUpdatePayload: (values) => conversationPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      questionnaireId: (v) => optionValue(v),
+      questionnaireCode: (v) => text(v).trim() || undefined,
+      channelId: (v) => optionValue(v),
+      participantId: (v) => text(v).trim() || undefined,
+      phone: (v) => text(v).trim() || undefined,
+      email: (v) => text(v).trim() || undefined,
+      currentQuestionId: (v) => text(v).trim() || undefined,
+      status: (v) => optionValue(v),
+      state: (v) => optionValue(v),
+      context: (v) => jsonObject(v),
+    }),
 });
 
 export const participantPageSchema: ModelConfig = withDefaultActions({
@@ -431,7 +558,14 @@ export const participantPageSchema: ModelConfig = withDefaultActions({
     email: text(values.email).trim() || undefined,
     metadata: jsonObject(values.metadata),
   }),
-  buildUpdatePayload: (values) => participantPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      firstName: (v) => text(v).trim() || undefined,
+      lastName: (v) => text(v).trim() || undefined,
+      phone: (v) => text(v).trim() || undefined,
+      email: (v) => text(v).trim() || undefined,
+      metadata: (v) => jsonObject(v),
+    }),
 });
 
 export const stepPageSchema: ModelConfig = withDefaultActions({
@@ -489,7 +623,15 @@ export const stepPageSchema: ModelConfig = withDefaultActions({
     onEnter: optionValue(values.onEnter) || undefined,
     onExit: optionValue(values.onExit) || undefined,
   }),
-  buildUpdatePayload: (values) => stepPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      id: (v) => text(v).trim(),
+      type: (v) => optionValue(v),
+      config: (v) => jsonObject(v),
+      transitions: (v) => jsonArray(v),
+      onEnter: (v) => optionValue(v) || undefined,
+      onExit: (v) => optionValue(v) || undefined,
+    }),
 });
 
 export const workflowPageSchema: ModelConfig = withDefaultActions({
@@ -552,7 +694,17 @@ export const workflowPageSchema: ModelConfig = withDefaultActions({
     startStepId: text(values.startStepId).trim() || undefined,
     steps: jsonArray(values.steps),
   }),
-  buildUpdatePayload: (values) => workflowPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      code: (v) => text(v).trim(),
+      metadata: (v) => jsonObject(v),
+      version: (v) => numberValue(v, 1),
+      maxTransitionsPerRun: (v) => numberValue(v, 25),
+      isActive: (v) => bool(v, true),
+      startStepId: (v) => text(v).trim() || undefined,
+      steps: (v) => jsonArray(v),
+    }),
 });
 
 export const questionnairePageSchema: ModelConfig = withDefaultActions({
@@ -578,6 +730,8 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
         { name: 'description', label: 'Description', type: 'textarea', col: 12 },
         selectField('processingStrategy', 'Processing Strategy', PROCESSING_STRATEGY_OPTIONS),
         switchField('isActive', 'Active'),
+        switchField('isInit', 'Init Flow'),
+        switchField('isMediaHandler', 'Media Handler'),
         switchField('allowBackNavigation', 'Allow Back Navigation'),
         switchField('allowMultipleSessions', 'Allow Multiple Sessions'),
         {
@@ -605,6 +759,7 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
           label: 'Questions',
           type: 'accordion-array',
           col: 12,
+          relationshipId: 'questionnaireId',
           itemLabelKey: 'text',
           itemRender: (item: any) =>
             `${item.index ?? '?'}: ${item.text ?? '-'} : ${item.attribute}`,
@@ -644,10 +799,13 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     tags: [],
     metadata: {},
     isActive: true,
+    isInit: false,
+    isMediaHandler: false,
     questions: [],
     workflowId: null,
   },
   buildFormState: (row) => ({
+    id: text(row.id),
     name: text(row.name),
     code: text(row.code),
     description: text(row.description),
@@ -658,6 +816,8 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     tags: jsonArray(row.tags),
     metadata: jsonObject(row.metadata),
     isActive: bool(row.isActive, true),
+    isInit: bool(row.isInit),
+    isMediaHandler: bool(row.isMediaHandler),
     questions: jsonArray(row.questions),
     workflowId: option(row.workflowId),
   }),
@@ -674,10 +834,28 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     questions: jsonArray(values.questions),
     workflowId: optionValue(values.workflowId) || undefined,
     isActive: bool(values.isActive, true),
+    isInit: bool(values.isInit),
+    isMediaHandler: bool(values.isMediaHandler),
     isDynamic: false,
     version: 1,
   }),
-  buildUpdatePayload: (values) => questionnairePageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      code: (v) => text(v).trim(),
+      description: (v) => text(v).trim() || undefined,
+      allowBackNavigation: (v) => bool(v, true),
+      allowMultipleSessions: (v) => bool(v),
+      processingStrategy: (v) => optionValue(v),
+      channelIds: (v) => jsonArray(v),
+      metadata: (v) => jsonObject(v),
+      tags: (v) => jsonArray(v),
+      questions: (v) => jsonArray(v),
+      workflowId: (v) => optionValue(v) || undefined,
+      isActive: (v) => bool(v, true),
+      isInit: (v) => bool(v),
+      isMediaHandler: (v) => bool(v),
+    }),
 });
 
 export const workflowInstancePageSchema: ModelConfig = {
@@ -715,13 +893,14 @@ export const workflowInstancePageSchema: ModelConfig = {
     state: jsonObject(row.state),
     config: jsonObject(row.config),
   }),
-  buildUpdatePayload: (values) => ({
-    status: optionValue(values.status),
-    currentStepId: text(values.currentStepId).trim() || undefined,
-    workflowVersion: numberValue(values.workflowVersion, 1),
-    state: jsonObject(values.state),
-    config: jsonObject(values.config),
-  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      status: (v) => optionValue(v),
+      currentStepId: (v) => text(v).trim() || undefined,
+      workflowVersion: (v) => numberValue(v, 1),
+      state: (v) => jsonObject(v),
+      config: (v) => jsonObject(v),
+    }),
 };
 
 export const workflowEventPageSchema: ModelConfig = {
@@ -885,7 +1064,15 @@ export const workflowAttachmentPageSchema: ModelConfig = withDefaultActions({
     mappings: jsonArray(values.mappings),
     metadata: jsonObject(values.metadata),
   }),
-  buildUpdatePayload: (values) => workflowAttachmentPageSchema.buildCreatePayload?.(values),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      questionnaireId: (v) => optionValue(v),
+      workflowId: (v) => optionValue(v),
+      workflowVersion: (v) => numberValue(v, 1),
+      status: (v) => optionValue(v),
+      mappings: (v) => jsonArray(v),
+      metadata: (v) => jsonObject(v),
+    }),
 });
 
 export const workflowStepTypeOptions = WORKFLOW_STEP_TYPE_OPTIONS;

@@ -6,7 +6,13 @@ export function OrderContextCard() {
 
   if (!state.orderNumber && !state.patientName) return null;
 
-  const completedSteps = [state.stepProgress.enter, state.stepProgress.collect, state.stepProgress.label, state.stepProgress.qa, state.stepProgress.order].filter(Boolean).length;
+  const completedSteps = [
+    state.stepProgress.enter,
+    state.stepProgress.collect,
+    state.stepProgress.label,
+    state.stepProgress.qa,
+    state.stepProgress.order,
+  ].filter(Boolean).length;
 
   return (
     <Card withBorder p="sm" radius="md" bg="gray.0">

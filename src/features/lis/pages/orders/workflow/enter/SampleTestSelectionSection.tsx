@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
 import { Card, Stack, Text, Checkbox, Group, TextInput, Badge, Paper, Table } from '@mantine/core';
-import { Search } from 'lucide-react';
 import { useDebouncedValue } from '@mantine/hooks';
+import { Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
 
@@ -52,7 +52,10 @@ export function SampleTestSelectionSection() {
 
   const toggleTest = (testId: string) => {
     if (selectedIds.has(testId)) {
-      dispatch({ type: 'SET_ITEMS', payload: state.items.filter((i) => i.testDefinitionId !== testId) });
+      dispatch({
+        type: 'SET_ITEMS',
+        payload: state.items.filter((i) => i.testDefinitionId !== testId),
+      });
     } else {
       dispatch({ type: 'SET_ITEMS', payload: [...state.items, { testDefinitionId: testId }] });
     }
@@ -62,11 +65,17 @@ export function SampleTestSelectionSection() {
     const panelTestIds = panel.panelItems?.map((pi) => pi.test?.id).filter(Boolean) ?? [];
     const allSelected = panelTestIds.every((id) => selectedIds.has(id));
     if (allSelected) {
-      dispatch({ type: 'SET_ITEMS', payload: state.items.filter((i) => !panelTestIds.includes(i.testDefinitionId)) });
+      dispatch({
+        type: 'SET_ITEMS',
+        payload: state.items.filter((i) => !panelTestIds.includes(i.testDefinitionId)),
+      });
     } else {
       const existing = new Set(state.items.map((i) => i.testDefinitionId));
       const toAdd = panelTestIds.filter((id) => !existing.has(id));
-      dispatch({ type: 'SET_ITEMS', payload: [...state.items, ...toAdd.map((id) => ({ testDefinitionId: id }))] });
+      dispatch({
+        type: 'SET_ITEMS',
+        payload: [...state.items, ...toAdd.map((id) => ({ testDefinitionId: id }))],
+      });
     }
   };
 
@@ -96,8 +105,10 @@ export function SampleTestSelectionSection() {
             </Text>
             <Paper withBorder>
               {panels.map((panel) => {
-                const panelTestIds = panel.panelItems?.map((pi) => pi.test?.id).filter(Boolean) ?? [];
-                const allSelected = panelTestIds.length > 0 && panelTestIds.every((id) => selectedIds.has(id));
+                const panelTestIds =
+                  panel.panelItems?.map((pi) => pi.test?.id).filter(Boolean) ?? [];
+                const allSelected =
+                  panelTestIds.length > 0 && panelTestIds.every((id) => selectedIds.has(id));
                 return (
                   <Group key={panel.id} p="xs" justify="space-between">
                     <Checkbox
@@ -121,7 +132,14 @@ export function SampleTestSelectionSection() {
         </Text>
         <Paper withBorder style={{ height: 320, overflow: 'auto' }}>
           <Table highlightOnHover>
-            <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--mantine-color-body)', zIndex: 1 }}>
+            <Table.Thead
+              style={{
+                position: 'sticky',
+                top: 0,
+                background: 'var(--mantine-color-body)',
+                zIndex: 1,
+              }}
+            >
               <Table.Tr>
                 <Table.Th>Select</Table.Th>
                 <Table.Th>Code</Table.Th>

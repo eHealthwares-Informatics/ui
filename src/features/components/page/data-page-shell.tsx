@@ -2,7 +2,7 @@ import { ActionIcon, Select, Tooltip } from '@mantine/core';
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { HelpCircle } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ModuleContext, useModuleContext } from '@/context/module-context';
 import { entityInfoMap } from '@/features/lis/schema/entity-info';
@@ -107,23 +107,29 @@ export function DataPageShell(props: DataPageShellProps) {
     ? (formContext?.formState ?? {})
     : (propsFormState ?? localFormState);
 
-  const effectiveSetFormState = usingFormProvider
-    ? (state: Record<string, unknown>) => {
-        formContext?.setFields(state as any);
-      }
-    : (propsSetFormState ?? setLocalFormState);
+  const effectiveSetFormState = useCallback(
+    usingFormProvider
+      ? (state: Record<string, unknown>) => {
+          formContext?.setFields(state as any);
+        }
+      : (propsSetFormState ?? setLocalFormState),
+    [usingFormProvider, formContext, propsSetFormState]
+  );
 
-  const effectiveUpdateField = usingFormProvider
-    ? (name: string, value: unknown) => {
-        formContext?.setField(name as any, value as any);
-      }
-    : (propsUpdateField ??
-      ((name: string, value: unknown) => {
-        setLocalFormState((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-      }));
+  const effectiveUpdateField = useCallback(
+    usingFormProvider
+      ? (name: string, value: unknown) => {
+          formContext?.setField(name as any, value as any);
+        }
+      : propsUpdateField ??
+        ((name: string, value: unknown) => {
+          setLocalFormState((prev) => ({
+            ...prev,
+            [name]: value,
+          }));
+        }),
+    [usingFormProvider, formContext, propsUpdateField]
+  );
 
   const queryClient = useQueryClient();
 
@@ -253,7 +259,14 @@ export function DataPageShell(props: DataPageShellProps) {
       let params: any = queryParams;
       if (moduleId === 'rxsoft' && Object.keys(queryParams).length > 2) {
         const { page, limit, sortBy: sort, sortOrder: order, ...rest } = queryParams;
-        const search = JSON.stringify(rest);
+        // A free-text search alone must be sent as a PLAIN string: every backend
+        // implements the ILIKE fallback for it, but JSON-parsing backends treat
+        // `{"search":"..."}` as a column filter (no-op) and plain-LIKE backends
+        // try to match the JSON text itself (returns nothing). JSON-encode only
+        // when real column filters are present.
+        const restKeys = Object.keys(rest);
+        const onlyPlainSearch = restKeys.length === 1 && restKeys[0] === 'search';
+        const search = onlyPlainSearch ? String(rest.search) : JSON.stringify(rest);
         params = {
           page,
           limit,
@@ -264,7 +277,6 @@ export function DataPageShell(props: DataPageShellProps) {
       const response = await apiProvider.get(endpoint, { params });
       const meta = response.data?.meta;
 
-      setPageIndex(meta?.page ?? 1);
       setTotalItems(meta?.total ?? response.data.length);
 
       return response.data;

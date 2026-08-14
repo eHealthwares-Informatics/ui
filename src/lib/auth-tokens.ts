@@ -18,9 +18,14 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       email?: string;
       roles?: string[];
       phone?: string;
+      exp?: number;
     };
 
     if (!payload.sub || !payload.username) {
+      return null;
+    }
+
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
       return null;
     }
 

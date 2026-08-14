@@ -119,8 +119,13 @@ export const lisResources: LisResourceConfig[] = [
                 options: [
                   { label: 'NUMERIC', value: 'NUMERIC' },
                   { label: 'TEXT', value: 'TEXT' },
-                  { label: 'CODED', value: 'CODED' },
+                  { label: 'DICTIONARY', value: 'DICTIONARY' },
                   { label: 'BOOLEAN', value: 'BOOLEAN' },
+                  { label: 'DATE', value: 'DATE' },
+                  { label: 'RICH_TEXT', value: 'RICH_TEXT' },
+                  { label: 'ATTACHMENT', value: 'ATTACHMENT' },
+                  { label: 'TABLE', value: 'TABLE' },
+                  { label: 'CALCULATED', value: 'CALCULATED' },
                 ],
               },
               {
@@ -606,6 +611,7 @@ export const lisResources: LisResourceConfig[] = [
       { key: 'name', label: 'Name' },
       { key: 'type.name', label: 'Type' },
       { key: 'parent', label: 'Parent' },
+      { key: 'storageAssignment', label: 'Storage Assignment' },
       { key: 'active', label: 'Active' },
     ],
 
@@ -648,6 +654,13 @@ export const lisResources: LisResourceConfig[] = [
             type: 'async-select',
             placeholder: `Select Parent`,
             col: 6,
+          },
+
+          {
+            name: 'storageAssignment',
+            label: 'Storage Assignment',
+            type: 'switch',
+            col: 3,
           },
 
           {
@@ -1266,7 +1279,11 @@ export const lisResources: LisResourceConfig[] = [
 
     columns: [
       { key: 'orderNumber', label: 'Order #' },
-      { key: 'patient', label: 'Patient', render: (row: any) => `${row.patient?.firstName} ${row.patient?.lastName}` },
+      {
+        key: 'patient',
+        label: 'Patient',
+        render: (row: any) => `${row.patient?.firstName} ${row.patient?.lastName}`,
+      },
       { key: 'status', label: 'Status' },
       { key: 'requestedDate', label: 'Requested' },
     ],

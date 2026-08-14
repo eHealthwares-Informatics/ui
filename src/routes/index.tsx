@@ -13,5 +13,13 @@ export const Route = createFileRoute('/')({
     if (hasRxsoft) {
       throw redirect({ to: '/rxsoft/items' });
     }
+
+    // Modules may still be loading (or /auth/me failed) — never render a blank
+    // page at "/". Fall back to the first known module, else sign-in.
+    const firstModule = userModules[0];
+    if (firstModule?.root) {
+      throw redirect({ href: `/${firstModule.id}${firstModule.root}` });
+    }
+    throw redirect({ to: '/sign-in' });
   },
 });
