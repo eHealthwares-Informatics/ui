@@ -18,7 +18,7 @@ import type {
 } from './types';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://rxsoft-backend.onrender.com/api',
+  baseURL: import.meta.env.VITE_APM_API_URL || '/api',
 });
 
 export const apmApi = {
