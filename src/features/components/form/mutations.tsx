@@ -107,31 +107,38 @@ export const useUpdateMutation = ({
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
   return useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      if (!editingRow?.id) {
+      const recordId = editingRow?.id ?? editingRow?._id;
+      if (!recordId) {
         throw new Error('Missing record id');
       }
       const changedValues = initialFormState ? getDirtyFields(values, initialFormState) : values;
       const normalized = normalizeMultiSelectIds(changedValues, fields ?? []);
       const payload = buildUpdatePayload
-        ? buildUpdatePayload(normalized, editingRow)
+        ? buildUpdatePayload(normalized, editingRow as Record<string, unknown>)
         : buildCreatePayload
           ? buildCreatePayload(normalized)
           : normalized;
       const response = await effectiveApiProvider!.patch(
-        `${endpoint}/${String(editingRow.id)}`,
+        `${endpoint}/${String(recordId)}`,
         payload
       );
-      return response.data as Record<string, unknown>;
+      return { data: response.data as Record<string, unknown>, recordId };
     },
-    onSuccess: () => {
+    onSuccess: ({ recordId }) => {
       void queryClient.invalidateQueries({
         queryKey: ['rxsoft-data-page', endpoint],
       });
+      void queryClient.invalidateQueries({ queryKey: [endpoint] });
+      void queryClient.invalidateQueries({ queryKey: ['rxsoft-detail', endpoint] });
+      if (recordId) {
+        void queryClient.invalidateQueries({ queryKey: [endpoint, String(recordId)] });
+      }
       setShowModal(false);
       setEditingRow(null);
       notifications.show({ message: `${title} record updated` });
     },
     onError: (error: any) => {
+      console.log({error})
       notifications.show({
         message: `Failed to update ${title.toLowerCase()} record - ${error?.data?.error?.message ?? error?.response?.data?.error?.message}`,
       });
@@ -151,7 +158,9 @@ export const useDeleteMutation = ({
 
   return useMutation({
     mutationFn: async (row: Record<string, unknown>) => {
-      const target = deletePathBuilder ? deletePathBuilder(row) : `${endpoint}/${String(row.id)}`;
+      const target = deletePathBuilder
+        ? deletePathBuilder(row)
+        : `${endpoint}/${String(row.id ?? row._id)}`;
       await effectiveApiProvider.delete(target);
     },
     onSuccess: () => {

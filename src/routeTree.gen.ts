@@ -140,6 +140,19 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftItemsIndexRouteImport } from './routes/_authenticated/rxsoft/items/index'
 import { Route as AuthenticatedRxsoftInventoryIndexRouteImport } from './routes/_authenticated/rxsoft/inventory/index'
 import { Route as AuthenticatedRxsoftGlAccountsIndexRouteImport } from './routes/_authenticated/rxsoft/gl-accounts/index'
+import { Route as AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-testimonials/index'
+import { Route as AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-team/index'
+import { Route as AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-settings/index'
+import { Route as AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-services/index'
+import { Route as AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-sections/index'
+import { Route as AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-products/index'
+import { Route as AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-partners/index'
+import { Route as AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-investors/index'
+import { Route as AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-hero-slides/index'
+import { Route as AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-contact-submissions/index'
+import { Route as AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-categories/index'
+import { Route as AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-careers/index'
+import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
 import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
 import { Route as AuthenticatedRxsoftDashboardIndexRouteImport } from './routes/_authenticated/rxsoft/dashboard/index'
 import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
@@ -934,6 +947,84 @@ const AuthenticatedRxsoftGlAccountsIndexRoute =
     path: '/rxsoft/gl-accounts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-testimonials/',
+    path: '/rxsoft/ehealthwares-testimonials/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresTeamIndexRoute =
+  AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-team/',
+    path: '/rxsoft/ehealthwares-team/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresSettingsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-settings/',
+    path: '/rxsoft/ehealthwares-settings/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresServicesIndexRoute =
+  AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-services/',
+    path: '/rxsoft/ehealthwares-services/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresSectionsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-sections/',
+    path: '/rxsoft/ehealthwares-sections/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresProductsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-products/',
+    path: '/rxsoft/ehealthwares-products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresPartnersIndexRoute =
+  AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-partners/',
+    path: '/rxsoft/ehealthwares-partners/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-investors/',
+    path: '/rxsoft/ehealthwares-investors/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute =
+  AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-hero-slides/',
+    path: '/rxsoft/ehealthwares-hero-slides/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-contact-submissions/',
+    path: '/rxsoft/ehealthwares-contact-submissions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute =
+  AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-categories/',
+    path: '/rxsoft/ehealthwares-categories/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresCareersIndexRoute =
+  AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-careers/',
+    path: '/rxsoft/ehealthwares-careers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftEhealthwaresArticlesIndexRoute =
+  AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-articles/',
+    path: '/rxsoft/ehealthwares-articles/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftDrugComponentsIndexRoute =
   AuthenticatedRxsoftDrugComponentsIndexRouteImport.update({
     id: '/rxsoft/drug-components/',
@@ -1642,6 +1733,19 @@ export interface FileRoutesByFullPath {
   '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/dashboard/': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
   '/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
@@ -1859,6 +1963,19 @@ export interface FileRoutesByTo {
   '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-careers': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/rxsoft/ehealthwares-categories': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/rxsoft/ehealthwares-contact-submissions': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/rxsoft/ehealthwares-hero-slides': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/rxsoft/ehealthwares-investors': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/rxsoft/ehealthwares-partners': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/rxsoft/ehealthwares-products': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/rxsoft/ehealthwares-sections': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/rxsoft/ehealthwares-services': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/rxsoft/ehealthwares-settings': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/rxsoft/ehealthwares-team': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/rxsoft/ehealthwares-testimonials': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/rxsoft/gl-accounts': typeof AuthenticatedRxsoftGlAccountsIndexRoute
   '/rxsoft/inventory': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/rxsoft/items': typeof AuthenticatedRxsoftItemsIndexRoute
@@ -2082,6 +2199,19 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/_authenticated/rxsoft/dashboard/': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/_authenticated/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
   '/_authenticated/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/_authenticated/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
@@ -2303,6 +2433,19 @@ export interface FileRouteTypes {
     | '/rxsoft/customers/'
     | '/rxsoft/dashboard/'
     | '/rxsoft/drug-components/'
+    | '/rxsoft/ehealthwares-articles/'
+    | '/rxsoft/ehealthwares-careers/'
+    | '/rxsoft/ehealthwares-categories/'
+    | '/rxsoft/ehealthwares-contact-submissions/'
+    | '/rxsoft/ehealthwares-hero-slides/'
+    | '/rxsoft/ehealthwares-investors/'
+    | '/rxsoft/ehealthwares-partners/'
+    | '/rxsoft/ehealthwares-products/'
+    | '/rxsoft/ehealthwares-sections/'
+    | '/rxsoft/ehealthwares-services/'
+    | '/rxsoft/ehealthwares-settings/'
+    | '/rxsoft/ehealthwares-team/'
+    | '/rxsoft/ehealthwares-testimonials/'
     | '/rxsoft/gl-accounts/'
     | '/rxsoft/inventory/'
     | '/rxsoft/items/'
@@ -2520,6 +2663,19 @@ export interface FileRouteTypes {
     | '/rxsoft/customers'
     | '/rxsoft/dashboard'
     | '/rxsoft/drug-components'
+    | '/rxsoft/ehealthwares-articles'
+    | '/rxsoft/ehealthwares-careers'
+    | '/rxsoft/ehealthwares-categories'
+    | '/rxsoft/ehealthwares-contact-submissions'
+    | '/rxsoft/ehealthwares-hero-slides'
+    | '/rxsoft/ehealthwares-investors'
+    | '/rxsoft/ehealthwares-partners'
+    | '/rxsoft/ehealthwares-products'
+    | '/rxsoft/ehealthwares-sections'
+    | '/rxsoft/ehealthwares-services'
+    | '/rxsoft/ehealthwares-settings'
+    | '/rxsoft/ehealthwares-team'
+    | '/rxsoft/ehealthwares-testimonials'
     | '/rxsoft/gl-accounts'
     | '/rxsoft/inventory'
     | '/rxsoft/items'
@@ -2742,6 +2898,19 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/customers/'
     | '/_authenticated/rxsoft/dashboard/'
     | '/_authenticated/rxsoft/drug-components/'
+    | '/_authenticated/rxsoft/ehealthwares-articles/'
+    | '/_authenticated/rxsoft/ehealthwares-careers/'
+    | '/_authenticated/rxsoft/ehealthwares-categories/'
+    | '/_authenticated/rxsoft/ehealthwares-contact-submissions/'
+    | '/_authenticated/rxsoft/ehealthwares-hero-slides/'
+    | '/_authenticated/rxsoft/ehealthwares-investors/'
+    | '/_authenticated/rxsoft/ehealthwares-partners/'
+    | '/_authenticated/rxsoft/ehealthwares-products/'
+    | '/_authenticated/rxsoft/ehealthwares-sections/'
+    | '/_authenticated/rxsoft/ehealthwares-services/'
+    | '/_authenticated/rxsoft/ehealthwares-settings/'
+    | '/_authenticated/rxsoft/ehealthwares-team/'
+    | '/_authenticated/rxsoft/ehealthwares-testimonials/'
     | '/_authenticated/rxsoft/gl-accounts/'
     | '/_authenticated/rxsoft/inventory/'
     | '/_authenticated/rxsoft/items/'
@@ -3765,6 +3934,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftGlAccountsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/ehealthwares-testimonials/': {
+      id: '/_authenticated/rxsoft/ehealthwares-testimonials/'
+      path: '/rxsoft/ehealthwares-testimonials'
+      fullPath: '/rxsoft/ehealthwares-testimonials/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-team/': {
+      id: '/_authenticated/rxsoft/ehealthwares-team/'
+      path: '/rxsoft/ehealthwares-team'
+      fullPath: '/rxsoft/ehealthwares-team/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-settings/': {
+      id: '/_authenticated/rxsoft/ehealthwares-settings/'
+      path: '/rxsoft/ehealthwares-settings'
+      fullPath: '/rxsoft/ehealthwares-settings/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-services/': {
+      id: '/_authenticated/rxsoft/ehealthwares-services/'
+      path: '/rxsoft/ehealthwares-services'
+      fullPath: '/rxsoft/ehealthwares-services/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-sections/': {
+      id: '/_authenticated/rxsoft/ehealthwares-sections/'
+      path: '/rxsoft/ehealthwares-sections'
+      fullPath: '/rxsoft/ehealthwares-sections/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-products/': {
+      id: '/_authenticated/rxsoft/ehealthwares-products/'
+      path: '/rxsoft/ehealthwares-products'
+      fullPath: '/rxsoft/ehealthwares-products/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-partners/': {
+      id: '/_authenticated/rxsoft/ehealthwares-partners/'
+      path: '/rxsoft/ehealthwares-partners'
+      fullPath: '/rxsoft/ehealthwares-partners/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-investors/': {
+      id: '/_authenticated/rxsoft/ehealthwares-investors/'
+      path: '/rxsoft/ehealthwares-investors'
+      fullPath: '/rxsoft/ehealthwares-investors/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-hero-slides/': {
+      id: '/_authenticated/rxsoft/ehealthwares-hero-slides/'
+      path: '/rxsoft/ehealthwares-hero-slides'
+      fullPath: '/rxsoft/ehealthwares-hero-slides/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-contact-submissions/': {
+      id: '/_authenticated/rxsoft/ehealthwares-contact-submissions/'
+      path: '/rxsoft/ehealthwares-contact-submissions'
+      fullPath: '/rxsoft/ehealthwares-contact-submissions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-categories/': {
+      id: '/_authenticated/rxsoft/ehealthwares-categories/'
+      path: '/rxsoft/ehealthwares-categories'
+      fullPath: '/rxsoft/ehealthwares-categories/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-careers/': {
+      id: '/_authenticated/rxsoft/ehealthwares-careers/'
+      path: '/rxsoft/ehealthwares-careers'
+      fullPath: '/rxsoft/ehealthwares-careers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/ehealthwares-articles/': {
+      id: '/_authenticated/rxsoft/ehealthwares-articles/'
+      path: '/rxsoft/ehealthwares-articles'
+      fullPath: '/rxsoft/ehealthwares-articles/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/drug-components/': {
       id: '/_authenticated/rxsoft/drug-components/'
       path: '/rxsoft/drug-components'
@@ -4577,6 +4837,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
   AuthenticatedRxsoftDashboardIndexRoute: typeof AuthenticatedRxsoftDashboardIndexRoute
   AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  AuthenticatedRxsoftEhealthwaresCareersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  AuthenticatedRxsoftEhealthwaresPartnersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  AuthenticatedRxsoftEhealthwaresProductsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  AuthenticatedRxsoftEhealthwaresSectionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  AuthenticatedRxsoftEhealthwaresServicesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  AuthenticatedRxsoftEhealthwaresSettingsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  AuthenticatedRxsoftEhealthwaresTeamIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   AuthenticatedRxsoftGlAccountsIndexRoute: typeof AuthenticatedRxsoftGlAccountsIndexRoute
   AuthenticatedRxsoftInventoryIndexRoute: typeof AuthenticatedRxsoftInventoryIndexRoute
   AuthenticatedRxsoftItemsIndexRoute: typeof AuthenticatedRxsoftItemsIndexRoute
@@ -4756,6 +5029,32 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftDashboardIndexRoute,
   AuthenticatedRxsoftDrugComponentsIndexRoute:
     AuthenticatedRxsoftDrugComponentsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresArticlesIndexRoute:
+    AuthenticatedRxsoftEhealthwaresArticlesIndexRoute,
+  AuthenticatedRxsoftEhealthwaresCareersIndexRoute:
+    AuthenticatedRxsoftEhealthwaresCareersIndexRoute,
+  AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute:
+    AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute,
+  AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute:
+    AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute,
+  AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresPartnersIndexRoute:
+    AuthenticatedRxsoftEhealthwaresPartnersIndexRoute,
+  AuthenticatedRxsoftEhealthwaresProductsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresProductsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresSectionsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresSectionsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresServicesIndexRoute:
+    AuthenticatedRxsoftEhealthwaresServicesIndexRoute,
+  AuthenticatedRxsoftEhealthwaresSettingsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresSettingsIndexRoute,
+  AuthenticatedRxsoftEhealthwaresTeamIndexRoute:
+    AuthenticatedRxsoftEhealthwaresTeamIndexRoute,
+  AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute,
   AuthenticatedRxsoftGlAccountsIndexRoute:
     AuthenticatedRxsoftGlAccountsIndexRoute,
   AuthenticatedRxsoftInventoryIndexRoute:

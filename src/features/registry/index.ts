@@ -196,16 +196,76 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
       default: resourceToModelConfig(m.getLisResourceByKey('loinc')!),
     })),
   questionnaires: () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
-      default: m.questionnairePageSchema as unknown as ModelConfig,
-    })),
+    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
+      (m) => ({
+        default: m.questionnairePageSchema as unknown as ModelConfig,
+      })
+    ),
   'option-lists': () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
-      default: m.optionListsPageSchema as unknown as ModelConfig,
-    })),
+    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
+      (m) => ({
+        default: m.optionListsPageSchema as unknown as ModelConfig,
+      })
+    ),
   workflows: () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then((m) => ({
-      default: m.workflowPageSchema as unknown as ModelConfig,
+    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
+      (m) => ({
+        default: m.workflowPageSchema as unknown as ModelConfig,
+      })
+    ),
+
+  // eHealthwares website content
+  'ehealthwares-products': () =>
+    import('@/features/ehealthwares/pages/products/schema').then((m) => ({
+      default: m.ehealthwaresProductsConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-services': () =>
+    import('@/features/ehealthwares/pages/services/schema').then((m) => ({
+      default: m.ehealthwaresServicesConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-testimonials': () =>
+    import('@/features/ehealthwares/pages/testimonials/schema').then((m) => ({
+      default: m.ehealthwaresTestimonialsConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-partners': () =>
+    import('@/features/ehealthwares/pages/partners/schema').then((m) => ({
+      default: m.ehealthwaresPartnersConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-team': () =>
+    import('@/features/ehealthwares/pages/team/schema').then((m) => ({
+      default: m.ehealthwaresTeamConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-hero-slides': () =>
+    import('@/features/ehealthwares/pages/hero-slides/schema').then((m) => ({
+      default: m.ehealthwaresHeroSlidesConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-categories': () =>
+    import('@/features/ehealthwares/pages/categories/schema').then((m) => ({
+      default: m.ehealthwaresCategoriesConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-articles': () =>
+    import('@/features/ehealthwares/pages/articles/schema').then((m) => ({
+      default: m.ehealthwaresArticlesConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-investors': () =>
+    import('@/features/ehealthwares/pages/investors/schema').then((m) => ({
+      default: m.ehealthwaresInvestorsConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-careers': () =>
+    import('@/features/ehealthwares/pages/careers/schema').then((m) => ({
+      default: m.ehealthwaresCareersConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-sections': () =>
+    import('@/features/ehealthwares/pages/sections/schema').then((m) => ({
+      default: m.ehealthwaresSectionsConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-settings': () =>
+    import('@/features/ehealthwares/pages/settings/schema').then((m) => ({
+      default: m.ehealthwaresSettingsConfig as unknown as ModelConfig,
+    })),
+  'ehealthwares-contact-submissions': () =>
+    import('@/features/ehealthwares/pages/contact-submissions/schema').then((m) => ({
+      default: m.ehealthwaresContactsConfig as unknown as ModelConfig,
     })),
 };
 
@@ -232,6 +292,8 @@ function resourceToModelConfig(resource: {
 
 export function getModelConfig(resourceKey: string): Promise<ModelConfig | null> {
   const loader = modelRegistry[resourceKey];
-  if (!loader) {return Promise.resolve(null);}
+  if (!loader) {
+    return Promise.resolve(null);
+  }
   return loader().then((m) => m.default);
 }

@@ -8,6 +8,7 @@ const moduleFavicons: Record<string, string> = {
   communication: '/src/favicons/rxsoft.svg',
   'coding-concept': '/src/favicons/admin.svg',
   emr: '/src/favicons/emr.svg',
+  website: '/src/favicons/rxsoft.svg',
 };
 
 export function useModuleFavicon(moduleId: string | undefined) {

@@ -9,6 +9,7 @@ import {
   Microscope,
   Shield,
   HeartPulse,
+  Globe,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
@@ -24,6 +25,7 @@ const moduleIcons: Record<string, React.ElementType> = {
   lis: Microscope,
   emr: HeartPulse,
   admin: Shield,
+  website: Globe,
 };
 
 const modulePlans: Record<string, string> = {
@@ -34,6 +36,7 @@ const modulePlans: Record<string, string> = {
   lis: 'Laboratory',
   emr: 'Electronic Health Record',
   admin: 'Administration',
+  website: 'Website Content',
 };
 
 function toTeams(modules: ModuleInfo[]) {

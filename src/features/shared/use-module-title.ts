@@ -9,6 +9,7 @@ const moduleTitles: Record<string, string> = {
   'coding-concept': 'Coding Concept',
   emr: 'EMR',
   damorex: 'Damorex Pharmacy',
+  website: 'Website Console',
 };
 
 export function useModuleTitle(moduleId: string | undefined) {

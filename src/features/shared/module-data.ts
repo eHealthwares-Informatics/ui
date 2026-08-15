@@ -13,7 +13,8 @@ export type ModuleId =
   | 'lis'
   | 'emr'
   | 'rxsoft'
-  | 'admin';
+  | 'admin'
+  | 'website';
 
 export type ModuleDefinition = {
   id: ModuleId;
@@ -80,12 +81,7 @@ export const modules: ModuleDefinition[] = [
       '/communication/routing',
       '/communication/mapping',
     ],
-    resources: [
-      'messages',
-      'notifications',
-      'notification-templates',
-      'message-templates',
-    ],
+    resources: ['messages', 'notifications', 'notification-templates', 'message-templates'],
   },
   {
     id: 'coding-concept',
@@ -194,7 +190,8 @@ export const modules: ModuleDefinition[] = [
   {
     id: 'emr',
     title: 'EMR',
-    description: 'Electronic Medical Record: appointments, visits, encounters, dynamic forms and clinical requests.',
+    description:
+      'Electronic Medical Record: appointments, visits, encounters, dynamic forms and clinical requests.',
     root: '/emr',
     apiProvider: emrApi,
     routes: [
@@ -225,6 +222,44 @@ export const modules: ModuleDefinition[] = [
     routes: [],
     resources: [],
   },
+  {
+    id: 'website',
+    title: 'Website Console',
+    description:
+      'Website content management: eHealthwares products, services, sections and site settings.',
+    root: '/rxsoft/ehealthwares-products',
+    apiProvider: rxsoftApi,
+    routes: [
+      '/rxsoft/ehealthwares-hero-slides',
+      '/rxsoft/ehealthwares-products',
+      '/rxsoft/ehealthwares-services',
+      '/rxsoft/ehealthwares-categories',
+      '/rxsoft/ehealthwares-articles',
+      '/rxsoft/ehealthwares-testimonials',
+      '/rxsoft/ehealthwares-partners',
+      '/rxsoft/ehealthwares-team',
+      '/rxsoft/ehealthwares-investors',
+      '/rxsoft/ehealthwares-careers',
+      '/rxsoft/ehealthwares-sections',
+      '/rxsoft/ehealthwares-settings',
+      '/rxsoft/ehealthwares-contact-submissions',
+    ],
+    resources: [
+      'ehealthwares-hero-slides',
+      'ehealthwares-products',
+      'ehealthwares-services',
+      'ehealthwares-categories',
+      'ehealthwares-articles',
+      'ehealthwares-testimonials',
+      'ehealthwares-partners',
+      'ehealthwares-team',
+      'ehealthwares-investors',
+      'ehealthwares-careers',
+      'ehealthwares-sections',
+      'ehealthwares-settings',
+      'ehealthwares-contact-submissions',
+    ],
+  },
 ];
 
 export const moduleMap: Record<ModuleId, ModuleDefinition> = {
@@ -235,6 +270,7 @@ export const moduleMap: Record<ModuleId, ModuleDefinition> = {
   lis: modules[4],
   emr: modules[5],
   admin: modules[6],
+  website: modules[7],
 };
 
 export const defaultModule: ModuleId = 'rxsoft';

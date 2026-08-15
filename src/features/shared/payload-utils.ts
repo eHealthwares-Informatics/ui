@@ -92,6 +92,7 @@ export function buildPayload(
   values: Record<string, unknown>,
   fields?: FieldDef[]
 ): Record<string, unknown> {
+  console.log({values, fields})
   if (!fields) {
     return Object.fromEntries(Object.entries(values).map(([k, v]) => [k, castValue(v, 'string')]));
   }

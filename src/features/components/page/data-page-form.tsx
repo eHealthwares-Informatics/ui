@@ -101,6 +101,11 @@ export function DataPageForm({
       void queryClient.invalidateQueries({
         queryKey: ['rxsoft-data-page', endpoint],
       });
+      void queryClient.invalidateQueries({ queryKey: [endpoint] });
+      void queryClient.invalidateQueries({ queryKey: ['rxsoft-detail', endpoint] });
+      if (mode === 'edit' && data?.id) {
+        void queryClient.invalidateQueries({ queryKey: [endpoint, String(data.id)] });
+      }
       if (isWizard) {
         setFormState((prev) => ({ ...prev, id: data.id as string }));
       } else {
