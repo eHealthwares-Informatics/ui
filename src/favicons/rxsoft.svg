@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#2b8a3e"/><path d="M13 8h6v6h6v6h-6v6h-6v-6H7v-6h6V8z" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="eHealthWares icon">
+  <path d="M80.7 18.1 L95.42 26.6 L95.42 43.6 L80.7 52.1 L65.98 43.6 L65.98 26.6 Z" fill="#7C3AED"/>
+  <path d="M47.3 18.1 L62.02 26.6 L62.02 43.6 L47.3 52.1 L32.58 43.6 L32.58 26.6 Z" fill="#0F2A43"/>
+  <path d="M97.4 47 L112.12 55.5 L112.12 72.5 L97.4 81 L82.68 72.5 L82.68 55.5 Z" fill="#0D9488"/>
+  <path d="M30.6 47 L45.32 55.5 L45.32 72.5 L30.6 81 L15.88 72.5 L15.88 55.5 Z" fill="#16A34A"/>
+  <path d="M47.3 75.9 L62.02 84.4 L62.02 101.4 L47.3 109.9 L32.58 101.4 L32.58 84.4 Z" fill="#F59E0B"/>
+  <path d="M80.7 75.9 L95.42 84.4 L95.42 101.4 L80.7 109.9 L65.98 101.4 L65.98 84.4 Z" fill="#F43F5E"/>
+  <path fill-rule="evenodd" d="M64 47 L78.72 55.5 L78.72 72.5 L64 81 L49.28 72.5 L49.28 55.5 Z M61 55 H67 V61 H73 V67 H67 V73 H61 V67 H55 V61 H61 Z" fill="#2563EB"/>
+</svg>
