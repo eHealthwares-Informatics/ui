@@ -1,7 +1,10 @@
 import { AppShell, Stack, ScrollArea, Box, Divider, Badge, Group, Text } from '@mantine/core';
-import { useState } from 'react';
 import { useLocation } from '@tanstack/react-router';
+import { MapPin } from 'lucide-react';
+import { useState } from 'react';
 import { useModuleId, useModuleName } from '@/context/module-context';
+import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
+import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
 import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
@@ -13,6 +16,9 @@ export function AppSidebar() {
   const moduleId = useModuleId();
   const moduleName = useModuleName();
   const { pathname } = useLocation();
+  const { data: currentLocation } = useCurrentLocation(
+    moduleId === 'emr' ? (user?.locationId ?? null) : null
+  );
 
   const navGroups = filterNavGroupsByModule(sidebarData.navGroups, moduleId);
   const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
@@ -54,6 +60,37 @@ export function AppSidebar() {
                 </Text>
               </Group>
             </Badge>
+
+            {moduleId === 'emr' && <PatientLookup />}
+
+            {moduleId === 'emr' && (
+              <Group gap={6} align="center">
+                <Badge
+                  variant="outline"
+                  radius="xl"
+                  styles={{
+                    root: {
+                      width: 'fit-content',
+                    },
+                  }}
+                >
+                  <Group gap={6}>
+                    <MapPin size={12} />
+                    <Text size="xs" fw={700}>
+                      {currentLocation?.code ?? 'No location'}
+                    </Text>
+                    <Text size="10px" c="dimmed">
+                      {currentLocation?.name ?? '—'}
+                    </Text>
+                  </Group>
+                </Badge>
+                {user?.organizationId && (
+                  <Badge variant="light" radius="xl" size="sm">
+                    org {user.organizationId.slice(0, 8)}
+                  </Badge>
+                )}
+              </Group>
+            )}
           </Stack>
         </Box>
 

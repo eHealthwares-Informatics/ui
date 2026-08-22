@@ -1,18 +1,9 @@
-import axios from 'axios';
-import { getAccessToken } from '@/lib/auth-tokens';
+import { createAuthApiClient, IDENTITY_API_BASE_URL } from '@/lib/create-api-client';
 
-export const IDENTITY_API_BASE_URL =
-  (import.meta.env.VITE_IDENTITY_API_URL as string | undefined) ?? 'http://localhost:8092';
+export { IDENTITY_API_BASE_URL };
 
-export const identityApi = axios.create({
+export const identityApi = createAuthApiClient({
   baseURL: IDENTITY_API_BASE_URL,
   timeout: 10000,
-});
-
-identityApi.interceptors.request.use((config) => {
-  const token = getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  enableRefresh: false,
 });

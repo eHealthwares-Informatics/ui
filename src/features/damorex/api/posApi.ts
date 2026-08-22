@@ -1,6 +1,6 @@
+import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import { notifications } from '@mantine/notifications';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import type { CreateSaleDto } from '../types';
 
@@ -24,6 +24,14 @@ export const paymentMethodKeys = {
 
 export const userPosConfigKeys = {
   me: ['user-pos-config', 'me'] as any,
+};
+
+export const whitelistedItemsKeys = {
+  list: ['whitelisted-items'] as any,
+};
+
+export const itemUomsKeys = {
+  list: (itemId?: string) => ['item-uoms', itemId] as any,
 };
 
 export async function createSale(payload: CreateSaleDto) {
@@ -59,7 +67,9 @@ export function useSale(id?: string) {
   return useQuery({
     queryKey: id ? salesKeys.detail(id) : (['sales', 'undefined'] as const),
     queryFn: async () => {
-      if (!id) {return null;}
+      if (!id) {
+        return null;
+      }
       const { data } = await rxsoftApi.get(`/sales/${id}`);
       return data;
     },
@@ -81,7 +91,9 @@ export function useSearchSales(search?: string) {
   return useQuery({
     queryKey: ['sales', 'search', debounced] as const,
     queryFn: async () => {
-      if (!debounced) {return [];}
+      if (!debounced) {
+        return [];
+      }
       const { data } = await rxsoftApi.get('/sales', {
         params: { search: debounced, limit: 10 },
       });
@@ -122,7 +134,9 @@ export function usePriceListItems(priceListId?: string) {
   return useQuery({
     queryKey: priceListKeys.items(priceListId),
     queryFn: async () => {
-      if (!priceListId) {return [];}
+      if (!priceListId) {
+        return [];
+      }
       const { data } = await rxsoftApi.get(`/price-lists/${priceListId}/items`, {
         params: { limit: 100000 },
       });
@@ -131,6 +145,43 @@ export function usePriceListItems(priceListId?: string) {
     enabled: !!priceListId,
     staleTime: 60_000,
   });
+}
+
+export function useWhitelistedItems() {
+  return useQuery({
+    queryKey: whitelistedItemsKeys.list,
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/items/me', { params: { limit: 100000 } });
+      return Array.isArray(data) ? data : (data?.data ?? data ?? []);
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useItemUoms(itemId?: string) {
+  return useQuery({
+    queryKey: itemUomsKeys.list(itemId),
+    queryFn: async () => {
+      if (!itemId) {
+        return [];
+      }
+      const { data } = await rxsoftApi.get(`/items/${itemId}/uoms`);
+      return (data?.data ?? data ?? []) as UomOption[];
+    },
+    enabled: !!itemId,
+    staleTime: 300_000,
+  });
+}
+
+export interface UomOption {
+  id: string;
+  name: string;
+  code: string | null;
+  factor: number;
+  uomType: string;
+  categoryId?: string | null;
+  rounding?: number | null;
+  isActive?: boolean;
 }
 
 export function usePaymentMethods() {

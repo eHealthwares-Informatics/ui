@@ -1,7 +1,15 @@
-import { Text } from '@mantine/core';
+import { Badge, Switch, Text } from '@mantine/core';
 import { AxiosInstance } from 'axios';
+import { useEffect } from 'react';
 import type {} from '@/features/components/page/rx-page';
-import { EQUALS_WITH_OPTIONS, FieldGroup, FilterType, RELATION_FILTER, TabGroup, View } from '@/features/rxsoft/types';
+import {
+  EQUALS_WITH_OPTIONS,
+  FieldGroup,
+  FilterType,
+  RELATION_FILTER,
+  TabGroup,
+  View,
+} from '@/features/rxsoft/types';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { buildPayload as buildPriceListPayload } from '../../price-list-items/schema';
 import { ProductImagesTab } from '../components/product-images-tab';
@@ -25,7 +33,6 @@ import {
   validateStockRow,
   type StockMatrixRow,
 } from '../utils/stock-matrix-helper';
-import { useEffect } from 'react';
 
 function CategoryUomWatcher({
   formState,
@@ -39,18 +46,21 @@ function CategoryUomWatcher({
     if (category?.value && category?.uomCategoryId) {
       updateField('categoryUomCategoryId', category.uomCategoryId);
     } else if (category?.value) {
-      rxsoftApi.get(`/categories/${category.value}`).then((res) => {
-        const data = res.data?.data ?? res.data;
-        if (data?.uomCategoryId) {
-          updateField('categoryUomCategoryId', data.uomCategoryId);
-        }
-      }).catch(() => {});
+      rxsoftApi
+        .get(`/categories/${category.value}`)
+        .then((res) => {
+          const data = res.data?.data ?? res.data;
+          if (data?.uomCategoryId) {
+            updateField('categoryUomCategoryId', data.uomCategoryId);
+          }
+        })
+        .catch(() => {});
     }
   }, [category?.value]);
   return null;
 }
 
-const endpoint = '/items'
+const endpoint = '/items';
 const itemCreateFieldGroups: FieldGroup[] = [
   {
     title: 'Classification',
@@ -91,9 +101,17 @@ const itemCreateFieldGroups: FieldGroup[] = [
     title: 'Basic Information',
     fields: [
       { name: 'name', label: 'Item Name (Brand/Variety)', required: true, col: 6 },
-      { name: 'code', label: 'Code', required: true, col: 6 },
-      { name: 'barcode', label: 'Barcode', col: 6 },
       { name: 'imageUrl', label: 'Image URL', col: 12, type: 'image', imageSize: 'large' },
+    ],
+  },
+  {
+    title: 'Organisation Settings (optional)',
+    description:
+      'Set an org code, barcode or alias to explicitly whitelist this product for the current organisation.',
+    fields: [
+      { name: 'code', label: 'Org Code', col: 4 },
+      { name: 'barcode', label: 'Org Barcode', col: 4 },
+      { name: 'alias', label: 'Org Alias (display name)', col: 4 },
     ],
   },
   {
@@ -248,8 +266,7 @@ const itemPriceListFieldGroups: FieldGroup[] = [
           type: 'number',
           col: 3,
           required: true,
-          updateField: (row, name, value) => {
-          }, //updateMatrixRow(row, name, value)
+          updateField: (row, name, value) => {}, //updateMatrixRow(row, name, value)
         },
       },
       {
@@ -507,34 +524,53 @@ export const buildFormState = (row: Record<string, any>) => {
   return formState;
 };
 
-import { Switch } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ColumnTypeFilters, type Column } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 
-function ToggleActive({ row, onToggle }: { row: Record<string, unknown>; onToggle?: () => void }) {
+function ToggleActive({ row }: { row: Record<string, unknown> }) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (isActive: boolean) =>
-      rxsoftApi.patch(`/items/${String(row.id)}`, { isActive }),
+    mutationFn: (checked: boolean) =>
+      rxsoftApi.put(`/items/me/${String(row.id)}`, { isActive: checked }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rxsoft-data-page', endpoint] });
-      onToggle?.();
     },
-    onError: () => {
-      notifications.show({ color: 'red', message: 'Failed to update item status' });
+    onError: (err: any) => {
+      notifications.show({
+        color: 'red',
+        message: err?.response?.data?.message ?? 'Failed to update visibility',
+      });
     },
   });
 
+  // Checked = visible to the current organisation (default or whitelisted);
+  // unchecked = blacklisted.
+  const checked = row.visibility !== 'blacklisted';
   return (
     <Switch
-      checked={Boolean(row.isActive)}
+      checked={checked}
       onChange={(e) => mutation.mutate(e.currentTarget.checked)}
       disabled={mutation.isPending}
       size="sm"
     />
+  );
+}
+
+const VISIBILITY_META: Record<string, { label: string; color: string }> = {
+  default: { label: 'Default', color: 'gray' },
+  whitelisted: { label: 'Whitelisted', color: 'green' },
+  blacklisted: { label: 'Blacklisted', color: 'red' },
+};
+
+function VisibilityBadge({ visibility }: { visibility?: unknown }) {
+  const meta = VISIBILITY_META[String(visibility ?? 'default')] ?? VISIBILITY_META.default;
+  return (
+    <Badge color={meta.color} variant="light" size="sm">
+      {meta.label}
+    </Badge>
   );
 }
 
@@ -551,6 +587,7 @@ export const itemColumns: Column[] = [
     }),
   },
   { key: 'name', label: 'Item Name', filters: ColumnTypeFilters.STRING },
+  { key: 'displayName', label: 'Display Name' },
   {
     key: 'genericProduct.name',
     label: 'Generic Product',
@@ -562,8 +599,13 @@ export const itemColumns: Column[] = [
       minChars: 3,
     }),
   },
-  { key: 'code', label: 'Code' },
-  { key: 'barcode', label: 'Barcode' },
+  { key: 'code', label: 'Org Code' },
+  { key: 'barcode', label: 'Org Barcode' },
+  {
+    key: 'visibility',
+    label: 'Visibility',
+    render: (row) => <VisibilityBadge visibility={row.visibility} />,
+  },
   {
     key: 'isActive',
     label: 'Active',
@@ -571,7 +613,7 @@ export const itemColumns: Column[] = [
     filters: EQUALS_WITH_OPTIONS([
       { value: 'true', label: 'Active' },
       { value: 'false', label: 'Inactive' },
-    ])
+    ]),
   },
 ];
 
@@ -648,8 +690,14 @@ export const itemsView: View<any> = {
           col: 3,
           render: (value) =>
             value ? (
-              <img src={value as string} alt="product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }} />
-            ) : '-',
+              <img
+                src={value as string}
+                alt="product"
+                style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+              />
+            ) : (
+              '-'
+            ),
         },
         {
           key: 'smallImageUrl',
@@ -657,8 +705,14 @@ export const itemsView: View<any> = {
           col: 3,
           render: (value) =>
             value ? (
-              <img src={value as string} alt="product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }} />
-            ) : '-',
+              <img
+                src={value as string}
+                alt="product"
+                style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+              />
+            ) : (
+              '-'
+            ),
         },
         {
           key: 'mediumImageUrl',
@@ -666,8 +720,14 @@ export const itemsView: View<any> = {
           col: 3,
           render: (value) =>
             value ? (
-              <img src={value as string} alt="product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }} />
-            ) : '-',
+              <img
+                src={value as string}
+                alt="product"
+                style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+              />
+            ) : (
+              '-'
+            ),
         },
         {
           key: 'largeImageUrl',
@@ -675,8 +735,14 @@ export const itemsView: View<any> = {
           col: 3,
           render: (value) =>
             value ? (
-              <img src={value as string} alt="product" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }} />
-            ) : '-',
+              <img
+                src={value as string}
+                alt="product"
+                style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+              />
+            ) : (
+              '-'
+            ),
         },
       ],
     },
@@ -720,6 +786,9 @@ export const itemsConfig: ModelConfig = {
   tabGroups,
   modalTitle: 'Add Item',
   metricsEndpoint: '/items/metrics',
+  // Show the FULL catalog (LEFT JOIN organisation_items) including items that
+  // are blacklisted for the current org, so they stay toggleable/editable.
+  listParams: { includeAll: true },
   metricsConfig: {
     endpoint: '/items/metrics',
     items: (data: any) => [
@@ -727,7 +796,12 @@ export const itemsConfig: ModelConfig = {
       { label: 'Active', value: data.active, icon: 'CheckCircle', color: 'green' },
       { label: 'Inactive', value: data.inactive, icon: 'XCircle', color: 'red' },
       { label: 'No Category', value: data.noCategory, icon: 'AlertTriangle', color: 'orange' },
-      { label: 'No Generic Product', value: data.noGenericProductCode, icon: 'AlertTriangle', color: 'yellow' },
+      {
+        label: 'No Generic Product',
+        value: data.noGenericProductCode,
+        icon: 'AlertTriangle',
+        color: 'yellow',
+      },
     ],
   },
   buildCreatePayload: buildItemPayload,
@@ -755,7 +829,7 @@ export function buildItemPayload(values: Record<string, any>) {
     }));
 
   return {
-    code: values.code,
+    code: values.code || undefined,
     name: values.name,
     categoryId: (values.category as any).value,
     genericProductCode: (values?.genericProductCode as any)?.value,
@@ -763,6 +837,7 @@ export function buildItemPayload(values: Record<string, any>) {
     purchaseUomId: (values as any).purchaseUom.value,
     saleUomId: (values as any).saleUom.value || undefined,
     barcode: values.barcode || undefined,
+    alias: values.alias || undefined,
     isActive: values.isActive,
     imageUrl: values.imageUrl || undefined,
     smallImageUrl: values.smallImageUrl || undefined,

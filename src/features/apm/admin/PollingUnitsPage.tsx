@@ -43,7 +43,7 @@ export function PollingUnitsPage() {
 
   const handleSave = () => {
     if (!selectedPu) {return;}
-    updatePu.mutate({ id: selectedPu.id, data: form }, { onSuccess: close });
+    updatePu.mutate({ id: selectedPu.id ?? selectedPu._id, data: form }, { onSuccess: close });
   };
 
   return (
@@ -75,7 +75,7 @@ export function PollingUnitsPage() {
             </Table.Thead>
             <Table.Tbody>
               {(pus ?? []).map((pu: any) => (
-                <Table.Tr key={pu.id}>
+                <Table.Tr key={pu.id ?? pu._id}>
                   <Table.Td fw={600} style={{ fontSize: 13 }}>{pu.code}</Table.Td>
                   <Table.Td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {pu.name}

@@ -1,20 +1,32 @@
-import { Button, Image, NumberInput, Paper, Select, Table, Text, UnstyledButton } from '@mantine/core';
+import {
+  Button,
+  Image,
+  NumberInput,
+  Paper,
+  Select,
+  Table,
+  Text,
+  UnstyledButton,
+} from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { usePriceListItems } from '../../api/posApi';
+import { useItemUoms, usePriceListItems, useWhitelistedItems, UomOption } from '../../api/posApi';
 import { SaleSession, CartItem } from '../types';
-import { StockAdjustModal } from './StockAdjustModal';
 import { getUomEffectiveFactor } from '../utils/calculation';
+import { StockAdjustModal } from './StockAdjustModal';
 
-interface UomOption {
-  id: string;
+interface ProductOption {
+  value: string;
+  label: string;
   name: string;
-  code: string | null;
-  factor: number;
-  uomType: string;
-  categoryId: string | null;
+  code: string;
+  saleUomId: string | null;
+  retailPrice: number;
+  wholesalePrice: number;
+  imageUrl: string;
 }
 
 interface Props {
@@ -36,6 +48,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
   const [adjustCurrentQty, setAdjustCurrentQty] = useState(0);
 
   const { data: priceListItems = [] } = usePriceListItems(session.priceListId);
+  const { data: whitelistedItems = [] } = useWhitelistedItems();
 
   const { data: allUoms = [] } = useQuery({
     queryKey: ['uoms', 'all'],
@@ -48,46 +61,77 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
 
   const uomMap = useMemo(() => {
     const map = new Map<string, UomOption>();
-    for (const u of allUoms) {map.set(u.id, u);}
+    for (const u of allUoms) {
+      map.set(u.id, u as UomOption);
+    }
     return map;
   }, [allUoms]);
 
-  const productOptions = useMemo(() => {
-    return (Array.isArray(priceListItems) ? priceListItems : []).map((pli: any) => ({
-      value: pli.item?.id || pli.id,
-      label: `${pli.item?.code || ''} - ${pli.item?.name || ''}`,
-      item: pli.item,
-      retailPrice: pli.unitPrice,
-      wholesalePrice: pli.unitPrice,
-      uomId: pli.item?.saleUomId || pli.uomId || '',
-      imageUrl: pli.item?.smallImageUrl || pli.item?.imageUrl || '',
-    }));
+  const priceByItemId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const pli of Array.isArray(priceListItems) ? priceListItems : []) {
+      const itemId = pli.item?.id;
+      if (itemId) {
+        map.set(itemId, Number(pli.unitPrice) || 0);
+      }
+    }
+    return map;
   }, [priceListItems]);
 
-  const selectedProduct = productOptions.find((p: any) => p.value === selectedProductId);
+  const productOptions = useMemo<ProductOption[]>(() => {
+    const list = Array.isArray(whitelistedItems) ? whitelistedItems : [];
+    return list.map((w: any) => {
+      const displayName = w.displayName || w.name || '';
+      const code = w.code || '';
+      return {
+        value: w.itemId,
+        label: `${code} - ${displayName}`,
+        name: displayName,
+        code,
+        saleUomId: w.saleUomId ?? null,
+        retailPrice: priceByItemId.get(w.itemId) ?? 0,
+        wholesalePrice: priceByItemId.get(w.itemId) ?? 0,
+        imageUrl: w.smallImageUrl || w.imageUrl || '',
+      };
+    });
+  }, [whitelistedItems, priceByItemId]);
 
-  const itemCode = selectedProduct?.item?.code || selectedProductId?.slice(0, 8) || '';
+  const selectedProduct = productOptions.find((p) => p.value === selectedProductId);
+
+  const itemCode = selectedProduct?.code || selectedProductId?.slice(0, 8) || '';
   const retailPrice = selectedProduct?.retailPrice || 0;
   const wholesalePrice = selectedProduct?.wholesalePrice || 0;
   const effectivePrice = session.pricingMode === 'wholesale' ? wholesalePrice : retailPrice;
 
-  const currentUom = uomId ? uomMap.get(uomId) : null;
+  const currentUom = uomId ? (uomMap.get(uomId) ?? null) : null;
   const uomFactor = getUomEffectiveFactor(currentUom);
   const total = quantity * effectivePrice * uomFactor;
 
   const unitPrice = effectivePrice * uomFactor;
 
+  const { data: itemUoms = [] } = useItemUoms(selectedProductId ?? undefined);
+
   const filteredUomOptions = useMemo(() => {
-    if (!uomId) return [];
+    const perItem = Array.isArray(itemUoms) ? itemUoms : [];
+    if (selectedProductId && perItem.length > 0) {
+      return perItem as UomOption[];
+    }
+    if (!uomId) {
+      return [];
+    }
     const selectedUom = uomMap.get(uomId);
-    if (!selectedUom?.categoryId) return Array.from(uomMap.values());
+    if (!selectedUom?.categoryId) {
+      return Array.from(uomMap.values());
+    }
     return Array.from(uomMap.values()).filter((u) => u.categoryId === selectedUom.categoryId);
-  }, [uomId, uomMap]);
+  }, [selectedProductId, itemUoms, uomId, uomMap]);
 
   const { data: stockQty = 0, refetch: refetchStock } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
     queryFn: async () => {
-      if (!selectedProductId || !stockLocationId) {return 0;}
+      if (!selectedProductId || !stockLocationId) {
+        return 0;
+      }
       const { data: balances } = await rxsoftApi.get('/inventory/stock-balances', {
         params: { itemId: selectedProductId, locationId: stockLocationId, limit: 1 },
       });
@@ -100,17 +144,38 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
 
   const adjustedStockQty = uomFactor > 0 ? stockQty / uomFactor : 0;
 
+  function handleProductSelect(value: string | null) {
+    setSelectedProductId(value);
+    const prod = value ? productOptions.find((p) => p.value === value) : null;
+    if (prod) {
+      if (prod.saleUomId) {
+        setUomId(prod.saleUomId);
+      } else {
+        setUomId(null);
+        notifications.show({
+          color: 'red',
+          message: `Sale UOM not configured for ${prod.name || prod.code || 'this product'}`,
+        });
+      }
+    } else {
+      setUomId(null);
+    }
+  }
+
   function handleAdd() {
-    if (!selectedProductId || !quantity) {return;}
+    if (!selectedProductId || !quantity) {
+      return;
+    }
+    const uomUsed = uomId || selectedProduct?.saleUomId || '';
     const item: CartItem = {
       id: selectedProductId,
       code: itemCode,
-      name: selectedProduct?.label || '',
+      name: selectedProduct?.name || '',
       retailPrice,
       wholesalePrice,
       quantity,
       pricingMode: session.pricingMode,
-      uomId: uomId || selectedProduct?.uomId || '',
+      uomId: uomUsed,
       uomName: currentUom?.name || 'Unit',
       uomFactor,
       lineTotal: total,
@@ -119,13 +184,16 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
     onAddToCart(item);
     setSelectedProductId(null);
     setQuantity(1);
+    setUomId(null);
   }
 
   function openAdjustModal() {
-    if (!selectedProductId || !stockLocationId) {return;}
+    if (!selectedProductId || !stockLocationId) {
+      return;
+    }
     setAdjustItemId(selectedProductId);
-    setAdjustItemName(selectedProduct?.label || itemCode);
-    setAdjustUomId(uomId || selectedProduct?.uomId || '');
+    setAdjustItemName(selectedProduct?.name || itemCode);
+    setAdjustUomId(uomId || selectedProduct?.saleUomId || '');
     setAdjustUomName(currentUom?.name || 'Unit');
     setAdjustCurrentQty(adjustedStockQty);
     setAdjustModalOpen(true);
@@ -153,7 +221,9 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               {selectedProduct?.imageUrl ? (
                 <Image src={selectedProduct.imageUrl} w={40} h={40} fit="cover" />
               ) : (
-                <Text size="xs" c="dimmed">-</Text>
+                <Text size="xs" c="dimmed">
+                  -
+                </Text>
               )}
             </Table.Td>
             <Table.Td>{itemCode || '-'}</Table.Td>
@@ -161,28 +231,32 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               <Select
                 size="xs"
                 placeholder="Select product..."
-                data={productOptions.map((p: any) => ({ value: p.value, label: p.label }))}
+                data={productOptions.map((p) => ({ value: p.value, label: p.label }))}
                 value={selectedProductId}
-                onChange={(v) => {
-                  setSelectedProductId(v);
-                  const prod = productOptions.find((p: any) => p.value === v);
-                  if (prod) setUomId(prod.uomId);
-                }}
+                onChange={handleProductSelect}
                 searchable
                 clearable
                 w={280}
               />
             </Table.Td>
-             <Table.Td>
+            <Table.Td>
               {stockLocationId && selectedProductId ? (
-                <UnstyledButton
-                  onClick={openAdjustModal}
-                  style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                >
-                  {adjustedStockQty.toFixed(2)}
-                </UnstyledButton>
+                adjustedStockQty > 0 ? (
+                  <UnstyledButton
+                    onClick={openAdjustModal}
+                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {adjustedStockQty.toFixed(2)}
+                  </UnstyledButton>
+                ) : (
+                  <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
+                    Set Stock
+                  </Button>
+                )
               ) : (
-                <Text size="xs" c="dimmed">-</Text>
+                <Text size="xs" c="dimmed">
+                  -
+                </Text>
               )}
             </Table.Td>
             <Table.Td>{unitPrice.toFixed(2)}</Table.Td>
@@ -196,6 +270,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
                 }))}
                 value={uomId}
                 onChange={(v) => setUomId(v)}
+                placeholder="Pick UOM"
               />
             </Table.Td>
             <Table.Td>

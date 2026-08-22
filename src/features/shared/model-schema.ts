@@ -52,4 +52,5 @@ export type ModelConfig<T = any> = {
   metricsEndpoint?: string;
   metricsConfig?: MetricsConfig;
   superAdminOrgFilter?: boolean;
+  listParams?: Record<string, unknown>;
 };

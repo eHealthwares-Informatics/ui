@@ -121,13 +121,13 @@ export function DataPageShell(props: DataPageShellProps) {
       ? (name: string, value: unknown) => {
           formContext?.setField(name as any, value as any);
         }
-      : propsUpdateField ??
-        ((name: string, value: unknown) => {
-          setLocalFormState((prev) => ({
-            ...prev,
-            [name]: value,
-          }));
-        }),
+      : (propsUpdateField ??
+          ((name: string, value: unknown) => {
+            setLocalFormState((prev) => ({
+              ...prev,
+              [name]: value,
+            }));
+          })),
     [usingFormProvider, formContext, propsUpdateField]
   );
 
@@ -226,6 +226,12 @@ export function DataPageShell(props: DataPageShellProps) {
     params.page = pageIndex;
     params.limit = pageSize;
 
+    // Per-config default list params (e.g. items: { includeAll: true }) stay as
+    // top-level query params on every request.
+    if (config.listParams) {
+      Object.assign(params, config.listParams);
+    }
+
     return params;
   }, [
     search,
@@ -238,6 +244,7 @@ export function DataPageShell(props: DataPageShellProps) {
     isSuperAdmin,
     superAdminOrgFilter,
     selectedOrgId,
+    config.listParams,
   ]);
 
   useEffect(() => {
@@ -259,6 +266,11 @@ export function DataPageShell(props: DataPageShellProps) {
       let params: any = queryParams;
       if (moduleId === 'rxsoft' && Object.keys(queryParams).length > 2) {
         const { page, limit, sortBy: sort, sortOrder: order, ...rest } = queryParams;
+        // Config-driven top-level params (config.listParams) are re-emitted as
+        // real query params, never JSON-encoded into the search bag.
+        for (const key of Object.keys(config.listParams ?? {})) {
+          delete rest[key];
+        }
         // A free-text search alone must be sent as a PLAIN string: every backend
         // implements the ILIKE fallback for it, but JSON-parsing backends treat
         // `{"search":"..."}` as a column filter (no-op) and plain-LIKE backends
@@ -272,6 +284,7 @@ export function DataPageShell(props: DataPageShellProps) {
           limit,
           ...(sort ? { sortBy: sort, sortOrder: order ?? 'desc' } : {}),
           search,
+          ...(config.listParams ?? {}),
         };
       }
       const response = await apiProvider.get(endpoint, { params });

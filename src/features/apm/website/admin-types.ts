@@ -16,6 +16,7 @@ export interface Ward {
 
 export interface PollingUnit {
   id: string;
+  _id?: string;
   code: string;
   name: string;
   wardId: string;

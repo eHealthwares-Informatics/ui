@@ -42,10 +42,10 @@ import {
   Stethoscope,
   CalendarDays,
   UserRound,
+  UserCog,
   Bed,
   FileSpreadsheet,
   FilePlus2,
-  Hourglass,
   ClipboardList,
   Globe,
 } from 'lucide-react';
@@ -869,6 +869,7 @@ export const sidebarData: SidebarData = {
           modules: ['emr', 'admin'],
         },
         { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr', 'admin'] },
+        { title: 'Staff', url: '/emr/staff', icon: UserCog, modules: ['emr', 'admin'] },
         { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr', 'admin'] },
         {
           title: 'Encounters',

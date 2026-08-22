@@ -18,7 +18,12 @@ const userCreateFields: Field[] = [
     name: 'roles',
     label: 'Roles',
     type: 'multi-async-select' as any,
-    toOptions: (values) => values.map((value:any) => ({value: value.code ?? value.value, label: value.name ?? value.label})),
+    toOptions: (values) =>
+      values.map((value: any) =>
+        typeof value === 'string'
+          ? { value, label: value }
+          : { value: value.code ?? value.value, label: value.name ?? value.label },
+      ),
     required: true,
     searchParam: {
       endpoint: '/roles',

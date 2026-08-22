@@ -5,6 +5,7 @@ import { defineConfig } from '@playwright/test';
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 /** Playwright resolves `use.storageState` relative to the process CWD, so use an absolute path. */
 const ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'admin.json');
+const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
 
 /**
  * Playwright config — Phase 1: Auth + APM website.
@@ -22,7 +23,8 @@ export default defineConfig({
   workers: 2,
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'reports' }],
+    // open: 'never' keeps CI/scripted runs from blocking on the report server
+    ['html', { outputFolder: 'reports', open: 'never' }],
   ],
   projects: [
     {
@@ -41,9 +43,23 @@ export default defineConfig({
     {
       name: 'admin',
       testMatch: ['tests/**', 'crud-suite/**'],
-      testIgnore: ['**/auth.setup.ts'],
+      testIgnore: ['**/auth.setup.ts', 'tests/emr/**'],
       use: {
         storageState: ADMIN_STORAGE_STATE,
+      },
+    },
+    // EMR: fully mocked API (identity + EMR), synthetic admin session, so the
+    // suite runs without any backend. See tests/emr and support/emr-mocks.ts.
+    {
+      name: 'emr-setup',
+      testMatch: 'emr.setup.ts',
+    },
+    {
+      name: 'emr',
+      dependencies: ['emr-setup'],
+      testMatch: ['tests/emr/**/*.spec.ts'],
+      use: {
+        storageState: EMR_ADMIN_STORAGE_STATE,
       },
     },
   ],

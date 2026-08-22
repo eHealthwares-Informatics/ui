@@ -189,6 +189,7 @@ import { Route as AuthenticatedLisEqaProgramsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedLisEqaEnrollmentsIndexRouteImport } from './routes/_authenticated/lis/eqa-enrollments/index'
 import { Route as AuthenticatedLisAttributeDefinitionsIndexRouteImport } from './routes/_authenticated/lis/attribute-definitions/index'
 import { Route as AuthenticatedEmrVisitsIndexRouteImport } from './routes/_authenticated/emr/visits/index'
+import { Route as AuthenticatedEmrStaffIndexRouteImport } from './routes/_authenticated/emr/staff/index'
 import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_authenticated/emr/requests/index'
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
@@ -219,6 +220,10 @@ import { Route as AuthenticatedRxsoftSettingsAppearanceRouteImport } from './rou
 import { Route as AuthenticatedRxsoftSettingsAccountRouteImport } from './routes/_authenticated/rxsoft/settings/account'
 import { Route as AuthenticatedRxsoftItemsCreateRouteImport } from './routes/_authenticated/rxsoft/items/create'
 import { Route as AuthenticatedLisOrdersDashboardRouteImport } from './routes/_authenticated/lis/orders/dashboard'
+import { Route as AuthenticatedEmrVisitsVisitIdRouteImport } from './routes/_authenticated/emr/visits/$visitId'
+import { Route as AuthenticatedEmrRequestsRequestIdRouteImport } from './routes/_authenticated/emr/requests/$requestId'
+import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
+import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
 import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
 import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
 import { Route as AuthenticatedPageIdEditRouteImport } from './routes/_authenticated/$page/$id/edit'
@@ -1241,6 +1246,12 @@ const AuthenticatedEmrVisitsIndexRoute =
     path: '/emr/visits/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrStaffIndexRoute =
+  AuthenticatedEmrStaffIndexRouteImport.update({
+    id: '/emr/staff/',
+    path: '/emr/staff/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrRequestsIndexRoute =
   AuthenticatedEmrRequestsIndexRouteImport.update({
     id: '/emr/requests/',
@@ -1418,6 +1429,30 @@ const AuthenticatedLisOrdersDashboardRoute =
   AuthenticatedLisOrdersDashboardRouteImport.update({
     id: '/lis/orders/dashboard',
     path: '/lis/orders/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrVisitsVisitIdRoute =
+  AuthenticatedEmrVisitsVisitIdRouteImport.update({
+    id: '/emr/visits/$visitId',
+    path: '/emr/visits/$visitId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrRequestsRequestIdRoute =
+  AuthenticatedEmrRequestsRequestIdRouteImport.update({
+    id: '/emr/requests/$requestId',
+    path: '/emr/requests/$requestId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrPatientsPatientIdRoute =
+  AuthenticatedEmrPatientsPatientIdRouteImport.update({
+    id: '/emr/patients/$patientId',
+    path: '/emr/patients/$patientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrEncountersEncounterIdRoute =
+  AuthenticatedEmrEncountersEncounterIdRouteImport.update({
+    id: '/emr/encounters/$encounterId',
+    path: '/emr/encounters/$encounterId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConversationExchangesExchangeIdRoute =
@@ -1667,6 +1702,10 @@ export interface FileRoutesByFullPath {
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
   '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
@@ -1697,6 +1736,7 @@ export interface FileRoutesByFullPath {
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
   '/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
   '/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
   '/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
@@ -1897,6 +1937,10 @@ export interface FileRoutesByTo {
   '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
   '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
@@ -1927,6 +1971,7 @@ export interface FileRoutesByTo {
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/staff': typeof AuthenticatedEmrStaffIndexRoute
   '/emr/visits': typeof AuthenticatedEmrVisitsIndexRoute
   '/lis/attribute-definitions': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
   '/lis/eqa-enrollments': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
@@ -2133,6 +2178,10 @@ export interface FileRoutesById {
   '/_authenticated/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
   '/_authenticated/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
   '/_authenticated/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/_authenticated/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/_authenticated/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/_authenticated/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/_authenticated/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
   '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
@@ -2163,6 +2212,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/_authenticated/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
   '/_authenticated/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
   '/_authenticated/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
   '/_authenticated/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
@@ -2367,6 +2417,10 @@ export interface FileRouteTypes {
     | '/$page/$id/edit'
     | '/conversation/$conversationId/edit'
     | '/conversation/exchanges/$exchangeId'
+    | '/emr/encounters/$encounterId'
+    | '/emr/patients/$patientId'
+    | '/emr/requests/$requestId'
+    | '/emr/visits/$visitId'
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/settings/account'
@@ -2397,6 +2451,7 @@ export interface FileRouteTypes {
     | '/emr/forms/'
     | '/emr/patients/'
     | '/emr/requests/'
+    | '/emr/staff/'
     | '/emr/visits/'
     | '/lis/attribute-definitions/'
     | '/lis/eqa-enrollments/'
@@ -2597,6 +2652,10 @@ export interface FileRouteTypes {
     | '/$page/$id/edit'
     | '/conversation/$conversationId/edit'
     | '/conversation/exchanges/$exchangeId'
+    | '/emr/encounters/$encounterId'
+    | '/emr/patients/$patientId'
+    | '/emr/requests/$requestId'
+    | '/emr/visits/$visitId'
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/settings/account'
@@ -2627,6 +2686,7 @@ export interface FileRouteTypes {
     | '/emr/forms'
     | '/emr/patients'
     | '/emr/requests'
+    | '/emr/staff'
     | '/emr/visits'
     | '/lis/attribute-definitions'
     | '/lis/eqa-enrollments'
@@ -2832,6 +2892,10 @@ export interface FileRouteTypes {
     | '/_authenticated/$page/$id/edit'
     | '/_authenticated/conversation/$conversationId/edit'
     | '/_authenticated/conversation/exchanges/$exchangeId'
+    | '/_authenticated/emr/encounters/$encounterId'
+    | '/_authenticated/emr/patients/$patientId'
+    | '/_authenticated/emr/requests/$requestId'
+    | '/_authenticated/emr/visits/$visitId'
     | '/_authenticated/lis/orders/dashboard'
     | '/_authenticated/rxsoft/items/create'
     | '/_authenticated/rxsoft/settings/account'
@@ -2862,6 +2926,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/forms/'
     | '/_authenticated/emr/patients/'
     | '/_authenticated/emr/requests/'
+    | '/_authenticated/emr/staff/'
     | '/_authenticated/emr/visits/'
     | '/_authenticated/lis/attribute-definitions/'
     | '/_authenticated/lis/eqa-enrollments/'
@@ -4277,6 +4342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmrVisitsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/staff/': {
+      id: '/_authenticated/emr/staff/'
+      path: '/emr/staff'
+      fullPath: '/emr/staff/'
+      preLoaderRoute: typeof AuthenticatedEmrStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/requests/': {
       id: '/_authenticated/emr/requests/'
       path: '/emr/requests'
@@ -4485,6 +4557,34 @@ declare module '@tanstack/react-router' {
       path: '/lis/orders/dashboard'
       fullPath: '/lis/orders/dashboard'
       preLoaderRoute: typeof AuthenticatedLisOrdersDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/visits/$visitId': {
+      id: '/_authenticated/emr/visits/$visitId'
+      path: '/emr/visits/$visitId'
+      fullPath: '/emr/visits/$visitId'
+      preLoaderRoute: typeof AuthenticatedEmrVisitsVisitIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/requests/$requestId': {
+      id: '/_authenticated/emr/requests/$requestId'
+      path: '/emr/requests/$requestId'
+      fullPath: '/emr/requests/$requestId'
+      preLoaderRoute: typeof AuthenticatedEmrRequestsRequestIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/patients/$patientId': {
+      id: '/_authenticated/emr/patients/$patientId'
+      path: '/emr/patients/$patientId'
+      fullPath: '/emr/patients/$patientId'
+      preLoaderRoute: typeof AuthenticatedEmrPatientsPatientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/encounters/$encounterId': {
+      id: '/_authenticated/emr/encounters/$encounterId'
+      path: '/emr/encounters/$encounterId'
+      fullPath: '/emr/encounters/$encounterId'
+      preLoaderRoute: typeof AuthenticatedEmrEncountersEncounterIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/exchanges/$exchangeId': {
@@ -4777,6 +4877,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLisOrdersWorkflowRouteRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   AuthenticatedConversationConversationIdEditRoute: typeof AuthenticatedConversationConversationIdEditRoute
   AuthenticatedConversationExchangesExchangeIdRoute: typeof AuthenticatedConversationExchangesExchangeIdRoute
+  AuthenticatedEmrEncountersEncounterIdRoute: typeof AuthenticatedEmrEncountersEncounterIdRoute
+  AuthenticatedEmrPatientsPatientIdRoute: typeof AuthenticatedEmrPatientsPatientIdRoute
+  AuthenticatedEmrRequestsRequestIdRoute: typeof AuthenticatedEmrRequestsRequestIdRoute
+  AuthenticatedEmrVisitsVisitIdRoute: typeof AuthenticatedEmrVisitsVisitIdRoute
   AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
   AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute
   AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
@@ -4801,6 +4905,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
   AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
+  AuthenticatedEmrStaffIndexRoute: typeof AuthenticatedEmrStaffIndexRoute
   AuthenticatedEmrVisitsIndexRoute: typeof AuthenticatedEmrVisitsIndexRoute
   AuthenticatedLisAttributeDefinitionsIndexRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRoute
   AuthenticatedLisEqaEnrollmentsIndexRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRoute
@@ -4935,6 +5040,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationConversationIdEditRoute,
   AuthenticatedConversationExchangesExchangeIdRoute:
     AuthenticatedConversationExchangesExchangeIdRoute,
+  AuthenticatedEmrEncountersEncounterIdRoute:
+    AuthenticatedEmrEncountersEncounterIdRoute,
+  AuthenticatedEmrPatientsPatientIdRoute:
+    AuthenticatedEmrPatientsPatientIdRoute,
+  AuthenticatedEmrRequestsRequestIdRoute:
+    AuthenticatedEmrRequestsRequestIdRoute,
+  AuthenticatedEmrVisitsVisitIdRoute: AuthenticatedEmrVisitsVisitIdRoute,
   AuthenticatedLisOrdersDashboardRoute: AuthenticatedLisOrdersDashboardRoute,
   AuthenticatedRxsoftItemsCreateRoute: AuthenticatedRxsoftItemsCreateRoute,
   AuthenticatedRxsoftUomsUomIdRoute:
@@ -4977,6 +5089,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
   AuthenticatedEmrRequestsIndexRoute: AuthenticatedEmrRequestsIndexRoute,
+  AuthenticatedEmrStaffIndexRoute: AuthenticatedEmrStaffIndexRoute,
   AuthenticatedEmrVisitsIndexRoute: AuthenticatedEmrVisitsIndexRoute,
   AuthenticatedLisAttributeDefinitionsIndexRoute:
     AuthenticatedLisAttributeDefinitionsIndexRoute,

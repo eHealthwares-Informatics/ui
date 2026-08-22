@@ -26,8 +26,9 @@ type AuthState = {
   error: string | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
+  logoutAll: () => Promise<void>;
   bootstrap: () => void;
-  fetchModules: () => Promise<void>;
+  fetchModules: (force?: boolean) => Promise<void>;
   pendingModulesFetch: Promise<void> | null;
 };
 
@@ -88,6 +89,34 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          // Best-effort server-side revocation of the current refresh token.
+          void identityApi.post('/auth/logout', { refreshToken }).catch(() => {
+            // Local session is cleared regardless of whether revocation succeeds.
+          });
+        }
+        clearTokens();
+        set({
+          accessToken: null,
+          refreshToken: null,
+          user: null,
+          modules: [],
+          loading: false,
+          error: null,
+          pendingModulesFetch: null,
+        });
+      },
+
+      logoutAll: async () => {
+        const refreshToken = getRefreshToken();
+        try {
+          if (refreshToken) {
+            await identityApi.post('/auth/logout-all', { refreshToken });
+          }
+        } catch {
+          // Fall through — clear the local session even if revocation fails.
+        }
         clearTokens();
         set({
           accessToken: null,
@@ -104,7 +133,9 @@ export const useAuthStore = create<AuthState>()(
         const accessToken = getAccessToken();
         const refreshToken = getRefreshToken();
 
-        if (!accessToken || !refreshToken) return;
+        if (!accessToken || !refreshToken) {
+          return;
+        }
 
         const user = decodeUserFromAccessToken(accessToken);
         if (!user) {
@@ -115,14 +146,16 @@ export const useAuthStore = create<AuthState>()(
 
         set({ accessToken, refreshToken, user, loading: false, error: null });
 
-        // Fetch modules in background only if not already loaded
-        if (get().modules.length === 0) {
-          get().fetchModules();
+        // Always refresh the module list in the background so modules granted
+        // server-side (e.g. EMR) appear without requiring a re-login. The
+        // persisted list remains as a synchronous fallback for route redirects.
+        if (user) {
+          get().fetchModules(true);
         }
       },
 
-      fetchModules: async () => {
-        if (get().modules.length > 0 || get().pendingModulesFetch) {
+      fetchModules: async (force = false) => {
+        if (!force && (get().modules.length > 0 || get().pendingModulesFetch)) {
           return get().pendingModulesFetch ?? Promise.resolve();
         }
 

@@ -1,5 +1,18 @@
-import { Badge } from '@mantine/core';
+import { Badge, Stack, Text } from '@mantine/core';
 import type { EmrResourceConfig } from '../pages/resource-page';
+import { StatusBadge } from '../components/shared/status-badge';
+import { PatientForm } from '../components/patients/patient-form';
+import { PatientRowActions } from '../components/patients/patient-row-actions';
+import { PaymentProvidersCell } from '../components/shared/payment-providers-cell';
+import { StaffForm } from '../components/staff/staff-form';
+import { StaffRowActions } from '../components/staff/staff-row-actions';
+import { AppointmentForm } from '../components/appointments/appointment-form';
+import { AppointmentActions } from '../components/appointments/appointment-actions';
+import { VisitForm } from '../components/visits/visit-form';
+import { VisitActions } from '../components/visits/visit-actions';
+import { RequestForm } from '../components/requests/request-form';
+import { RequestRowActions } from '../components/requests/request-row-actions';
+import { formatEnum } from './emr-constants';
 
 export const emrResources: Record<string, EmrResourceConfig> = {
   patients: {
@@ -7,18 +20,68 @@ export const emrResources: Record<string, EmrResourceConfig> = {
     title: 'Patients',
     description: 'Search and manage patient demographic records.',
     endpoint: '/patients',
-    badgeKey: 'gender',
+    createLabel: 'Register Patient',
+    createForm: PatientForm,
+    actions: (row) => <PatientRowActions row={row} />,
+    rowLink: (row) => (row.id ? `/emr/patients/${String(row.id)}` : undefined),
     columns: [
-      { key: 'patientId', label: 'EMR ID', render: (r) => <Badge variant="light">{String(r.patientId)}</Badge> },
+      { key: 'patientId', label: 'MRN', render: (r) => <Badge variant="light">{String(r.patientId)}</Badge> },
       {
         key: 'patientName',
         label: 'Name',
-        render: (r) => `${r.firstName} ${r.lastName}`,
+        render: (r) => (
+          <Text size="sm" fw={500}>
+            {[r.firstName, r.lastName].filter(Boolean).join(' ')}
+          </Text>
+        ),
       },
-      { key: 'gender', label: 'Gender' },
-      { key: 'dateOfBirth', label: 'Date of Birth' },
-      { key: 'phone', label: 'Phone' },
-      { key: 'isActive', label: 'Active', render: (r) => String(r.isActive ?? '—') },
+      {
+        key: 'gender',
+        label: 'Gender',
+        render: (r) => <StatusBadge value={r.gender} kind="gender" />,
+      },
+      { key: 'dateOfBirth', label: 'Date of Birth', render: (r) => String(r.dateOfBirth ?? '—') },
+      { key: 'phone', label: 'Phone', render: (r) => String(r.phone ?? '—') },
+      {
+        key: 'paymentProviderIds',
+        label: 'Payment Providers',
+        render: (r) => <PaymentProvidersCell ids={r.paymentProviderIds} />,
+      },
+      {
+        key: 'isActive',
+        label: 'Active',
+        render: (r) => <StatusBadge value={r.isActive} kind="active" />,
+      },
+    ],
+  },
+  staff: {
+    key: 'staff',
+    title: 'Staff',
+    description: 'Manage hospital staff, roles, departments, and identity-user links.',
+    endpoint: '/staff',
+    createLabel: 'Register Staff',
+    createForm: StaffForm,
+    actions: (row) => <StaffRowActions row={row} />,
+    columns: [
+      { key: 'staffNumber', label: 'Staff #', render: (r) => <Badge variant="light">{String(r.staffNumber)}</Badge> },
+      {
+        key: 'name',
+        label: 'Name',
+        render: (r) => (
+          <Text size="sm" fw={500}>
+            {[r.firstName, r.lastName, r.otherNames].filter(Boolean).join(' ')}
+          </Text>
+        ),
+      },
+      { key: 'roleType', label: 'Role', render: (r) => <StatusBadge value={r.roleType} kind="staffRole" /> },
+      { key: 'category', label: 'Category', render: (r) => String(r.category ?? '—') },
+      { key: 'department', label: 'Department', render: (r) => String(r.department ?? '—') },
+      { key: 'phone', label: 'Phone', render: (r) => String(r.phone ?? '—') },
+      {
+        key: 'isActive',
+        label: 'Active',
+        render: (r) => <StatusBadge value={r.isActive} kind="active" />,
+      },
     ],
   },
   appointments: {
@@ -26,15 +89,26 @@ export const emrResources: Record<string, EmrResourceConfig> = {
     title: 'Appointments',
     description: 'Schedule and manage patient appointments.',
     endpoint: '/appointments',
-    badgeKey: 'status',
+    createLabel: 'Schedule Appointment',
+    createForm: AppointmentForm,
+    actions: (row) => <AppointmentActions row={row} />,
     columns: [
-      { key: 'appointmentNumber', label: 'Appt #' },
-      { key: 'patientName', label: 'Patient' },
-      { key: 'appointmentType', label: 'Type' },
+      { key: 'appointmentNumber', label: 'Appt #', render: (r) => <Badge variant="light">{String(r.appointmentNumber)}</Badge> },
+      {
+        key: 'patientName',
+        label: 'Patient',
+        render: (r) => (
+          <Text size="sm" fw={500}>
+            {String(r.patientName ?? '—')}
+          </Text>
+        ),
+      },
+      { key: 'appointmentType', label: 'Type', render: (r) => formatEnum(String(r.appointmentType)) },
       { key: 'date', label: 'Date' },
       { key: 'startTime', label: 'Start' },
-      { key: 'providerName', label: 'Provider' },
-      { key: 'status', label: 'Status' },
+      { key: 'providerName', label: 'Provider', render: (r) => String(r.providerName ?? '—') },
+      { key: 'priority', label: 'Priority', render: (r) => <StatusBadge value={r.priority} kind="priority" /> },
+      { key: 'status', label: 'Status', render: (r) => <StatusBadge value={r.status} kind="appointment" /> },
     ],
   },
   visits: {
@@ -42,42 +116,29 @@ export const emrResources: Record<string, EmrResourceConfig> = {
     title: 'Visits',
     description: 'Active and historical patient visits.',
     endpoint: '/visits',
-    badgeKey: 'status',
+    createLabel: 'Start Visit',
+    createForm: VisitForm,
+    actions: (row) => <VisitActions row={row} />,
+    rowLink: (row) => (row.id ? `/emr/visits/${String(row.id)}` : undefined),
     columns: [
-      { key: 'visitNumber', label: 'Visit #' },
-      { key: 'patientName', label: 'Patient' },
-      { key: 'visitType', label: 'Type' },
-      { key: 'providerName', label: 'Provider' },
-      { key: 'startDatetime', label: 'Started' },
-      { key: 'status', label: 'Status' },
-    ],
-  },
-  encounters: {
-    key: 'encounters',
-    title: 'Encounters',
-    description: 'Clinical encounters linked to visits.',
-    endpoint: '/encounters',
-    badgeKey: 'encounterType',
-    columns: [
-      { key: 'encounterNumber', label: 'Enc #' },
-      { key: 'patientName', label: 'Patient' },
-      { key: 'encounterType', label: 'Type' },
-      { key: 'encounterDatetime', label: 'Datetime' },
-      { key: 'providerName', label: 'Provider' },
-    ],
-  },
-  forms: {
-    key: 'forms',
-    title: 'Forms',
-    description: 'Dynamic clinical form definitions and submissions.',
-    endpoint: '/forms/definitions',
-    badgeKey: 'category',
-    columns: [
-      { key: 'code', label: 'Code' },
-      { key: 'name', label: 'Name' },
-      { key: 'version', label: 'Version' },
-      { key: 'category', label: 'Category' },
-      { key: 'isPublished', label: 'Published', render: (r) => String(r.isPublished ?? '—') },
+      { key: 'visitNumber', label: 'Visit #', render: (r) => <Badge variant="light">{String(r.visitNumber)}</Badge> },
+      {
+        key: 'patientName',
+        label: 'Patient',
+        render: (r) => (
+          <Text size="sm" fw={500}>
+            {String(r.patientName ?? '—')}
+          </Text>
+        ),
+      },
+      { key: 'visitType', label: 'Type', render: (r) => formatEnum(String(r.visitType)) },
+      { key: 'providerName', label: 'Provider', render: (r) => String(r.providerName ?? '—') },
+      {
+        key: 'startDatetime',
+        label: 'Started',
+        render: (r) => (r.startDatetime ? new Date(String(r.startDatetime)).toLocaleString() : '—'),
+      },
+      { key: 'status', label: 'Status', render: (r) => <StatusBadge value={r.status} kind="visit" /> },
     ],
   },
   requests: {
@@ -85,14 +146,43 @@ export const emrResources: Record<string, EmrResourceConfig> = {
     title: 'Clinical Requests',
     description: 'Prescriptions, lab, radiology and other test orders.',
     endpoint: '/requests',
-    badgeKey: 'status',
+    createLabel: 'New Clinical Request',
+    createForm: RequestForm,
+    actions: (row) => <RequestRowActions row={row} />,
+    rowLink: (row) => (row.id ? `/emr/requests/${String(row.id)}` : undefined),
     columns: [
-      { key: 'requestNumber', label: 'Request #' },
-      { key: 'patientName', label: 'Patient' },
-      { key: 'requestType', label: 'Type' },
-      { key: 'priority', label: 'Priority' },
-      { key: 'status', label: 'Status' },
-      { key: 'requestedAt', label: 'Requested' },
+      { key: 'requestNumber', label: 'Request #', render: (r) => <Badge variant="light">{String(r.requestNumber)}</Badge> },
+      {
+        key: 'patientName',
+        label: 'Patient',
+        render: (r) => (
+          <Text size="sm" fw={500}>
+            {String(r.patientName ?? '—')}
+          </Text>
+        ),
+      },
+      { key: 'requestType', label: 'Type', render: (r) => formatEnum(String(r.requestType)) },
+      { key: 'priority', label: 'Priority', render: (r) => <StatusBadge value={r.priority} kind="priority" /> },
+      { key: 'status', label: 'Status', render: (r) => <StatusBadge value={r.status} kind="request" /> },
+      {
+        key: 'syncStatus',
+        label: 'Sync',
+        render: (r) => (
+          <Stack gap={2}>
+            <StatusBadge value={r.syncStatus} kind="sync" />
+            {r.syncError ? (
+              <Text size="xs" c="red" lineClamp={2} maw={200}>
+                {String(r.syncError)}
+              </Text>
+            ) : null}
+          </Stack>
+        ),
+      },
+      {
+        key: 'requestedAt',
+        label: 'Requested',
+        render: (r) => (r.requestedAt ? new Date(String(r.requestedAt)).toLocaleString() : '—'),
+      },
     ],
   },
 };

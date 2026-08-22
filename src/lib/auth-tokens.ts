@@ -4,6 +4,8 @@ export type AuthUser = {
   email?: string;
   roles: string[];
   phone?: string;
+  organizationId: string | null;
+  locationId: string | null;
 };
 
 export const ACCESS_TOKEN_KEY = 'rxsoft_admin_access_token';
@@ -18,6 +20,8 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       email?: string;
       roles?: string[];
       phone?: string;
+      organizationId?: string;
+      locationId?: string | null;
       exp?: number;
     };
 
@@ -35,6 +39,8 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       email: payload.email,
       roles: payload.roles ?? [],
       phone: payload.phone,
+      organizationId: payload.organizationId ? payload.organizationId : null,
+      locationId: payload.locationId ?? null,
     };
   } catch {
     return null;
@@ -43,6 +49,25 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
 
 export function getAccessToken(): string | null {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+/**
+ * Returns the access token's absolute expiry timestamp in ms, or null when the
+ * token carries no `exp` claim (e.g. missing/corrupt payload).
+ */
+export function getAccessTokenExpiry(
+  accessToken: string | null = getAccessToken(),
+): number | null {
+  if (!accessToken) {
+    return null;
+  }
+  try {
+    const payloadRaw = accessToken.split('.')[1] ?? '';
+    const payload = JSON.parse(atob(payloadRaw)) as { exp?: number };
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
 }
 
 export function getRefreshToken(): string | null {

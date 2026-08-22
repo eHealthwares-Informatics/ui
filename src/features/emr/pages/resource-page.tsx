@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   Group,
@@ -12,6 +11,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { Plus, Search } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
@@ -30,13 +30,14 @@ export type EmrResourceConfig = {
   endpoint: string;
   columns: EmrListColumn[];
   badgeKey?: string;
+  createLabel?: string;
+  createForm?: React.FC<{ onCreated: () => void; onClose: () => void }>;
+  actions?: (row: Record<string, unknown>) => ReactNode;
+  rowLink?: (row: Record<string, unknown>) => string | undefined;
 };
 
-function defaultBadge(value: unknown) {
-  return <Badge variant="light">{String(value ?? '—')}</Badge>;
-}
-
 export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [opened, { open, close }] = useDisclosure(false);
@@ -46,7 +47,7 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
     queryFn: async () => {
       const { data: res } = await emrApi.get<{
         data: Record<string, unknown>[];
-        total: number;
+        meta: { page: number; limit: number; total: number };
       }>(config.endpoint, {
         params: { page, limit: 20, search: search || undefined },
       });
@@ -55,7 +56,10 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
   });
 
   const rows = data?.data ?? [];
-  const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / 20));
+  const total = data?.meta.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / 20));
+  const CreateForm = config.createForm;
+  const columnCount = config.columns.length + (config.actions ? 1 : 0);
 
   return (
     <RxPage
@@ -64,7 +68,7 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
       description={config.description}
       actions={
         <Button leftSection={<Plus size={16} />} onClick={open}>
-          Add {config.title.replace(/s$/, '')}
+          {config.createLabel ?? `Add ${config.title.replace(/s$/, '')}`}
         </Button>
       }
     >
@@ -81,7 +85,7 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
             style={{ maxWidth: 320 }}
           />
           <Text size="xs" c="dimmed">
-            {data?.total ?? 0} records
+            {total} records
           </Text>
         </Group>
 
@@ -92,31 +96,40 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
                 {config.columns.map((col) => (
                   <Table.Th key={col.key}>{col.label}</Table.Th>
                 ))}
+                {config.actions && <Table.Th style={{ width: 48 }} />}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {isLoading ? (
                 <Table.Tr>
-                  <Table.Td colSpan={config.columns.length}>Loading…</Table.Td>
+                  <Table.Td colSpan={columnCount}>Loading…</Table.Td>
                 </Table.Tr>
               ) : rows.length === 0 ? (
                 <Table.Tr>
-                  <Table.Td colSpan={config.columns.length}>No records found.</Table.Td>
+                  <Table.Td colSpan={columnCount}>No records found.</Table.Td>
                 </Table.Tr>
               ) : (
-                rows.map((row, index) => (
-                  <Table.Tr key={String(row.id ?? index)}>
-                    {config.columns.map((col) => (
-                      <Table.Td key={col.key}>
-                        {col.render
-                          ? col.render(row)
-                          : col.key === config.badgeKey
-                            ? defaultBadge(row[col.key])
-                            : String(row[col.key] ?? '—')}
-                      </Table.Td>
-                    ))}
-                  </Table.Tr>
-                ))
+                rows.map((row, index) => {
+                  const rowTo = config.rowLink?.(row);
+                  return (
+                    <Table.Tr
+                      key={String(row.id ?? index)}
+                      style={rowTo ? { cursor: 'pointer' } : undefined}
+                      onClick={
+                        rowTo
+                          ? () => {
+                              void navigate({ to: rowTo });
+                            }
+                          : undefined
+                      }
+                    >
+                      {config.columns.map((col) => (
+                        <Table.Td key={col.key}>{col.render ? col.render(row) : String(row[col.key] ?? '—')}</Table.Td>
+                      ))}
+                      {config.actions && <Table.Td onClick={(e) => e.stopPropagation()}>{config.actions(row)}</Table.Td>}
+                    </Table.Tr>
+                  );
+                })
               )}
             </Table.Tbody>
           </Table>
@@ -128,19 +141,28 @@ export function EmrResourcePage({ config }: { config: EmrResourceConfig }) {
         </Card>
       </Stack>
 
-      <Modal opened={opened} onClose={close} title={`Add ${config.title.replace(/s$/, '')}`} centered>
-        <Stack>
-          <Text size="sm" c="dimmed">
-            Full create form is wired up in the EMR visit workspace. Create a patient record first,
-            then schedule appointments from the patient profile.
-          </Text>
-          <TextInput label="Patient ID" placeholder="Enter patient id" />
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" onClick={close}>
-              Close
-            </Button>
-          </Group>
-        </Stack>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={config.createLabel ?? `Add ${config.title.replace(/s$/, '')}`}
+        size={CreateForm ? 'lg' : 'md'}
+        centered
+      >
+        {CreateForm ? (
+          <CreateForm onCreated={close} onClose={close} />
+        ) : (
+          <Stack>
+            <Text size="sm" c="dimmed">
+              Creating {config.title.toLowerCase()} directly is not available yet — use the
+              operational flows (patient registration, appointment scheduling) to build up records.
+            </Text>
+            <Group justify="flex-end" mt="md">
+              <Button variant="light" onClick={close}>
+                Close
+              </Button>
+            </Group>
+          </Stack>
+        )}
       </Modal>
     </RxPage>
   );

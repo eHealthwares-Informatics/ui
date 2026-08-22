@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -16,6 +15,8 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getRouteApi, useNavigate } from '@tanstack/react-router';
 import {
   ArrowLeftRight,
   CheckCircle2,
@@ -30,8 +31,7 @@ import {
   Smartphone,
   User,
 } from 'lucide-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 import { buildReportHtml, printReportHtml, type PrintReportData } from './report-print';
@@ -135,7 +135,13 @@ export function LisOrderReportPage() {
   );
 }
 
-export function OrderReportContent({ orderId, embedded = false }: { orderId: string; embedded?: boolean }) {
+export function OrderReportContent({
+  orderId,
+  embedded = false,
+}: {
+  orderId: string;
+  embedded?: boolean;
+}) {
   const navigate = useNavigate();
 
   /* ---------- Data queries ---------- */
@@ -216,9 +222,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
         value: result?.value ?? item.resultValue ?? '',
         notes: result?.notes ?? item.notes ?? '',
         referenceRangeId:
-          result?.referenceRangeId ??
-          pickDefaultRange(ranges, order)?.id ??
-          ranges[0]?.id,
+          result?.referenceRangeId ?? pickDefaultRange(ranges, order)?.id ?? ranges[0]?.id,
       };
     }
     setValues(map);
@@ -247,9 +251,10 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
         ? ranges.filter((r) => r.gender === gender)
         : ranges.filter((r) => r.gender === 'DEFAULT');
     const pool = genderRanges.length ? genderRanges : ranges;
-    const ageRanges = age !== undefined
-      ? pool.filter((r) => age >= r.minAge && (r.maxAge === 0 || age <= r.maxAge))
-      : pool;
+    const ageRanges =
+      age !== undefined
+        ? pool.filter((r) => age >= r.minAge && (r.maxAge === 0 || age <= r.maxAge))
+        : pool;
     return (ageRanges.length ? ageRanges : pool)[0];
   };
 
@@ -427,7 +432,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
     mutationFn: async () => {
       // Sign each result that exists for this order
       const resultsToSign = allResults.filter((r) =>
-        order?.items?.some((i) => i.id === r.orderItemId),
+        order?.items?.some((i) => i.id === r.orderItemId)
       );
       for (const result of resultsToSign) {
         await lisApi.post('/lis/result-signatures', {
@@ -458,7 +463,9 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
     try {
       const promises = Object.entries(values).map(([itemId, val]) => {
         const item = order?.items.find((i) => i.id === itemId);
-        const selectedRange = item ? getRangesForItem(item).find((r) => r.id === val.referenceRangeId) : undefined;
+        const selectedRange = item
+          ? getRangesForItem(item).find((r) => r.id === val.referenceRangeId)
+          : undefined;
         return saveResult.mutateAsync({
           orderItemId: itemId,
           value: val.value,
@@ -567,11 +574,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
           >
             Patient Info
           </Button>
-          <Button
-            color="red"
-            leftSection={<Printer size={16} />}
-            onClick={handlePrint}
-          >
+          <Button color="red" leftSection={<Printer size={16} />} onClick={handlePrint}>
             Print Report
           </Button>
           <Menu position="bottom-end" shadow="md" width={200}>
@@ -599,10 +602,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
               >
                 SMS
               </Menu.Item>
-              <Menu.Item
-                leftSection={<Mail size={16} />}
-                onClick={() => handleSendVia('email')}
-              >
+              <Menu.Item leftSection={<Mail size={16} />} onClick={() => handleSendVia('email')}>
                 Email
               </Menu.Item>
             </Menu.Dropdown>
@@ -656,7 +656,7 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
           <Group justify="space-between" align="center" mb="md">
             <Text fw={600}>Tests</Text>
           </Group>
-          
+
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Tabs.List>
               {order.items.map((item) => (
@@ -700,7 +700,10 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                             onChange={(v) =>
                               setValues((prev) => ({
                                 ...prev,
-                                [item.id]: { ...(prev[item.id] ?? {}), referenceRangeId: v ?? undefined },
+                                [item.id]: {
+                                  ...(prev[item.id] ?? {}),
+                                  referenceRangeId: v ?? undefined,
+                                },
                               }))
                             }
                             clearable
@@ -741,7 +744,8 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
                     <Paper withBorder p="sm" mt="sm" bg="gray.0">
                       <Text size="sm" c="dimmed">
                         {selectedRange.alias}: {selectedRange.lowValue} - {selectedRange.highValue}{' '}
-                        {selectedRange.unit?.name ?? ''} | {selectedRange.gender} (min {selectedRange.minAge} - max {selectedRange.maxAge} years)
+                        {selectedRange.unit?.name ?? ''} | {selectedRange.gender} (min{' '}
+                        {selectedRange.minAge} - max {selectedRange.maxAge} years)
                       </Text>
                     </Paper>
                   )}
@@ -825,7 +829,8 @@ export function OrderReportContent({ orderId, embedded = false }: { orderId: str
             <strong>Date of Birth:</strong> {order.patientDateOfBirth ?? '—'}
           </Text>
           <Text>
-            <strong>Order Status:</strong> <Badge color={statusColor(order.status)}>{order.status}</Badge>
+            <strong>Order Status:</strong>{' '}
+            <Badge color={statusColor(order.status)}>{order.status}</Badge>
           </Text>
         </Stack>
       </Modal>

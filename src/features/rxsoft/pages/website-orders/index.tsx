@@ -48,9 +48,11 @@ export function RxWebsiteOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  // Post as Sale state
   const [postSaleOpen, setPostSaleOpen] = useState(false);
   const [postSaleOrderId, setPostSaleOrderId] = useState<string | null>(null);
   const [stockLocationId, setStockLocationId] = useState<string | null>(null);
+  const [postOrgId, setPostOrgId] = useState<string | null>(null);
 
   // Reconciliation state
   const [reconcileOpen, setReconcileOpen] = useState(false);
@@ -72,6 +74,14 @@ export function RxWebsiteOrdersPage() {
     queryKey: ['stock-locations', 'all'],
     queryFn: async () => {
       const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 200 } });
+      return data?.data ?? data ?? [];
+    },
+  });
+
+  const { data: organizations = [] } = useQuery({
+    queryKey: ['organizations', 'all'],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/organizations', { params: { limit: 200 } });
       return data?.data ?? data ?? [];
     },
   });
@@ -98,6 +108,7 @@ export function RxWebsiteOrdersPage() {
     mutationFn: async () => {
       await rxsoftApi.post(`/website/admin/orders/${postSaleOrderId}/post-sale`, {
         stockLocationId: stockLocationId || undefined,
+        organizationId: postOrgId || undefined,
       });
     },
     onSuccess: () => {
@@ -106,6 +117,7 @@ export function RxWebsiteOrdersPage() {
       qc.invalidateQueries({ queryKey: ['website-order-detail'] });
       setPostSaleOpen(false);
       setStockLocationId(null);
+      setPostOrgId(null);
     },
     onError: (err: any) => {
       notifications.show({ message: err?.response?.data?.message ?? 'Post sale failed.', color: 'red' });
@@ -213,6 +225,7 @@ export function RxWebsiteOrdersPage() {
                                 onClick={() => {
                                   setPostSaleOrderId(o.id);
                                   setStockLocationId(null);
+                                  setPostOrgId(o.organizationId ?? null);
                                   setPostSaleOpen(true);
                                 }}
                               >
@@ -260,9 +273,17 @@ export function RxWebsiteOrdersPage() {
       </Stack>
 
       {/* Post as Sale Modal */}
-      <Modal opened={postSaleOpen} onClose={() => { setPostSaleOpen(false); setStockLocationId(null); }} title="Post Order as Sale" centered>
+      <Modal opened={postSaleOpen} onClose={() => { setPostSaleOpen(false); setStockLocationId(null); setPostOrgId(null); }} title="Post Order as Sale" centered>
         <Stack>
           <Text size="sm" c="dimmed">This will create a draft sale record from this order. Stock won't be depleted until the sale is completed.</Text>
+          <Select
+            label="Organisation (optional)"
+            value={postOrgId}
+            onChange={setPostOrgId}
+            data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({ value: o.id, label: o.name }))}
+            searchable
+            clearable
+          />
           <Select
             label="Stock Location (optional)"
             value={stockLocationId}
@@ -272,7 +293,7 @@ export function RxWebsiteOrdersPage() {
             clearable
           />
           <Group justify="flex-end">
-            <Button variant="light" onClick={() => { setPostSaleOpen(false); setStockLocationId(null); }}>Cancel</Button>
+            <Button variant="light" onClick={() => { setPostSaleOpen(false); setStockLocationId(null); setPostOrgId(null); }}>Cancel</Button>
             <Button
               onClick={() => postSaleMutation.mutate()}
               loading={postSaleMutation.isPending}
@@ -291,6 +312,7 @@ export function RxWebsiteOrdersPage() {
           qc.invalidateQueries({ queryKey: ['website-orders'] });
           qc.invalidateQueries({ queryKey: ['website-order-detail'] });
         }}
+        organizations={Array.isArray(organizations) ? organizations : []}
       />
 
       <DetailModal
@@ -304,13 +326,14 @@ export function RxWebsiteOrdersPage() {
 }
 
 function ReconcileModal({
-  order, opened, onClose, onReconciled,
+  order, opened, onClose, onReconciled, organizations = [],
 }: {
-  order: any; opened: boolean; onClose: () => void; onReconciled: () => void;
+  order: any; opened: boolean; onClose: () => void; onReconciled: () => void; organizations?: any[];
 }) {
   const qc = useQueryClient();
   const [itemSelections, setItemSelections] = useState<Record<string, string>>({});
   const [itemSearch, setItemSearch] = useState('');
+  const [orgId, setOrgId] = useState<string | null>(null);
 
   const { data: searchResults = [] } = useQuery({
     queryKey: ['items-search', itemSearch],
@@ -326,7 +349,10 @@ function ReconcileModal({
 
   const reconcileMutation = useMutation({
     mutationFn: async ({ orderItemId, itemId }: { orderItemId: string; itemId: string }) => {
-      await rxsoftApi.post(`/orders/admin/orders/${order.id}/items/${orderItemId}/reconcile`, { itemId });
+      await rxsoftApi.post(`/orders/admin/orders/${order.id}/items/${orderItemId}/reconcile`, {
+        itemId,
+        organizationId: orgId || undefined,
+      });
     },
     onSuccess: () => {
       notifications.show({ message: 'Item reconciled.', color: 'green' });
@@ -347,7 +373,10 @@ function ReconcileModal({
       }, {});
       if (!Object.keys(itemIds).length) throw new Error('No items selected');
 
-      await rxsoftApi.post(`/orders/admin/orders/${order.id}/reconcile-all`, { itemIds });
+      await rxsoftApi.post(`/orders/admin/orders/${order.id}/reconcile-all`, {
+        itemIds,
+        organizationId: orgId || undefined,
+      });
     },
     onSuccess: () => {
       notifications.show({ message: 'All items reconciled.', color: 'green' });
@@ -369,6 +398,16 @@ function ReconcileModal({
         <Text size="sm" c="dimmed">
           Link freetext items to real products. Each item must be linked before the order can be posted as a sale.
         </Text>
+
+        <Select
+          label="Organisation (optional)"
+          placeholder="Assign order to an organisation"
+          value={orgId}
+          onChange={setOrgId}
+          data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({ value: o.id, label: o.name }))}
+          searchable
+          clearable
+        />
 
         <TextInput
           placeholder="Search items..."
@@ -404,7 +443,7 @@ function ReconcileModal({
                       placeholder="Select item..."
                       value={itemSelections[item.id] ?? null}
                       onChange={(v) => setItemSelections((prev) => ({ ...prev, [item.id]: v ?? '' }))}
-                      data={searchResults.map((r: any) => ({ value: r.id, label: `${r.name} (${r.code})` }))}
+                      data={searchResults.map((r: any) => ({ value: r.id, label: `${r.displayName ?? r.name}${r.code ? ` (${r.code})` : ''}` }))}
                       searchable
                       clearable
                       style={{ minWidth: 220 }}
