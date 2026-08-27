@@ -94,6 +94,13 @@ export function DataPageForm({
       }
       const normalized = normalizeMultiSelectIds(values, fields);
       const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
+      // Wizard create-and-continue: a prior step already POSTed the record, so
+      // the final submit finalises it with a PATCH instead of creating a duplicate.
+      const existingId = (values as any).id as string | undefined;
+      if (existingId) {
+        const response = await apiProvider!.patch(`${endpoint}/${String(existingId)}`, payload);
+        return response.data as Record<string, unknown>;
+      }
       const response = await apiProvider!.post(endpoint, payload);
       return response.data as Record<string, unknown>;
     },
@@ -106,17 +113,13 @@ export function DataPageForm({
       if (mode === 'edit' && data?.id) {
         void queryClient.invalidateQueries({ queryKey: [endpoint, String(data.id)] });
       }
-      if (isWizard) {
-        setFormState((prev) => ({ ...prev, id: data.id as string }));
+      const action = mode === 'edit' ? 'updated' : 'created';
+      notifications.show({ message: `${title} record ${action}` });
+      onSaved?.(data);
+      if (onSave) {
+        onSave();
       } else {
-        const action = mode === 'edit' ? 'updated' : 'created';
-        notifications.show({ message: `${title} record ${action}` });
-        onSaved?.(data);
-        if (onSave) {
-          onSave();
-        } else {
-          navigate({ to: '..' });
-        }
+        navigate({ to: '..' });
       }
     },
     onError: (error: any) => {
@@ -128,7 +131,7 @@ export function DataPageForm({
     },
   });
 
-  const handleStepSubmit = async (stepIndex: number): Promise<Record<string, unknown> | void> => {
+  const handleStepSubmit = async (_stepIndex: number): Promise<Record<string, unknown> | void> => {
     try {
       if (mode === 'edit') {
         const id = initialData?.id ?? (formState as any).id ?? (initialData as any)?._id;
@@ -177,19 +180,7 @@ export function DataPageForm({
               tabGroups={tabGroups}
               formState={formState}
               updateField={updateField}
-              onSubmit={
-                isWizard
-                  ? () => {
-                      const action = mode === 'edit' ? 'updated' : 'created';
-                      notifications.show({ message: `${title} record ${action}` });
-                      if (onSave) {
-                        onSave();
-                      } else {
-                        navigate({ to: '..' });
-                      }
-                    }
-                  : () => mutation.mutate(formState)
-              }
+              onSubmit={() => mutation.mutate(formState)}
               isPending={mutation.isPending}
               onStepSubmit={handleStepSubmit}
             />

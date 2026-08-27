@@ -1,6 +1,6 @@
-import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Combobox, Group, InputBase, Modal, NumberInput, Select, Stack, Table, Text, Tooltip, useCombobox } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { Check, DollarSign, Save, Trash2, X } from 'lucide-react';
+import { Check, ChevronDown, DollarSign, Save, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { convertPriceBetweenUoms } from '@/lib/uom-utils';
@@ -60,7 +60,7 @@ function UomSelect({
       }}
       searchable
       clearable
-      w={100}
+      w={200}
       disabled={disabled || !itemId}
     />
   );
@@ -124,6 +124,86 @@ function UomChangeModal({
   );
 }
 
+// Fully-controlled searchable item picker (Combobox) — avoids the Mantine
+// `Select` onSearchChange effect loop that caused "Maximum update depth
+// exceeded" / flicker while typing or after picking an item.
+function ItemSearchSelect({
+  value,
+  selectedLabel,
+  excludeIds,
+  onSelect,
+  w = 300,
+}: {
+  value: string;
+  selectedLabel?: string;
+  excludeIds?: Set<string>;
+  onSelect: (item: any) => void;
+  w?: number;
+}) {
+  const combobox = useCombobox();
+  const [search, setSearch] = useState('');
+  const { data: items = [] } = useItems(search);
+
+  const options = useMemo(
+    () =>
+      (Array.isArray(items) ? items : [])
+        .map((i: any) => ({
+          value: i.id,
+          label: `${i.code || ''} ${i.name || ''}${i.alias ? ` · ${i.alias}` : ''}`.trim(),
+          item: i,
+        }))
+        // Keep the already-selected item visible; hide items used on other
+        // saved lines.
+        .filter((o) => o.value === value || !excludeIds?.has(o.value)),
+    [items, excludeIds, value],
+  );
+
+  const selected = options.find((o) => o.value === value);
+
+  const submit = (val: string) => {
+    const opt = options.find((o) => o.value === val);
+    if (opt) {
+      onSelect(opt.item);
+    }
+    setSearch('');
+    combobox.closeDropdown();
+  };
+
+  return (
+    <Combobox store={combobox} onOptionSubmit={submit}>
+      <Combobox.Target>
+        <InputBase
+          size="xs"
+          placeholder="Select item"
+          value={search || selected?.label || selectedLabel || ''}
+          onChange={(e) => {
+            setSearch(e.currentTarget.value);
+            combobox.openDropdown();
+          }}
+          onClick={() => combobox.openDropdown()}
+          onFocus={() => combobox.openDropdown()}
+          onBlur={() => setSearch('')}
+          rightSection={<ChevronDown size={14} />}
+          w={w}
+        />
+      </Combobox.Target>
+      <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 20 }}>
+        <Combobox.Options>
+          {options.length === 0 ? (
+            <Combobox.Empty>No results</Combobox.Empty>
+          ) : (
+            options.slice(0, 20).map((o) => (
+              <Combobox.Option key={o.value} value={o.value}>
+                {o.label}
+              </Combobox.Option>
+            ))
+          )}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
 interface PriceListItem {
   id: string;
   unitPrice: number;
@@ -173,8 +253,10 @@ export function PoLinesTable({
   onSetPrice,
   savingLines,
 }: Props) {
-  const [itemSearch, setItemSearch] = useState('');
-  const { data: items = [] } = useItems(itemSearch);
+  const usedItemIds = useMemo(
+    () => new Set(lines.filter((l) => l.serverLineId).map((l) => l.itemId).filter(Boolean)),
+    [lines],
+  );
 
   const [pendingUom, setPendingUom] = useState<{
     lineId: string;
@@ -193,19 +275,11 @@ export function PoLinesTable({
 
   const uomMap = useMemo(() => {
     const map = new Map<string, UomData>();
-    for (const u of allUoms) {map.set(u.id, u);}
+    for (const u of allUoms) {
+      map.set(u.id, u);
+    }
     return map;
   }, [allUoms]);
-
-  const usedItemIds = useMemo(
-    () => lines.filter((l) => l.serverLineId).map((l) => l.itemId).filter(Boolean),
-    [lines],
-  );
-
-  const itemOpts = (Array.isArray(items) ? items : []).map((i: any) => ({
-    value: i.id,
-    label: `${i.code || ''} ${i.name || ''}`,
-  }));
 
   const isReadOnly = status === 'received' || status === 'cancelled';
 
@@ -222,24 +296,28 @@ export function PoLinesTable({
             <Table.Th>Price List</Table.Th>
             <Table.Th>Subtotal</Table.Th>
             <Table.Th>Total</Table.Th>
+            <Table.Th>Received Total</Table.Th>
             <Table.Th>Actions</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {lines.map((line) => {
             const isSaved = !!line.serverLineId;
-            const isFullyReceived = isSaved && Number(line.receivedQty) >= Number(line.orderedQty);
 
             const isDraftStatus = !status || status === 'draft';
             const isApprovedStatus = status === 'approved';
             const isPartiallyReceivedStatus = status === 'partially_received';
 
             const itemEditable = isDraftStatus && !isSaved;
+            const orderedEditable = isDraftStatus && !isReadOnly;
             const uomEditable = isDraftStatus;
+            // Received qty / unit cost stay editable until the line is actually
+            // posted (goods received). Reaching orderedQty must not lock them —
+            // the backend validates the received quantity when receiving.
             const recvQtyEditable =
-              (isApprovedStatus || isPartiallyReceivedStatus) && !isFullyReceived;
+              (isApprovedStatus || isPartiallyReceivedStatus) && !line.isPosted && !isReadOnly;
             const costEditable =
-              (isApprovedStatus || isPartiallyReceivedStatus) && !isFullyReceived;
+              (isApprovedStatus || isPartiallyReceivedStatus) && !line.isPosted && !isReadOnly;
 
             const canDelete = !isReadOnly && isDraftStatus && lines.length > 1;
             const canSave = !isReadOnly && isDraftStatus && !isSaved && !!pendingPoId;
@@ -247,13 +325,9 @@ export function PoLinesTable({
               (isApprovedStatus || isPartiallyReceivedStatus);
             const canUnpost = !isReadOnly && isSaved && line.isPosted;
 
-            const filteredItemOpts = itemOpts.filter(
-              (o) => o.value === line.itemId || !usedItemIds.includes(o.value),
-            );
-
-            const showItemLabel = line.itemId && !itemOpts.some((o) => o.value === line.itemId)
+            const selectedItemLabel = line.itemId
               ? `${line.itemCode || ''} ${line.itemName || ''}`.trim() || line.itemId
-              : null;
+              : '';
 
             const isSaving = savingLines.has(line.id);
 
@@ -261,28 +335,18 @@ export function PoLinesTable({
               <Table.Tr key={line.id}>
                 <Table.Td>
                   {itemEditable ? (
-                    <Select
-                      size="xs"
-                      placeholder="Select item"
-                      data={showItemLabel
-                        ? [{ value: line.itemId, label: showItemLabel }, ...filteredItemOpts]
-                        : filteredItemOpts}
-                      value={line.itemId || null}
-                      onChange={(v) => {
-                        onUpdateLine(line.id, { itemId: v || '' });
-                        const item = (Array.isArray(items) ? items : []).find((i: any) => i.id === v);
-                        if (item) {
-                          onUpdateLine(line.id, {
-                            itemCode: item.code,
-                            itemName: item.name,
-                            uomId: item.purchaseUom?.id || item.purchaseUomId || '',
-                          });
-                        }
-                      }}
-                      onSearchChange={setItemSearch}
-                      searchable
-                      clearable
-                      w={220}
+                    <ItemSearchSelect
+                      value={line.itemId || ''}
+                      selectedLabel={selectedItemLabel || undefined}
+                      excludeIds={usedItemIds}
+                      onSelect={(item) =>
+                        onUpdateLine(line.id, {
+                          itemId: item.id,
+                          itemCode: item.code,
+                          itemName: item.name,
+                          uomId: item.purchaseUom?.id || item.purchaseUomId || '',
+                        })
+                      }
                     />
                   ) : (
                     <Text size="xs">{line.itemName || line.itemCode || line.itemId}</Text>
@@ -299,7 +363,17 @@ export function PoLinesTable({
                   />
                 </Table.Td>
                 <Table.Td>
-                  <Text size="xs">{line.orderedQty}</Text>
+                  {orderedEditable ? (
+                    <NumberInput
+                      size="xs"
+                      min={0}
+                      value={line.orderedQty}
+                      onChange={(v) => onUpdateLine(line.id, { orderedQty: Number(v) || 0 })}
+                      w={100}
+                    />
+                  ) : (
+                    <Text size="xs">{line.orderedQty}</Text>
+                  )}
                 </Table.Td>
                 <Table.Td>
                   <NumberInput
@@ -307,7 +381,7 @@ export function PoLinesTable({
                     min={0}
                     value={line.receivedQty}
                     onChange={(v) => onUpdateLine(line.id, { receivedQty: Number(v) || 0 })}
-                    w={80}
+                    w={120}
                     disabled={!recvQtyEditable}
                   />
                 </Table.Td>
@@ -317,7 +391,7 @@ export function PoLinesTable({
                     min={0}
                     value={line.unitCost}
                     onChange={(v) => onUpdateLine(line.id, { unitCost: Number(v) || 0 })}
-                    w={90}
+                    w={140}
                     decimalScale={2}
                     disabled={!costEditable}
                   />
@@ -330,6 +404,9 @@ export function PoLinesTable({
                 </Table.Td>
                 <Table.Td>
                   <Text size="xs" fw={700}>{line.lineTotal.toFixed(2)}</Text>
+                </Table.Td>
+                <Table.Td>
+                  <Text size="xs" fw={700} c="green">{(line.receivedLineTotal ?? 0).toFixed(2)}</Text>
                 </Table.Td>
                 <Table.Td>
                   {canSave && (

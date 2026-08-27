@@ -50,6 +50,18 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
     import('@/features/rxsoft/pages/payment-methods/schema').then((m) => ({
       default: m.paymentMethodsConfig as unknown as ModelConfig,
     })),
+  'payment-providers': () =>
+    import('@/features/rxsoft/pages/payment-providers/schema').then((m) => ({
+      default: m.paymentProvidersConfig as unknown as ModelConfig,
+    })),
+  'pos-terminals': () =>
+    import('@/features/rxsoft/pages/pos-terminals/schema').then((m) => ({
+      default: m.posTerminalsConfig as unknown as ModelConfig,
+    })),
+  'insurance-providers': () =>
+    import('@/features/rxsoft/pages/insurance-providers/schema').then((m) => ({
+      default: m.insuranceProvidersConfig as unknown as ModelConfig,
+    })),
   manufacturers: () =>
     import('@/features/rxsoft/pages/manufacturers/schema').then((m) => ({
       default: m.manufacturersConfig as unknown as ModelConfig,

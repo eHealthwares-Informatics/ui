@@ -92,7 +92,8 @@ const itemCreateFieldGroups: FieldGroup[] = [
           valueKey: 'code',
         },
         col: 6,
-        required: true,
+        // Optional — matches the backend CreateItemDto (genericProductCode is
+        // validated only when supplied), so items can be created without it.
         placeholder: 'Select Generic Product',
       },
     ],
@@ -786,6 +787,8 @@ export const itemsConfig: ModelConfig = {
   tabGroups,
   modalTitle: 'Add Item',
   metricsEndpoint: '/items/metrics',
+  canExport: true,
+  csvEndpoint: '/items/export',
   // Show the FULL catalog (LEFT JOIN organisation_items) including items that
   // are blacklisted for the current org, so they stay toggleable/editable.
   listParams: { includeAll: true },
@@ -805,7 +808,7 @@ export const itemsConfig: ModelConfig = {
     ],
   },
   buildCreatePayload: buildItemPayload,
-  buildUpdatePayload: buildItemPayload,
+  buildUpdatePayload: buildItemUpdatePayload,
   buildFormState,
   createPathBuilder: () => '/rxsoft/items/create',
   detailPathBuilder: (row) => `/rxsoft/items/${String(row.id)}`,
@@ -848,4 +851,56 @@ export function buildItemPayload(values: Record<string, any>) {
     priceListItems: priceListEntries,
     stockItems,
   };
+}
+
+function flattenOptionValue(value: any): any {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value;
+  }
+  return value;
+}
+
+export function buildItemUpdatePayload(values: Record<string, any>) {
+  const payload: Record<string, any> = {};
+
+  if (values.name !== undefined) payload.name = values.name;
+  if (values.category !== undefined) payload.categoryId = flattenOptionValue(values.category);
+  if (values.genericProductCode !== undefined) {
+    payload.genericProductCode = flattenOptionValue(values.genericProductCode);
+  }
+  if (values.baseUom !== undefined) payload.baseUomId = flattenOptionValue(values.baseUom);
+  if (values.purchaseUom !== undefined) payload.purchaseUomId = flattenOptionValue(values.purchaseUom);
+  if (values.saleUom !== undefined) payload.saleUomId = flattenOptionValue(values.saleUom);
+  if (values.code !== undefined) payload.code = values.code || undefined;
+  if (values.barcode !== undefined) payload.barcode = values.barcode || undefined;
+  if (values.alias !== undefined) payload.alias = values.alias || undefined;
+  if (values.isTrackable !== undefined) {
+    payload.trackLot = values.isTrackable;
+    payload.trackExpiry = values.isTrackable;
+  }
+  if (values.isActive !== undefined) payload.isActive = values.isActive;
+  if (values.shelfLifeDays !== undefined) payload.shelfLifeDays = values.shelfLifeDays;
+  for (const field of ['imageUrl', 'smallImageUrl', 'mediumImageUrl', 'largeImageUrl'] as const) {
+    if (values[field] !== undefined) payload[field] = values[field] || undefined;
+  }
+
+  if (values.priceListItems !== undefined) {
+    const priceListEntries = ((values.priceListItems as PendingPriceListEntry[] | undefined) ?? [])
+      .filter((entry) => entry.priceList && hasNumericValue(entry.unitPrice))
+      .map(buildPriceListPayload);
+    if (priceListEntries.length) payload.priceListItems = priceListEntries;
+  }
+
+  if (values.stockEntries !== undefined) {
+    const stockItems = ((values.stockEntries as PendingStockEntry[] | undefined) ?? [])
+      .filter((entry) => entry.locationId && hasNumericValue(entry.quantity))
+      .map((entry) => ({
+        locationId: entry.locationId,
+        deltaQuantity: Number(entry.quantity),
+        reason: 'Initial stock setup from item creation',
+      }));
+    if (stockItems.length) payload.stockItems = stockItems;
+  }
+
+  return payload;
 }

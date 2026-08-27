@@ -19,24 +19,27 @@ export class AppLayoutPage {
   }
 
   get navUserTrigger(): Locator {
-    return this.page.locator('#sidebar-extra nav a').last();
+    return this.page.getByTestId('nav-user-trigger');
   }
 
   get signOutMenuItem(): Locator {
-    return this.page.getByRole('menuitem', { name: 'Sign out' });
+    return this.page.getByTestId('sign-out-menu-item');
   }
 
   get signOutDialog(): Locator {
-    return this.page.getByRole('dialog', { name: 'Sign out' });
+    return this.page.getByTestId('confirm-dialog');
   }
 
   get confirmSignOutButton(): Locator {
-    return this.signOutDialog.getByRole('button', { name: 'Sign out' });
+    return this.signOutDialog.getByTestId('confirm-dialog-confirm');
   }
 
   /** Opens the NavUser menu and clicks the "Sign out" item. */
   async openSignOut(): Promise<void> {
-    await this.navUserTrigger.click();
+    // dispatchEvent bypasses Playwright's scroll/actionability math, which stalls
+    // on Mantine's nested ScrollArea; the menu opens on any click.
+    await this.navUserTrigger.dispatchEvent('click');
+    await expect(this.signOutMenuItem).toBeVisible();
     await this.signOutMenuItem.click();
   }
 

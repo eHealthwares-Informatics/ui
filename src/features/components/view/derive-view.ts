@@ -42,6 +42,8 @@ function extractAccordionFields(fg: FieldGroup): ViewAccordion<any>[] {
       title: f.label,
       labelKey: f.itemLabelKey ?? 'name',
       itemEditConfig: f.itemEditConfig,
+      itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string }).itemEditEndpoint,
+      canEditItem: (f as Field & { canEditItem?: (data: any, item: any) => boolean }).canEditItem,
     }));
 }
 
@@ -89,6 +91,8 @@ export function deriveView(config: ModelConfig): View<any> {
         title: f.label,
         labelKey: f.itemLabelKey ?? 'name',
         itemEditConfig: f.itemEditConfig,
+        itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string }).itemEditEndpoint,
+        canEditItem: (f as Field & { canEditItem?: (data: any, item: any) => boolean }).canEditItem,
       }));
   }
 

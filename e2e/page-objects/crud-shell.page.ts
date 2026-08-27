@@ -26,27 +26,23 @@ export class CrudShellPage {
   }
 
   get searchInput(): Locator {
-    // Settings/inventory pages render more than one "Search" input, so scope
-    // to the first (the HeaderBar list search).
-    return this.page.getByPlaceholder('Search').first();
+    return this.page.getByTestId('header-search');
   }
 
   get newButton(): Locator {
-    return this.page.getByRole('button', { name: 'New', exact: true });
+    return this.page.getByTestId('header-new');
   }
 
   get exportButton(): Locator {
-    return this.page.getByRole('button', { name: 'Export', exact: true });
+    return this.page.getByTestId('header-export');
   }
 
   get recordsTotal(): Locator {
-    // "N records total", but singular when exactly one row ("1 record total").
-    // Some pages (Settings) render the counter more than once, so scope to the first.
-    return this.page.getByText(/record[s]? total/).first();
+    return this.page.getByTestId('pagination-records-total');
   }
 
   get pagination(): Locator {
-    return this.page.getByRole('navigation', { name: /pagination/i });
+    return this.page.getByTestId('pagination-controls');
   }
 
   /** The currently open modal (create/update). */
@@ -63,7 +59,7 @@ export class CrudShellPage {
   }
 
   getRow(text: string): Locator {
-    return this.page.locator('tbody tr').filter({ hasText: text }).first();
+    return this.page.getByTestId('data-table-body').locator('tr').filter({ hasText: text }).first();
   }
 
   /** Locates a row's action button by its lucide icon class (pencil / trash-2). */

@@ -38,6 +38,7 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
   const confirmHandler = onConfirm ?? handleConfirm;
   return (
     <Modal
+      data-testid="confirm-dialog"
       opened={props.open}
       onClose={() => handleConfirm && handleConfirm()}
       title={
@@ -54,10 +55,11 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
         </Text>
         {children}
         <Group justify="flex-end" mt="lg">
-          <Button variant="default" onClick={() => onOpenChange && onOpenChange(false)}>
+          <Button data-testid="confirm-dialog-cancel" variant="default" onClick={() => onOpenChange && onOpenChange(false)}>
             {cancelBtnText ?? 'Cancel'}
           </Button>
           <Button
+            data-testid="confirm-dialog-confirm"
             color={destructive ? 'red' : 'blue'}
             onClick={confirmHandler}
             disabled={disabled || isLoading}

@@ -97,9 +97,11 @@ export const modules: ModuleDefinition[] = [
     id: 'rxsoft',
     title: 'RxSoft',
     description: 'RxSoft pharmacy admin module with reporting, catalog, and operations.',
-    root: '/rxsoft/items',
+    root: '/dashboard/sales',
     apiProvider: rxsoftApi,
     routes: [
+      '/dashboard/sales',
+      '/dashboard/purchases',
       '/rxsoft',
       '/rxsoft/products',
       '/rxsoft/items',

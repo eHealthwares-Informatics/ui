@@ -242,10 +242,35 @@ export type Staff = {
   roleType: StaffRoleType;
   category: StaffCategory | null;
   department: string | null;
+  departmentId: string | null;
   identityLocationId: string | null;
   userId: string | null;
   isActive: boolean;
   otherDetails: Record<string, unknown> | null;
+};
+
+export type DepartmentType =
+  | 'OPD'
+  | 'INPATIENT'
+  | 'EMERGENCY'
+  | 'LABORATORY'
+  | 'PHARMACY'
+  | 'RADIOLOGY'
+  | 'MATERNITY'
+  | 'SUPPORT'
+  | 'OTHER';
+
+export type Department = {
+  id: string;
+  organizationId: string | null;
+  locationId: string | null;
+  code: string;
+  name: string;
+  departmentType: DepartmentType;
+  description: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type PatientDetail = {

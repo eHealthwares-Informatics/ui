@@ -72,6 +72,7 @@ import { Route as AuthenticatedCodingConceptIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index'
 import { Route as DamorexTrackOrderCodeRouteImport } from './routes/damorex/track-order.$code'
 import { Route as DamorexShopSlugRouteImport } from './routes/damorex/shop_.$slug'
+import { Route as DamorexPayTokenRouteImport } from './routes/damorex/pay.$token'
 import { Route as DamorexOrdersIdRouteImport } from './routes/damorex/orders_.$id'
 import { Route as DamorexHealthConcernsSlugRouteImport } from './routes/damorex/health-concerns.$slug'
 import { Route as DamorexCategoriesSlugRouteImport } from './routes/damorex/categories.$slug'
@@ -94,6 +95,8 @@ import { Route as ApmAdminConversionRouteImport } from './routes/apm/admin/conve
 import { Route as ApmAdminContentRouteImport } from './routes/apm/admin/content'
 import { Route as ApmAdminCanvassingRouteImport } from './routes/apm/admin/canvassing'
 import { Route as ApmAdminAgentsRouteImport } from './routes/apm/admin/agents'
+import { Route as AuthenticatedDashboardSalesRouteImport } from './routes/_authenticated/dashboard/sales'
+import { Route as AuthenticatedDashboardPurchasesRouteImport } from './routes/_authenticated/dashboard/purchases'
 import { Route as AuthenticatedCommunicationTraceExplorerRouteImport } from './routes/_authenticated/communication/trace-explorer'
 import { Route as AuthenticatedCommunicationMessageTesterRouteImport } from './routes/_authenticated/communication/message-tester'
 import { Route as AuthenticatedCommunicationFlowGraphRouteImport } from './routes/_authenticated/communication/flow-graph'
@@ -123,6 +126,7 @@ import { Route as AuthenticatedRxsoftSuppliersIndexRouteImport } from './routes/
 import { Route as AuthenticatedRxsoftStockLocationsIndexRouteImport } from './routes/_authenticated/rxsoft/stock-locations/index'
 import { Route as AuthenticatedRxsoftSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/settings/index'
 import { Route as AuthenticatedRxsoftSalesIndexRouteImport } from './routes/_authenticated/rxsoft/sales/index'
+import { Route as AuthenticatedRxsoftSalesLinesIndexRouteImport } from './routes/_authenticated/rxsoft/sales-lines/index'
 import { Route as AuthenticatedRxsoftRolesIndexRouteImport } from './routes/_authenticated/rxsoft/roles/index'
 import { Route as AuthenticatedRxsoftReportsIndexRouteImport } from './routes/_authenticated/rxsoft/reports/index'
 import { Route as AuthenticatedRxsoftReceivingIndexRouteImport } from './routes/_authenticated/rxsoft/receiving/index'
@@ -130,7 +134,9 @@ import { Route as AuthenticatedRxsoftReceivablesIndexRouteImport } from './route
 import { Route as AuthenticatedRxsoftPurchasesIndexRouteImport } from './routes/_authenticated/rxsoft/purchases/index'
 import { Route as AuthenticatedRxsoftPriceListsIndexRouteImport } from './routes/_authenticated/rxsoft/price-lists/index'
 import { Route as AuthenticatedRxsoftPriceListItemsIndexRouteImport } from './routes/_authenticated/rxsoft/price-list-items/index'
+import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './routes/_authenticated/rxsoft/pos-terminals/index'
 import { Route as AuthenticatedRxsoftPharmaceuticsIndexRouteImport } from './routes/_authenticated/rxsoft/pharmaceutics/index'
+import { Route as AuthenticatedRxsoftPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/payment-providers/index'
 import { Route as AuthenticatedRxsoftPaymentMethodsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-methods/index'
 import { Route as AuthenticatedRxsoftOrganizationsIndexRouteImport } from './routes/_authenticated/rxsoft/organizations/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
@@ -139,6 +145,7 @@ import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from '.
 import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entries/index'
 import { Route as AuthenticatedRxsoftItemsIndexRouteImport } from './routes/_authenticated/rxsoft/items/index'
 import { Route as AuthenticatedRxsoftInventoryIndexRouteImport } from './routes/_authenticated/rxsoft/inventory/index'
+import { Route as AuthenticatedRxsoftInsuranceProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/insurance-providers/index'
 import { Route as AuthenticatedRxsoftGlAccountsIndexRouteImport } from './routes/_authenticated/rxsoft/gl-accounts/index'
 import { Route as AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-testimonials/index'
 import { Route as AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-team/index'
@@ -154,7 +161,6 @@ import { Route as AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport } fr
 import { Route as AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-careers/index'
 import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
 import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
-import { Route as AuthenticatedRxsoftDashboardIndexRouteImport } from './routes/_authenticated/rxsoft/dashboard/index'
 import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
 import { Route as AuthenticatedRxsoftCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/categories/index'
 import { Route as AuthenticatedRxsoftBranchesIndexRouteImport } from './routes/_authenticated/rxsoft/branches/index'
@@ -194,6 +200,7 @@ import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
 import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index'
+import { Route as AuthenticatedEmrDepartmentsIndexRouteImport } from './routes/_authenticated/emr/departments/index'
 import { Route as AuthenticatedEmrAppointmentsIndexRouteImport } from './routes/_authenticated/emr/appointments/index'
 import { Route as AuthenticatedConversationWorkflowsIndexRouteImport } from './routes/_authenticated/conversation/workflows/index'
 import { Route as AuthenticatedConversationWorkflowInstancesIndexRouteImport } from './routes/_authenticated/conversation/workflow-instances/index'
@@ -566,6 +573,11 @@ const DamorexShopSlugRoute = DamorexShopSlugRouteImport.update({
   path: '/damorex/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DamorexPayTokenRoute = DamorexPayTokenRouteImport.update({
+  id: '/damorex/pay/$token',
+  path: '/damorex/pay/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DamorexOrdersIdRoute = DamorexOrdersIdRouteImport.update({
   id: '/damorex/orders_/$id',
   path: '/damorex/orders/$id',
@@ -678,6 +690,18 @@ const ApmAdminAgentsRoute = ApmAdminAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => ApmAdminRouteRoute,
 } as any)
+const AuthenticatedDashboardSalesRoute =
+  AuthenticatedDashboardSalesRouteImport.update({
+    id: '/dashboard/sales',
+    path: '/dashboard/sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardPurchasesRoute =
+  AuthenticatedDashboardPurchasesRouteImport.update({
+    id: '/dashboard/purchases',
+    path: '/dashboard/purchases',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCommunicationTraceExplorerRoute =
   AuthenticatedCommunicationTraceExplorerRouteImport.update({
     id: '/communication/trace-explorer',
@@ -850,6 +874,12 @@ const AuthenticatedRxsoftSalesIndexRoute =
     path: '/rxsoft/sales/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftSalesLinesIndexRoute =
+  AuthenticatedRxsoftSalesLinesIndexRouteImport.update({
+    id: '/rxsoft/sales-lines/',
+    path: '/rxsoft/sales-lines/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftRolesIndexRoute =
   AuthenticatedRxsoftRolesIndexRouteImport.update({
     id: '/rxsoft/roles/',
@@ -892,10 +922,22 @@ const AuthenticatedRxsoftPriceListItemsIndexRoute =
     path: '/rxsoft/price-list-items/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftPosTerminalsIndexRoute =
+  AuthenticatedRxsoftPosTerminalsIndexRouteImport.update({
+    id: '/rxsoft/pos-terminals/',
+    path: '/rxsoft/pos-terminals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftPharmaceuticsIndexRoute =
   AuthenticatedRxsoftPharmaceuticsIndexRouteImport.update({
     id: '/rxsoft/pharmaceutics/',
     path: '/rxsoft/pharmaceutics/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftPaymentProvidersIndexRoute =
+  AuthenticatedRxsoftPaymentProvidersIndexRouteImport.update({
+    id: '/rxsoft/payment-providers/',
+    path: '/rxsoft/payment-providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftPaymentMethodsIndexRoute =
@@ -944,6 +986,12 @@ const AuthenticatedRxsoftInventoryIndexRoute =
   AuthenticatedRxsoftInventoryIndexRouteImport.update({
     id: '/rxsoft/inventory/',
     path: '/rxsoft/inventory/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftInsuranceProvidersIndexRoute =
+  AuthenticatedRxsoftInsuranceProvidersIndexRouteImport.update({
+    id: '/rxsoft/insurance-providers/',
+    path: '/rxsoft/insurance-providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftGlAccountsIndexRoute =
@@ -1034,12 +1082,6 @@ const AuthenticatedRxsoftDrugComponentsIndexRoute =
   AuthenticatedRxsoftDrugComponentsIndexRouteImport.update({
     id: '/rxsoft/drug-components/',
     path: '/rxsoft/drug-components/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRxsoftDashboardIndexRoute =
-  AuthenticatedRxsoftDashboardIndexRouteImport.update({
-    id: '/rxsoft/dashboard/',
-    path: '/rxsoft/dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftCustomersIndexRoute =
@@ -1274,6 +1316,12 @@ const AuthenticatedEmrEncountersIndexRoute =
   AuthenticatedEmrEncountersIndexRouteImport.update({
     id: '/emr/encounters/',
     path: '/emr/encounters/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrDepartmentsIndexRoute =
+  AuthenticatedEmrDepartmentsIndexRouteImport.update({
+    id: '/emr/departments/',
+    path: '/emr/departments/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEmrAppointmentsIndexRoute =
@@ -1666,6 +1714,8 @@ export interface FileRoutesByFullPath {
   '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
   '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
   '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
   '/apm/admin/content': typeof ApmAdminContentRoute
@@ -1688,6 +1738,7 @@ export interface FileRoutesByFullPath {
   '/damorex/categories/$slug': typeof DamorexCategoriesSlugRoute
   '/damorex/health-concerns/$slug': typeof DamorexHealthConcernsSlugRoute
   '/damorex/orders/$id': typeof DamorexOrdersIdRoute
+  '/damorex/pay/$token': typeof DamorexPayTokenRoute
   '/damorex/shop/$slug': typeof DamorexShopSlugRoute
   '/damorex/track-order/$code': typeof DamorexTrackOrderCodeRoute
   '/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
@@ -1732,6 +1783,7 @@ export interface FileRoutesByFullPath {
   '/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
   '/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
@@ -1771,7 +1823,6 @@ export interface FileRoutesByFullPath {
   '/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
-  '/rxsoft/dashboard/': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
   '/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
@@ -1787,6 +1838,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
   '/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
   '/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
   '/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
@@ -1795,7 +1847,9 @@ export interface FileRoutesByFullPath {
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
   '/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute
   '/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
   '/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
   '/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
   '/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
@@ -1803,6 +1857,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
   '/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute
   '/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
   '/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
@@ -1901,6 +1956,8 @@ export interface FileRoutesByTo {
   '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
   '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
   '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
   '/apm/admin/content': typeof ApmAdminContentRoute
@@ -1923,6 +1980,7 @@ export interface FileRoutesByTo {
   '/damorex/categories/$slug': typeof DamorexCategoriesSlugRoute
   '/damorex/health-concerns/$slug': typeof DamorexHealthConcernsSlugRoute
   '/damorex/orders/$id': typeof DamorexOrdersIdRoute
+  '/damorex/pay/$token': typeof DamorexPayTokenRoute
   '/damorex/shop/$slug': typeof DamorexShopSlugRoute
   '/damorex/track-order/$code': typeof DamorexTrackOrderCodeRoute
   '/$moduleId': typeof AuthenticatedModuleIdIndexRoute
@@ -1967,6 +2025,7 @@ export interface FileRoutesByTo {
   '/conversation/workflow-instances': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/conversation/workflows': typeof AuthenticatedConversationWorkflowsIndexRoute
   '/emr/appointments': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/departments': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
@@ -2006,7 +2065,6 @@ export interface FileRoutesByTo {
   '/rxsoft/branches': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
-  '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
   '/rxsoft/ehealthwares-careers': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
@@ -2022,6 +2080,7 @@ export interface FileRoutesByTo {
   '/rxsoft/ehealthwares-team': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
   '/rxsoft/ehealthwares-testimonials': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/rxsoft/gl-accounts': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/rxsoft/insurance-providers': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
   '/rxsoft/inventory': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/rxsoft/items': typeof AuthenticatedRxsoftItemsIndexRoute
   '/rxsoft/journal-entries': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
@@ -2030,7 +2089,9 @@ export interface FileRoutesByTo {
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
   '/rxsoft/organizations': typeof AuthenticatedRxsoftOrganizationsIndexRoute
   '/rxsoft/payment-methods': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/rxsoft/payment-providers': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
   '/rxsoft/pharmaceutics': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/rxsoft/pos-terminals': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
   '/rxsoft/price-list-items': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists': typeof AuthenticatedRxsoftPriceListsIndexRoute
   '/rxsoft/purchases': typeof AuthenticatedRxsoftPurchasesIndexRoute
@@ -2038,6 +2099,7 @@ export interface FileRoutesByTo {
   '/rxsoft/receiving': typeof AuthenticatedRxsoftReceivingIndexRoute
   '/rxsoft/reports': typeof AuthenticatedRxsoftReportsIndexRoute
   '/rxsoft/roles': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/rxsoft/sales-lines': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/rxsoft/sales': typeof AuthenticatedRxsoftSalesIndexRoute
   '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/rxsoft/stock-locations': typeof AuthenticatedRxsoftStockLocationsIndexRoute
@@ -2142,6 +2204,8 @@ export interface FileRoutesById {
   '/_authenticated/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
   '/_authenticated/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
   '/_authenticated/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/_authenticated/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/_authenticated/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
   '/apm/admin/content': typeof ApmAdminContentRoute
@@ -2164,6 +2228,7 @@ export interface FileRoutesById {
   '/damorex/categories/$slug': typeof DamorexCategoriesSlugRoute
   '/damorex/health-concerns/$slug': typeof DamorexHealthConcernsSlugRoute
   '/damorex/orders_/$id': typeof DamorexOrdersIdRoute
+  '/damorex/pay/$token': typeof DamorexPayTokenRoute
   '/damorex/shop_/$slug': typeof DamorexShopSlugRoute
   '/damorex/track-order/$code': typeof DamorexTrackOrderCodeRoute
   '/_authenticated/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
@@ -2208,6 +2273,7 @@ export interface FileRoutesById {
   '/_authenticated/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   '/_authenticated/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
   '/_authenticated/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/_authenticated/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
@@ -2247,7 +2313,6 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/_authenticated/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
-  '/_authenticated/rxsoft/dashboard/': typeof AuthenticatedRxsoftDashboardIndexRoute
   '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
   '/_authenticated/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
@@ -2263,6 +2328,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
   '/_authenticated/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   '/_authenticated/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/_authenticated/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
   '/_authenticated/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
   '/_authenticated/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
   '/_authenticated/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
@@ -2271,7 +2337,9 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
   '/_authenticated/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute
   '/_authenticated/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/_authenticated/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
   '/_authenticated/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/_authenticated/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
   '/_authenticated/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/_authenticated/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
   '/_authenticated/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
@@ -2279,6 +2347,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
   '/_authenticated/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute
   '/_authenticated/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/_authenticated/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/_authenticated/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
   '/_authenticated/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/_authenticated/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
@@ -2381,6 +2450,8 @@ export interface FileRouteTypes {
     | '/communication/flow-graph'
     | '/communication/message-tester'
     | '/communication/trace-explorer'
+    | '/dashboard/purchases'
+    | '/dashboard/sales'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
     | '/apm/admin/content'
@@ -2403,6 +2474,7 @@ export interface FileRouteTypes {
     | '/damorex/categories/$slug'
     | '/damorex/health-concerns/$slug'
     | '/damorex/orders/$id'
+    | '/damorex/pay/$token'
     | '/damorex/shop/$slug'
     | '/damorex/track-order/$code'
     | '/$moduleId/'
@@ -2447,6 +2519,7 @@ export interface FileRouteTypes {
     | '/conversation/workflow-instances/'
     | '/conversation/workflows/'
     | '/emr/appointments/'
+    | '/emr/departments/'
     | '/emr/encounters/'
     | '/emr/forms/'
     | '/emr/patients/'
@@ -2486,7 +2559,6 @@ export interface FileRouteTypes {
     | '/rxsoft/branches/'
     | '/rxsoft/categories/'
     | '/rxsoft/customers/'
-    | '/rxsoft/dashboard/'
     | '/rxsoft/drug-components/'
     | '/rxsoft/ehealthwares-articles/'
     | '/rxsoft/ehealthwares-careers/'
@@ -2502,6 +2574,7 @@ export interface FileRouteTypes {
     | '/rxsoft/ehealthwares-team/'
     | '/rxsoft/ehealthwares-testimonials/'
     | '/rxsoft/gl-accounts/'
+    | '/rxsoft/insurance-providers/'
     | '/rxsoft/inventory/'
     | '/rxsoft/items/'
     | '/rxsoft/journal-entries/'
@@ -2510,7 +2583,9 @@ export interface FileRouteTypes {
     | '/rxsoft/manufacturers/'
     | '/rxsoft/organizations/'
     | '/rxsoft/payment-methods/'
+    | '/rxsoft/payment-providers/'
     | '/rxsoft/pharmaceutics/'
+    | '/rxsoft/pos-terminals/'
     | '/rxsoft/price-list-items/'
     | '/rxsoft/price-lists/'
     | '/rxsoft/purchases/'
@@ -2518,6 +2593,7 @@ export interface FileRouteTypes {
     | '/rxsoft/receiving/'
     | '/rxsoft/reports/'
     | '/rxsoft/roles/'
+    | '/rxsoft/sales-lines/'
     | '/rxsoft/sales/'
     | '/rxsoft/settings/'
     | '/rxsoft/stock-locations/'
@@ -2616,6 +2692,8 @@ export interface FileRouteTypes {
     | '/communication/flow-graph'
     | '/communication/message-tester'
     | '/communication/trace-explorer'
+    | '/dashboard/purchases'
+    | '/dashboard/sales'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
     | '/apm/admin/content'
@@ -2638,6 +2716,7 @@ export interface FileRouteTypes {
     | '/damorex/categories/$slug'
     | '/damorex/health-concerns/$slug'
     | '/damorex/orders/$id'
+    | '/damorex/pay/$token'
     | '/damorex/shop/$slug'
     | '/damorex/track-order/$code'
     | '/$moduleId'
@@ -2682,6 +2761,7 @@ export interface FileRouteTypes {
     | '/conversation/workflow-instances'
     | '/conversation/workflows'
     | '/emr/appointments'
+    | '/emr/departments'
     | '/emr/encounters'
     | '/emr/forms'
     | '/emr/patients'
@@ -2721,7 +2801,6 @@ export interface FileRouteTypes {
     | '/rxsoft/branches'
     | '/rxsoft/categories'
     | '/rxsoft/customers'
-    | '/rxsoft/dashboard'
     | '/rxsoft/drug-components'
     | '/rxsoft/ehealthwares-articles'
     | '/rxsoft/ehealthwares-careers'
@@ -2737,6 +2816,7 @@ export interface FileRouteTypes {
     | '/rxsoft/ehealthwares-team'
     | '/rxsoft/ehealthwares-testimonials'
     | '/rxsoft/gl-accounts'
+    | '/rxsoft/insurance-providers'
     | '/rxsoft/inventory'
     | '/rxsoft/items'
     | '/rxsoft/journal-entries'
@@ -2745,7 +2825,9 @@ export interface FileRouteTypes {
     | '/rxsoft/manufacturers'
     | '/rxsoft/organizations'
     | '/rxsoft/payment-methods'
+    | '/rxsoft/payment-providers'
     | '/rxsoft/pharmaceutics'
+    | '/rxsoft/pos-terminals'
     | '/rxsoft/price-list-items'
     | '/rxsoft/price-lists'
     | '/rxsoft/purchases'
@@ -2753,6 +2835,7 @@ export interface FileRouteTypes {
     | '/rxsoft/receiving'
     | '/rxsoft/reports'
     | '/rxsoft/roles'
+    | '/rxsoft/sales-lines'
     | '/rxsoft/sales'
     | '/rxsoft/settings'
     | '/rxsoft/stock-locations'
@@ -2856,6 +2939,8 @@ export interface FileRouteTypes {
     | '/_authenticated/communication/flow-graph'
     | '/_authenticated/communication/message-tester'
     | '/_authenticated/communication/trace-explorer'
+    | '/_authenticated/dashboard/purchases'
+    | '/_authenticated/dashboard/sales'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
     | '/apm/admin/content'
@@ -2878,6 +2963,7 @@ export interface FileRouteTypes {
     | '/damorex/categories/$slug'
     | '/damorex/health-concerns/$slug'
     | '/damorex/orders_/$id'
+    | '/damorex/pay/$token'
     | '/damorex/shop_/$slug'
     | '/damorex/track-order/$code'
     | '/_authenticated/$moduleId/'
@@ -2922,6 +3008,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/workflow-instances/'
     | '/_authenticated/conversation/workflows/'
     | '/_authenticated/emr/appointments/'
+    | '/_authenticated/emr/departments/'
     | '/_authenticated/emr/encounters/'
     | '/_authenticated/emr/forms/'
     | '/_authenticated/emr/patients/'
@@ -2961,7 +3048,6 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/branches/'
     | '/_authenticated/rxsoft/categories/'
     | '/_authenticated/rxsoft/customers/'
-    | '/_authenticated/rxsoft/dashboard/'
     | '/_authenticated/rxsoft/drug-components/'
     | '/_authenticated/rxsoft/ehealthwares-articles/'
     | '/_authenticated/rxsoft/ehealthwares-careers/'
@@ -2977,6 +3063,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/ehealthwares-team/'
     | '/_authenticated/rxsoft/ehealthwares-testimonials/'
     | '/_authenticated/rxsoft/gl-accounts/'
+    | '/_authenticated/rxsoft/insurance-providers/'
     | '/_authenticated/rxsoft/inventory/'
     | '/_authenticated/rxsoft/items/'
     | '/_authenticated/rxsoft/journal-entries/'
@@ -2985,7 +3072,9 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/manufacturers/'
     | '/_authenticated/rxsoft/organizations/'
     | '/_authenticated/rxsoft/payment-methods/'
+    | '/_authenticated/rxsoft/payment-providers/'
     | '/_authenticated/rxsoft/pharmaceutics/'
+    | '/_authenticated/rxsoft/pos-terminals/'
     | '/_authenticated/rxsoft/price-list-items/'
     | '/_authenticated/rxsoft/price-lists/'
     | '/_authenticated/rxsoft/purchases/'
@@ -2993,6 +3082,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/receiving/'
     | '/_authenticated/rxsoft/reports/'
     | '/_authenticated/rxsoft/roles/'
+    | '/_authenticated/rxsoft/sales-lines/'
     | '/_authenticated/rxsoft/sales/'
     | '/_authenticated/rxsoft/settings/'
     | '/_authenticated/rxsoft/stock-locations/'
@@ -3075,6 +3165,7 @@ export interface RootRouteChildren {
   DamorexIndexRoute: typeof DamorexIndexRoute
   QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute
   DamorexOrdersIdRoute: typeof DamorexOrdersIdRoute
+  DamorexPayTokenRoute: typeof DamorexPayTokenRoute
   DamorexShopSlugRoute: typeof DamorexShopSlugRoute
   DamorexTrackOrderCodeRoute: typeof DamorexTrackOrderCodeRoute
   DamorexPurchasesIndexRoute: typeof DamorexPurchasesIndexRoute
@@ -3523,6 +3614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DamorexShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/damorex/pay/$token': {
+      id: '/damorex/pay/$token'
+      path: '/damorex/pay/$token'
+      fullPath: '/damorex/pay/$token'
+      preLoaderRoute: typeof DamorexPayTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/damorex/orders_/$id': {
       id: '/damorex/orders_/$id'
       path: '/damorex/orders/$id'
@@ -3676,6 +3774,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/apm/admin/agents'
       preLoaderRoute: typeof ApmAdminAgentsRouteImport
       parentRoute: typeof ApmAdminRouteRoute
+    }
+    '/_authenticated/dashboard/sales': {
+      id: '/_authenticated/dashboard/sales'
+      path: '/dashboard/sales'
+      fullPath: '/dashboard/sales'
+      preLoaderRoute: typeof AuthenticatedDashboardSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/purchases': {
+      id: '/_authenticated/dashboard/purchases'
+      path: '/dashboard/purchases'
+      fullPath: '/dashboard/purchases'
+      preLoaderRoute: typeof AuthenticatedDashboardPurchasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/communication/trace-explorer': {
       id: '/_authenticated/communication/trace-explorer'
@@ -3880,6 +3992,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftSalesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/sales-lines/': {
+      id: '/_authenticated/rxsoft/sales-lines/'
+      path: '/rxsoft/sales-lines'
+      fullPath: '/rxsoft/sales-lines/'
+      preLoaderRoute: typeof AuthenticatedRxsoftSalesLinesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/roles/': {
       id: '/_authenticated/rxsoft/roles/'
       path: '/rxsoft/roles'
@@ -3929,11 +4048,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/pos-terminals/': {
+      id: '/_authenticated/rxsoft/pos-terminals/'
+      path: '/rxsoft/pos-terminals'
+      fullPath: '/rxsoft/pos-terminals/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/pharmaceutics/': {
       id: '/_authenticated/rxsoft/pharmaceutics/'
       path: '/rxsoft/pharmaceutics'
       fullPath: '/rxsoft/pharmaceutics/'
       preLoaderRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/payment-providers/': {
+      id: '/_authenticated/rxsoft/payment-providers/'
+      path: '/rxsoft/payment-providers'
+      fullPath: '/rxsoft/payment-providers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/payment-methods/': {
@@ -3990,6 +4123,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/inventory'
       fullPath: '/rxsoft/inventory/'
       preLoaderRoute: typeof AuthenticatedRxsoftInventoryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/insurance-providers/': {
+      id: '/_authenticated/rxsoft/insurance-providers/'
+      path: '/rxsoft/insurance-providers'
+      fullPath: '/rxsoft/insurance-providers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/gl-accounts/': {
@@ -4095,13 +4235,6 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/drug-components'
       fullPath: '/rxsoft/drug-components/'
       preLoaderRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rxsoft/dashboard/': {
-      id: '/_authenticated/rxsoft/dashboard/'
-      path: '/rxsoft/dashboard'
-      fullPath: '/rxsoft/dashboard/'
-      preLoaderRoute: typeof AuthenticatedRxsoftDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/customers/': {
@@ -4375,6 +4508,13 @@ declare module '@tanstack/react-router' {
       path: '/emr/encounters'
       fullPath: '/emr/encounters/'
       preLoaderRoute: typeof AuthenticatedEmrEncountersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/departments/': {
+      id: '/_authenticated/emr/departments/'
+      path: '/emr/departments'
+      fullPath: '/emr/departments/'
+      preLoaderRoute: typeof AuthenticatedEmrDepartmentsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/emr/appointments/': {
@@ -4870,6 +5010,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunicationFlowGraphRoute: typeof AuthenticatedCommunicationFlowGraphRoute
   AuthenticatedCommunicationMessageTesterRoute: typeof AuthenticatedCommunicationMessageTesterRoute
   AuthenticatedCommunicationTraceExplorerRoute: typeof AuthenticatedCommunicationTraceExplorerRoute
+  AuthenticatedDashboardPurchasesRoute: typeof AuthenticatedDashboardPurchasesRoute
+  AuthenticatedDashboardSalesRoute: typeof AuthenticatedDashboardSalesRoute
   AuthenticatedCodingConceptIndexRoute: typeof AuthenticatedCodingConceptIndexRoute
   AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute
   AuthenticatedEmrIndexRoute: typeof AuthenticatedEmrIndexRoute
@@ -4901,6 +5043,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationWorkflowInstancesIndexRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRoute
   AuthenticatedConversationWorkflowsIndexRoute: typeof AuthenticatedConversationWorkflowsIndexRoute
   AuthenticatedEmrAppointmentsIndexRoute: typeof AuthenticatedEmrAppointmentsIndexRoute
+  AuthenticatedEmrDepartmentsIndexRoute: typeof AuthenticatedEmrDepartmentsIndexRoute
   AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
@@ -4940,7 +5083,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftBranchesIndexRoute: typeof AuthenticatedRxsoftBranchesIndexRoute
   AuthenticatedRxsoftCategoriesIndexRoute: typeof AuthenticatedRxsoftCategoriesIndexRoute
   AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
-  AuthenticatedRxsoftDashboardIndexRoute: typeof AuthenticatedRxsoftDashboardIndexRoute
   AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
   AuthenticatedRxsoftEhealthwaresCareersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
@@ -4956,6 +5098,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftEhealthwaresTeamIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
   AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
   AuthenticatedRxsoftGlAccountsIndexRoute: typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  AuthenticatedRxsoftInsuranceProvidersIndexRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
   AuthenticatedRxsoftInventoryIndexRoute: typeof AuthenticatedRxsoftInventoryIndexRoute
   AuthenticatedRxsoftItemsIndexRoute: typeof AuthenticatedRxsoftItemsIndexRoute
   AuthenticatedRxsoftJournalEntriesIndexRoute: typeof AuthenticatedRxsoftJournalEntriesIndexRoute
@@ -4964,7 +5107,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
   AuthenticatedRxsoftOrganizationsIndexRoute: typeof AuthenticatedRxsoftOrganizationsIndexRoute
   AuthenticatedRxsoftPaymentMethodsIndexRoute: typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  AuthenticatedRxsoftPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
   AuthenticatedRxsoftPharmaceuticsIndexRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  AuthenticatedRxsoftPosTerminalsIndexRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRoute
   AuthenticatedRxsoftPriceListItemsIndexRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   AuthenticatedRxsoftPriceListsIndexRoute: typeof AuthenticatedRxsoftPriceListsIndexRoute
   AuthenticatedRxsoftPurchasesIndexRoute: typeof AuthenticatedRxsoftPurchasesIndexRoute
@@ -4972,6 +5117,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftReceivingIndexRoute: typeof AuthenticatedRxsoftReceivingIndexRoute
   AuthenticatedRxsoftReportsIndexRoute: typeof AuthenticatedRxsoftReportsIndexRoute
   AuthenticatedRxsoftRolesIndexRoute: typeof AuthenticatedRxsoftRolesIndexRoute
+  AuthenticatedRxsoftSalesLinesIndexRoute: typeof AuthenticatedRxsoftSalesLinesIndexRoute
   AuthenticatedRxsoftSalesIndexRoute: typeof AuthenticatedRxsoftSalesIndexRoute
   AuthenticatedRxsoftStockLocationsIndexRoute: typeof AuthenticatedRxsoftStockLocationsIndexRoute
   AuthenticatedRxsoftSuppliersIndexRoute: typeof AuthenticatedRxsoftSuppliersIndexRoute
@@ -5030,6 +5176,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCommunicationMessageTesterRoute,
   AuthenticatedCommunicationTraceExplorerRoute:
     AuthenticatedCommunicationTraceExplorerRoute,
+  AuthenticatedDashboardPurchasesRoute: AuthenticatedDashboardPurchasesRoute,
+  AuthenticatedDashboardSalesRoute: AuthenticatedDashboardSalesRoute,
   AuthenticatedCodingConceptIndexRoute: AuthenticatedCodingConceptIndexRoute,
   AuthenticatedConversationIndexRoute: AuthenticatedConversationIndexRoute,
   AuthenticatedEmrIndexRoute: AuthenticatedEmrIndexRoute,
@@ -5085,6 +5233,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationWorkflowsIndexRoute,
   AuthenticatedEmrAppointmentsIndexRoute:
     AuthenticatedEmrAppointmentsIndexRoute,
+  AuthenticatedEmrDepartmentsIndexRoute: AuthenticatedEmrDepartmentsIndexRoute,
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
@@ -5138,8 +5287,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftCategoriesIndexRoute,
   AuthenticatedRxsoftCustomersIndexRoute:
     AuthenticatedRxsoftCustomersIndexRoute,
-  AuthenticatedRxsoftDashboardIndexRoute:
-    AuthenticatedRxsoftDashboardIndexRoute,
   AuthenticatedRxsoftDrugComponentsIndexRoute:
     AuthenticatedRxsoftDrugComponentsIndexRoute,
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute:
@@ -5170,6 +5317,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute,
   AuthenticatedRxsoftGlAccountsIndexRoute:
     AuthenticatedRxsoftGlAccountsIndexRoute,
+  AuthenticatedRxsoftInsuranceProvidersIndexRoute:
+    AuthenticatedRxsoftInsuranceProvidersIndexRoute,
   AuthenticatedRxsoftInventoryIndexRoute:
     AuthenticatedRxsoftInventoryIndexRoute,
   AuthenticatedRxsoftItemsIndexRoute: AuthenticatedRxsoftItemsIndexRoute,
@@ -5184,8 +5333,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftOrganizationsIndexRoute,
   AuthenticatedRxsoftPaymentMethodsIndexRoute:
     AuthenticatedRxsoftPaymentMethodsIndexRoute,
+  AuthenticatedRxsoftPaymentProvidersIndexRoute:
+    AuthenticatedRxsoftPaymentProvidersIndexRoute,
   AuthenticatedRxsoftPharmaceuticsIndexRoute:
     AuthenticatedRxsoftPharmaceuticsIndexRoute,
+  AuthenticatedRxsoftPosTerminalsIndexRoute:
+    AuthenticatedRxsoftPosTerminalsIndexRoute,
   AuthenticatedRxsoftPriceListItemsIndexRoute:
     AuthenticatedRxsoftPriceListItemsIndexRoute,
   AuthenticatedRxsoftPriceListsIndexRoute:
@@ -5198,6 +5351,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftReceivingIndexRoute,
   AuthenticatedRxsoftReportsIndexRoute: AuthenticatedRxsoftReportsIndexRoute,
   AuthenticatedRxsoftRolesIndexRoute: AuthenticatedRxsoftRolesIndexRoute,
+  AuthenticatedRxsoftSalesLinesIndexRoute:
+    AuthenticatedRxsoftSalesLinesIndexRoute,
   AuthenticatedRxsoftSalesIndexRoute: AuthenticatedRxsoftSalesIndexRoute,
   AuthenticatedRxsoftStockLocationsIndexRoute:
     AuthenticatedRxsoftStockLocationsIndexRoute,
@@ -5434,6 +5589,7 @@ const rootRouteChildren: RootRouteChildren = {
   DamorexIndexRoute: DamorexIndexRoute,
   QuestionnaireIndexRoute: QuestionnaireIndexRoute,
   DamorexOrdersIdRoute: DamorexOrdersIdRoute,
+  DamorexPayTokenRoute: DamorexPayTokenRoute,
   DamorexShopSlugRoute: DamorexShopSlugRoute,
   DamorexTrackOrderCodeRoute: DamorexTrackOrderCodeRoute,
   DamorexPurchasesIndexRoute: DamorexPurchasesIndexRoute,

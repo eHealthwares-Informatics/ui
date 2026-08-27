@@ -22,7 +22,7 @@ test.describe('sign-out', () => {
     await appLayout.openSignOut();
 
     await expect(appLayout.signOutDialog).toBeVisible();
-    await appLayout.signOutDialog.getByRole('button', { name: 'Cancel' }).click();
+    await appLayout.signOutDialog.getByTestId('confirm-dialog-cancel').click();
 
     await expect(appLayout.signOutDialog).toBeHidden();
     await expect(page).not.toHaveURL(/\/sign-in/);

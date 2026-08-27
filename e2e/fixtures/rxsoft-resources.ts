@@ -185,6 +185,35 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     hasExport: false,
   },
   {
+    id: 'warehouses',
+    title: 'Warehouses',
+    route: '/rxsoft/warehouses',
+    endpoint: '/warehouses',
+    nameLabel: 'Name',
+    uniquePrefix: 'E2E Warehouse',
+    createFields: [
+      { label: 'Code', value: t },
+      { label: 'Warehouse Name', value: t },
+    ],
+    canCreate: true,
+    canEdit: false, // opens an edit route page, not the modal
+    canDelete: false, // warehouse deletion depends on row FK state; not exercised here
+    hasExport: true,
+  },
+  {
+    id: 'audit-logs',
+    title: 'Audit Logs',
+    route: '/rxsoft/audit-logs',
+    endpoint: '/audit-logs',
+    nameLabel: 'ID',
+    uniquePrefix: 'E2E Audit',
+    createFields: [],
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    hasExport: false,
+  },
+  {
     id: 'payment-methods',
     title: 'Payment Methods',
     route: '/rxsoft/payment-methods',

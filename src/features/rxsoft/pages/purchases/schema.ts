@@ -64,6 +64,37 @@ const createFields: Field[] = [
   { name: 'note', label: 'Note' },
 ];
 
+export const purchaseLineEditConfig: ModelConfig = {
+  id: 'purchase-lines',
+  title: 'Purchase Line',
+  description: 'Adjust unit cost and received quantity before the purchase order is received.',
+  endpoint: '/purchases/:purchaseId/lines',
+  columns: [
+    { key: 'itemName', label: 'Item' },
+    { key: 'orderedQty', label: 'Ordered Qty' },
+    { key: 'receivedQty', label: 'Received Qty' },
+    { key: 'unitCost', label: 'Unit Cost Price' },
+  ],
+  createFields: [
+    { name: 'unitCost', label: 'Unit Cost Price', type: 'number', required: true, min: 0 },
+    { name: 'receivedQty', label: 'Received Qty', type: 'number', min: 0 },
+  ],
+  buildFormState: (row) => ({
+    unitCost: row.unitCost,
+    receivedQty: row.receivedQty,
+  }),
+  buildUpdatePayload: (values) => {
+    const payload: Record<string, unknown> = {};
+    if (values.unitCost !== undefined) {
+      payload.unitCost = Number(values.unitCost);
+    }
+    if (values.receivedQty !== undefined) {
+      payload.receivedQty = Number(values.receivedQty);
+    }
+    return payload;
+  },
+};
+
 const purchasesView: View<any> = {
   endpoint: '/purchases/:id',
   title: 'Purchase Order',
@@ -88,6 +119,9 @@ const purchasesView: View<any> = {
       title: 'Purchase Lines',
       renderLabel: (item) =>
         `${item.itemName} \u2014 ${item.receivedQty} ${item.uomName} @ $${Number(item.unitCost).toFixed(2)} = $${Number(item.lineTotal).toFixed(2)}`,
+      itemEditConfig: purchaseLineEditConfig,
+      itemEditEndpoint: (data) => `/purchases/${data.id}/lines`,
+      canEditItem: (data) => !['received', 'cancelled'].includes(data?.status),
     },
   ],
 };
@@ -136,4 +170,6 @@ export const purchasesConfig: ModelConfig = {
   view: purchasesView,
   detailPathBuilder: (row) => `/rxsoft/purchases/${String(row.id)}`,
   canDelete: true,
+  canExport: true,
+  csvEndpoint: '/purchases/export',
 };

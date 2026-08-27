@@ -794,6 +794,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mantine/charts@npm:9.1.1":
+  version: 9.1.1
+  resolution: "@mantine/charts@npm:9.1.1"
+  peerDependencies:
+    "@mantine/core": 9.1.1
+    "@mantine/hooks": 9.1.1
+    react: ^19.2.0
+    react-dom: ^19.2.0
+    recharts: ">=3.2.1"
+  checksum: 10c0/7b33d177459af865bade99fb7e1242726bcde09cd7b9bb0abb78a58d497154f611a6283588e5b54e03641fb9374654a792ebb5894bb395f40f8c18a83ce952ff
+  languageName: node
+  linkType: hard
+
 "@mantine/core@npm:9.1.1":
   version: 9.1.1
   resolution: "@mantine/core@npm:9.1.1"
@@ -4865,6 +4878,7 @@ __metadata:
     "@dnd-kit/sortable": "npm:^10.0.0"
     "@dnd-kit/utilities": "npm:^3.2.2"
     "@hookform/resolvers": "npm:^5.2.2"
+    "@mantine/charts": "npm:9.1.1"
     "@mantine/core": "npm:9.1.1"
     "@mantine/dates": "npm:9.1.1"
     "@mantine/form": "npm:9.1.1"

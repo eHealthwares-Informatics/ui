@@ -35,7 +35,8 @@ export function PoSummary({
   saving,
   submitting,
 }: Props) {
-  const totalAmount = lines.reduce((sum, l) => sum + l.lineTotal, 0);
+  const orderedTotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
+  const receivedTotal = lines.reduce((sum, l) => sum + (l.receivedLineTotal ?? 0), 0);
   const canReceive = lines.filter((l) => l.serverLineId && !l.isPosted && l.receivedQty > 0).length;
 
   const isReadOnly = status === 'received' || status === 'cancelled';
@@ -62,7 +63,8 @@ export function PoSummary({
           />
           <Text size="xs">Lines: {lines.length}</Text>
           <Text size="xs">Receivable: {canReceive}</Text>
-          <Title order={3}>Total: ₦{totalAmount.toFixed(2)}</Title>
+          <Title order={4}>Ordered Total: ₦{orderedTotal.toFixed(2)}</Title>
+          <Title order={4}>Received Total: ₦{receivedTotal.toFixed(2)}</Title>
         </Group>
         <Group>
           {canReceive > 0 && !isReadOnly && status && status !== 'draft' && (

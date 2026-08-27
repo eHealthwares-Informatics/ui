@@ -1,6 +1,5 @@
-import { Text } from '@mantine/core';
 import type { ModelConfig } from '../../../shared/model-schema';
-import { ColumnTypeFilters, type Column, type Field } from '../../types';
+import { ColumnDataType, ColumnTypeFilters, type Column, type Field } from '../../types';
 
 const columns: Column[] = [
   // { key: 'id', label: 'ID' },
@@ -16,7 +15,7 @@ const columns: Column[] = [
   },
   { key: 'totalAmount', label: 'Total' },
   { key: 'status', label: 'Status' },
-  { key: 'saleDate', label: 'Date', filters: ColumnTypeFilters.DATE },
+  { key: 'saleDate', label: 'Date', dataType: ColumnDataType.DATE, filters: ColumnTypeFilters.DATE },
 ];
 
 const createFields: Field[] = [
@@ -60,6 +59,8 @@ export const salesConfig: ModelConfig = {
   createFields,
   buildCreatePayload,
   metricsEndpoint: '/sales/metrics',
+  canExport: true,
+  csvEndpoint: '/sales/export',
   metricsConfig: {
     endpoint: '/sales/metrics',
     items: (data: any) => [
@@ -81,5 +82,4 @@ export const salesConfig: ModelConfig = {
       })),
     ],
   },
-  canDelete: true,
 };

@@ -1,4 +1,5 @@
 import { ActionIcon, Select, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { HelpCircle } from 'lucide-react';
@@ -23,6 +24,7 @@ import { HeaderBar } from '../table/HeaderBar';
 import { MetricsBar } from '../table/MetricsBar';
 import { Pagination } from '../table/pagination';
 import { DataTable } from '../table/table';
+import { triggerBlobDownload } from '../export/download';
 import { getArrayPayload } from '../utils';
 import { InfoDrawer } from './info-drawer';
 import { RxPage } from './rx-page';
@@ -354,6 +356,33 @@ export function DataPageShell(props: DataPageShellProps) {
     apiProvider,
   });
 
+  // Export strips pagination — backends force a large limit so every row that
+  // matches the current search/filters is downloaded (CSV and PDF alike).
+  const exportParams = useMemo(() => {
+    const rest = { ...queryParams };
+    delete rest.page;
+    delete rest.limit;
+    return rest;
+  }, [queryParams]);
+
+  const pdfEndpoint = csvEndpoint ? `${csvEndpoint}/pdf` : undefined;
+
+  const downloadPdf = async () => {
+    if (!pdfEndpoint) {
+      return;
+    }
+    try {
+      await triggerBlobDownload(
+        apiProvider!,
+        { method: 'GET', url: pdfEndpoint, params: exportParams },
+        `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`,
+      );
+      notifications.show({ message: `${title} export downloaded` });
+    } catch {
+      notifications.show({ color: 'red', message: `Failed to export ${title.toLowerCase()}` });
+    }
+  };
+
   function openModal(row: Record<string, unknown> | null = null) {
     setEditingRow(row);
     const initialState = buildFormState && row ? buildFormState(row) : row || defaultState || {};
@@ -426,7 +455,10 @@ export function DataPageShell(props: DataPageShellProps) {
             query.refetch();
           },
         })}
-        onExport={canExport && csvEndpoint ? () => exportMutation.mutate() : undefined}
+        onExportCsv={
+          canExport && csvEndpoint ? () => exportMutation.mutate(exportParams) : undefined
+        }
+        onExportPdf={canExport && pdfEndpoint ? () => void downloadPdf() : undefined}
         onDelete={canDelete || deletePathBuilder ? () => setIsDeleteOpen(true) : undefined}
         hasFilterableColumns={hasFilterableColumns}
         minSearchLength={minSearchLength}

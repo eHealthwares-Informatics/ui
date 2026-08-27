@@ -1,5 +1,5 @@
-import { ActionIcon, Button, Group, Text, TextInput } from '@mantine/core';
-import { Download, Filter, RefreshCcw, Search, Trash } from 'lucide-react';
+import { ActionIcon, Button, Group, Menu, Text, TextInput } from '@mantine/core';
+import { Download, FileText, Filter, RefreshCcw, Search, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Column, FilterValue } from '@/features/rxsoft/types';
 import { useDebouncedValue } from '../utils';
@@ -19,7 +19,8 @@ export const HeaderBar = ({
   search,
   onSearchChange,
   customActions,
-  onExport,
+  onExportCsv,
+  onExportPdf,
   onDelete,
   hasFilterableColumns,
   minSearchLength = 2,
@@ -38,7 +39,8 @@ export const HeaderBar = ({
   search: string;
   onSearchChange: (value: string) => void;
   customActions?: React.ReactNode;
-  onExport?: () => void;
+  onExportCsv?: () => void;
+  onExportPdf?: () => void;
   onDelete?: () => void;
   hasFilterableColumns?: boolean;
   minSearchLength?: number;
@@ -62,6 +64,7 @@ export const HeaderBar = ({
       <Group justify="space-between">
         <Group gap="xs">
           <TextInput
+            data-testid="header-search"
             leftSection={<Search size={14} />}
             placeholder="Search"
             value={searchValue}
@@ -73,17 +76,37 @@ export const HeaderBar = ({
             </Button>
           )}
           {onCreate && (
-            <Button variant="subtle" onClick={onCreate}>
+            <Button data-testid="header-new" variant="subtle" onClick={onCreate}>
               New
             </Button>
           )}
-          {onExport && (
-            <Button variant="subtle" leftSection={<Download size={14} />} onClick={onExport}>
-              Export
-            </Button>
+          {(onExportCsv || onExportPdf) && (
+            <Menu shadow="md" width={160} withinPortal>
+              <Menu.Target>
+                <Button data-testid="header-export" variant="subtle" leftSection={<Download size={14} />}>
+                  Export
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<Download size={14} />}
+                  disabled={!onExportCsv}
+                  onClick={onExportCsv}
+                >
+                  CSV
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<FileText size={14} />}
+                  disabled={!onExportPdf}
+                  onClick={onExportPdf}
+                >
+                  PDF
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           )}
           {onDelete && (
-            <Button variant="subtle" leftSection={<Trash size={14} />} onClick={onDelete}>
+            <Button data-testid="header-delete" variant="subtle" leftSection={<Trash size={14} />} onClick={onDelete}>
               Delete
             </Button>
           )}

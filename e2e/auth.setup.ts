@@ -2,7 +2,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test as setup, expect } from '@playwright/test';
 import { SignInPage } from './page-objects/sign-in.page';
-import { adminCredentials } from './fixtures/data';
 
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 /** Must match config `storageState: './.auth/admin.json'` (resolved from the config dir). */

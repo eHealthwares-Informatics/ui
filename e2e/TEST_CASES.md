@@ -1,5 +1,8 @@
 # Test Case Map (Use Case → Playwright Test)
 
+> **Scope note (current):** APM website/admin are **out of scope** — APM specs were removed.
+> Sections 2 & 3 below are historical and NOT executed.
+
 Each test case lists: **scenario · steps · expected · auth · data · API endpoints**.
 
 Conventions:
@@ -26,7 +29,7 @@ Conventions:
 
 ---
 
-## 2. APM Website — 15 tests (project `public`)
+## 2. APM Website — 15 tests (project `public`) — OUT OF SCOPE (historical)
 
 | TC | Scenario | Steps | Expected | Endpoints |
 |---|---|---|---|---|
@@ -38,7 +41,7 @@ Conventions:
 
 ---
 
-## 3. APM Admin — 24 tests (project `admin`)
+## 3. APM Admin — 24 tests (project `admin`) — OUT OF SCOPE (historical)
 
 Auth: token required; `/apm/admin` guard redirects to `/sign-in` without it.
 
@@ -192,11 +195,11 @@ POST `/sales`, GET `/sales`; GET/POST/PUT `/purchases[/{id}]`.
 
 ---
 
-## Totals
+## Totals (in-scope; APM removed)
 
 | Project | Test count |
 |---|---|
-| public | ~85 |
+| public | ~17 |
 | admin | ~84 |
 | admin-modules | ~125 (each gated by module access + backend health) |
-| **Total** | **~300** |
+| **Total** | **~226** |

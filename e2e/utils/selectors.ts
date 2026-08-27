@@ -5,7 +5,7 @@ import type { Locator, Page } from '@playwright/test';
  * `src/features/errors/not-found-error.tsx` and `general-error.tsx`.
  */
 export function notFoundH1(page: Page): Locator {
-  return page.getByRole('heading', { name: '404' });
+  return page.getByTestId('error-not-found-h1');
 }
 
 export function notFoundBody(page: Page): Locator {
@@ -14,15 +14,15 @@ export function notFoundBody(page: Page): Locator {
 
 export function notFoundButtons(page: Page): { goBack: Locator; backToHome: Locator } {
   return {
-    goBack: page.getByRole('button', { name: 'Go Back' }),
-    backToHome: page.getByRole('button', { name: 'Back to Home' }),
+    goBack: page.getByTestId('error-go-back'),
+    backToHome: page.getByTestId('error-back-to-home'),
   };
 }
 
 export function generalErrorH1(page: Page): Locator {
-  return page.getByRole('heading', { name: '500' });
+  return page.getByTestId('error-general-h1');
 }
 
 export function generalErrorBody(page: Page): Locator {
-  return page.getByText('Oops! Something went wrong');
+  return page.getByTestId('error-general-body');
 }

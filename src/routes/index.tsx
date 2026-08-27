@@ -11,7 +11,7 @@ export const Route = createFileRoute('/')({
 
     const hasRxsoft = userModules.some((m) => m.id === 'rxsoft');
     if (hasRxsoft) {
-      throw redirect({ to: '/rxsoft/items' });
+      throw redirect({ to: '/dashboard/sales' });
     }
 
     // Modules may still be loading (or /auth/me failed) — never render a blank

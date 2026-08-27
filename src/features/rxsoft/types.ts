@@ -12,7 +12,7 @@ import {
   CalendarClock,
   CalendarRange,
 } from 'lucide-react';
-import { ComponentType, SVGProps } from 'react';
+import { ComponentType, ReactNode, SVGProps } from 'react';
 import { ActionCellProps } from '../components/table/action-cell';
 
 export type SearchControlType = 'autocomplete' | 'select';
@@ -265,7 +265,7 @@ export type Field = {
   defaultValue?: unknown;
   value?: string | { formKey: string; paramKey: string }; // value to be passed back during submission
   options?: Option[];
-  toOptions?: (value: any) => Option[]
+  toOptions?: (value: any) => Option[];
   validate?: (value: unknown) => boolean | string;
   updateField?: (row: Record<string, unknown>, name: string, value: unknown) => void;
   extraParams?: (formState: Record<string, unknown>) => Record<string, unknown>;
@@ -385,6 +385,100 @@ export type DailySale = {
   totalAmount: number;
 };
 
+export type SalesAnalyticsSummary = {
+  totalRevenue: number;
+  totalSales: number;
+  averageOrderValue: number;
+  itemsSold: number;
+  refunds: number;
+};
+
+export type SalesAnalyticsTrendPoint = {
+  day: string;
+  revenue: number;
+  orders: number;
+};
+
+export type SalesAnalyticsCategory = {
+  code: string;
+  name: string;
+  revenue: number;
+  orders: number;
+  pct: number;
+};
+
+export type SalesAnalyticsLocation = {
+  stockLocationId: string;
+  name: string;
+  revenue: number;
+};
+
+export type SalesAnalytics = {
+  summary: SalesAnalyticsSummary;
+  trend: SalesAnalyticsTrendPoint[];
+  byCategory: SalesAnalyticsCategory[];
+  byLocation: SalesAnalyticsLocation[];
+};
+
+export type PurchasesAnalyticsSummary = {
+  totalValue: number;
+  totalPOs: number;
+  itemsPurchased: number;
+  averagePOValue: number;
+  activeSuppliers: number;
+  topSupplier: { supplierId: string; name: string; value: number } | null;
+};
+
+export type PurchasesAnalyticsTrendPoint = {
+  day: string;
+  value: number;
+  orders: number;
+};
+
+export type PurchasesAnalyticsCategory = {
+  code: string;
+  name: string;
+  value: number;
+  pct: number;
+};
+
+export type PurchasesAnalyticsSupplier = {
+  supplierId: string;
+  name: string;
+  value: number;
+};
+
+export type PurchasesAnalyticsLocation = {
+  warehouseId: string;
+  name: string;
+  value: number;
+  pct: number;
+};
+
+export type PurchasesAnalyticsStatus = {
+  status: string;
+  count: number;
+};
+
+export type PurchasesAnalyticsRecentPurchase = {
+  id: string;
+  purchaseOrderNumber: string;
+  orderDate: string;
+  status: string;
+  totalAmount: number;
+  supplierName: string | null;
+};
+
+export type PurchasesAnalytics = {
+  summary: PurchasesAnalyticsSummary;
+  trend: PurchasesAnalyticsTrendPoint[];
+  byCategory: PurchasesAnalyticsCategory[];
+  bySupplier: PurchasesAnalyticsSupplier[];
+  byLocation: PurchasesAnalyticsLocation[];
+  byStatus: PurchasesAnalyticsStatus[];
+  recent: PurchasesAnalyticsRecentPurchase[];
+};
+
 export type InventoryValuation = {
   itemsCount: number;
   totalQuantity: number;
@@ -397,7 +491,6 @@ export type TopProduct = {
 };
 
 // types/view.ts
-import { ReactNode } from 'react';
 export type ViewRelationField<T> = {
   key: keyof T & string;
   label: string;
@@ -441,6 +534,8 @@ export type ViewAccordion<T> = {
   renderLabel?: (item: any) => ReactNode;
   itemEditConfig?: any;
   itemFields?: string[];
+  itemEditEndpoint?: (data: any, item: any) => string;
+  canEditItem?: (data: any, item: any) => boolean;
 };
 
 export type View<T> = {
@@ -471,9 +566,21 @@ export const RELATION_FILTER = (searchParam: SearchConfig): ColumnFilter[] => [
   },
 ];
 
-export const SUPPLIER_FILTER = RELATION_FILTER({ endpoint: '/customers', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 2 });
+export const SUPPLIER_FILTER = RELATION_FILTER({
+  endpoint: '/customers',
+  queryParam: 'search',
+  valueKey: 'id',
+  labelKey: 'name',
+  minChars: 2,
+});
 
-export const WAREHOUSE_FILTER = RELATION_FILTER({ endpoint: '/stock-locations', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 0 });
+export const WAREHOUSE_FILTER = RELATION_FILTER({
+  endpoint: '/stock-locations',
+  queryParam: 'search',
+  valueKey: 'id',
+  labelKey: 'name',
+  minChars: 0,
+});
 
 export const EQUALS_WITH_OPTIONS = (options: Option[]) => [
   {

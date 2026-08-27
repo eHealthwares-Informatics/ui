@@ -7,9 +7,10 @@ import { adminCredentials } from '../fixtures/data';
  * Page object for the RxSignIn form rendered at /sign-in.
  *
  * Selectors are drawn from `src/features/rxsoft/pages/sign-in/index.tsx`:
- *  - Username TextInput: label "Username", placeholder "admin"
- *  - Password PasswordInput: placeholder "********" (no label prop is wired to it)
- *  - Submit Button: "Sign in", type="submit"
+ *  - Username TextInput: placeholder "Enter your username" (label is a bare <Text>,
+ *    not wired to the input, so `getByLabel` does not match)
+ *  - Password PasswordInput: placeholder "Enter your password"
+ *  - Submit Button: "Sign In", type="submit"
  *  - Auth-store error is rendered as c="red" text (e.g. "Invalid credentials")
  */
 export class SignInPage {
@@ -19,15 +20,15 @@ export class SignInPage {
   }
 
   get usernameInput(): Locator {
-    return this.page.getByLabel('Username');
+    return this.page.getByTestId('sign-in-username');
   }
 
   get passwordInput(): Locator {
-    return this.page.getByPlaceholder('********');
+    return this.page.getByTestId('sign-in-password');
   }
 
   get submitButton(): Locator {
-    return this.page.getByRole('button', { name: 'Sign in' });
+    return this.page.getByTestId('sign-in-submit');
   }
 
   async goto(redirectTo?: string): Promise<void> {
@@ -57,14 +58,17 @@ export class SignInPage {
     await this.submit();
   }
 
-  /** Fills the form with the default seeded admin credentials and submits. */
+  /** Fills the form with the active suite credentials (fresh org owner, else DEFAULT admin) and submits. */
   async signInAsAdmin(): Promise<void> {
-    await this.signIn(adminCredentials.username, adminCredentials.password);
+    const creds = adminCredentials();
+    await this.signIn(creds.username, creds.password);
   }
 
   /** Asserts the auth-store error text is visible (e.g. "Invalid credentials"). */
   async expectError(message: string): Promise<void> {
-    await expect(this.page.getByText(message)).toBeVisible();
+    const errorLocator = this.page.getByTestId('sign-in-error');
+    await expect(errorLocator).toBeVisible();
+    await expect(errorLocator).toContainText(message);
   }
 
   /**

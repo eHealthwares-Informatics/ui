@@ -1,160 +1,85 @@
-# Playwright E2E Test Plan — RxSoft Frontend
+# Playwright E2E Test Plan — RxSoft Frontend (current)
 
 ## 1. Goal & Scope
 
-Comprehensive browser E2E suite for the `frontend/` app (Vite dev server, port 5173), covering all feature pages.
+Comprehensive browser E2E suite for the `frontend/` app (Vite dev server, port 5173).
 
-- **212 route files** across 13 modules: Auth, Errors, Root, APM website, APM admin, RxSoft,
-  EMR, LIS, Conversation, Coding-Concept, Communication, Damorex, Clerk, Questionnaire.
-- **Strategy:** shared parameterized CRUD specs for config-driven pages
-  (`DataPageShell` / `ModelConfig` / `LisResourceConfig` / conversation schemas), bespoke specs
-  for custom pages, a single admin storageState for authenticated runs, and `skip-if` guards so
-  suites for unprovisioned backends or inaccessible modules skip rather than fail.
-- **Target environment:** the already-running dev stack (Vite `:5173`, NestJS `:8080`, Identity
-  `:8092`, Mongo `:27017` with seeded APM data, Postgres `:5432`).
+- **APM is OUT of scope** (user-confirmed). Existing APM docs/specs were removed from the suite.
+- Priority: **RxSoft core → Damorex POS + purchases → remaining modules** (LIS, Conversation,
+  Communication, Coding-Concept — write suites + start their backends).
+- **Data strategy (user-confirmed):** live dev DB, but isolated per run — `global-setup.ts` provisions a **fresh organisation** via the seed service (`POST /api/provision`, code `E2E-<date>-<run>`); every suite signs in as that org's owner and `global-teardown.ts` deprovisions it. Mutating suites use unique tokens and run serially within a resource. When the seed service is down (local dev, mocked-only projects), the suite falls back to the DEFAULT org `admin`/`password`. Unavailable backends/modules are `skip`-gated, never hard-failed.
 
-## 2. Environment & Running Services
+## 2. Environment
 
-| Service | URL | Notes |
+| Service | Port | Running? | Used by |
+|---|---|---|---|
+| Frontend (Vite) | 5173 | yes | webServer (reused) |
+| rxsoft + APM backend | 8080/api | yes | RxSoft, Damorex, website |
+| identity | 8092 | yes | login/auth |
+| conversation | 8090 | no | module suite (skips until started) |
+| LIS | 8091 | no | module suite (skips until started) |
+| EMR | 8093 | no (EMR suite is fully mocked) | emr project |
+| coding-concept (concepts) | 3011 | no | module suite |
+| communication | 8003 | no | module suite |
+
+## 3. Infra (in place)
+
+- `e2e/playwright.config.ts`: projects `setup` (auth), `public`, `admin` (storageState), `emr-setup`+`emr` (mocked). `globalSetup` provisions a fresh org; `globalTeardown` deprovisions it. `webServer` reuses Vite. `workers: 4` (a single-file suite is capped at 1 worker by Playwright). `timeout: 60s` (live identity login is slow).
+- `global-setup.ts`: probes `:8080/api/health` + seed health, provisions `E2E-<…>` org (seed `POST /api/provision`) when both are up, writes `e2e/.runtime/backend-health.json`; the fresh-org result lives in `e2e/.runtime/org-state.json` (gitignored).
+- `global-teardown.ts`: `DELETE /api/provision/<code>` for the provisioned org (idempotent).
+- `auth.setup.ts`: UI login as the fresh org owner (`utils/provision.ts::activeAdminCredentials`), writes `.auth/admin.json`.
+- Provisioning fixture/template: `e2e/fixtures/org-template.json`; client: `e2e/utils/provision.ts`.
+- **Session priming** (`e2e/utils/session-refresh.ts`): the identity access token expires in ~8–15 min.
+  A worker-level fixture logs in once and injects the session via `addInitScript` into every test's
+  page before the app boots, so suites never expire mid-run.
+- Page-objects: `sign-in`, `app-layout` (NavUser sign-out), `crud-shell` (text/select fields).
+- Generic CRUD runner: `crud-suite/run-crud.spec.ts` over `fixtures/rxsoft-resources.ts`
+  (list, pagination, create, search-created, edit, delete, CSV export, API cleanup).
+- Skipping: `utils/skip-if.ts` (`skipIfBackendDown`, `skipIfModuleMissing`, `readBackendHealth`).
+
+## 4. Current coverage matrix (verified green)
+
+| Area | Specs | Status |
 |---|---|---|
-| Frontend | http://localhost:5173 | Vite dev server (`yarn dev --host`), reused by Playwright webServer |
-| Backend (rxsoft + APM) | http://192.168.1.49:8080/api | NestJS, `app.enableCors()`, global `/api` prefix |
-| Identity | http://192.168.1.49:8092 | login provider, `app.enableCors()` |
-| Conversation | http://localhost:8090/api | optional — module suite |
-| EMR | http://localhost:8093/api | optional — module suite |
-| Communication | http://localhost:8003/api/v1 | optional — module suite |
-| Coding-Concept | http://localhost:8004/api/v1 | optional — module suite |
-| LIS | http://localhost:8002 | optional — module suite |
-| MongoDB (APM seed) | localhost:27017 | 33 LGAs, 363 wards, 165 PUs, 30 stakeholders, 20 agents |
-| PostgreSQL | localhost:5432 | rxsoft + identity schemas |
+| Auth/errors/root (public) | sign-in, sign-out, 404, 500, root redirect | ✅ 10 passing |
+| RxSoft bespoke | dashboard, sales, reports, inventory, settings | ✅ 8 passing |
+| Damorex POS | product→saleUOM-preselect→cart→pay→complete; hold | ✅ 2 passing |
+| Damorex purchases | PO builder render + supplier validation | ✅ 2 passing |
+| RxSoft CRUD generic | list + pagination per resource; create/edit/delete/export with skip guards | ✅ runner validated (full sweep pending) |
+| EMR (mocked) | patients, appointments, encounters, forms, requests, staff | suite exists (mocked) |
+| APM | removed per scope | — |
 
-- LAN IP for phone testing: `192.168.1.49`. The frontend `.env.local` points the API URLs at the
-  LAN IP, which is also reachable from the mac via `localhost`. Tests use `http://localhost:5173`.
-- Login: `admin` / `password`.
+## 5. Phases
 
-## 3. Infra Plan
+1. **Phase 0 — baseline/done:** auth + session fix, APM removed, public & admin shell specs green.
+2. **Phase 1 — RxSoft CRUD registry:** expand `rxsoft-resources.ts` to remaining simple resources
+   (uom-category, price-list-items, stock-locations, journal-entries, audit-logs, users read paths);
+   extend `crud-shell` for number/switch/async fields; sweep the runner.
+3. **Phase 2 — catalog:** items wizard (price/stock tabs, saleUom), categories (async parent),
+   price-lists/items, uoms/uom-category, settings.
+4. **Phase 3 — operations:** roles permissions, purchases→receiving→unpost, inventory
+   adjust/transfer.
+5. **Phase 4 — commerce:** sales complete-sale, website-orders, receivables, reports+CSV, dashboard;
+   Damorex storefront + purchases line flows.
+6. **Phase 5 — modules:** start backends (8090/8091/8003/3011), grant `admin` modules in identity,
+   write/run LIS order workflow, Conversation chats, Communication tools, Coding-Concept search.
+7. **Phase 6 — hardening:** full matrix, retries, trace review, flake log in `progress.md`.
 
-### Dependencies (execution phase, NOT now)
+## 6. Running
 
-- Add `@playwright/test` as a devDependency: `yarn add -D @playwright/test`.
-- Install the Chromium browser: `npx playwright install chromium`.
-
-### `playwright.config.ts` (proposed)
-
-- `testDir: './e2e/tests'`
-- `globalSetup: './e2e/global-setup.ts'` — health-check the required backends and write
-  `e2e/.runtime/backend-health.json` so specs can call `skipIfBackendDown('lis')` etc.
-- `projects`:
-  - `setup` → runs `auth.setup.ts`, logs in as admin via the UI, writes `e2e/.auth/admin.json`.
-  - `public` — no storageState → auth, errors, root, APM website, Damorex, Clerk, Questionnaire.
-  - `admin` — storageState `.auth/admin.json` → `/apm/admin/*` + `/rxsoft/*`.
-  - `admin-modules` — same state → EMR, LIS, Conversation, Coding-Concept, Communication
-    (each suite self-gates via module-access + backend-health skips).
-- `webServer: { command: 'yarn dev --host', port: 5173, reuseExistingServer: true }`
-- `use: { baseURL: 'http://localhost:5173', headless: true, viewport: { width: 1280, height: 800 },
-  screenshot: 'only-on-failure', trace: 'retain-on-failure', video: 'retain-on-failure',
-  actionTimeout: 15_000, navigationTimeout: 30_000 }`
-- `reporter: [['list'], ['html', { outputFolder: 'e2e/reports' }]]`
-- `workers: 4`. CRUD specs that mutate the shared DB declare
-  `test.describe.configure({ mode: 'serial' })` and clean up created rows via API in `afterAll`.
-- `timeout: 30_000` per test; `expect: { timeout: 10_000 }`.
-
-### Auth strategy
-
-- `auth.setup.ts`: goto `/sign-in`, fill `admin`/`password`, submit, wait until the app shell
-  renders (redirect off `/sign-in`), then
-  `page.context().storageState({ path: 'e2e/.auth/admin.json' })`.
-- The saved storageState captures both the raw tokens
-  (`rxsoft_admin_access_token`, `rxsoft_admin_refresh_token`) and the zustand-persisted store
-  (`rxsoft-admin-auth`) on the `:5173` origin. That satisfies both auth guards:
-  - `/apm/admin` layout guard → `getAccessToken()` from localStorage;
-  - `_authenticated` layout guard → `useAuthStore.getState().bootstrap()` from the zustand store.
-- **Module-access caveat (Risk R1):** `/auth/me` for `admin` currently returns `modules: []`.
-  The `_authenticated/$moduleId` guard validates `moduleId` against the module list, so LIS/EMR/
-  Conversation/Coding-Concept/Communication routes redirect to `/` for this user. Each module
-  suite therefore calls `expectModule('lis')` (reads `/auth/me`) and `test.skip`s when the module
-  is absent. Optionally the identity seed can assign modules to `admin` to unlock those suites.
-
-### File structure (execution phase)
-
+```bash
+cd frontend
+yarn test:e2e --project=public          # auth/errors/root (no auth needed)
+yarn test:e2e --project=admin tests/damorex
+yarn test:e2e --project=admin crud-suite
+yarn test:e2e --project=emr             # mocked EMR
 ```
-frontend/e2e/
-├── PLAYWRIGHT_PLAN.md            (this file)
-├── USE_CASES.md
-├── TEST_CASES.md
-├── README.md
-├── playwright.config.ts
-├── global-setup.ts
-├── auth.setup.ts
-├── .auth/admin.json              (generated by setup project)
-├── .runtime/backend-health.json  (generated)
-├── fixtures/
-│   ├── test.ts                   (extends base test; app helpers, module-access skip)
-│   └── data.ts                   (seeded fixtures: LGA names, module roots, endpoints)
-├── page-objects/
-│   ├── sign-in.page.ts
-│   ├── app-layout.page.ts        (sidebar, module nav, profile menu)
-│   ├── crud-shell.page.ts        (DataPageShell: table, search, pagination, create/edit/delete modal, export)
-│   ├── apm-admin.page.ts         (AdminLayout nav)
-│   └── <bespoke per custom page> (pos.page.ts, order-workflow.page.ts, …)
-├── utils/
-│   ├── api.ts                    (direct API calls for setup/teardown, token helpers)
-│   ├── skip-if.ts                (module access, backend health)
-│   └── selectors.ts
-└── tests/
-    ├── auth/ errors/ apm/website/ apm/admin/ rxsoft/ emr/ lis/ conversation/
-    ├── coding-concept/ communication/ damorex/ clerk/ questionnaire/
-    └── crud-suite/run-crud.spec.ts (parameterized generic CRUD runner)
-```
+Requires: Vite (auto-started), rxsoft `:8080`, identity `:8092`, Postgres seeded, Mongo seeded (POS items, payment methods).
 
-### Generic CRUD suite (parameterization)
+## 7. Risks
 
-`crud-suite/run-crud.spec.ts` reads a registry of resource configs (endpoint, title column,
-required create fields — sourced from `modelRegistry`, `LisResourceConfig`, and the conversation
-schemas) and, for each resource, runs a shared suite:
-
-1. list renders rows and correct column headers;
-2. search filters the table;
-3. pagination controls appear (when `PaginatedResponse`);
-4. create via modal → new row appears (unique name);
-5. edit a row → updated value visible;
-6. delete/archive flow (when the config allows);
-7. CSV export triggers a download (when `csvEndpoint` is set).
-
-Bespoke pages get their own small specs on top of this.
-
-## 4. CI Notes
-
-- `.github/workflows/e2e.yml`:
-  - services: Mongo + Postgres via docker compose;
-  - start rxsoft, identity, and any provisioned backends;
-  - seed DBs (`yarn seed` / `npm run seed`);
-  - `npx playwright install --with-deps chromium`;
-  - `npx playwright test`, upload `e2e/reports`, traces, and videos as artifacts.
-- Optional project matrix for parallelism; `--project` split across runners.
-
-## 5. Phased Rollout
-
-1. **Phase 1 — Auth + APM website:** infra + `auth.setup.ts` + auth/errors/root specs + public
-   `/apm/*` page smoke tests. Validates the toolchain and the sign-in flow end-to-end.
-2. **Phase 2 — APM admin (with auth):** `/apm/admin/*` suites using the admin storageState,
-   starting with `lgas` (the phone/LAN bug target) then the remaining admin pages.
-3. **Phase 3 — RxSoft:** generic CRUD suite across all RxSoft resources + bespoke specs
-   (dashboard, sales, receiving, inventory, reports, role permissions, settings, POS-adjacent).
-4. **Phase 4 — Remaining modules:** EMR, LIS (incl. orders workflow + report builder),
-   Conversation (incl. chats + public questionnaire), Coding-Concept, Communication, Damorex
-   (incl. POS + PO), Clerk — each gated by module access + backend health.
-5. **Phase 5 — CI wiring + hardening:** GitHub Actions, retries, trace review, data cleanup.
-
-## 6. Risks & Constraints
-
-- **R1 Module access** — `admin` may lack LIS/EMR/etc. modules (`/auth/me` returns `[]`).
-  Mitigation: `skipIfModuleMissing` + optional identity seed to grant modules.
-- **R2 Shared mutable DB** — CRUD tests create/delete real records; use unique names and API
-  cleanup in `afterAll`; run serial within a spec file.
-- **R3 Unprovisioned backends** — `skipIfBackendDown`, never hard-fail.
-- **R4 Env/IP** — `.env.local` uses the LAN IP; works on the mac. CI should pass `VITE_*` overrides
-  appropriate to the runner.
-- **R5 React Query caching** — `staleTime`/preload can show cached skeletons; wait for the real
-  API response (row count / network idle) rather than assuming data from a previous visit.
-- **R6 Playwright not installed** — install step belongs to the execution phase.
+- R1 short-lived access tokens → mitigated by worker session priming.
+- R2 single-file CRUD runner → 1 worker; split per-resource files to parallelize if it matters.
+- R3 unprovisioned module backends → skip-gated.
+- R4 live-DB mutations → unique tokens + API cleanup + serial.
+- R5 Vite cold-compile per fresh context → ~20s/test floor; avoid per-test asserts that wait on stale skeletons (wait on real API rows).

@@ -20,7 +20,7 @@ export function NavUser({ user }: NavUserProps) {
     <>
       <Menu opened={opened} onChange={setOpened} position="right-end" offset={4} width={220}>
         <Menu.Target>
-          <UnstyledButton style={{ width: '100%' }}>
+          <UnstyledButton data-testid="nav-user-trigger" style={{ width: '100%' }}>
             <Group gap="sm">
               <Avatar src={user.avatar} radius="md" size="sm" />
 
@@ -75,6 +75,7 @@ export function NavUser({ user }: NavUserProps) {
           <Menu.Divider />
 
           <Menu.Item
+            data-testid="sign-out-menu-item"
             color="red"
             leftSection={<LogOut size={14} />}
             onClick={() => setSignOutOpen(true)}

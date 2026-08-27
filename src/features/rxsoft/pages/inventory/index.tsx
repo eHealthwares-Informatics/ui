@@ -2,7 +2,7 @@ import { Card, Text, Stack, Grid, Button, TextInput, Group, Table, Modal, Select
 import { DatePickerInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Download, Eye, Scale, Search } from 'lucide-react';
 import { rxsoftApi, downloadBlob } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
@@ -10,6 +10,7 @@ import { RxPage } from '../../../components/page/rx-page';
 import { UserPopover } from '../../../components/popover/user-popover';
 import { StockMatrix } from './components/stock-matrix';
 import { stockBalancesConfig } from './schema';
+import { uomToBaseQuantity, type UomFactorInfo } from './utils';
 
 function TransferModal({
   opened,
@@ -23,6 +24,7 @@ function TransferModal({
   const qc = useQueryClient();
   const [toLocationId, setToLocationId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
+  const [uomId, setUomId] = useState<string | null>(null);
 
   const { data: locations = [] } = useQuery({
     queryKey: ['stock-locations', 'all'],
@@ -32,6 +34,45 @@ function TransferModal({
     },
   });
 
+  const { data: itemDetail } = useQuery({
+    queryKey: ['item', balance?.itemId],
+    enabled: opened && !!balance?.itemId,
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get(`/items/${String(balance.itemId)}`);
+      return (Array.isArray((data as any)?.data) ? undefined : (data as any)?.data) ?? data;
+    },
+  });
+
+  // Base, Purchase and Sale UOMs of the item (person-deduplicated), defaulting
+  // the transfer UOM to the base UOM on each open.
+  const uomOptions = useMemo(() => {
+    const list: Array<UomFactorInfo & { id: string }> = [
+      itemDetail?.baseUom,
+      itemDetail?.purchaseUom,
+      itemDetail?.saleUom,
+    ].filter((u) => u && u.id);
+    const byId = new Map<string, UomFactorInfo & { id: string }>();
+    for (const u of list) {
+      byId.set(u.id, u);
+    }
+    return Array.from(byId.values());
+  }, [itemDetail]);
+
+  useEffect(() => {
+    if (balance?.itemId) {
+      setToLocationId(null);
+      setQuantity(0);
+      setUomId(itemDetail?.baseUom?.id ?? null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [balance?.itemId, itemDetail?.baseUom?.id]);
+
+  const selectedUom = uomOptions.find((u) => u.id === uomId) ?? itemDetail?.baseUom ?? null;
+  const baseUom = itemDetail?.baseUom ?? null;
+
+  const availableBase = Number(balance?.quantityOnHand ?? 0) - Number(balance?.quantityReserved ?? 0);
+  const baseQuantity = uomToBaseQuantity(quantity, selectedUom, baseUom);
+
   const transferMutation = useMutation({
     mutationFn: async () => {
       await rxsoftApi.post('/inventory/transfers', {
@@ -39,6 +80,7 @@ function TransferModal({
         toLocationId,
         itemId: balance?.itemId,
         quantity,
+        uomId: selectedUom?.id ?? baseUom?.id ?? undefined,
         reason: 'manual_transfer',
       });
     },
@@ -63,7 +105,8 @@ function TransferModal({
           Item: <Badge>{balance?.item?.name as string ?? balance?.itemId as string}</Badge>
         </Text>
         <Text size="sm">
-          Available: <Badge color="blue">{Number(balance?.quantityOnHand ?? 0) - Number(balance?.quantityReserved ?? 0)}</Badge>
+          Available: <Badge color="blue">{availableBase}</Badge>
+          {baseUom?.name && <span> {baseUom.name}</span>}
         </Text>
 
         <Select
@@ -77,12 +120,23 @@ function TransferModal({
           required
         />
 
+        <Select
+          label="UOM"
+          value={selectedUom?.id ?? null}
+          onChange={(v) => setUomId(v)}
+          data={uomOptions.map((u) => ({
+            value: u.id,
+            label: u.name ?? u.code ?? u.id,
+          }))}
+          required
+        />
+
         <NumberInput
           label="Quantity"
           value={quantity}
           onChange={(v) => setQuantity(Number(v) || 0)}
           min={0.001}
-          max={Number(balance?.quantityOnHand ?? 0)}
+          description={selectedUom?.name ? `Equals ${baseQuantity} ${baseUom?.name ?? 'base units'}` : undefined}
           required
         />
 
@@ -91,7 +145,7 @@ function TransferModal({
           <Button
             onClick={() => transferMutation.mutate()}
             loading={transferMutation.isPending}
-            disabled={!toLocationId || quantity <= 0}
+            disabled={!toLocationId || quantity <= 0 || baseQuantity > availableBase}
           >
             Transfer
           </Button>
@@ -430,6 +484,7 @@ export function RxInventoryPage() {
                     { value: 'out', label: 'Out' },
                     { value: 'transfer', label: 'Transfer' },
                     { value: 'adjustment', label: 'Adjustment' },
+                    { value: 'base-conversion', label: 'Base Conversion' },
                   ]}
                   clearable
                 />
@@ -484,7 +539,17 @@ export function RxInventoryPage() {
                           <Table.Td>{locationLabel}</Table.Td>
                           <Table.Td>
                             <Badge
-                              color={m.movementType === 'in' ? 'green' : m.movementType === 'out' ? 'red' : m.movementType === 'transfer' ? 'blue' : 'yellow'}
+                              color={
+                                m.movementType === 'in'
+                                  ? 'green'
+                                  : m.movementType === 'out'
+                                    ? 'red'
+                                    : m.movementType === 'transfer'
+                                      ? 'blue'
+                                      : m.movementType === 'base-conversion'
+                                        ? 'violet'
+                                        : 'yellow'
+                              }
                               variant="light"
                             >
                               {m.movementType}

@@ -1,5 +1,8 @@
 # Use Cases by Module
 
+> **Scope note (current):** APM website/admin are **out of scope** — their specs were removed.
+> Sections 2 & 3 below are retained only as historical reference and are NOT tested.
+
 Template per use case:
 `UC-<MOD>-<NN> — <page/route> — <user story (who/what/why)> | auth: public|admin | endpoints`
 
@@ -27,7 +30,7 @@ Endpoints: `POST {identity}/auth/login`, `GET {identity}/auth/me`, `POST {identi
 
 ---
 
-## 2. APM — Public Website (12 pages, 12 use cases)
+## 2. APM — Public Website (12 pages, 12 use cases) — OUT OF SCOPE (historical)
 
 | ID | Route | Use case | Auth |
 |---|---|---|---|
@@ -50,7 +53,7 @@ contact/join/volunteer/event-registration.
 
 ---
 
-## 3. APM — Admin (17 pages, 18 use cases)
+## 3. APM — Admin (17 pages, 18 use cases) — OUT OF SCOPE (historical)
 
 All under `/apm/admin` layout, whose `beforeLoad` requires `getAccessToken()` → redirect to
 `/sign-in` otherwise. **Auth: admin.**
@@ -203,7 +206,7 @@ GET/POST/PUT `/purchases[/{id}]`.
 
 ## Summary
 
-- **Pages covered:** 212 route files.
-- **Use cases:** ~255.
-- Modules: Auth/Errors/Root, APM website (12), APM admin (17), RxSoft (44), EMR (7), LIS (38),
-  Conversation (17), Coding-Concept (13), Communication (13), Damorex (34), Clerk, Questionnaire.
+- **In-scope modules:** Auth/Errors/Root, RxSoft, Damorex, LIS, Conversation, Coding-Concept,
+  Communication, EMR, Clerk, Questionnaire. **APM website/admin are out of scope.**
+- **Pages covered (in-scope):** ~180 route files.
+- **Use cases (in-scope):** ~218 (APM's 30 removed).

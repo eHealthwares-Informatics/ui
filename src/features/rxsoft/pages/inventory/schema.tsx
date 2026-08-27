@@ -79,6 +79,8 @@ export const stockBalancesConfig: ModelConfig = {
   description: 'Inventory stock balances with pagination and filters.',
   endpoint: '/inventory/stock-balances',
   columns: stockBalancesColumns,
+  canExport: true,
+  csvEndpoint: '/inventory/stock-balances/export',
 };
 
 export const stockMovementsConfig: ModelConfig = {

@@ -76,6 +76,7 @@ export function TeamSwitcher() {
     <Menu width={220} position="right-start" offset={6}>
       <Menu.Target>
         <UnstyledButton
+          data-testid="team-switcher-trigger"
           style={{
             width: '100%',
             padding: '10px',

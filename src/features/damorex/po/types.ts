@@ -14,6 +14,8 @@ export interface PoLineItem {
   taxPercent: number;
   lineSubtotal: number;
   lineTotal: number;
+  receivedSubtotal?: number;
+  receivedLineTotal?: number;
   isDraft?: boolean;
   isPosted?: boolean;
   serverLineId?: string;

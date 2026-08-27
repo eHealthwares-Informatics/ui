@@ -48,7 +48,7 @@ export function RxPage({
       {/* PAGE HEADER */}
       <Group justify="space-between" align="flex-end">
         <Stack gap={4}>
-          <Title order={2}>{title}</Title>
+          <Title order={2} data-testid="page-title">{title}</Title>
 
           {description && (
             <Text size="sm" c="dimmed" maw={700}>

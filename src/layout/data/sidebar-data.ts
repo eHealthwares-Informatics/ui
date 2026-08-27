@@ -48,6 +48,8 @@ import {
   FilePlus2,
   ClipboardList,
   Globe,
+  Wallet,
+  Smartphone,
 } from 'lucide-react';
 import type { ModuleId } from '@/features/shared/module-data';
 import { NavItem, type SidebarData } from '../types';
@@ -116,8 +118,14 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/',
+          url: '/dashboard/sales',
           icon: LayoutDashboard,
+          modules: ['rxsoft', 'admin'],
+        },
+        {
+          title: 'Purchases',
+          url: '/dashboard/purchases',
+          icon: ShoppingCart,
           modules: ['rxsoft', 'admin'],
         },
         {
@@ -217,6 +225,12 @@ export const sidebarData: SidebarData = {
           modules: ['rxsoft', 'admin'],
         },
         {
+          title: 'Sales Lines',
+          url: '/rxsoft/sales-lines',
+          icon: ShoppingCart,
+          modules: ['rxsoft', 'admin'],
+        },
+        {
           title: 'Receivables',
           url: '/rxsoft/receivables',
           icon: HandCoins,
@@ -232,6 +246,24 @@ export const sidebarData: SidebarData = {
           title: 'Payment Methods',
           url: '/rxsoft/payment-methods',
           icon: CreditCard,
+          modules: ['rxsoft', 'admin'],
+        },
+        {
+          title: 'Payment Providers',
+          url: '/rxsoft/payment-providers',
+          icon: Wallet,
+          modules: ['rxsoft', 'admin'],
+        },
+        {
+          title: 'POS Terminals',
+          url: '/rxsoft/pos-terminals',
+          icon: Smartphone,
+          modules: ['rxsoft', 'admin'],
+        },
+        {
+          title: 'Insurance Providers',
+          url: '/rxsoft/insurance-providers',
+          icon: ShieldCheck,
           modules: ['rxsoft', 'admin'],
         },
         {
@@ -870,6 +902,12 @@ export const sidebarData: SidebarData = {
         },
         { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr', 'admin'] },
         { title: 'Staff', url: '/emr/staff', icon: UserCog, modules: ['emr', 'admin'] },
+        {
+          title: 'Departments',
+          url: '/emr/departments',
+          icon: Building2,
+          modules: ['emr', 'admin'],
+        },
         { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr', 'admin'] },
         {
           title: 'Encounters',

@@ -29,20 +29,20 @@ for (const resource of rxsoftResources) {
     let crud: CrudShellPage;
 
     test.beforeEach(async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       crud = new CrudShellPage(page);
       await crud.goto(resource.route);
     });
 
     test('renders the list page', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
-      await expect(page.getByRole('heading', { name: resource.title }).first()).toBeVisible();
+      skipIfBackendDown(testInfo);
+      await expect(page.getByTestId('page-title')).toHaveText(resource.title);
       await expect(crud.searchInput).toBeVisible();
       await expect(crud.recordsTotal).toBeVisible();
     });
 
     test('pagination and page-size controls render', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       const countText = await crud.recordsTotal.textContent();
       const count = Number.parseInt(countText ?? '0', 10);
       if (count > 0) {
@@ -51,7 +51,7 @@ for (const resource of rxsoftResources) {
     });
 
     test('creates a record through the modal', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       test.skip(!resource.canCreate, 'resource does not expose a simple create modal');
       accessToken = await readAccessToken(page);
       await crud.create(resource, createdToken);
@@ -59,14 +59,14 @@ for (const resource of rxsoftResources) {
     });
 
     test('search narrows the list to the created record', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       test.skip(!resource.canCreate, 'resource has no create step to search for');
       await crud.search(createdToken);
       await expect(crud.getRow(createdToken)).toBeVisible();
     });
 
     test('edits the created record through the modal', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
       await crud.search(createdToken);
       await expect(crud.rowAction(createdToken, 'lucide-pencil')).toBeVisible();
@@ -80,7 +80,7 @@ for (const resource of rxsoftResources) {
     });
 
     test('deletes the created record via the row action', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       test.skip(!(resource.canCreate && resource.canDelete), 'record not created by this suite');
       const searchKey = updatedToken ?? createdToken;
       await crud.search(searchKey);
@@ -91,7 +91,7 @@ for (const resource of rxsoftResources) {
     });
 
     test('exposes CSV export', async ({ page }, testInfo) => {
-      skipIfBackendDown(testInfo, 'rxsoft');
+      skipIfBackendDown(testInfo);
       test.skip(!resource.hasExport, 'resource has no csv endpoint');
       await expect(crud.exportButton).toBeVisible();
       await crud.exportButton.click();

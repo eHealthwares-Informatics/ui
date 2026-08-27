@@ -4,17 +4,17 @@ test.describe('RxSoft dashboard', () => {
   test('/rxsoft redirects to the module root', async ({ page }) => {
     await page.goto('/rxsoft');
 
-    await expect(page).toHaveURL(/\/rxsoft\/items/);
-    await expect(page.getByRole('heading', { name: 'Items', level: 2 })).toBeVisible();
+    await expect(page).toHaveURL(/\/dashboard\/sales/);
+    await expect(page.getByTestId('page-title')).toHaveText('Sales Analytics');
   });
 
   test('dashboard renders KPI cards from the reports endpoints', async ({ page }) => {
-    await page.goto('/rxsoft/dashboard');
+    await page.goto('/dashboard/sales');
 
-    await expect(page.getByRole('heading', { name: 'Dashboard', level: 2 })).toBeVisible();
+    await expect(page.getByTestId('page-title')).toHaveText('Sales Analytics');
 
     // KPIs render once the three reports requests resolve; tolerate the
     // error state so a down reports API does not hard-fail the spec.
-    await expect(page.locator('body')).toContainText(/Inventory Items|Failed to load dashboard reports\./);
+    await expect(page.locator('body')).toContainText(/Overview of sales performance|Failed to load dashboard reports\./);
   });
 });

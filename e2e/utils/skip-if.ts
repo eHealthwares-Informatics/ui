@@ -8,11 +8,21 @@ const HEALTH_FILE = join(__dirname, '..', '.runtime', 'backend-health.json');
 
 interface BackendHealth {
   backendUp: boolean;
-  apmUp: boolean;
+  conversationUp: boolean;
+  lisUp: boolean;
+  communicationUp: boolean;
   checkedAt: string;
 }
 
-const DOWN: BackendHealth = { backendUp: false, apmUp: false, checkedAt: '' };
+const DOWN: BackendHealth = {
+  backendUp: false,
+  conversationUp: false,
+  lisUp: false,
+  communicationUp: false,
+  checkedAt: '',
+};
+
+export type BackendScope = 'rxsoft' | 'conversation' | 'lis' | 'communication';
 
 /** Loads the health snapshot written by global-setup; treats a missing file as "down". */
 export function readBackendHealth(): BackendHealth {
@@ -34,12 +44,19 @@ export function skipIfModuleMissing(testInfo: TestInfo, moduleId: string): boole
   return false;
 }
 
-/** Skip rule R2: data-driven APM specs must not fail when Mongo is down. */
-export function skipIfBackendDown(testInfo: TestInfo, scope: 'apm' | 'rxsoft'): boolean {
+/** Skip rule R2: data-driven suites must never fail when their backend is down. */
+export function skipIfBackendDown(testInfo: TestInfo, scope: BackendScope = 'rxsoft'): boolean {
   const health = readBackendHealth();
-  const up = scope === 'apm' ? health.apmUp : health.backendUp;
+  const up =
+    scope === 'rxsoft'
+      ? health.backendUp
+      : scope === 'conversation'
+        ? health.conversationUp
+        : scope === 'lis'
+          ? health.lisUp
+          : health.communicationUp;
   if (!up) {
-    testInfo.skip(true, `${scope}: ${scope === 'apm' ? 'Mongo/APM' : 'backend'} is down (skipped)`);
+    testInfo.skip(true, `${scope}: backend is down (skipped)`);
     return true;
   }
   return false;

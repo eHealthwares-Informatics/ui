@@ -4,8 +4,8 @@ test.describe('RxSoft sales', () => {
   test('sales list renders with its table columns', async ({ page }) => {
     await page.goto('/rxsoft/sales');
 
-    await expect(page.getByRole('heading', { name: 'Sales', level: 2 })).toBeVisible();
-    await expect(page.getByPlaceholder('Search')).toBeVisible();
+    await expect(page.getByTestId('page-title')).toHaveText('Sales');
+    await expect(page.getByTestId('header-search')).toBeVisible();
 
     // Mantine Table.Th has no `scope`, so browsers omit the `columnheader`
     // ARIA role — assert the header cell text directly instead.

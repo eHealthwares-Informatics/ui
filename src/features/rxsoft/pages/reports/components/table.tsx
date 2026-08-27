@@ -1,24 +1,36 @@
-import { Card, Table, Text, Stack } from '@mantine/core';
+import { Card, Group, Table, Text, ThemeIcon } from '@mantine/core';
+import type { LucideIcon } from 'lucide-react';
 
 export function ReportsTable({
   title,
   description,
   columns,
   rows,
+  icon: Icon,
 }: {
   title: string;
   description: string;
   columns: string[];
   rows: React.ReactNode;
+  icon?: LucideIcon;
 }) {
   return (
-    <Card withBorder p="md">
-      <Stack gap={4} mb="md">
-        <Text fw={600}>{title}</Text>
-        <Text size="sm" c="dimmed">
-          {description}
-        </Text>
-      </Stack>
+    <Card withBorder radius="md" p="md" style={{ height: '100%' }}>
+      <Group gap="sm" mb="md" wrap="nowrap">
+        {Icon && (
+          <ThemeIcon variant="light" size="md" radius="md" color="blue">
+            <Icon size={18} />
+          </ThemeIcon>
+        )}
+        <div>
+          <Text fw={600} size="sm">
+            {title}
+          </Text>
+          <Text size="xs" c="dimmed">
+            {description}
+          </Text>
+        </div>
+      </Group>
 
       <Table
         striped
@@ -32,7 +44,7 @@ export function ReportsTable({
           <Table.Tr>
             {columns.map((column) => (
               <Table.Th key={column}>
-                <Text size="sm" c="dimmed" fw={500}>
+                <Text size="xs" c="dimmed" fw={600} tt="uppercase" lh={1}>
                   {column}
                 </Text>
               </Table.Th>

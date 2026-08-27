@@ -8,7 +8,7 @@ test.describe('error boundary', () => {
 
     await expect(generalErrorH1(page)).toBeVisible();
     await expect(generalErrorBody(page)).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Back to Home' })).toBeVisible();
+    await expect(page.getByTestId('error-back-to-home')).toBeVisible();
   });
 
   test('404 route renders the NotFoundError surface', async ({ page }) => {

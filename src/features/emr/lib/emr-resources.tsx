@@ -6,6 +6,8 @@ import { PatientRowActions } from '../components/patients/patient-row-actions';
 import { PaymentProvidersCell } from '../components/shared/payment-providers-cell';
 import { StaffForm } from '../components/staff/staff-form';
 import { StaffRowActions } from '../components/staff/staff-row-actions';
+import { DepartmentForm } from '../components/departments/department-form';
+import { DepartmentRowActions } from '../components/departments/department-row-actions';
 import { AppointmentForm } from '../components/appointments/appointment-form';
 import { AppointmentActions } from '../components/appointments/appointment-actions';
 import { VisitForm } from '../components/visits/visit-form';
@@ -15,6 +17,31 @@ import { RequestRowActions } from '../components/requests/request-row-actions';
 import { formatEnum } from './emr-constants';
 
 export const emrResources: Record<string, EmrResourceConfig> = {
+  departments: {
+    key: 'departments',
+    title: 'Departments',
+    description: 'Manage organisational departments. Each department belongs to an identity site (location).',
+    endpoint: '/departments',
+    createLabel: 'Add Department',
+    createForm: DepartmentForm,
+    actions: (row) => <DepartmentRowActions row={row} />,
+    columns: [
+      { key: 'code', label: 'Code', render: (r) => <Badge variant="light">{String(r.code)}</Badge> },
+      { key: 'name', label: 'Name', render: (r) => <Text size="sm" fw={500}>{String(r.name)}</Text> },
+      {
+        key: 'departmentType',
+        label: 'Type',
+        render: (r) => <StatusBadge value={r.departmentType} kind="departmentType" />,
+      },
+      { key: 'locationId', label: 'Site (Location)', render: (r) => String(r.locationId ?? '—') },
+      { key: 'description', label: 'Description', render: (r) => String(r.description ?? '—') },
+      {
+        key: 'isActive',
+        label: 'Active',
+        render: (r) => <StatusBadge value={r.isActive} kind="active" />,
+      },
+    ],
+  },
   patients: {
     key: 'patients',
     title: 'Patients',

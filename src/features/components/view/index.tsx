@@ -16,6 +16,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { Pencil } from 'lucide-react';
 import { View } from '@/features/rxsoft/types';
 import { DataPageForm } from '@/features/components/page/data-page-form';
@@ -28,9 +29,12 @@ type Props<T> = {
 export function GenericViewComponent<T>({ view, data }: Props<T>) {
   const isLoading = !data || (typeof data === 'object' && Object.keys(data as object).length === 0);
 
+  const queryClient = useQueryClient();
+
   const [editAccordionItem, setEditAccordionItem] = useState<{
     item: any;
     config: any;
+    endpoint?: string | null;
   } | null>(null);
 
   const [editOpen, setEditOpen] = useState(false);
@@ -194,15 +198,20 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
                           <Text truncate style={{ flex: 1 }}>
                             {label}
                           </Text>
-                          {accordionSection.itemEditConfig && (
+                          {accordionSection.itemEditConfig &&
+                            (!accordionSection.canEditItem || accordionSection.canEditItem(data, item)) && (
                             <ActionIcon
                               variant="subtle"
                               color="gray"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                const resolvedEndpoint = accordionSection.itemEditEndpoint
+                                  ? accordionSection.itemEditEndpoint(data, item)
+                                  : accordionSection.itemEditConfig.endpoint;
                                 setEditAccordionItem({
                                   item,
                                   config: accordionSection.itemEditConfig,
+                                  endpoint: resolvedEndpoint,
                                 });
                               }}
                             >
@@ -254,10 +263,22 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
           size="xl"
         >
           <DataPageForm
-            config={editAccordionItem.config}
+            config={
+              editAccordionItem.endpoint
+                ? { ...editAccordionItem.config, endpoint: editAccordionItem.endpoint }
+                : editAccordionItem.config
+            }
             initialData={editAccordionItem.item}
             mode="edit"
             onSave={() => setEditAccordionItem(null)}
+            onSaved={() => {
+              const segments = view.endpoint.split('/').filter(Boolean);
+              const page = segments[segments.length - 2];
+              const id = (data as any)?.id;
+              if (page && id != null) {
+                void queryClient.invalidateQueries({ queryKey: [page, String(id)] });
+              }
+            }}
           />
         </Modal>
       )}

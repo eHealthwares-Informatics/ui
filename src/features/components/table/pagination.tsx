@@ -21,7 +21,7 @@ export function Pagination({
   return (
     <Group justify="space-between" align="center" wrap="wrap">
       {/* LEFT: count */}
-      <Text size="sm" c="dimmed">
+      <Text data-testid="pagination-records-total" size="sm" c="dimmed">
         {totalItems} record{totalItems === 1 ? '' : 's'} total
       </Text>
 
@@ -34,10 +34,11 @@ export function Pagination({
           </Text>
 
           {/* pagination */}
-          <MantinePagination value={activePage} onChange={onPageChange} total={totalPages} />
+          <MantinePagination data-testid="pagination-controls" value={activePage} onChange={onPageChange} total={totalPages} />
 
           {/* page size */}
           <Select
+            data-testid="pagination-page-size"
             value={String(pageSize)}
             onChange={(val) => val && onPageSizeChange(Number(val))}
             data={[5, 10, 20, 30, 50, 100].map((size) => ({

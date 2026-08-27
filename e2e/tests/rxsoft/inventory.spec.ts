@@ -4,7 +4,7 @@ test.describe('RxSoft inventory', () => {
   test('inventory page renders stock sections', async ({ page }) => {
     await page.goto('/rxsoft/inventory');
 
-    await expect(page.getByRole('heading', { name: 'Inventory', level: 2 })).toBeVisible();
+    await expect(page.getByTestId('page-title')).toHaveText('Inventory');
 
     // Section headings (in order of appearance on the page). Substring text
     // ("Stock balances, movement…" card copy) collides, so match exactly.

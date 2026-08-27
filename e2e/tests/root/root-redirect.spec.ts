@@ -8,7 +8,7 @@ test.describe('root redirect', () => {
     await page.goto('/');
 
     await expect(page).toHaveURL(/\/sign-in/);
-    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    await expect(page.getByTestId('sign-in-submit')).toBeVisible();
   });
 
   test('sign-in page receives the original redirect target', async ({ page }) => {

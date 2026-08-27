@@ -12,6 +12,8 @@ for (const mod of modules) {
 
 routeModuleMap['/'] = ['rxsoft', 'conversation', 'communication', 'admin'];
 routeModuleMap['/dashboard'] = ['rxsoft', 'conversation', 'communication', 'admin'];
+routeModuleMap['/dashboard/sales'] = ['rxsoft', 'admin'];
+routeModuleMap['/dashboard/purchases'] = ['rxsoft', 'admin'];
 
 export { routeModuleMap };
 
@@ -26,7 +28,7 @@ export function isRouteAllowedForModule(pathname: string, moduleId: ModuleId): b
 
   const pathSegments = pathname.split('/').filter(Boolean);
   if (pathSegments.length > 1) {
-    const parentRoute = `/${  pathSegments[0]}`;
+    const parentRoute = `/${pathSegments[0]}`;
     if (routeModuleMap[parentRoute]) {
       return routeModuleMap[parentRoute].includes(moduleId);
     }
@@ -43,7 +45,7 @@ export function getModuleDashboard(moduleId: ModuleId): string {
 export function getModuleFromPath(pathname: string): ModuleId | null {
   if (routeModuleMap[pathname]) {
     const allowed = routeModuleMap[pathname];
-    return allowed[0] as ModuleId ?? null;
+    return (allowed[0] as ModuleId) ?? null;
   }
   const sorted = [...modules].sort((a, b) => b.routes.length - a.routes.length);
   for (const mod of sorted) {

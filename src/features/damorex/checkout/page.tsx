@@ -11,6 +11,7 @@ import {
   Input,
   Paper,
   Progress,
+  Radio,
   Select,
   Stack,
   Stepper,
@@ -48,6 +49,7 @@ import {
 import { useAuthStore } from '../website/auth-store';
 import { useCartStore } from '../website/cart-store';
 import { useCreateOrder, useDeliveryAreas } from '../website/hooks';
+import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
 import {
   WebsiteLayout,
   green,
@@ -201,6 +203,8 @@ export default function CheckoutPage() {
   const { isAuthenticated } = useAuthStore();
   const { mutate: placeOrder, isPending } = useCreateOrder();
   const { data: deliveryAreasData, isLoading: areasLoading } = useDeliveryAreas();
+  const { data: providers = [] } = useWebPaymentProviders('web');
+  const initialize = useInitializeWebPayment();
   const navigate = useNavigate();
 
   const deliveryAreas =
@@ -212,7 +216,9 @@ export default function CheckoutPage() {
   const [state_, setState_] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryAreaId, setDeliveryAreaId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>('Card');
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(
+    providers[0]?.id ?? null
+  );
   const [promoCode, setPromoCode] = useState('');
   const [placedOrder, setPlacedOrder] = useState<OrderView | null>(null);
 
@@ -247,7 +253,7 @@ export default function CheckoutPage() {
   const handlePlaceOrder = () => {
     placeOrder(
       {
-        paymentMethod: paymentMethod || 'Card',
+        paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
         items: items.map((i) => ({
           itemId: i.productId,
@@ -266,7 +272,25 @@ export default function CheckoutPage() {
         onSuccess: (order) => {
           clearCart();
           setPlacedOrder(order);
-          setStep(4);
+          // Kick off gateway payment for the newly created order.
+          initialize.mutate(
+            {
+              amount: total,
+              sourceType: 'order',
+              sourceId: order.id,
+              providerId: paymentMethod,
+              returnUrl: `${window.location.origin}/damorex/pay/checkout-return?order=${order.id}`,
+            },
+            {
+              onSuccess: (res) => {
+                if (res.checkoutUrl) {
+                  window.location.href = res.checkoutUrl;
+                }
+                setStep(4);
+              },
+              onError: () => setStep(4),
+            }
+          );
         },
         onError: () => {
           setStep(4);
@@ -274,7 +298,7 @@ export default function CheckoutPage() {
             id: 'ERR',
             orderNumber: `DMX-${Date.now().toString(36).toUpperCase()}`,
             customerId: null,
-            paymentMethod: paymentMethod || 'Card',
+            paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
             orderStatus: 'pending',
             notes: null,
             saleId: null,
@@ -452,6 +476,7 @@ export default function CheckoutPage() {
 
               {step === 3 && (
                 <StepPayment
+                  providers={providers}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
                   promoCode={promoCode}
@@ -854,6 +879,7 @@ function StepPrescriptionValidation({
 }
 
 function StepPayment({
+  providers,
   paymentMethod,
   setPaymentMethod,
   promoCode,
@@ -864,6 +890,7 @@ function StepPayment({
   total,
   totalItems,
 }: {
+  providers: Array<{ id: string; name: string; providerType: string; production: boolean }>;
   paymentMethod: string | null;
   setPaymentMethod: (v: string | null) => void;
   promoCode: string;
@@ -887,17 +914,34 @@ function StepPayment({
             </Group>
             <Divider />
 
-            <Select
-              label="Select payment method"
-              data={[
-                { value: 'Card', label: 'Card Payment (Paystack)' },
-                { value: 'Transfer', label: 'Bank Transfer' },
-                { value: 'COD', label: 'Cash on Delivery' },
-              ]}
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              radius="xl"
-            />
+            <Radio.Group value={paymentMethod} onChange={setPaymentMethod}>
+              <Stack gap="xs">
+                {providers.length === 0 && (
+                  <Text size="sm" c={muted}>
+                    No online payment providers are enabled yet.
+                  </Text>
+                )}
+                {providers.map((p) => (
+                  <Paper
+                    key={p.id}
+                    radius={16}
+                    withBorder
+                    p="sm"
+                    style={{
+                      borderColor: paymentMethod === p.id ? green : line,
+                      background: paymentMethod === p.id ? soft : '#FFFFFF',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setPaymentMethod(p.id)}
+                  >
+                    <Radio
+                      value={p.id}
+                      label={`${p.name} (${p.production ? 'Live' : 'Test'})`}
+                    />
+                  </Paper>
+                ))}
+              </Stack>
+            </Radio.Group>
 
             <Divider />
 

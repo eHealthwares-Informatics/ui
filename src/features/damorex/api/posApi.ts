@@ -26,6 +26,118 @@ export const userPosConfigKeys = {
   me: ['user-pos-config', 'me'] as any,
 };
 
+export const posTerminalKeys = {
+  list: ['pos-terminals'] as any,
+};
+
+export const walletKeys = {
+  me: ['customer-wallet', 'me'] as any,
+};
+
+export function usePosTerminals() {
+  return useQuery({
+    queryKey: posTerminalKeys.list,
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/pos-terminals', { params: { limit: 100 } });
+      return (data?.data ?? data ?? []) as Array<{
+        id: string;
+        code: string;
+        label: string | null;
+        providerType: string;
+        serial: string | null;
+        isActive: boolean;
+      }>;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useInitiatePosPayment() {
+  return useMutation({
+    mutationFn: async (payload: { amount: number; terminalId: string; paymentMethodId?: string | null }) => {
+      const { data } = await rxsoftApi.post('/payments/pos/initiate', payload);
+      return data as { reference: string; nextAction?: string | null; status: string };
+    },
+  });
+}
+
+export function useQueryPosPayment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (reference: string) => {
+      const { data } = await rxsoftApi.get(`/payments/pos/query/${reference}`);
+      return data as { reference: string; status: string; amountPaid?: number };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['payments'] });
+    },
+  });
+}
+
+export function useCustomerWallet() {
+  return useQuery({
+    queryKey: walletKeys.me,
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/customer/wallet');
+      return data as { id: string; balance: number; currency: string };
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useDebitWallet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { amount: number; reference?: string; note?: string }) => {
+      const { data } = await rxsoftApi.post('/customer/wallet/debit', payload);
+      return data as { id: string; balance: number; reference?: string };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries(walletKeys.me);
+    },
+  });
+}
+
+export const webProviderKeys = {
+  list: (channel: string) => ['payment-providers', channel] as const,
+};
+
+export function useWebPaymentProviders(channel: 'web' | 'pos' = 'web') {
+  return useQuery({
+    queryKey: webProviderKeys.list(channel),
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/payment-providers/available', { params: { channel } });
+      return (Array.isArray(data) ? data : data?.data ?? []) as Array<{
+        id: string;
+        code: string;
+        name: string;
+        providerType: string;
+        production: boolean;
+        configured: boolean;
+      }>;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useInitializeWebPayment() {
+  return useMutation({
+    mutationFn: async (payload: {
+      amount: number;
+      sourceType: 'order' | 'wallet_deposit';
+      sourceId?: string | null;
+      userId?: string | null;
+      providerId?: string | null;
+      paymentMethodId?: string | null;
+      returnUrl?: string | null;
+      callbackUrl?: string | null;
+    }) => {
+      const { data } = await rxsoftApi.post('/payments/initialize', payload);
+      return data as { reference: string; checkoutUrl: string | null; status: string; provider: { code: string } };
+    },
+  });
+}
+
 export const whitelistedItemsKeys = {
   list: ['whitelisted-items'] as any,
 };

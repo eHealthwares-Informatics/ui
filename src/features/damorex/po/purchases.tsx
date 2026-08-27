@@ -7,7 +7,7 @@ import { PoSettingsDrawer } from './components/PoSettingsDrawer';
 import { PoSummary } from './components/PoSummary';
 import { PoToolbar } from './components/PoToolbar';
 import { SetPriceModal } from './components/SetPriceModal';
-import { usePoStore } from './store/usePoStore';
+import { usePoStore, computeSubtotal, computeTotal } from './store/usePoStore';
 import { useAddPoLine, useCreatePurchaseOrder, useReceiveGoods, useUnpostGoods, useUpdatePurchaseOrder } from './api/poApi';
 import { printPo } from './utils/print';
 import { UnpostPasswordModal } from './components/UnpostPasswordModal';
@@ -92,6 +92,8 @@ export default function PurchasesPage() {
         taxPercent: l.taxPercent || 0,
         lineSubtotal: l.lineSubtotal || 0,
         lineTotal: l.lineTotal || 0,
+        receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
+        receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
         isDraft: false,
         isPosted: false,
         serverLineId: l.id,
@@ -141,6 +143,8 @@ export default function PurchasesPage() {
         taxPercent: l.taxPercent || 0,
         lineSubtotal: l.lineSubtotal || 0,
         lineTotal: l.lineTotal || 0,
+        receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
+        receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
         isDraft: false,
         isPosted: false,
         serverLineId: l.id,

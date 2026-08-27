@@ -1,0 +1,31 @@
+{
+  "_comment": "Stored fixture for Playwright fresh-organisation runs. Each run provisions a brand-new organisation via the seed service's provisioning module, runs the whole suite against it, then deprovisions it in globalTeardown. This file is the human/CI record of what a provisioned organisation contains; the live result of the current run is written to .runtime/org-state.json.",
+  "provision": {
+    "endpoint": "POST seed:/api/provision",
+    "auth": "x-api-key (SEED_API_KEY)",
+    "codePrefix": "E2E-",
+    "template": "playwright",
+    "password": "password"
+  },
+  "organisationTemplate": {
+    "roles": [
+      "admin (owner)",
+      "cashier",
+      "pharmacist",
+      "manager",
+      "inventory_clerk",
+      "auditor",
+      "customer"
+    ],
+    "users": [
+      { "suffix": "OWNER", "roles": ["admin"], "location": "STORE" },
+      { "suffix": "CASHIER", "roles": ["cashier"], "location": "STORE" },
+      { "suffix": "PHARMACIST", "roles": ["pharmacist"], "location": "STORE" }
+    ],
+    "whitelistedItems": "all active global items (org-level codes carried from DEFAULT_ORG)",
+    "priceList": "RETAIL (is_default)",
+    "stock": "SALE_STOCK + MAIN_STOCK + RETURN_STOCK, store 'default' sale_issue/sale_return mappings, opening balances per item",
+    "parties": "Walk-in customer + sample customer + 2 suppliers",
+    "pos": "organisation_configs + user_pos_configs rows provisioned"
+  }
+}

@@ -4,6 +4,7 @@ import type { AxiosInstance } from 'axios';
 import { Field } from '@/features/rxsoft/types';
 import { normalizeMultiSelectIds } from '@/features/shared/payload-utils';
 import { useApiProvider } from '../../../context/module-context';
+import { triggerBlobDownload } from '../export/download';
 import { getDirtyFields } from '../utils';
 
 type MutationProps = {
@@ -183,14 +184,15 @@ export const useExportMutation = ({ csvEndpoint, title, apiProvider }: ExportMut
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (params?: Record<string, unknown>) => {
       if (!csvEndpoint) {
         return;
       }
-      // await downloadBlob(
-      //     { method: 'GET', url: csvEndpoint },
-      //     `${title.toLowerCase().replace(/\s+/g, '_')}.csv`
-      // )
+      await triggerBlobDownload(
+        effectiveApiProvider!,
+        { method: 'GET', url: csvEndpoint, params },
+        `${title.toLowerCase().replace(/\s+/g, '_')}.csv`,
+      );
     },
     onSuccess: () => notifications.show({ message: `${title} export downloaded` }),
     onError: () =>

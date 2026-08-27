@@ -13,12 +13,12 @@ export function GeneralError({ minimal = false, ...props }: GeneralErrorProps) {
     <Center style={{ height: '100vh', width: '100%' }}>
       <Stack align="center" gap="xs">
         {!minimal && (
-          <Title order={1} size="6rem">
+          <Title data-testid="error-general-h1" order={1} size="6rem">
             500
           </Title>
         )}
 
-        <Text fw={500}>Oops! Something went wrong :'</Text>
+        <Text data-testid="error-general-body" fw={500}>Oops! Something went wrong :'</Text>
 
         <Text size="sm" c="dimmed" ta="center">
           We apologize for the inconvenience. <br />
@@ -34,11 +34,11 @@ export function GeneralError({ minimal = false, ...props }: GeneralErrorProps) {
 
         {!minimal && (
           <Group mt="md">
-            <Button variant="outline" onClick={() => history.go(-1)}>
+            <Button data-testid="error-go-back" variant="outline" onClick={() => history.go(-1)}>
               Go Back
             </Button>
 
-            <Button onClick={() => navigate({ to: '/' })}>Back to Home</Button>
+            <Button data-testid="error-back-to-home" onClick={() => navigate({ to: '/' })}>Back to Home</Button>
           </Group>
         )}
       </Stack>

@@ -13,10 +13,12 @@ import { useForm } from 'react-hook-form';
 import { useMediaQuery } from '@mantine/hooks';
 import z from 'zod';
 import { useAuthStore } from '@/stores/auth-store';
-import { Lock, User, ShieldCheck } from 'lucide-react';
+import { Lock, User, ShieldCheck, Building2 } from 'lucide-react';
+import { OnboardOrganisation } from './onboard-organisation';
+import { useState } from 'react';
 
 const signInSchema = z.object({
-  username: z.string().min(1, 'Please enter your username'),
+  username: z.string().min(1, 'Please enter your email or username'),
   password: z.string().min(1, 'Please enter your password'),
 });
 
@@ -48,6 +50,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const error = useAuthStore((state) => state.error);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
+  const [mode, setMode] = useState<'signin' | 'onboard'>('signin');
 
   const {
     register,
@@ -276,15 +279,17 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
             </Box>
           </Group>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
+          {mode === 'signin' ? (
+          <form data-testid="sign-in-form" onSubmit={handleSubmit(onSubmit)}>
             <Stack gap={isMobile ? 'sm' : 'md'}>
-              {/* Username field */}
+              {/* Username / email field */}
               <Box>
                 <Text fw={500} size="sm" mb={6} style={{ color: '#374151' }}>
-                  Username
+                  Email or username
                 </Text>
                 <TextInput
-                  placeholder="Enter your username"
+                  data-testid="sign-in-username"
+                  placeholder="Enter your email or username"
                   leftSection={<User size={18} color="#9CA3AF" />}
                   {...register('username')}
                   error={errors.username?.message}
@@ -307,6 +312,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   Password
                 </Text>
                 <PasswordInput
+                  data-testid="sign-in-password"
                   placeholder="Enter your password"
                   leftSection={<Lock size={18} color="#9CA3AF" />}
                   {...register('password')}
@@ -345,13 +351,14 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
 
               {/* Error message */}
               {error && (
-                <Text size="sm" style={{ color: '#DC2626' }}>
+                <Text data-testid="sign-in-error" size="sm" style={{ color: '#DC2626' }}>
                   {error}
                 </Text>
               )}
 
               {/* Sign in button */}
               <Button
+                data-testid="sign-in-submit"
                 type="submit"
                 loading={loading}
                 fullWidth
@@ -418,8 +425,23 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   Your data is secure and encrypted
                 </Text>
               </Group>
+
+              {/* Onboard toggle */}
+              <Group justify="center" mt={4}>
+                <Text
+                  size="sm"
+                  style={{ color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
+                  onClick={() => setMode('onboard')}
+                >
+                  <Building2 size={15} style={{ marginRight: 6, verticalAlign: -2 }} />
+                  New here? Onboard your Organisation
+                </Text>
+              </Group>
             </Stack>
           </form>
+          ) : (
+            <OnboardOrganisation onBack={() => setMode('signin')} />
+          )}
         </Box>
       </Box>
 

@@ -53,6 +53,27 @@ interface PoStoreState {
   setSettingsOpened: (v: boolean) => void;
 }
 
+export const computeSubtotal = (
+  qty: number,
+  unitCost: number,
+  discountPercent: number,
+): number => {
+  const raw = qty * unitCost;
+  const discount = raw * (discountPercent / 100);
+  return Number((raw - discount).toFixed(2));
+};
+
+export const computeTotal = (
+  qty: number,
+  unitCost: number,
+  discountPercent: number,
+  taxPercent: number,
+): number => {
+  const subtotal = computeSubtotal(qty, unitCost, discountPercent);
+  const tax = subtotal * (taxPercent / 100);
+  return Number((subtotal + tax).toFixed(2));
+};
+
 const emptyLine = (): PoLineItem => ({
   id: crypto.randomUUID(),
   itemId: '',
@@ -64,6 +85,8 @@ const emptyLine = (): PoLineItem => ({
   taxPercent: 0,
   lineSubtotal: 0,
   lineTotal: 0,
+  receivedSubtotal: 0,
+  receivedLineTotal: 0,
   isDraft: true,
   isPosted: false,
 });
@@ -172,11 +195,10 @@ export const usePoStore = create<PoStoreState>((set, get) => ({
       lines: tab.lines.map((line) => {
         if (line.id !== lineId) {return line;}
         const updated = { ...line, ...updates };
-        const raw = updated.orderedQty * updated.unitCost;
-        const discount = raw * (updated.discountPercent / 100);
-        updated.lineSubtotal = +(raw - discount).toFixed(2);
-        const tax = updated.lineSubtotal * (updated.taxPercent / 100);
-        updated.lineTotal = +(updated.lineSubtotal + tax).toFixed(2);
+        updated.lineSubtotal = computeSubtotal(updated.orderedQty, updated.unitCost, updated.discountPercent);
+        updated.lineTotal = computeTotal(updated.orderedQty, updated.unitCost, updated.discountPercent, updated.taxPercent);
+        updated.receivedSubtotal = computeSubtotal(updated.receivedQty, updated.unitCost, updated.discountPercent);
+        updated.receivedLineTotal = computeTotal(updated.receivedQty, updated.unitCost, updated.discountPercent, updated.taxPercent);
         return updated;
       }),
     });

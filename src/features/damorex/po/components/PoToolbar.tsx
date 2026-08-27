@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Button, Group, Select, Text, TextInput } from '@mant
 import { FileText, Plus, Printer, RefreshCcw, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useSuppliers, useWarehouses, usePurchaseOrders } from '../api/poApi';
-import { usePoStore } from '../store/usePoStore';
+import { usePoStore, computeSubtotal, computeTotal } from '../store/usePoStore';
 import { QuickAddSupplierModal } from './QuickAddSupplierModal';
 
 interface Props {
@@ -81,6 +81,8 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
                   taxPercent: l.taxPercent || 0,
                   lineSubtotal: l.lineSubtotal || 0,
                   lineTotal: l.lineTotal || 0,
+                  receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
+                  receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
                   isDraft: false,
                   isPosted: Number(l.receivedQty || 0) > 0,
                   serverLineId: l.id,

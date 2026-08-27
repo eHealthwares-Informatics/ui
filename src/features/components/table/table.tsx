@@ -55,7 +55,7 @@ export const DataTable = ({
         </Table.Tr>
       </Table.Thead>
 
-      <Table.Tbody>
+      <Table.Tbody data-testid="data-table-body">
         {isLoading && (
           <Table.Tr>
             <Table.Td colSpan={colSpan}>
@@ -87,7 +87,7 @@ export const DataTable = ({
         )}
 
         {rows.map((row: any, index: number) => (
-          <Table.Tr key={String(row.id ?? index)}>
+          <Table.Tr key={String(row.id ?? index)} data-testid="data-table-row">
             <Table.Td key={index}>{index + 1}</Table.Td>
             {columns.map((column) => (
               <Table.Td key={column.key}>
