@@ -15,7 +15,7 @@ The LIMS module manages the full laboratory workflow: test catalog configuration
 
 ```
 Sidebar → LIS
-  ├── Dashboard (Resource Cards)
+  ├── Dashboard (Metrics + Drill-down)
   ├── Test Management
   │   ├── Test Definitions
   │   ├── Test Categories
@@ -27,11 +27,13 @@ Sidebar → LIS
   │   ├── Sample Types
   │   ├── Samples
   │   └── Locations / Location Types
-  ├── Orders & Results
-  │   ├── Orders
-  │   ├── Results
-  │   ├── Result Signatures
-  │   └── Statuses / Status History
+  ├── Orders
+  │   ├── Orders List
+  │   ├── Order Workflow (5-step wizard)
+  │   └── Order Report (result entry + print)
+  ├── Results
+  │   ├── Results List
+  │   └── Result Signatures
   ├── Reference Data
   │   ├── UOMs (Units of Measure)
   │   ├── Reference Ranges
@@ -53,14 +55,49 @@ Sidebar → LIS
 
 ## 3. LIS Dashboard
 
-**Route:** `/lis`
+**Route:** `/lis/orders/dashboard`
 
-The dashboard presents a **card grid** of all LIS resources. Each card shows:
-- **Resource title** (e.g., "Test Definitions", "Samples", "Orders")
-- **Description** — What this resource manages
-- **Manage button** — Navigates to the dedicated resource page
+The LIS dashboard is a **metrics-driven operational view** that auto-refreshes every 60 seconds.
 
-Click any card to enter that resource's full CRUD interface.
+### KPI Metric Cards
+
+Each card is clickable — click to see a drill-down modal with the underlying orders.
+
+| Card | Icon | Color | Description |
+|---|---|---|
+| **Total Orders** | Clipboard | Blue | All orders (non-clickable summary) |
+| **In Progress** | Clock | Orange | Orders awaiting result entry |
+| **Ready for Validation** | Microscope | Yellow | Results entered, awaiting review |
+| **Completed Today** | Checkmark | Green | Orders finished today |
+| **Partially Completed** | Ban | Grape | Some tests still pending |
+| **Entered by You** | User+ | Cyan | Orders you created today |
+| **Rejected Today** | X-Circle | Red | Samples rejected today |
+| **Unprinted Results** | Printer | Teal | Validated results not yet printed |
+| **Electronic Orders** | Inbox | Blue | Samples received today |
+| **Avg TAT** | TrendingUp | Teal | Average turnaround time (hours) |
+| **Delayed Turnaround** | AlertTriangle | Red | Orders exceeding TAT threshold |
+
+### Drill-Down Modal
+
+Click any metric card to open a modal with:
+- **Paginated table** of the underlying orders
+- **Columns** vary by metric type (e.g., In Progress shows Order #, Patient, Status, Received date)
+- **Pagination** controls at the bottom
+- **Click a row** to navigate to the order report
+
+### Daily Trend Chart
+
+Below the metric cards, a **7-day area chart** shows:
+- **Received** orders per day (blue area)
+- **Completed** orders per day (green area)
+- Hover for exact numbers
+
+### TAT Sub-Metrics
+
+The Average TAT card breaks down into:
+- Reception → Validation time
+- Reception → Result entry time
+- Result entry → Validation time
 
 ---
 
@@ -183,60 +220,314 @@ Categories of laboratory locations.
 
 ---
 
-## 6. Orders & Results
+## 6. Orders — Full Workflow
 
-### Orders
+### 6.1 Orders List
 
 **Route:** `/lis/orders`
 
-Laboratory orders with full workflow tracking.
+Standard list view with search and filters.
 
-**Sub-views:**
-- **Dashboard** — Order summary and statistics
-- **Workflow** — Kanban-style view of orders by status
-- **Report** — Order reporting
+**Columns:**
+| Column | Description |
+|---|---|
+| Order # | Unique order number |
+| Patient | Patient name |
+| MRN | Medical record number |
+| Status | Current order status |
+| Requested | Requested date |
 
-**Columns:** Order #, Patient, Tests, Priority, Status, Ordered Date, Completed Date
+**Create/Edit form (tabbed):**
 
-**Filters:** Status, priority, date range, provider
+**Tab 1: Patient Information**
+| Field | Type | Required |
+|---|---|---|
+| MRN | text | Yes |
+| Patient Name | text | Yes |
+| Gender | select (MALE/FEMALE/OTHER/UNKNOWN) | No |
+| Date of Birth | date | No |
+| Age | number | No |
+| Internal Reference | text | No |
+| External Reference | text | No |
 
-**Statuses:** REQUESTED → IN_PROGRESS → COMPLETED | CANCELLED | REJECTED
+**Tab 2: Order Details**
+| Field | Type | Required |
+|---|---|---|
+| Order Number | text | No (auto) |
+| Status | text | No |
+| Priority | async-select (`/lis/priorities`) | No |
+| Requested Date | date | No |
+| Tests | multi-async-select (`/lis/test-definitions`) | No |
+| Notes | textarea | No |
 
-### Results
+Clicking a row navigates to the **Order Report** page.
+
+---
+
+### 6.2 Order Workflow (5-Step Wizard)
+
+**Route:** `/lis/orders/workflow`
+
+The workflow is a guided 5-step process for creating and processing lab orders. It uses a shared state context (React reducer) that persists across all steps.
+
+#### Workflow Layout
+
+The layout includes:
+1. **Barcode Scanner Bar** — Top bar for scanning order barcodes or searching by order number
+2. **Stepper** — Visual step indicator showing progress (Enter → Collect → Label → QA → Order)
+3. **Context Card** — Shows order number, patient name, MRN, and progress bar (e.g., "3/5")
+4. **Step Content** — The current step's form
+5. **Navigation Buttons** — Back, Save, Save & Next
+
+#### Step 1: Enter (Patient & Tests)
+
+**Route:** `/lis/orders/workflow/enter`
+
+Three sections:
+
+**Patient Search Section:**
+- Search bar with debounced API lookup (`/lis/patients`)
+- Results table showing: Patient ID, Name, Gender, DOB
+- Click a row to select the patient
+- **"Register New Patient"** button opens a modal with:
+  - First Name, Last Name (required)
+  - Gender (select)
+  - Date of Birth (date picker)
+  - Phone, Email
+- Selected patient appears as a card with name, MRN, gender, DOB, age
+
+**Sample Test Selection Section:**
+- Search bar to filter tests by name or code
+- **Panels** displayed as cards — click to toggle all tests in the panel on/off
+- **Individual tests** displayed as checkboxes with code and name
+- Selected tests show with a checkmark badge
+- Tests are sorted: selected tests first, then alphabetical
+- **Selected count** shown in the header
+
+**Order Details Section:**
+| Field | Type |
+|---|---|
+| Priority | async-select (from `/lis/priorities`) |
+| Requested Date | date picker |
+| Requester Name | text (referring physician) |
+| Requester Phone | text |
+| Diagnosis | text |
+| Clinical Notes | textarea |
+| Notes | textarea |
+
+**Gate:** Must have patient name, MRN, and at least one test selected to proceed.
+
+**Save & Next** → Creates/updates the order and navigates to Step 2.
+
+---
+
+#### Step 2: Collect (Sample Collection)
+
+**Route:** `/lis/orders/workflow/collect`
+
+Two sections:
+
+**Samples Collection Section:**
+- **"Add Sample"** button creates a new sample card
+- Each sample card shows:
+  | Field | Type | Description |
+  |---|---|---|
+  | Barcode | text (auto-generated: `S-{timestamp}`) | Unique sample identifier |
+  | Sample Type | async-select (`/lis/sample-types`) | Blood, Urine, CSF, etc. |
+  | Collector | text | Who collected the sample |
+  | Collection Date | date picker | When it was collected |
+  | Collection Method | text | How it was collected |
+  | Collection Conditions | text | Special conditions |
+  | Quantity | number | Amount collected |
+  | Notes | text | Additional notes |
+- **Delete button** (trash icon) removes a sample
+- When sample type changes, quantity auto-fills from the type's default
+- Collection method auto-fills from the first test's method
+
+**Test-to-Sample Assignment Section:**
+- Table showing each ordered test and a dropdown to assign it to a sample
+- **Assignment columns:** Test name → Assigned Sample (dropdown of sample numbers)
+- **Unassigned tests** shown below with a "Sample not assigned" badge
+- Click a sample badge to unassign
+- **Gate:** All tests must be assigned to proceed
+
+**Save & Next** → Saves samples and assignments, navigates to Step 3.
+
+---
+
+#### Step 3: Label (Labels & Storage)
+
+**Route:** `/lis/orders/workflow/label`
+
+Two sections:
+
+**Print Labels Section:**
+- Table of all labels to print:
+  | Label | Content |
+  |---|---|
+  | Order Label | Order number |
+  | Sample #1 Label | Barcode + sample type name |
+  | Sample #2 Label | Barcode + sample type name |
+  | ... | ... |
+- **Quantity input** per label (number of copies)
+- **Print button** per label — shows notification, marks as PRINTED
+- **"Print All"** button — prints all unprinted labels
+- **Status badge:** Printed (green) or Not Printed (gray)
+- **Printed date** shown after printing
+
+**Storage Section:**
+- For each sample, assign a storage location:
+  | Field | Type |
+  |---|---|
+  | Storage Location | autocomplete (from `/lis/locations` where `storageAssignment=true`) |
+  | Storage Notes | textarea |
+- Locations show name and reference code
+- **Status badge:** Stored (green) or Not Stored (yellow)
+
+**Save & Next** → Saves print status and storage assignments, navigates to Step 4.
+
+---
+
+#### Step 4: QA (Review & Approve)
+
+**Route:** `/lis/orders/workflow/qa`
+
+Two sections:
+
+**QA Checklist Section:**
+- Loads checklist items from `/lis/qa-checklist-items`
+- Each item is a **checkbox** with name and category
+- **Progress badge:** e.g., "5/8" (completed/total)
+- Color: Green when all checked, Yellow when incomplete
+- Error alert if checklist fails to load
+
+**Order Summary Section:**
+- **Accordion** with three panels:
+
+  **Patient Information:**
+  - Name, MRN, Gender, DOB, Age
+
+  **Ordered Tests:**
+  - Table: Test name, Assigned sample badge (violet) or "Not assigned" (gray)
+
+  **Samples:**
+  - For each sample: barcode, type, collector, date, storage location, print status badges
+
+**Save & Next** → Saves QA checks, navigates to Step 5.
+
+---
+
+#### Step 5: Order (Final Review)
+
+**Route:** `/lis/orders/workflow/order`
+
+Shows the full **Order Report** (same as the report page, embedded) with:
+- Patient details
+- Test results table
+- Reference ranges
+- Print / PDF export
+- Share options (email, SMS, WhatsApp)
+
+**Save & Finish** → Finalizes the order and returns to the orders list.
+
+---
+
+### 6.3 Order Report (Result Entry & Print)
+
+**Route:** `/lis/orders/:orderId/report`
+
+The report page is the primary interface for entering results and generating printable reports.
+
+#### Header
+- **Order number** with badge
+- **Patient name** and **MRN**
+- **Status** badge
+- **Priority** badge
+- **Previous/Next** navigation arrows (cycles through orders from the list)
+
+#### Result Entry Table
+For each ordered test:
+| Column | Description |
+|---|---|
+| Test Name | Full test name |
+| Value | Text input for the result value |
+| Unit | async-select from UOMs |
+| Reference Range | Dropdown of applicable ranges (filtered by gender/age) |
+| Abnormal | Switch toggle |
+| Notes | Text input |
+| Status | Badge: Pending, Entered, Validated |
+
+#### Reference Range Auto-Selection
+When a result value is entered, the system automatically selects the correct reference range based on:
+- Patient gender
+- Patient age
+- Test definition
+
+Ranges are highlighted: normal (green), borderline (yellow), critical (red).
+
+#### Actions Bar
+| Action | Description |
+|---|---|
+| **Save** | Save current result values |
+| **Validate** | Mark results as validated (requires signature) |
+| **Print** | Generate PDF report and open print dialog |
+| **Email** | Send report via email |
+| **SMS** | Send report via SMS |
+| **WhatsApp** | Send report via WhatsApp |
+
+#### PDF Report Generation
+- Generates a formatted HTML report from `report-print.ts`
+- Includes: hospital header, patient details, test results with reference ranges, signature line
+- Opens in a new tab with print dialog
+
+#### Previous/Next Navigation
+- Arrow buttons in the header cycle through orders
+- Order IDs are stored in localStorage from the orders list
+
+---
+
+### 6.4 Results List
 
 **Route:** `/lis/results`
 
-Individual test results linked to orders.
+**Columns:** Order Item, Value, Unit, Entered Date, Validated Date, Acknowledged
 
-**Columns:** Order #, Test, Result Value, Unit, Reference Range, Status, Reviewed
+**Create/Edit form (tabbed):**
 
-**Filters:** Test, status, date range
+**Tab: Result Entry**
+| Field | Type | Description |
+|---|---|---|
+| Order Item ID | text (disabled) | Linked order item |
+| Value | text (required) | The result value |
+| Unit | async-select (`/lis/uoms`) | Unit of measure |
+| Abnormal | switch | Flag if abnormal |
+| Notes | text | Additional notes |
+| Entered By | async-select (`/lis/users`) | Who entered the result |
+| Entered Date | text | When it was entered |
+| Validated By | async-select (`/lis/users`) | Who validated |
+| Validated Date | text | When it was validated |
 
-### Result Signatures
+---
+
+### 6.5 Result Signatures
 
 **Route:** `/lis/result-signatures`
 
-Digital signatures for result verification and approval.
+Digital signatures for result verification.
 
 **Columns:** Result, Signer, Signature Date, Status
 **Create:** Result (select), Notes
 
-### Statuses
+---
 
-**Route:** `/lis/statuses`
+### 6.6 Statuses & Status History
 
-Configurable order and result statuses.
+**Route:** `/lis/statuses` and `/lis/status-history`
 
-**Columns:** Name, Code, Category, Sort Order
-**Create:** Name, Code, Category, Color, Sort Order
+Configurable order/result statuses and full audit trail of all transitions.
 
-### Status History
-
-**Route:** `/lis/status-history`
-
-Audit trail of all status changes for orders and results.
-
-**Columns:** Entity, From Status, To Status, Changed By, Changed At
+**Statuses columns:** Name, Code, Category, Sort Order
+**Status History columns:** Entity, From Status, To Status, Changed By, Changed At
 
 ---
 
@@ -392,11 +683,20 @@ For fields that accept multiple values (e.g., sample types, programs):
 | Feature | How To |
 |---|---|
 | **Quick search** | Type in the search bar on any list page |
+| **Barcode scan** | Use the barcode scanner bar at the top of the workflow to load an order by scanning or typing |
 | **LOINC lookup** | Use the async-select in test definitions to search LOINC codes |
+| **Panel selection** | Click a panel card in Step 1 to toggle all its tests on/off at once |
+| **Auto-fill collection method** | Collection method auto-fills from the first test's method definition |
+| **Auto-fill sample quantity** | Quantity defaults to the sample type's `defaultQuantity` |
+| **Print all labels** | Click "Print All" in Step 3 to print all labels at once |
+| **Navigate between orders** | Use Previous/Next arrows in the report header to cycle through orders |
+| **Reference range auto-select** | Enter result value → system auto-picks the correct range by gender/age |
+| **Click metric cards** | Dashboard metric cards are clickable for drill-down into the underlying orders |
 | **Panel management** | Create panels to group related tests for batch ordering |
 | **QC monitoring** | Check QC Alerts regularly for out-of-range results |
 | **Reference ranges** | Set up by test + gender + age for accurate result interpretation |
 | **EQA tracking** | Monitor EQA scores for accreditation compliance |
+| **Workflow step click** | Click any completed or current step in the stepper to jump back to it |
 
 ---
 
@@ -409,6 +709,14 @@ For fields that accept multiple values (e.g., sample types, programs):
 | QC alerts not appearing | QC results must be entered first; check lot expiry dates |
 | Sample not showing | Verify sample type is active and assigned to the correct test |
 | EQA results missing | Check enrollment is active for the current program round |
+| Workflow "Save & Next" disabled | Check that all required fields are filled (Step 1: patient + tests; Step 2: samples + all tests assigned) |
+| Barcode scanner not finding order | Ensure the order exists; try searching by patient name or MRN instead |
+| Reference range not auto-selecting | Check that reference ranges exist for the test with matching gender/age |
+| Print labels not working | Labels are marked as printed in the UI; actual printer integration requires backend config |
+| Dashboard metrics not loading | Check `/lis/dashboard/metrics` endpoint is accessible; metrics auto-refresh every 60s |
+| Drill-down modal empty | The metric endpoint may not have data for that category; try a different date range |
+| TAT showing as 0h | No completed orders in the period; TAT requires reception + validation timestamps |
+| Previous/Next arrows grayed out | Order IDs are loaded from localStorage; navigate from the orders list first |
 
 ---
 
