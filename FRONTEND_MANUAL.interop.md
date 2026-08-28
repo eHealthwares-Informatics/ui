@@ -1,0 +1,369 @@
+# FRONTEND MANUAL — Healthcare Interoperability Switch
+
+**Frontend routes:** `/communication/*`
+**Backend:** `healthcare-interoperability-switch` (port 3000)
+
+---
+
+## 1. What You Can Do
+
+The Communication (Interop) module provides the frontend interface for the Healthcare Interoperability Switch. It manages Application Entities (AEs), message routing rules, protocol mappings, message templates, and provides real-time tracing and audit capabilities. It also includes a message tester for debugging integration flows.
+
+---
+
+## 2. Navigation
+
+```
+Sidebar → Communication
+  ├── Application Entities (AEs)
+  ├── Routing Rules
+  ├── Message Mappings
+  ├── Message Templates
+  ├── Message Logs
+  ├── Communication Channels
+  ├── Notifications
+  ├── Notification Templates
+  ├── Audit Center
+  ├── Message Tester
+  ├── Flow Graph
+  └── Trace Explorer
+```
+
+---
+
+## 3. Application Entities (AEs)
+
+**Route:** `/communication/aes`
+
+Application Entities represent the systems that the interop switch communicates with (e.g., DCM4CHEE PACS, OpenELIS, Healthstack).
+
+### Listing AEs
+
+Shows all registered Application Entities with their configurations.
+
+**Typical columns:** Name, Type, Protocol, Endpoint, Port, Status
+
+### Creating an AE
+
+1. Click **Add AE**
+2. Fill in:
+   - **Name** (required) — e.g., "DCM4CHEE PACS"
+   - **Type** (select: Source, Destination)
+   - **Protocol** (select: HL7, FHIR)
+   - **Endpoint** — IP address or hostname
+   - **Port** — Connection port
+   - **Description** — What this system does
+3. Click **Create**
+
+### Editing an AE
+
+1. Click the AE row or ⋮ → **Edit**
+2. Modify fields
+3. Click **Save**
+
+### Deleting an AE
+
+1. ⋮ → **Delete**
+2. Confirm deletion
+
+---
+
+## 4. Routing Rules
+
+**Route:** `/communication/routing`
+
+Routing rules determine how messages flow between Application Entities.
+
+### Listing Routing Rules
+
+Shows all configured routing rules with their conditions and targets.
+
+**Columns:** Name, Source AE, Target AE, Protocol, Conditions, Status
+
+### Creating a Routing Rule
+
+1. Click **Add Rule**
+2. Configure:
+   - **Name** — Descriptive name
+   - **Source AE** — Where messages come from (select from AE list)
+   - **Target AE** — Where messages go (select from AE list)
+   - **Conditions** — Rule evaluation criteria:
+     - Message type
+     - Patient demographics
+     - Order type
+     - Custom fields
+   - **Priority** — Rule evaluation order
+   - **Enabled** — Toggle on/off
+3. Click **Create**
+
+### How Routing Works
+
+1. A message arrives from a source AE
+2. All routing rules matching the source are evaluated
+3. Conditions are checked against the message content
+4. The first matching rule determines the target AE
+5. The message is mapped and forwarded to the target
+
+---
+
+## 5. Message Mappings
+
+**Route:** `/communication/mapping`
+
+Message mappings define how data is transformed between protocols.
+
+### Listing Mappings
+
+Shows all configured mapping templates.
+
+**Columns:** Name, Source Protocol, Target Protocol, Source AE, Target AE
+
+### Creating a Mapping
+
+1. Click **Add Mapping**
+2. Configure:
+   - **Name** — Descriptive name
+   - **Source Protocol** (select: HL7, FHIR, Canonical)
+   - **Target Protocol** (select: HL7, FHIR, Canonical)
+   - **Source AE** — Which system this mapping applies to
+   - **Template** — The mapping template definition
+3. Click **Create**
+
+### Mapping Types
+
+| Source → Target | Description |
+|---|---|
+| HL7 → Canonical | Parse HL7 v2 message into internal canonical model |
+| Canonical → HL7 | Convert canonical model to HL7 v2 for target system |
+| FHIR → Canonical | Parse FHIR R4 resource into canonical model |
+| Canonical → FHIR | Convert canonical model to FHIR R4 resource |
+
+---
+
+## 6. Message Templates
+
+**Route:** `/communication/message-templates`
+
+Reusable templates for message construction.
+
+**Columns:** Name, Protocol, Type, Description
+**Create:** Name, Protocol, Message Type, Template Content
+
+---
+
+## 7. Message Logs
+
+**Route:** `/communication/message-logs`
+
+Audit trail of all messages processed by the switch.
+
+**Columns:** Timestamp, Source, Destination, Message Type, Status, Duration
+
+**Filters:**
+- Date/time range
+- Source AE
+- Target AE
+- Message type
+- Status (Success/Failed/Pending)
+
+### Viewing Message Detail
+
+Click a log entry to see:
+- Raw message content
+- Source protocol details
+- Mapped canonical model
+- Target protocol output
+- Delivery status and timestamps
+- Error messages (if any)
+
+---
+
+## 8. Communication Channels
+
+**Route:** `/communication/communication-channels`
+
+Configuration of transport channels for message delivery.
+
+**Columns:** Name, Type, Protocol, Endpoint, Status
+**Create:** Name, Type (TCP/HTTP), Protocol, Connection details
+
+---
+
+## 9. Notifications
+
+**Route:** `/communication/notifications`
+
+System notifications generated by the interop switch (e.g., failed deliveries, connection issues).
+
+**Columns:** Timestamp, Type, Message, Severity, Read status
+
+**Actions:** Mark as read, dismiss
+
+### Notification Templates
+
+**Route:** `/communication/notification-templates`
+
+Templates for formatting notification messages.
+
+**Columns:** Name, Type, Channel, Template
+**Create:** Name, Event Type, Channel, Message template
+
+---
+
+## 10. Audit Center
+
+**Route:** `/communication/audit-center` (or `/communication/audit-center`)
+
+Centralized audit view of all interop activities.
+
+### Features
+
+- **Timeline view** — Chronological list of all events
+- **Filtering** — By event type, AE, time range, status
+- **Detail drill-down** — Click any event to see full details
+- **Export** — Download audit logs as CSV
+
+### Event Types
+
+| Event | Description |
+|---|---|
+| Message Received | Inbound message from a source AE |
+| Routing Evaluated | Routing rules were checked |
+| Mapping Applied | Protocol transformation executed |
+| Message Dispatched | Forwarded to target AE |
+| Delivery Confirmed | Target acknowledged receipt |
+| Delivery Failed | Target rejected or timed out |
+| AE Created/Updated/Deleted | Configuration changes |
+
+---
+
+## 11. Message Tester
+
+**Route:** `/communication/message-tester`
+
+A built-in debugging tool for testing message flows without external systems.
+
+### How to Use
+
+1. **Select source AE** — Choose which system you're simulating
+2. **Select message type** — HL7 message type or FHIR resource type
+3. **Enter message content** — Paste raw HL7 message or FHIR JSON, or use a template
+4. **Click Send** — The switch processes the message through the full pipeline
+5. **View results**:
+   - Routing decision
+   - Canonical model output
+   - Target protocol mapping
+   - Delivery simulation result
+
+### Use Cases
+
+- Test routing rules before deploying to production
+- Debug mapping templates
+- Verify HL7 message parsing
+- Validate FHIR resource transformations
+- Troubleshoot connectivity to target systems
+
+---
+
+## 12. Flow Graph
+
+**Route:** `/communication/flow-graph`
+
+A **visual graph representation** of message flows through the interop switch.
+
+### Features
+
+- **Node visualization** — Each AE is a node
+- **Edge visualization** — Routing rules are edges between nodes
+- **Color coding** — Active/inactive routes, success/failure rates
+- **Click to inspect** — Click a node or edge to see details
+- **Real-time updates** — Refreshes to show current routing state
+
+### Reading the Graph
+
+- **Green edges** — Active, healthy routes
+- **Yellow edges** — Routes with intermittent failures
+- **Red edges** — Routes with high failure rates
+- **Gray edges** — Disabled routes
+- **Node size** — Proportional to message volume
+
+---
+
+## 13. Trace Explorer
+
+**Route:** `/communication/trace-explorer`
+
+End-to-end tracing of individual messages through the entire interop pipeline.
+
+### How to Use
+
+1. **Search** — Enter a message ID, patient ID, order ID, or timestamp range
+2. **View trace** — See the complete journey:
+   - When the message was received
+   - Which routing rules were evaluated
+   - What mapping was applied
+   - The canonical model state
+   - The target mapping result
+   - When/where it was dispatched
+   - Delivery confirmation or error
+3. **Timeline view** — Visual timeline with duration for each step
+4. **Raw data** — Toggle to see raw message content at each stage
+
+### Use Cases
+
+- Debug why a message wasn't delivered
+- Verify the correct mapping was applied
+- Investigate latency in message processing
+- Audit the complete path of a clinical order or patient record
+
+---
+
+## 14. Common UI Patterns
+
+### Configuration Pages (AEs, Routing, Mappings)
+
+All configuration pages follow:
+1. **List view** with search and filters
+2. **Create modal** with form fields
+3. **Edit** via row click or ⋮ menu
+4. **Delete** with confirmation
+
+### Log/Trace Pages (Logs, Audit, Trace)
+
+All log pages follow:
+1. **Filter bar** with date range, entity selectors
+2. **Sortable table** with pagination
+3. **Detail drill-down** via row click
+4. **Export** option where applicable
+
+---
+
+## 15. Tips & Shortcuts
+
+| Feature | How To |
+|---|---|
+| **Quick AE lookup** | Search by name or endpoint in the AE list |
+| **Test before deploy** | Use Message Tester to validate changes |
+| **Debug routing** | Use Trace Explorer to follow a message end-to-end |
+| **Monitor health** | Check Audit Center for failed deliveries |
+| **Visual overview** | Use Flow Graph to see the routing topology |
+
+---
+
+## 16. Troubleshooting
+
+| Issue | Solution |
+|---|---|
+| AE not receiving messages | Verify endpoint and port are correct; check network connectivity |
+| Routing rule not matching | Check conditions match the message content; verify rule priority |
+| Mapping errors | Use Message Tester to debug the template; check field mappings |
+| Trace not found | Ensure event tracing is enabled; check the timestamp range |
+| Flow graph not loading | Verify the interop backend is running on port 3000 |
+| Delivery failures | Check target system status; review error in message logs |
+
+---
+
+## 17. Related Documentation
+
+- [MANUAL.interop.md](./MANUAL.interop.md) — Backend API reference
+- [PRD.md](./PRD.md) — Full product requirements
