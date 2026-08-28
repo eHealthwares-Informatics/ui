@@ -241,54 +241,220 @@ Purchase order receiving workflow. Shows pending and received shipments with a d
 
 **Route:** `/rxsoft/sales`
 
-**Columns:** Sale #, Channel, Store, Total, Status, Date
+The sales list page shows all transactions with per-row actions and summary metrics.
 
-**Create fields:**
-- Sale Number (required)
-- Sale Channel (e.g., "pos", "online")
-- Store ID (required)
-- Customer ID (optional)
-- Lines (JSON textarea — array of `{ productId, uomId, quantity, unitPrice }`)
-- Payments (JSON textarea — array of `{ paymentMethodId, amount }`)
+**List columns:**
+| Column | Description |
+|---|---|
+| Sale # | Unique sale number |
+| Channel | Sale channel (pos, online, mobile) |
+| Store | Store name (resolved from storeId) |
+| Total | Total sale amount |
+| Status | Draft, completed, voided |
+| Date | Sale date |
 
-**Metrics:** Total Sales, In Progress, Revenue, by Channel, by Category
+**Metrics cards at top:**
+- Total Sales (count)
+- In Progress (count)
+- Revenue (sum)
+- Breakdown by Channel (e.g., "Channel: pos (42)")
+- Breakdown by Category (top 5)
 
-**Export:** CSV download available
+**Per-row actions:**
+| Action | Description |
+|---|---|
+| **View Lines** (eye icon) | Navigate to `/rxsoft/sales-lines?saleId=...` to see individual line items |
+| **Print Receipt** (printer icon) | Opens a PDF receipt in a new tab and triggers print |
+| **Complete Sale** | Only for mobile channel + draft status — finalizes the sale and depletes stock |
+
+**Create sale form:**
+- **Sale Number** (required)
+- **Sale Channel** (required) — e.g., `pos`, `online`, `mobile`
+- **Store ID** (required)
+- **Customer ID** (optional)
+- **Lines** (required) — JSON textarea:
+  ```json
+  [{"productId":"...","uomId":"...","quantity":1,"unitPrice":10}]
+  ```
+- **Payments** (required) — JSON textarea:
+  ```json
+  [{"paymentMethodId":"...","amount":10}]
+  ```
+
+**Export:** CSV download via `/sales/export`
+
+---
 
 ### Sales Lines
 
 **Route:** `/rxsoft/sales-lines`
 
-Individual line items within sales.
+Individual line items within each sale. Filterable by `saleId` query param.
 
 **Columns:** Sale, Product, Quantity, Unit Price, Line Total, Discount
+
+**Filters:** Sale ID (from link), Product search, quantity range
+
+---
 
 ### Sales Analytics
 
 **Route:** `/rxsoft/sales-analytics`
 
-Visual analytics dashboard for sales data with charts and summaries.
+Full-page analytics dashboard with interactive charts and KPIs.
+
+**Filter bar:**
+| Filter | Type | Description |
+|---|---|
+| Location | Dropdown | Filter by stock location/store |
+| Date Range | Date picker | From / To dates (defaults to current month) |
+| Category | Dropdown | Filter by product category |
+| Payment Method | Dropdown | Filter by payment method |
+
+**KPI cards (with period-over-period delta):**
+- Total Revenue
+- Total Sales (count)
+- Average Sale Value
+- Items Sold
+- Gross Profit (with separate gross profit API)
+- Return Rate
+
+**Charts:**
+- **Revenue Trend** — Line/area chart over time
+- **Sales by Category** — Donut chart (top categories)
+- **Sales by Channel** — Bar chart (pos, online, mobile)
+- **Sales by Payment Method** — Donut chart
+- **Sales by Location** — Bar chart
+- **Top Products** — Ranked list
+- **Status Distribution** — Donut chart (completed, draft, voided)
+
+**Export:** "Export Report" button downloads a CSV of the filtered data
+
+---
 
 ### Purchases
 
 **Route:** `/rxsoft/purchases`
 
-**Columns:** PO #, Supplier, Status, Total, Order Date, Expected Delivery
+Full purchase order management with detail view, line item editing, and goods receiving workflow.
 
-**Create:** PO number, supplier, line items, expected delivery date
+**List columns:**
+| Column | Description |
+|---|---|
+| PO/Invoice | Purchase order or invoice number |
+| Supplier | Supplier name (async-select filter) |
+| Warehouse | Destination warehouse (async-select filter) |
+| Currency | Currency code (e.g., NGN) |
+| Total Cost | Total purchase value |
+| Status | Draft, approved, partially_received, received, cancelled |
+| Lines | Count of line items |
+
+**Create purchase form:**
+| Field | Type | Required |
+|---|---|---|
+| Supplier | async-select (searches `/customers`) | Yes |
+| Warehouse | async-select (searches `/stock-locations`) | Yes |
+| Product ID | text | Yes |
+| Purchase UOM | async-select (searches `/uoms`) | No |
+| Quantity | number | Yes |
+| Unit Cost | number | Yes |
+| Invoice/PO Number | text | No |
+| Currency Code | text (placeholder: NGN) | No |
+| Status | text (placeholder: draft) | No |
+| Note | text | No |
+
+**Detail view** (click a row → full detail modal):
+- **Header fields:** PO Number, Supplier, Warehouse, Order Date, Expected Date, Status, Currency, Total Cost, Note
+- **Purchase Lines accordion:** Expandable list of line items showing:
+  - Item name — Ordered Qty, UOM @ Unit Cost = Line Total
+  - **Inline edit** on each line (if status is not received/cancelled):
+    - Unit Cost Price (number, min 0)
+    - Received Qty (number, min 0)
+  - Edit endpoint: `/purchases/:purchaseId/lines`
+
+**Export:** CSV download via `/purchases/export`
+
+---
+
+### Receiving (Goods Receipt)
+
+**Route:** `/rxsoft/receiving`
+
+View and manage goods receipts from purchase orders.
+
+**List columns:**
+| Column | Description |
+|---|---|
+| Receipt # | Unique receipt number |
+| PO # | Linked purchase order number |
+| Date | Received date |
+| Items | Count of received line items |
+| Note | Receipt notes |
+
+**Detail modal** (click a row):
+- Header: Receipt number, PO number, date, note
+- **Line items table:**
+  | Column | Description |
+  |---|---|
+  | Item | Product name |
+  | Ordered | Quantity ordered |
+  | Received | Quantity received |
+  | UOM | Unit of measure code |
+  | Unit Cost | Cost per unit |
+  | Status | Badge: Active (green) or Unposted (red) |
+  | Action | **Unpost** button (orange, requires password confirmation) |
+
+**Unpost workflow:**
+1. Click **Unpost** on an active receipt line
+2. Enter your password in the confirmation dialog
+3. The line is reversed (status → Unposted)
+4. Stock adjustments are automatically applied
+
+---
 
 ### Purchases Analytics
 
 **Route:** `/rxsoft/purchases-analytics`
 
-Visual analytics dashboard for purchase data.
+Full-page analytics dashboard for purchasing performance.
+
+**Filter bar:**
+| Filter | Type | Description |
+|---|---|
+| Location | Dropdown | Filter by warehouse/location |
+| Date Range | Date picker | From / To (defaults to current month) |
+| Category | Dropdown | Filter by product category |
+| Supplier | Dropdown | Filter by supplier |
+
+**KPI cards (with period-over-period delta):**
+- Total Purchase Value (₦ formatted)
+- Total POs (count)
+- Total Items Purchased
+- Average PO Value
+- Active Suppliers
+- Top Supplier (name + value)
+
+**Charts:**
+- **Spend Trend** — Line chart over time
+- **Spend by Category** — Donut chart
+- **Spend by Supplier** — Bar chart (top 6)
+- **Spend by Location** — Bar chart
+- **Status Distribution** — Donut chart (Completed, Partially Received, Pending, Cancelled)
+- **Top Suppliers Table** — Ranked list with spend amounts
+
+**Export:** "Export Report" button downloads filtered data as CSV
+
+---
 
 ### Suppliers
 
 **Route:** `/rxsoft/suppliers`
 
-**Columns:** Name, code, contact, phone, email, address
-**Create:** Name, code, contact info
+**Columns:** Name, Code, Contact, Phone, Email, Address
+
+**Create:** Name, Code, Contact person, Phone, Email, Address
+
+**Used by:** Purchases (async-select in create form), Purchases Analytics (supplier filter)
 
 ---
 
@@ -396,22 +562,95 @@ Read-only financial statement showing revenue and expenses over a period.
 
 **Route:** `/rxsoft/pos-terminals`
 
-**Columns:** Name, code, store, status, last active
-**Create:** Name, code, store (select)
+Physical point-of-sale terminals assigned to the organization. Supports Nigerian payment providers.
+
+**List columns:**
+| Column | Description |
+|---|---|
+| Code | Unique terminal code |
+| Label | Human-readable label |
+| Provider | Payment provider type |
+| Serial (SN) | Hardware serial number |
+| Terminal ID | Provider-assigned terminal ID |
+| Active | Whether the terminal is enabled |
+
+**Create/edit form:**
+| Field | Type | Required | Description |
+|---|---|---|---|
+| Code | text | Yes | Unique identifier |
+| Label | text | No | Display name |
+| Provider Type | select | Yes | Paystack, Monnify, OPay, Moniepoint |
+| Serial (SN) | text | No | Physical serial number |
+| Terminal ID | text | No | Provider terminal ID |
+| Store ID | text | No | Store this terminal is assigned to |
+| Active | switch | No | Default: on |
+
+**Supported providers:** Paystack, Monnify, OPay, Moniepoint
+
+---
 
 ### Payment Methods
 
 **Route:** `/rxsoft/payment-methods`
 
-**Columns:** Name, code, type (Cash/Card/Mobile/Bank), status
-**Create:** Name, code, type
+Accepted payment instruments (what customers can use to pay).
+
+**List columns:**
+| Column | Description |
+|---|---|
+| Code | Unique method code |
+| Name | Display name |
+| Type | Payment method type |
+| Active | Whether this method is accepted |
+
+**Create/edit form:**
+| Field | Type | Required |
+|---|---|---|
+| Code | text | Yes |
+| Name | text | Yes |
+| Method Type | select | Yes |
+| Active | switch | No (default: on) |
+
+**Method types:** Cash, Card, Transfer, Wallet, Insurance
+
+**Usage:** Referenced when creating sales payments (the `paymentMethodId` in the payments JSON).
+
+---
 
 ### Payment Providers
 
 **Route:** `/rxsoft/payment-providers`
 
-**Columns:** Name, code, type, API endpoint, status
-**Create:** Name, code, type, configuration
+Gateway provider configurations with separate test and live credential storage.
+
+**List columns:**
+| Column | Description |
+|---|---|
+| Code | Unique provider code |
+| Name | Display name |
+| Provider | Provider type |
+| Channel | Payment channel |
+| Mode | **Live** or **Test** (based on `production` flag) |
+| Active | Whether this provider is enabled |
+
+**Create/edit form:**
+| Field | Type | Required | Description |
+|---|---|---|---|
+| Code | text | Yes | Unique identifier |
+| Name | text | Yes | Display name |
+| Provider Type | select | Yes | Paystack, Monnify, OPay, Moniepoint, Wallet, Insurance, Cash |
+| Channel | select | Yes | Cash, POS, Web, Wallet, Insurance |
+| Description | text | No | What this provider is for |
+| Use Live credentials | switch | No | Toggle between test and live mode |
+| Active | switch | No | Default: on |
+| Test Credentials (JSON) | JSON textarea | No | API keys, secrets for sandbox |
+| Live Credentials (JSON) | JSON textarea | No | API keys, secrets for production |
+
+**Provider types:** Paystack, Monnify, OPay, Moniepoint, Wallet, Insurance, Cash
+
+**Channels:** Cash, POS, Web, Wallet, Insurance
+
+**Credential security:** Test and live credentials are stored as JSON in the database. The `production` switch determines which credential set is active for processing.
 
 ---
 
@@ -586,6 +825,14 @@ Reporting engine with various report types:
 | **Metrics** | Summary cards at the top of dashboard pages |
 | **Pagination** | Use page controls at the bottom of lists |
 | **JSON fields** | Some create forms accept JSON (e.g., sales lines) — paste valid JSON |
+| **Print receipt** | On Sales page, click the printer icon on any sale row |
+| **Complete mobile sale** | On Sales page, click "Complete Sale" on mobile channel + draft status |
+| **View sale lines** | Click the eye icon on a sale row to navigate to Sales Lines |
+| **Edit PO lines** | In Purchase detail, expand the Lines accordion and click edit on any line |
+| **Unpost receipt** | In Receiving detail, click Unpost on a line → enter password to confirm |
+| **Switch live/test** | In Payment Providers, toggle "Use Live credentials" to switch modes |
+| **Period comparison** | Analytics dashboards auto-compare to the previous period with delta percentages |
+| **Export analytics** | Click "Export Report" on Sales/Purchases analytics for filtered CSV |
 
 ---
 
@@ -599,6 +846,13 @@ Reporting engine with various report types:
 | CSV export fails | Ensure the backend export endpoint is implemented |
 | Sort not working | The backend uses a sort allow-list; new columns may need backend config |
 | Two different form styles | Known debt — `ListQueryDto` vs `PaginationQueryDto` |
+| POS terminal not processing | Check provider credentials in Payment Providers; verify terminal is Active |
+| Sale receipt won't print | Ensure the backend PDF endpoint is implemented for that sale |
+| Complete Sale button missing | Only appears for mobile channel + draft status |
+| PO line edit blocked | Status must not be "received" or "cancelled" |
+| Unpost requires password | Enter your account password in the confirmation dialog |
+| Analytics charts empty | Check the date range filter; ensure data exists for the selected period |
+| Payment provider mode wrong | Toggle "Use Live credentials" in Payment Providers config |
 
 ---
 
