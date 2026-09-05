@@ -31,7 +31,7 @@ const statusColors: Record<string, string> = {
 const statusLabel = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
 
 export default function OrderDetailPage() {
-  const { id } = useParams({ from: '/damorex/orders_/$id' });
+  const { id } = useParams({ from: '/shop/orders_/$id' });
   const { data: order, isLoading } = useOrder(id);
 
   return (

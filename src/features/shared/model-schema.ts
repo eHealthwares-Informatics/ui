@@ -53,4 +53,11 @@ export type ModelConfig<T = any> = {
   metricsConfig?: MetricsConfig;
   superAdminOrgFilter?: boolean;
   listParams?: Record<string, unknown>;
+  rowActions?: RowAction[];
+};
+
+export type RowAction = {
+  label: string;
+  icon?: React.ComponentType<{ size?: number }>;
+  href: (row: Record<string, unknown>) => string;
 };

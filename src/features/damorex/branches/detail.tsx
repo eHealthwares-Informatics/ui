@@ -5,7 +5,7 @@ import { useBranch } from '../website/hooks';
 import { WebsiteLayout, green, ink, muted, line } from '../website/layout';
 
 export default function BranchDetailPage() {
-  const { id } = useParams({ from: '/damorex/branches/$id' });
+  const { id } = useParams({ from: '/shop/branches/$id' });
   const { data: branch, isLoading } = useBranch(id);
 
   return (

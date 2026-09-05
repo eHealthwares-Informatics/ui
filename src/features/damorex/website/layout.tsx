@@ -47,11 +47,11 @@ export const blue = '#0EA5E9';
 
 const navItems = [
   { label: 'Home', path: '/damorex' },
-  { label: 'Shop Medicines', path: '/damorex/shop' },
-  { label: 'Categories', path: '/damorex/categories' },
-  { label: 'Health Concerns', path: '/damorex/health-concerns' },
-  { label: 'Consult Pharmacist', path: '/damorex/consult-pharmacist' },
-  { label: 'Blog', path: '/damorex/blog' },
+  { label: 'Shop Medicines', path: '/shop/shop' },
+  { label: 'Categories', path: '/shop/categories' },
+  { label: 'Health Concerns', path: '/shop/health-concerns' },
+  { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist' },
+  { label: 'Blog', path: '/shop/blog' },
 ];
 
 export const buttonStyles = {
@@ -183,7 +183,7 @@ export function WebsiteHeader() {
                 color="gray"
                 radius="xl"
                 aria-label="Search"
-                onClick={() => navigate({ to: '/damorex/search' })}
+                onClick={() => navigate({ to: '/shop/search' })}
               >
                 <Search size={20} />
               </ActionIcon>
@@ -194,7 +194,7 @@ export function WebsiteHeader() {
                 color="green"
                 leftSection={<Upload size={16} />}
                 styles={buttonStyles}
-                onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+                onClick={() => navigate({ to: '/shop/upload-prescription' })}
               >
                 Upload Prescription
               </Button>
@@ -214,7 +214,7 @@ export function WebsiteHeader() {
                 radius="xl"
                 aria-label="Cart"
                 style={{ background: green, position: 'relative' }}
-                onClick={() => navigate({ to: '/damorex/cart' })}
+                onClick={() => navigate({ to: '/shop/cart' })}
               >
                 <ShoppingCart size={20} />
                 {totalItems > 0 ? (
@@ -262,7 +262,7 @@ export function WebsiteHeader() {
               ))}
               <Anchor
                 onClick={() => {
-                  navigate({ to: '/damorex/upload-prescription' });
+                  navigate({ to: '/shop/upload-prescription' });
                   toggle();
                 }}
                 underline="never"
@@ -275,7 +275,7 @@ export function WebsiteHeader() {
               </Anchor>
               <Anchor
                 onClick={() => {
-                  navigate({ to: '/damorex/login' });
+                  navigate({ to: '/shop/login' });
                   toggle();
                 }}
                 underline="never"
@@ -378,23 +378,23 @@ export function WebsiteFooter() {
                     onClick={() => {
                       const path = link.toLowerCase().replace(/\s+/g, '-');
                       if (path === 'prescription-upload')
-                        {navigate({ to: '/damorex/upload-prescription' });}
+                        {navigate({ to: '/shop/upload-prescription' });}
                       else if (path === 'consult-pharmacist')
-                        {navigate({ to: '/damorex/consult-pharmacist' });}
-                      else if (path === 'delivery') {navigate({ to: '/damorex/delivery-areas' });}
-                      else if (path === 'contact') {navigate({ to: '/damorex/contact' });}
-                      else if (path === 'about-us') {navigate({ to: '/damorex/about' });}
-                      else if (path === 'faqs') {navigate({ to: '/damorex/faq' });}
+                        {navigate({ to: '/shop/consult-pharmacist' });}
+                      else if (path === 'delivery') {navigate({ to: '/shop/delivery-areas' });}
+                      else if (path === 'contact') {navigate({ to: '/shop/contact' });}
+                      else if (path === 'about-us') {navigate({ to: '/shop/about' });}
+                      else if (path === 'faqs') {navigate({ to: '/shop/faq' });}
                       else if (path === 'privacy-policy')
-                        {navigate({ to: '/damorex/privacy-policy' });}
-                      else if (path === 'terms') {navigate({ to: '/damorex/terms' });}
-                      else if (path === 'careers') {navigate({ to: '/damorex/about' });}
+                        {navigate({ to: '/shop/privacy-policy' });}
+                      else if (path === 'terms') {navigate({ to: '/shop/terms' });}
+                      else if (path === 'careers') {navigate({ to: '/shop/about' });}
                       else if (
                         link === 'Medicines' ||
                         link === 'Supplements' ||
                         link === 'Wellness'
                       )
-                        {navigate({ to: '/damorex/shop' });}
+                        {navigate({ to: '/shop/shop' });}
                       else {navigate({ to: '/damorex' });}
                     }}
                     c="rgba(255,255,255,0.68)"
@@ -429,7 +429,7 @@ export function WebsiteFooter() {
                 WhatsApp
               </Anchor>
               <Anchor
-                onClick={() => navigate({ to: '/damorex/branches' })}
+                onClick={() => navigate({ to: '/shop/branches' })}
                 c="rgba(255,255,255,0.68)"
                 underline="never"
                 style={{ cursor: 'pointer' }}
@@ -461,7 +461,7 @@ export function WebsiteFooter() {
               color="green"
               variant="light"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate({ to: '/damorex/delivery-areas' })}
+              onClick={() => navigate({ to: '/shop/delivery-areas' })}
             >
               <Truck size={18} />
             </ThemeIcon>
@@ -470,7 +470,7 @@ export function WebsiteFooter() {
               color="green"
               variant="light"
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate({ to: '/damorex/about' })}
+              onClick={() => navigate({ to: '/shop/about' })}
             >
               <ShieldCheck size={18} />
             </ThemeIcon>

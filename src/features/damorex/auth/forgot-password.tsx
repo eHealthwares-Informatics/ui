@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
               mt="lg"
               variant="light"
               color="green"
-              onClick={() => navigate({ to: '/damorex/login' })}
+              onClick={() => navigate({ to: '/shop/login' })}
             >
               Back to Sign In
             </Button>
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
               variant="subtle"
               color="gray"
               leftSection={<ArrowLeft size={18} />}
-              onClick={() => navigate({ to: '/damorex/login' })}
+              onClick={() => navigate({ to: '/shop/login' })}
               styles={buttonStyles}
             >
               Back

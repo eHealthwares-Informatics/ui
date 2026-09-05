@@ -1,9 +1,9 @@
-import { ActionIcon, Group } from '@mantine/core';
+import { ActionIcon, Group, Menu } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import { Eye, Pencil, RotateCcw, Save, Trash2 } from 'lucide-react';
+import { Eye, MoreHorizontal, Pencil, RotateCcw, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { refundData } from '@/registry/fields';
+import type { RowAction } from '@/features/shared/model-schema';
 
 export type ActionCellProps = {
   rowIndex?: number;
@@ -19,6 +19,7 @@ export type ActionCellProps = {
   resetRow?: (rowIndex: string) => void;
   savingRowIndex?: string | null;
   actions?: any[];
+  rowActions?: RowAction[];
 };
 
 export const ActionCell = ({
@@ -35,6 +36,7 @@ export const ActionCell = ({
   savingRowIndex,
   saveRow,
   resetRow,
+  rowActions,
 }: ActionCellProps & { row: Record<string, unknown> }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const handleDelete = () => {
@@ -112,6 +114,31 @@ export const ActionCell = ({
         >
           <RotateCcw size={16} />
         </ActionIcon>
+      )}
+
+      {rowActions && rowActions.length > 0 && (
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <ActionIcon variant="outline">
+              <MoreHorizontal size={16} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            {rowActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Menu.Item
+                  key={action.label}
+                  component={Link}
+                  to={action.href(row)}
+                  leftSection={Icon ? <Icon size={14} /> : undefined}
+                >
+                  {action.label}
+                </Menu.Item>
+              );
+            })}
+          </Menu.Dropdown>
+        </Menu>
       )}
 
       {/* DELETE CONFIRMATION DIALOG */}

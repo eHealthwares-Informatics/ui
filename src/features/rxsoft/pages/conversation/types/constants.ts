@@ -87,3 +87,21 @@ export const VALIDATION_RULE_OPTIONS = [
   'regex',
   'api',
 ].map((value) => ({ value, label: value }));
+
+export const INVITE_STATUS_OPTIONS = [
+  'CREATED',
+  'AWAITING',
+  'ACCEPTED',
+  'TIMED_OUT',
+  'CANCELLED',
+  'BROADCASTING',
+].map((value) => ({ value, label: value }));
+
+export const PROJECTION_ROLE_OPTIONS = ['USER', 'PATIENT', 'DOCTOR', 'NURSE', 'BOT'].map(
+  (value) => ({ value, label: value }),
+);
+
+export const PROJECTION_STATUS_OPTIONS = ['ACTIVE', 'PAUSED', 'ENDED'].map((value) => ({
+  value,
+  label: value,
+}));

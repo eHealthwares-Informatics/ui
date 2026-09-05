@@ -70,7 +70,7 @@ export function EmptyProducts({ title, message }: EmptyStateProps) {
           <Button
             radius="xl"
             style={{ background: green }}
-            onClick={() => navigate({ to: '/damorex/shop' })}
+            onClick={() => navigate({ to: '/shop/shop' })}
           >
             Browse Catalog
           </Button>
@@ -78,7 +78,7 @@ export function EmptyProducts({ title, message }: EmptyStateProps) {
             radius="xl"
             variant="outline"
             color="gray"
-            onClick={() => navigate({ to: '/damorex/search' })}
+            onClick={() => navigate({ to: '/shop/search' })}
           >
             Search
           </Button>
@@ -104,14 +104,14 @@ export function EmptySearchResults({ title, message }: EmptyStateProps) {
             radius="xl"
             variant="outline"
             color="gray"
-            onClick={() => navigate({ to: '/damorex/search' })}
+            onClick={() => navigate({ to: '/shop/search' })}
           >
             Try Again
           </Button>
           <Button
             radius="xl"
             style={{ background: green }}
-            onClick={() => navigate({ to: '/damorex/shop' })}
+            onClick={() => navigate({ to: '/shop/shop' })}
           >
             Browse Categories
           </Button>
@@ -135,7 +135,7 @@ export function EmptyOrders({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/shop' })}
+          onClick={() => navigate({ to: '/shop/shop' })}
         >
           Start Shopping
         </Button>
@@ -158,7 +158,7 @@ export function EmptyPrescriptions({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+          onClick={() => navigate({ to: '/shop/upload-prescription' })}
         >
           Upload Prescription
         </Button>
@@ -180,7 +180,7 @@ export function EmptyCart({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/shop' })}
+          onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse Medicines
         </Button>
@@ -203,7 +203,7 @@ export function EmptySavedMedicines({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/shop' })}
+          onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse & Save
         </Button>
@@ -226,7 +226,7 @@ export function EmptyConsultations({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/consult-pharmacist' })}
+          onClick={() => navigate({ to: '/shop/consult-pharmacist' })}
         >
           Book a Consultation
         </Button>
@@ -250,7 +250,7 @@ export function EmptyRewards({ title, message }: EmptyStateProps) {
           radius="xl"
           variant="outline"
           color="green"
-          onClick={() => navigate({ to: '/damorex/shop' })}
+          onClick={() => navigate({ to: '/shop/shop' })}
         >
           Learn About Rewards
         </Button>
@@ -274,7 +274,7 @@ export function EmptyBlog({ title, message }: EmptyStateProps) {
           radius="xl"
           variant="outline"
           color="gray"
-          onClick={() => navigate({ to: '/damorex/blog' })}
+          onClick={() => navigate({ to: '/shop/blog' })}
         >
           Check Back Later
         </Button>
@@ -296,7 +296,7 @@ export function EmptyCategories({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/shop' })}
+          onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse All
         </Button>
@@ -319,7 +319,7 @@ export function EmptyHealthConcerns({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
-          onClick={() => navigate({ to: '/damorex/health-concerns' })}
+          onClick={() => navigate({ to: '/shop/health-concerns' })}
         >
           Browse All
         </Button>

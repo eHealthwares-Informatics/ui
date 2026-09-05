@@ -132,7 +132,7 @@ function ItemSearchSelect({
   selectedLabel,
   excludeIds,
   onSelect,
-  w = 300,
+  w = 350,
 }: {
   value: string;
   selectedLabel?: string;
@@ -285,7 +285,7 @@ export function PoLinesTable({
 
   return (
     <>
-      <Table withTableBorder withColumnBorders>
+      <Table withTableBorder withColumnBorders data-testid="po-lines-table">
         <Table.Thead bg="#a6d5e5">
           <Table.Tr>
             <Table.Th>Item</Table.Th>
@@ -339,6 +339,7 @@ export function PoLinesTable({
                       value={line.itemId || ''}
                       selectedLabel={selectedItemLabel || undefined}
                       excludeIds={usedItemIds}
+                      data-testid="po-line-item-select"
                       onSelect={(item) =>
                         onUpdateLine(line.id, {
                           itemId: item.id,
@@ -370,6 +371,7 @@ export function PoLinesTable({
                       value={line.orderedQty}
                       onChange={(v) => onUpdateLine(line.id, { orderedQty: Number(v) || 0 })}
                       w={100}
+                      data-testid="po-line-ordered-qty"
                     />
                   ) : (
                     <Text size="xs">{line.orderedQty}</Text>
@@ -383,6 +385,7 @@ export function PoLinesTable({
                     onChange={(v) => onUpdateLine(line.id, { receivedQty: Number(v) || 0 })}
                     w={120}
                     disabled={!recvQtyEditable}
+                    data-testid="po-line-received-qty"
                   />
                 </Table.Td>
                 <Table.Td>
@@ -394,6 +397,7 @@ export function PoLinesTable({
                     w={140}
                     decimalScale={2}
                     disabled={!costEditable}
+                    data-testid="po-line-unit-cost"
                   />
                 </Table.Td>
                 <Table.Td>

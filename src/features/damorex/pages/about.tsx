@@ -198,7 +198,7 @@ export default function AboutPage() {
             </Text>
             <PrimaryButton
               leftSection={<ShoppingCart size={18} />}
-              onClick={() => navigate({ to: '/damorex/shop' })}
+              onClick={() => navigate({ to: '/shop/shop' })}
             >
               Shop Medicines
             </PrimaryButton>

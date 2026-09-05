@@ -5,7 +5,7 @@ import { useCategoryBySlug } from '../website/hooks';
 import { WebsiteLayout, green, ink, muted, line } from '../website/layout';
 
 export default function CategoryProductsPage() {
-  const { slug } = useParams({ from: '/damorex/categories/$slug' });
+  const { slug } = useParams({ from: '/shop/categories/$slug' });
   const { data, isLoading } = useCategoryBySlug(slug);
 
   return (

@@ -52,6 +52,7 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
         <Select
           size="xs"
           placeholder="Pending PO"
+          data-testid="po-pending-select"
           data={pendingPOpts}
           value={pendingPoId || null}
           onChange={(v) => {
@@ -98,6 +99,7 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
 
         {activeTab?.pendingPoStatus && (
           <Badge
+            data-testid="po-status-badge"
             color={
               activeTab.pendingPoStatus === 'draft' ? 'yellow' :
               activeTab.pendingPoStatus === 'approved' ? 'blue' :
@@ -114,6 +116,7 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
         <Select
           size="xs"
           placeholder="Supplier"
+          data-testid="po-supplier-select"
           data={supplierOpts}
           value={supplierId || null}
           onChange={(v, opt) => {
@@ -132,6 +135,7 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
         <Select
           size="xs"
           placeholder="Warehouse"
+          data-testid="po-warehouse-select"
           data={warehouseOpts}
           value={warehouseId || null}
           onChange={(v, opt) => {
@@ -146,24 +150,25 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
         <TextInput
           size="xs"
           placeholder="Receipt #"
+          data-testid="po-receipt-input"
           value={receiptNumber}
           onChange={(e) => setReceiptNumber(e.currentTarget.value)}
           w={140}
         />
 
-        <Button size="xs" leftSection={<FileText size={14} />} onClick={onNew}>
+        <Button size="xs" leftSection={<FileText size={14} />} onClick={onNew} data-testid="po-new-btn">
           New
         </Button>
 
-        <Button size="xs" color="red" leftSection={<RefreshCcw size={14} />} onClick={onReset}>
+        <Button size="xs" color="red" leftSection={<RefreshCcw size={14} />} onClick={onReset} data-testid="po-reset-btn">
           Reset
         </Button>
 
-        <ActionIcon size="lg" variant="light" onClick={onPrint}>
+        <ActionIcon size="lg" variant="light" onClick={onPrint} data-testid="po-print-btn">
           <Printer size={18} />
         </ActionIcon>
 
-        <ActionIcon size="lg" variant="light" onClick={onSettings}>
+        <ActionIcon size="lg" variant="light" onClick={onSettings} data-testid="po-settings-btn">
           <Settings size={18} />
         </ActionIcon>
 

@@ -29,7 +29,7 @@ export function SalesSummary({
   sessionCompleted = false,
 }: Props) {
   return (
-    <Paper radius={0} withBorder bg="#c7e6f1" h="100%" p="md">
+    <Paper radius={0} withBorder bg="#c7e6f1" h="100%" p="md" data-testid="pos-sales-summary">
       <Stack>
         <Title order={3} ta="center">
           Current Sales Summary
@@ -69,19 +69,19 @@ export function SalesSummary({
           </Title>
         </Paper>
 
-        <Button fullWidth mt="md" onClick={onCheckout} disabled={cartEmpty || sessionCompleted}>
+        <Button fullWidth mt="md" onClick={onCheckout} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-only-btn">
           Sell Only
         </Button>
-        <Button fullWidth mt="xs" onClick={onSellPrint} disabled={cartEmpty || sessionCompleted}>
+        <Button fullWidth mt="xs" onClick={onSellPrint} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-print-btn">
           Sell and Print
         </Button>
-        <Button fullWidth mt="xs" onClick={onPrintWholesale} disabled={cartEmpty || sessionCompleted}>
+        <Button fullWidth mt="xs" onClick={onPrintWholesale} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-wholesale-btn">
           Sell and Print wholesale
         </Button>
-        <Button fullWidth mt="xs" variant="light" onClick={onHold} disabled={cartEmpty || sessionCompleted}>
+        <Button fullWidth mt="xs" variant="light" onClick={onHold} disabled={cartEmpty || sessionCompleted} data-testid="pos-hold-sale-btn">
           Hold Sale
         </Button>
-        <Button fullWidth mt="xs" variant="outline" onClick={onNextCustomer} disabled={!sessionCompleted}>
+        <Button fullWidth mt="xs" variant="outline" onClick={onNextCustomer} disabled={!sessionCompleted} data-testid="pos-next-customer-btn">
           Next Customer
         </Button>
       </Stack>

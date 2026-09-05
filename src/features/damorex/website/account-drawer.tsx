@@ -45,13 +45,13 @@ interface AccountDrawerProps {
 }
 
 const DASHBOARD_LINKS = [
-  { label: 'My Orders', icon: Receipt, path: '/damorex/orders' },
-  { label: 'Prescriptions', icon: Pill, path: '/damorex/my-prescriptions' },
-  { label: 'Saved Medicines', icon: Heart, path: '/damorex/dashboard' },
-  { label: 'Consultation History', icon: Stethoscope, path: '/damorex/consultations' },
-  { label: 'Rewards & Points', icon: Gift, path: '/damorex/rewards' },
-  { label: 'Addresses', icon: MapPin, path: '/damorex/dashboard' },
-  { label: 'Payment Methods', icon: CreditCard, path: '/damorex/dashboard' },
+  { label: 'My Orders', icon: Receipt, path: '/shop/orders' },
+  { label: 'Prescriptions', icon: Pill, path: '/shop/my-prescriptions' },
+  { label: 'Saved Medicines', icon: Heart, path: '/shop/dashboard' },
+  { label: 'Consultation History', icon: Stethoscope, path: '/shop/consultations' },
+  { label: 'Rewards & Points', icon: Gift, path: '/shop/rewards' },
+  { label: 'Addresses', icon: MapPin, path: '/shop/dashboard' },
+  { label: 'Payment Methods', icon: CreditCard, path: '/shop/dashboard' },
 ];
 
 function LoggedOutView({ onSuccess, onClose }: { onSuccess: () => void; onClose: () => void }) {
@@ -166,7 +166,7 @@ function LoggedOutView({ onSuccess, onClose }: { onSuccess: () => void; onClose:
                   style={{ cursor: 'pointer' }}
                   onClick={() => {
                     onClose();
-                    navigate({ to: '/damorex/forgot-password' });
+                    navigate({ to: '/shop/forgot-password' });
                   }}
                 >
                   Forgot password?

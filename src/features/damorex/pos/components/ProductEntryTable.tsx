@@ -200,7 +200,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
   }
 
   return (
-    <Paper radius={0} withBorder>
+    <Paper radius={0} withBorder data-testid="pos-product-entry">
       <Table striped withTableBorder withColumnBorders horizontalSpacing="xs" verticalSpacing={4}>
         <Table.Thead bg="#a6d5e5">
           <Table.Tr>
@@ -231,12 +231,13 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               <Select
                 size="xs"
                 placeholder="Select product..."
+                data-testid="pos-product-select"
                 data={productOptions.map((p) => ({ value: p.value, label: p.label }))}
                 value={selectedProductId}
                 onChange={handleProductSelect}
                 searchable
                 clearable
-                w={280}
+                w={350}
               />
             </Table.Td>
             <Table.Td>
@@ -264,6 +265,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               <Select
                 size="xs"
                 w={200}
+                data-testid="pos-entry-uom"
                 data={filteredUomOptions.map((u) => ({
                   value: u.id,
                   label: u.name,
@@ -284,7 +286,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
             </Table.Td>
             <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
             <Table.Td>
-              <Button size="xs" leftSection={<Plus size={14} />} onClick={handleAdd}>
+              <Button size="xs" leftSection={<Plus size={14} />} onClick={handleAdd} data-testid="pos-add-to-cart-btn">
                 Add
               </Button>
             </Table.Td>

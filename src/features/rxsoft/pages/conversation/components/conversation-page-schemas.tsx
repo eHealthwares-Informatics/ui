@@ -1,4 +1,5 @@
 import { Text } from '@mantine/core';
+import { FileText, MessageSquare, Users } from 'lucide-react';
 import {
   ColumnDataType,
   ColumnTypeFilters,
@@ -10,6 +11,7 @@ import {
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import {
+  INVITE_STATUS_OPTIONS,
   CHANNEL_TYPE_OPTIONS,
   CONVERSATION_STATE_OPTIONS,
   CONVERSATION_STATUS_OPTIONS,
@@ -17,6 +19,8 @@ import {
   EXCHANGE_STATUS_OPTIONS,
   PROCESSING_STRATEGY_OPTIONS,
   PROCESS_MODE_OPTIONS,
+  PROJECTION_ROLE_OPTIONS,
+  PROJECTION_STATUS_OPTIONS,
   QUESTION_TYPE_OPTIONS,
   RENDER_MODE_OPTIONS,
   WORKFLOW_STATUS_OPTIONS,
@@ -426,6 +430,7 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
   title: 'Conversations',
   description: 'Create and manage conversation sessions, participant linkage, and saved context.',
   endpoint: '/conversations',
+  detailPathBuilder: (row) => `/conversation/${String(row.id)}/edit`,
   editPathBuilder: (row) => `/conversation/${String(row.id)}/edit`,
   columns: [
     { key: 'id', label: 'Conversation ID', render: (row) => shortText(row.id) },
@@ -524,6 +529,11 @@ export const participantPageSchema: ModelConfig = withDefaultActions({
   title: 'Participants',
   description: 'Create participants and search by phone or email for questionnaire entry.',
   endpoint: '/participants',
+  rowActions: [
+    { label: 'View Conversations', icon: MessageSquare, href: (row) => `/conversation?participantId=${String(row.id ?? row._id ?? '')}` },
+    { label: 'View Projections', icon: Users, href: (row) => `/conversation/projections?participantId=${String(row.id ?? row._id ?? '')}` },
+    { label: 'View Exchanges', icon: FileText, href: (row) => `/conversation/exchanges?participantId=${String(row.id ?? row._id ?? '')}` },
+  ],
   columns: [
     { key: 'firstName', label: 'First Name' },
     { key: 'lastName', label: 'Last Name' },
@@ -928,11 +938,14 @@ export const projectionPageSchema: ModelConfig = {
   title: 'Projections',
   description: 'View conversation participant projections, roles, and activity.',
   endpoint: '/projections',
+  detailPathBuilder: (row) => `/conversation/projections/${String(row.id)}`,
   columns: [
-    { key: 'participant.phone', label: 'Phone' },
+    { key: 'id', label: 'ID', render: (row) => shortText(row.id) },
+    { key: 'participant.phone', label: 'Phone', filters: ColumnTypeFilters.STRING },
     {
       key: 'participant',
-      label: 'Name',
+      label: 'Participant',
+      filters: ColumnTypeFilters.STRING,
       render: (row) => {
         const p = row.participant as Record<string, unknown> | undefined;
         return [p?.firstName, p?.lastName].filter(Boolean).join(' ') || '-';
@@ -941,10 +954,19 @@ export const projectionPageSchema: ModelConfig = {
     {
       key: 'conversationId',
       label: 'Conversation',
+      filters: ColumnTypeFilters.STRING,
       render: (row) => shortText(row.conversationId),
     },
-    { key: 'role', label: 'Role' },
-    { key: 'status', label: 'Status' },
+    {
+      key: 'role',
+      label: 'Role',
+      filters: EQUALS_WITH_OPTIONS(PROJECTION_ROLE_OPTIONS),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      filters: EQUALS_WITH_OPTIONS(PROJECTION_STATUS_OPTIONS),
+    },
     {
       key: 'isPrimary',
       label: 'Primary',
@@ -954,11 +976,11 @@ export const projectionPageSchema: ModelConfig = {
       key: 'lastMessageText',
       label: 'Last Message',
       render: (row) => {
-        const text = String(row.lastMessageText ?? '');
-        return text.length < 60 ? text : `${text.slice(0, 60)}...`;
+        const t = String(row.lastMessageText ?? '');
+        return t.length < 60 ? t : `${t.slice(0, 60)}...`;
       },
     },
-    { key: 'lastMessageAt', label: 'Last Activity' },
+    { key: 'lastMessageAt', label: 'Last Activity', dataType: ColumnDataType.DATE, sortable: true },
     { key: 'unreadCount', label: 'Unread' },
   ],
 };
@@ -1076,3 +1098,162 @@ export const workflowAttachmentPageSchema: ModelConfig = withDefaultActions({
 });
 
 export const workflowStepTypeOptions = WORKFLOW_STEP_TYPE_OPTIONS;
+
+export const invitePageSchema: ModelConfig = {
+  id: 'invites',
+  apiProvider: conversationApi,
+  title: 'Invites',
+  description: 'View conversation invites, provider assignments, and acceptance tracking.',
+  endpoint: '/invites',
+  detailPathBuilder: (row) => `/conversation/invites/${String(row.id)}`,
+  columns: [
+    { key: 'id', label: 'ID', render: (row) => shortText(row.id) },
+    {
+      key: 'conversationId',
+      label: 'Conversation',
+      filters: ColumnTypeFilters.STRING,
+      render: (row) => shortText(row.conversationId),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      filters: EQUALS_WITH_OPTIONS(INVITE_STATUS_OPTIONS),
+    },
+    {
+      key: 'providers',
+      label: 'Providers',
+      render: (row) => {
+        const providers = jsonArray(row.providers);
+        return `${providers.length} provider${providers.length !== 1 ? 's' : ''}`;
+      },
+    },
+    { key: 'acceptanceCount', label: 'Required' },
+    { key: 'acceptedCount', label: 'Accepted' },
+    {
+      key: 'chatMode',
+      label: 'Chat Mode',
+      render: (row) => (bool(row.chatMode) ? 'Yes' : 'No'),
+    },
+    {
+      key: 'timeoutAt',
+      label: 'Timeout',
+      render: (row) => {
+        if (!row.timeoutAt) return '—';
+        const d = new Date(Number(row.timeoutAt));
+        return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
+      },
+    },
+    {
+      key: 'createdAt',
+      label: 'Created',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+  ],
+};
+
+// ── AI Pages ──────────────────────────────────────────────────────────────────
+
+export const aiInstructionPageSchema: ModelConfig = {
+  id: 'ai-instructions',
+  apiProvider: conversationApi,
+  title: 'AI Instructions',
+  description: 'Versioned AI instructions for question extraction, with scoring and promotion history.',
+  endpoint: '/ai/instructions',
+  columns: [
+    {
+      key: 'questionId',
+      label: 'Question ID',
+      render: (row) => shortText(row.questionId),
+      filters: ColumnTypeFilters.STRING,
+    },
+    {
+      key: 'activeInstructions',
+      label: 'Active Instructions',
+      render: (row) => {
+        const text = String(row.activeInstructions ?? '');
+        return text.length < 80 ? text : `${text.slice(0, 80)}...`;
+      },
+    },
+    {
+      key: 'activeScore',
+      label: 'Score',
+      render: (row) => {
+        const score = Number(row.activeScore ?? 0);
+        const color = score >= 0.8 ? 'green' : score >= 0.5 ? 'yellow' : 'red';
+        return `${score.toFixed(3)}`;
+      },
+    },
+    {
+      key: 'versionsCount',
+      label: 'Versions',
+    },
+    {
+      key: 'updatedAt',
+      label: 'Updated',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+  ],
+};
+
+export const aiEvalLogPageSchema: ModelConfig = {
+  id: 'ai-eval-logs',
+  apiProvider: conversationApi,
+  title: 'AI Eval Logs',
+  description: 'Audit trail of instruction improvement runs — scores, promotion decisions, and candidate content.',
+  endpoint: '/ai/eval-logs',
+  columns: [
+    {
+      key: 'questionId',
+      label: 'Question ID',
+      render: (row) => shortText(row.questionId),
+      filters: ColumnTypeFilters.STRING,
+    },
+    {
+      key: 'currentScore',
+      label: 'Current Score',
+      render: (row) => Number(row.currentScore ?? 0).toFixed(3),
+    },
+    {
+      key: 'candidateScore',
+      label: 'Candidate Score',
+      render: (row) => Number(row.candidateScore ?? 0).toFixed(3),
+    },
+    {
+      key: 'promoted',
+      label: 'Promoted',
+      render: (row) => (row.promoted ? '✅ Yes' : '❌ No'),
+    },
+    {
+      key: 'triggeredBy',
+      label: 'Triggered By',
+    },
+    {
+      key: 'candidateContent',
+      label: 'Candidate',
+      render: (row) => {
+        const text = String(row.candidateContent ?? '');
+        return text.length < 60 ? text : `${text.slice(0, 60)}...`;
+      },
+    },
+    {
+      key: 'createdAt',
+      label: 'Created',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+  ],
+};
+
+export const aiConfigPageSchema: ModelConfig = {
+  id: 'ai-config',
+  apiProvider: conversationApi,
+  title: 'AI Configuration',
+  description: 'Current AI provider configuration and routing defaults. Configured via environment variables.',
+  endpoint: '/ai/config',
+  columns: [
+    { key: 'setting', label: 'Setting' },
+    { key: 'value', label: 'Value' },
+  ],
+};

@@ -1,0 +1,22 @@
+Create e2e test for 
+ create UOM category e2e Items - (Count-e2e)
+ create a UOM (Unit-e2e , factor 1) with uom category  - (Count-e2e) 
+ Create a UOM (Dozen-e2e , factor * 12) with uom category - (Count-e2e)
+ create a category (Junks-e2e) Test 
+ Create a sales location (JunksSales-e2e)
+ create a Item (Biscuit) with Base UOM - Unit-e2e, Selinng UOM Unit-e2e and Purchase UOM - Dozen-e2e
+ create a pricelist (Retail-Prices e2e)
+ create a price list(above) item of 10 for the Biscuit created abbove  
+ view the item(Biscuit) and edit adn update the price to 100 
+ Use the purchase flow to purchase and receive 2 Dozens
+ Transfer 20 from Main Location to JunksSales-e2e
+ Use the POS flow to sell  5 
+ use the website order flow to order 5
+ use the Website Orders flow to post the complete the order
+ Use the Invenntory Flow to confirm 
+ the current stock
+ the adjustment esist with right value
+ the purchase esist with right value
+ the sale esist with right value
+ the posted order esist with right value in JunkSales-e2e location
+ 

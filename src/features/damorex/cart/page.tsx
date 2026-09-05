@@ -622,7 +622,7 @@ export default function CartPage() {
                         leftSection={<ArrowRight size={20} />}
                         styles={buttonStyles}
                         style={{ background: green }}
-                        onClick={() => navigate({ to: '/damorex/checkout' })}
+                        onClick={() => navigate({ to: '/shop/checkout' })}
                       >
                         Proceed to Checkout
                       </Button>

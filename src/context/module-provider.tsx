@@ -2,17 +2,28 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { ModuleContext, type ModuleContextType } from '@/context/module-context';
 import { useAttributeDefinitionsBootstrap } from '@/features/queries/bootstrap';
 import { modules, type ModuleId, moduleMap } from '@/features/shared/module-data';
+import { useAuthStore } from '@/stores/auth-store';
 
 const MODULE_STORAGE_KEY = 'rxsoft_admin_selected_module';
 
-const getInitialModule = (): ModuleId => {
+/**
+ * Picks the best initial module:
+ * 1. Stored in localStorage (if the user has access to it)
+ * 2. First module the user has access to
+ * 3. Hardcoded fallback 'rxsoft'
+ */
+const getInitialModule = (userModules: { id: string }[]): ModuleId => {
   if (typeof window === 'undefined') {
-    return 'rxsoft';
+    return userModules[0]?.id as ModuleId || 'rxsoft';
   }
 
   const stored = window.localStorage.getItem(MODULE_STORAGE_KEY);
-  if (stored && modules.some((module) => module.id === stored)) {
+  if (stored && userModules.some((m) => m.id === stored)) {
     return stored as ModuleId;
+  }
+
+  if (userModules.length > 0) {
+    return userModules[0].id as ModuleId;
   }
 
   return 'rxsoft';
@@ -41,9 +52,26 @@ function FullScreenLoader() {
 }
 
 export function ModuleProvider({ children, defaultModule }: ModuleProviderProps) {
+  const storeModules = useAuthStore((state) => state.modules);
   const [selectedModule, setSelectedModuleState] = useState<ModuleId>(
-    defaultModule || getInitialModule()
+    defaultModule || getInitialModule(storeModules)
   );
+
+  // When user modules load (async from /auth/me), sync the selected module:
+  // - If current selection isn't in the user's modules, switch to the first one they have
+  // - If localStorage stored a module the user no longer has, update it
+  useEffect(() => {
+    if (storeModules.length === 0) return;
+
+    const hasAccess = storeModules.some((m) => m.id === selectedModule);
+    if (!hasAccess) {
+      const firstAvailable = storeModules[0]?.id as ModuleId | undefined;
+      if (firstAvailable && moduleMap[firstAvailable]) {
+        setSelectedModuleState(firstAvailable);
+        window.localStorage.setItem(MODULE_STORAGE_KEY, firstAvailable);
+      }
+    }
+  }, [storeModules]);
 
   const currentModuleDefinition = moduleMap[selectedModule];
 
@@ -71,7 +99,7 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
 
   function AppBootstrap({ children }: { children: React.ReactNode }) {
     const pathname = typeof window === 'undefined' ? '' : window.location.pathname;
-    const isPublicWebsiteRoute = pathname === '/' || pathname.startsWith('/damorex');
+    const isPublicWebsiteRoute = pathname === '/' || pathname.startsWith('/shop');
     const [isReady, setIsReady] = useState(false);
     // const attributeDefs = useAttributeDefinitionsBootstrap('LOINC');
     useEffect(() => {

@@ -48,7 +48,7 @@ export function PoSummary({
       <Group justify="space-between">
         <Group gap="xl">
           {status && (
-            <Badge color={statusColors[status] || 'gray'} size="lg">
+            <Badge data-testid="po-summary-status" color={statusColors[status] || 'gray'} size="lg">
               {status.replace(/_/g, ' ')}
             </Badge>
           )}
@@ -68,7 +68,7 @@ export function PoSummary({
         </Group>
         <Group>
           {canReceive > 0 && !isReadOnly && status && status !== 'draft' && (
-            <Button size="xs" color="green" onClick={onReceiveAll} disabled={!receiptNumber}>
+            <Button size="xs" color="green" onClick={onReceiveAll} disabled={!receiptNumber} data-testid="po-receive-all-btn">
               Receive All ({canReceive})
             </Button>
           )}
@@ -78,6 +78,7 @@ export function PoSummary({
             onClick={onSaveDraft}
             loading={saving}
             disabled={saveDraftDisabled}
+            data-testid="po-save-draft-btn"
           >
             Save as Draft
           </Button>
@@ -88,6 +89,7 @@ export function PoSummary({
             onClick={onSubmitApprove}
             loading={submitting}
             disabled={submitApproveDisabled}
+            data-testid="po-submit-approve-btn"
           >
             Submit & Approve
           </Button>

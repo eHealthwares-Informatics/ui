@@ -43,7 +43,8 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { conversationApi } from '@/lib/conversation-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { useChatPhoneStore } from '@/stores/chat-phone-store';
 import {
@@ -97,6 +98,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   const [statusByMode, setStatusByMode] = useState<Partial<Record<InboxMode, InboxStatus | ''>>>(
     {},
   );
+  const [channelFilter, setChannelFilter] = useState<string | null>(null);
   const [adminParticipantId, setAdminParticipantId] = useState<string | null>(null);
   const [adminParticipantLoaded, setAdminParticipantLoaded] = useState(false);
   const [addProjectionOpened, { open: openAddProjection, close: closeAddProjection }] =
@@ -121,14 +123,27 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
 
   useEffect(() => {
     setPageIndex(0);
-  }, [search, inboxMode, status]);
+  }, [search, inboxMode, status, channelFilter]);
+
+  // Fetch channels for the filter dropdown
+  const { data: channels = [] } = useQuery({
+    queryKey: ['channels-list'],
+    queryFn: async () => {
+      const res = await conversationApi.get('/channels', { params: { limit: 100 } });
+      const items = res.data?.data ?? res.data ?? [];
+      return Array.isArray(items)
+        ? items.map((c: any) => ({ id: c.id || c._id, name: c.name || c.type || 'Unknown' }))
+        : [];
+    },
+    staleTime: 120_000,
+  });
 
   const handlePrevPage = () => {
     if (pageIndex <= 0) {return;}
     queryClient.setQueryData<{
       pages: ConversationInboxResponse[];
       pageParams: Array<string | undefined>;
-    }>(chatKeys.inbox(search, inboxMode, status), (current) => {
+    }>(chatKeys.inbox(search, inboxMode, status, channelFilter ?? undefined), (current) => {
       if (!current) {return current;}
       return {
         ...current,
@@ -171,7 +186,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
     })();
   }, [effectivePhone, adminParticipantLoaded]);
 
-  const inboxQuery = useConversationInbox(search, inboxMode, status, adminParticipantId ?? undefined);
+  const inboxQuery = useConversationInbox(search, inboxMode, status, adminParticipantId ?? undefined, channelFilter ?? undefined);
 
   useEffect(() => {
     const pageCount = inboxQuery.data?.pages.length ?? 1;
@@ -273,6 +288,9 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
               openParticipantModal();
             }}
             onAddMe={handleAddMe}
+            channelFilter={channelFilter}
+            onChannelFilterChange={setChannelFilter}
+            channels={channels}
             pageIndex={pageIndex}
             canPrev={pageIndex > 0}
             canNext={inboxQuery.hasNextPage}
@@ -371,6 +389,9 @@ function InboxSidebar(props: {
   onModeChange: (mode: InboxMode) => void;
   status: InboxStatus | '';
   onStatusChange: (status: InboxStatus | '') => void;
+  channelFilter: string | null;
+  onChannelFilterChange: (channelId: string | null) => void;
+  channels: Array<{ id: string; name: string }>;
   onNewChat: () => void;
   onAddParticipant: (conversationId: string) => void;
   onRemoveParticipant: (conversationId: string) => void;
@@ -417,13 +438,25 @@ function InboxSidebar(props: {
         </Group>
       </Group>
 
-      <Select
-        allowDeselect={false}
-        data={INBOX_STATUSES}
-        onChange={(v) => props.onStatusChange((v || '') as InboxStatus | '')}
-        size="xs"
-        value={props.status}
-      />
+      <Group gap="xs" wrap="nowrap">
+        <Select
+          allowDeselect={false}
+          data={INBOX_STATUSES}
+          onChange={(v) => props.onStatusChange((v || '') as InboxStatus | '')}
+          size="xs"
+          style={{ flex: 1 }}
+          value={props.status}
+        />
+        <Select
+          clearable
+          data={props.channels.map((c) => ({ value: c.id, label: c.name }))}
+          onChange={(v) => props.onChannelFilterChange(v ?? null)}
+          placeholder="All channels"
+          size="xs"
+          style={{ flex: 1 }}
+          value={props.channelFilter}
+        />
+      </Group>
 
       <TextInput
         leftSection={<Search size={15} />}

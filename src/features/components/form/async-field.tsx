@@ -233,6 +233,7 @@ export function AsyncSelectField({
           disabled={disabled}
           value={inputValue}
           placeholder={field.placeholder ?? `Search ${field.label.toLowerCase()}...`}
+          data-testid={`async-select-${field.name}`}
           onFocus={() => combobox.openDropdown()}
           onChange={(event) => {
             setInputValue(event.currentTarget.value);
@@ -271,7 +272,7 @@ export function AsyncSelectField({
             const isSelected = selectedValues?.includes(option.value) ?? false;
             return (
               <Combobox.Option key={option.value} value={option.value}>
-                <Group justify="space-between" gap="xs" w="100%">
+                <Group justify="space-between" gap="xs" w="100%" data-testid={`async-option-${option.label}`}>
                   <Text size="sm">{option.label}</Text>
                   {isSelected ? <Check size={14} /> : null}
                 </Group>

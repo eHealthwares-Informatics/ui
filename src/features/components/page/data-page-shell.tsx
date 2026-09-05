@@ -11,7 +11,7 @@ import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields } from '@/features/shared/payload-utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { JsonPreviewDialog } from '../../rxsoft';
-import type { FilterValue } from '../../rxsoft/types';
+import { FILTERS, type FilterValue } from '../../rxsoft/types';
 import { useFormContext } from '../form/form-context';
 import { ModalDataForm } from '../form/ModalDataForm';
 import {
@@ -138,7 +138,6 @@ export function DataPageShell(props: DataPageShellProps) {
   // -----------------------------
   // STATE
   // -----------------------------
-  const [search, setSearch] = useState('');
   const [searchBy, setSearchBy] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
@@ -162,7 +161,28 @@ export function DataPageShell(props: DataPageShellProps) {
     setPageIndex(1);
   };
 
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, FilterValue | null>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, FilterValue | null>>(() => {
+    // Initialize filters from URL search params (e.g. ?conversationId=abc)
+    const params = new URLSearchParams(window.location.search);
+    const columnKeys = new Set(columns.map((c) => c.key));
+    const initial: Record<string, FilterValue | null> = {};
+    params.forEach((value, key) => {
+      if (key === 'search' || key === 'page' || key === 'limit' || key === 'sortBy' || key === 'sortOrder') {
+        return; // skip reserved params
+      }
+      if (columnKeys.has(key) && value) {
+        initial[key] = { filter: FILTERS.EQUALS, value };
+      }
+    });
+    return initial;
+  });
+
+  // Also initialize search from URL ?search= param
+  const [search, setSearch] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('search') ?? '';
+  });
+
   const handleApplyFilter = (columnKey: string, filterValue: FilterValue | null) => {
     setAppliedFilters((prev) => ({
       ...prev,
@@ -482,13 +502,15 @@ export function DataPageShell(props: DataPageShellProps) {
           editPathBuilder ||
           buildUpdatePayload ||
           deletePathBuilder ||
-          canDelete
+          canDelete ||
+          config.rowActions
             ? {
                 detailPathBuilder,
                 editPathBuilder,
                 onEdit: buildUpdatePayload && openModal,
                 onDelete: deletePathBuilder || canDelete ? () => undefined : undefined,
                 deleteMutation,
+                rowActions: config.rowActions,
               }
             : undefined
         }

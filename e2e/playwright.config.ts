@@ -40,6 +40,7 @@ export default defineConfig({
     },
     {
       name: 'admin',
+      dependencies: ['setup'],
       testMatch: ['tests/**', 'crud-suite/**'],
       testIgnore: ['**/auth.setup.ts', 'tests/emr/**', 'tests/auth/sign-in.spec.ts', 'tests/root/**'],
       use: {

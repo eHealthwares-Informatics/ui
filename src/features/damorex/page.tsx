@@ -378,13 +378,13 @@ export default function DamorexPage() {
               >
                 <PrimaryButton
                   leftSection={<ShoppingCart size={18} />}
-                  onClick={() => navigate({ to: '/damorex/shop' })}
+                  onClick={() => navigate({ to: '/shop/shop' })}
                 >
                   Shop Medicines
                 </PrimaryButton>
                 <OutlineButton
                   leftSection={<FileUp size={18} />}
-                  onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+                  onClick={() => navigate({ to: '/shop/upload-prescription' })}
                 >
                   Upload Prescription
                 </OutlineButton>
@@ -592,7 +592,7 @@ export default function DamorexPage() {
                     leftSection={<FileUp size={18} />}
                     w="fit-content"
                     styles={buttonStyles}
-                    onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+                    onClick={() => navigate({ to: '/shop/upload-prescription' })}
                   >
                     Upload Prescription
                   </Button>
@@ -715,7 +715,7 @@ export default function DamorexPage() {
                 color="green"
                 rightSection={<ChevronRight size={16} />}
                 styles={buttonStyles}
-                onClick={() => navigate({ to: '/damorex/categories' })}
+                onClick={() => navigate({ to: '/shop/categories' })}
               >
                 View all categories
               </Button>
@@ -784,7 +784,7 @@ export default function DamorexPage() {
                 color="green"
                 rightSection={<ChevronRight size={16} />}
                 styles={buttonStyles}
-                onClick={() => navigate({ to: '/damorex/categories' })}
+                onClick={() => navigate({ to: '/shop/categories' })}
               >
                 View all
               </Button>
@@ -976,7 +976,7 @@ export default function DamorexPage() {
               color="green"
               rightSection={<ChevronRight size={16} />}
               styles={buttonStyles}
-              onClick={() => navigate({ to: '/damorex/shop' })}
+              onClick={() => navigate({ to: '/shop/shop' })}
             >
               See All Product
             </Button>
@@ -1083,7 +1083,7 @@ export default function DamorexPage() {
                   </Text>
                   <PrimaryButton
                     leftSection={<ShoppingCart size={18} />}
-                    onClick={() => navigate({ to: '/damorex/shop' })}
+                    onClick={() => navigate({ to: '/shop/shop' })}
                   >
                     Shop Now
                   </PrimaryButton>
@@ -1174,7 +1174,7 @@ export default function DamorexPage() {
               color="green"
               rightSection={<ChevronRight size={16} />}
               styles={buttonStyles}
-              onClick={() => navigate({ to: '/damorex/shop' })}
+              onClick={() => navigate({ to: '/shop/shop' })}
             >
               View all products
             </Button>
@@ -1286,7 +1286,7 @@ export default function DamorexPage() {
                 <Group>
                   <PrimaryButton
                     leftSection={<CalendarClock size={18} />}
-                    onClick={() => navigate({ to: '/damorex/consult-pharmacist' })}
+                    onClick={() => navigate({ to: '/shop/consult-pharmacist' })}
                   >
                     Book Consultation
                   </PrimaryButton>
@@ -1569,7 +1569,7 @@ export default function DamorexPage() {
                 w="fit-content"
                 leftSection={<CircleDollarSign size={18} />}
                 styles={buttonStyles}
-                onClick={() => navigate({ to: '/damorex/rewards' })}
+                onClick={() => navigate({ to: '/shop/rewards' })}
               >
                 Join Rewards Program
               </Button>

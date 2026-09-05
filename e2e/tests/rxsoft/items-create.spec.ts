@@ -13,15 +13,23 @@ import { expect, test } from '../../fixtures/test';
  */
 const token = `E2E Create ${Date.now().toString(36)}`;
 
-async function pickOption(page: import('@playwright/test').Page, placeholder: string, query: string, option: string) {
-  const input = page.getByPlaceholder(placeholder);
+async function pickOption(
+  page: import('@playwright/test').Page,
+  fieldName: string,
+  query: string,
+  optionLabel: string,
+  { exact = false }: { exact?: boolean } = {},
+) {
+  const input = page.getByTestId(`async-select-${fieldName}`);
   await expect(input).toBeEnabled();
   await input.click();
   await input.fill(query);
-  const opt = page.getByRole('option', { name: option }).first();
-  await expect(opt).toBeVisible({ timeout: 12_000 });
+  // Re-click to keep dropdown open after fill
+  await input.click();
+  const opt = page.getByRole('option', { name: optionLabel, exact }).first();
+  await expect(opt).toBeVisible({ timeout: 15_000 });
   await opt.click();
-  await expect(input).toHaveValue(option, { timeout: 8_000 });
+  await expect(input).toHaveValue(optionLabel, { timeout: 8_000 });
 }
 
 test.describe('RxSoft items create (wizard)', () => {
@@ -34,11 +42,11 @@ test.describe('RxSoft items create (wizard)', () => {
       content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
     });
 
-    const categoryInput = page.getByPlaceholder('Select Category');
+    const categoryInput = page.getByTestId('async-select-category');
     await expect(categoryInput).toBeEnabled({ timeout: 20_000 });
 
     // Step 0 — Item Details.
-    await pickOption(page, 'Select Category', 'Med', 'Medicine');
+    await pickOption(page, 'category', 'Med', 'Medical', { exact: true });
 
     const nameField = page
       .getByText('Item Name (Brand/Variety)', { exact: false })
@@ -49,9 +57,9 @@ test.describe('RxSoft items create (wizard)', () => {
     await expect(nameField).toBeVisible();
     await nameField.fill(token);
 
-    await pickOption(page, 'Search base uom...', 'Each', 'Each');
-    await pickOption(page, 'Search purchase uom...', 'Gram', 'Gram');
-    await pickOption(page, 'Search sale uom...', 'Milli', 'Milliliter');
+    await pickOption(page, 'baseUom', 'Unit', 'Unit(s)');
+    await pickOption(page, 'purchaseUom', 'Doz', 'Dozen(s)');
+    await pickOption(page, 'saleUom', 'Unit', 'Unit(s)');
 
 // First Next is "Create & Continue": the Price List tab has `waitFor: id`,
 // so stepping submits the item (POST). Remaining tabs advance with plain Next.

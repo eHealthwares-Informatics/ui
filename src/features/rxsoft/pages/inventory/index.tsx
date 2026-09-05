@@ -609,6 +609,7 @@ export function RxInventoryPage() {
                         label="Stock Balance"
                         value={selectedBalanceLabel || balanceSearch}
                         placeholder="Search stock balance..."
+                        data-testid="stock-balance-search"
                         onChange={(e) => {
                           setBalanceSearch(e.currentTarget.value);
                           setSelectedBalanceLabel('');
@@ -627,7 +628,7 @@ export function RxInventoryPage() {
                           <Combobox.Empty>No results</Combobox.Empty>
                         ) : (
                           balanceOptions.map((opt) => (
-                            <Combobox.Option key={opt.value} value={opt.value}>
+                            <Combobox.Option key={opt.value} value={opt.value} data-testid="stock-balance-option">
                               {opt.label}
                             </Combobox.Option>
                           ))

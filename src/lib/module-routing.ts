@@ -12,8 +12,16 @@ for (const mod of modules) {
 
 routeModuleMap['/'] = ['rxsoft', 'conversation', 'communication', 'admin'];
 routeModuleMap['/dashboard'] = ['rxsoft', 'conversation', 'communication', 'admin'];
-routeModuleMap['/dashboard/sales'] = ['rxsoft', 'admin'];
-routeModuleMap['/dashboard/purchases'] = ['rxsoft', 'admin'];
+routeModuleMap['/rxsoft/dashboard'] = ['rxsoft'];
+routeModuleMap['/dashboard/sales'] = ['rxsoft'];
+routeModuleMap['/dashboard/purchases'] = ['rxsoft'];
+routeModuleMap['/conversation/dashboard'] = ['conversation'];
+routeModuleMap['/communication/dashboard'] = ['communication'];
+routeModuleMap['/coding-concept/dashboard'] = ['coding-concept'];
+routeModuleMap['/lis/dashboard'] = ['lis'];
+routeModuleMap['/emr/dashboard'] = ['emr'];
+routeModuleMap['/admin/dashboard'] = ['admin'];
+routeModuleMap['/website/dashboard'] = ['website'];
 
 export { routeModuleMap };
 

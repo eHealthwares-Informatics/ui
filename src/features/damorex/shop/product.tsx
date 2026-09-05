@@ -53,7 +53,7 @@ import {
 import { PageLoader } from '../website/loaders';
 
 export default function ProductDetailPage() {
-  const { slug } = useParams({ from: '/damorex/shop_/$slug' });
+  const { slug } = useParams({ from: '/shop/shop_/$slug' });
   const { data, isLoading } = useProduct(slug);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
@@ -273,7 +273,7 @@ export default function ProductDetailPage() {
                         fullWidth
                         leftSection={<ShoppingCart size={18} />}
                         styles={buttonStyles}
-                        onClick={() => navigate({ to: '/damorex/checkout' })}
+                        onClick={() => navigate({ to: '/shop/checkout' })}
                       >
                         Checkout ({totalItems} item{totalItems !== 1 ? 's' : ''})
                       </Button>

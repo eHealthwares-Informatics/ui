@@ -23,7 +23,7 @@ function naira(amount: number) {
 }
 
 export default function PayPage() {
-  const { token } = useParams({ from: '/damorex/pay/$token' });
+  const { token } = useParams({ from: '/shop/pay/$token' });
   const [providerId, setProviderId] = useState<string | null>(null);
   const [session, setSession] = useState<PaySession | null>(loadPaySession(token));
   const [starting, setStarting] = useState(false);

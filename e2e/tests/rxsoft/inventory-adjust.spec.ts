@@ -18,13 +18,13 @@ test.describe('RxSoft inventory adjustments', () => {
       content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
     });
 
-    const balanceInput = page.getByPlaceholder('Search stock balance...');
+    const balanceInput = page.getByTestId('stock-balance-search');
     await expect(balanceInput).toBeVisible();
     await balanceInput.click();
 
-    const option = page.getByRole('option').first();
+    const option = page.getByTestId('stock-balance-option').first();
     await expect(option).toBeVisible({ timeout: 12_000 });
-    if ((await page.getByRole('option').count()) === 0) {
+    if ((await page.getByTestId('stock-balance-option').count()) === 0) {
       test.skip(true, 'no stock balances seeded to adjust');
     }
     await option.click();

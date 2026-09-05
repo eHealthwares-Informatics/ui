@@ -146,10 +146,10 @@ export const useAuthStore = create<AuthState>()(
 
         set({ accessToken, refreshToken, user, loading: false, error: null });
 
-        // Always refresh the module list in the background so modules granted
-        // server-side (e.g. EMR) appear without requiring a re-login. The
-        // persisted list remains as a synchronous fallback for route redirects.
-        if (user) {
+        // Refresh modules in the background, but only if they haven't been loaded
+        // yet. Force-fetching on every navigation caused unnecessary re-renders
+        // that collapsed sidebar submenus.
+        if (user && get().modules.length === 0) {
           get().fetchModules(true);
         }
       },

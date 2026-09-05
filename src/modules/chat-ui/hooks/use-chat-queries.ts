@@ -17,8 +17,8 @@ import type {
 } from '../types';
 
 export const chatKeys = {
-  inbox: (search: string, mode?: InboxMode, status?: InboxStatus | '') =>
-    ['conversation-inbox', { search, mode, status }] as const,
+  inbox: (search: string, mode?: InboxMode, status?: InboxStatus | '', channelId?: string) =>
+    ['conversation-inbox', { search, mode, status, channelId }] as const,
   messages: (conversationId?: string) => ['conversation-messages', conversationId] as const,
   projections: (conversationId?: string) => ['projections', conversationId] as const,
   pending: (conversationId?: string) => ['pending-exchanges', conversationId] as const,
@@ -29,9 +29,10 @@ export function useConversationInbox(
   mode?: InboxMode,
   status?: InboxStatus | '',
   adminParticipantId?: string,
+  channelId?: string,
 ) {
   return useInfiniteQuery({
-    queryKey: chatKeys.inbox(search, mode, status),
+    queryKey: chatKeys.inbox(search, mode, status, channelId),
     queryFn: ({ pageParam }) =>
       fetchConversationInbox({
         cursor: pageParam,
@@ -40,6 +41,7 @@ export function useConversationInbox(
         status: status || undefined,
         activeOnly: mode !== 'all' && !status,
         participantId: mode === 'admin' ? adminParticipantId : undefined,
+        channelId: channelId || undefined,
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,

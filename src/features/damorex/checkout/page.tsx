@@ -373,7 +373,7 @@ export default function CheckoutPage() {
                 styles={buttonStyles}
                 style={{ background: green }}
                 leftSection={<Package size={18} />}
-                onClick={() => navigate({ to: '/damorex/orders' })}
+                onClick={() => navigate({ to: '/shop/orders' })}
               >
                 Track Order
               </Button>
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
                 variant="light"
                 color="green"
                 leftSection={<ShoppingBag size={18} />}
-                onClick={() => navigate({ to: '/damorex/shop' })}
+                onClick={() => navigate({ to: '/shop/shop' })}
               >
                 Continue Shopping
               </Button>
@@ -442,7 +442,7 @@ export default function CheckoutPage() {
                 color="green"
                 styles={buttonStyles}
                 style={{ background: green }}
-                onClick={() => navigate({ to: '/damorex/login' })}
+                onClick={() => navigate({ to: '/shop/login' })}
               >
                 Sign In
               </Button>
@@ -499,7 +499,7 @@ export default function CheckoutPage() {
                 color="gray"
                 leftSection={<ArrowLeft size={18} />}
                 onClick={() => {
-                  if (step === 0) {navigate({ to: '/damorex/cart' });}
+                  if (step === 0) {navigate({ to: '/shop/cart' });}
                   else {setStep(step - 1);}
                 }}
                 disabled={step === 3 && isPending}
@@ -826,7 +826,7 @@ function StepPrescriptionValidation({
                 leftSection={<FileUp size={18} />}
                 styles={buttonStyles}
                 style={{ background: green }}
-                onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+                onClick={() => navigate({ to: '/shop/upload-prescription' })}
               >
                 Upload Prescription
               </Button>

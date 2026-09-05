@@ -276,6 +276,7 @@ export default function PurchasesPage() {
           {tabs.map((tab) => (
             <Group
               key={tab.id}
+              data-testid="po-tab"
               gap={4}
               p="xs"
               style={{
@@ -289,6 +290,7 @@ export default function PurchasesPage() {
               <ActionIcon
                 size="xs"
                 variant="subtle"
+                data-testid="po-tab-close"
                 onClick={(e) => {
                   e.stopPropagation();
                   closeTab(tab.id);
@@ -298,7 +300,7 @@ export default function PurchasesPage() {
               </ActionIcon>
             </Group>
           ))}
-          <ActionIcon size="sm" ml={4} onClick={addTab}>
+          <ActionIcon size="sm" ml={4} onClick={addTab} data-testid="po-add-tab">
             <Plus size={14} />
           </ActionIcon>
         </Group>
@@ -334,6 +336,7 @@ export default function PurchasesPage() {
                       size="xs"
                       leftSection={<Plus size={14} />}
                       onClick={() => usePoStore.getState().addLine()}
+                      data-testid="po-add-line"
                     >
                       Add Line
                     </Button>

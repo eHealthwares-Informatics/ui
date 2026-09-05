@@ -183,6 +183,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       }}
       title="Payment"
       centered
+      data-testid="pos-payment-modal"
     >
       <Stack>
         <Select
@@ -195,6 +196,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           data={methodOptions}
           placeholder="Select method"
           clearable
+          data-testid="pos-payment-method"
         />
 
         <NumberInput
@@ -245,15 +247,15 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           </Badge>
         )}
 
-        <Text>Total: ₦{totals.total.toFixed(2)}</Text>
-        <Text>Balance: ₦{Math.max(0, balance).toFixed(2)}</Text>
+        <Text data-testid="pos-payment-total">Total: ₦{totals.total.toFixed(2)}</Text>
+        <Text data-testid="pos-payment-balance">Balance: ₦{Math.max(0, balance).toFixed(2)}</Text>
         {change > 0 && <Text c="green">Change: ₦{change.toFixed(2)}</Text>}
 
         <Group grow>
-          <Button loading={mutation.isPending} onClick={handleComplete} disabled={!canComplete}>
+          <Button loading={mutation.isPending} onClick={handleComplete} disabled={!canComplete} data-testid="pos-complete-sale-btn">
             Complete Sale
           </Button>
-          <Button variant="light" onClick={onClose}>
+          <Button variant="light" onClick={onClose} data-testid="pos-cancel-payment-btn">
             Cancel
           </Button>
         </Group>

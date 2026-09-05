@@ -393,7 +393,7 @@ export function PrescriptionUploadSection() {
                   leftSection={<FileUp size={18} />}
                   w="fit-content"
                   styles={buttonStyles}
-                  onClick={() => navigate({ to: '/damorex/upload-prescription' })}
+                  onClick={() => navigate({ to: '/shop/upload-prescription' })}
                 >
                   Upload Prescription
                 </Button>
@@ -478,7 +478,7 @@ export function ConsultationSection() {
               <Group>
                 <PrimaryButton
                   leftSection={<CalendarClock size={18} />}
-                  onClick={() => navigate({ to: '/damorex/consult-pharmacist' })}
+                  onClick={() => navigate({ to: '/shop/consult-pharmacist' })}
                 >
                   Book Consultation
                 </PrimaryButton>

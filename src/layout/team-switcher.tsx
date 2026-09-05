@@ -11,7 +11,7 @@ import {
   HeartPulse,
   Globe,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
 import type { ModuleId } from '@/features/shared/module-data';
 import { getModuleDashboard } from '@/lib/module-routing';
@@ -72,11 +72,14 @@ export function TeamSwitcher() {
     );
   }
 
+  const [opened, setOpened] = useState(false);
+
   return (
-    <Menu width={220} position="right-start" offset={6}>
+    <Menu opened={opened} onChange={setOpened} width={220} position="right-start" offset={6}>
       <Menu.Target>
         <UnstyledButton
           data-testid="team-switcher-trigger"
+          onClick={() => setOpened((o) => !o)}
           style={{
             width: '100%',
             padding: '10px',

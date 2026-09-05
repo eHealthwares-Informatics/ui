@@ -41,7 +41,7 @@ export default function DashboardPage() {
                 p="lg"
                 withBorder
                 style={{ borderColor: line, cursor: 'pointer' }}
-                onClick={() => navigate({ to: '/damorex/orders' })}
+                onClick={() => navigate({ to: '/shop/orders' })}
               >
                 <Stack align="center" gap="sm">
                   <ThemeIcon radius="xl" size={48} color="green" variant="light">
@@ -63,7 +63,7 @@ export default function DashboardPage() {
                 p="lg"
                 withBorder
                 style={{ borderColor: line, cursor: 'pointer' }}
-                onClick={() => navigate({ to: '/damorex/my-prescriptions' })}
+                onClick={() => navigate({ to: '/shop/my-prescriptions' })}
               >
                 <Stack align="center" gap="sm">
                   <ThemeIcon radius="xl" size={48} color="green" variant="light">
@@ -85,7 +85,7 @@ export default function DashboardPage() {
                 p="lg"
                 withBorder
                 style={{ borderColor: line, cursor: 'pointer' }}
-                onClick={() => navigate({ to: '/damorex/consultations' })}
+                onClick={() => navigate({ to: '/shop/consultations' })}
               >
                 <Stack align="center" gap="sm">
                   <ThemeIcon radius="xl" size={48} color="green" variant="light">
@@ -107,7 +107,7 @@ export default function DashboardPage() {
                 p="lg"
                 withBorder
                 style={{ borderColor: line, cursor: 'pointer' }}
-                onClick={() => navigate({ to: '/damorex/rewards' })}
+                onClick={() => navigate({ to: '/shop/rewards' })}
               >
                 <Stack align="center" gap="sm">
                   <ThemeIcon radius="xl" size={48} color="green" variant="light">

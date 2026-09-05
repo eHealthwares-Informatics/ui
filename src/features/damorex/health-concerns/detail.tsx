@@ -744,7 +744,7 @@ function KnownAsBadge({ label }: { label: string }) {
 
 export default function HealthConcernDetailPage() {
   const navigate = useNavigate();
-  const { slug } = useParams({ from: '/damorex/health-concerns/$slug' });
+  const { slug } = useParams({ from: '/shop/health-concerns/$slug' });
   const { data, isLoading } = useHealthConcernBySlug(slug);
   const content = getContent(slug);
   const IconComponent = content.icon;
@@ -770,7 +770,7 @@ export default function HealthConcernDetailPage() {
               We could not find information for this health concern. It may have been removed or the
               link may be incorrect.
             </Text>
-            <OutlineButton onClick={() => navigate({ to: '/damorex/health-concerns' })}>
+            <OutlineButton onClick={() => navigate({ to: '/shop/health-concerns' })}>
               Browse Health Concerns
             </OutlineButton>
           </Stack>
@@ -826,7 +826,7 @@ export default function HealthConcernDetailPage() {
                           params: { slug: products[0].id },
                         });
                       } else {
-                        navigate({ to: '/damorex/shop' });
+                        navigate({ to: '/shop/shop' });
                       }
                     }}
                   >
@@ -1058,7 +1058,7 @@ export default function HealthConcernDetailPage() {
               <Group justify="center" mt="lg">
                 <OutlineButton
                   leftSection={<ShoppingCartIcon />}
-                  onClick={() => navigate({ to: '/damorex/shop' })}
+                  onClick={() => navigate({ to: '/shop/shop' })}
                 >
                   View All Medicines
                 </OutlineButton>
@@ -1134,7 +1134,7 @@ export default function HealthConcernDetailPage() {
                   <Group pt="sm">
                     <PrimaryButton
                       leftSection={<CalendarClock size={18} />}
-                      onClick={() => navigate({ to: '/damorex/consult-pharmacist' })}
+                      onClick={() => navigate({ to: '/shop/consult-pharmacist' })}
                     >
                       Book Free Consultation
                     </PrimaryButton>

@@ -151,7 +151,7 @@ export default function AuthPage() {
                     fw={800}
                     c={green}
                     style={{ cursor: 'pointer' }}
-                    onClick={() => navigate({ to: '/damorex/forgot-password' })}
+                    onClick={() => navigate({ to: '/shop/forgot-password' })}
                   >
                     Forgot password?
                   </Text>

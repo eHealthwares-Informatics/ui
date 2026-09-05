@@ -8,10 +8,8 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { Link } from '@tanstack/react-router';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-// sidebar-nav-item.tsx
 import { useMemo } from 'react';
 import { NavItem } from '@/layout/types';
 
@@ -44,11 +42,8 @@ export function SidebarNavItem({
     );
   }, [pathname, item]);
 
-  /**
-   * Automatically open submenu
-   * when one of the children is active
-   */
-  const [opened, { toggle }] = useDisclosure(active);
+  // Single source of truth: expanded controls both chevron and collapse
+  const opened = expanded || active;
 
   const Icon = item.icon;
 
@@ -56,7 +51,6 @@ export function SidebarNavItem({
     <UnstyledButton
       onClick={() => {
         if (hasChildren) {
-          toggle();
           resetExpandState(index, expanded);
         }
       }}

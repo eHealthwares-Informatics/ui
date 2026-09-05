@@ -80,7 +80,7 @@ function ShareButton({ icon, label }: { icon: React.ReactNode; label: string }) 
 }
 
 export default function ArticlePage() {
-  const { slug } = useParams({ from: '/damorex/blog/$slug' });
+  const { slug } = useParams({ from: '/shop/blog/$slug' });
   const navigate = useNavigate();
   const { data, isLoading, isError } = useArticleBySlug(slug);
 
@@ -158,7 +158,7 @@ export default function ArticlePage() {
               <Text c={muted} maw={480}>
                 The article you're looking for doesn't exist or has been removed.
               </Text>
-              <Button radius="xl" color="green" onClick={() => navigate({ to: '/damorex/blog' })}>
+              <Button radius="xl" color="green" onClick={() => navigate({ to: '/shop/blog' })}>
                 Back to Blog
               </Button>
             </Stack>

@@ -1,3 +1,5 @@
+export * from './components/invites';
+export * from './components/invite-detail';
 export * from './components/channels';
 export * from './components/conversations';
 export * from './components/exchanges';
@@ -8,7 +10,11 @@ export * from './components/questions';
 export * from './components/option-lists';
 export * from './components/shared';
 export * from './components/projections';
+export * from './components/projection-detail';
 export * from './components/workflow-events';
 export * from './components/workflow-instances';
 export * from './components/workflow-configuration';
 export * from './components/workflows';
+export * from './components/ai-instructions';
+export * from './components/ai-eval-logs';
+export * from './components/ai-config';

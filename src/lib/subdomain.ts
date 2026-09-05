@@ -1,6 +1,6 @@
 const SUBDOMAIN_ROUTES: Record<string, string> = {
   rxsoft: '/dashboard/sales',
-  damorex: '/damorex',
+  damorex: '/shop',
   apm: '/apm',
   conversation: '/conversation',
 };
