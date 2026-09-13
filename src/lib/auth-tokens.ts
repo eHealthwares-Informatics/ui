@@ -3,6 +3,7 @@ export type AuthUser = {
   username: string;
   email?: string;
   roles: string[];
+  permissions: string[];
   phone?: string;
   organizationId: string | null;
   locationId: string | null;
@@ -19,6 +20,7 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       username?: string;
       email?: string;
       roles?: string[];
+      permissions?: string[];
       phone?: string;
       organizationId?: string;
       locationId?: string | null;
@@ -38,6 +40,7 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       username: payload.username,
       email: payload.email,
       roles: payload.roles ?? [],
+      permissions: payload.permissions ?? [],
       phone: payload.phone,
       organizationId: payload.organizationId ? payload.organizationId : null,
       locationId: payload.locationId ?? null,

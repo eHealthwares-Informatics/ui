@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Box, Button, Group, Image, Paper, Text, Stack, ActionIcon, Loader } from '@mantine/core';
 import { Upload, X, Camera } from 'lucide-react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { green, ink, muted, line } from '@/features/damorex/website/layout';
+import { green, ink, muted, line } from '@/features/shop/website/layout';
 
 interface ImageUploaderProps {
   value?: string;

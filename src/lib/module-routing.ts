@@ -22,6 +22,7 @@ routeModuleMap['/lis/dashboard'] = ['lis'];
 routeModuleMap['/emr/dashboard'] = ['emr'];
 routeModuleMap['/admin/dashboard'] = ['admin'];
 routeModuleMap['/website/dashboard'] = ['website'];
+routeModuleMap['/identity/dashboard'] = ['identity'];
 
 export { routeModuleMap };
 

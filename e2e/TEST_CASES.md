@@ -175,7 +175,7 @@ GET `/v1/routing/tables/default-routing/routes`.
   - TC-DMX-ORDERS: orders list + detail render; track-order by code.
   - TC-DMX-PRESC: my-prescriptions + upload-prescription.
   - TC-DMX-CONS: consultations list + book.
-  - TC-DMX-LOGIN: damorex login/forgot-password forms.
+  - TC-DMX-LOGIN: shop login/forgot-password forms.
 - **POS/PO (~16):**
   - TC-DMX-POS: add products → cart → payment modal → complete sale (POST /sales; cleanup).
   - TC-DMX-POS2: pos2 responsive sale flow.

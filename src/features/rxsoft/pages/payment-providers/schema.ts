@@ -75,6 +75,52 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+function buildUpdatePayload(values: Record<string, unknown>): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+  if (values.name !== undefined) { payload.name = values.name; }
+  if (values.code !== undefined) { payload.code = values.code; }
+  if (values.providerType !== undefined) {
+    payload.providerType = (values.providerType as any)?.value ?? values.providerType;
+  }
+  if (values.channel !== undefined) {
+    payload.channel = (values.channel as any)?.value ?? values.channel;
+  }
+  if (values.description !== undefined) {
+    payload.description = (values.description as string) || undefined;
+  }
+  if (values.production !== undefined) { payload.production = values.production; }
+  if (values.isActive !== undefined) { payload.isActive = values.isActive; }
+  if (values.testConfig !== undefined) {
+    const cfg = coerceJson(values.testConfig);
+    if (cfg) { payload.testConfig = cfg; }
+  }
+  if (values.liveConfig !== undefined) {
+    const cfg = coerceJson(values.liveConfig);
+    if (cfg) { payload.liveConfig = cfg; }
+  }
+  return payload;
+}
+
+function stringifyJson(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+}
+
+function buildFormState(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    production: row.production,
+    isActive: row.isActive,
+    testConfig: stringifyJson(row.testConfig),
+    liveConfig: stringifyJson(row.liveConfig),
+  };
+}
+
 export const paymentProvidersConfig: ModelConfig = {
   id: 'payment-providers',
   title: 'Payment Providers',
@@ -83,5 +129,7 @@ export const paymentProvidersConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
+  buildFormState,
   canDelete: true,
 };

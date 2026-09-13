@@ -3,6 +3,7 @@ import { codingConceptApi } from '@/lib/coding-concept-api';
 import { communicationApi } from '@/lib/communication-api';
 import { conversationApi } from '@/lib/conversation-api';
 import { emrApi } from '@/lib/emr-api';
+import { identityApi } from '@/lib/identity-api';
 import { lisApi } from '@/lib/lis-api';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
@@ -14,7 +15,8 @@ export type ModuleId =
   | 'emr'
   | 'rxsoft'
   | 'admin'
-  | 'website';
+  | 'website'
+  | 'identity';
 
 export type ModuleDefinition = {
   id: ModuleId;
@@ -266,6 +268,24 @@ export const modules: ModuleDefinition[] = [
       'ehealthwares-contact-submissions',
     ],
   },
+  {
+    id: 'identity',
+    title: 'Identity',
+    description:
+      'Identity & access management: users, roles, permissions, organizations and locations.',
+    root: '/identity/dashboard',
+    apiProvider: identityApi,
+    routes: [
+      '/identity',
+      '/identity/dashboard',
+      '/identity/users',
+      '/identity/roles',
+      '/identity/permissions',
+      '/identity/organizations',
+      '/identity/locations',
+    ],
+    resources: ['identity-users', 'identity-roles', 'identity-organizations', 'identity-locations'],
+  },
 ];
 
 export const moduleMap: Record<ModuleId, ModuleDefinition> = {
@@ -277,6 +297,7 @@ export const moduleMap: Record<ModuleId, ModuleDefinition> = {
   emr: modules[5],
   admin: modules[6],
   website: modules[7],
+  identity: modules[8],
 };
 
 export const defaultModule: ModuleId = 'rxsoft';

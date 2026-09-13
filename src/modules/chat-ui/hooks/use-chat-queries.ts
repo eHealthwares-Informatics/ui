@@ -12,13 +12,11 @@ import {
 import type {
   ExchangeMessage,
   ExchangeMessagesResponse,
-  InboxMode,
-  InboxStatus,
 } from '../types';
 
 export const chatKeys = {
-  inbox: (search: string, mode?: InboxMode, status?: InboxStatus | '', channelId?: string) =>
-    ['conversation-inbox', { search, mode, status, channelId }] as const,
+  inbox: (search: string, status?: string, channelId?: string) =>
+    ['conversation-inbox', { search, status, channelId }] as const,
   messages: (conversationId?: string) => ['conversation-messages', conversationId] as const,
   projections: (conversationId?: string) => ['projections', conversationId] as const,
   pending: (conversationId?: string) => ['pending-exchanges', conversationId] as const,
@@ -26,25 +24,17 @@ export const chatKeys = {
 
 export function useConversationInbox(
   search: string,
-  mode?: InboxMode,
-  status?: InboxStatus | '',
-  adminParticipantId?: string,
+  status?: string,
   channelId?: string,
 ) {
-  return useInfiniteQuery({
-    queryKey: chatKeys.inbox(search, mode, status, channelId),
-    queryFn: ({ pageParam }) =>
+  return useQuery({
+    queryKey: chatKeys.inbox(search, status, channelId),
+    queryFn: () =>
       fetchConversationInbox({
-        cursor: pageParam,
         search: search.trim() || undefined,
-        mode,
         status: status || undefined,
-        activeOnly: mode !== 'all' && !status,
-        participantId: mode === 'admin' ? adminParticipantId : undefined,
         channelId: channelId || undefined,
       }),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 }
 

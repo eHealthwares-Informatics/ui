@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import AuthPage from '@/features/damorex/auth/login';
+import AuthPage from '@/features/shop/auth/login';
 
 export const Route = createFileRoute('/shop/login')({
   component: AuthPage,

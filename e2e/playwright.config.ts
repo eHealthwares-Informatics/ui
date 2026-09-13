@@ -13,7 +13,7 @@ const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
  * Projects:
  *  - setup   : runs e2e/tests/auth.setup.ts, logs in as admin, writes e2e/.auth/admin.json
  *  - public  : no storageState -> auth, errors, root specs
- *  - admin   : admin storageState -> sign-out + /rxsoft + crud-suite + damorex
+ *  - admin   : admin storageState -> sign-out + /rxsoft + crud-suite + shop
  */
 export default defineConfig({
   testDir: '.',

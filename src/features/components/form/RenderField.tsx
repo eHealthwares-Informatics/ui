@@ -9,6 +9,7 @@ import { AsyncSelectField } from './async-field';
 import { DebouncedTextInput } from './debounced-text-input';
 import { useFormField } from './form-context';
 import { JsonEditorField } from './json-editor-field';
+import { PermissionPicker } from './permission-picker';
 import { RemoteSelectField } from './remote-select-field';
 import { SelectField } from './select';
 import { FieldValue } from './types/form-context';
@@ -305,6 +306,17 @@ function RenderFieldComponent({
 
   if (field.type === 'hidden') {
     return <HiddenFieldSync field={field} value={fieldValue} onSync={handleChange} />;
+  }
+
+  if (field.type === 'permission-picker') {
+    return (
+      <PermissionPicker
+        value={Array.isArray(fieldValue) ? fieldValue.map(String) : []}
+        onChange={(codes) => handleChange(codes)}
+        disabled={disabled}
+        error={fieldError}
+      />
+    );
   }
 
   if (field.type === 'accordion-array') {

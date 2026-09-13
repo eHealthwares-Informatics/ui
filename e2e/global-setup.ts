@@ -54,7 +54,7 @@ export default async function globalSetup(): Promise<void> {
   ]);
 
   // Fresh organisation per run: request it from the seed provisioning module so
-  // every suite (auth, rxsoft, crud, damorex) executes against an isolated
+  // every suite (auth, rxsoft, crud, shop) executes against an isolated
   // tenant with the same reference data (items, price list, stock, parties,
   // roles/users). Falls back to the DEFAULT org admin when provisioning is
   // unavailable (seed service down / only running the mocked EMR project).

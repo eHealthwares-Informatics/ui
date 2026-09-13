@@ -51,6 +51,7 @@ export const CHANNEL_TYPE_OPTIONS = [
   'WEB',
   'WHATSAPP',
   'SMS',
+  'SMS_PROXY',
   'EMAIL',
   'WEBCHAT',
   'TELEGRAM',
@@ -89,6 +90,15 @@ export const VALIDATION_RULE_OPTIONS = [
 ].map((value) => ({ value, label: value }));
 
 export const INVITE_STATUS_OPTIONS = [
+  'CREATED',
+  'AWAITING',
+  'ACCEPTED',
+  'TIMED_OUT',
+  'CANCELLED',
+  'BROADCASTING',
+].map((value) => ({ value, label: value }));
+
+export const BROADCAST_STATUS_OPTIONS = [
   'CREATED',
   'AWAITING',
   'ACCEPTED',

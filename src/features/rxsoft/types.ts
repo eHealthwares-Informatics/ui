@@ -251,7 +251,8 @@ export type Field = {
     | 'multi-image'
     | 'accordion'
     | 'accordion-array'
-    | 'json-accordion-array';
+    | 'json-accordion-array'
+    | 'permission-picker';
   hidden?: boolean;
   disabled?: boolean;
   placeholder?: string;

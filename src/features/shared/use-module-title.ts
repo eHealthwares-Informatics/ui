@@ -10,6 +10,7 @@ const moduleTitles: Record<string, string> = {
   emr: 'EMR',
   damorex: 'Damorex Pharmacy',
   website: 'Website Console',
+  identity: 'Identity',
 };
 
 export function useModuleTitle(moduleId: string | undefined) {

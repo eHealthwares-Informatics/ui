@@ -1,47 +1,46 @@
 export type Participant = {
   id: string;
+  userId?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
   phone?: string;
+  externalId?: string;
   metadata?: Record<string, unknown>;
+  user?: {
+    id: string;
+    username: string;
+    phone?: string;
+    email?: string;
+    roles: string[];
+  };
 };
 
 export type ConversationDirection = 'inbound' | 'outbound';
 
-export type ConversationInboxItem = {
-  conversationId: string;
+export type ConversationListItem = {
+  id: string;
+  questionnaireId: string;
   channelId: string;
+  currentQuestionId?: string;
   status: string;
   state: string;
-  participant: Participant;
-  moderator?: Participant;
-  lastMessage?: {
-    id?: string;
-    text: string;
-    direction: ConversationDirection;
-    createdAt: string;
-    questionAttribute?: string;
-  };
-  unreadCount?: number;
-  lastMessageAt?: string;
-  currentQuestion?: {
-    id?: string;
-    attribute?: string;
-    text?: string;
-  };
-  projection: {
-    id: string;
-    isPrimary: boolean;
-    active: boolean;
-    priority: number;
-    externalThreadId?: string;
-  };
+  startedAt?: string;
+  endedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  questionnaire?: { id: string; name: string } | null;
+  channel?: { id: string; name: string } | null;
+  currentQuestion?: { id: string; text: string } | null;
+  /** Alias for backward compat — same as id */
+  conversationId?: string;
 };
 
+export type ConversationInboxItem = ConversationListItem;
+
 export type ConversationInboxResponse = {
-  items: ConversationInboxItem[];
-  nextCursor?: string;
+  items: ConversationListItem[];
+  meta: { total: number; page: number; limit: number };
 };
 
 export type ExchangeMessage = {

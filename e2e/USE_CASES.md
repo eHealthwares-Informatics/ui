@@ -182,12 +182,12 @@ Endpoints: `/{resource}` CRUD, GET `/v1/flow/traces`, GET `/v1/flow/audit/{id}`,
 
 | Group | Routes | Use case |
 |---|---|---|
-| Browse | /damorex (homepage), /shop, /shop/$slug, /categories, /categories/$slug, /search, /health-concerns, /health-concerns/$slug, /blog, /blog/$slug, /branches, /branches/$id, /delivery-areas, /rewards, /about, /faq, /privacy-policy, /terms | Visitor browses content |
+| Browse | /shop (homepage), /shop/shop, /shop/shop/$slug, /shop/categories, /shop/categories/$slug, /shop/search, /shop/health-concerns, /shop/health-concerns/$slug, /shop/blog, /shop/blog/$slug, /shop/branches, /shop/branches/$id, /shop/delivery-areas, /shop/rewards, /shop/about, /shop/faq, /shop/privacy-policy, /shop/terms | Visitor browses content |
 | Commerce | /cart (add/remove), /checkout, /orders, /orders/$id, /track-order/$code, /my-prescriptions, /upload-prescription, /consultations, /consult-pharmacist, /login, /forgot-password | Visitor completes a shopping/order flow |
-| POS | /damorex/pos, /damorex/pos2 | Cashier creates a sale (cart, payment modal, invoice) |
-| PO | /damorex/purchases | Staff lists/creates/updates purchase orders |
+| POS | /shop/pos, /shop/pos2 | Cashier creates a sale (cart, payment modal, invoice) |
+| PO | /shop/purchases | Staff lists/creates/updates purchase orders |
 
-Endpoints (`features/damorex/website/api.ts` + `posApi`/`poApi`): GET homepage/products/
+Endpoints (`features/shop/website/api.ts` + `posApi`/`poApi`): GET homepage/products/
 categories/health-concerns/blog/branches/orders/rewards/search; POST `/sales`, GET `/sales`;
 GET/POST/PUT `/purchases[/{id}]`.
 

@@ -1,0 +1,38 @@
+import type { ModelConfig } from '../../../shared/model-schema';
+import { ColumnDataType, ColumnTypeFilters, type Column } from '../../types';
+
+export const websiteOrdersColumns: Column[] = [
+  { key: 'orderNumber', label: 'Order #', filters: ColumnTypeFilters.STRING },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    dataType: ColumnDataType.DATE,
+    filters: ColumnTypeFilters.DATE,
+    render: (row: any) =>
+      row.createdAt ? new Date(row.createdAt).toLocaleString() : '-',
+  },
+  {
+    key: 'items',
+    label: 'Items',
+    render: (row: any) => (row.items?.length ?? 0),
+  },
+  { key: 'totalAmount', label: 'Total', dataType: ColumnDataType.NUMBER },
+  {
+    key: 'status',
+    label: 'Status',
+    filters: ColumnTypeFilters.STRING,
+  },
+  {
+    key: 'paymentMethod',
+    label: 'Payment',
+    filters: ColumnTypeFilters.STRING,
+  },
+];
+
+export const websiteOrdersConfig: ModelConfig = {
+  id: 'website-orders',
+  title: 'Orders',
+  description: 'Manage and fulfill orders.',
+  endpoint: '/website/admin/orders',
+  columns: websiteOrdersColumns,
+};

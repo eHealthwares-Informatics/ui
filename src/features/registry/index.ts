@@ -279,6 +279,24 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
     import('@/features/ehealthwares/pages/contact-submissions/schema').then((m) => ({
       default: m.ehealthwaresContactsConfig as unknown as ModelConfig,
     })),
+
+  // Identity
+  'identity-users': () =>
+    import('@/features/identity/schema/users').then((m) => ({
+      default: m.identityUsersConfig as unknown as ModelConfig,
+    })),
+  'identity-roles': () =>
+    import('@/features/identity/schema/roles').then((m) => ({
+      default: m.identityRolesConfig as unknown as ModelConfig,
+    })),
+  'identity-organizations': () =>
+    import('@/features/identity/schema/organizations').then((m) => ({
+      default: m.identityOrganizationsConfig as unknown as ModelConfig,
+    })),
+  'identity-locations': () =>
+    import('@/features/identity/schema/locations').then((m) => ({
+      default: m.identityLocationsConfig as unknown as ModelConfig,
+    })),
 };
 
 function resourceToModelConfig(resource: {

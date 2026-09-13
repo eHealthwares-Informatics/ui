@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import DamorexPage from '@/features/damorex/page';
+import DamorexPage from '@/features/shop/page';
 
 /* ================= ROUTE ================= */
 

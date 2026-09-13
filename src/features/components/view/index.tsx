@@ -166,9 +166,8 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
 
       {/* ACCORDION SECTIONS */}
       {view.accordions?.map((accordionSection, sectionIndex) => {
-        const items: any[] = isLoading
-          ? []
-          : ((data as any)[accordionSection.key as string] as any[]) || [];
+        const raw = isLoading ? [] : (data as any)[accordionSection.key as string];
+        const items: any[] = Array.isArray(raw) ? raw : [];
         console.log({items})
         return (
           <Card key={sectionIndex} withBorder radius="md" p="lg">

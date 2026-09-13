@@ -140,23 +140,12 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
 
   const handlePrevPage = () => {
     if (pageIndex <= 0) {return;}
-    queryClient.setQueryData<{
-      pages: ConversationInboxResponse[];
-      pageParams: Array<string | undefined>;
-    }>(chatKeys.inbox(search, inboxMode, status, channelFilter ?? undefined), (current) => {
-      if (!current) {return current;}
-      return {
-        ...current,
-        pages: current.pages.slice(0, -1),
-        pageParams: current.pageParams.slice(0, -1),
-      };
-    });
     setPageIndex((index) => index - 1);
   };
 
   const handleNextPage = () => {
-    if (!inboxQuery.hasNextPage || inboxQuery.isFetchingNextPage) {return;}
-    inboxQuery.fetchNextPage();
+    const totalPages = Math.ceil((inboxQuery.data?.meta.total ?? 0) / 30);
+    if (pageIndex >= totalPages - 1) {return;}
     setPageIndex((index) => index + 1);
   };
 
@@ -186,25 +175,26 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
     })();
   }, [effectivePhone, adminParticipantLoaded]);
 
-  const inboxQuery = useConversationInbox(search, inboxMode, status, adminParticipantId ?? undefined, channelFilter ?? undefined);
-
-  useEffect(() => {
-    const pageCount = inboxQuery.data?.pages.length ?? 1;
-    setPageIndex((index) => (index >= pageCount ? Math.max(0, pageCount - 1) : index));
-  }, [inboxQuery.data?.pages.length]);
+  const inboxQuery = useConversationInbox(search, status, channelFilter ?? undefined);
 
   const selectedConversation = useMemo(
     () =>
-      inboxQuery.data?.pages
-        .flatMap((page) => page.items)
-        .find((item) => item.conversationId === selectedConversationId),
+      inboxQuery.data?.items
+        .find((item: any) => item.conversationId === selectedConversationId),
     [inboxQuery.data, selectedConversationId],
   );
 
+  // Fetch projections for the selected conversation to get participant info
+  const projectionsQuery = useQuery({
+    queryKey: ['projections', selectedConversationId],
+    enabled: Boolean(selectedConversationId),
+    queryFn: () => listProjections(selectedConversationId!),
+  });
+
   const activeParticipantId =
     mode === 'admin'
-      ? selectedConversation?.moderator?.id
-      : selectedConversation?.participant.id;
+      ? projectionsQuery.data?.find((p) => p.type === 'BOT')?.participant?.id
+      : projectionsQuery.data?.find((p) => p.type === 'USER' || p.type === 'PATIENT')?.participant?.id;
   const pendingConversationId = composing
     ? adminParticipantId
       ? `pending-${adminParticipantId}`
@@ -236,7 +226,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
     });
   }, [activeParticipantId, selectedConversationId]);
 
-  const conversations = inboxQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  const conversations = inboxQuery.data?.items ?? [];
 
   const handleAddMe = useCallback(async (conversationId: string) => {
     if (!adminParticipantId) {return;}
@@ -261,7 +251,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
             connected={socket.connected}
             conversations={conversations}
             error={inboxQuery.isError}
-            isFetchingNextPage={inboxQuery.isFetchingNextPage}
+            isFetchingNextPage={inboxQuery.isFetching}
             loading={inboxQuery.isLoading}
             onRetry={() => inboxQuery.refetch()}
             onSearch={setSearch}
@@ -278,7 +268,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
             onStatusChange={handleStatusChange}
             onNewChat={startCompose}
             onAddParticipant={(convId) => {
-              const item = conversations.find((c) => c.conversationId === convId);
+              const item = conversations.find((c: any) => c.conversationId === convId);
               setContextConversationId(convId);
               setContextChannelId(item?.channelId);
               openAddProjection();
@@ -293,7 +283,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
             channels={channels}
             pageIndex={pageIndex}
             canPrev={pageIndex > 0}
-            canNext={inboxQuery.hasNextPage}
+            canNext={pageIndex < Math.ceil((inboxQuery.data?.meta.total ?? 0) / 30) - 1}
             onPrev={handlePrevPage}
             onNext={handleNextPage}
           />
@@ -558,11 +548,10 @@ function ConversationListItem(props: {
   onRemoveParticipant: (conversationId: string) => void;
   onAddMe: (conversationId: string) => void;
 }) {
-  const participant = props.conversation.participant;
-  const name = getParticipantName(participant);
-  const lastMessage = props.conversation.lastMessage?.text ?? 'No messages yet';
-  const lastMessagePrefix =
-    props.conversation.lastMessage?.direction === 'outbound' ? 'You: ' : '';
+  const conv = props.conversation;
+  const displayName = conv.questionnaire?.name ?? conv.channel?.name ?? conv.conversationId?.slice(0, 8) ?? 'Unknown';
+  const subtitle = conv.currentQuestion?.text ?? conv.status;
+  const isActive = conv.status === 'ACTIVE';
 
   const [contextMenuOpened, setContextMenuOpened] = useState(false);
 
@@ -599,9 +588,11 @@ function ConversationListItem(props: {
         >
           <Group gap="sm" wrap="nowrap" w="100%">
             <Box pos="relative">
-              <Avatar radius="xl">{getParticipantInitials(participant)}</Avatar>
+              <Avatar radius="xl" color={isActive ? 'blue' : 'gray'}>
+                {displayName.charAt(0).toUpperCase()}
+              </Avatar>
               <Box
-                bg={props.conversation.projection.active ? 'green' : 'gray'}
+                bg={isActive ? 'green' : 'gray'}
                 bottom={0}
                 h={10}
                 pos="absolute"
@@ -613,24 +604,21 @@ function ConversationListItem(props: {
             <Box flex={1} style={{ minWidth: 0 }}>
               <Group justify="space-between" wrap="nowrap">
                 <Text fw={600} lineClamp={1} size="sm">
-                  {name}
+                  {displayName}
                 </Text>
-                {props.conversation.lastMessageAt && (
+                {conv.createdAt && (
                   <Text c="dimmed" size="xs">
-                    {dayjs(props.conversation.lastMessageAt).fromNow()}
+                    {dayjs(conv.createdAt).fromNow()}
                   </Text>
                 )}
               </Group>
               <Text c="dimmed" lineClamp={1} size="xs">
-                {lastMessagePrefix}
-                {lastMessage}
+                {subtitle}
               </Text>
             </Box>
-            {Boolean(props.conversation.unreadCount) && (
-              <Badge circle size="sm">
-                {props.conversation.unreadCount}
-              </Badge>
-            )}
+            <Badge color={isActive ? 'blue' : 'gray'} size="sm" variant="light">
+              {conv.status}
+            </Badge>
           </Group>
         </Button>
       </Popover.Target>
@@ -643,7 +631,7 @@ function ConversationListItem(props: {
             leftSection={<UserPlus size={14} />}
             onClick={() => {
               closeContextMenu();
-              props.onAddMe(props.conversation.conversationId);
+              if (props.conversation.conversationId) props.onAddMe(props.conversation.conversationId);
             }}
             size="sm"
             variant="subtle"
@@ -656,7 +644,7 @@ function ConversationListItem(props: {
             leftSection={<UserPlus size={14} />}
             onClick={() => {
               closeContextMenu();
-              props.onAddParticipant(props.conversation.conversationId);
+              if (props.conversation.conversationId) props.onAddParticipant(props.conversation.conversationId);
             }}
             size="sm"
             variant="subtle"
@@ -670,7 +658,7 @@ function ConversationListItem(props: {
             leftSection={<UserX size={14} />}
             onClick={() => {
               closeContextMenu();
-              props.onRemoveParticipant(props.conversation.conversationId);
+              if (props.conversation.conversationId) props.onRemoveParticipant(props.conversation.conversationId);
             }}
             size="sm"
             variant="subtle"
@@ -714,7 +702,7 @@ function ConversationThread(props: {
   const senderId =
     props.mode === 'admin'
       ? projections.find(p => p.isPrimary)?.participant.id
-      : props.conversation?.participant.id;
+      : projections.find(p => p.type === 'USER' || p.type === 'PATIENT')?.participant.id;
 
   const hasMyProjection = projections.some((p) => p.participant.id === props.adminParticipantId);
   const isCompleted = props.conversation?.status === 'COMPLETED';
@@ -903,12 +891,12 @@ function ConversationThread(props: {
   const conversation = props.conversation;
 
   const submit = () => {
-    if (!draft.trim() || !senderId || sendMessage.isPending || inputDisabled) {return;}
+    if (!draft.trim() || !senderId || !conversation.conversationId || sendMessage.isPending || inputDisabled) {return;}
 
     sendMessage.mutate({
       conversationId: conversation.conversationId,
       channelId: conversation.channelId,
-      senderPhone: props.userPhone ?? (conversation.participant.phone || ''),
+      senderPhone: props.userPhone ?? '',
       text: draft.trim(),
     });
     setDraft('');
@@ -934,17 +922,19 @@ function ConversationThread(props: {
               <ArrowLeft size={18} />
             </ActionIcon>
           )}
-          <Avatar radius="xl">{getParticipantInitials(conversation.participant)}</Avatar>
+          <Avatar radius="xl" color={conversation.status === 'ACTIVE' ? 'blue' : 'gray'}>
+            {(conversation.questionnaire?.name ?? conversation.channel?.name ?? '?').charAt(0).toUpperCase()}
+          </Avatar>
           <Box>
             <Text fw={700} lineClamp={1}>
-              {getParticipantName(conversation.participant)}
+              {conversation.questionnaire?.name ?? conversation.channel?.name ?? conversation.conversationId?.slice(0, 8)}
             </Text>
             <Group gap={6}>
               <Badge color={props.connected ? 'green' : 'gray'} size="xs">
                 {props.connected ? 'Online' : 'Offline'}
               </Badge>
               <Text c="dimmed" size="xs">
-                {conversation.currentQuestion?.attribute ?? conversation.state}
+                {conversation.currentQuestion?.text ?? conversation.state}
               </Text>
             </Group>
           </Box>
@@ -1026,11 +1016,13 @@ function ConversationThread(props: {
                 <MessageBubble
                   key={message.id}
                   message={message}
+                  disabled={inputDisabled}
                   onOptionSelect={(value) => {
+                    if (!conversation.conversationId) return;
                     sendMessage.mutate({
                       conversationId: conversation.conversationId,
                       channelId: conversation.channelId,
-                      senderPhone: props.userPhone ?? (conversation.participant.phone || ''),
+                      senderPhone: props.userPhone ?? '',
                       text: value,
                     });
                   }}
@@ -1093,9 +1085,11 @@ function ConversationThread(props: {
 function MessageBubble({
   message,
   onOptionSelect,
+  disabled,
 }: {
   message: ExchangeMessage;
   onOptionSelect?: (value: string) => void;
+  disabled?: boolean;
 }) {
   const isOwnMessage = message.direction === 'inbound';
   const parsed = !isOwnMessage ? parseQuestionOptions(message.text) : null;
@@ -1122,6 +1116,7 @@ function MessageBubble({
               key={opt.value}
               color="blue"
               fullWidth
+              disabled={disabled}
               onClick={() => onOptionSelect?.(opt.value)}
               size="sm"
               variant="outline"

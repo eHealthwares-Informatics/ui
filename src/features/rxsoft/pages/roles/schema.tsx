@@ -32,9 +32,8 @@ const createFields: Field[] = [
   { name: 'name', label: 'Name', required: true, placeholder: 'Manager' },
   {
     name: 'permissionCodes',
-    label: 'Permission Codes (comma-separated)',
-    required: true,
-    placeholder: 'products:read,inventory:read',
+    label: 'Permissions',
+    type: 'permission-picker',
   },
 ];
 
@@ -42,24 +41,33 @@ function buildCreatePayload(values: Record<string, unknown>) {
   return {
     code: values.code,
     name: values.name,
-    permissionCodes: String(values.permissionCodes ?? '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean),
+    permissionCodes: toPermissionCodes(values),
   };
 }
 
 function buildUpdatePayload(values: Record<string, unknown>, _row?: Record<string, unknown>) {
   const payload: Record<string, unknown> = {};
-  if (values.code) {payload.code = values.code;}
-  if (values.name) {payload.name = values.name;}
-  if (values.permissionCodes) {
-    payload.permissionCodes = String(values.permissionCodes)
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
+  if (values.code) {
+    payload.code = values.code;
+  }
+  if (values.name) {
+    payload.name = values.name;
+  }
+  if (values.permissionCodes !== undefined) {
+    payload.permissionCodes = toPermissionCodes(values);
   }
   return payload;
+}
+
+function toPermissionCodes(values: Record<string, unknown>): string[] {
+  if (Array.isArray(values.permissionCodes)) {
+    return values.permissionCodes.map(String);
+  }
+  // Backward compatibility with legacy comma-separated input
+  return String(values.permissionCodes ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 export const rolesConfig: ModelConfig = {

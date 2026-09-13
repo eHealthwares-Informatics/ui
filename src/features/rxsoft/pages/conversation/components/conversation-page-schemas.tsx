@@ -11,6 +11,7 @@ import {
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import {
+  BROADCAST_STATUS_OPTIONS,
   INVITE_STATUS_OPTIONS,
   CHANNEL_TYPE_OPTIONS,
   CONVERSATION_STATE_OPTIONS,
@@ -43,6 +44,27 @@ const optionValue = (value: unknown) => {
     return String((value as Option).value);
   }
   return value ? String(value) : undefined;
+};
+
+/**
+ * Resolves the conversation's attached workflow into an Option for the
+ * `workflow` accordion field. Accepts `row.workflow` as an object or id, or a
+ * workflow nested inside `row.workflowInstance`.
+ */
+const workflowOption = (row: Record<string, unknown>): Option | null => {
+  const wf = row.workflow as Record<string, unknown> | string | undefined;
+  if (wf && typeof wf === 'object') {
+    return option(wf.id ?? wf._id, wf.name);
+  }
+  if (typeof wf === 'string' && wf) {
+    return option(wf);
+  }
+  const instance = row.workflowInstance as Record<string, unknown> | undefined;
+  const instanceWorkflow = instance?.workflow as Record<string, unknown> | undefined;
+  if (instanceWorkflow) {
+    return option(instanceWorkflow.id ?? instanceWorkflow._id, instanceWorkflow.name);
+  }
+  return option(instance?.workflowId);
 };
 
 const jsonObject = (value: unknown) =>
@@ -138,6 +160,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
     { key: 'id', label: 'ID', sortable: true },
     { key: 'name', label: 'Name' },
     { key: 'type', label: 'Type' },
+    { key: 'code', label: 'Code' },
     { key: 'provider', label: 'Provider' },
     { key: 'externalId', label: 'External ID' },
     { key: 'isActive', label: 'Active' },
@@ -145,10 +168,12 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   createFieldGroups: buildFields([
     textField('name', 'Name'),
     selectField('type', 'Type', CHANNEL_TYPE_OPTIONS),
-    textField('provider', 'Provider'),
+    textField('code', 'Code'),
+     textField('provider', 'Provider'),
     textField('externalId', 'External ID'),
     switchField('isActive', 'Active'),
     jsonField('metadata', 'Metadata'),
+    jsonField('config', 'Config'),
   ]),
   defaultState: {
     name: '',
@@ -156,6 +181,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
     provider: '',
     externalId: '',
     metadata: {},
+    config: {},
     isActive: true,
   },
   buildFormState: (row) => ({
@@ -164,23 +190,28 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
     provider: text(row.provider),
     externalId: text(row.externalId),
     metadata: jsonObject(row.metadata),
+    config: jsonObject(row.config),
     isActive: bool(row.isActive, true),
   }),
   buildCreatePayload: (values) => ({
     name: text(values.name).trim(),
     type: optionValue(values.type),
+    code: optionValue(values.code),
     provider: text(values.provider).trim() || undefined,
     externalId: text(values.externalId).trim() || undefined,
     metadata: jsonObject(values.metadata),
+    config: jsonObject(values.config),
     isActive: bool(values.isActive, true),
   }),
   buildUpdatePayload: (values) =>
     pickUpdatePayload(values, {
       name: (v) => text(v).trim(),
       type: (v) => optionValue(v),
+      code: (v) => optionValue(v),
       provider: (v) => text(v).trim() || undefined,
       externalId: (v) => text(v).trim() || undefined,
       metadata: (v) => jsonObject(v),
+      config: (v) => jsonObject(v),
       isActive: (v) => bool(v, true),
     }),
 });
@@ -430,8 +461,7 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
   title: 'Conversations',
   description: 'Create and manage conversation sessions, participant linkage, and saved context.',
   endpoint: '/conversations',
-  detailPathBuilder: (row) => `/conversation/${String(row.id)}/edit`,
-  editPathBuilder: (row) => `/conversation/${String(row.id)}/edit`,
+  detailPathBuilder: (row) => `/conversation/${String(row.id)}`,
   columns: [
     { key: 'id', label: 'Conversation ID', render: (row) => shortText(row.id) },
     {
@@ -464,6 +494,41 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
     selectField('state', 'State', CONVERSATION_STATE_OPTIONS),
     jsonField('context', 'Context'),
     {
+      name: 'workflowInstanceId',
+      label: 'Workflow Instance ID',
+      type: 'text',
+      col: 6,
+      disabled: true,
+    },
+    {
+      name: 'workflow',
+      label: 'Workflow',
+      type: 'accordion',
+      col: 12,
+      itemLabelKey: 'name',
+      // Deferred via getter: workflowPageSchema is declared later in this module,
+      // so accessing it eagerly would hit the temporal dead zone at module load.
+      get itemEditConfig() {
+        return workflowPageSchema;
+      },
+      searchParam: {
+        endpoint: '/workflows',
+        queryParam: 'search',
+        minChars: 0,
+        valueKey: 'id',
+        labelKey: 'name',
+      },
+    },
+    {
+      name: 'responses',
+      label: 'Responses',
+      type: 'accordion-array',
+      col: 12,
+      itemLabelKey: 'attribute',
+      itemRender: (item: any) =>
+        `${item.direction ?? 'RESPONSE'}${item.attribute ? ` · ${item.attribute}` : ''}: ${String(item.textAnswer ?? item.message ?? '').slice(0, 80)}`,
+    },
+    {
       name: 'questions',
       label: 'Questions',
       type: 'accordion-array',
@@ -484,6 +549,9 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
     status: option('ACTIVE'),
     state: option('START'),
     context: {},
+    workflowInstanceId: '',
+    workflow: null,
+    responses: [],
   },
   buildFormState: (row) => ({
     questionnaireId: option(row.questionnaireId),
@@ -496,6 +564,9 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
     status: option(row.status || 'ACTIVE'),
     state: option(row.state || 'START'),
     context: jsonObject(row.context),
+    workflowInstanceId: text(row.workflowInstanceId),
+    workflow: workflowOption(row),
+    responses: jsonArray(row.responses),
   }),
   buildCreatePayload: (values) => ({
     questionnaireId: optionValue(values.questionnaireId),
@@ -508,6 +579,8 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
     status: optionValue(values.status),
     state: optionValue(values.state),
     context: jsonObject(values.context),
+    workflow: optionValue(values.workflow) || undefined,
+    responses: jsonArray(values.responses),
   }),
   buildUpdatePayload: (values) =>
     pickUpdatePayload(values, {
@@ -521,6 +594,8 @@ export const conversationPageSchema: ModelConfig = withDefaultActions({
       status: (v) => optionValue(v),
       state: (v) => optionValue(v),
       context: (v) => jsonObject(v),
+      workflow: (v) => optionValue(v) || undefined,
+      responses: (v) => jsonArray(v),
     }),
 });
 
@@ -1257,3 +1332,98 @@ export const aiConfigPageSchema: ModelConfig = {
     { key: 'value', label: 'Value' },
   ],
 };
+
+export const broadcastPageSchema: ModelConfig = withDefaultActions({
+  id: 'broadcasts',
+  title: 'Broadcasts',
+  description: 'Manage conversation broadcasts, provider assignments, and acceptance tracking.',
+  endpoint: '/broadcasts',
+  columns: [
+    { key: 'id', label: 'ID', render: (row) => shortText(row.id) },
+    {
+      key: 'conversationId',
+      label: 'Conversation',
+      render: (row) => shortText(row.conversationId),
+    },
+    { key: 'status', label: 'Status' },
+    {
+      key: 'providers',
+      label: 'Providers',
+      render: (row) => {
+        const providers = jsonArray(row.providers);
+        return `${providers.length} provider${providers.length !== 1 ? 's' : ''}`;
+      },
+    },
+    { key: 'acceptanceCount', label: 'Required' },
+    { key: 'acceptedCount', label: 'Accepted' },
+    {
+      key: 'chatMode',
+      label: 'Chat Mode',
+      render: (row) => (bool(row.chatMode) ? 'Yes' : 'No'),
+    },
+    {
+      key: 'timeoutAt',
+      label: 'Timeout',
+      render: (row) => {
+        if (!row.timeoutAt) return '—';
+        const d = new Date(Number(row.timeoutAt));
+        return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
+      },
+    },
+    {
+      key: 'createdAt',
+      label: 'Created',
+      render: (row) => {
+        if (!row.createdAt) return '—';
+        const d = new Date(row.createdAt as any);
+        return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
+      },
+    },
+  ],
+  createFieldGroups: buildFields([
+    asyncField('conversationId', 'Conversation', '/conversations'),
+    selectField('status', 'Status', BROADCAST_STATUS_OPTIONS),
+    jsonField('target', 'Target'),
+    jsonField('providers', 'Providers'),
+    textField('acceptanceCount', 'Acceptance Count'),
+    switchField('chatMode', 'Chat Mode'),
+    textField('timeoutAt', 'Timeout (epoch ms)'),
+  ]),
+  defaultState: {
+    conversationId: null,
+    status: option('AWAITING'),
+    target: {},
+    providers: [],
+    acceptanceCount: 1,
+    chatMode: false,
+    timeoutAt: '',
+  },
+  buildFormState: (row) => ({
+    conversationId: option(row.conversationId),
+    status: option(row.status || 'AWAITING'),
+    target: jsonObject(row.target),
+    providers: jsonArray(row.providers),
+    acceptanceCount: numberValue(row.acceptanceCount, 1),
+    chatMode: bool(row.chatMode),
+    timeoutAt: row.timeoutAt ? String(row.timeoutAt) : '',
+  }),
+  buildCreatePayload: (values) => ({
+    conversationId: optionValue(values.conversationId),
+    status: optionValue(values.status),
+    target: jsonObject(values.target),
+    providers: jsonArray(values.providers),
+    acceptanceCount: numberValue(values.acceptanceCount, 1),
+    chatMode: bool(values.chatMode),
+    timeoutAt: text(values.timeoutAt).trim() ? Number(text(values.timeoutAt).trim()) : undefined,
+  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      conversationId: (v) => optionValue(v),
+      status: (v) => optionValue(v),
+      target: (v) => jsonObject(v),
+      providers: (v) => jsonArray(v),
+      acceptanceCount: (v) => numberValue(v, 1),
+      chatMode: (v) => bool(v),
+      timeoutAt: (v) => (text(v).trim() ? Number(text(v).trim()) : undefined),
+    }),
+});

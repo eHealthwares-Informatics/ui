@@ -4,8 +4,6 @@ import type {
   ConversationInboxResponse,
   ConversationProjection,
   ExchangeMessagesResponse,
-  InboxMode,
-  InboxStatus,
   ParticipantRole,
 } from '../types';
 
@@ -14,21 +12,41 @@ type InboxParams = {
   search?: string;
   channelId?: string;
   participantId?: string;
-  status?: InboxStatus | '';
+  status?: string;
   activeOnly?: boolean;
-  mode?: InboxMode;
+  limit?: number;
+  page?: number;
 };
 
+/**
+ * Fetch conversations using the generic GET /conversations endpoint with search.
+ * Returns full conversation objects (not projections).
+ */
 export async function fetchConversationInbox(params: InboxParams) {
-  const response = await conversationApi.get<ConversationInboxResponse>('/conversations/inbox', {
+  const response = await conversationApi.get('/conversations', {
     params: {
-      limit: 30,
-      activeOnly: true,
-      ...params,
+      limit: params.limit ?? 30,
+      page: params.page ?? 1,
+      ...(params.search?.trim() ? { search: params.search.trim() } : {}),
+      ...(params.channelId ? { channelId: params.channelId } : {}),
+      ...(params.status ? { status: params.status } : {}),
     },
   });
 
-  return response.data;
+  const data = response.data;
+  // Handle { data, meta } envelope, { data: [...], items, results }, or raw array
+  const raw = Array.isArray(data)
+    ? data
+    : (data?.data ?? data?.items ?? data?.results ?? []);
+  const meta = data?.meta ?? { total: raw.length, page: 1, limit: 30 };
+
+  // Add conversationId alias for backward compat with chat UI
+  const items = raw.map((item: any) => ({
+    ...item,
+    conversationId: item.conversationId ?? item.id,
+  }));
+
+  return { items, meta };
 }
 
 export async function fetchConversationMessages(input: {

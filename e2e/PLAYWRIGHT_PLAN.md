@@ -70,7 +70,7 @@ Comprehensive browser E2E suite for the `frontend/` app (Vite dev server, port 5
 ```bash
 cd frontend
 yarn test:e2e --project=public          # auth/errors/root (no auth needed)
-yarn test:e2e --project=admin tests/damorex
+yarn test:e2e --project=admin tests/shop
 yarn test:e2e --project=admin crud-suite
 yarn test:e2e --project=emr             # mocked EMR
 ```
