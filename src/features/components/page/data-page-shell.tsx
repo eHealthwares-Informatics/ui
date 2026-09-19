@@ -81,8 +81,10 @@ export function DataPageShell(props: DataPageShellProps) {
     metricsEndpoint,
     metricsConfig,
     superAdminOrgFilter,
+    queryKeyBase,
   } = config;
   const moduleContext = useModuleContext();
+  const listKeyBase = queryKeyBase ?? ['rxsoft-data-page', endpoint];
   const apiProvider = configApiProvider ?? moduleContext.apiProvider;
   const moduleId = moduleContext.moduleId;
   const shellModuleContext = configApiProvider
@@ -283,7 +285,7 @@ export function DataPageShell(props: DataPageShellProps) {
   // DATA FETCH
   // -----------------------------
   const query = useQuery({
-    queryKey: ['rxsoft-data-page', endpoint, queryParams] satisfies QueryKey,
+    queryKey: [...listKeyBase, queryParams] satisfies QueryKey,
     queryFn: async () => {
       let params: any = queryParams;
       if (moduleId === 'rxsoft' && Object.keys(queryParams).length > 2) {
@@ -342,6 +344,7 @@ export function DataPageShell(props: DataPageShellProps) {
     title,
     apiProvider,
     fields,
+    queryKeyBase: listKeyBase,
   });
 
   const updateMutation = useUpdateMutation({
@@ -356,6 +359,7 @@ export function DataPageShell(props: DataPageShellProps) {
     apiProvider,
     initialFormState: initialFormState ?? undefined,
     fields,
+    queryKeyBase: listKeyBase,
   });
 
   const deleteMutation = useDeleteMutation({
@@ -365,6 +369,7 @@ export function DataPageShell(props: DataPageShellProps) {
     title,
     deletePathBuilder,
     apiProvider,
+    queryKeyBase: listKeyBase,
   });
 
   const exportMutation = useExportMutation({

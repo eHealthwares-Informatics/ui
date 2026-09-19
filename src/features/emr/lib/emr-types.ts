@@ -80,7 +80,8 @@ export type FormFieldType =
   | 'table'
   | 'section'
   | 'tab'
-  | 'col';
+  | 'col'
+  | 'item';
 
 export type FormFieldSchema = {
   key: string;
@@ -212,6 +213,9 @@ export type RequestDetail = {
   externalReference: string | null;
   syncStatus: string;
   syncError: string | null;
+  sendAttemptCount: number;
+  sentAt: string | null;
+  lastSyncedAt: string | null;
   requestedAt: string;
   completedAt: string | null;
   items: RequestItem[];
@@ -314,4 +318,85 @@ export type PaymentProvider = {
   isActive: boolean;
   organizationId: string | null;
   locationId: string | null;
+};
+
+export type WardType =
+  | 'GENERAL'
+  | 'PRIVATE'
+  | 'ICU'
+  | 'PEDIATRIC'
+  | 'MATERNITY'
+  | 'ISOLATION'
+  | 'EMERGENCY'
+  | 'OTHER';
+
+export type Ward = {
+  id: string;
+  organizationId: string | null;
+  locationId: string | null;
+  code: string;
+  name: string;
+  wardType: WardType;
+  departmentId: string | null;
+  departmentType: string | null;
+  description: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type BedType = 'STANDARD' | 'ICU' | 'MATERNITY' | 'ISOLATION' | 'PEDIATRIC' | 'RECOVERY';
+
+export type BedStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'OUT_OF_SERVICE';
+
+export type Bed = {
+  id: string;
+  organizationId: string | null;
+  locationId: string | null;
+  wardId: string;
+  code: string;
+  bedType: BedType;
+  status: BedStatus;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdmissionStatus = 'ADMITTED' | 'TRANSFERRED' | 'DISCHARGED';
+
+export type AdmissionType =
+  | 'EMERGENCY'
+  | 'URGENT'
+  | 'ELECTIVE'
+  | 'MATERNITY'
+  | 'SURGICAL'
+  | 'MEDICAL';
+
+export type DischargeType =
+  | 'DISCHARGED_HOME'
+  | 'DIED'
+  | 'REFERRED'
+  | 'TRANSFERRED'
+  | 'SELF_DISCHARGE'
+  | 'AMA';
+
+export type Admission = {
+  id: string;
+  admissionNumber: string;
+  patientId: string;
+  patientName: string;
+  wardId: string | null;
+  bedId: string | null;
+  admissionDatetime: string;
+  admissionType: AdmissionType;
+  diagnosis: string | null;
+  referringProviderId: string | null;
+  referringProviderName: string | null;
+  status: AdmissionStatus;
+  dischargeDatetime: string | null;
+  dischargeType: DischargeType | null;
+  dischargeSummary: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
 };

@@ -11,23 +11,21 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Title,
 } from '@mantine/core';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import {
   BadgeCheck,
-  Clock3,
   MessageCircle,
   MessageSquare,
   Minus,
   Pill,
   Plus,
-  ShieldCheck,
   ShoppingCart,
   Truck,
 } from 'lucide-react';
 import { useState } from 'react';
+import { notifications } from '@mantine/notifications';
 import { useChatbotStore } from '../website/chatbot-store';
 import {
   toHL7Prescription,
@@ -57,6 +55,7 @@ export default function ProductDetailPage() {
   const { data, isLoading } = useProduct(slug);
   const navigate = useNavigate();
   const addItem = useCartStore((s) => s.addItem);
+  const addGenericItem = useCartStore((s) => s.addGenericItem);
   const totalItems = useCartStore((s) => s.totalItems);
   const [quantity, setQuantity] = useState(1);
 
@@ -222,7 +221,17 @@ export default function ProductDetailPage() {
                           leftSection={<ShoppingCart size={18} />}
                           styles={buttonStyles}
                           style={{ background: green }}
-                          onClick={() => addItem(product.id, quantity)}
+                          onClick={() => {
+            addItem(product.id, quantity);
+            const count = useCartStore.getState().totalItems;
+            notifications.show({
+              position: 'bottom-right',
+              title: 'Added to cart',
+              message: `${count} item${count === 1 ? '' : 's'} in cart — ${product.name}`,
+              color: 'green',
+              icon: <ShoppingCart size={18} />,
+            });
+          }}
                         >
                           Add to Cart
                         </Button>
@@ -264,6 +273,31 @@ export default function ProductDetailPage() {
                         Chat
                       </Button>
                     </Group>
+                    {gp ? (
+                      <Button
+                        radius="xl"
+                        size="md"
+                        variant="light"
+                        color="green"
+                        fullWidth
+                        leftSection={<Pill size={18} />}
+                        styles={buttonStyles}
+                        onClick={() => {
+                          addGenericItem({
+                            name: gp.name || product.name,
+                            genericProductCode: gp.id,
+                            unitPrice: product.unitPrice ?? 0,
+                          });
+                          notifications.show({
+                            message: `${gp.name || product.name} (generic) added to cart`,
+                            color: 'green',
+                            icon: <ShoppingCart size={18} />,
+                          });
+                        }}
+                      >
+                        Add Generic (any brand)
+                      </Button>
+                    ) : null}
                     {totalItems > 0 ? (
                       <Button
                         radius="xl"

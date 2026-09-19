@@ -30,6 +30,7 @@ export * from './receivables';
 export * from './reports';
 export * from './reset-password';
 export * from './roles';
+export * from './role-requests';
 export * from './sales';
 export * from './sales-lines';
 export * from './sales-analytics';

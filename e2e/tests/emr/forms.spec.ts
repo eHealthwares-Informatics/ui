@@ -56,6 +56,45 @@ test('publishes and unpublishes a form definition (UC-25/26)', async ({ page }) 
   ).toBe(true);
 });
 
+test('builds a form with an item/drug searchable field type', async ({ page }) => {
+  const posts: { method: string; url: string; body: unknown }[] = [];
+  await installEmrMocks(page, {
+    forms,
+    onRequest: (method, url, body) => {
+      if (method === 'POST') {
+        posts.push({ method, url, body });
+      }
+    },
+  });
+  await page.goto('/emr/forms');
+  await page.getByRole('button', { name: 'New Form' }).click();
+
+  await page.getByLabel('Name').fill('Medication Plan');
+  await page.getByLabel('Code').fill('MEDICATION_PLAN');
+  await page.getByPlaceholder('Select category').click();
+  await page.getByRole('option', { name: 'Clinical Note' }).click();
+
+  await page.getByRole('button', { name: 'Add field' }).click();
+  await page.getByLabel('Label').fill('Medication');
+  await page.getByLabel('Key').fill('medication');
+  await page.getByRole('combobox', { name: 'Type' }).click();
+  await page.getByRole('option', { name: 'Item' }).click();
+
+  await page.getByRole('button', { name: 'Create Form' }).click();
+  await expect(page.getByText('Form definition created (draft)')).toBeVisible();
+
+  const createPost = posts.find((post) => post.url.endsWith('/form-definitions'));
+  expect(createPost).toBeTruthy();
+  const body = createPost!.body as {
+    schemaJson: { fields: { key: string; label: string; type: string }[] };
+  };
+  expect(body.schemaJson.fields[0]).toMatchObject({
+    key: 'medication',
+    label: 'Medication',
+    type: 'item',
+  });
+});
+
 test('builds and saves a new form definition (UC-24 form builder)', async ({ page }) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {

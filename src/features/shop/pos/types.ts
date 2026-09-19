@@ -13,6 +13,23 @@ export interface CartItem {
   expiryDate?: string;
   imageUrl?: string;
   pricingMode?: 'retail' | 'wholesale';
+  /** Source website-order line being dispensed (links sale line ↔ order line). */
+  orderItemId?: string;
+}
+
+export interface DispenseRow {
+  orderItemId: string;
+  orderedLabel: string;
+  orderedCode?: string;
+  quantity: number;
+  initialItemId?: string | null;
+  initialItem?: {
+    id: string;
+    code?: string;
+    name: string;
+    saleUomId?: string | null;
+    imageUrl?: string;
+  } | null;
 }
 
 export interface Customer {

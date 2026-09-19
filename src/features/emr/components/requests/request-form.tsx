@@ -21,6 +21,7 @@ import { PRIORITIES, REQUEST_TYPES, toSelectData } from '../../lib/emr-constants
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
+import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 
 type RequestItem = {
   name: string;
@@ -51,7 +52,7 @@ export function RequestForm({
   submitUrl,
   lockPatient = false,
 }: {
-  onCreated: () => void;
+  onCreated?: (created?: Record<string, unknown>) => void;
   onClose: () => void;
   initialPatient?: PatientOption | null;
   submitUrl?: string;
@@ -61,6 +62,7 @@ export function RequestForm({
   const [patient, setPatient] = useState<PatientOption | null>(initialPatient ?? null);
   const [patientError, setPatientError] = useState<string | null>(null);
   const [orderingProvider, setOrderingProvider] = useState<StaffOption | null>(null);
+  const [itemRefs, setItemRefs] = useState<(MasterItem | null)[]>([null]);
 
   const form = useForm({
     initialValues: {
@@ -115,7 +117,7 @@ export function RequestForm({
     onSuccess: () => {
       notifications.show({ message: 'Clinical request created', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'requests'] });
-      onCreated();
+      onCreated?.();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });
@@ -182,13 +184,26 @@ export function RequestForm({
                 <ActionIcon
                   variant="subtle"
                   color="red"
-                  onClick={() => form.removeListItem('items', index)}
+                  onClick={() => {
+                    form.removeListItem('items', index);
+                    setItemRefs((prev) => prev.filter((_, i) => i !== index));
+                  }}
                   aria-label="Remove item"
                 >
                   <Trash2 size={15} />
                 </ActionIcon>
               )}
             </Group>
+            <MasterItemSearch
+              label="Item / Drug"
+              placeholder="Search stock items or generic products…"
+              value={itemRefs[index] ?? null}
+              onChange={(next) => {
+                setItemRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
+                form.setFieldValue(`items.${index}.name`, next?.label ?? form.values.items[index].name);
+                form.setFieldValue(`items.${index}.code`, next?.code ?? form.values.items[index].code);
+              }}
+            />
             <TextInput
               label="Name"
               required
@@ -219,7 +234,10 @@ export function RequestForm({
         <Button
           variant="light"
           leftSection={<Plus size={15} />}
-          onClick={() => form.insertListItem('items', { ...EMPTY_ITEM })}
+          onClick={() => {
+            form.insertListItem('items', { ...EMPTY_ITEM });
+            setItemRefs((prev) => [...prev, null]);
+          }}
         >
           Add item
         </Button>

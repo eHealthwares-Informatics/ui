@@ -245,6 +245,12 @@ export const sidebarData: SidebarData = {
           icon: Shield,
           modules: ['rxsoft', 'admin'],
         },
+        {
+          title: 'Roles Request',
+          url: '/rxsoft/role-requests',
+          icon: ShieldCheck,
+          modules: ['rxsoft', 'admin'],
+        },
       ],
     },
     {
@@ -888,6 +894,12 @@ export const sidebarData: SidebarData = {
           icon: Pill,
           modules: ['coding-concept'],
         },
+        {
+          title: 'Drug Classifications',
+          url: '/coding-concept/drug-classifications',
+          icon: Tags,
+          modules: ['coding-concept'],
+        },
       ],
     },
     {
@@ -1040,6 +1052,42 @@ export const sidebarData: SidebarData = {
           url: '/lis/attribute-definitions',
           icon: Cog,
           modules: ['lis'],
+        },
+      ],
+    },
+    {
+      title: 'Wards',
+      icon: Bed,
+      items: [
+        {
+          title: 'Wards',
+          url: '/emr/wards',
+          icon: Bed,
+          modules: ['emr'],
+        },
+        {
+          title: 'Beds',
+          url: '/emr/wards/beds',
+          icon: Bed,
+          modules: ['emr'],
+        },
+        {
+          title: 'Admissions',
+          url: '/emr/wards/admissions',
+          icon: Bed,
+          modules: ['emr'],
+        },
+        {
+          title: 'Discharges',
+          url: '/emr/wards/discharges',
+          icon: Bed,
+          modules: ['emr'],
+        },
+        {
+          title: 'Bed Allocations',
+          url: '/emr/wards/board',
+          icon: Bed,
+          modules: ['emr'],
         },
       ],
     },

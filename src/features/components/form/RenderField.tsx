@@ -139,7 +139,7 @@ function RenderFieldComponent({
         <Group gap="xs">
           {current.map((item: string | Option) => (
             <Badge
-              key={item.toString()}
+              key={typeof item === 'string' ? item : item.value}
               rightSection={
                 <ActionIcon
                   size="xs"
@@ -152,7 +152,7 @@ function RenderFieldComponent({
                 </ActionIcon>
               }
             >
-              {(item as Option).label}
+              {typeof item === 'string' ? item : item.label}
             </Badge>
           ))}
         </Group>

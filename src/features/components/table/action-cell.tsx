@@ -59,7 +59,7 @@ export const ActionCell = ({
   return (
     <Group gap="xs">
       {detailPathBuilder && (
-        <ActionIcon variant="outline" component={Link} to={detailPathBuilder(row)}>
+        <ActionIcon variant="outline" component={Link} to={detailPathBuilder(row)} aria-label="View details">
           <Eye size={16} />
         </ActionIcon>
       )}
@@ -126,11 +126,19 @@ export const ActionCell = ({
           <Menu.Dropdown>
             {rowActions.map((action) => {
               const Icon = action.icon;
-              return (
+              return action.onClick ? (
+                <Menu.Item
+                  key={action.label}
+                  onClick={() => action.onClick && action.onClick(row)}
+                  leftSection={Icon ? <Icon size={14} /> : undefined}
+                >
+                  {action.label}
+                </Menu.Item>
+              ) : (
                 <Menu.Item
                   key={action.label}
                   component={Link}
-                  to={action.href(row)}
+                  to={action.href!(row)}
                   leftSection={Icon ? <Icon size={14} /> : undefined}
                 >
                   {action.label}

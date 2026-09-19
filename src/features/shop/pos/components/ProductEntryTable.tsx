@@ -1,47 +1,360 @@
 import {
+  ActionIcon,
   Button,
+  Combobox,
   Image,
+  InputBase,
+  Loader,
   NumberInput,
   Paper,
   Select,
   Table,
   Text,
   UnstyledButton,
+  useCombobox,
 } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
-import { useState, useMemo } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
-import { useWhitelistedItems, UomOption } from '../../api/posApi';
-import { SaleSession, CartItem } from '../types';
+import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getUomEffectiveFactor } from '@/lib/uom-utils';
+import { rxsoftApi } from '@/lib/rxsoft-api';
+import {
+  UomOption,
+  usePosItemPrice,
+  usePosItemUoms,
+  usePosItems,
+} from '../../api/posApi';
+import { SaleSession, CartItem, DispenseRow } from '../types';
 import { PosSetPriceModal } from './PosSetPriceModal';
 import { StockAdjustModal } from './StockAdjustModal';
 
-interface ProductOption {
-  value: string;
-  label: string;
+type PosItemOption = {
+  id: string;
+  code?: string;
+  itemCode?: string;
+  barcode?: string;
   name: string;
+  displayName?: string;
+  saleUomId?: string | null;
+  smallImageUrl?: string;
+  imageUrl?: string;
+};
+
+type SelectedProduct = {
+  id: string;
   code: string;
+  name: string;
   saleUomId: string | null;
-  baseUomId: string | null;
-  uomCategoryId: string | null;
-  retailPrice: number | null;
-  wholesalePrice: number | null;
   imageUrl: string;
-}
+};
 
 interface Props {
   session: SaleSession;
   onAddToCart: (item: CartItem) => void;
   stockLocationId?: string | null;
+  /** When provided, the table renders the dispense (multi-row) mode. */
+  dispenseRows?: DispenseRow[];
+  /** Order id key — resets dispense rows when a different order is loaded. */
+  dispenseKey?: string | null;
+  onDispenseAdd?: (item: CartItem) => void;
 }
 
-export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Props) {
+// Fully-controlled server-side searchable picker — mirrors the PO line item
+// picker. Avoids the Mantine `Select` client-side filtering over the entire
+// catalog (the cause of the POS hang) by querying `/items?search=` per keystroke.
+function PosProductPicker({
+  selectedLabel,
+  onSelect,
+}: {
+  selectedLabel?: string;
+  onSelect: (item: PosItemOption | null) => void;
+}) {
+  const combobox = useCombobox();
+  const [search, setSearch] = useState('');
+  const [debounced] = useDebouncedValue(search, 250);
+  const { data: items = [], isLoading } = usePosItems(debounced);
+
+  const options = useMemo(
+    () =>
+      (Array.isArray(items) ? items : []).map((i) => ({
+        value: i.id,
+        label:
+          `${i.code || ''}${i.code ? ' - ' : ''}${i.displayName || i.name || ''}`.trim() ||
+          i.id,
+        item: i,
+      })),
+    [items],
+  );
+
+  const submit = (val: string) => {
+    const opt = options.find((o) => o.value === val);
+    onSelect(opt?.item ?? null);
+    setSearch('');
+    combobox.closeDropdown();
+  };
+
+  return (
+    <Combobox store={combobox} onOptionSubmit={submit}>
+      <Combobox.Target>
+        <InputBase
+          size="xs"
+          placeholder="Search product..."
+          w={350}
+          data-testid="pos-product-select"
+          value={search || selectedLabel || ''}
+          onChange={(e) => {
+            setSearch(e.currentTarget.value);
+            combobox.openDropdown();
+          }}
+          onClick={() => combobox.openDropdown()}
+          onFocus={() => combobox.openDropdown()}
+          onBlur={() => setSearch('')}
+          rightSection={
+            isLoading ? <Loader size={14} /> : <ChevronDown size={14} />
+          }
+        />
+      </Combobox.Target>
+      <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 20 }}>
+        <Combobox.Options style={{ maxHeight: 280, overflowY: 'auto' }}>
+          {options.length === 0 ? (
+            <Combobox.Empty>{isLoading ? 'Loading…' : 'No products found'}</Combobox.Empty>
+          ) : (
+            options.slice(0, 20).map((o) => (
+              <Combobox.Option key={o.value} value={o.value}>
+                {o.label}
+              </Combobox.Option>
+            ))
+          )}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
+function DispenseRowEditor({
+  row,
+  priceListId,
+  pricingMode,
+  stockLocationId,
+  onAdd,
+  onRemove,
+}: {
+  row: DispenseRow;
+  priceListId?: string;
+  pricingMode: 'retail' | 'wholesale';
+  stockLocationId?: string | null;
+  onAdd: (item: CartItem) => void;
+  onRemove: () => void;
+}) {
+  const initialSelected: SelectedProduct | null = row.initialItem
+    ? {
+        id: row.initialItem.id,
+        code: row.initialItem.code ?? '',
+        name: row.initialItem.name,
+        saleUomId: row.initialItem.saleUomId ?? null,
+        imageUrl: row.initialItem.imageUrl ?? '',
+      }
+    : null;
+  const [selected, setSelected] = useState<SelectedProduct | null>(initialSelected);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    row.initialItem ? row.initialItem.id : (row.initialItemId ?? null)
+  );
+  const [quantity, setQuantity] = useState(row.quantity || 1);
+  const [uomId, setUomId] = useState<string | null>(null);
+  const [setPriceOpen, setSetPriceOpen] = useState(false);
+
+  const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
+  const { data: unitPrice = null } = usePosItemPrice(priceListId, selectedProductId);
+
+  const itemUomMap = useMemo(() => new Map(itemUoms.map((u) => [u.id, u as UomOption])), [itemUoms]);
+
+  const uomItemId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedProductId) {
+      uomItemId.current = null;
+      setUomId(null);
+      return;
+    }
+    if (itemUoms.length === 0) {
+      setUomId(null);
+      return;
+    }
+    if (uomItemId.current === selectedProductId) { return; }
+    uomItemId.current = selectedProductId;
+    if (selected?.saleUomId && itemUoms.some((u) => u.id === selected.saleUomId)) {
+      setUomId(selected.saleUomId);
+      return;
+    }
+    setUomId(itemUoms[0].id);
+  }, [selectedProductId, itemUoms, selected]);
+
+  const effectivePrice = unitPrice;
+  const currentUom = uomId ? (itemUomMap.get(uomId) ?? null) : null;
+  const uomFactor = getUomEffectiveFactor(currentUom);
+  const unitPriceDisplay = effectivePrice !== null ? effectivePrice * uomFactor : null;
+  const total = effectivePrice !== null ? quantity * effectivePrice * uomFactor : 0;
+
+  const { data: stockQty = null } = useQuery({
+    queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
+    queryFn: async () => {
+      if (!selectedProductId || !stockLocationId) { return null; }
+      const { data } = await rxsoftApi.get('/inventory/stock-balances/summary', {
+        params: { itemId: selectedProductId, locationId: stockLocationId },
+      });
+      return data?.quantityOnHand ?? null;
+    },
+    enabled: !!selectedProductId && !!stockLocationId,
+    staleTime: 0,
+  });
+  const adjustedStockQty = uomFactor > 0 && stockQty !== null ? stockQty / uomFactor : null;
+
+  const itemCode = selected?.code || selectedProductId?.slice(0, 8) || '';
+  const selectedLabel = selected
+    ? `${selected.code}${selected.code ? ' - ' : ''}${selected.name}`.trim()
+    : '';
+
+  function handleProductSelect(item: PosItemOption | null) {
+    if (!item) {
+      setSelected(null);
+      setSelectedProductId(null);
+      setUomId(null);
+      return;
+    }
+    setSelected({
+      id: item.id,
+      code: item.itemCode ?? item.code ?? item.barcode ?? '',
+      name: item.displayName || item.name || '',
+      saleUomId: item.saleUomId ?? null,
+      imageUrl: item.smallImageUrl || item.imageUrl || '',
+    });
+    setSelectedProductId(item.id);
+    setUomId(null);
+  }
+
+  function handleAdd() {
+    if (!selectedProductId || !quantity) {
+      notifications.show({ color: 'red', message: 'Select a product and quantity first' });
+      return;
+    }
+    const uom = uomId ? itemUomMap.get(uomId) : undefined;
+    if (!uom) {
+      notifications.show({ color: 'red', message: 'Please select a UOM for this product' });
+      return;
+    }
+    if (effectivePrice === null) {
+      notifications.show({
+        color: 'red',
+        message: `${selected?.name || row.orderedLabel || 'This product'} has no price set`,
+      });
+      return;
+    }
+    onAdd({
+      id: selectedProductId,
+      code: itemCode,
+      name: selected?.name || row.orderedLabel || '',
+      retailPrice: effectivePrice ?? 0,
+      wholesalePrice: effectivePrice ?? 0,
+      quantity,
+      pricingMode,
+      uomId: uom.id,
+      uomName: uom.name || 'Unit',
+      uomFactor,
+      lineTotal: total,
+      imageUrl: selected?.imageUrl || '',
+      orderItemId: row.orderItemId,
+    });
+  }
+
+  return (
+    <Table.Tr>
+      <Table.Td>
+        {selected?.imageUrl ? (
+          <Image src={selected.imageUrl} w={40} h={40} fit="cover" />
+        ) : (
+          <Text size="xs" c="dimmed">-</Text>
+        )}
+      </Table.Td>
+      <Table.Td fw={600}>{row.orderedLabel || '-'}</Table.Td>
+      <Table.Td>
+        <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
+      </Table.Td>
+      <Table.Td>
+        {stockLocationId && selectedProductId ? (
+          adjustedStockQty === null ? (
+            <Text size="xs" c="dimmed">-</Text>
+          ) : (
+            <Text size="xs">{adjustedStockQty.toFixed(2)}</Text>
+          )
+        ) : (
+          <Text size="xs" c="dimmed">-</Text>
+        )}
+      </Table.Td>
+      <Table.Td>
+        {!selectedProductId ? (
+          <Text size="xs" c="dimmed">-</Text>
+        ) : unitPriceDisplay === null ? (
+          <Button size="xs" variant="light" color="cyan" onClick={() => setSetPriceOpen(true)}>
+            SetPrice
+          </Button>
+        ) : (
+          unitPriceDisplay.toFixed(2)
+        )}
+      </Table.Td>
+      <Table.Td>
+        <Select
+          size="xs"
+          w={180}
+          data={itemUoms.map((u) => ({ value: u.id, label: u.name }))}
+          value={uomId}
+          onChange={(v) => setUomId(v)}
+          placeholder="Pick UOM"
+          disabled={itemUoms.length === 0}
+          maxDropdownHeight={300}
+        />
+      </Table.Td>
+      <Table.Td>
+        <NumberInput size="xs" min={1} value={quantity} onChange={(v) => setQuantity(Number(v) || 1)} w={80} />
+      </Table.Td>
+      <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
+      <Table.Td>
+        <ActionIcon.Group>
+          <Button size="xs" leftSection={<Plus size={14} />} onClick={handleAdd} data-testid="pos-dispense-add-btn">
+            Add
+          </Button>
+          <ActionIcon size="sm" color="red" variant="subtle" onClick={onRemove} aria-label="Remove dispense row">
+            <Trash2 size={14} />
+          </ActionIcon>
+        </ActionIcon.Group>
+      </Table.Td>
+
+      <PosSetPriceModal
+        opened={setPriceOpen}
+        onClose={() => setSetPriceOpen(false)}
+        onSaved={() => {}}
+        itemId={selectedProductId ?? ''}
+        itemName={selected?.name ?? row.orderedLabel}
+        priceListId={priceListId}
+      />
+    </Table.Tr>
+  );
+}
+
+export function ProductEntryTable({ session, onAddToCart, stockLocationId, dispenseRows, dispenseKey, onDispenseAdd }: Props) {
+  const [selected, setSelected] = useState<SelectedProduct | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [uomId, setUomId] = useState<string | null>(null);
+
+  const isDispense = Boolean(dispenseRows && onDispenseAdd && dispenseKey);
+  const [dispenseRowState, setDispenseRowState] = useState<DispenseRow[]>(dispenseRows ?? []);
+
+  // When a different order is loaded, reset the editable dispense rows.
+  useEffect(() => {
+    setDispenseRowState(dispenseRows ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispenseKey]);
 
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [adjustItemId, setAdjustItemId] = useState('');
@@ -52,100 +365,52 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
 
   const [setPriceOpen, setSetPriceOpen] = useState(false);
 
-  const { data: priceListEntries = [] } = useQuery({
-    queryKey: ['price-list-items', session.priceListId],
-    queryFn: async () => {
-      if (!session.priceListId) {return [];}
-      const { data } = await rxsoftApi.get(`/price-lists/${session.priceListId}/items`, {
-        params: { limit: 100000 },
-      });
-      return data?.data ?? data ?? [];
-    },
-    enabled: !!session.priceListId,
-    staleTime: 60_000,
-  });
+  const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
+  const { data: unitPrice = null } = usePosItemPrice(session.priceListId, selectedProductId);
 
-  const { data: whitelistedItems = [] } = useWhitelistedItems();
-
-  const { data: allUoms = [] } = useQuery({
-    queryKey: ['uoms', 'all'],
-    queryFn: async () => {
-      const { data } = await rxsoftApi.get('/uoms', { params: { limit: 100 } });
-      return (data?.data ?? data ?? []) as UomOption[];
-    },
-    staleTime: 300_000,
-  });
-
-  const uomMap = useMemo(() => {
+  const itemUomMap = useMemo(() => {
     const map = new Map<string, UomOption>();
-    for (const u of allUoms) {
+    for (const u of itemUoms) {
       map.set(u.id, u as UomOption);
     }
     return map;
-  }, [allUoms]);
+  }, [itemUoms]);
 
-  // Price for the session's selected price list, keyed by itemId. When an item
-  // has NO entry in that list, retailPrice/wholesalePrice are null (unset).
-  const priceByItemId = useMemo(() => {
-    const map = new Map<string, number | null>();
-    for (const pli of Array.isArray(priceListEntries) ? priceListEntries : []) {
-      const itemId = pli.item?.id;
-      if (itemId) {
-        map.set(itemId, Number(pli.unitPrice) || 0);
-      }
+  // Select a sensible default UOM only once per item (when the item or its UOM
+  // list changes), so later refetches don't clobber the cashier's choice.
+  const uomItemId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selected) {
+      uomItemId.current = null;
+      setUomId(null);
+      return;
     }
-    return map;
-  }, [priceListEntries]);
+    if (itemUoms.length === 0) {
+      setUomId(null);
+      return;
+    }
+    if (uomItemId.current === selected.id) {
+      return;
+    }
+    uomItemId.current = selected.id;
+    if (selected.saleUomId && itemUoms.some((u) => u.id === selected.saleUomId)) {
+      setUomId(selected.saleUomId);
+      return;
+    }
+    setUomId(itemUoms[0].id);
+  }, [selected, itemUoms]);
 
-  const productOptions = useMemo<ProductOption[]>(() => {
-    const list = Array.isArray(whitelistedItems) ? whitelistedItems : [];
-    return list.map((w: any) => {
-      const displayName = w.displayName || w.name || '';
-      const code = w.code || '';
-      const price = priceByItemId.get(w.itemId);
-      return {
-        value: w.itemId,
-        label: `${code} - ${displayName}`,
-        name: displayName,
-        code,
-        saleUomId: w.saleUomId ?? null,
-        baseUomId: w.baseUom?.id ?? null,
-        uomCategoryId: w.uomCategoryId ?? null,
-        retailPrice: price === undefined ? null : price,
-        wholesalePrice: price === undefined ? null : price,
-        imageUrl: w.smallImageUrl || w.imageUrl || '',
-      };
-    });
-  }, [whitelistedItems, priceByItemId]);
+  const retailPrice = unitPrice;
+  const wholesalePrice = unitPrice;
+  const effectivePrice = session.pricingMode === 'wholesale' ? wholesalePrice : retailPrice;
 
-  const selectedProduct = productOptions.find((p) => p.value === selectedProductId);
+  const itemCode = selected?.code || selectedProductId?.slice(0, 8) || '';
 
-  const itemCode = selectedProduct?.code || selectedProductId?.slice(0, 8) || '';
-  const retailPrice = selectedProduct?.retailPrice ?? null;
-  const wholesalePrice = selectedProduct?.wholesalePrice ?? null;
-  const effectivePrice =
-    session.pricingMode === 'wholesale' ? wholesalePrice : retailPrice;
-
-  const currentUom = uomId ? (uomMap.get(uomId) ?? null) : null;
+  const currentUom = uomId ? (itemUomMap.get(uomId) ?? null) : null;
   const uomFactor = getUomEffectiveFactor(currentUom);
   const total = effectivePrice !== null ? quantity * effectivePrice * uomFactor : 0;
 
-  const unitPrice = effectivePrice !== null ? effectivePrice * uomFactor : null;
-
-  // UOMs available for the item are those in the SAME category as the item's
-  // base UOM (uomCategoryId returned with the product). Fall back to the full
-  // UOM list only when the category cannot be determined.
-  const filteredUomOptions = useMemo(() => {
-    if (!selectedProductId || !selectedProduct) {
-      return [];
-    }
-    if (!selectedProduct.uomCategoryId) {
-      return Array.from(uomMap.values());
-    }
-    return Array.from(uomMap.values()).filter(
-      (u) => u.categoryId === selectedProduct.uomCategoryId,
-    );
-  }, [selectedProductId, selectedProduct, uomMap]);
+  const unitPriceDisplay = effectivePrice !== null ? effectivePrice * uomFactor : null;
 
   const { data: stockQty = null, refetch: refetchStock } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
@@ -166,30 +431,23 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
 
   const adjustedStockQty = uomFactor > 0 && stockQty !== null ? stockQty / uomFactor : null;
 
-  function handleProductSelect(value: string | null) {
-    setSelectedProductId(value);
-    setUomId(null);
-    const prod = value ? productOptions.find((p) => p.value === value) : null;
-    if (!prod) {
+  function handleProductSelect(item: PosItemOption | null) {
+    if (!item) {
+      setSelected(null);
+      setSelectedProductId(null);
+      setUomId(null);
       return;
     }
-    const categoryUoms = Array.from(uomMap.values()).filter(
-      (u) => prod.uomCategoryId && u.categoryId === prod.uomCategoryId,
-    );
-    const saleUom = prod.saleUomId ? categoryUoms.find((u) => u.id === prod.saleUomId) : null;
-    const baseUom = prod.baseUomId ? uomMap.get(prod.baseUomId) : null;
-    const defaultUom =
-      saleUom ??
-      (baseUom && prod.uomCategoryId === baseUom.categoryId ? baseUom : categoryUoms[0]);
-    if (defaultUom) {
-      setUomId(defaultUom.id);
-    } else {
-      setUomId(null);
-      notifications.show({
-        color: 'red',
-        message: `No sale UOM configured for ${prod.name || prod.code || 'this product'}`,
-      });
-    }
+    const prod: SelectedProduct = {
+      id: item.id,
+      code: item.itemCode ?? item.code ?? item.barcode ?? '',
+      name: item.displayName || item.name || '',
+      saleUomId: item.saleUomId ?? null,
+      imageUrl: item.smallImageUrl || item.imageUrl || '',
+    };
+    setSelected(prod);
+    setSelectedProductId(item.id);
+    setUomId(null);
   }
 
   function handleAdd() {
@@ -197,29 +455,22 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
       notifications.show({ color: 'red', message: 'Select a product and quantity first' });
       return;
     }
-    const uom = uomId ? uomMap.get(uomId) : undefined;
+    const uom = uomId ? itemUomMap.get(uomId) : undefined;
     if (!uom) {
       notifications.show({ color: 'red', message: 'Please select a UOM for this product' });
-      return;
-    }
-    if (selectedProduct?.uomCategoryId && uom.categoryId !== selectedProduct.uomCategoryId) {
-      notifications.show({
-        color: 'red',
-        message: `UOM (${uom.name}) is not in the same category as the base UOM`,
-      });
       return;
     }
     if (effectivePrice === null) {
       notifications.show({
         color: 'red',
-        message: `${selectedProduct?.name || 'This product'} has no price set`,
+        message: `${selected?.name || 'This product'} has no price set`,
       });
       return;
     }
     const item: CartItem = {
       id: selectedProductId,
       code: itemCode,
-      name: selectedProduct?.name || '',
+      name: selected?.name || '',
       retailPrice: retailPrice ?? 0,
       wholesalePrice: wholesalePrice ?? 0,
       quantity,
@@ -228,9 +479,10 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
       uomName: uom.name || 'Unit',
       uomFactor,
       lineTotal: total,
-      imageUrl: selectedProduct?.imageUrl || '',
+      imageUrl: selected?.imageUrl || '',
     };
     onAddToCart(item);
+    setSelected(null);
     setSelectedProductId(null);
     setQuantity(1);
     setUomId(null);
@@ -241,12 +493,16 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
       return;
     }
     setAdjustItemId(selectedProductId);
-    setAdjustItemName(selectedProduct?.name || itemCode);
-    setAdjustUomId(uomId || selectedProduct?.saleUomId || '');
+    setAdjustItemName(selected?.name || itemCode);
+    setAdjustUomId(uomId || selected?.saleUomId || '');
     setAdjustUomName(currentUom?.name || 'Unit');
     setAdjustCurrentQty(adjustedStockQty ?? 0);
     setAdjustModalOpen(true);
   }
+
+  const selectedLabel = selected
+    ? `${selected.code}${selected.code ? ' - ' : ''}${selected.name}`.trim()
+    : '';
 
   return (
     <Paper radius={0} withBorder data-testid="pos-product-entry">
@@ -254,21 +510,38 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
         <Table.Thead bg="#a6d5e5">
           <Table.Tr>
             <Table.Th w={50}>Image</Table.Th>
-            <Table.Th>ITEM CODE</Table.Th>
-            <Table.Th>ITEM NAME</Table.Th>
+            {isDispense && <Table.Th>ORDERED</Table.Th>}
+            <Table.Th>{isDispense ? 'ITEM (SOLD)' : 'ITEM CODE'}</Table.Th>
             <Table.Th>StockQty</Table.Th>
             <Table.Th>RtPrice</Table.Th>
             <Table.Th>UOM</Table.Th>
             <Table.Th>QUANTITY</Table.Th>
             <Table.Th>TOTAL</Table.Th>
-            <Table.Th w={60} />
+            <Table.Th w={isDispense ? 110 : 60} />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {isDispense ? (
+            dispenseRowState.map((row) => (
+              <DispenseRowEditor
+                key={row.orderItemId}
+                row={row}
+                priceListId={session.priceListId}
+                pricingMode={session.pricingMode}
+                stockLocationId={stockLocationId}
+                onAdd={(item) => onDispenseAdd?.(item)}
+                onRemove={() =>
+                  setDispenseRowState((prev) =>
+                    prev.filter((r) => r.orderItemId !== row.orderItemId)
+                  )
+                }
+              />
+            ))
+          ) : (
           <Table.Tr>
             <Table.Td>
-              {selectedProduct?.imageUrl ? (
-                <Image src={selectedProduct.imageUrl} w={40} h={40} fit="cover" />
+              {selected?.imageUrl ? (
+                <Image src={selected.imageUrl} w={40} h={40} fit="cover" />
               ) : (
                 <Text size="xs" c="dimmed">
                   -
@@ -277,17 +550,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
             </Table.Td>
             <Table.Td>{itemCode || '-'}</Table.Td>
             <Table.Td>
-              <Select
-                size="xs"
-                placeholder="Select product..."
-                data-testid="pos-product-select"
-                data={productOptions.map((p) => ({ value: p.value, label: p.label }))}
-                value={selectedProductId}
-                onChange={handleProductSelect}
-                searchable
-                clearable
-                w={350}
-              />
+              <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
             </Table.Td>
             <Table.Td>
               {stockLocationId && selectedProductId ? (
@@ -310,11 +573,11 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               )}
             </Table.Td>
             <Table.Td>
-              {!selectedProductId || !selectedProduct ? (
+              {!selectedProductId || !selected ? (
                 <Text size="xs" c="dimmed">
                   -
                 </Text>
-              ) : unitPrice === null ? (
+              ) : unitPriceDisplay === null ? (
                 <Button
                   size="xs"
                   variant="light"
@@ -325,7 +588,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
                   SetPrice
                 </Button>
               ) : (
-                unitPrice.toFixed(2)
+                unitPriceDisplay.toFixed(2)
               )}
             </Table.Td>
             <Table.Td>
@@ -333,14 +596,15 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
                 size="xs"
                 w={200}
                 data-testid="pos-entry-uom"
-                data={filteredUomOptions.map((u) => ({
+                data={itemUoms.map((u) => ({
                   value: u.id,
                   label: u.name,
                 }))}
                 value={uomId}
                 onChange={(v) => setUomId(v)}
                 placeholder="Pick UOM"
-                disabled={filteredUomOptions.length === 0}
+                disabled={itemUoms.length === 0}
+                maxDropdownHeight={300}
               />
             </Table.Td>
             <Table.Td>
@@ -359,6 +623,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
               </Button>
             </Table.Td>
           </Table.Tr>
+          )}
         </Table.Tbody>
       </Table>
 
@@ -378,13 +643,9 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId }: Pro
       <PosSetPriceModal
         opened={setPriceOpen}
         onClose={() => setSetPriceOpen(false)}
-        onSaved={() => {
-          // Invalidate the price-list-items query so the line reflects the saved price.
-          // (priceListEntries is derived from a query keyed on session.priceListId.)
-          // This component refetches priceListEntries via its own queryKey.
-        }}
+        onSaved={() => {}}
         itemId={selectedProductId ?? ''}
-        itemName={selectedProduct?.name ?? itemCode}
+        itemName={selected?.name ?? itemCode}
         priceListId={session.priceListId}
       />
     </Paper>

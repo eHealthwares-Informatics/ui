@@ -1,4 +1,4 @@
-import { Box, Container, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Box, Card, Container, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { Cross, Search, FileText, CalendarClock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { green, darkGreen, muted, line, soft } from './components';
@@ -29,6 +29,10 @@ const loaderStyles = `
 @keyframes damorex-skeleton-pulse {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+@keyframes damorex-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
 }
 `;
 
@@ -159,6 +163,32 @@ export function FullPageLoader() {
   );
 }
 
+export function SkeletonCards({
+  cols = { base: 1, sm: 2, lg: 3 },
+  count = 6,
+}: {
+  cols?: { base?: number; sm?: number; lg?: number };
+  count?: number;
+}) {
+  useEffect(() => {
+    injectLoaderStyles();
+  }, []);
+
+  return (
+    <SimpleGrid cols={cols} spacing="md">
+      {Array.from({ length: count }).map((_, i) => (
+        <Card key={i} radius={20} withBorder padding="md" style={{ borderColor: line }}>
+          <Stack gap={6}>
+            <Box style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '60%' }} />
+            <Box style={{ height: 16, background: '#E8F0EC', borderRadius: 8, width: '80%' }} />
+            <Box style={{ height: 34, background: '#E8F0EC', borderRadius: 16, marginTop: 6 }} />
+          </Stack>
+        </Card>
+      ))}
+    </SimpleGrid>
+  );
+}
+
 export function PageLoader() {
   useEffect(() => {
     injectLoaderStyles();
@@ -221,26 +251,43 @@ export function ProductLoader({ count = 8 }: { count?: number }) {
           key={i}
           style={{
             border: `1px solid ${line}`,
-            borderRadius: 24,
+            borderRadius: 20,
             overflow: 'hidden',
             background: '#fff',
-            animation: `damorex-skeleton-pulse 1.5s ease-in-out ${i * 0.08}s infinite`,
+            boxShadow: '0 12px 28px rgba(15, 111, 53, 0.06)',
+            animation: `damorex-skeleton-pulse 1.6s ease-in-out ${i * 0.08}s infinite`,
           }}
         >
-          <Box
-            style={{
-              height: 190,
-              background: `linear-gradient(90deg, ${line} 25%, rgba(22,163,74,0.06) 50%, ${line} 75%)`,
-              backgroundSize: '200% 100%',
-              animation: 'damorex-shimmer 1.5s ease-in-out infinite',
-            }}
-          />
+          <Box style={{ position: 'relative', height: 180, background: soft, overflow: 'hidden' }}>
+            <Box
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: `linear-gradient(90deg, ${soft} 25%, rgba(22,163,74,0.08) 50%, ${soft} 75%)`,
+                backgroundSize: '200% 100%',
+                animation: 'damorex-shimmer 1.5s ease-in-out infinite',
+              }}
+            />
+            <Box
+              style={{
+                position: 'absolute',
+                top: 12,
+                left: 12,
+                width: 34,
+                height: 16,
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.9)',
+              }}
+            />
+          </Box>
           <Stack p="md" gap="sm">
-            <SkeletonBar width="80%" height={16} />
-            <SkeletonBar width="55%" height={12} />
-            <SkeletonBar width="40%" height={12} />
+            <SkeletonBar width="85%" height={16} />
+            <SkeletonBar width="60%" height={12} />
+            <Box>
+              <SkeletonBar width="38%" height={16} />
+            </Box>
             <Box mt="xs">
-              <SkeletonBar width="100%" height={36} radius={999} />
+              <SkeletonBar width="100%" height={38} radius={999} />
             </Box>
           </Stack>
         </Box>

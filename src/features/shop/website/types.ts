@@ -215,6 +215,8 @@ export interface OrderItemView {
   id: string;
   itemId?: string;
   freetextName?: string;
+  genericItemCode?: string;
+  genericDrugCode?: string;
   quantity: number;
   unitPrice: number;
 }
@@ -235,7 +237,40 @@ export interface CartItem {
   productId?: string;
   name?: string;
   genericProductCode?: string;
+  genericDrugCode?: string;
   unitPrice?: number;
   quantity: number;
   product?: WebsiteProduct;
+}
+
+export interface GenericDrugView {
+  id: string;
+  code: string;
+  name: string;
+  genericClass: string | null;
+  pharmaceuticalClass: string | null;
+  source: string | null;
+  averagePrice: number | null;
+  brandCount: number;
+}
+
+export interface GenericDrugBrand {
+  id: string;
+  name: string;
+  code: string | null;
+  imageUrl: string | null;
+  genericProductCode: string | null;
+  unitPrice: number | null;
+}
+
+export interface GenericDrugDetail extends GenericDrugView {
+  similarBrands: GenericDrugBrand[];
+}
+
+export interface GenericProductSearchResult {
+  id: string;
+  code: string;
+  name: string;
+  averagePrice: number | null;
+  brandCount: number;
 }

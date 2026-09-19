@@ -4,6 +4,17 @@ import { ColumnDataType, ColumnTypeFilters, type Column } from '../../types';
 export const websiteOrdersColumns: Column[] = [
   { key: 'orderNumber', label: 'Order #', filters: ColumnTypeFilters.STRING },
   {
+    key: 'origin',
+    label: 'Origin',
+    filters: ColumnTypeFilters.STRING,
+    render: (row: any) => (row.origin === 'emr-encounter-request' ? 'EMR Request' : row.origin ?? 'website'),
+  },
+  {
+    key: 'externalReference',
+    label: 'EMR Reference',
+    render: (row: any) => row.externalReference ?? '-',
+  },
+  {
     key: 'createdAt',
     label: 'Date',
     dataType: ColumnDataType.DATE,

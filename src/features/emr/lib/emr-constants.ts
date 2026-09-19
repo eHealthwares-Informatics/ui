@@ -64,6 +64,8 @@ export const REQUEST_TYPES = ['PRESCRIPTION', 'LAB', 'RADIOLOGY', 'OTHER_TEST'] 
 
 export const REQUEST_STATUSES = ['REQUESTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'REJECTED'] as const;
 
+export const SYNC_STATUSES = ['NONE', 'PENDING', 'SYNCED', 'FAILED'] as const;
+
 export const GENDERS = ['MALE', 'FEMALE', 'OTHER'] as const;
 
 export const MARITAL_STATUSES = ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'OTHER'] as const;
@@ -75,6 +77,48 @@ export const GENOTYPES = ['AA', 'AS', 'SS', 'AC', 'CC', 'SC'] as const;
 export const NEXT_OF_KIN_RELATIONSHIPS = ['SPOUSE', 'PARENT', 'SIBLING', 'CHILD', 'OTHER'] as const;
 
 export const PAYMENT_PROVIDER_TYPES = ['CASH', 'HMO', 'COMPANY', 'PROGRAM', 'OTHER'] as const;
+
+export const WARD_TYPES = [
+  'GENERAL',
+  'PRIVATE',
+  'ICU',
+  'PEDIATRIC',
+  'MATERNITY',
+  'ISOLATION',
+  'EMERGENCY',
+  'OTHER',
+] as const;
+
+export const BED_TYPES = [
+  'STANDARD',
+  'ICU',
+  'MATERNITY',
+  'ISOLATION',
+  'PEDIATRIC',
+  'RECOVERY',
+] as const;
+
+export const BED_STATUSES = ['AVAILABLE', 'OCCUPIED', 'MAINTENANCE', 'OUT_OF_SERVICE'] as const;
+
+export const ADMISSION_STATUSES = ['ADMITTED', 'DISCHARGED', 'TRANSFERRED'] as const;
+
+export const ADMISSION_TYPES = [
+  'EMERGENCY',
+  'URGENT',
+  'ELECTIVE',
+  'MATERNITY',
+  'SURGICAL',
+  'MEDICAL',
+] as const;
+
+export const DISCHARGE_TYPES = [
+  'DISCHARGED_HOME',
+  'DIED',
+  'REFERRED',
+  'TRANSFERRED',
+  'SELF_DISCHARGE',
+  'AMA',
+] as const;
 
 /** Convert an uppercase enum value into a readable label, e.g. IN_PROGRESS -> In Progress */
 export function formatEnum(value: string | null | undefined): string {

@@ -277,8 +277,8 @@ export function RxWebsiteOrdersPage() {
             <Stack gap={2} mt="xs">
               {unmatchedItems.map((item) => (
                 <Text key={item.id} size="sm">
-                  • {[item.freetextName, item.genericItemCode, item.id].filter(Boolean).join(' · ')}
-                  {item.genericItemCode ? ' (generic)' : ''} — qty {item.quantity}
+                  • {[item.freetextName, item.genericItemCode, item.genericDrugCode, item.id].filter(Boolean).join(' · ')}
+                  {(item.genericItemCode || item.genericDrugCode) ? ' (generic)' : ''} — qty {item.quantity}
                 </Text>
               ))}
             </Stack>
@@ -376,6 +376,22 @@ function ReconcileModal({
     label: g.name,
   }));
 
+  // generic drug search state (NDF/crosswalk generic drugs)
+  const [drugSearch, setDrugSearch] = useState('');
+  const { data: drugResults = [] } = useQuery({
+    queryKey: ['generic-drugs-search', drugSearch],
+    queryFn: async () => {
+      if (drugSearch.trim().length < 2) { return []; }
+      const { data } = await rxsoftApi.get('/generic-drugs', { params: { search: drugSearch, page: 1, limit: 20 } });
+      return data?.data ?? [];
+    },
+    enabled: drugSearch.trim().length >= 2,
+  });
+  const drugOptions = (Array.isArray(drugResults) ? drugResults : []).map((g: any) => ({
+    value: g.code,
+    label: `${g.name}${g.code ? ` (${g.code})` : ''}`,
+  }));
+
   // item search state
   const [itemSearch, setItemSearch] = useState('');
   const { data: itemResults = [] } = useQuery({
@@ -425,6 +441,7 @@ function ReconcileModal({
       await rxsoftApi.post(`/orders/admin/orders/${order.id}/items/${item.id}/reconcile`, {
         itemId: d.itemId ?? undefined,
         genericItemCode: d.genericProductId ?? undefined,
+        genericDrugCode: d.genericDrugId ?? item.genericDrugCode ?? undefined,
         freetextName: d.freetextName !== undefined ? d.freetextName : item.freetextName ?? undefined,
         unitPrice: d.unitPrice !== undefined ? String(d.unitPrice) : item.unitPrice !== undefined ? String(item.unitPrice) : undefined,
         organizationId: orgId || undefined,
@@ -469,6 +486,7 @@ function ReconcileModal({
               <Table.Tr>
                 <Table.Th>Item</Table.Th>
                 <Table.Th>Generic Product</Table.Th>
+                <Table.Th>Generic Drug</Table.Th>
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Qty</Table.Th>
                 <Table.Th>Amount (unit)</Table.Th>
@@ -484,6 +502,7 @@ function ReconcileModal({
                 const isDirty =
                   (d.itemId ?? null) !== (item.itemId ?? null) ||
                   (d.genericProductId ?? null) !== (item.genericItemCode ?? null) ||
+                  (d.genericDrugId ?? null) !== (item.genericDrugCode ?? null) ||
                   (d.freetextName ?? item.freetextName ?? '') !== (item.freetextName ?? '') ||
                   (d.unitPrice ?? item.unitPrice ?? 0) !== (item.unitPrice ?? 0);
                 return (
@@ -530,6 +549,21 @@ function ReconcileModal({
                         onChange={(v) => setDraft((prev) => ({ ...prev, [item.id]: { ...prev[item.id], genericProductId: v } }))}
                         searchable
                         clearable
+                        disabled={!!(d.itemId ?? item.itemId)}
+                        style={{ minWidth: 180 }}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <Select
+                        size="xs"
+                        placeholder="Generic drug"
+                        data={drugOptions}
+                        value={d.genericDrugId ?? item.genericDrugCode ?? null}
+                        onChange={(v) => setDraft((prev) => ({ ...prev, [item.id]: { ...prev[item.id], genericDrugId: v } }))}
+                        onSearchChange={setDrugSearch}
+                        searchable
+                        clearable
+                        nothingFoundMessage="Type at least 2 characters"
                         disabled={!!(d.itemId ?? item.itemId)}
                         style={{ minWidth: 180 }}
                       />

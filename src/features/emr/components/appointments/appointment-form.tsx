@@ -16,7 +16,7 @@ export function AppointmentForm({
   onClose,
   initialPatient,
 }: {
-  onCreated: () => void;
+  onCreated?: (created?: Record<string, unknown>) => void;
   onClose: () => void;
   initialPatient?: PatientOption | null;
 }) {
@@ -65,11 +65,12 @@ export function AppointmentForm({
       });
       return data;
     },
-    onSuccess: () => {
+onSuccess: (created) => {
       notifications.show({ message: 'Appointment scheduled', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'appointments'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'dashboard'] });
-      onCreated();
+      onCreated?.(created as Record<string, unknown>);
+      onClose();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });

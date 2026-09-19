@@ -21,6 +21,15 @@ function findLabel(fields: FormFieldSchema[] | undefined, key: string): string |
 }
 
 function summarizeValue(value: unknown): string {
+  if (value !== null && typeof value === 'object') {
+    const record = value as { label?: unknown; code?: unknown; kind?: unknown };
+    if (typeof record.label === 'string') {
+      const caption =
+        record.label + (typeof record.code === 'string' && record.code ? ` (${record.code})` : '');
+      return typeof record.kind === 'string' ? `${caption} · ${record.kind.replace(/_/g, ' ')}` : caption;
+    }
+    return JSON.stringify(value);
+  }
   if (typeof value === 'string') {
     return value.length > MAX_CHARS ? `${value.slice(0, MAX_CHARS)}…` : value;
   }

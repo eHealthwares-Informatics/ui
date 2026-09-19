@@ -15,6 +15,9 @@ import type {
   PaginatedResponse,
   GenericMedicineView,
   GenericMedicineVariant,
+  GenericDrugView,
+  GenericDrugDetail,
+  GenericProductSearchResult,
 } from './types';
 import { createAuthApiClient } from '@/lib/create-api-client';
 
@@ -48,8 +51,36 @@ export const websiteApi = {
   getGenericProductItems: (id: string) =>
     api.get<GenericMedicineVariant[]>(`/generic-products/${id}/items`).then((r) => r.data),
 
+  // Generic Drugs (NDF/crosswalk)
+  listGenericDrugs: (params?: Record<string, string | number>) =>
+    api
+      .get<PaginatedResponse<GenericDrugView>>('/generic-drugs', { params })
+      .then((r) => r.data),
+
+  getGenericDrug: (code: string) =>
+    api.get<GenericDrugDetail>(`/generic-drugs/${encodeURIComponent(code)}`).then((r) => r.data),
+
+  listGenericDrugClasses: () =>
+    api
+      .get<{ data: Array<{ genericClass: string; pharmaceuticalClass: string }> }>(
+        '/generic-drugs/classes',
+      )
+      .then((r) => r.data),
+
+  searchGenericProducts: (q: string) =>
+    api
+      .get<PaginatedResponse<GenericProductSearchResult>>('/generic-products/search', {
+        params: { search: q, page: 1, limit: 10 },
+      })
+      .then((r) => r.data),
+
   // Categories
   listCategories: () => api.get<CategoryView[]>('/website/categories').then((r) => r.data),
+
+  listTherapeuticCategories: () =>
+    api
+      .get<{ data: Array<{ code: string; name: string }> }>('/website/therapeutic-categories')
+      .then((r) => r.data),
 
   getCategoryBySlug: (slug: string) =>
     api
@@ -98,7 +129,14 @@ export const websiteApi = {
     paymentMethod: string;
     prescriptionIds?: string[];
     notes?: string;
-    items: Array<{ itemId?: string; freetextName?: string; quantity: number; unitPrice?: number }>;
+    items: Array<{
+      itemId?: string;
+      freetextName?: string;
+      genericItemCode?: string;
+      genericDrugCode?: string;
+      quantity: number;
+      unitPrice?: number;
+    }>;
     delivery?: {
       address: string;
       city?: string;

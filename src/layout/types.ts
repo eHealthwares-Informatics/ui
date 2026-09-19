@@ -22,16 +22,13 @@ type BaseNavItem = {
 };
 
 type NavLink = BaseNavItem & {
-  url: LinkProps['to'] | (string & {});
-  items?: never;
+  url?: LinkProps['to'] | (string & {});
+  items?: NavLink[];
 };
 
-type NavCollapsible = BaseNavItem & {
-  items: (BaseNavItem & { url: LinkProps['to'] | (string & {}) })[];
-  url?: never;
-};
+type NavCollapsible = NavLink;
 
-type NavItem = NavCollapsible | NavLink;
+type NavItem = NavLink;
 
 type SidebarData = {
   user: User;

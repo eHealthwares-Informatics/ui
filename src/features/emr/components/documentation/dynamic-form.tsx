@@ -18,6 +18,7 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import type { FormFieldSchema, FormSchema } from '../../lib/emr-types';
 import { formatEnum } from '../../lib/emr-constants';
+import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 
 export type FormData = Record<string, unknown>;
 
@@ -235,6 +236,16 @@ function DynamicField({
             ))}
           </Stack>
         </CheckboxGroup>
+      );
+    case 'item':
+      return (
+        <MasterItemSearch
+          label={field.label}
+          required={field.required}
+          placeholder={field.placeholder ?? 'Search items or drugs…'}
+          value={typeof value === 'object' && value !== null ? (value as MasterItem) : null}
+          onChange={(next) => onChange(next ?? undefined)}
+        />
       );
     case 'table':
       return <TableField field={field} value={value} onChange={onChange} />;

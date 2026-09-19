@@ -376,6 +376,66 @@ export function useStockLocations() {
   });
 }
 
+export function usePosItems(search?: string) {
+  return useQuery({
+    queryKey: ['pos-items', search ?? ''],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/items', { params: { search, limit: 25 } });
+      return (data?.data ?? data ?? []) as Array<{
+        id: string;
+        code?: string;
+        itemCode?: string;
+        barcode?: string;
+        name: string;
+        displayName?: string;
+        saleUomId?: string | null;
+        smallImageUrl?: string;
+        imageUrl?: string;
+      }>;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function usePosItemUoms(itemId?: string | null) {
+  return useQuery({
+    queryKey: ['item-uoms', itemId],
+    queryFn: async () => {
+      if (!itemId) {
+        return [];
+      }
+      const { data } = await rxsoftApi.get(`/items/${itemId}/uoms`);
+      const uoms = (data?.data ?? data ?? []) as UomOption[];
+      if (uoms.length > 0) {
+        return uoms;
+      }
+      const all = await rxsoftApi.get('/uoms', { params: { limit: 200 } });
+      return (all.data?.data ?? all.data ?? []) as UomOption[];
+    },
+    enabled: !!itemId,
+    staleTime: 60_000,
+  });
+}
+
+export function usePosItemPrice(priceListId?: string | null, itemId?: string | null) {
+  return useQuery({
+    queryKey: ['price-list-items', priceListId, itemId],
+    queryFn: async () => {
+      if (!priceListId || !itemId) {
+        return null;
+      }
+      const { data } = await rxsoftApi.get(`/price-lists/${priceListId}/items`, {
+        params: { itemId, limit: 1 },
+      });
+      const rows = data?.data ?? data ?? [];
+      const row = Array.isArray(rows) ? rows[0] : rows;
+      return row ? Number(row.unitPrice) || 0 : null;
+    },
+    enabled: !!priceListId && !!itemId,
+    staleTime: 60_000,
+  });
+}
+
 export function useOrganisationConfig() {
   return useQuery({
     queryKey: ['organisation-config'],
@@ -384,5 +444,56 @@ export function useOrganisationConfig() {
       return data;
     },
     staleTime: 60_000,
+  });
+}
+
+export function useDispenseOrders(search?: string) {
+  return useQuery({
+    queryKey: ['dispense-orders', search ?? ''],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/orders/admin/orders/dispense', {
+        params: { search, limit: 25 },
+      });
+      return data?.data ?? data ?? [];
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useOrderDetail(id?: string) {
+  return useQuery({
+    queryKey: ['dispense-order', id],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get(`/orders/admin/orders/dispense/${id}`);
+      return data;
+    },
+    enabled: !!id,
+    staleTime: 30_000,
+  });
+}
+
+export function useCompleteDispense() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      orderId: string;
+      saleId?: string;
+      saleNumber?: string;
+    }) => {
+      const { data } = await rxsoftApi.post(
+        `/orders/admin/orders/dispense/${payload.orderId}/complete`,
+        { saleId: payload.saleId, saleNumber: payload.saleNumber },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['dispense-orders'] });
+    },
+    onError: (err: any) => {
+      notifications.show({
+        color: 'red',
+        message: err?.response?.data?.message ?? err?.message ?? 'Failed to complete dispense',
+      });
+    },
   });
 }

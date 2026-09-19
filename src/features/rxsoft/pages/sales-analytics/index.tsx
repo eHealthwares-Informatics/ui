@@ -1,4 +1,5 @@
 import { BarChart, CompositeChart, DonutChart, LineChart } from '@mantine/charts';
+import { UserInsightsPanel } from '../user-insights/panel';
 import {
   Box,
   Button,
@@ -234,6 +235,7 @@ export function SalesAnalyticsPage() {
       }
     >
       <Stack gap="lg">
+        <UserInsightsPanel />
         {/* FILTERS */}
         <Card withBorder radius="md" p="md">
           <Grid gap="md" align="flex-end">

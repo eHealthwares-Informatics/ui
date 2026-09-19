@@ -9,11 +9,12 @@ import {
   ScrollArea,
   Stack,
   Text,
+  TextInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { FileText, AlertCircle, Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import type { FormDefinition } from '../../lib/emr-types';
 import { formatEnum } from '../../lib/emr-constants';
@@ -52,6 +53,7 @@ export function DocumentationModal({
   const queryClient = useQueryClient();
 
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  const [formFilter, setFormFilter] = useState('');
   const [patient, setPatient] = useState<PatientOption | null>(null);
   const [patientError, setPatientError] = useState<string | null>(null);
   const [data, setData] = useState<FormData>({});
@@ -86,6 +88,7 @@ export function DocumentationModal({
     }
     setSelectedFormId(null);
     setData({});
+    setFormFilter('');
   }, [opened, activeEncounter, initialPatient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-select the first accessible form once the list loads.
@@ -94,6 +97,29 @@ export function DocumentationModal({
       setSelectedFormId(accessibleForms[0].id);
     }
   }, [accessibleForms, selectedFormId]);
+
+  const filteredForms = useMemo(() => {
+    const query = formFilter.trim().toLowerCase();
+    if (!query) {
+      return accessibleForms;
+    }
+    return accessibleForms.filter((form) =>
+      [form.name, form.code, form.category, form.description ?? '']
+        .join(' ')
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [accessibleForms, formFilter]);
+
+  // Keep the selection inside the filtered set as the user types.
+  useEffect(() => {
+    if (
+      filteredForms.length > 0 &&
+      !filteredForms.some((form) => form.id === selectedFormId)
+    ) {
+      setSelectedFormId(filteredForms[0].id);
+    }
+  }, [filteredForms, selectedFormId]);
 
   const selectedForm = accessibleForms.find((form) => form.id === selectedFormId) ?? null;
 
@@ -162,46 +188,60 @@ export function DocumentationModal({
         <Grid gap="lg">
           <Grid.Col span={{ base: 12, md: 4 }}>
             <Text size="sm" fw={600} mb="xs">
-              Forms ({accessibleForms.length})
+              Forms ({filteredForms.length})
             </Text>
+            <TextInput
+              placeholder="Filter forms…"
+              leftSection={<Search size={15} />}
+              value={formFilter}
+              onChange={(e) => setFormFilter(e.currentTarget.value)}
+              size="xs"
+              mb="xs"
+            />
             <ScrollArea h={420} type="auto">
               <Stack gap="xs">
-                {accessibleForms.map((form) => (
-                  <Group
-                    key={form.id}
-                    gap="sm"
-                    p="xs"
-                    wrap="nowrap"
-                    style={{
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      background:
-                        form.id === selectedFormId
-                          ? 'var(--mantine-color-blue-0)'
-                          : undefined,
-                      border:
-                        form.id === selectedFormId
-                          ? '1px solid var(--mantine-color-blue-4)'
-                          : '1px solid var(--mantine-color-default-border)',
-                    }}
-                    onClick={() => setSelectedFormId(form.id)}
-                  >
-                    <FileText size={16} style={{ flexShrink: 0 }} />
-                    <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-                      <Text size="sm" fw={500} truncate>
-                        {form.name}
-                      </Text>
-                      <Text size="xs" c="dimmed" truncate>
-                        {formatEnum(form.category)} · v{form.version}
-                      </Text>
-                    </Stack>
-                    {form.isPublished && (
-                      <Badge size="xs" variant="light" color="teal">
-                        Published
-                      </Badge>
-                    )}
-                  </Group>
-                ))}
+                {filteredForms.length === 0 ? (
+                  <Text size="xs" c="dimmed">
+                    No forms match your filter.
+                  </Text>
+                ) : (
+                  filteredForms.map((form) => (
+                    <Group
+                      key={form.id}
+                      gap="sm"
+                      p="xs"
+                      wrap="nowrap"
+                      style={{
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        background:
+                          form.id === selectedFormId
+                            ? 'var(--mantine-color-blue-0)'
+                            : undefined,
+                        border:
+                          form.id === selectedFormId
+                            ? '1px solid var(--mantine-color-blue-4)'
+                            : '1px solid var(--mantine-color-default-border)',
+                      }}
+                      onClick={() => setSelectedFormId(form.id)}
+                    >
+                      <FileText size={16} style={{ flexShrink: 0 }} />
+                      <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                        <Text size="sm" fw={500} truncate>
+                          {form.name}
+                        </Text>
+                        <Text size="xs" c="dimmed" truncate>
+                          {formatEnum(form.category)} · v{form.version}
+                        </Text>
+                      </Stack>
+                      {form.isPublished && (
+                        <Badge size="xs" variant="light" color="teal">
+                          Published
+                        </Badge>
+                      )}
+                    </Group>
+                  ))
+                )}
               </Stack>
             </ScrollArea>
           </Grid.Col>

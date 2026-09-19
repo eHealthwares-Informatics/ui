@@ -29,8 +29,8 @@ export function SalesSummary({
   sessionCompleted = false,
 }: Props) {
   return (
-    <Paper radius={0} withBorder bg="#c7e6f1" h="100%" p="md" data-testid="pos-sales-summary">
-      <Stack>
+    <Paper radius={0} withBorder bg="#c7e6f1" h="100%" p="xs" style={{ overflow: 'auto' }} data-testid="pos-sales-summary">
+      <Stack gap="xs">
         <Title order={3} ta="center">
           Current Sales Summary
         </Title>
@@ -56,32 +56,32 @@ export function SalesSummary({
           </Flex>
         </Paper>
 
-        <Button fullWidth mt="md" leftSection={<Calculator size={16} />} onClick={onCalculate} disabled={cartEmpty || sessionCompleted}>
+        <Button fullWidth leftSection={<Calculator size={16} />} onClick={onCalculate} disabled={cartEmpty || sessionCompleted}>
           Print Invoice
         </Button>
 
-        <Paper mt="md" p="md" withBorder>
+        <Paper p="xs" withBorder>
           <Text ta="center" fw={700}>
             Total Cost
           </Text>
-          <Title order={2} ta="center">
+          <Title order={3} ta="center">
             ₦{totals.total.toFixed(2)}
           </Title>
         </Paper>
 
-        <Button fullWidth mt="md" onClick={onCheckout} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-only-btn">
+        <Button fullWidth onClick={onCheckout} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-only-btn">
           Sell Only
         </Button>
-        <Button fullWidth mt="xs" onClick={onSellPrint} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-print-btn">
+        <Button fullWidth onClick={onSellPrint} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-print-btn">
           Sell and Print
         </Button>
-        <Button fullWidth mt="xs" onClick={onPrintWholesale} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-wholesale-btn">
+        <Button fullWidth onClick={onPrintWholesale} disabled={cartEmpty || sessionCompleted} data-testid="pos-sell-wholesale-btn">
           Sell and Print wholesale
         </Button>
-        <Button fullWidth mt="xs" variant="light" onClick={onHold} disabled={cartEmpty || sessionCompleted} data-testid="pos-hold-sale-btn">
+        <Button fullWidth variant="light" onClick={onHold} disabled={cartEmpty || sessionCompleted} data-testid="pos-hold-sale-btn">
           Hold Sale
         </Button>
-        <Button fullWidth mt="xs" variant="outline" onClick={onNextCustomer} disabled={!sessionCompleted} data-testid="pos-next-customer-btn">
+        <Button fullWidth variant="outline" onClick={onNextCustomer} disabled={!sessionCompleted} data-testid="pos-next-customer-btn">
           Next Customer
         </Button>
       </Stack>

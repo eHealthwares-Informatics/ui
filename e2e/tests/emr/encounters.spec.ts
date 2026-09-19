@@ -60,9 +60,11 @@ test('amends a submission from the encounter documentation tab (UC-32 amend)', a
   await page.getByRole('tab', { name: /Documentation/ }).click();
   await expect(page.getByText('SUB-100').first()).toBeVisible();
 
+  // Documentation is an accordion — expand the submission item to reveal actions.
+  await page.getByText('SUB-100').first().click();
   await page.getByRole('button', { name: 'Amend' }).click();
   // Pre-filled dynamic form; amend the field and save
-  await page.getByLabel('Clinical note').fill('Updated note after review');
+  await page.getByRole('dialog').getByLabel('Clinical note').fill('Updated note after review');
   await page.getByRole('button', { name: 'Save Amendment' }).click();
 
   await expect(page.getByText('Documentation amended')).toBeVisible();

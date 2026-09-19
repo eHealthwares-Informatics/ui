@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Badge,
   Box,
   Button,
@@ -6,9 +7,10 @@ import {
   Container,
   Divider,
   Group,
-  Image,
+  HoverCard,
   Input,
   Pagination,
+  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -16,9 +18,12 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { ChevronDown, ChevronUp, Pill, Search, ShoppingCart } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronRight, Pill, Search, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import { useGenericProducts } from '../website/hooks';
+import { useNavigate } from '@tanstack/react-router';
+import { websiteApi } from '../website/api';
+import { useGenericDrugs, useTherapeuticClasses } from '../website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -28,44 +33,118 @@ import {
   buttonStyles,
 } from '../website/layout';
 import { useCartStore } from '../website/cart-store';
-import { GenericMedicineView } from '../website/types';
+import { SkeletonCards } from '../website/loaders';
+import { GenericDrugView } from '../website/types';
+
+function BrandCountLink({ code, brandCount }: { code: string; brandCount: number }) {
+  const navigate = useNavigate();
+  const [hovered, setHovered] = useState(false);
+  const { data } = useQuery({
+    queryKey: ['generic-drug-brands', code],
+    queryFn: () => websiteApi.getGenericDrug(code),
+    enabled: hovered,
+    staleTime: 60_000,
+  });
+  const brands = data?.similarBrands ?? [];
+
+  return (
+    <HoverCard
+      width={280}
+      shadow="md"
+      position="bottom-start"
+      openDelay={120}
+      closeDelay={50}
+      onOpen={() => setHovered(true)}
+      onClose={() => setHovered(false)}
+    >
+      <HoverCard.Target>
+        <Anchor
+          size="sm"
+          c={green}
+          fw={700}
+          onClick={() => navigate({ to: '/shop/medicines/$code', params: { code } })}
+        >
+          {brandCount} brand{brandCount === 1 ? '' : 's'}
+        </Anchor>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Stack gap={4} p="xs">
+          <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+            Brands under this generic
+          </Text>
+          {brands.length === 0 ? (
+            <Text size="xs" c="dimmed">
+              Loading brands…
+            </Text>
+          ) : (
+            brands.slice(0, 6).map((b) => (
+              <Group key={b.id} justify="space-between" wrap="nowrap" gap={8}>
+                <Text size="xs" fw={500} lineClamp={1} style={{ flex: 1 }}>
+                  {b.name}
+                </Text>
+                <Text size="xs" c={green} style={{ flexShrink: 0 }}>
+                  {b.unitPrice != null ? `₦${Number(b.unitPrice).toLocaleString()}` : '—'}
+                </Text>
+              </Group>
+            ))
+          )}
+        </Stack>
+      </HoverCard.Dropdown>
+    </HoverCard>
+  );
+}
 
 export default function ShopMedicinesPage() {
   const [search, setSearch] = useState('');
+  const [tClass, setTClass] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const { data, isLoading } = useGenericProducts({ search, page, limit: 20 });
-  const addGenericItem = useCartStore((s) => s.addGenericItem);
-  const addItem = useCartStore((s) => s.addItem);
+  const navigate = useNavigate();
+  const { data, isLoading } = useGenericDrugs({
+    search,
+    therapeuticClass: tClass || '',
+    page,
+    limit: 20,
+  });
+  const { data: classesData } = useTherapeuticClasses();
+  const addGenericDrug = useCartStore((s) => s.addGenericDrug);
 
   const list = data?.data ?? [];
 
-  function toggle(code: string) {
-    setExpanded((prev) => ({ ...prev, [code]: !prev[code] }));
-  }
+  const classOptions = (() => {
+    const seen = new Set<string>();
+    const out: Array<{ value: string; label: string }> = [];
+    for (const c of classesData?.data ?? []) {
+      for (const label of [c.genericClass, c.pharmaceuticalClass]) {
+        if (!label) {continue;}
+        if (seen.has(label)) {continue;}
+        seen.add(label);
+        out.push({ value: label, label });
+      }
+    }
+    return out.sort((a, b) => a.label.localeCompare(b.label));
+  })();
 
-  function addGeneric(g: GenericMedicineView) {
-    addGenericItem({
+  function addGeneric(g: GenericDrugView) {
+    addGenericDrug({
       name: g.name,
-      genericProductCode: g.code,
-      // No variant chosen: still create the order line as freetext; unit price
-      // is reconciled by the pharmacist (0 here).
-      unitPrice: 0,
+      genericDrugCode: g.code,
+      // Avg of available brands; the pharmacist assigns the real brand (and its
+      // price) at reconcile.
+      unitPrice: g.averagePrice ?? 0,
     });
+    const count = useCartStore.getState().totalItems;
     notifications.show({
-      message: `${g.name} added to cart`,
+      position: 'bottom-right',
+      title: 'Added to cart',
+      message: `${g.name} added — ${count} item${count === 1 ? '' : 's'} in cart`,
       color: 'green',
       icon: <ShoppingCart size={18} />,
     });
   }
 
-  function addVariant(id: string) {
-    addItem(id, 1);
-    notifications.show({
-      message: `${name} added to cart`,
-      color: 'green',
-      icon: <ShoppingCart size={18} />,
-    });
+  function onSearchChange(v: string) {
+    setSearch(v);
+    setPage(1);
   }
 
   return (
@@ -77,135 +156,123 @@ export default function ShopMedicinesPage() {
               Shop Medicines
             </Title>
             <Text c={muted} size="lg" lh={1.7}>
-              Browse medicines by generic name. Pick a variant (brand/strength) or add the generic
-              directly.
+              Browse medicines by generic name. Choose a brand, or add the generic and our
+              pharmacist will dispense any available brand.
             </Text>
           </Box>
 
-          <PaperSearch search={search} onSearchChange={setSearch} />
+          <Group align="center" grow>
+            <Box style={{ flex: 3 }}>
+              <PaperSearch search={search} onSearchChange={onSearchChange} />
+            </Box>
+            <Box style={{ flex: 1 }}>
+              <Select
+                placeholder="Therapeutic class"
+                data={classOptions}
+                value={tClass}
+                onChange={(v) => {
+                  setTClass(v);
+                  setPage(1);
+                }}
+                radius="xl"
+                clearable
+                searchable
+                nothingFoundMessage="No classes found"
+              />
+            </Box>
+          </Group>
 
           {isLoading ? (
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} radius={20} withBorder padding="md" style={{ borderColor: line }}>
-                  <Stack gap={6}>
-                    <Box style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '60%' }} />
-                    <Box style={{ height: 16, background: '#E8F0EC', borderRadius: 8, width: '80%' }} />
-                    <Box style={{ height: 34, background: '#E8F0EC', borderRadius: 16, marginTop: 6 }} />
-                  </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
+            <SkeletonCards cols={{ base: 1, sm: 2, lg: 3 }} count={6} />
           ) : list.length === 0 ? (
-            <Text c={muted}>No generic medicines found.</Text>
+            <Text c={muted}>
+              {search ? `No medicines match "${search}".` : 'No generic medicines found.'}
+            </Text>
           ) : (
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-              {list.map((g) => {
-                const open = !!expanded[g.code];
-                const hasVariants = (g.variants?.length ?? 0) > 0;
-                return (
-                  <Card key={g.code} radius={20} withBorder padding="md" style={{ borderColor: line }}>
-                    <Stack gap="sm">
-                      <Group justify="space-between" align="flex-start">
-                        <Box style={{ flex: 1 }}>
-                          <Text fw={900} lh={1.25}>
-                            {g.name}
-                          </Text>
-                          <Text size="xs" c={muted}>
-                            {g.code}
-                          </Text>
-                        </Box>
-                        {g.isPrescriptionRequired ? (
-                          <Badge color="orange" variant="light" radius="xl" size="sm">
-                            Rx
-                          </Badge>
+              {list.map((g) => (
+                <Card key={g.code} radius={20} withBorder padding="md" style={{ borderColor: line }}>
+                  <Stack gap="sm">
+                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Box style={{ flex: 1, minWidth: 0 }}>
+                        <Text fw={900} lh={1.25} lineClamp={2}>
+                          {g.name}
+                        </Text>
+                        <Text size="xs" c={muted}>
+                          {g.code}
+                        </Text>
+                      </Box>
+                      <Badge color="green" variant="light" radius="xl" size="sm">
+                        Generic
+                      </Badge>
+                    </Group>
+
+                    {g.genericClass ? (
+                      <Text size="sm" c={muted} lineClamp={1}>
+                        {g.genericClass}
+                      </Text>
+                    ) : null}
+
+                    <Divider />
+
+                    <Group justify="space-between" align="baseline" wrap="nowrap" gap={4}>
+                      <Text size="sm" c={muted}>
+                        {g.brandCount > 0 ? (
+                          <BrandCountLink code={g.code} brandCount={g.brandCount} />
                         ) : (
-                          <Badge color="green" variant="light" radius="xl" size="sm">
-                            OTC
-                          </Badge>
+                          'No brands yet'
                         )}
-                      </Group>
+                      </Text>
+                      <Box ta="right">
+                        {g.averagePrice != null ? (
+                          <Text size="lg" fw={800} c={green}>
+                            ₦{Number(g.averagePrice).toLocaleString()}
+                          </Text>
+                        ) : (
+                          <Text size="sm" c={muted}>
+                            Price on dispense
+                          </Text>
+                        )}
+                        {g.averagePrice != null ? (
+                          <Text fz={11} c={muted} maw={200}>
+                            avg — may be higher or lower (generics vary by brand)
+                          </Text>
+                        ) : null}
+                      </Box>
+                    </Group>
 
-                      {hasVariants ? (
-                        <Button
-                          size="xs"
-                          radius="xl"
-                          variant="light"
-                          color="green"
-                          rightSection={open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                          onClick={() => toggle(g.code)}
-                        >
-                          {open ? 'Hide variants' : `Choose variant (${g.variants?.length})`}
-                        </Button>
-                      ) : null}
-
-                      {open && hasVariants ? (
-                        <>
-                          <Divider />
-                          <Stack gap={6}>
-                            {(g.variants ?? []).map((v) => (
-                              <Group key={v.id} justify="space-between" wrap="nowrap">
-                                <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                                  <Image
-                                    src={v.mediumImageUrl || v.imageUrl || undefined}
-                                    alt={v.name}
-                                    w={36}
-                                    h={36}
-                                    fit="contain"
-                                    style={{
-                                      borderRadius: 8,
-                                      background: '#F1F8F4',
-                                      border: `1px solid ${line}`,
-                                    }}
-                                  />
-                                  <Text size="sm" fw={700} lineClamp={2}>
-                                    {v.name}
-                                  </Text>
-                                </Group>
-                                <Group gap={6} wrap="nowrap">
-                                  {v.unitPrice != null ? (
-                                    <Text size="sm" c={green} fw={800}>
-                                      ₦{Number(v.unitPrice).toLocaleString()}
-                                    </Text>
-                                  ) : null}
-                                  <Button
-                                    size="xs"
-                                    radius="xl"
-                                    variant="light"
-                                    color="green"
-                                    leftSection={<ShoppingCart size={14} />}
-                                    onClick={() => addVariant(v.id)}
-                                  >
-                                    Add
-                                  </Button>
-                                </Group>
-                              </Group>
-                            ))}
-                          </Stack>
-                        </>
-                      ) : null}
-
+                    <Group gap="xs" wrap="nowrap">
                       <Button
                         radius="xl"
                         size="sm"
-                        style={{ background: green }}
-                        leftSection={<ShoppingCart size={16} />}
+                        style={{ background: green, flex: 1 }}
                         styles={buttonStyles}
+                        leftSection={<ShoppingCart size={16} />}
                         onClick={() => addGeneric(g)}
                       >
                         Add Generic
                       </Button>
-                    </Stack>
-                  </Card>
-                );
-              })}
+                      <Button
+                        radius="xl"
+                        size="sm"
+                        variant="light"
+                        color="green"
+                        rightSection={<ChevronRight size={16} />}
+                        onClick={() => navigate({ to: '/shop/medicines/$code', params: { code: g.code } })}
+                      >
+                        View
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Card>
+              ))}
             </SimpleGrid>
           )}
 
-          {data && data.total > data.limit ? (
+          {data && (data.limit || 20) > 0 && data.total > (data.limit || 20) ? (
             <Group justify="center">
               <Pagination
-                total={Math.ceil(data.total / data.limit)}
+                total={Math.ceil(data.total / (data.limit || 20))}
                 value={page}
                 onChange={setPage}
                 radius="xl"
@@ -234,7 +301,7 @@ function PaperSearch({ search, onSearchChange }: { search: string; onSearchChang
           <Pill size={20} />
         </ThemeIcon>
         <Input
-          placeholder="Search generic medicines by name or code..."
+          placeholder="Search medicines by generic name or code..."
           size="lg"
           radius="xl"
           value={search}

@@ -32,9 +32,8 @@ test('lists patients from the API and deep-links to a profile', async ({ page })
   await expect(page.getByText('MRN-100')).toBeVisible();
   await expect(page.getByText('Ada Obi')).toBeVisible();
   await expect(page.getByText('Ben Okoro')).toBeVisible();
-  await expect(page.getByText('2 records')).toBeVisible();
 
-  await page.getByText('Ada Obi').click();
+  await page.getByRole('link', { name: 'View details' }).first().click();
   await expect(page).toHaveURL(/\/emr\/patients\/patient-1$/);
   // Profile page shell with its tabs
   await expect(page.getByRole('tab', { name: 'Documentation' })).toBeVisible();

@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Container,
-  Divider,
   Grid,
   Group,
   Image,
@@ -21,7 +20,6 @@ import {
   Text,
   ThemeIcon,
   Title,
-  VisuallyHidden,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from '@tanstack/react-router';
@@ -34,7 +32,6 @@ import {
   CalendarClock,
   ChevronRight,
   CircleDollarSign,
-  Clock3,
   CreditCard,
   FileUp,
   HeartPulse,
@@ -71,12 +68,12 @@ import {
 import { websiteApi } from './website/api';
 import type { WebsiteProduct } from './website/types';
 import { useCartStore } from './website/cart-store';
-import { SectionHeading, PrimaryButton, OutlineButton, Logo } from './website/components';
+import { GenericSearchInput } from './website/generic-search';
+import { SectionHeading, PrimaryButton, OutlineButton } from './website/components';
 import {
   WebsiteLayout,
   green,
   darkGreen,
-  blue,
   ink,
   muted,
   line,
@@ -260,7 +257,6 @@ const articles = [
 ];
 
 export default function DamorexPage() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [subscribing, setSubscribing] = useState(false);
@@ -328,27 +324,14 @@ export default function DamorexPage() {
                     <ThemeIcon radius="xl" size={44} color="green" variant="light">
                       <Search size={22} />
                     </ThemeIcon>
-                    <Input
-                      aria-label="Search medicines"
-                      placeholder="Search by medicine name, generic name, brand name or health concern..."
+                    <GenericSearchInput
                       size="lg"
-                      radius="xl"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          navigate({ to: `/shop/search?q=${encodeURIComponent(searchQuery)}` });
-                        }
-                      }}
-                      style={{ flex: 1, minWidth: 0 }}
-                      styles={{
-                        input: {
-                          borderColor: '#CFE5D7',
-                          color: ink,
-                          minHeight: 52,
-                          minWidth: 0,
-                        },
-                      }}
+                      onSelect={(gp) =>
+                        navigate({ to: '/shop/shop', search: { gp: gp as any } })
+                      }
+                      onSubmit={(text) =>
+                        navigate({ to: `/shop/search?q=${encodeURIComponent(text)}` })
+                      }
                     />
                   </Group>
                   <Group gap={8}>

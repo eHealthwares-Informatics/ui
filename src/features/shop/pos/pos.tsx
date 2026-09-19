@@ -10,11 +10,11 @@ import { ProductEntryTable } from './components/ProductEntryTable';
 import { SalesSummary } from './components/SalesSummary';
 import { SaleTabs } from './components/SaleTabs';
 import { usePosStore } from './store/usePosStore';
-import type { Customer } from './types';
+import type { Customer, DispenseRow } from './types';
 import { calculateTotals } from './utils/calculation';
 import { printPosReceipt, printA4Receipt, printInvoice } from './utils/print';
 import { useKeyboardShortcuts } from './utils/useKeyboardShortcuts';
-import { useOrganisationConfig, useUserPosConfig, useStockLocations } from '../api/posApi';
+import { useCompleteDispense, useOrganisationConfig, useOrderDetail, useUserPosConfig, useStockLocations } from '../api/posApi';
 
 export default function PosSalesPage() {
   const {
@@ -24,6 +24,7 @@ export default function PosSalesPage() {
     closeSession,
     setActiveSession,
     addItem,
+    addItems,
     updateItem,
     removeItem,
     clearCart,
@@ -39,12 +40,37 @@ export default function PosSalesPage() {
   const [heldSalesOpened, setHeldSalesOpened] = useState(false);
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [invoicePreviewOpened, setInvoicePreviewOpened] = useState(false);
+  const [dispenseOrderId, setDispenseOrderId] = useState<string | null>(null);
   const saleResultRef = useRef<any>(null);
   const defaultsAppliedForSessions = useRef(new Set<string>());
   const { data: orgConfig } = useOrganisationConfig();
   const { data: userPosConfig } = useUserPosConfig();
   const { data: stockLocations = [] } = useStockLocations();
   const stockLocationId = userPosConfig?.stockLocationId as string | undefined;
+
+  const { data: dispenseOrder } = useOrderDetail(dispenseOrderId ?? undefined);
+  const completeDispense = useCompleteDispense();
+
+  const dispenseRows = useMemo<DispenseRow[]>(() => {
+    const items = dispenseOrder?.items ?? [];
+    return (Array.isArray(items) ? items : []).map((oi: any) => ({
+      orderItemId: oi.id,
+      orderedLabel:
+        oi.item?.name || oi.genericDrugCode || oi.genericItemCode || oi.freetextName || '',
+      orderedCode: oi.item?.code || oi.genericDrugCode || oi.genericItemCode || '',
+      quantity: oi.quantity ?? 1,
+      initialItemId: oi.itemId ?? null,
+      initialItem: oi.item
+        ? {
+            id: oi.item.id,
+            code: oi.item.code,
+            name: oi.item.name,
+            saleUomId: oi.item.saleUomId ?? null,
+            imageUrl: oi.item.smallImageUrl || oi.item.imageUrl || '',
+          }
+        : null,
+    }));
+  }, [dispenseOrder]);
 
   const stockLocationName = useMemo(() => {
     if (!stockLocationId) {return undefined;}
@@ -105,15 +131,30 @@ export default function PosSalesPage() {
 
   function resetSession() {
           createSession();
+    setDispenseOrderId(null);
   }
   function nextCustomer() {
     createSession();
     closeSession(activeSession.id);
+    setDispenseOrderId(null);
+  }
+
+  function handleLoadOrder(orderId: string) {
+    setDispenseOrderId(orderId);
+  }
+
+  function handleLoadSale(saleId: string) {
+    const sale = sessions.find((s) => s.id === saleId);
+    if (sale) {
+      setActiveSession(saleId);
+    }
+    setDispenseOrderId(null);
   }
 
   function handleHold() {
     holdSale(activeSession.id);
     createSession();
+    setDispenseOrderId(null);
   }
 
   function handlePaymentComplete() {
@@ -130,9 +171,19 @@ export default function PosSalesPage() {
     saleResultRef.current = 'print_wholesale';
   }
 
-  function handlePaymentModalComplete() {
+  function handlePaymentModalComplete(saleResult?: any) {
     const printMode = saleResultRef.current;
     saleResultRef.current = null;
+
+    // If this POS sale was dispensed from an order, link + dispatch the order.
+    if (dispenseOrderId && saleResult?.id) {
+      completeDispense.mutate({
+        orderId: dispenseOrderId,
+        saleId: saleResult.id,
+        saleNumber: saleResult.saleNumber,
+      });
+    }
+    setDispenseOrderId(null);
 
     handlePaymentComplete();
 
@@ -182,13 +233,6 @@ export default function PosSalesPage() {
         changeAmount: 0,
         header: orgConfig?.posHeader ?? undefined,
       });
-    }
-  }
-
-  function handleLoadSale(saleId: string) {
-    const sale = sessions.find((s) => s.id === saleId);
-    if (sale) {
-      setActiveSession(saleId);
     }
   }
 
@@ -248,16 +292,24 @@ export default function PosSalesPage() {
             onReset={resetSession}
             onSettings={() => setSettingsOpened(true)}
             onLoadSale={handleLoadSale}
+            onLoadOrder={handleLoadOrder}
             onHeldSalesOpen={() => setHeldSalesOpened(true)}
             heldSalesCount={heldSalesCount}
           />
 
-          {/* PRODUCT ENTRY */}
+          {/* PRODUCT ENTRY (dispense mode shows order lines as editable rows) */}
           {activeSession.status !== 'completed' && (
             <ProductEntryTable
             session={activeSession}
             onAddToCart={(item) => addItem(activeSession.id, item)}
             stockLocationId={stockLocationId}
+            dispenseRows={dispenseOrderId ? dispenseRows : undefined}
+            dispenseKey={dispenseOrderId}
+            onDispenseAdd={
+              dispenseOrderId
+                ? (item) => addItems(activeSession.id, [item])
+                : undefined
+            }
           />)}
 
           {/* MAIN AREA */}

@@ -5,6 +5,12 @@ const columns: Column[] = [
   { key: 'orderNumber', label: 'Order #' },
   { key: 'patientName', label: 'Patient' },
   { key: 'patientId', label: 'MRN' },
+  {
+    key: 'source',
+    label: 'Source',
+    render: (row: any) =>
+      row.source === 'emr-encounter-request' ? 'EMR Request' : row.source ?? 'MANUAL',
+  },
   { key: 'status', label: 'Status' },
   { key: 'requestedDate', label: 'Requested' },
 ];
@@ -34,7 +40,17 @@ const tabGroups: TabGroup[] = [
           { name: 'patientDateOfBirth', label: 'Date of Birth', type: 'date', col: 3 },
           { name: 'patientAge', label: 'Age', type: 'number', col: 3 },
           { name: 'internalReference', label: 'Internal Reference', type: 'text', col: 3 },
-          { name: 'externalReference', label: 'External Reference', type: 'text', col: 6 },
+          { name: 'externalReference', label: 'External Reference', type: 'text', col: 3 },
+          {
+            name: 'source',
+            label: 'Source',
+            type: 'select',
+            options: [
+              { value: 'MANUAL', label: 'MANUAL' },
+              { value: 'emr-encounter-request', label: 'EMR Request' },
+            ],
+            col: 6,
+          },
         ],
       },
       {

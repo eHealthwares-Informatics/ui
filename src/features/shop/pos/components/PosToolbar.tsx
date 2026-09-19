@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Button, Group, Select, Text } from '@mantine/core';
 import { Plus, RefreshCcw, Search, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCustomers, usePriceLists, useSearchSales } from '../../api/posApi';
+import { useCustomers, useDispenseOrders, usePriceLists, useSearchSales } from '../../api/posApi';
 import { SaleSession } from '../types';
 import { CustomerQuickAddModal } from './CustomerQuickAddModal';
 
@@ -14,18 +14,22 @@ interface Props {
   onReset: () => void;
   onSettings: () => void;
   onLoadSale: (saleId: string) => void;
+  onLoadOrder: (orderId: string) => void;
   onHeldSalesOpen: () => void;
   heldSalesCount: number;
 }
+
+const ORDER_OPTION_PREFIX = 'order:';
 
 export function PosToolbar({
   session,
   onCustomerChange,
   onPriceListChange,
-  onPricingModeChange,
+  onPricingModeChange: _onPricingModeChange,
   onReset,
   onSettings,
   onLoadSale,
+  onLoadOrder,
   onHeldSalesOpen,
   heldSalesCount,
 }: Props) {
@@ -38,6 +42,7 @@ export function PosToolbar({
   const { data: customers = [] } = useCustomers(customerSearch);
   const { data: priceLists = [] } = usePriceLists(priceListSearch);
   const { data: sales = [] } = useSearchSales(saleSearch);
+  const { data: dispenseOrders = [] } = useDispenseOrders(saleSearch);
 
   const customerData = (Array.isArray(customers) ? customers : []).map((c: any) => ({
     value: c.id,
@@ -53,6 +58,25 @@ export function PosToolbar({
     value: s.id,
     label: `${s.saleNumber} - ₦${s.totalAmount?.toFixed(2) ?? '0.00'}`,
   }));
+
+  const orderData = (Array.isArray(dispenseOrders) ? dispenseOrders : []).map((o: any) => ({
+    value: `${ORDER_OPTION_PREFIX}${o.id}`,
+    label: `Dispense ${o.orderNumber}${o.externalReference ? ` · ${o.externalReference}` : ''} (${o.items?.length ?? 0} lines)`,
+  }));
+
+  const loadData = [
+    ...orderData,
+    ...saleData,
+  ];
+
+  function handleLoad(value: string | null) {
+    if (!value) { return; }
+    if (value.startsWith(ORDER_OPTION_PREFIX)) {
+      onLoadOrder(value.slice(ORDER_OPTION_PREFIX.length));
+    } else {
+      onLoadSale(value);
+    }
+  }
 
   return (
     <>
@@ -101,17 +125,15 @@ export function PosToolbar({
 
         <Select
           size="xs"
-          placeholder="Load Sale by #"
-          data={saleData}
+          placeholder="Load Sale or Dispense Order"
+          data={loadData}
           onSearchChange={setSaleSearch}
-          onChange={(value) => {
-            if (value) {onLoadSale(value);}
-          }}
+          onChange={handleLoad}
           searchable
           clearable
-          w={200}
+          w={260}
           leftSection={<Search size={14} />}
-          nothingFoundMessage="No sales found"
+          nothingFoundMessage="No sales or orders found"
         />
 
         <Button
@@ -119,9 +141,9 @@ export function PosToolbar({
           variant="light"
           leftSection={<RefreshCcw size={14} />}
           onClick={() => {
-            queryClient.invalidateQueries({ queryKey: ['whitelisted-items'] });
+            queryClient.invalidateQueries({ queryKey: ['pos-items'] });
+            queryClient.invalidateQueries({ queryKey: ['item-uoms'] });
             queryClient.invalidateQueries({ queryKey: ['price-list-items'] });
-            queryClient.invalidateQueries({ queryKey: ['uoms'] });
             queryClient.invalidateQueries({ queryKey: ['stock-locations'] });
             queryClient.invalidateQueries({ queryKey: ['user-pos-config'] });
             queryClient.invalidateQueries({ queryKey: ['pos-stock-qty'] });

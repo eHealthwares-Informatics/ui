@@ -12,7 +12,13 @@ export type StatusKind =
   | 'sync'
   | 'submission'
   | 'staffRole'
-  | 'departmentType';
+  | 'departmentType'
+  | 'wardType'
+  | 'bedStatus'
+  | 'bedType'
+  | 'admission'
+  | 'admissionType'
+  | 'dischargeType';
 
 const COLOR_MAPS: Record<StatusKind, Record<string, string>> = {
   appointment: {
@@ -90,6 +96,51 @@ const COLOR_MAPS: Record<StatusKind, Record<string, string>> = {
     MATERNITY: 'pink',
     SUPPORT: 'gray',
     OTHER: 'gray',
+  },
+  wardType: {
+    GENERAL: 'blue',
+    PRIVATE: 'indigo',
+    ICU: 'red',
+    PEDIATRIC: 'pink',
+    MATERNITY: 'grape',
+    ISOLATION: 'orange',
+    EMERGENCY: 'red',
+    OTHER: 'gray',
+  },
+  bedStatus: {
+    AVAILABLE: 'teal',
+    OCCUPIED: 'blue',
+    MAINTENANCE: 'yellow',
+    OUT_OF_SERVICE: 'red',
+  },
+  bedType: {
+    STANDARD: 'gray',
+    ICU: 'red',
+    MATERNITY: 'pink',
+    ISOLATION: 'orange',
+    PEDIATRIC: 'cyan',
+    RECOVERY: 'teal',
+  },
+  admission: {
+    ADMITTED: 'blue',
+    TRANSFERRED: 'grape',
+    DISCHARGED: 'teal',
+  },
+  admissionType: {
+    EMERGENCY: 'red',
+    URGENT: 'orange',
+    ELECTIVE: 'blue',
+    MATERNITY: 'pink',
+    SURGICAL: 'grape',
+    MEDICAL: 'teal',
+  },
+  dischargeType: {
+    DISCHARGED_HOME: 'teal',
+    DIED: 'red',
+    REFERRED: 'blue',
+    TRANSFERRED: 'grape',
+    SELF_DISCHARGE: 'gray',
+    AMA: 'orange',
   },
 };
 

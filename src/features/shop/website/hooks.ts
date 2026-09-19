@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useDebouncedValue } from '@mantine/hooks';
 import { websiteApi } from './api';
 
 // ── Homepage ─────────────────────────────────────────────────────
@@ -14,9 +15,13 @@ export function useHomepage() {
 // ── Products ─────────────────────────────────────────────────────
 
 export function useProducts(params?: Record<string, string | number>) {
+  const search = typeof params?.search === 'string' ? params.search : '';
+  const [debouncedSearch] = useDebouncedValue(search, 300);
+  const effective = params ? { ...params, search: debouncedSearch } : undefined;
   return useQuery({
-    queryKey: ['website', 'products', params],
-    queryFn: () => websiteApi.listProducts(params),
+    queryKey: ['website', 'products', effective],
+    queryFn: () => websiteApi.listProducts(effective),
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -42,6 +47,51 @@ export function useGenericProductItems(id: string) {
     queryKey: ['website', 'generic-products', id, 'items'],
     queryFn: () => websiteApi.getGenericProductItems(id),
     enabled: !!id,
+  });
+}
+
+// ── Generic Drugs (NDF/crosswalk) ────────────────────────────────
+
+export function useGenericDrugs(params?: Record<string, string | number>) {
+  const search = typeof params?.search === 'string' ? params.search : '';
+  const [debouncedSearch] = useDebouncedValue(search, 300);
+  const effective = params ? { ...params, search: debouncedSearch } : undefined;
+  return useQuery({
+    queryKey: ['website', 'generic-drugs', effective],
+    queryFn: () => websiteApi.listGenericDrugs(effective),
+  });
+}
+
+export function useGenericDrug(code: string) {
+  return useQuery({
+    queryKey: ['website', 'generic-drugs', code],
+    queryFn: () => websiteApi.getGenericDrug(code),
+    enabled: !!code,
+  });
+}
+
+export function useTherapeuticClasses() {
+  return useQuery({
+    queryKey: ['website', 'generic-drugs', 'classes'],
+    queryFn: () => websiteApi.listGenericDrugClasses(),
+    staleTime: 30 * 60 * 1000,
+  });
+}
+
+export function useTherapeuticCategories() {
+  return useQuery({
+    queryKey: ['website', 'therapeutic-categories'],
+    queryFn: () => websiteApi.listTherapeuticCategories(),
+    staleTime: 30 * 60 * 1000,
+  });
+}
+
+export function useGenericProductSearch(q: string) {
+  const [debounced] = useDebouncedValue(q, 250);
+  return useQuery({
+    queryKey: ['website', 'generic-products', 'search', debounced],
+    queryFn: () => websiteApi.searchGenericProducts(debounced),
+    enabled: debounced.length >= 2,
   });
 }
 
@@ -243,9 +293,10 @@ export function useRewards() {
 // ── Search ───────────────────────────────────────────────────────
 
 export function useSearch(q: string, type?: string) {
+  const [debounced] = useDebouncedValue(q, 300);
   return useQuery({
-    queryKey: ['website', 'search', q, type],
-    queryFn: () => websiteApi.search(q, type),
-    enabled: q.length >= 2,
+    queryKey: ['website', 'search', debounced, type],
+    queryFn: () => websiteApi.search(debounced, type),
+    enabled: debounced.length >= 2,
   });
 }

@@ -7,22 +7,34 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Title,
 } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
 import { Search, Pill, BookOpen, HeartPulse, Tags } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ProductCard } from '../website/components';
 import { useSearch } from '../website/hooks';
-import { WebsiteLayout, green, ink, muted, line } from '../website/layout';
+import { WebsiteLayout, green, muted, line } from '../website/layout';
 import { SearchLoader } from '../website/loaders';
 
 export default function SearchPage() {
-  const [query, setQuery] = useState('');
-  const results = useSearch(query);
+  const urlParams = new URLSearchParams(window.location.search);
+  const [query, setQuery] = useState(urlParams.get('q') ?? '');
+  const [type] = useState<string | undefined>(urlParams.get('type') ?? undefined);
+  const [debounced] = useDebouncedValue(query, 300);
+  const results = useSearch(query, type);
 
   const navigate = useNavigate();
+
+  // Keep the URL queryable so /shop/search?q=… is shareable and survives refresh.
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (debounced.trim()) {p.set('q', debounced.trim());}
+    if (type) {p.set('type', type);}
+    const qs = p.toString();
+    history.replaceState(null, '', qs ? `/shop/search?${qs}` : '/shop/search');
+  }, [debounced, type]);
 
   return (
     <WebsiteLayout>

@@ -13,7 +13,7 @@ export function VisitForm({
   onCreated,
   onClose,
 }: {
-  onCreated: () => void;
+  onCreated?: (created?: Record<string, unknown>) => void;
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -52,7 +52,7 @@ export function VisitForm({
       queryClient.invalidateQueries({ queryKey: ['emr', 'visits'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'appointments'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'dashboard'] });
-      onCreated();
+      onCreated?.();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });

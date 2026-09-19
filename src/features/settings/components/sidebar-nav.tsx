@@ -22,6 +22,50 @@ interface SidebarNavItemProps {
   index: number;
 }
 
+function SubMenuLinks({
+  items,
+  pathname,
+  depth = 0,
+}: {
+  items: NavItem[];
+  pathname: string;
+  depth?: number;
+}) {
+  return (
+    <Stack gap={2} pl={12 + depth * 14}>
+      {items.map((subItem) => {
+        const subActive = pathname === subItem.url;
+        const content = (
+          <UnstyledButton
+            style={{
+              width: '100%',
+              borderRadius: 8,
+              padding: '10px 5px',
+              transition: 'all 140ms ease',
+              background: subActive ? 'var(--mantine-color-gray-1)' : 'transparent',
+            }}
+          >
+            <Group gap="sm">
+              {subItem.icon && <subItem.icon size={15} />}
+              <Text size="sm" fw={subActive ? 600 : 500}>
+                {subItem.title}
+              </Text>
+            </Group>
+          </UnstyledButton>
+        );
+        return (
+          <div key={subItem.title}>
+            {subItem.url ? <Link to={subItem.url}>{content}</Link> : content}
+            {subItem.items?.length ? (
+              <SubMenuLinks items={subItem.items} pathname={pathname} depth={depth + 1} />
+            ) : null}
+          </div>
+        );
+      })}
+    </Stack>
+  );
+}
+
 export function SidebarNavItem({
   item,
   pathname,
@@ -111,33 +155,7 @@ export function SidebarNavItem({
       {/* SUBMENU */}
       {hasChildren && (
         <Collapse expanded={expanded}>
-          <Stack gap={2} pl={20}>
-            {item.items?.map((subItem: NavItem) => {
-              const subActive = pathname === subItem.url;
-
-              return (
-                <Link key={subItem.title} to={subItem.url}>
-                  <UnstyledButton
-                    style={{
-                      width: '100%',
-                      borderRadius: 8,
-                      padding: '10px 5px',
-                      transition: 'all 140ms ease',
-                      background: subActive ? 'var(--mantine-color-gray-1)' : 'transparent',
-                    }}
-                  >
-                    <Group gap="sm">
-                      {subItem.icon && <subItem.icon size={15} />}
-
-                      <Text size="sm" fw={subActive ? 600 : 500}>
-                        {subItem.title}
-                      </Text>
-                    </Group>
-                  </UnstyledButton>
-                </Link>
-              );
-            })}
-          </Stack>
+          <SubMenuLinks items={item.items ?? []} pathname={pathname} />
         </Collapse>
       )}
     </Stack>

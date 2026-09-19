@@ -1,4 +1,4 @@
-import { Badge, Switch, Text } from '@mantine/core';
+import { Badge, Divider, HoverCard, Stack, Switch, Text } from '@mantine/core';
 import { AxiosInstance } from 'axios';
 import { useEffect } from 'react';
 import type {} from '@/features/components/page/rx-page';
@@ -575,6 +575,84 @@ function VisibilityBadge({ visibility }: { visibility?: unknown }) {
   );
 }
 
+function GenericProductCell({ row }: { row: Record<string, unknown> }) {
+  const gp = row.genericProduct as any;
+  const name = gp?.name ?? (row.genericProductCode ? String(row.genericProductCode) : '');
+  if (!gp) {
+    return (
+      <Text size="sm" c={name ? undefined : 'dimmed'}>
+        {name || '-'}
+      </Text>
+    );
+  }
+  const variants: any[] = Array.isArray(gp.genericProducts) ? gp.genericProducts : [];
+  return (
+    <HoverCard width={360} shadow="md" position="bottom-start" openDelay={150} closeDelay={50}>
+      <HoverCard.Target>
+        <Text
+          size="sm"
+          style={{ cursor: 'context-menu', textDecoration: 'underline dotted', maxWidth: 260 }}
+          truncate
+        >
+          {name}
+        </Text>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Stack gap={5} p="xs">
+          <Text size="sm" fw={600}>
+            {name}
+          </Text>
+          <Text size="xs" c="dimmed">
+            <Text span fw={600} c="dark">
+              Code:
+            </Text>{' '}
+            {gp.code ?? '-'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            <Text span fw={600} c="dark">
+              Generic class:
+            </Text>{' '}
+            {gp.genericClass ?? '-'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            <Text span fw={600} c="dark">
+              Pharmaceutical class:
+            </Text>{' '}
+            {gp.pharmaceuticalClass ?? '-'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            <Text span fw={600} c="dark">
+              EMdex code:
+            </Text>{' '}
+            {gp.emdexCode ?? '-'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            <Text span fw={600} c="dark">
+              Source:
+            </Text>{' '}
+            {gp.source ?? '-'}
+          </Text>
+          {variants.length > 0 && (
+            <>
+              <Divider my={4} />
+              <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                Forms / Variants
+              </Text>
+              {variants.slice(0, 10).map((v) => (
+                <Text size="xs" key={v.code ?? v.id}>
+                  {v.name}
+                  {v.strength ? ` · ${v.strength}` : ''}
+                  {v.dosageForm ? ` (${v.dosageForm})` : ''}
+                </Text>
+              ))}
+            </>
+          )}
+        </Stack>
+      </HoverCard.Dropdown>
+    </HoverCard>
+  );
+}
+
 export const itemColumns: Column[] = [
   {
     key: 'category.name',
@@ -590,18 +668,13 @@ export const itemColumns: Column[] = [
   { key: 'name', label: 'Item Name', filters: ColumnTypeFilters.STRING },
   { key: 'displayName', label: 'Display Name' },
   {
-    key: 'genericProduct.name',
+    key: 'genericProductCode',
     label: 'Generic Product',
-    filters: RELATION_FILTER({
-      endpoint: '/generic-products',
-      valueKey: 'name',
-      labelKey: 'name',
-      queryParam: 'search',
-      minChars: 3,
-    }),
+    render: (row) => <GenericProductCell row={row} />,
+    filters: ColumnTypeFilters.STRING,
   },
-  { key: 'code', label: 'Org Code' },
-  { key: 'barcode', label: 'Org Barcode' },
+  // { key: 'code', label: 'Org Code' },
+  // { key: 'barcode', label: 'Org Barcode' },
   {
     key: 'visibility',
     label: 'Visibility',

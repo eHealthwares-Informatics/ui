@@ -9,7 +9,6 @@ import {
   SimpleGrid,
   Skeleton,
   Stack,
-  Table,
   Tabs,
   Text,
 } from '@mantine/core';
@@ -25,11 +24,11 @@ import {
   type ActiveEncounter,
 } from '../components/documentation/documentation-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
-import { SubmissionSummary } from '../components/documentation/submission-summary';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
 import { PatientLink } from '../components/shared/patient-link';
 import { RequestForm } from '../components/requests/request-form';
 import { StatusBadge } from '../components/shared/status-badge';
+import { DocumentsAccordion, RequestsAccordion } from '../components/encounters/encounter-activity-accordion';
 import { formatEnum } from '../lib/emr-constants';
 import { usePatientByMrn } from '../hooks/use-patient-by-mrn';
 import type { Encounter, FormSubmission, Visit } from '../lib/emr-types';
@@ -78,6 +77,17 @@ export function EncounterDetailPage() {
     queryKey: ['emr', 'form-submissions', 'encounter', encounterId],
     queryFn: async () => {
       const res = await emrApi.get<{ data: FormSubmission[] }>('/form-submissions', {
+        params: { encounterId, limit: 100 },
+      });
+      return res.data.data;
+    },
+    enabled: Boolean(encounterId),
+  });
+
+  const requestsQuery = useQuery({
+    queryKey: ['emr', 'encounters', encounterId, 'requests'],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: Array<Record<string, unknown>> }>('/requests', {
         params: { encounterId, limit: 100 },
       });
       return res.data.data;
@@ -148,6 +158,9 @@ export function EncounterDetailPage() {
           <Tabs.Tab value="documentation">
             Documentation ({submissionsQuery.data?.length ?? 0})
           </Tabs.Tab>
+          <Tabs.Tab value="requests">
+            Requests ({requestsQuery.data?.length ?? 0})
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="details">
@@ -190,76 +203,18 @@ export function EncounterDetailPage() {
 
         <Tabs.Panel value="documentation">
           <Card withBorder radius="md" padding="lg">
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Submission #</Table.Th>
-                  <Table.Th>Form</Table.Th>
-                  <Table.Th>Version</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th>Submitted by</Table.Th>
-                  <Table.Th>Submitted at</Table.Th>
-                  <Table.Th style={{ width: 120 }} />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {submissionsQuery.isLoading ? (
-                  <Table.Tr>
-                    <Table.Td colSpan={7}>Loading…</Table.Td>
-                  </Table.Tr>
-                ) : (submissionsQuery.data ?? []).length === 0 ? (
-                  <Table.Tr>
-                    <Table.Td colSpan={7}>
-                      No documentation for this encounter yet.
-                    </Table.Td>
-                  </Table.Tr>
-                ) : (
-                  (submissionsQuery.data ?? []).map((row) => (
-                    <Table.Tr key={row.id}>
-                      <Table.Td>
-                        <Badge variant="light">{row.submissionNumber}</Badge>
-                      </Table.Td>
-                      <Table.Td>
-                        <Stack gap={2}>
-                          <Text size="sm" fw={500}>
-                            {row.formName}
-                          </Text>
-                          <SubmissionSummary submission={row} />
-                        </Stack>
-                      </Table.Td>
-                      <Table.Td>v{row.formVersion}</Table.Td>
-                      <Table.Td>
-                        <StatusBadge value={row.status} kind="submission" />
-                      </Table.Td>
-                      <Table.Td>{row.submittedByName ?? '—'}</Table.Td>
-                      <Table.Td>
-                        {row.submittedAt ? new Date(row.submittedAt).toLocaleString() : '—'}
-                      </Table.Td>
-                      <Table.Td>
-                        <Group gap={4} wrap="nowrap">
-                          <Button
-                            size="compact-xs"
-                            variant="light"
-                            onClick={() => setViewSubmission(row)}
-                          >
-                            View
-                          </Button>
-                          {row.status === 'SUBMITTED' && (
-                            <Button
-                              size="compact-xs"
-                              variant="outline"
-                              onClick={() => setAmendSubmission(row)}
-                            >
-                              Amend
-                            </Button>
-                          )}
-                        </Group>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))
-                )}
-              </Table.Tbody>
-            </Table>
+            <DocumentsAccordion
+              submissions={submissionsQuery.data ?? []}
+              isLoading={submissionsQuery.isLoading}
+              onView={setViewSubmission}
+              onAmend={setAmendSubmission}
+            />
+          </Card>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="requests">
+          <Card withBorder radius="md" padding="lg">
+            <RequestsAccordion requests={requestsQuery.data ?? []} isLoading={requestsQuery.isLoading} />
           </Card>
         </Tabs.Panel>
       </Tabs>
@@ -291,6 +246,9 @@ export function EncounterDetailPage() {
           submitUrl={`/encounters/${encounter.id}/requests`}
           onCreated={() => {
             queryClient.invalidateQueries({ queryKey: ['emr', 'requests'] });
+            queryClient.invalidateQueries({
+              queryKey: ['emr', 'encounters', encounter.id, 'requests'],
+            });
             closeRequest();
           }}
           onClose={closeRequest}

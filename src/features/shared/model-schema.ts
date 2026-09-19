@@ -54,10 +54,15 @@ export type ModelConfig<T = any> = {
   superAdminOrgFilter?: boolean;
   listParams?: Record<string, unknown>;
   rowActions?: RowAction[];
+  /** Query-key prefix used by the data page. Defaults to ['rxsoft-data-page', endpoint]. */
+  queryKeyBase?: unknown[];
 };
 
 export type RowAction = {
   label: string;
   icon?: React.ComponentType<{ size?: number }>;
-  href: (row: Record<string, unknown>) => string;
+  /** Navigate to a route when selected. */
+  href?: (row: Record<string, unknown>) => string;
+  /** Run a handler (e.g. a mutation + modal) when selected. */
+  onClick?: (row: Record<string, unknown>) => void;
 };

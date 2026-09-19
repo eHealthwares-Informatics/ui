@@ -20,6 +20,7 @@ interface PosStore {
   setActiveSession: (id: string) => void;
 
   addItem: (sessionId: string, item: CartItem) => void;
+  addItems: (sessionId: string, items: CartItem[]) => void;
   updateItem: (sessionId: string, itemId: string, updates: Partial<CartItem>) => void;
   removeItem: (sessionId: string, itemId: string) => void;
   clearCart: (sessionId: string) => void;
@@ -93,6 +94,31 @@ export const usePosStore = create<PosStore>()(
               ...session,
               cart: [...session.cart, item],
             };
+          }),
+        })),
+
+      // Batch add used by dispense mode. Lines linked to a source order line
+      // stay separate (one order line ↔ one sale line); other lines merge by
+      // code like addItem.
+      addItems: (sessionId, items) =>
+        set((state) => ({
+          sessions: state.sessions.map((session) => {
+            if (session.id !== sessionId) {return session;}
+            const cart = [...session.cart];
+            for (const item of items) {
+              if (item.orderItemId) {
+                cart.push(item);
+                continue;
+              }
+              const existing = cart.find((i) => i.code === item.code);
+              if (existing) {
+                existing.quantity += item.quantity;
+                existing.lineTotal = getLineTotal(existing);
+              } else {
+                cart.push(item);
+              }
+            }
+            return { ...session, cart };
           }),
         })),
 

@@ -2,7 +2,8 @@ import { emrApi } from '@/lib/emr-api';
 import type { FormSubmission } from './emr-types';
 
 function openPdf(blob: Blob, filename: string): boolean {
-  const url = URL.createObjectURL(blob);
+  const pdf = new Blob([blob], { type: 'application/pdf' });
+  const url = URL.createObjectURL(pdf);
   const win = window.open(url, '_blank');
   if (win) {
     win.focus();

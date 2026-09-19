@@ -8,6 +8,7 @@ import {
   Divider,
   Group,
   Image,
+  Menu,
   Stack,
   Text,
   ThemeIcon,
@@ -18,25 +19,21 @@ import { useNavigate } from '@tanstack/react-router';
 import { useModuleTitle } from '@/features/shared/use-module-title';
 import { ChatbotWidget } from './chatbot-widget';
 import {
-  BadgeCheck,
-  BellRing,
-  ChevronRight,
+  ChevronDown,
   Clock3,
-  CreditCard,
   MapPin,
   MessageCircle,
-  Search,
   ShieldCheck,
   ShoppingCart,
   Truck,
   Upload,
   User,
 } from 'lucide-react';
-import { useState } from 'react';
 import logoImage from '../sample_images/sample_logo.png';
 import AccountDrawer from './account-drawer';
 import { useAccountDrawerStore } from './account-drawer-store';
 import { useCartStore } from './cart-store';
+import { GenericSearchInput } from './generic-search';
 
 export const green = '#16A34A';
 export const darkGreen = '#0F6F35';
@@ -46,14 +43,31 @@ export const line = '#DDE7E2';
 export const soft = '#F7FBF9';
 export const blue = '#0EA5E9';
 
-const navItems = [
-  { label: 'Home', path: '/shop' },
-  { label: 'Shop Products', path: '/shop/shop' },
-  { label: 'Shop Medicines', path: '/shop/medicines' },
-  { label: 'Categories', path: '/shop/categories' },
-  { label: 'Health Concerns', path: '/shop/health-concerns' },
-  { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist' },
-  { label: 'Blog', path: '/shop/blog' },
+const navMenus = [
+  {
+    label: 'Shop',
+    items: [
+      { label: 'Shop Products', path: '/shop/shop' },
+      { label: 'Shop Medicines', path: '/shop/medicines' },
+      { label: 'Shop Supermarket Items', path: '/shop/categories/supermarket-essentials' },
+      { label: 'Categories', path: '/shop/categories' },
+    ],
+  },
+  {
+    label: 'My Health',
+    items: [
+      { label: 'Health Concerns', path: '/shop/health-concerns' },
+      { label: 'Blog', path: '/shop/blog' },
+    ],
+  },
+  {
+    label: 'Contact',
+    items: [
+      { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist' },
+      { label: 'Contact Us', path: '/shop/contact' },
+      { label: 'Delivery Areas', path: '/shop/delivery-areas' },
+    ],
+  },
 ];
 
 export const buttonStyles = {
@@ -163,33 +177,44 @@ export function WebsiteHeader() {
               </Group>
             </Group>
 
-            <Group visibleFrom="lg" gap={24}>
-              {navItems.map((item) => (
-                <Anchor
-                  key={item.label}
-                  onClick={() => navigate({ to: item.path })}
-                  style={{ cursor: 'pointer' }}
-                  c={ink}
-                  fw={800}
-                  size="sm"
-                  underline="never"
-                  className="damorex-link"
-                >
-                  {item.label}
-                </Anchor>
+            <Group visibleFrom="lg" gap={8} wrap="nowrap">
+              {navMenus.map((menu) => (
+                <Menu key={menu.label} position="bottom-start" width={240} shadow="md" offset={6}>
+                  <Menu.Target>
+                    <Button
+                      variant="subtle"
+                      color="dark"
+                      fw={800}
+                      radius="xl"
+                      size="sm"
+                      rightSection={<ChevronDown size={14} />}
+                    >
+                      {menu.label}
+                    </Button>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    {menu.items.map((item) => (
+                      <Menu.Item key={item.path} onClick={() => navigate({ to: item.path })}>
+                        {item.label}
+                      </Menu.Item>
+                    ))}
+                  </Menu.Dropdown>
+                </Menu>
               ))}
             </Group>
 
             <Group gap={8} wrap="nowrap">
-              <ActionIcon
-                variant="subtle"
-                color="gray"
-                radius="xl"
-                aria-label="Search"
-                onClick={() => navigate({ to: '/shop/search' })}
-              >
-                <Search size={20} />
-              </ActionIcon>
+              <Box visibleFrom="md" style={{ width: 220 }}>
+                <GenericSearchInput
+                  compact
+                  onSelect={(gp) =>
+                    navigate({ to: '/shop/shop', search: { gp: gp as any } })
+                  }
+                  onSubmit={(text) =>
+                    navigate({ to: '/shop/shop', search: { q: text as any } })
+                  }
+                />
+              </Box>
               <Button
                 visibleFrom="md"
                 radius="xl"
@@ -247,21 +272,29 @@ export function WebsiteHeader() {
 
           {mobileOpened ? (
             <Stack hiddenFrom="lg" mt="md" gap={6}>
-              {navItems.map((item) => (
-                <Anchor
-                  key={item.label}
-                  onClick={() => {
-                    navigate({ to: item.path });
-                    toggleMobile();
-                  }}
-                  underline="never"
-                  c={ink}
-                  fw={800}
-                  py={8}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {item.label}
-                </Anchor>
+              {navMenus.map((menu) => (
+                <Box key={menu.label}>
+                  <Text fw={900} size="sm" c={green} mt={8}>
+                    {menu.label}
+                  </Text>
+                  {menu.items.map((item) => (
+                    <Anchor
+                      key={item.path}
+                      onClick={() => {
+                        navigate({ to: item.path });
+                        toggleMobile();
+                      }}
+                      underline="never"
+                      c={ink}
+                      fw={700}
+                      py={6}
+                      pl={12}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {item.label}
+                    </Anchor>
+                  ))}
+                </Box>
               ))}
               <Anchor
                 onClick={() => {

@@ -60,6 +60,8 @@ export type EmrMockRequest = {
   requestNumber: string;
   patientId: string;
   patientName: string;
+  encounterId?: string | null;
+  visitId?: string | null;
   requestType: string;
   status: string;
   priority: string;
@@ -73,6 +75,53 @@ export type EmrMockRequest = {
   statusHistory?: EmrMockStatusHistory[];
 };
 
+export type EmrMockDepartment = {
+  id: string;
+  code: string;
+  name: string;
+  departmentType: string;
+  description?: string | null;
+  locationId?: string | null;
+  isActive: boolean;
+};
+
+export type EmrMockWard = {
+  id: string;
+  code: string;
+  name: string;
+  wardType: string;
+  departmentType?: string | null;
+  departmentId?: string | null;
+  description?: string | null;
+  isActive: boolean;
+};
+
+export type EmrMockBed = {
+  id: string;
+  wardId: string;
+  code: string;
+  bedType: string;
+  status: string;
+  notes?: string | null;
+};
+
+export type EmrMockAdmission = {
+  id: string;
+  admissionNumber: string;
+  patientId: string;
+  patientName: string;
+  wardId?: string | null;
+  bedId?: string | null;
+  admissionDatetime: string;
+  admissionType: string;
+  diagnosis?: string | null;
+  status: string;
+  dischargeDatetime?: string | null;
+  dischargeType?: string | null;
+  dischargeSummary?: string | null;
+  notes?: string | null;
+};
+
 export type EmrMockOptions = {
   patients?: EmrMockPatient[];
   forms?: EmrMockForm[];
@@ -80,6 +129,10 @@ export type EmrMockOptions = {
   requests?: EmrMockRequest[];
   submissions?: unknown[];
   staff?: unknown[];
+  departments?: EmrMockDepartment[];
+  wards?: EmrMockWard[];
+  beds?: EmrMockBed[];
+  admissions?: EmrMockAdmission[];
   appointments?: unknown[];
   visits?: unknown[];
   /** Capture every intercepted request for assertions. */
@@ -140,7 +193,7 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
     const path = url.pathname.replace(/^\/api/, '');
     const body = route.request().postDataJSON?.() ?? null;
 
-    opts.onRequest?.(method, url.pathname, body);
+    opts.onRequest?.(method, url.toString(), body);
 
     // --- GET single resources (must precede list + id patterns) ---
     if (method === 'GET') {
@@ -164,6 +217,10 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
         ['/encounters', opts.encounters ?? []],
         ['/requests', opts.requests ?? []],
         ['/staff', opts.staff ?? []],
+        ['/departments', opts.departments ?? []],
+        ['/wards', opts.wards ?? []],
+        ['/beds', opts.beds ?? []],
+        ['/admissions', opts.admissions ?? []],
       ] as const) {
         const match = path.match(new RegExp(`^${prefix}/([^/]+)$`));
         if (match) {
@@ -226,9 +283,62 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
         case '/encounters':
           return route.fulfill({ json: listResponse(opts.encounters ?? [], url) });
         case '/requests':
-          return route.fulfill({ json: listResponse(opts.requests ?? [], url) });
+          return route.fulfill({
+            json: listResponse(
+              (opts.requests ?? []).filter((request) => {
+                const encounterId = url.searchParams.get('encounterId');
+                const patientId = url.searchParams.get('patientId');
+                const visitId = url.searchParams.get('visitId');
+                if (encounterId && String(request.encounterId) !== encounterId) {
+                  return false;
+                }
+                if (patientId && String(request.patientId) !== patientId) {
+                  return false;
+                }
+                if (visitId && String(request.visitId) !== visitId) {
+                  return false;
+                }
+                return true;
+              }),
+              url,
+            ),
+          });
         case '/staff':
           return route.fulfill({ json: listResponse(opts.staff ?? [], url) });
+        case '/departments':
+          return route.fulfill({ json: listResponse(opts.departments ?? [], url) });
+        case '/wards':
+          return route.fulfill({ json: listResponse(opts.wards ?? [], url) });
+        case '/beds':
+          return route.fulfill({
+            json: listResponse(
+              (opts.beds ?? []).filter((bed) => {
+                const wardId = url.searchParams.get('wardId');
+                const status = url.searchParams.get('status');
+                if (wardId && String(bed.wardId) !== wardId) {
+                  return false;
+                }
+                if (status && String(bed.status) !== status) {
+                  return false;
+                }
+                return true;
+              }),
+              url,
+            ),
+          });
+        case '/admissions':
+          return route.fulfill({
+            json: listResponse(
+              (opts.admissions ?? []).filter((admission) => {
+                const status = url.searchParams.get('status');
+                if (status && String(admission.status) !== status) {
+                  return false;
+                }
+                return true;
+              }),
+              url,
+            ),
+          });
         case '/appointments':
           return route.fulfill({ json: listResponse(opts.appointments ?? [], url) });
         case '/visits':

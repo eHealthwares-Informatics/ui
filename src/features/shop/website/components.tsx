@@ -15,15 +15,17 @@ import {
   Text,
   ThemeIcon,
   Title,
+  Tooltip,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useNavigate } from '@tanstack/react-router';
 import {
   Baby,
   BadgeCheck,
   CalendarClock,
   ChevronRight,
-  CircleDollarSign,
   Clock3,
+  Eye,
   FileUp,
   MessageCircle,
   MessageSquare,
@@ -40,6 +42,7 @@ import {
   User,
 } from 'lucide-react';
 import { useChatbotStore } from './chatbot-store';
+import { useCartStore } from './cart-store';
 import {
   toHL7Prescription,
   buildWhatsAppUrl,
@@ -147,6 +150,19 @@ export function OutlineButton({
 export function ProductCard({ product }: { product: WebsiteProduct }) {
   const navigate = useNavigate();
   const gp = product.genericProduct;
+  const addItem = useCartStore((s) => s.addItem);
+
+  function addToCart() {
+    addItem(product.id, 1);
+    const count = useCartStore.getState().totalItems;
+    notifications.show({
+      position: 'bottom-right',
+      title: 'Added to cart',
+      message: `${count} item${count === 1 ? '' : 's'} in cart — ${product.name}`,
+      color: 'green',
+      icon: <ShoppingCart size={18} />,
+    });
+  }
 
   return (
     <Card
@@ -190,58 +206,83 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
           {gp?.isPrescriptionRequired ? 'Prescription required' : 'No prescription needed'}
         </Text>
         <Group grow gap={6}>
-          <Button
-            radius="xl"
-            size="sm"
-            style={{ background: green }}
-            leftSection={<ShoppingCart size={16} />}
-            styles={buttonStyles}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate({ to: '/shop/shop/$slug', params: { slug: product.id } });
-            }}
-          >
-            View
-          </Button>
-          <Button
-            radius="xl"
-            size="sm"
-            variant="light"
-            color="green"
-            leftSection={<MessageCircle size={16} />}
-            styles={buttonStyles}
-            onClick={(e) => {
-              e.stopPropagation();
-              const hl7 = toHL7Prescription(
-                { product, quantity: 1 },
-                { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
-              );
-              window.open(
-                buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY),
-                '_blank',
-              );
-            }}
-          >
-            WhatsApp
-          </Button>
-          <Button
-            radius="xl"
-            size="sm"
-            variant="filled"
-            color="blue"
-            leftSection={<MessageSquare size={16} />}
-            styles={buttonStyles}
-            onClick={(e) => {
-              e.stopPropagation();
-              const hl7 = toHL7Prescription(
-                { product, quantity: 1 },
-                { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
-              );
-              useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
-            }}
-          >
-            Chat
-          </Button>
+          <Tooltip label="Add to cart" withArrow position="top">
+            <Button
+              radius="xl"
+              size="sm"
+              style={{ background: green }}
+              leftSection={<ShoppingCart size={16} />}
+              styles={buttonStyles}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart();
+              }}
+            >
+              Add to Cart
+            </Button>
+          </Tooltip>
+          <Tooltip label="View product details" withArrow position="top">
+            <Button
+              radius="xl"
+              size="sm"
+              variant="light"
+              color="green"
+              p={8}
+              aria-label="View product"
+              styles={buttonStyles}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate({ to: '/shop/shop/$slug', params: { slug: product.id } });
+              }}
+            >
+              <Eye size={16} />
+            </Button>
+          </Tooltip>
+          <Tooltip label="Ask about this on WhatsApp" withArrow position="top">
+            <Button
+              radius="xl"
+              size="sm"
+              variant="light"
+              color="green"
+              p={8}
+              aria-label="WhatsApp enquiry"
+              styles={buttonStyles}
+              onClick={(e) => {
+                e.stopPropagation();
+                const hl7 = toHL7Prescription(
+                  { product, quantity: 1 },
+                  { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                );
+                window.open(
+                  buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY),
+                  '_blank',
+                );
+              }}
+            >
+              <MessageCircle size={16} />
+            </Button>
+          </Tooltip>
+          <Tooltip label="Chat with a pharmacist" withArrow position="top">
+            <Button
+              radius="xl"
+              size="sm"
+              variant="filled"
+              color="blue"
+              p={8}
+              aria-label="Chat with a pharmacist"
+              styles={buttonStyles}
+              onClick={(e) => {
+                e.stopPropagation();
+                const hl7 = toHL7Prescription(
+                  { product, quantity: 1 },
+                  { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                );
+                useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
+              }}
+            >
+              <MessageSquare size={16} />
+            </Button>
+          </Tooltip>
         </Group>
       </Stack>
     </Card>

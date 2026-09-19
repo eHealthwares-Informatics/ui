@@ -14,6 +14,7 @@ type MutationProps = {
   title: any;
   apiProvider?: AxiosInstance;
   fields?: Field[];
+  queryKeyBase?: unknown[];
 };
 
 type CreateMutationProps = MutationProps & {
@@ -59,6 +60,7 @@ export const useCreateMutation = ({
   apiProvider,
   keepModalOpenOnSuccess = false,
   fields,
+  queryKeyBase,
 }: CreateMutationProps) => {
   const contextApiProvider = useApiProvider();
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
@@ -75,7 +77,7 @@ export const useCreateMutation = ({
         await onCreateSuccess(created, formState);
       }
       void queryClient.invalidateQueries({
-        queryKey: ['rxsoft-data-page', endpoint],
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
       });
       if (!keepModalOpenOnSuccess) {
         setShowModal(false);
@@ -103,6 +105,7 @@ export const useUpdateMutation = ({
   apiProvider,
   initialFormState,
   fields,
+  queryKeyBase,
 }: UpdateMutationProps) => {
   const contextApiProvider = useApiProvider();
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
@@ -127,7 +130,7 @@ export const useUpdateMutation = ({
     },
     onSuccess: ({ recordId }) => {
       void queryClient.invalidateQueries({
-        queryKey: ['rxsoft-data-page', endpoint],
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
       });
       void queryClient.invalidateQueries({ queryKey: [endpoint] });
       void queryClient.invalidateQueries({ queryKey: ['rxsoft-detail', endpoint] });
@@ -153,6 +156,7 @@ export const useDeleteMutation = ({
   queryClient,
   title,
   apiProvider,
+  queryKeyBase,
 }: DeteleMutationProps) => {
   const contextApiProvider = useApiProvider();
   const effectiveApiProvider = apiProvider ?? contextApiProvider;
@@ -166,7 +170,7 @@ export const useDeleteMutation = ({
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ['rxsoft-data-page', endpoint],
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
       });
       notifications.show({ message: `${title} record deleted` });
     },

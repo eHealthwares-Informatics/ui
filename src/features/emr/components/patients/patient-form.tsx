@@ -23,7 +23,7 @@ export function PatientForm({
   onCreated,
   onClose,
 }: {
-  onCreated: () => void;
+  onCreated?: (created?: Record<string, unknown>) => void;
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -62,7 +62,7 @@ export function PatientForm({
       notifications.show({ message: 'Patient registered successfully', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'patients'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'patients', 'picker'] });
-      onCreated();
+      onCreated?.();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });

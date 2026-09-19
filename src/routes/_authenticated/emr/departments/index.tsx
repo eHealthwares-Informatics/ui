@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { EmrResourcePage } from '@/features/emr/pages/resource-page';
-import { emrResources } from '@/features/emr/lib/emr-resources';
+import { DepartmentsPage } from '@/features/emr/pages/departments/departments-page';
 
 export const Route = createFileRoute('/_authenticated/emr/departments/')({
-  component: () => <EmrResourcePage config={emrResources.departments} />,
+  component: DepartmentsPage,
 });

@@ -110,7 +110,7 @@ export const TableHeader = ({
         {filters && onFilterValueChange && filters?.length > 0 && (
           <Menu shadow="md" width={220} opened={menuOpened} onChange={setMenuOpened}>
             <Menu.Target>
-              <ActionIcon size="sm" variant="subtle">
+              <ActionIcon size="sm" variant="subtle" aria-label={`Filter by ${label}`}>
                 <SlidersHorizontal size={14} />
               </ActionIcon>
             </Menu.Target>

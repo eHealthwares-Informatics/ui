@@ -17,7 +17,7 @@ import { getApiErrorMessage } from '../../lib/emr-errors';
 import { LocationPicker } from '../shared/location-picker';
 import { DepartmentPicker } from '../departments/department-picker';
 
-export function StaffForm({ onCreated, onClose }: { onCreated: () => void; onClose: () => void }) {
+export function StaffForm({ onCreated, onClose }: { onCreated?: (created?: Record<string, unknown>) => void; onClose: () => void }) {
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -76,7 +76,7 @@ export function StaffForm({ onCreated, onClose }: { onCreated: () => void; onClo
     onSuccess: () => {
       notifications.show({ message: 'Staff member registered', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'staff'] });
-      onCreated();
+      onCreated?.();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });

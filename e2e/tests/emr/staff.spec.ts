@@ -25,6 +25,16 @@ const staff = [
   },
 ];
 
+const departments = [
+  {
+    id: 'dept-1',
+    code: 'DEP-1',
+    name: 'Cardiology',
+    departmentType: 'OPD',
+    isActive: true,
+  },
+];
+
 test('lists staff members with their roles', async ({ page }) => {
   await installEmrMocks(page, { staff });
   await page.goto('/emr/staff');
@@ -39,6 +49,7 @@ test('registers a new staff member (UC-07 register staff)', async ({ page }) => 
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     staff,
+    departments,
     onRequest: (method, url, body) => {
       if (method === 'POST') {
         posts.push({ method, url, body });
@@ -52,7 +63,8 @@ test('registers a new staff member (UC-07 register staff)', async ({ page }) => 
   await page.getByLabel('Last name').fill('Eze');
   await page.getByPlaceholder('Select role').click();
   await page.getByRole('option', { name: 'Doctor' }).click();
-  await page.getByLabel('Department').fill('Cardiology');
+  await page.getByPlaceholder('Search department name or code').fill('Cardiology');
+  await page.getByRole('option', { name: 'DEP-1 · Cardiology' }).click();
   await page.getByRole('button', { name: 'Register Staff' }).last().click();
 
   await expect(page.getByText('Staff member registered')).toBeVisible();

@@ -6,8 +6,33 @@ export const codingModuleOptions = [
   { label: 'SNOMED', value: 'SNOMED' },
   { label: 'EMDEx', value: 'EMDEx' },
   { label: 'ICD10', value: 'ICD10' },
+  { label: 'ICD11', value: 'ICD11' },
+  { label: 'CPT', value: 'CPT' },
   { label: 'RxNorm', value: 'RxNorm' },
 ];
+
+export const codingModuleLabel = (module?: string | null): string => {
+  switch (module) {
+    case 'ICD10':
+      return 'ICD-10';
+    case 'ICD11':
+      return 'ICD-11';
+    case 'CPT':
+      return 'CPT';
+    case 'LOINC':
+      return 'LOINC';
+    case 'SNOMED':
+      return 'SNOMED';
+    case 'DICOM':
+      return 'DICOM';
+    case 'EMDEx':
+      return 'EMDEx';
+    case 'RxNorm':
+      return 'RxNorm';
+    default:
+      return 'Code';
+  }
+};
 
 type MetadataItem = {
   attributeId: string;

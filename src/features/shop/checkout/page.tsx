@@ -76,10 +76,6 @@ const productPrices: Record<string, number> = {
   '10': 900,
 };
 
-function getMockPrice(id: string): number {
-  return productPrices[id] || 2500;
-}
-
 const productInfo: Record<
   string,
   { name: string; genericName: string; dosage: string; isRx: boolean }
@@ -266,11 +262,28 @@ export default function CheckoutPage() {
       {
         paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
-        items: items.map((i) =>
-          i.productId
-            ? { itemId: i.productId, quantity: i.quantity, unitPrice: getMockPrice2(i.productId) }
-            : { freetextName: i.name, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 }
-        ),
+        items: items.map((i) => {
+          if (i.productId) {
+            return { itemId: i.productId, quantity: i.quantity, unitPrice: getMockPrice2(i.productId) };
+          }
+          if (i.genericDrugCode) {
+            return {
+              genericDrugCode: i.genericDrugCode,
+              freetextName: i.name,
+              quantity: i.quantity,
+              unitPrice: i.unitPrice ?? 0,
+            };
+          }
+          if (i.genericProductCode) {
+            return {
+              genericItemCode: i.genericProductCode,
+              freetextName: i.name,
+              quantity: i.quantity,
+              unitPrice: i.unitPrice ?? 0,
+            };
+          }
+          return { freetextName: i.name, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 };
+        }),
         delivery: {
           address,
           city,
@@ -925,7 +938,7 @@ function StepPayment({
   subtotal,
   deliveryFee,
   total,
-  totalItems,
+  totalItems: _totalItems,
 }: {
   providers: Array<{ id: string; name: string; providerType: string; production: boolean }>;
   paymentMethod: string | null;

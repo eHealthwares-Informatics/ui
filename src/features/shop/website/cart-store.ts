@@ -6,6 +6,7 @@ interface SavedItem {
   productId: string;
   name?: string;
   genericProductCode?: string;
+  genericDrugCode?: string;
   quantity: number;
 }
 
@@ -19,6 +20,12 @@ interface CartStore {
     unitPrice?: number;
     quantity?: number;
   }) => void;
+  addGenericDrug: (entry: {
+    name?: string;
+    genericDrugCode: string;
+    unitPrice?: number;
+    quantity?: number;
+  }) => void;
   updateQuantity: (productId: string | undefined, quantity: number) => void;
   removeItem: (productId: string | undefined) => void;
   clearCart: () => void;
@@ -28,6 +35,12 @@ interface CartStore {
   saveForLater: (productId: string | undefined) => void;
   moveToCart: (productId: string) => void;
   removeSaved: (productId: string) => void;
+}
+
+// A cart line is identified by exactly one of: productId (brand item),
+// genericProductCode (EMDEx generic), or genericDrugCode (NDF generic).
+function lineKey(i: CartItem): string | undefined {
+  return i.productId || i.genericProductCode || i.genericDrugCode || undefined;
 }
 
 function computeSubtotal(items: CartItem[]): number {
@@ -85,9 +98,30 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
+      addGenericDrug: (entry) => {
+        const { name, genericDrugCode, unitPrice, quantity = 1 } = entry;
+        set((state) => {
+          const key = genericDrugCode;
+          const existing = state.items.find((i) => i.genericDrugCode === key);
+          let items: CartItem[];
+          if (existing) {
+            items = state.items.map((i) =>
+              i.genericDrugCode === key ? { ...i, quantity: i.quantity + quantity } : i
+            );
+          } else {
+            items = [...state.items, { name, genericDrugCode, unitPrice, quantity }];
+          }
+          return {
+            items,
+            totalItems: items.reduce((sum, i) => sum + i.quantity, 0),
+            subtotal: computeSubtotal(items),
+          };
+        });
+      },
+
       updateQuantity: (productId, quantity) => {
         set((state) => {
-          const keyed = (i: CartItem) => i.productId ? i.productId === productId : i.genericProductCode === productId;
+          const keyed = (i: CartItem) => lineKey(i) === productId;
           if (quantity <= 0) {
             const items = state.items.filter((i) => !keyed(i));
             return {
@@ -109,7 +143,7 @@ export const useCartStore = create<CartStore>()(
 
       removeItem: (productId) => {
         set((state) => {
-          const keyed = (i: CartItem) => i.productId ? i.productId === productId : i.genericProductCode === productId;
+          const keyed = (i: CartItem) => lineKey(i) === productId;
           const items = state.items.filter((i) => !keyed(i));
           return {
             items,
@@ -124,9 +158,7 @@ export const useCartStore = create<CartStore>()(
       itemCount: () => get().items.length,
 
       saveForLater: (productId) => {
-        const item = get().items.find((i) =>
-          i.productId ? i.productId === productId : i.genericProductCode === productId
-        );
+        const item = get().items.find((i) => lineKey(i) === productId);
         if (!item) {
           return;
         }
@@ -134,10 +166,11 @@ export const useCartStore = create<CartStore>()(
           productId: item.productId ?? productId ?? '',
           name: item.name,
           genericProductCode: item.genericProductCode,
+          genericDrugCode: item.genericDrugCode,
           quantity: item.quantity,
         };
         set((state) => {
-          const items = state.items.filter((i) => !(i.productId ? i.productId === productId : i.genericProductCode === productId));
+          const items = state.items.filter((i) => lineKey(i) !== productId);
           return {
             items,
             savedForLater: [...state.savedForLater, saved],
@@ -152,27 +185,25 @@ export const useCartStore = create<CartStore>()(
         if (!saved) {
           return;
         }
+        const savedKey = saved.genericDrugCode ?? saved.genericProductCode;
         set((state) => {
-          const existing = saved.genericProductCode
-            ? state.items.find((i) => i.genericProductCode === saved.genericProductCode)
+          const existing = savedKey
+            ? state.items.find((i) => lineKey(i) === savedKey)
             : state.items.find((i) => i.productId === productId);
           let items: CartItem[];
           if (existing) {
             items = state.items.map((i) =>
-              saved.genericProductCode
-                ? i.genericProductCode === saved.genericProductCode
-                  ? { ...i, quantity: i.quantity + saved.quantity }
-                  : i
-                : i.productId === productId
-                  ? { ...i, quantity: i.quantity + saved.quantity }
-                  : i
+              lineKey(i) === savedKey
+                ? { ...i, quantity: i.quantity + saved.quantity }
+                : i
             );
-          } else if (saved.genericProductCode) {
+          } else if (savedKey) {
             items = [
               ...state.items,
               {
                 name: saved.name,
                 genericProductCode: saved.genericProductCode,
+                genericDrugCode: saved.genericDrugCode,
                 quantity: saved.quantity,
               },
             ];

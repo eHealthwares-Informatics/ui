@@ -1,6 +1,7 @@
 import { Badge } from '@mantine/core';
 import { View } from '@/features/rxsoft/types';
 import { CodingConcept } from './type';
+import { codingModuleLabel } from '../pages/shared';
 
 export const codingConceptView: View<CodingConcept> = {
   endpoint: '/concepts/:id',
@@ -22,8 +23,16 @@ export const codingConceptView: View<CodingConcept> = {
         },
         {
           key: 'code',
-          label: 'LOINC Code',
+          label: 'Code',
           col: 3,
+          render: (value, item) => (
+            <>
+              <Badge color="teal" variant="light">
+                {codingModuleLabel(item?.concept)}
+              </Badge>{' '}
+              <Badge variant="outline">{value}</Badge>
+            </>
+          ),
         },
         {
           key: 'name',

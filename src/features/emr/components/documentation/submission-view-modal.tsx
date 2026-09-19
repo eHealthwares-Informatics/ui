@@ -16,6 +16,14 @@ function renderValue(value: unknown): string {
     return value.length > 0 ? value.join(', ') : '—';
   }
   if (typeof value === 'object') {
+    const record = value as { label?: unknown; code?: unknown; kind?: unknown };
+    if (typeof record.label === 'string') {
+      const caption =
+        record.label + (typeof record.code === 'string' && record.code ? ` (${record.code})` : '');
+      return typeof record.kind === 'string'
+        ? `${caption} · ${String(record.kind).replace(/_/g, ' ')}`
+        : caption;
+    }
     return JSON.stringify(value);
   }
   return String(value);

@@ -16,7 +16,7 @@ import { DEPARTMENT_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import { LocationPicker } from '../shared/location-picker';
 
-export function DepartmentForm({ onCreated, onClose }: { onCreated: () => void; onClose: () => void }) {
+export function DepartmentForm({ onCreated, onClose }: { onCreated?: (created?: Record<string, unknown>) => void; onClose: () => void }) {
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -50,7 +50,7 @@ export function DepartmentForm({ onCreated, onClose }: { onCreated: () => void; 
     onSuccess: () => {
       notifications.show({ message: 'Department created', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'departments'] });
-      onCreated();
+      onCreated?.();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });

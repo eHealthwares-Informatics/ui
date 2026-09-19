@@ -30,7 +30,7 @@ interface Props {
   onClose: () => void;
   totals: { total: number };
   session: any;
-  onComplete: () => void;
+  onComplete: (saleResult?: any) => void;
 }
 
 const POS_TERMINAL_TIMEOUT_MS = 120_000;
@@ -91,8 +91,8 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   });
 
   const mutation = useCreateSale({
-    onSuccess: () => {
-      onComplete();
+    onSuccess: (data) => {
+      onComplete(data);
       onClose();
     },
   });
@@ -215,6 +215,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   async function handleComplete() {
     const lines = (session.cart || []).map((item: any) => ({
       itemId: item.id,
+      orderItemId: item.orderItemId ?? undefined,
       uomId: item.uomId || '',
       quantity: item.quantity,
       unitPrice: session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice,

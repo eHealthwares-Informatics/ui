@@ -51,6 +51,7 @@ const FIELD_TYPES: FormFieldType[] = [
   'section',
   'tab',
   'col',
+  'item',
 ];
 
 const TABLE_COLUMN_TYPES: FormFieldType[] = ['text', 'number', 'textarea', 'date', 'checkbox'];

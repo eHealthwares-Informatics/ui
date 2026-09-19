@@ -22,7 +22,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { AlertCircle, Check, Copy, RefreshCw } from 'lucide-react';
+import { AlertCircle, Check, Copy, RefreshCw, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
@@ -175,6 +175,28 @@ export function RequestDetailPage() {
     },
   });
 
+  const resendMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await emrApi.post<RequestDetail>(`/requests/${requestId}/resend`, {});
+      return data;
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['emr', 'requests', requestId], updated);
+      queryClient.invalidateQueries({ queryKey: ['emr', 'requests'] });
+      if (updated.syncStatus === 'SYNCED') {
+        notifications.show({ message: 'Request re-sent successfully', color: 'teal' });
+      } else if (updated.syncStatus === 'FAILED') {
+        notifications.show({
+          color: 'red',
+          message: `Send failed: ${updated.syncError ?? 'Unknown error'}`,
+        });
+      }
+    },
+    onError: (error) => {
+      notifications.show({ color: 'red', message: getApiErrorMessage(error) });
+    },
+  });
+
   const transitionMutation = useMutation({
     mutationFn: async ({
       status,
@@ -258,15 +280,28 @@ export function RequestDetailPage() {
         (canSync || availableTransitions.length > 0) && (
           <Group gap="sm">
             {canSync && (
-              <Button
-                size="sm"
-                variant="light"
-                leftSection={<RefreshCw size={14} />}
-                loading={syncMutation.isPending}
-                onClick={() => syncMutation.mutate()}
-              >
-                Re-sync
-              </Button>
+              <Group gap="sm">
+                {request.syncStatus === 'FAILED' && (
+                  <Button
+                    size="sm"
+                    color="orange"
+                    leftSection={<Send size={14} />}
+                    loading={resendMutation.isPending}
+                    onClick={() => resendMutation.mutate()}
+                  >
+                    Resend
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="light"
+                  leftSection={<RefreshCw size={14} />}
+                  loading={syncMutation.isPending}
+                  onClick={() => syncMutation.mutate()}
+                >
+                  Re-sync
+                </Button>
+              </Group>
             )}
             {availableTransitions.map((transition) => (
               <Button
@@ -358,6 +393,18 @@ export function RequestDetailPage() {
             )}
             {request.externalReference && (
               <DetailRow label="External reference" value={<CopyValue value={request.externalReference} />} />
+            )}
+            {request.sendAttemptCount > 0 && (
+              <DetailRow
+                label="Send attempts"
+                value={`${request.sendAttemptCount}${request.sentAt ? ` — last sent ${new Date(request.sentAt).toLocaleString()}` : ''}`}
+              />
+            )}
+            {request.lastSyncedAt && (
+              <DetailRow
+                label="Last synced"
+                value={new Date(request.lastSyncedAt).toLocaleString()}
+              />
             )}
           </SimpleGrid>
 

@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { FileText, Plus, Search, TimerReset } from 'lucide-react';
 import { useState } from 'react';
@@ -25,6 +25,7 @@ import {
   type ActiveEncounter,
 } from '../components/documentation/documentation-modal';
 import { StatusBadge } from '../components/shared/status-badge';
+import { PatientHoverCard } from '../components/shared/patient-hover-card';
 import { formatEnum } from '../lib/emr-constants';
 
 const ACTIVE_ENCOUNTER_KEY = 'emr-active-encounter';
@@ -50,6 +51,7 @@ function isSameDay(iso: string): boolean {
 
 export function EncountersPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [activeEncounter, setActiveEncounter] = useState<ActiveEncounter | null>(
@@ -74,6 +76,24 @@ export function EncountersPage() {
   const totalPages = Math.max(1, Math.ceil(total / 20));
 
   const handleEncounterCreated = (record?: Record<string, unknown>) => {
+    if (record?.id) {
+      queryClient.setQueryData<{
+        data: Array<Record<string, unknown>>;
+        meta: { page: number; limit: number; total: number };
+      }>(['emr', 'encounters', page, search], (prev) => {
+        if (!prev) {
+          return prev;
+        }
+        return {
+          data: [
+            record,
+            ...(prev.data ?? []).filter((row) => String(row.id) !== String(record.id)),
+          ],
+          meta: { ...prev.meta, total: (prev.meta?.total ?? 0) + 1 },
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ['emr', 'encounters'] });
+    }
     if (record?.id && record?.encounterDatetime) {
       const next: ActiveEncounter = {
         id: String(record.id),
@@ -217,9 +237,10 @@ export function EncountersPage() {
                           <Badge variant="light">{String(row.encounterNumber ?? '—')}</Badge>
                         </Table.Td>
                         <Table.Td>
-                          <Text size="sm" fw={500}>
-                            {String(row.patientId ?? '—')}
-                          </Text>
+                          <PatientHoverCard
+                            mrn={String(row.patientId ?? '')}
+                            label={String(row.patientId ?? '—')}
+                          />
                         </Table.Td>
                         <Table.Td>
                           <StatusBadge value={row.encounterType} kind="encounter" />
