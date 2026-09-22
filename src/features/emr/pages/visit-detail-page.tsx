@@ -1,6 +1,7 @@
 import {
   Alert,
   Badge,
+  Button,
   Card,
   Group,
   SimpleGrid,
@@ -10,6 +11,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle } from 'lucide-react';
@@ -17,9 +19,12 @@ import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
+import { AdmitFromVisitModal } from '../components/visits/admit-from-visit-modal';
 import { VisitCommentsPanel } from '../components/visits/visit-comments';
+import { BedCell } from '../components/wards/bed-cell';
+import { WardCell } from '../components/wards/ward-cell';
 import { formatEnum } from '../lib/emr-constants';
-import type { Visit } from '../lib/emr-types';
+import type { Admission, Visit } from '../lib/emr-types';
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -65,6 +70,21 @@ export function VisitDetailPage() {
     },
     enabled: Boolean(visitId),
   });
+
+  const admissionQuery = useQuery({
+    queryKey: ['emr', 'visits', visitId, 'admission'],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: Admission[] }>('/admissions', {
+        params: { visitId, limit: 1, sortBy: 'admissionDatetime', sortOrder: 'desc' },
+      });
+      return res.data.data[0] ?? null;
+    },
+    enabled: Boolean(visitId),
+  });
+
+  const [admitOpened, { open: openAdmit, close: closeAdmit }] = useDisclosure(false);
+  const activeAdmission =
+    admissionQuery.data && admissionQuery.data.status === 'ADMITTED' ? admissionQuery.data : null;
 
   if (visitQuery.isLoading) {
     return (
@@ -112,22 +132,46 @@ export function VisitDetailPage() {
               {formatEnum(visit.visitType)}
             </Badge>
             <StatusBadge value={visit.status} kind="visit" />
+            {visit.status === 'ONGOING' && !activeAdmission && (
+              <Button size="compact-xs" variant="light" onClick={openAdmit}>
+                Convert to Admission
+              </Button>
+            )}
           </Group>
 
           <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="md">
             <DetailRow label="Patient" value={<PatientLink mrn={visit.patientId} />} />
             <DetailRow label="MRN" value={visit.patientId} />
             <DetailRow label="Provider" value={visit.providerName} />
-            <DetailRow
-              label="Started"
-              value={new Date(visit.startDatetime).toLocaleString()}
-            />
+            <DetailRow label="Started" value={new Date(visit.startDatetime).toLocaleString()} />
             <DetailRow
               label="Ended"
               value={visit.stopDatetime ? new Date(visit.stopDatetime).toLocaleString() : undefined}
             />
           </SimpleGrid>
         </Card>
+
+        {admissionQuery.isLoading ? null : activeAdmission ? (
+          <Card withBorder radius="md" padding="lg">
+            <Group justify="space-between" mb="sm">
+              <Title order={4}>Admission</Title>
+              <StatusBadge value={activeAdmission.status} kind="admission" />
+            </Group>
+            <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="md">
+              <DetailRow label="Admission #" value={activeAdmission.admissionNumber} />
+              <DetailRow label="Ward" value={<WardCell wardId={activeAdmission.wardId} />} />
+              <DetailRow label="Bed" value={<BedCell bedId={activeAdmission.bedId} />} />
+              <DetailRow
+                label="Admitted"
+                value={
+                  activeAdmission.admissionDatetime
+                    ? new Date(activeAdmission.admissionDatetime).toLocaleString()
+                    : undefined
+                }
+              />
+            </SimpleGrid>
+          </Card>
+        ) : null}
 
         <Card withBorder radius="md" padding="lg">
           <Group justify="space-between" mb="sm">
@@ -212,9 +256,7 @@ export function VisitDetailPage() {
                       <StatusBadge value={row.status} kind="request" />
                     </Table.Td>
                     <Table.Td>
-                      {row.requestedAt
-                        ? new Date(String(row.requestedAt)).toLocaleString()
-                        : '—'}
+                      {row.requestedAt ? new Date(String(row.requestedAt)).toLocaleString() : '—'}
                     </Table.Td>
                   </Table.Tr>
                 ))
@@ -229,6 +271,16 @@ export function VisitDetailPage() {
           <VisitCommentsPanel visitId={visitId} />
         </Card>
       </Stack>
+
+      <AdmitFromVisitModal
+        opened={admitOpened}
+        onClose={closeAdmit}
+        visitId={visitId}
+        patientLabel={visit.patientName || visit.patientId}
+        onAdmitted={() => {
+          void admissionQuery.refetch();
+        }}
+      />
     </RxPage>
   );
 }

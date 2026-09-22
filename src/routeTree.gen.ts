@@ -281,6 +281,10 @@ import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes
 import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
 import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
 import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId'
+import { Route as AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/index'
+import { Route as AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
+import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/index'
+import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
 import { Route as AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/levels/index'
 import { Route as AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/lgas/index'
 import { Route as AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/pharmacies/index'
@@ -1848,6 +1852,32 @@ const ApmAdminWardsLgaIdRoute = ApmAdminWardsLgaIdRouteImport.update({
   path: '/wards/$lgaId',
   getParentRoute: () => ApmAdminRouteRoute,
 } as any)
+const AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute =
+  AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport.update({
+    id: '/coding-concept/facilities/hospitals/',
+    path: '/coding-concept/facilities/hospitals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute =
+  AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport.update({
+    id: '/coding-concept/facilities/hospitals/$hospitalId',
+    path: '/coding-concept/facilities/hospitals/$hospitalId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute =
+  AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport.update({
+    id: '/coding-concept/facilities/laboratories/',
+    path: '/coding-concept/facilities/laboratories/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute =
+  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport.update(
+    {
+      id: '/coding-concept/facilities/laboratories/$laboratoryId',
+      path: '/coding-concept/facilities/laboratories/$laboratoryId',
+      getParentRoute: () => AuthenticatedRouteRoute,
+    } as any,
+  )
 const AuthenticatedCodingConceptFacilitiesLevelsIndexRoute =
   AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport.update({
     id: '/coding-concept/facilities/levels/',
@@ -2281,6 +2311,8 @@ export interface FileRoutesByFullPath {
   '/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
@@ -2290,6 +2322,8 @@ export interface FileRoutesByFullPath {
   '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
   '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
   '/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
   '/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
@@ -2577,6 +2611,8 @@ export interface FileRoutesByTo {
   '/rxsoft/users': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
@@ -2586,6 +2622,8 @@ export interface FileRoutesByTo {
   '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
   '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/coding-concept/facilities/hospitals': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/coding-concept/facilities/laboratories': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
   '/coding-concept/facilities/levels': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/coding-concept/facilities/lgas': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
   '/coding-concept/facilities/pharmacies': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
@@ -2879,6 +2917,8 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
   '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
@@ -2888,6 +2928,8 @@ export interface FileRoutesById {
   '/_authenticated/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
   '/_authenticated/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
   '/_authenticated/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/_authenticated/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/_authenticated/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
   '/_authenticated/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   '/_authenticated/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
   '/_authenticated/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
@@ -3179,6 +3221,8 @@ export interface FileRouteTypes {
     | '/rxsoft/users/'
     | '/rxsoft/warehouses/'
     | '/rxsoft/website-orders/'
+    | '/coding-concept/facilities/hospitals/$hospitalId'
+    | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/conversation/$page/$id/edit'
     | '/lis/orders/$orderId/report'
@@ -3188,6 +3232,8 @@ export interface FileRouteTypes {
     | '/lis/orders/workflow/order'
     | '/lis/orders/workflow/qa'
     | '/rxsoft/uoms/$uomId/edit'
+    | '/coding-concept/facilities/hospitals/'
+    | '/coding-concept/facilities/laboratories/'
     | '/coding-concept/facilities/levels/'
     | '/coding-concept/facilities/lgas/'
     | '/coding-concept/facilities/pharmacies/'
@@ -3475,6 +3521,8 @@ export interface FileRouteTypes {
     | '/rxsoft/users'
     | '/rxsoft/warehouses'
     | '/rxsoft/website-orders'
+    | '/coding-concept/facilities/hospitals/$hospitalId'
+    | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/conversation/$page/$id/edit'
     | '/lis/orders/$orderId/report'
@@ -3484,6 +3532,8 @@ export interface FileRouteTypes {
     | '/lis/orders/workflow/order'
     | '/lis/orders/workflow/qa'
     | '/rxsoft/uoms/$uomId/edit'
+    | '/coding-concept/facilities/hospitals'
+    | '/coding-concept/facilities/laboratories'
     | '/coding-concept/facilities/levels'
     | '/coding-concept/facilities/lgas'
     | '/coding-concept/facilities/pharmacies'
@@ -3776,6 +3826,8 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/users/'
     | '/_authenticated/rxsoft/warehouses/'
     | '/_authenticated/rxsoft/website-orders/'
+    | '/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
+    | '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
     | '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/_authenticated/conversation/$page/$id/edit'
     | '/_authenticated/lis/orders/$orderId/report'
@@ -3785,6 +3837,8 @@ export interface FileRouteTypes {
     | '/_authenticated/lis/orders/workflow/order'
     | '/_authenticated/lis/orders/workflow/qa'
     | '/_authenticated/rxsoft/uoms/$uomId/edit'
+    | '/_authenticated/coding-concept/facilities/hospitals/'
+    | '/_authenticated/coding-concept/facilities/laboratories/'
     | '/_authenticated/coding-concept/facilities/levels/'
     | '/_authenticated/coding-concept/facilities/lgas/'
     | '/_authenticated/coding-concept/facilities/pharmacies/'
@@ -5777,6 +5831,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApmAdminWardsLgaIdRouteImport
       parentRoute: typeof ApmAdminRouteRoute
     }
+    '/_authenticated/coding-concept/facilities/hospitals/': {
+      id: '/_authenticated/coding-concept/facilities/hospitals/'
+      path: '/coding-concept/facilities/hospitals'
+      fullPath: '/coding-concept/facilities/hospitals/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': {
+      id: '/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
+      path: '/coding-concept/facilities/hospitals/$hospitalId'
+      fullPath: '/coding-concept/facilities/hospitals/$hospitalId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coding-concept/facilities/laboratories/': {
+      id: '/_authenticated/coding-concept/facilities/laboratories/'
+      path: '/coding-concept/facilities/laboratories'
+      fullPath: '/coding-concept/facilities/laboratories/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': {
+      id: '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
+      path: '/coding-concept/facilities/laboratories/$laboratoryId'
+      fullPath: '/coding-concept/facilities/laboratories/$laboratoryId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/levels/': {
       id: '/_authenticated/coding-concept/facilities/levels/'
       path: '/coding-concept/facilities/levels'
@@ -6270,9 +6352,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftUsersIndexRoute: typeof AuthenticatedRxsoftUsersIndexRoute
   AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute
   AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   AuthenticatedConversationPageIdEditRoute: typeof AuthenticatedConversationPageIdEditRoute
   AuthenticatedLisOrdersOrderIdReportRoute: typeof AuthenticatedLisOrdersOrderIdReportRoute
+  AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
   AuthenticatedCodingConceptFacilitiesLevelsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
   AuthenticatedCodingConceptFacilitiesLgasIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
   AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
@@ -6572,12 +6658,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftWarehousesIndexRoute,
   AuthenticatedRxsoftWebsiteOrdersIndexRoute:
     AuthenticatedRxsoftWebsiteOrdersIndexRoute,
+  AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute:
+    AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute,
+  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute:
+    AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute,
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute:
     AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute,
   AuthenticatedConversationPageIdEditRoute:
     AuthenticatedConversationPageIdEditRoute,
   AuthenticatedLisOrdersOrderIdReportRoute:
     AuthenticatedLisOrdersOrderIdReportRoute,
+  AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute:
+    AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute,
+  AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute:
+    AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute,
   AuthenticatedCodingConceptFacilitiesLevelsIndexRoute:
     AuthenticatedCodingConceptFacilitiesLevelsIndexRoute,
   AuthenticatedCodingConceptFacilitiesLgasIndexRoute:

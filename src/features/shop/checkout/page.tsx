@@ -291,13 +291,27 @@ export default function CheckoutPage() {
         paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
         items: items.map((i) => {
+          // Every line carries all available descriptive fields so the order is
+          // readable before reconciliation: the item name as freetextName, plus
+          // the generic product/drug codes when the hydrated product knows them.
+          const displayName = i.name ?? i.product?.name;
+          const genericProductCode =
+            i.genericProductCode ?? i.product?.genericProduct?.id ?? undefined;
+          const genericDrugCode = i.genericDrugCode ?? i.product?.genericDrugCode ?? undefined;
           if (i.productId) {
-            return { itemId: i.productId, quantity: i.quantity, unitPrice: itemUnitPrice(i) };
+            return {
+              itemId: i.productId,
+              freetextName: displayName,
+              genericProductCode,
+              genericDrugCode,
+              quantity: i.quantity,
+              unitPrice: itemUnitPrice(i),
+            };
           }
           if (i.genericDrugCode) {
             return {
               genericDrugCode: i.genericDrugCode,
-              freetextName: i.name,
+              freetextName: displayName,
               quantity: i.quantity,
               unitPrice: i.unitPrice ?? 0,
             };
@@ -305,12 +319,12 @@ export default function CheckoutPage() {
           if (i.genericProductCode) {
             return {
               genericItemCode: i.genericProductCode,
-              freetextName: i.name,
+              freetextName: displayName,
               quantity: i.quantity,
               unitPrice: i.unitPrice ?? 0,
             };
           }
-          return { freetextName: i.name, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 };
+          return { freetextName: displayName, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 };
         }),
         delivery: {
           address,

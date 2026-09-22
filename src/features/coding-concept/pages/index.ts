@@ -17,3 +17,5 @@ export * from './facility-wards';
 export * from './facility-types';
 export * from './facility-levels';
 export * from './pharmacies';
+export * from './hospitals';
+export * from './laboratories';

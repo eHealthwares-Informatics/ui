@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageSquarePlus, MoreHorizontal } from 'lucide-react';
 import { emrApi } from '@/lib/emr-api';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import { AdmitFromVisitModal } from './admit-from-visit-modal';
 import { VisitCommentsPanel } from './visit-comments';
 
 export function VisitActions({ row }: { row: Record<string, unknown> }) {
@@ -12,6 +13,7 @@ export function VisitActions({ row }: { row: Record<string, unknown> }) {
   const status = String(row.status ?? 'ONGOING');
   const id = String(row.id ?? '');
   const [commentOpened, { open: openComment, close: closeComment }] = useDisclosure(false);
+  const [admitOpened, { open: openAdmit, close: closeAdmit }] = useDisclosure(false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['emr', 'visits'] });
@@ -78,6 +80,7 @@ export function VisitActions({ row }: { row: Record<string, unknown> }) {
           <Menu.Item leftSection={<MessageSquarePlus size={14} />} onClick={openComment}>
             Add comment
           </Menu.Item>
+          <Menu.Item onClick={openAdmit}>Convert to admission…</Menu.Item>
           <Menu.Item onClick={() => endVisit.mutate()}>End visit</Menu.Item>
           <Menu.Item color="red" onClick={() => cancelVisit.mutate()}>
             Cancel visit
@@ -93,6 +96,12 @@ export function VisitActions({ row }: { row: Record<string, unknown> }) {
       >
         <VisitCommentsPanel visitId={id} />
       </Modal>
+      <AdmitFromVisitModal
+        opened={admitOpened}
+        onClose={closeAdmit}
+        visitId={id}
+        patientLabel={String(row.patientName ?? row.patientId ?? 'patient')}
+      />
     </>
   );
 }

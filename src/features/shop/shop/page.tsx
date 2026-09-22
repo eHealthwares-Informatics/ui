@@ -182,7 +182,7 @@ export default function ShopPage({
   presetCategory,
   heading = 'Shop Medicines',
   subheading = 'Browse our catalog of authentic medicines and healthcare products.',
-  defaultSort = 'purchases',
+  defaultSort = 'generic',
 }: ShopPageProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const qFromUrl = urlParams.get('q');
@@ -195,8 +195,8 @@ export default function ShopPage({
     typeof categoryFromUrl === 'string' && categoryFromUrl ? categoryFromUrl : null,
   );
   const [page, setPage] = useState(1);
-  // Defaults to Regularly Purchased (approved spec); server falls back to
-  // createdAt when a sort value is unknown.
+  // Defaults to Generic (image first); the shopper's own sort pick always
+  // wins. Ordering is resolved by the backend (`/website/products?sortBy=`).
   const [sort, setSort] = useState<string>(defaultSort);
   // Compound option values (name_desc / price_desc) split into the API pair.
   const [sortField, sortDirRaw] = sort.split('_');

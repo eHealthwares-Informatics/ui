@@ -2,6 +2,7 @@ import { Button, Group, Modal, Select, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DataPageShell } from '@/features/components/page/data-page-shell';
@@ -14,6 +15,7 @@ import { admissionsConfig } from './schema';
 
 export function AdmissionsPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [discharging, setDischarging] = useState<Admission | null>(null);
   const [transferring, setTransferring] = useState<Admission | null>(null);
@@ -48,6 +50,7 @@ export function AdmissionsPage() {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['emr', 'admissions'] });
     queryClient.invalidateQueries({ queryKey: ['emr', 'beds'] });
+    queryClient.invalidateQueries({ queryKey: ['emr', 'visits'] });
   };
 
   const dischargeMutation = useMutation({
@@ -99,6 +102,20 @@ export function AdmissionsPage() {
         </Button>
       ),
       rowActions: [
+        {
+          label: 'Open Visit',
+          onClick: (row: Record<string, unknown>) => {
+            const visitId = String(row.visitId ?? '');
+            if (visitId) {
+              void navigate({ to: '/emr/visits/$visitId', params: { visitId } });
+            } else {
+              notifications.show({
+                color: 'yellow',
+                message: 'This admission has no linked visit (legacy record)',
+              });
+            }
+          },
+        },
         {
           label: 'Transfer',
           onClick: (row: Record<string, unknown>) => setTransferring(row as unknown as Admission),

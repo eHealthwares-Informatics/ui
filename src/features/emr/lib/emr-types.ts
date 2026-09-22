@@ -300,12 +300,7 @@ export type PatientDetail = {
   isActive: boolean;
 };
 
-export type PaymentProviderType =
-  | 'CASH'
-  | 'HMO'
-  | 'COMPANY'
-  | 'PROGRAM'
-  | 'OTHER';
+export type PaymentProviderType = 'CASH' | 'HMO' | 'COMPANY' | 'PROGRAM' | 'OTHER';
 
 export type PaymentProvider = {
   id: string;
@@ -397,6 +392,14 @@ export type Admission = {
   dischargeType: DischargeType | null;
   dischargeSummary: string | null;
   notes: string | null;
+  /** Admissions extend a visit — encounters/requests attach via this visit. */
+  visitId?: string | null;
+  visit?: {
+    id: string;
+    visitNumber: string;
+    visitType: string;
+    status: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };

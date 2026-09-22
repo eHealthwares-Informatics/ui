@@ -9,6 +9,14 @@ import { ADMISSION_STATUSES, ADMISSION_TYPES, toSelectData } from '../../../lib/
 const columns: Column[] = [
   { key: 'admissionNumber', label: 'Admission #' },
   { ...patientCol() },
+  {
+    key: 'visitId',
+    label: 'Visit #',
+    render: (r) => {
+      const visit = r.visit as { visitNumber?: string } | null | undefined;
+      return visit?.visitNumber ?? '—';
+    },
+  },
   { key: 'wardId', label: 'Ward', render: (r) => <WardCell wardId={String(r.wardId ?? '')} /> },
   { key: 'bedId', label: 'Bed', render: (r) => <BedCell bedId={String(r.bedId ?? '')} /> },
   {

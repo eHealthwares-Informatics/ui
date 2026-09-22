@@ -861,6 +861,18 @@ export const sidebarData: SidebarData = {
           modules: ['coding-concept'],
         },
         {
+          title: 'Hospitals',
+          url: '/coding-concept/facilities/hospitals',
+          icon: Building2,
+          modules: ['coding-concept'],
+        },
+        {
+          title: 'Laboratories',
+          url: '/coding-concept/facilities/laboratories',
+          icon: Building2,
+          modules: ['coding-concept'],
+        },
+        {
           title: 'States',
           url: '/coding-concept/facilities/states',
           icon: Building2,
