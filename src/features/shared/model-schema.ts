@@ -35,6 +35,12 @@ export type ModelConfig<T = any> = {
     rows: Record<string, unknown>[];
     refresh: () => void;
   }) => React.ReactNode;
+  /**
+   * Custom create modal rendered by the built-in New button instead of the
+   * field-group form. Receives an onClose to close and a refresh to reload
+   * the list after creation.
+   */
+  renderCreateModal?: (args: { onClose: () => void; refresh: () => void }) => React.ReactNode;
   transformRows?: (rows: Record<string, unknown>[]) => Record<string, unknown>[];
   canDelete?: boolean;
   canArchive?: boolean;
@@ -53,6 +59,8 @@ export type ModelConfig<T = any> = {
   metricsConfig?: MetricsConfig;
   superAdminOrgFilter?: boolean;
   listParams?: Record<string, unknown>;
+  /** Sort applied until the user picks a column sort from a header. */
+  defaultSort?: { sortBy: string; sortOrder: 'asc' | 'desc' };
   rowActions?: RowAction[];
   /** Query-key prefix used by the data page. Defaults to ['rxsoft-data-page', endpoint]. */
   queryKeyBase?: unknown[];

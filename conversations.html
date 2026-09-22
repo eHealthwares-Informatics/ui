@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Damorex — Conversations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest-900:#0f2e21;
+    --forest-800:#123524;
+    --green-600:#1f8a3c;
+    --green-500:#2f9e44;
+    --green-100:#e5f5e9;
+    --green-50:#f2faf3;
+    --mint-bg:#eef7f0;
+    --ink-900:#12181a;
+    --ink-700:#3c454a;
+    --ink-500:#6b7680;
+    --line:#e3ebe4;
+    --card:#ffffff;
+    --danger:#e0455a;
+    --bubble-in:#f3f6f4;
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:20px;
+    --shadow-sm:0 1px 2px rgba(15,46,33,0.06);
+    --shadow-md:0 8px 24px rgba(15,46,33,0.08);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --forest-900:#0a1a13;
+      --forest-800:#0d2318;
+      --mint-bg:#0f1512;
+      --ink-900:#eef3ee;
+      --ink-700:#c3cdc5;
+      --ink-500:#8a9a8e;
+      --line:#293028;
+      --card:#171e1a;
+      --bubble-in:#212b26;
+      --green-100:#1e3226;
+      --green-50:#162019;
+      --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+      --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --forest-900:#0a1a13;
+    --forest-800:#0d2318;
+    --mint-bg:#0f1512;
+    --ink-900:#eef3ee;
+    --ink-700:#c3cdc5;
+    --ink-500:#8a9a8e;
+    --line:#293028;
+    --card:#171e1a;
+    --bubble-in:#212b26;
+    --green-100:#1e3226;
+    --green-50:#162019;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.35);
+    --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+  }
+  *,*::before,*::after{box-sizing:inherit;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--mint-bg);
+    color:var(--ink-900);
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .2s ease, color .2s ease;
+  }
+  .panel,.navbar,.icon-btn,.icon-toggle,.chip,.conv-item,.bubble,.status-banner,.guest-composer,.sugg-chip{
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease;
+  }
+
+  /* ---------- Top bar (brand chrome, matches reference) ---------- */
+  .topbar{
+    background:var(--forest-900);
+    color:#eaf3ec;
+    padding:8px 24px;
+    padding-top:calc(8px + env(safe-area-inset-top,0px));
+    font-size:12.5px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .topbar .grp{display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+  .topbar .item{display:flex;align-items:center;gap:6px;opacity:.92;}
+
+  .navbar{
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    padding:12px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--green-50);border:1px solid var(--green-100);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .brand-text b{display:block;font-size:16px;font-weight:800;color:var(--forest-800);line-height:1.1;}
+  .brand-text span{display:block;font-size:11px;color:var(--ink-500);font-weight:600;}
+  .nav-links{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink-700);}
+  .nav-links span{cursor:default;}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .avatar-round{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--green-500),var(--forest-800));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;
+  }
+  .icon-toggle{
+    width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:15px;line-height:1;
+  }
+  .icon-toggle:hover{background:var(--mint-bg);}
+  .auth-btn{
+    font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;
+    border:1px solid var(--green-100);color:var(--green-600);background:var(--green-50);
+    cursor:pointer;font-family:inherit;
+  }
+  .auth-btn:hover{background:var(--green-100);}
+
+  /* ---------- Page heading ---------- */
+  .page-head{
+    max-width:1180px;margin:0 auto;padding:20px 24px 0;
+  }
+  .page-head h1{font-size:22px;margin:0 0 2px;color:var(--forest-800);font-weight:800;}
+  .page-head p{margin:0;color:var(--ink-500);font-size:13.5px;}
+
+  /* ---------- App shell ---------- */
+  .shell{
+    max-width:1180px;
+    margin:16px auto 24px;
+    padding:0 24px;
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:16px;
+    height:calc(100vh - 190px);
+    min-height:520px;
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    min-height:0;
+  }
+
+  /* ---------- Conversation list ---------- */
+  .list-head{padding:16px 16px 10px;border-bottom:1px solid var(--line);}
+  .list-head h2{margin:0 0 10px;font-size:15px;font-weight:700;}
+  .search-input{
+    display:flex;align-items:center;gap:8px;
+    background:var(--mint-bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:8px 12px;
+  }
+  .search-input input{
+    border:none;background:transparent;outline:none;font-size:13.5px;
+    font-family:inherit;color:var(--ink-900);width:100%;
+  }
+  .search-input input::placeholder{color:var(--ink-500);}
+
+  .filters{display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);}
+  .chip{
+    font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;
+    border:1px solid var(--line);color:var(--ink-700);background:var(--card);cursor:pointer;
+  }
+  .chip.active{background:var(--green-100);border-color:var(--green-100);color:var(--green-600);}
+
+  .conv-scroll{overflow-y:auto;flex:1;padding:6px;}
+  .conv-item{
+    display:flex;gap:10px;padding:10px;border-radius:var(--radius-md);
+    cursor:pointer;border:1px solid transparent;align-items:flex-start;
+  }
+  .conv-item:hover{background:var(--mint-bg);}
+  .conv-item.active{background:var(--green-50);border-color:var(--green-100);}
+  .conv-avatar{
+    width:40px;height:40px;border-radius:50%;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13.5px;color:#fff;
+  }
+  .conv-body{min-width:0;flex:1;}
+  .conv-top{display:flex;justify-content:space-between;gap:8px;}
+  .conv-name{font-size:13.5px;font-weight:700;color:var(--ink-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .conv-time{font-size:11px;color:var(--ink-500);flex:0 0 auto;}
+  .conv-preview{
+    font-size:12.5px;color:var(--ink-500);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    display:flex;align-items:center;gap:6px;
+  }
+  .conv-tag{
+    font-size:10px;font-weight:700;color:var(--green-600);background:var(--green-100);
+    padding:1px 7px;border-radius:999px;flex:0 0 auto;
+  }
+  .unread-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--green-500);flex:0 0 auto;margin-top:6px;
+  }
+
+  /* ---------- Thread panel ---------- */
+  .thread-head{
+    padding:14px 20px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .thread-who{display:flex;align-items:center;gap:12px;}
+  .thread-name{font-size:14.5px;font-weight:700;}
+  .thread-sub{font-size:12px;color:var(--ink-500);display:flex;align-items:center;gap:6px;margin-top:1px;}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green-500);}
+  .thread-actions{display:flex;gap:8px;}
+  .icon-btn{
+    width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-700);
+  }
+  .icon-btn:hover{background:var(--mint-bg);}
+
+  .status-banner{
+    margin:14px 20px 0;padding:10px 14px;
+    background:var(--green-50);border:1px solid var(--green-100);
+    border-radius:var(--radius-md);
+    display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--forest-800);font-weight:600;
+  }
+  .status-banner .pulse{
+    width:8px;height:8px;border-radius:50%;background:var(--green-500);
+    box-shadow:0 0 0 0 rgba(47,158,68,.5);animation:pulse 1.8s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(47,158,68,.45);}
+    70%{box-shadow:0 0 0 8px rgba(47,158,68,0);}
+    100%{box-shadow:0 0 0 0 rgba(47,158,68,0);}
+  }
+
+  .messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;}
+  .day-sep{align-self:center;font-size:11px;color:var(--ink-500);background:var(--mint-bg);padding:3px 10px;border-radius:999px;}
+  .msg-row{display:flex;gap:8px;max-width:72%;}
+  .msg-row.out{align-self:flex-end;flex-direction:row-reverse;}
+  .msg-avatar{width:26px;height:26px;border-radius:50%;flex:0 0 auto;background:var(--forest-800);}
+  .bubble{
+    padding:10px 14px;border-radius:var(--radius-md);font-size:13.5px;line-height:1.5;
+  }
+  .msg-row.in .bubble{background:var(--bubble-in);color:var(--ink-900);border-bottom-left-radius:4px;}
+  .msg-row.out .bubble{background:var(--green-500);color:#fff;border-bottom-right-radius:4px;}
+  .msg-meta{font-size:10.5px;color:var(--ink-500);margin-top:4px;}
+  .msg-row.out .msg-meta{text-align:right;}
+  .attachment{
+    display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);
+    border-radius:var(--radius-sm);padding:8px 10px;margin-top:6px;font-size:12px;
+  }
+  .msg-row.in .attachment{background:var(--card);border:1px solid var(--line);}
+
+  .composer{
+    border-top:1px solid var(--line);padding:12px 16px;
+    display:flex;align-items:flex-end;gap:10px;
+  }
+  .composer-input{
+    flex:1;background:var(--mint-bg);border:1px solid var(--line);border-radius:var(--radius-md);
+    padding:10px 14px;font-size:13.5px;font-family:inherit;resize:none;outline:none;color:var(--ink-900);
+    max-height:120px;
+  }
+  .composer-input::placeholder{color:var(--ink-500);}
+  .send-btn{
+    background:var(--green-500);color:#fff;border:none;border-radius:var(--radius-md);
+    padding:10px 18px;font-weight:700;font-size:13.5px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;flex:0 0 auto;
+  }
+  .send-btn:hover{background:var(--green-600);}
+  .composer-tools{display:flex;gap:6px;}
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:820px){
+    .nav-links{display:none;}
+    .shell{grid-template-columns:1fr;height:calc(100vh - 150px);}
+    .panel.list-panel{display:flex;}
+    .panel.thread-panel{display:none;}
+    .shell.show-thread .panel.list-panel{display:none;}
+    .shell.show-thread .panel.thread-panel{display:flex;}
+    .back-btn{display:inline-flex;}
+  }
+  .back-btn{
+    display:none;align-items:center;justify-content:center;width:32px;height:32px;
+    border-radius:8px;border:1px solid var(--line);background:var(--card);margin-right:4px;cursor:pointer;
+  }
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:#d7e3d9;border-radius:8px;}
+
+  /* ---------- Guest (not logged in) — centered composer, Claude-chat style ---------- */
+  .guest-wrap{
+    max-width:640px;
+    margin:0 auto;
+    height:calc(100vh - 132px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:24px;
+  }
+  .guest-wrap.chatting{justify-content:flex-end;}
+  .guest-welcome{text-align:center;margin-bottom:22px;}
+  .guest-welcome .brand-mark{width:52px;height:52px;font-size:24px;margin:0 auto 16px;}
+  .guest-title{font-size:25px;font-weight:800;color:var(--forest-800);margin:0 0 8px;}
+  .guest-sub{color:var(--ink-500);font-size:13.5px;margin:0;line-height:1.55;}
+  .guest-messages{
+    flex:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;
+  }
+  .guest-wrap.chatting .guest-messages{flex:1;margin-bottom:16px;padding-top:8px;}
+  .guest-composer{
+    display:flex;align-items:flex-end;gap:10px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:10px 12px;box-shadow:var(--shadow-md);
+  }
+  .guest-suggestions{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .guest-wrap.chatting .guest-welcome,
+  .guest-wrap.chatting .guest-suggestions,
+  .guest-wrap.chatting .guest-login-note{display:none;}
+  .sugg-chip{
+    font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;
+    border:1px solid var(--line);color:var(--ink-700);background:var(--card);cursor:pointer;
+  }
+  .sugg-chip:hover{background:var(--mint-bg);}
+  .guest-login-note{text-align:center;font-size:12.5px;color:var(--ink-500);margin-top:16px;}
+  .guest-login-note a{color:var(--green-600);font-weight:700;text-decoration:none;cursor:pointer;}
+  .guest-login-note a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="grp">
+      <div class="item">🕐 Open 24 Hours</div>
+      <div class="item">🚚 Free delivery above ₦10,000</div>
+    </div>
+    <div class="grp">
+      <div class="item">💬 WhatsApp support</div>
+      <div class="item">📍 Lagos, Ogun and Oyo</div>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <div class="brand">
+      <div class="brand-mark">🌿</div>
+      <div class="brand-text">
+        <b>Damorex</b>
+        <span>Rx Online Pharmacy</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <span>Shop</span>
+      <span>My Health</span>
+      <span style="color:var(--green-600);">Conversations</span>
+      <span>Contact</span>
+    </div>
+    <div class="nav-right">
+      <button class="icon-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+      <button class="auth-btn" id="authToggle">Log out</button>
+      <div class="avatar-round" id="avatarBtn">CU</div>
+    </div>
+  </div>
+
+  <div id="appShellView">
+
+  <div class="page-head">
+    <h1>Conversations</h1>
+    <p>Message your pharmacist, track prescription reviews, and get delivery updates in one place.</p>
+  </div>
+
+  <div class="shell" id="shell">
+
+    <!-- Conversation list -->
+    <div class="panel list-panel">
+      <div class="list-head">
+        <h2>Inbox</h2>
+        <div class="search-input">
+          <span>🔍</span>
+          <input type="text" placeholder="Search conversations..." id="searchBox">
+        </div>
+      </div>
+      <div class="filters">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="unread">Unread</div>
+        <div class="chip" data-filter="pharmacist">Pharmacist</div>
+        <div class="chip" data-filter="orders">Orders</div>
+      </div>
+      <div class="conv-scroll" id="convList"></div>
+    </div>
+
+    <!-- Thread -->
+    <div class="panel thread-panel">
+      <div class="thread-head">
+        <div class="thread-who">
+          <button class="back-btn" id="backBtn">←</button>
+          <div class="conv-avatar" id="threadAvatar" style="background:var(--forest-800);">PT</div>
+          <div>
+            <div class="thread-name" id="threadName">Pharm. Tolu Adeyemi</div>
+            <div class="thread-sub"><span class="status-dot"></span><span id="threadSub">Pharmacist · Online</span></div>
+          </div>
+        </div>
+        <div class="thread-actions">
+          <div class="icon-btn">📞</div>
+          <div class="icon-btn">⋯</div>
+        </div>
+      </div>
+
+      <div class="status-banner" id="statusBanner">
+        <span class="pulse"></span>
+        <span id="statusText">Pharmacist review in progress — your prescription is being checked.</span>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="composer">
+        <div class="composer-tools">
+          <div class="icon-btn" title="Upload prescription">📎</div>
+        </div>
+        <textarea class="composer-input" id="composerInput" rows="1" placeholder="Type a message..."></textarea>
+        <button class="send-btn" id="sendBtn">Send</button>
+      </div>
+    </div>
+
+  </div>
+
+  </div><!-- /appShellView -->
+
+  <div id="guestView" style="display:none;">
+    <div class="guest-wrap" id="guestWrap">
+      <div class="guest-welcome">
+        <div class="brand-mark">🌿</div>
+        <h1 class="guest-title">Talk to a Damorex pharmacist</h1>
+        <p class="guest-sub">Ask about a medication, track an order, or upload a prescription. Sign in to see your full conversation history.</p>
+      </div>
+
+      <div class="guest-messages" id="guestMessages"></div>
+
+      <div class="guest-composer">
+        <div class="composer-tools">
+          <div class="icon-btn" title="Upload prescription">📎</div>
+        </div>
+        <textarea class="composer-input" id="guestInput" rows="1" placeholder="Ask a question..."></textarea>
+        <button class="send-btn" id="guestSend">Send</button>
+      </div>
+
+      <div class="guest-suggestions" id="guestSuggestions">
+        <div class="sugg-chip" data-q="Where is my order?">Track my order</div>
+        <div class="sugg-chip" data-q="Is it safe to take paracetamol with amoxicillin?">Ask about a medication</div>
+        <div class="sugg-chip" data-q="I'd like to upload a prescription">Upload a prescription</div>
+      </div>
+
+      <p class="guest-login-note">Already have an account? <a id="guestLoginLink">Log in</a></p>
+    </div>
+  </div>
+
+<script>
+const conversations = [
+  {
+    id:1, name:"Pharm. Tolu Adeyemi", role:"Pharmacist · Online", tag:"Pharmacist",
+    initials:"TA", color:"#123524", time:"2m", unread:2,
+    preview:"Your dosage has been confirmed, dispatching now.",
+    status:"Pharmacist review in progress — your prescription is being checked.",
+    messages:[
+      {from:"in", text:"Hi! I've received your uploaded prescription for review.", time:"10:02 AM"},
+      {from:"out", text:"Thank you, please let me know if you need anything else.", time:"10:03 AM"},
+      {from:"in", text:"Everything checks out. Confirming dosage: Amoxicillin 500mg, 3x daily for 7 days.", time:"10:11 AM"},
+      {from:"in", text:"Your dosage has been confirmed, dispatching now.", time:"10:12 AM", attach:"Prescription_review.pdf"}
+    ]
+  },
+  {
+    id:2, name:"Damorex Delivery", role:"Support · Order #DX-4471", tag:"Orders",
+    initials:"DD", color:"#2f9e44", time:"38m", unread:0,
+    preview:"Your rider is 12 minutes away.",
+    status:"Same-day dispatch — order en route to Ikeja GRA.",
+    messages:[
+      {from:"in", text:"Your order #DX-4471 has been dispatched.", time:"9:20 AM"},
+      {from:"in", text:"Your rider is 12 minutes away.", time:"9:48 AM"}
+    ]
+  },
+  {
+    id:3, name:"Pharm. Ngozi Bello", role:"Pharmacist · Offline", tag:"Pharmacist",
+    initials:"NB", color:"#3c454a", time:"Yesterday", unread:0,
+    preview:"You can take it with food to reduce discomfort.",
+    status:"Consultation closed — follow up anytime.",
+    messages:[
+      {from:"out", text:"Is it okay to take this medication on an empty stomach?", time:"Yesterday · 4:10 PM"},
+      {from:"in", text:"You can take it with food to reduce discomfort.", time:"Yesterday · 4:15 PM"}
+    ]
+  },
+  {
+    id:4, name:"Billing & Insurance", role:"Support", tag:"Orders",
+    initials:"BI", color:"#6b7680", time:"2d", unread:0,
+    preview:"Your HMO claim has been approved.",
+    status:"Claim approved — no action needed.",
+    messages:[
+      {from:"in", text:"Your HMO claim has been approved.", time:"Mon · 1:00 PM"}
+    ]
+  }
+];
+
+let activeId = 1;
+
+function renderList(filter="all", query=""){
+  const listEl = document.getElementById("convList");
+  listEl.innerHTML = "";
+  conversations
+    .filter(c => filter==="all" ? true : filter==="unread" ? c.unread>0 : c.tag.toLowerCase()===filter)
+    .filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
+    .forEach(c => {
+      const item = document.createElement("div");
+      item.className = "conv-item" + (c.id===activeId ? " active" : "");
+      item.innerHTML = `
+        <div class="conv-avatar" style="background:${c.color}">${c.initials}</div>
+        <div class="conv-body">
+          <div class="conv-top">
+            <span class="conv-name">${c.name}</span>
+            <span class="conv-time">${c.time}</span>
+          </div>
+          <div class="conv-preview">
+            <span class="conv-tag">${c.tag}</span>
+            <span>${c.preview}</span>
+          </div>
+        </div>
+        ${c.unread>0 ? '<div class="unread-dot"></div>' : ''}
+      `;
+      item.addEventListener("click", () => selectConversation(c.id));
+      listEl.appendChild(item);
+    });
+}
+
+function renderThread(){
+  const c = conversations.find(x => x.id===activeId);
+  if(!c) return;
+  document.getElementById("threadAvatar").textContent = c.initials;
+  document.getElementById("threadAvatar").style.background = c.color;
+  document.getElementById("threadName").textContent = c.name;
+  document.getElementById("threadSub").textContent = c.role;
+  document.getElementById("statusText").textContent = c.status;
+
+  const msgEl = document.getElementById("messages");
+  msgEl.innerHTML = '<div class="day-sep">Today</div>';
+  c.messages.forEach(m => {
+    const row = document.createElement("div");
+    row.className = "msg-row " + m.from;
+    row.innerHTML = `
+      <div class="msg-avatar" style="background:${m.from==='in' ? c.color : 'var(--green-500)'}"></div>
+      <div>
+        <div class="bubble">
+          ${m.text}
+          ${m.attach ? `<div class="attachment">📄 ${m.attach}</div>` : ''}
+        </div>
+        <div class="msg-meta">${m.time}</div>
+      </div>
+    `;
+    msgEl.appendChild(row);
+  });
+  msgEl.scrollTop = msgEl.scrollHeight;
+}
+
+function selectConversation(id){
+  activeId = id;
+  const c = conversations.find(x => x.id===id);
+  if(c) c.unread = 0;
+  renderList(currentFilter, document.getElementById("searchBox").value);
+  renderThread();
+  document.getElementById("shell").classList.add("show-thread");
+}
+
+let currentFilter = "all";
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    currentFilter = chip.dataset.filter;
+    renderList(currentFilter, document.getElementById("searchBox").value);
+  });
+});
+
+document.getElementById("searchBox").addEventListener("input", (e) => {
+  renderList(currentFilter, e.target.value);
+});
+
+document.getElementById("backBtn").addEventListener("click", () => {
+  document.getElementById("shell").classList.remove("show-thread");
+});
+
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+document.getElementById("composerInput").addEventListener("keydown", (e) => {
+  if(e.key==="Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+function sendMessage(){
+  const input = document.getElementById("composerInput");
+  const text = input.value.trim();
+  if(!text) return;
+  const c = conversations.find(x => x.id===activeId);
+  c.messages.push({from:"out", text, time:"Now"});
+  c.preview = text;
+  input.value = "";
+  renderThread();
+  renderList(currentFilter, document.getElementById("searchBox").value);
+}
+
+renderList();
+renderThread();
+
+/* ---------------- Theme toggle (dark / light) ---------------- */
+function applyThemeIcon(){
+  const explicit = document.documentElement.getAttribute("data-theme");
+  const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const isDark = explicit ? explicit === "dark" : systemDark;
+  document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+}
+(function initTheme(){
+  let stored = null;
+  try{ stored = localStorage.getItem("damorex-theme"); }catch(e){}
+  if(stored === "dark" || stored === "light"){
+    document.documentElement.setAttribute("data-theme", stored);
+  }
+  applyThemeIcon();
+})();
+document.getElementById("themeToggle").addEventListener("click", () => {
+  const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const current = document.documentElement.getAttribute("data-theme") || (systemDark ? "dark" : "light");
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("damorex-theme", next); }catch(e){}
+  applyThemeIcon();
+});
+
+/* ---------------- Auth state (logged in vs guest) ---------------- */
+let isLoggedIn = true;
+function setLoggedIn(v){
+  isLoggedIn = v;
+  document.getElementById("appShellView").style.display = v ? "" : "none";
+  document.getElementById("guestView").style.display = v ? "none" : "";
+  document.getElementById("avatarBtn").style.display = v ? "flex" : "none";
+  document.getElementById("authToggle").textContent = v ? "Log out" : "Log in";
+}
+document.getElementById("authToggle").addEventListener("click", () => setLoggedIn(!isLoggedIn));
+document.getElementById("guestLoginLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  setLoggedIn(true);
+});
+
+/* ---------------- Guest (logged-out) centered chat ---------------- */
+const guestWrap = document.getElementById("guestWrap");
+const guestMessagesEl = document.getElementById("guestMessages");
+const guestInput = document.getElementById("guestInput");
+
+function addGuestMessage(from, text){
+  const row = document.createElement("div");
+  row.className = "msg-row " + from;
+  row.innerHTML = `
+    <div class="msg-avatar" style="background:${from==='in' ? 'var(--forest-800)' : 'var(--green-500)'}"></div>
+    <div>
+      <div class="bubble">${text}</div>
+      <div class="msg-meta">Now</div>
+    </div>
+  `;
+  guestMessagesEl.appendChild(row);
+  guestMessagesEl.scrollTop = guestMessagesEl.scrollHeight;
+}
+
+function sendGuestMessage(text){
+  text = (text || guestInput.value).trim();
+  if(!text) return;
+  guestWrap.classList.add("chatting");
+  addGuestMessage("out", text);
+  guestInput.value = "";
+  setTimeout(() => {
+    addGuestMessage("in", "Thanks for reaching out! A licensed pharmacist will review this shortly. Sign in to keep this conversation saved to your account.");
+  }, 700);
+}
+
+document.getElementById("guestSend").addEventListener("click", () => sendGuestMessage());
+guestInput.addEventListener("keydown", (e) => {
+  if(e.key==="Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendGuestMessage();
+  }
+});
+document.querySelectorAll(".sugg-chip").forEach(chip => {
+  chip.addEventListener("click", () => sendGuestMessage(chip.dataset.q));
+});
+
+/* Start logged out by default so the centered composer is visible first */
+setLoggedIn(false);
+</script>
+</body>
+</html>

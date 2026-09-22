@@ -55,7 +55,8 @@ export function RxAIConfigPage() {
         <div>
           <Title order={3}>AI Configuration</Title>
           <Text size="sm" c="dimmed">
-            Current provider settings — configured via environment variables.
+            Current routing defaults and provider status. Models and API keys are
+            managed under AI → Models.
           </Text>
         </div>
       </Group>

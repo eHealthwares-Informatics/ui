@@ -2,6 +2,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { websiteApi } from '@/features/shop/website/api';
 import type { CreateSaleDto } from '../types';
 
 export const salesKeys = {
@@ -103,9 +104,16 @@ export const webProviderKeys = {
 };
 
 export function useWebPaymentProviders(channel: 'web' | 'pos' = 'web') {
+  const isWebsiteStorefront = channel === 'web';
   return useQuery({
     queryKey: webProviderKeys.list(channel),
     queryFn: async () => {
+      // The storefront must use the public website client: the admin-facing
+      // /payment-providers/available endpoint is JwtAuthGuard-protected and
+      // its 401 handler would bounce shoppers to /sign-in mid-checkout.
+      if (isWebsiteStorefront) {
+        return websiteApi.listPaymentProviders();
+      }
       const { data } = await rxsoftApi.get('/payment-providers/available', { params: { channel } });
       return (Array.isArray(data) ? data : data?.data ?? []) as Array<{
         id: string;

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { IdentityPage } from '@/features/identity/pages';
+import { ModuleDashboardPage } from '@/features/rxsoft/pages/module-dashboard/page';
 
 export const Route = createFileRoute('/_authenticated/identity/dashboard')({
-  component: IdentityPage,
+  component: () => <ModuleDashboardPage moduleId="identity" />,
 });

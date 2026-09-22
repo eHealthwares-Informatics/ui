@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useDebouncedValue } from '@mantine/hooks';
+import { useEffect, useMemo } from 'react';
 import { websiteApi } from './api';
+import { resolveBranding, resolveContact } from './branding';
+import { useCartStore } from './cart-store';
 
 // ── Homepage ─────────────────────────────────────────────────────
 
@@ -30,6 +33,24 @@ export function useProduct(id: string) {
     queryKey: ['website', 'product', id],
     queryFn: () => websiteApi.getProduct(id),
     enabled: !!id,
+  });
+}
+
+// ── Drug Classifications (4 labeled sources) ──────────────────────
+
+export function useClassifications(type?: string) {
+  return useQuery({
+    queryKey: ['website', 'classifications', type ?? 'all'],
+    queryFn: () => websiteApi.listClassifications(type),
+    staleTime: 30 * 60 * 1000,
+  });
+}
+
+export function useClassificationDetail(code: string) {
+  return useQuery({
+    queryKey: ['website', 'classifications', 'detail', code],
+    queryFn: () => websiteApi.getClassificationDetail(code),
+    enabled: !!code,
   });
 }
 
@@ -299,4 +320,107 @@ export function useSearch(q: string, type?: string) {
     queryFn: () => websiteApi.search(debounced, type),
     enabled: debounced.length >= 2,
   });
+}
+
+// ── Cart product hydration ───────────────────────────────────────
+
+export function useCartProductIds(): string[] {
+  // Select the stable items reference, then derive ids — a selector that
+  // builds a new array per call re-renders on every store update.
+  const items = useCartStore((s) => s.items);
+  return useMemo(
+    () =>
+      items
+        .map((i) => i.productId)
+        .filter((id): id is string => !!id)
+        .sort(),
+    [items],
+  );
+}
+
+// Resolves real product names/prices for cart lines by fetching
+// /website/cart?ids= once per unique id-set, then writing name + unitPrice
+// back onto the cart items. This both labels the checkout/cart pages and
+// repairs legacy persisted carts that stored bare { productId, quantity }.
+export function useCartProductHydration() {
+  const ids = useCartProductIds();
+  const key = ids.join(',');
+
+  // Write-through: patch name/unitPrice (and the embedded product snapshot)
+  // onto each cart item. needsPatch guards against re-render loops.
+  useEffect(() => {
+    if (ids.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const products = await websiteApi.getCartProducts(ids);
+        if (cancelled) return;
+        const byId = new Map(products.map((p) => [p.id, p]));
+        const store = useCartStore.getState();
+        for (const item of store.items) {
+          if (!item.productId) continue;
+          const p = byId.get(item.productId);
+          if (!p) continue;
+          const price = p.unitPrice != null ? Number(p.unitPrice) : undefined;
+          const needsPatch =
+            item.name !== p.name ||
+            item.unitPrice !== price ||
+            (item.product as any)?.unitPrice !== price ||
+            item.product?.isPrescriptionRequired !== p.isPrescriptionRequired;
+          if (needsPatch) {
+            store.updateItemDetails(item.productId, {
+              name: p.name,
+              unitPrice: price,
+              product: p,
+            });
+          }
+        }
+      } catch {
+        // Public endpoint failing (offline, network) leaves mock fallbacks in
+        // place; the UI still renders.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+}
+
+// ── Storefront branding (website name + logo) ────────────────────
+
+export function useWebsiteSettings() {
+  return useQuery({
+    queryKey: ['website', 'settings'],
+    queryFn: websiteApi.getSettings,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
+ * Resolves the storefront name/logo (with defaults) and applies them to the
+ * document: the website name becomes the tab title and the logo becomes the
+ * favicon. Shared by the website layout, header and footer.
+ */
+export function useWebsiteBranding() {
+  const { data } = useWebsiteSettings();
+  const { websiteName, logoUrl } = resolveBranding(data);
+
+  useEffect(() => {
+    document.title = websiteName;
+  }, [websiteName]);
+
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (link && logoUrl) {
+      link.href = logoUrl;
+    }
+  }, [logoUrl]);
+
+  return { websiteName, logoUrl };
+}
+
+/** Resolved storefront contact details (with defaults) for the website pages. */
+export function useWebsiteContact() {
+  const { data } = useWebsiteSettings();
+  return resolveContact(data);
 }

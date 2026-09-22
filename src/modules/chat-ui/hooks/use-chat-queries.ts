@@ -15,8 +15,8 @@ import type {
 } from '../types';
 
 export const chatKeys = {
-  inbox: (search: string, status?: string, channelId?: string) =>
-    ['conversation-inbox', { search, status, channelId }] as const,
+  inbox: (search: string, status?: string, channelId?: string, participantId?: string) =>
+    ['conversation-inbox', { search, status, channelId, participantId }] as const,
   messages: (conversationId?: string) => ['conversation-messages', conversationId] as const,
   projections: (conversationId?: string) => ['projections', conversationId] as const,
   pending: (conversationId?: string) => ['pending-exchanges', conversationId] as const,
@@ -26,15 +26,20 @@ export function useConversationInbox(
   search: string,
   status?: string,
   channelId?: string,
+  participantId?: string,
 ) {
   return useQuery({
-    queryKey: chatKeys.inbox(search, status, channelId),
+    queryKey: chatKeys.inbox(search, status, channelId, participantId),
     queryFn: () =>
       fetchConversationInbox({
         search: search.trim() || undefined,
         status: status || undefined,
         channelId: channelId || undefined,
+        participantId: participantId || undefined,
       }),
+    // Keep the inbox cached while navigating between threads.
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
   });
 }
 
@@ -49,7 +54,23 @@ export function useConversationMessages(conversationId?: string) {
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    // Client-cached infinite scroll: staleTime avoids refetching fresh pages
+    // on revisit, while event-invalidated threads still refetch on mount.
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
   });
+}
+
+/**
+ * Flatten the paginated exchanges into a chronological (oldest → newest)
+ * message list, ready for rendering in a bottom-anchored thread.
+ */
+export function useConversationThread(conversationId?: string) {
+  const query = useConversationMessages(conversationId);
+  const messages = (query.data?.pages.flatMap((page) => page.items) ?? [])
+    .slice()
+    .reverse();
+  return { ...query, messages };
 }
 
 export function usePendingExchanges(conversationId?: string) {

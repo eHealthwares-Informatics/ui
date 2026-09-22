@@ -1,14 +1,17 @@
-import { ActionIcon, Menu } from '@mantine/core';
+import { ActionIcon, Menu, Modal } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal } from 'lucide-react';
+import { MessageSquarePlus, MoreHorizontal } from 'lucide-react';
 import { emrApi } from '@/lib/emr-api';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import { VisitCommentsPanel } from './visit-comments';
 
 export function VisitActions({ row }: { row: Record<string, unknown> }) {
   const queryClient = useQueryClient();
   const status = String(row.status ?? 'ONGOING');
   const id = String(row.id ?? '');
+  const [commentOpened, { open: openComment, close: closeComment }] = useDisclosure(false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['emr', 'visits'] });
@@ -45,22 +48,51 @@ export function VisitActions({ row }: { row: Record<string, unknown> }) {
   });
 
   if (status !== 'ONGOING') {
-    return <ActionIcon variant="subtle" color="gray" disabled aria-label="No actions"><MoreHorizontal size={16} /></ActionIcon>;
+    return (
+      <>
+        <ActionIcon variant="subtle" aria-label="Visit actions" onClick={openComment}>
+          <MessageSquarePlus size={16} />
+        </ActionIcon>
+        <Modal
+          opened={commentOpened}
+          onClose={closeComment}
+          title="Visit comments"
+          size="md"
+          centered
+        >
+          <VisitCommentsPanel visitId={id} />
+        </Modal>
+      </>
+    );
   }
 
   return (
-    <Menu position="bottom-end" withinPortal>
-      <Menu.Target>
-        <ActionIcon variant="subtle" aria-label="Visit actions">
-          <MoreHorizontal size={16} />
-        </ActionIcon>
-      </Menu.Target>
-      <Menu.Dropdown>
-        <Menu.Item onClick={() => endVisit.mutate()}>End visit</Menu.Item>
-        <Menu.Item color="red" onClick={() => cancelVisit.mutate()}>
-          Cancel visit
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+    <>
+      <Menu position="bottom-end" withinPortal>
+        <Menu.Target>
+          <ActionIcon variant="subtle" aria-label="Visit actions">
+            <MoreHorizontal size={16} />
+          </ActionIcon>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item leftSection={<MessageSquarePlus size={14} />} onClick={openComment}>
+            Add comment
+          </Menu.Item>
+          <Menu.Item onClick={() => endVisit.mutate()}>End visit</Menu.Item>
+          <Menu.Item color="red" onClick={() => cancelVisit.mutate()}>
+            Cancel visit
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+      <Modal
+        opened={commentOpened}
+        onClose={closeComment}
+        title="Visit comments"
+        size="md"
+        centered
+      >
+        <VisitCommentsPanel visitId={id} />
+      </Modal>
+    </>
   );
 }

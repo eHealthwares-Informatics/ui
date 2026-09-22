@@ -56,6 +56,8 @@ import {
   chatKeys,
 } from '../hooks/use-chat-queries';
 import { useChatSocket } from '../hooks/use-chat-socket';
+import { useReplyingAnimation } from '@/lib/use-replying-animation';
+import { TypingBubble } from '@/components/typing-dots';
 import { addProjection, findParticipantByPhone, createParticipant, listProjections, sendWebhookMessage } from '../services/chat-api';
 import { AddProjectionModal } from '../components/add-projection-modal';
 import { ParticipantModal } from '../components/participant-modal';
@@ -698,7 +700,21 @@ function ConversationThread(props: {
     () => (messagesQuery.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse(),
     [messagesQuery.data],
   );
-  const groupedMessages = useMemo(() => groupMessagesByDate(messages), [messages]);
+  // Lag inbound replies behind a typing indicator; history shows immediately.
+  const { visible: visibleMessages, replying } = useReplyingAnimation(messages, {
+    key: props.conversation?.conversationId ?? null,
+    isIncoming: (message) => message.direction === 'outbound',
+    getText: (message) => message.text,
+  });
+  const groupedMessages = useMemo(
+    () => groupMessagesByDate(visibleMessages),
+    [visibleMessages],
+  );
+  const showTyping =
+    replying ||
+    Boolean(props.typingParticipantId) ||
+    sendMessage.isPending ||
+    messagesQuery.isLoading;
   const senderId =
     props.mode === 'admin'
       ? projections.find(p => p.isPrimary)?.participant.id
@@ -822,15 +838,23 @@ function ConversationThread(props: {
                 </Text>
               </Center>
             ) : (
-              composeThread.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                  onOptionSelect={(value) => {
-                    void sendComposeText(value);
-                  }}
-                />
-              ))
+              <>
+                {composeThread.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    onOptionSelect={(value) => {
+                      void sendComposeText(value);
+                    }}
+                  />
+                ))}
+                {composeSending && (
+                  <TypingBubble
+                    background="var(--mantine-color-gray-1)"
+                    color="var(--mantine-color-blue-6)"
+                  />
+                )}
+              </>
             )}
           </Stack>
         </ScrollArea>
@@ -956,7 +980,19 @@ function ConversationThread(props: {
         </Group>
       </Group>
 
-      <ScrollArea flex={1} viewportRef={viewportRef}>
+      <ScrollArea
+        flex={1}
+        viewportRef={viewportRef}
+        onScrollPositionChange={({ y }) => {
+          if (
+            y <= 40 &&
+            messagesQuery.hasNextPage &&
+            !messagesQuery.isFetchingNextPage
+          ) {
+            void fetchOlderMessages();
+          }
+        }}
+      >
         <Stack gap="sm" p="md">
           {messagesQuery.hasNextPage && (
             <Center>
@@ -997,7 +1033,7 @@ function ConversationThread(props: {
             </Alert>
           )}
 
-          {!messagesQuery.isLoading && messages.length === 0 && (
+          {!messagesQuery.isLoading && visibleMessages.length === 0 && (
             <Center h={320}>
               <Stack align="center" gap="xs">
                 <MessagesSquare size={34} />
@@ -1031,10 +1067,11 @@ function ConversationThread(props: {
             </Fragment>
           ))}
 
-          {props.typingParticipantId && (
-            <Text c="dimmed" fs="italic" size="sm">
-              Typing...
-            </Text>
+          {showTyping && (
+            <TypingBubble
+              background="var(--mantine-color-gray-1)"
+              color="var(--mantine-color-blue-6)"
+            />
           )}
         </Stack>
       </ScrollArea>

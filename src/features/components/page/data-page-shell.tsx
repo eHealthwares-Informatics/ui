@@ -12,6 +12,7 @@ import { collectFields } from '@/features/shared/payload-utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { JsonPreviewDialog } from '../../rxsoft';
 import { FILTERS, type FilterValue } from '../../rxsoft/types';
+import { triggerBlobDownload } from '../export/download';
 import { useFormContext } from '../form/form-context';
 import { ModalDataForm } from '../form/ModalDataForm';
 import {
@@ -24,7 +25,6 @@ import { HeaderBar } from '../table/HeaderBar';
 import { MetricsBar } from '../table/MetricsBar';
 import { Pagination } from '../table/pagination';
 import { DataTable } from '../table/table';
-import { triggerBlobDownload } from '../export/download';
 import { getArrayPayload } from '../utils';
 import { InfoDrawer } from './info-drawer';
 import { RxPage } from './rx-page';
@@ -82,6 +82,8 @@ export function DataPageShell(props: DataPageShellProps) {
     metricsConfig,
     superAdminOrgFilter,
     queryKeyBase,
+    defaultSort,
+    renderCreateModal,
   } = config;
   const moduleContext = useModuleContext();
   const listKeyBase = queryKeyBase ?? ['rxsoft-data-page', endpoint];
@@ -155,8 +157,8 @@ export function DataPageShell(props: DataPageShellProps) {
   const [helpOpen, setHelpOpen] = useState(false);
   const helpInfo = entityInfoMap[config.id] ?? null;
 
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const [sortBy, setSortBy] = useState<string | null>(defaultSort?.sortBy ?? null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(defaultSort?.sortOrder ?? null);
   const handleSortChange = (key: string, order: 'asc' | 'desc' | null) => {
     setSortBy(order ? key : null);
     setSortOrder(order);
@@ -169,7 +171,13 @@ export function DataPageShell(props: DataPageShellProps) {
     const columnKeys = new Set(columns.map((c) => c.key));
     const initial: Record<string, FilterValue | null> = {};
     params.forEach((value, key) => {
-      if (key === 'search' || key === 'page' || key === 'limit' || key === 'sortBy' || key === 'sortOrder') {
+      if (
+        key === 'search' ||
+        key === 'page' ||
+        key === 'limit' ||
+        key === 'sortBy' ||
+        key === 'sortOrder'
+      ) {
         return; // skip reserved params
       }
       if (columnKeys.has(key) && value) {
@@ -206,7 +214,7 @@ export function DataPageShell(props: DataPageShellProps) {
     staleTime: 120_000,
   });
 
-  const hasCreate = Boolean(tabGroups || createFields || createFieldGroups);
+  const hasCreate = Boolean(tabGroups || createFields || createFieldGroups || renderCreateModal);
   const hasInlineEdit = hasCreate && !editPathBuilder;
   const hasFilterableColumns = columns.some((c) => c.filters && c.filters.length > 0);
 
@@ -400,7 +408,7 @@ export function DataPageShell(props: DataPageShellProps) {
       await triggerBlobDownload(
         apiProvider!,
         { method: 'GET', url: pdfEndpoint, params: exportParams },
-        `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`,
+        `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`
       );
       notifications.show({ message: `${title} export downloaded` });
     } catch {
@@ -532,20 +540,29 @@ export function DataPageShell(props: DataPageShellProps) {
         onPageChange={setPageIndex}
         onPageSizeChange={setPageSize}
       />
-      <ModalDataForm
-        editingRow={editingRow}
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={title}
-        tabGroups={tabGroups}
-        fieldGroups={fieldGroups}
-        formState={effectiveFormState}
-        setFormState={effectiveSetFormState}
-        updateField={effectiveUpdateField}
-        mutation={editingRow ? updateMutation : createMutation}
-        modalTitle={modalTitle}
-        renderCreateExtras={renderCreateExtras}
-      />
+      {renderCreateModal && showModal && !editingRow ? (
+        renderCreateModal({
+          onClose: () => setShowModal(false),
+          refresh: () => {
+            query.refetch();
+          },
+        })
+      ) : (
+        <ModalDataForm
+          editingRow={editingRow}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          title={title}
+          tabGroups={tabGroups}
+          fieldGroups={fieldGroups}
+          formState={effectiveFormState}
+          setFormState={effectiveSetFormState}
+          updateField={effectiveUpdateField}
+          mutation={editingRow ? updateMutation : createMutation}
+          modalTitle={modalTitle}
+          renderCreateExtras={renderCreateExtras}
+        />
+      )}
 
       <ConfirmDialog
         title={`Delete ${title}`}

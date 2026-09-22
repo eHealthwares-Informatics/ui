@@ -13,7 +13,11 @@ interface SavedItem {
 interface CartStore {
   items: CartItem[];
   savedForLater: SavedItem[];
-  addItem: (productId: string, quantity?: number) => void;
+  addItem: (
+    productId: string,
+    quantity?: number,
+    details?: { name?: string; unitPrice?: number; product?: CartItem['product'] },
+  ) => void;
   addGenericItem: (entry: {
     name?: string;
     genericProductCode: string;
@@ -26,6 +30,10 @@ interface CartStore {
     unitPrice?: number;
     quantity?: number;
   }) => void;
+  updateItemDetails: (
+    productId: string,
+    details: { name?: string; unitPrice?: number; product?: CartItem['product'] },
+  ) => void;
   updateQuantity: (productId: string | undefined, quantity: number) => void;
   removeItem: (productId: string | undefined) => void;
   clearCart: () => void;
@@ -45,7 +53,7 @@ function lineKey(i: CartItem): string | undefined {
 
 function computeSubtotal(items: CartItem[]): number {
   return items.reduce(
-    (sum, i) => sum + ((i.product as any)?.price ?? i.unitPrice ?? 0) * i.quantity,
+    (sum, i) => sum + ((i.product as any)?.unitPrice ?? i.unitPrice ?? 0) * i.quantity,
     0,
   );
 }
@@ -58,7 +66,7 @@ export const useCartStore = create<CartStore>()(
       totalItems: 0,
       subtotal: 0,
 
-      addItem: (productId, quantity = 1) => {
+      addItem: (productId, quantity = 1, details) => {
         set((state) => {
           const existing = state.items.find((i) => i.productId === productId);
           let items: CartItem[];
@@ -67,7 +75,7 @@ export const useCartStore = create<CartStore>()(
               i.productId === productId ? { ...i, quantity: i.quantity + quantity } : i
             );
           } else {
-            items = [...state.items, { productId, quantity }];
+            items = [...state.items, { productId, quantity, ...(details ?? {}) }];
           }
           return {
             items,
@@ -119,7 +127,20 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateItemDetails: (productId, details) => {
+    set((state) => {
+      const items = state.items.map((i) =>
+        i.productId === productId ? { ...i, ...details } : i,
+      );
+      return {
+        items,
+        totalItems: items.reduce((sum, i) => sum + i.quantity, 0),
+        subtotal: computeSubtotal(items),
+      }; 
+    });
+  },
+
+  updateQuantity: (productId, quantity) => {
         set((state) => {
           const keyed = (i: CartItem) => lineKey(i) === productId;
           if (quantity <= 0) {

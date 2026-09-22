@@ -8,8 +8,10 @@ import {
   Cog,
   Command,
   ContactRound,
+  Cpu,
   CreditCard,
   FileText,
+  Server,
   GitBranch,
   HandCoins,
   LayoutDashboard,
@@ -338,6 +340,12 @@ export const sidebarData: SidebarData = {
         {
           title: 'Payment Providers',
           url: '/rxsoft/payment-providers',
+          icon: Wallet,
+          modules: ['rxsoft'],
+        },
+        {
+          title: 'Organisation Payment Providers',
+          url: '/rxsoft/organisation-payment-providers',
           icon: Wallet,
           modules: ['rxsoft'],
         },
@@ -678,6 +686,24 @@ export const sidebarData: SidebarData = {
       icon: Brain,
       items: [
         {
+          title: 'Providers',
+          url: '/conversation/ai/providers',
+          icon: Server,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Models',
+          url: '/conversation/ai/models',
+          icon: Cpu,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Processors',
+          url: '/conversation/ai/processors',
+          icon: Boxes,
+          modules: ['conversation'],
+        },
+        {
           title: 'Instructions',
           url: '/conversation/ai/instructions',
           icon: Brain,
@@ -687,6 +713,18 @@ export const sidebarData: SidebarData = {
           title: 'Eval Logs',
           url: '/conversation/ai/eval-logs',
           icon: FileText,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Costs',
+          url: '/conversation/ai/costs',
+          icon: ChartColumn,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Request Logs',
+          url: '/conversation/ai/request-logs',
+          icon: Receipt,
           modules: ['conversation'],
         },
         {
@@ -1056,6 +1094,33 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
+      title: 'EMR',
+      icon: HeartPulse,
+      items: [
+        { title: 'Dashboard', url: '/emr', icon: LayoutDashboard, modules: ['emr'] },
+        {
+          title: 'Appointments',
+          url: '/emr/appointments',
+          icon: CalendarDays,
+          modules: ['emr'],
+        },
+        { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr'] },
+        { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr'] },
+        {
+          title: 'Encounters',
+          url: '/emr/encounters',
+          icon: Stethoscope,
+          modules: ['emr'],
+        },
+        {
+          title: 'Clinical Requests',
+          url: '/emr/requests',
+          icon: FilePlus2,
+          modules: ['emr'],
+        },
+      ],
+    },
+    {
       title: 'Wards',
       icon: Bed,
       items: [
@@ -1092,17 +1157,9 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'EMR',
-      icon: HeartPulse,
+      title: 'Configuration',
+      icon: Cog,
       items: [
-        { title: 'Dashboard', url: '/emr', icon: LayoutDashboard, modules: ['emr'] },
-        {
-          title: 'Appointments',
-          url: '/emr/appointments',
-          icon: CalendarDays,
-          modules: ['emr'],
-        },
-        { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr'] },
         { title: 'Staff', url: '/emr/staff', icon: UserCog, modules: ['emr'] },
         {
           title: 'Departments',
@@ -1110,20 +1167,8 @@ export const sidebarData: SidebarData = {
           icon: Building2,
           modules: ['emr'],
         },
-        { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr'] },
-        {
-          title: 'Encounters',
-          url: '/emr/encounters',
-          icon: Stethoscope,
-          modules: ['emr'],
-        },
         { title: 'Forms', url: '/emr/forms', icon: FileSpreadsheet, modules: ['emr'] },
-        {
-          title: 'Clinical Requests',
-          url: '/emr/requests',
-          icon: FilePlus2,
-          modules: ['emr'],
-        },
+        { title: 'Tags', url: '/emr/tags', icon: Tags, modules: ['emr'] },
       ],
     },
   ],

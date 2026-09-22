@@ -20,3 +20,8 @@ export * from './components/workflows';
 export * from './components/ai-instructions';
 export * from './components/ai-eval-logs';
 export * from './components/ai-config';
+export * from './components/ai-costs';
+export * from './components/ai-request-logs';
+export * from './components/ai-models';
+export * from './components/ai-processors';
+export * from './components/ai-providers';

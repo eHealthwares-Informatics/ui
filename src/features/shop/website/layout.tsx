@@ -8,32 +8,45 @@ import {
   Divider,
   Group,
   Image,
-  Menu,
+  Popover,
   Stack,
   Text,
   ThemeIcon,
   VisuallyHidden,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useModuleTitle } from '@/features/shared/use-module-title';
 import { ChatbotWidget } from './chatbot-widget';
 import {
   ChevronDown,
   Clock3,
+  HeartPulse,
+  Hospital,
+  LayoutGrid,
+  Mail,
+  MapPinned,
   MapPin,
   MessageCircle,
+  MessagesSquare,
+  Newspaper,
+  Package,
+  Phone,
+  Pill,
   ShieldCheck,
+  ShoppingBag,
+  ShoppingBasket,
   ShoppingCart,
+  Stethoscope,
   Truck,
   Upload,
   User,
 } from 'lucide-react';
-import logoImage from '../sample_images/sample_logo.png';
+import { useWebsiteBranding, useWebsiteContact } from './hooks';
 import AccountDrawer from './account-drawer';
 import { useAccountDrawerStore } from './account-drawer-store';
 import { useCartStore } from './cart-store';
-import { GenericSearchInput } from './generic-search';
+import { ExpandableSearch } from './generic-search';
 
 export const green = '#16A34A';
 export const darkGreen = '#0F6F35';
@@ -46,26 +59,50 @@ export const blue = '#0EA5E9';
 const navMenus = [
   {
     label: 'Shop',
+    icon: ShoppingBag,
+    color: '#16A34A',
+    desc: 'Browse our catalog of authentic medicines and healthcare products.',
+    learnMore: '/shop/shop',
     items: [
-      { label: 'Shop Products', path: '/shop/shop' },
-      { label: 'Shop Medicines', path: '/shop/medicines' },
-      { label: 'Shop Supermarket Items', path: '/shop/categories/supermarket-essentials' },
-      { label: 'Categories', path: '/shop/categories' },
+      { label: 'Shop Products', path: '/shop/shop', icon: Package, color: '#16A34A', desc: 'Browse our full catalog of medicines and healthcare products' },
+      { label: 'Shop Medicines', path: '/shop/medicines', icon: Pill, color: '#0EA5E9', desc: 'Browse medicines by generic name and find available brands' },
+      { label: 'Shop Supermarket Items', path: '/shop/supermarket', icon: ShoppingBasket, color: '#D97706', desc: 'Essential everyday items and supermarket products' },
+      { label: 'Categories', path: '/shop/categories', icon: LayoutGrid, color: '#7C3AED', desc: 'Browse products by category and therapeutic class' },
     ],
   },
   {
     label: 'My Health',
+    icon: HeartPulse,
+    color: '#E11D48',
+    desc: 'Access health information, consultations, and wellness resources.',
+    learnMore: '/shop/health-concerns',
     items: [
-      { label: 'Health Concerns', path: '/shop/health-concerns' },
-      { label: 'Blog', path: '/shop/blog' },
+      { label: 'Health Concerns', path: '/shop/health-concerns', icon: Stethoscope, color: '#E11D48', desc: 'Find medicines and advice for common health conditions' },
+      { label: 'Blog', path: '/shop/blog', icon: Newspaper, color: '#0EA5E9', desc: 'Read health tips, news, and pharmacy insights' },
+    ],
+  },
+  {
+    label: 'Facility Locator',
+    icon: MapPinned,
+    color: '#0D9488',
+    desc: 'Find registered hospitals, clinics and pharmacies near you.',
+    learnMore: '/shop/facility-locator',
+    items: [
+      { label: 'Health Facility/Hospital Locator', path: '/shop/facility-locator', icon: Hospital, color: '#0D9488', desc: 'Search hospitals and clinics by name and location' },
+      { label: 'Pharmacy Drug Store Locator', path: '/shop/pharmacy-locator', icon: Pill, color: '#D97706', desc: 'Find licensed pharmacies and drug stores near you' },
     ],
   },
   {
     label: 'Contact',
+    icon: Phone,
+    color: '#0EA5E9',
+    desc: 'Get in touch with our pharmacists and support team.',
+    learnMore: '/shop/contact',
     items: [
-      { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist' },
-      { label: 'Contact Us', path: '/shop/contact' },
-      { label: 'Delivery Areas', path: '/shop/delivery-areas' },
+      { label: 'Conversational shopping', path: '/shop/conversation', icon: MessagesSquare, color: '#0EA5E9', desc: 'Chat with our pharmacist and shop through the conversation' },
+      { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist', icon: MessageCircle, color: '#16A34A', desc: 'Speak with a licensed pharmacist online' },
+      { label: 'Contact Us', path: '/shop/contact', icon: Mail, color: '#D97706', desc: 'Reach our customer support team' },
+      { label: 'Delivery Areas', path: '/shop/delivery-areas', icon: Truck, color: '#7C3AED', desc: 'Check delivery coverage and areas' },
     ],
   },
 ];
@@ -79,8 +116,13 @@ export const buttonStyles = {
 
 export function WebsiteHeader() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
+  const [cartHovered, { open: openCartHover, close: closeCartHover }] =
+    useDisclosure(false);
+  const { websiteName, logoUrl } = useWebsiteBranding();
   const openAccount = useAccountDrawerStore((s) => s.open);
   const totalItems = useCartStore((s) => s.totalItems);
+  const cartItems = useCartStore((s) => s.items);
+  const cartSubtotal = useCartStore((s) => s.subtotal);
   const navigate = useNavigate();
 
   return (
@@ -164,11 +206,11 @@ export function WebsiteHeader() {
                     boxShadow: '0 12px 24px rgba(22, 163, 74, 0.12)',
                   }}
                 >
-                  <Image src={logoImage} alt="Damorex logo" fit="cover" h="100%" />
+                  <Image src={logoUrl} alt={`${websiteName} logo`} fit="cover" h="100%" />
                 </Box>
                 <Box>
                   <Text fw={900} size="xl" c={ink} lh={1}>
-                    Damorex
+                    {websiteName}
                   </Text>
                   <Text size="xs" c={green} fw={800} lh={1.1}>
                     Rx Online Pharmacy
@@ -178,35 +220,155 @@ export function WebsiteHeader() {
             </Group>
 
             <Group visibleFrom="lg" gap={8} wrap="nowrap">
-              {navMenus.map((menu) => (
-                <Menu key={menu.label} position="bottom-start" width={240} shadow="md" offset={6}>
-                  <Menu.Target>
-                    <Button
-                      variant="subtle"
-                      color="dark"
-                      fw={800}
-                      radius="xl"
-                      size="sm"
-                      rightSection={<ChevronDown size={14} />}
+              {navMenus.map((menu) => {
+                const MenuIcon = menu.icon;
+                return (
+                  <Popover
+                    key={menu.label}
+                    position="bottom-start"
+                    width={1140}
+                    shadow="lg"
+                    offset={12}
+                    withArrow
+                  >
+                    <Popover.Target>
+                      <Button
+                        variant="subtle"
+                        color="dark"
+                        fw={800}
+                        radius="xl"
+                        size="sm"
+                        leftSection={<MenuIcon size={16} style={{ color: menu.color }} />}
+                        rightSection={<ChevronDown size={14} />}
+                        style={{
+                          transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
+                        }}
+                      >
+                        {menu.label}
+                      </Button>
+                    </Popover.Target>
+                    <Popover.Dropdown
+                      style={{
+                        padding: 0,
+                        borderRadius: 16,
+                        overflow: 'hidden',
+                        border: `1px solid ${line}`,
+                      }}
                     >
-                      {menu.label}
-                    </Button>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    {menu.items.map((item) => (
-                      <Menu.Item key={item.path} onClick={() => navigate({ to: item.path })}>
-                        {item.label}
-                      </Menu.Item>
-                    ))}
-                  </Menu.Dropdown>
-                </Menu>
-              ))}
+                      <Box style={{ display: 'flex', minHeight: 280 }}>
+                        {/* Left section: title, description, learn more */}
+                        <Box
+                          style={{
+                            flex: '0 0 260px',
+                            padding: '28px 24px',
+                            background: soft,
+                            borderRight: `1px solid ${line}`,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            gap: 12,
+                          }}
+                        >
+                          <Group gap={8} wrap="nowrap">
+                            <Box
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 10,
+                                background: `${menu.color}18`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <MenuIcon size={18} style={{ color: menu.color }} />
+                            </Box>
+                            <Text fw={900} size="lg" style={{ color: ink, letterSpacing: '-0.02em' }}>
+                              {menu.label}
+                            </Text>
+                          </Group>
+                          <Text size="sm" style={{ color: muted, lineHeight: 1.6 }}>
+                            {menu.desc}
+                          </Text>
+                          <Anchor
+                            size="sm"
+                            fw={700}
+                            style={{ color: green, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                            onClick={() => navigate({ to: menu.learnMore })}
+                          >
+                            Learn more <ChevronDown size={12} style={{ transform: 'rotate(-90deg)' }} />
+                          </Anchor>
+                        </Box>
+
+                        {/* Right section: grid of items */}
+                        <Box
+                          style={{
+                            flex: 1,
+                            padding: '20px 24px',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gap: 4,
+                            alignContent: 'start',
+                          }}
+                        >
+                          {menu.items.map((item) => {
+                            const ItemIcon = item.icon;
+                            return (
+                              <Box
+                                key={item.path}
+                                onClick={() => navigate({ to: item.path })}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  gap: 12,
+                                  padding: '12px 12px',
+                                  borderRadius: 10,
+                                  cursor: 'pointer',
+                                  transition: 'background 150ms ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  (e.currentTarget.style.background = '#f0f7f3');
+                                }}
+                                onMouseLeave={(e) => {
+                                  (e.currentTarget.style.background = 'transparent');
+                                }}
+                              >
+                                <Box
+                                  style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 10,
+                                    background: `${item.color}14`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <ItemIcon size={18} style={{ color: item.color }} aria-hidden />
+                                </Box>
+                                <Stack gap={2} style={{ flex: 1 }}>
+                                  <Text fw={700} size="sm" style={{ color: ink, lineHeight: 1.3 }}>
+                                    {item.label}
+                                  </Text>
+                                  <Text size="xs" style={{ color: muted, lineHeight: 1.4 }}>
+                                    {item.desc}
+                                  </Text>
+                                </Stack>
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    </Popover.Dropdown>
+                  </Popover>
+                );
+              })}
             </Group>
 
             <Group gap={8} wrap="nowrap">
-              <Box visibleFrom="md" style={{ width: 220 }}>
-                <GenericSearchInput
-                  compact
+              <Box visibleFrom="md" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ExpandableSearch
                   onSelect={(gp) =>
                     navigate({ to: '/shop/shop', search: { gp: gp as any } })
                   }
@@ -236,37 +398,181 @@ export function WebsiteHeader() {
               >
                 <User size={20} />
               </ActionIcon>
-              <ActionIcon
-                variant="filled"
-                color="green"
-                radius="xl"
-                aria-label="Cart"
-                style={{ background: green, position: 'relative' }}
-                onClick={() => navigate({ to: '/shop/cart' })}
+              <Popover
+                width={330}
+                position="bottom-end"
+                withArrow
+                shadow="md"
+                withinPortal
+                offset={10}
+                opened={cartHovered}
+                onChange={(next) => {
+                  if (!next) closeCartHover();
+                }}
+                trapFocus={false}
+                closeOnClickOutside={false}
               >
-                <ShoppingCart size={20} />
-                {totalItems > 0 ? (
+                <Popover.Target>
                   <Box
-                    style={{
-                      position: 'absolute',
-                      top: -4,
-                      right: -4,
-                      width: 18,
-                      height: 18,
-                      borderRadius: '50%',
-                      background: '#EF4444',
-                      color: '#fff',
-                      fontSize: 10,
-                      fontWeight: 900,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                    onMouseEnter={openCartHover}
+                    onMouseLeave={closeCartHover}
+                    style={{ display: 'inline-flex', position: 'relative' }}
                   >
-                    {totalItems > 99 ? '99+' : totalItems}
+                    <ActionIcon
+                      variant="filled"
+                      color="green"
+                      radius="xl"
+                      aria-label="Cart"
+                      style={{ background: green, position: 'relative' }}
+                      onClick={() => {
+                        closeCartHover();
+                        navigate({ to: '/shop/cart' });
+                      }}
+                    >
+                      <ShoppingCart size={20} />
+                      {totalItems > 0 ? (
+                        <Box
+                          style={{
+                            position: 'absolute',
+                            top: -4,
+                            right: -4,
+                            width: 18,
+                            height: 18,
+                            borderRadius: '50%',
+                            background: '#EF4444',
+                            color: '#fff',
+                            fontSize: 10,
+                            fontWeight: 900,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {totalItems > 99 ? '99+' : totalItems}
+                        </Box>
+                      ) : null}
+                    </ActionIcon>
                   </Box>
-                ) : null}
-              </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown
+                  onMouseEnter={openCartHover}
+                  onMouseLeave={closeCartHover}
+                  style={{
+                    padding: 0,
+                    borderRadius: 14,
+                    border: `1px solid ${line}`,
+                    overflow: 'hidden',
+                    cursor: 'default',
+                  }}
+                >
+                  {cartItems.length === 0 ? (
+                    <Stack gap={6} px="md" py="lg" align="center">
+                      <ShoppingCart size={22} style={{ color: muted }} />
+                      <Text size="sm" fw={700} c={ink}>
+                        Your cart is empty
+                      </Text>
+                      <Text size="xs" c={muted} ta="center">
+                        Browse medicines and supermarket items to get started.
+                      </Text>
+                    </Stack>
+                  ) : (
+                    <>
+                      <Box
+                        px="md"
+                        py={10}
+                        style={{
+                          background: soft,
+                          borderBottom: `1px solid ${line}`,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text size="sm" fw={800} c={ink}>
+                          Cart summary
+                        </Text>
+                        <Text size="xs" c={muted}>
+                          {totalItems} item{totalItems === 1 ? '' : 's'}
+                        </Text>
+                      </Box>
+                      <Box
+                        px="md"
+                        style={{
+                          maxHeight: 240,
+                          overflowY: 'auto',
+                          paddingTop: 8,
+                          paddingBottom: 8,
+                        }}
+                      >
+                        <Stack gap={8}>
+                          {cartItems.map((item, index) => {
+                            const name =
+                              item.name ??
+                              (item.product as { name?: string } | undefined)?.name ??
+                              'Item';
+                            const unitPrice =
+                              (item.product as { unitPrice?: number } | undefined)
+                                ?.unitPrice ??
+                              item.unitPrice ??
+                              0;
+                            return (
+                              <Group
+                                key={`${item.productId ?? item.genericProductCode ?? item.genericDrugCode ?? 'line'}-${index}`}
+                                justify="space-between"
+                                wrap="nowrap"
+                                gap={10}
+                              >
+                                <Box style={{ flex: 1, minWidth: 0 }}>
+                                  <Text size="sm" fw={600} c={ink} lineClamp={1}>
+                                    {name}
+                                  </Text>
+                                  <Text size="xs" c={muted}>
+                                    {item.quantity} × ₦{Number(unitPrice).toLocaleString()}
+                                  </Text>
+                                </Box>
+                                <Text size="sm" fw={700} c={green} style={{ flexShrink: 0 }}>
+                                  ₦{(Number(unitPrice) * item.quantity).toLocaleString()}
+                                </Text>
+                              </Group>
+                            );
+                          })}
+                        </Stack>
+                      </Box>
+                      <Box
+                        px="md"
+                        py={10}
+                        style={{
+                          borderTop: `1px solid ${line}`,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text size="sm" fw={700} c={ink}>
+                          Subtotal
+                        </Text>
+                        <Text size="sm" fw={900} c={green}>
+                          ₦{Number(cartSubtotal).toLocaleString()}
+                        </Text>
+                      </Box>
+                      <Box px="md" pb="md">
+                        <Button
+                          fullWidth
+                          radius="md"
+                          color="green"
+                          styles={buttonStyles}
+                          onClick={() => {
+                            closeCartHover();
+                            navigate({ to: '/shop/cart' });
+                          }}
+                        >
+                          View cart
+                        </Button>
+                      </Box>
+                    </>
+                  )}
+                </Popover.Dropdown>
+              </Popover>
             </Group>
           </Group>
 
@@ -277,23 +583,29 @@ export function WebsiteHeader() {
                   <Text fw={900} size="sm" c={green} mt={8}>
                     {menu.label}
                   </Text>
-                  {menu.items.map((item) => (
-                    <Anchor
-                      key={item.path}
-                      onClick={() => {
-                        navigate({ to: item.path });
-                        toggleMobile();
-                      }}
-                      underline="never"
-                      c={ink}
-                      fw={700}
-                      py={6}
-                      pl={12}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {item.label}
-                    </Anchor>
-                  ))}
+                  {menu.items.map((item) => {
+                    const ItemIcon = item.icon;
+                    return (
+                      <Anchor
+                        key={item.path}
+                        onClick={() => {
+                          navigate({ to: item.path });
+                          toggleMobile();
+                        }}
+                        underline="never"
+                        c={ink}
+                        fw={700}
+                        py={6}
+                        pl={12}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <Group gap={8} wrap="nowrap">
+                          <ItemIcon size={16} style={{ color: item.color }} aria-hidden />
+                          {item.label}
+                        </Group>
+                      </Anchor>
+                    );
+                  })}
                 </Box>
               ))}
               <Anchor
@@ -333,6 +645,8 @@ export function WebsiteHeader() {
 
 export function WebsiteFooter() {
   const navigate = useNavigate();
+  const { websiteName, logoUrl } = useWebsiteBranding();
+  const { contactPhone, contactEmail, contactWhatsApp } = useWebsiteContact();
 
   return (
     <Box
@@ -362,11 +676,11 @@ export function WebsiteFooter() {
                     background: '#fff',
                   }}
                 >
-                  <Image src={logoImage} alt="Damorex logo" fit="cover" h="100%" />
+                  <Image src={logoUrl} alt={`${websiteName} logo`} fit="cover" h="100%" />
                 </Box>
                 <Box>
                   <Text fw={900} size="xl" c="#fff" lh={1}>
-                    Damorex
+                    {websiteName}
                   </Text>
                   <Text size="xs" c={green} fw={800} lh={1.1}>
                     Rx Online Pharmacy
@@ -450,14 +764,14 @@ export function WebsiteFooter() {
               <Text fw={900} c="#fff">
                 Contact
               </Text>
-              <Anchor href="tel:+2348000000000" c="rgba(255,255,255,0.68)" underline="never">
+              <Anchor href={`tel:${contactPhone}`} c="rgba(255,255,255,0.68)" underline="never">
                 Phone
               </Anchor>
-              <Anchor href="mailto:hello@damorex.com" c="rgba(255,255,255,0.68)" underline="never">
+              <Anchor href={`mailto:${contactEmail}`} c="rgba(255,255,255,0.68)" underline="never">
                 Email
               </Anchor>
               <Anchor
-                href="https://wa.me/2348000000000"
+                href={`https://wa.me/${contactWhatsApp.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 c="rgba(255,255,255,0.68)"
                 underline="never"
@@ -479,7 +793,7 @@ export function WebsiteFooter() {
         <Divider my="xl" color="rgba(255,255,255,0.14)" />
         <Group justify="space-between">
           <Text size="sm" c="rgba(255,255,255,0.58)">
-            &copy; Damorex. All rights reserved.
+            &copy; {websiteName}. All rights reserved.
           </Text>
           <Group gap={8}>
             <VisuallyHidden>Delivery and support channels</VisuallyHidden>
@@ -488,7 +802,7 @@ export function WebsiteFooter() {
               color="green"
               variant="light"
               style={{ cursor: 'pointer' }}
-              onClick={() => window.open('https://wa.me/2348000000000', '_blank')}
+              onClick={() => window.open(`https://wa.me/${contactWhatsApp.replace(/[^0-9]/g, '')}`, '_blank')}
             >
               <MessageCircle size={18} />
             </ThemeIcon>
@@ -519,9 +833,12 @@ export function WebsiteFooter() {
 
 export function WebsiteLayout({ children }: { children: React.ReactNode }) {
   useModuleTitle('damorex');
+  useWebsiteBranding();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const showWidget = pathname !== '/shop/conversation';
   return (
     <>
-      <ChatbotWidget />
+      {showWidget && <ChatbotWidget />}
     <Box
       style={{
         background:

@@ -20,6 +20,10 @@ export interface WebsiteAuthStore {
   logout: () => void;
   login: (username: string, password: string) => Promise<void>;
   register: (data: { username: string; email?: string; phone?: string; password: string }) => Promise<void>;
+  requestOtp: (phone: string) => Promise<{ sent: boolean; channel: string; code?: string }>;
+  verifyOtp: (phone: string, code: string) => Promise<void>;
+  googleSignIn: (accessToken: string) => Promise<void>;
+  facebookSignIn: (accessToken: string) => Promise<void>;
 }
 
 function decodeToken(token: string): WebsiteUser {
@@ -71,6 +75,31 @@ export const useAuthStore = create<WebsiteAuthStore>()(
 
       register: async (data) => {
         const res = await websiteApi.register(data);
+        persistTokens(res.accessToken, res.refreshToken);
+        const user = decodeToken(res.accessToken);
+        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+      },
+
+      requestOtp: async (phone) => {
+        return websiteApi.requestOtp({ phone, channel: 'sms' });
+      },
+
+      verifyOtp: async (phone, code) => {
+        const res = await websiteApi.verifyOtp({ phone, code });
+        persistTokens(res.accessToken, res.refreshToken);
+        const user = decodeToken(res.accessToken);
+        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+      },
+
+      googleSignIn: async (accessToken) => {
+        const res = await websiteApi.googleSignIn(accessToken);
+        persistTokens(res.accessToken, res.refreshToken);
+        const user = decodeToken(res.accessToken);
+        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+      },
+
+      facebookSignIn: async (accessToken) => {
+        const res = await websiteApi.facebookSignIn(accessToken);
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
         set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });

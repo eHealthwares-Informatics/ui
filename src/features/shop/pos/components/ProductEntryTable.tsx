@@ -512,6 +512,7 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId, dispe
             <Table.Th w={50}>Image</Table.Th>
             {isDispense && <Table.Th>ORDERED</Table.Th>}
             <Table.Th>{isDispense ? 'ITEM (SOLD)' : 'ITEM CODE'}</Table.Th>
+            {!isDispense && <Table.Th>PRODUCT</Table.Th>}
             <Table.Th>StockQty</Table.Th>
             <Table.Th>RtPrice</Table.Th>
             <Table.Th>UOM</Table.Th>

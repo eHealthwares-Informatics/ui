@@ -55,6 +55,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -440,7 +441,14 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
             </Stack>
           </form>
           ) : (
-            <OnboardOrganisation onBack={() => setMode('signin')} />
+            <OnboardOrganisation
+              onBack={(prefillUsername) => {
+                if (prefillUsername) {
+                  setValue('username', prefillUsername);
+                }
+                setMode('signin');
+              }}
+            />
           )}
         </Box>
       </Box>

@@ -261,6 +261,13 @@ export default function DamorexPage() {
   const [phone, setPhone] = useState('');
   const [subscribing, setSubscribing] = useState(false);
   const navigate = useNavigate();
+
+  // Category cards land on the shop listing with the category pre-filtered
+  // (the slug-based detail page is no longer the primary target).
+  const goCategory = (slug: string) =>
+    slug === 'supermarket-essentials'
+      ? navigate({ to: '/shop/supermarket' })
+      : navigate({ to: '/shop/shop', search: { category: slug } as any });
   const { data: trendingData } = useProducts({ limit: 4 });
   const { data: catalogData } = useProducts({ limit: 8 });
   const trendingProducts = trendingData?.data ?? [];
@@ -717,7 +724,7 @@ export default function DamorexPage() {
                       background: '#fff',
                       cursor: 'pointer',
                     }}
-                    onClick={() => navigate({ to: `/shop/categories/${item.slug}` })}
+                    onClick={() => goCategory(item.slug)}
                   >
                     <Group justify="space-between" wrap="nowrap">
                       <Group gap="md" wrap="nowrap">
@@ -738,7 +745,7 @@ export default function DamorexPage() {
                         variant="light"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate({ to: `/shop/categories/${item.slug}` });
+                          goCategory(item.slug);
                         }}
                       >
                         <ChevronRight size={18} />
@@ -786,9 +793,7 @@ export default function DamorexPage() {
                       cursor: 'pointer',
                       transition: 'transform 220ms, box-shadow 220ms',
                     }}
-                    onClick={() =>
-                      navigate({ to: `/shop/categories/${item.slug}` })
-                    }
+                    onClick={() => goCategory(item.slug)}
                   >
                     <Stack align="center" gap={4} py="md" px={6}>
                       <ThemeIcon radius="xl" size={48} color="green" variant="light">
@@ -892,7 +897,9 @@ export default function DamorexPage() {
                       styles={buttonStyles}
                       style={{ background: green }}
                       onClick={() => {
-                        useCartStore.getState().addItem(item.id);
+                        useCartStore
+                          .getState()
+                          .addItem(item.id, 1, { name: item.name, product: item as any });
                         notifications.show({
                           message: 'Added to cart',
                           color: 'green',
@@ -1010,10 +1017,15 @@ export default function DamorexPage() {
                     fullWidth
                     leftSection={<ShoppingCart size={16} />}
                     styles={buttonStyles}
-                    style={{ background: green, marginTop: 4 }}
-                    onClick={(e) => {
+                    style={{ background: green, marginTop: 4 }}                      onClick={(e) => {
                       e.stopPropagation();
-                      useCartStore.getState().addItem(product.id);
+                      useCartStore
+                        .getState()
+                        .addItem(product.id, 1, {
+                          name: product.name,
+                          unitPrice: (product as any).unitPrice ?? undefined,
+                          product: product as any,
+                        });
                       notifications.show({
                         message: 'Added to cart',
                         color: 'green',
@@ -1206,10 +1218,15 @@ export default function DamorexPage() {
                     fullWidth
                     leftSection={<ShoppingCart size={16} />}
                     styles={buttonStyles}
-                    style={{ background: green, marginTop: 6 }}
-                    onClick={(e) => {
+                    style={{ background: green, marginTop: 6 }}                      onClick={(e) => {
                       e.stopPropagation();
-                      useCartStore.getState().addItem(product.id);
+                      useCartStore
+                        .getState()
+                        .addItem(product.id, 1, {
+                          name: product.name,
+                          unitPrice: (product as any).unitPrice ?? undefined,
+                          product: product as any,
+                        });
                       notifications.show({
                         message: 'Added to cart',
                         color: 'green',

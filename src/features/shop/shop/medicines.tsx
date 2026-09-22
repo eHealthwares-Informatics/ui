@@ -9,7 +9,6 @@ import {
   Group,
   HoverCard,
   Input,
-  Pagination,
   Select,
   SimpleGrid,
   Stack,
@@ -22,8 +21,9 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, Pill, Search, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { BrandCountLink } from '../website/components';
 import { websiteApi } from '../website/api';
-import { useGenericDrugs, useTherapeuticClasses } from '../website/hooks';
+import { useGenericDrugs, useTherapeuticClasses, useClassifications } from '../website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -33,90 +33,57 @@ import {
   buttonStyles,
 } from '../website/layout';
 import { useCartStore } from '../website/cart-store';
+import { ListPagination } from '../website/components';
+
 import { SkeletonCards } from '../website/loaders';
 import { GenericDrugView } from '../website/types';
 
-function BrandCountLink({ code, brandCount }: { code: string; brandCount: number }) {
-  const navigate = useNavigate();
-  const [hovered, setHovered] = useState(false);
-  const { data } = useQuery({
-    queryKey: ['generic-drug-brands', code],
-    queryFn: () => websiteApi.getGenericDrug(code),
-    enabled: hovered,
-    staleTime: 60_000,
-  });
-  const brands = data?.similarBrands ?? [];
-
-  return (
-    <HoverCard
-      width={280}
-      shadow="md"
-      position="bottom-start"
-      openDelay={120}
-      closeDelay={50}
-      onOpen={() => setHovered(true)}
-      onClose={() => setHovered(false)}
-    >
-      <HoverCard.Target>
-        <Anchor
-          size="sm"
-          c={green}
-          fw={700}
-          onClick={() => navigate({ to: '/shop/medicines/$code', params: { code } })}
-        >
-          {brandCount} brand{brandCount === 1 ? '' : 's'}
-        </Anchor>
-      </HoverCard.Target>
-      <HoverCard.Dropdown>
-        <Stack gap={4} p="xs">
-          <Text size="xs" fw={700} c="dimmed" tt="uppercase">
-            Brands under this generic
-          </Text>
-          {brands.length === 0 ? (
-            <Text size="xs" c="dimmed">
-              Loading brands…
-            </Text>
-          ) : (
-            brands.slice(0, 6).map((b) => (
-              <Group key={b.id} justify="space-between" wrap="nowrap" gap={8}>
-                <Text size="xs" fw={500} lineClamp={1} style={{ flex: 1 }}>
-                  {b.name}
-                </Text>
-                <Text size="xs" c={green} style={{ flexShrink: 0 }}>
-                  {b.unitPrice != null ? `₦${Number(b.unitPrice).toLocaleString()}` : '—'}
-                </Text>
-              </Group>
-            ))
-          )}
-        </Stack>
-      </HoverCard.Dropdown>
-    </HoverCard>
-  );
-}
+const CLASSIFICATION_SOURCES: Record<string, string> = {
+  therapeutic: 'drugs.com',
+  pharmaceutical: 'goodrx',
+  ndf: 'NDF/EDL',
+  emdex: 'EMDEx (ATC)',
+};
 
 export default function ShopMedicinesPage() {
   const [search, setSearch] = useState('');
   const [tClass, setTClass] = useState<string | null>(null);
+  const [classification, setClassification] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const { data, isLoading } = useGenericDrugs({
     search,
     therapeuticClass: tClass || '',
+    classificationCode: classification || '',
     page,
     limit: 20,
   });
   const { data: classesData } = useTherapeuticClasses();
+  const { data: therapeuticCls } = useClassifications('therapeutic');
+  const { data: pharmaceuticalCls } = useClassifications('pharmaceutical');
+  const { data: ndfCls } = useClassifications('ndf');
+  const { data: emdexCls } = useClassifications('emdex');
   const addGenericDrug = useCartStore((s) => s.addGenericDrug);
 
   const list = data?.data ?? [];
+
+  // Unified classification options: one select combining all four labeled
+  // sources (each classification keeps its source type for display).
+  const classificationOptions = [
+    ...(therapeuticCls?.data ?? []).map((c) => ({ value: c.code, label: `[Therapeutic] ${c.name}`, type: c.type })),
+    ...(pharmaceuticalCls?.data ?? []).map((c) => ({ value: c.code, label: `[Pharmaceutical] ${c.name}`, type: c.type })),
+    ...(ndfCls?.data ?? []).map((c) => ({ value: c.code, label: `[NDF/EDL] ${c.name}`, type: c.type })),
+    ...(emdexCls?.data ?? []).map((c) => ({ value: c.code, label: `[EMDEx] ${c.name}`, type: c.type })),
+  ];
+  const selectedClassification = classificationOptions.find((o) => o.value === classification);
 
   const classOptions = (() => {
     const seen = new Set<string>();
     const out: Array<{ value: string; label: string }> = [];
     for (const c of classesData?.data ?? []) {
       for (const label of [c.genericClass, c.pharmaceuticalClass]) {
-        if (!label) {continue;}
-        if (seen.has(label)) {continue;}
+        if (!label) { continue; }
+        if (seen.has(label)) { continue; }
         seen.add(label);
         out.push({ value: label, label });
       }
@@ -163,24 +130,71 @@ export default function ShopMedicinesPage() {
 
           <Group align="center" grow>
             <Box style={{ flex: 3 }}>
-              <PaperSearch search={search} onSearchChange={onSearchChange} />
-            </Box>
+              {/* <PaperSearch search={search} onSearchChange={onSearchChange} /> */}
+              <Stack
+                p="md"
+                style={{
+                  background: '#F7FBF9',
+                  borderRadius: 24,
+                  border: `1px solid ${line}`,
+                }}
+              >
+                <Group align="center">
+                  <ThemeIcon radius="xl" size={40} color="green" variant="light">
+                    <Pill size={20} />
+                  </ThemeIcon>
+                  <Input
+                    placeholder="Search medicines by generic name or code..."
+                    size="sm"
+                    radius="xl"
+                    value={search}
+                    onChange={(e) => {
+                      onSearchChange(e.currentTarget.value);
+                    }}
+                    leftSection={<Search size={18} />}
+                    style={{ flex: 1 }}
+                    styles={{ input: { borderColor: '#CFE5D7', color: ink } }}
+                  />  
             <Box style={{ flex: 1 }}>
               <Select
-                placeholder="Therapeutic class"
-                data={classOptions}
-                value={tClass}
+                placeholder="Classification"
+                data={classificationOptions}
+                value={classification}
                 onChange={(v) => {
-                  setTClass(v);
+                  setClassification(v);
                   setPage(1);
                 }}
                 radius="xl"
                 clearable
                 searchable
-                nothingFoundMessage="No classes found"
+                limit={50}
+                maxDropdownHeight={280}
+                nothingFoundMessage="No classifications found"
               />
             </Box>
+                </Group>
+              </Stack>
+            </Box>
+
+          
           </Group>
+
+          {selectedClassification ? (
+            <Text size="sm" c={muted}>
+              Filtering by <strong>{selectedClassification.label}</strong> — source:{' '}
+              {CLASSIFICATION_SOURCES[selectedClassification.type] ?? selectedClassification.type}
+            </Text>
+          ) : null}
+
+          {data ? (
+            <ListPagination
+              withCount
+              total={data.total}
+              limit={data.limit || 20}
+              page={page}
+              onChange={setPage}
+            />
+          ) : null}
 
           {isLoading ? (
             <SkeletonCards cols={{ base: 1, sm: 2, lg: 3 }} count={6} />
@@ -269,17 +283,12 @@ export default function ShopMedicinesPage() {
             </SimpleGrid>
           )}
 
-          {data && (data.limit || 20) > 0 && data.total > (data.limit || 20) ? (
-            <Group justify="center">
-              <Pagination
-                total={Math.ceil(data.total / (data.limit || 20))}
-                value={page}
-                onChange={setPage}
-                radius="xl"
-                color="green"
-              />
-            </Group>
-          ) : null}
+          <ListPagination
+            total={data?.total}
+            limit={data?.limit || 20}
+            page={page}
+            onChange={setPage}
+          />
         </Stack>
       </Container>
     </WebsiteLayout>
@@ -302,7 +311,7 @@ function PaperSearch({ search, onSearchChange }: { search: string; onSearchChang
         </ThemeIcon>
         <Input
           placeholder="Search medicines by generic name or code..."
-          size="lg"
+          size="sm"
           radius="xl"
           value={search}
           onChange={(e) => {

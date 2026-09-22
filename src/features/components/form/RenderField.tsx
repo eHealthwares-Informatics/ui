@@ -1,10 +1,23 @@
-import { ActionIcon, Badge, Grid, Group, SimpleGrid, Switch, UnstyledButton } from '@mantine/core';
+import {
+  ActionIcon,
+  Badge,
+  ColorInput,
+  Grid,
+  Group,
+  SimpleGrid,
+  Switch,
+  UnstyledButton,
+} from '@mantine/core';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useApiProvider } from '@/context/module-context';
 import { LabelField } from '@/features/communication/components/shared';
 import { ImageUploader } from '@/features/rxsoft/pages/products/components/image-uploader';
 import { Field, Option } from '@/features/rxsoft/types';
-import { AccordionArrayField, AccordionSingleField, JsonAccordionArrayField } from './accordion-fields';
+import {
+  AccordionArrayField,
+  AccordionSingleField,
+  JsonAccordionArrayField,
+} from './accordion-fields';
 import { AsyncSelectField } from './async-field';
 import { DebouncedTextInput } from './debounced-text-input';
 import { useFormField } from './form-context';
@@ -265,6 +278,32 @@ function RenderFieldComponent({
         value={fieldValue}
         onChange={(v) => handleChange(v)}
       />
+    );
+  }
+
+  if (field.type === 'color') {
+    return (
+      <LabelField label={inTable ? '' : field.label} required={field.required}>
+        <ColorInput
+          value={(fieldValue as string) ?? '#228be6'}
+          format="hex"
+          swatches={[
+            '#228be6',
+            '#40c057',
+            '#fd7e14',
+            '#e64980',
+            '#be4bdb',
+            '#f59f00',
+            '#15aabf',
+            '#868e96',
+          ]}
+          disabled={disabled}
+          onChange={(v) => handleChange(v)}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          error={fieldError}
+        />
+      </LabelField>
     );
   }
 

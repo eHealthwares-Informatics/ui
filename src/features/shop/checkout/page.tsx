@@ -38,7 +38,9 @@ import {
   Stethoscope,
   Truck,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useCartProductHydration } from '../website/hooks';
+import type { WebsiteProduct } from '../website/types';
 import { useChatbotStore } from '../website/chatbot-store';
 import {
   toHL7Prescription,
@@ -127,28 +129,43 @@ const productInfo: Record<
   },
 };
 
-function getProductName(id: string): string {
-  return productInfo[id]?.name || 'Medication';
+// Helpers read from the item's own product data (stored by the cart store at
+// add time, or hydrated from /website/cart for legacy persisted carts). The
+// old mock productInfo/productPrices maps keyed '1'-'10' never matched real
+// product ids, which is why checkout showed "Medication" with fake prices.
+function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProduct | null }): string {
+  return (
+    i.name ||
+    i.product?.name ||
+    (i.productId ? productInfo[i.productId]?.name : undefined) ||
+    'Medication'
+  );
 }
 
-function getProductGeneric(id: string): string {
-  return productInfo[id]?.genericName || 'Generic';
+function itemUnitPrice(i: { productId?: string; unitPrice?: number; product?: WebsiteProduct | null }): number {
+  const p =
+    i.unitPrice ??
+    (i.product as any)?.unitPrice ??
+    (i.productId ? productPrices[i.productId] : undefined) ??
+    0;
+  return Number(p) || 0;
 }
 
-function isRxRequired(id: string): boolean {
-  return productInfo[id]?.isRx || false;
+function itemGenericName(i: { productId?: string; product?: WebsiteProduct | null }): string {
+  return (
+    i.product?.genericProduct?.pharmaceutics?.commonGenericName ||
+    i.product?.genericProduct?.name ||
+    (i.productId ? productInfo[i.productId]?.genericName : undefined) ||
+    'Generic Medicine'
+  );
 }
 
-function itemLabel(i: { productId?: string; name?: string }): string {
-  return i.productId ? getProductName(i.productId) : i.name ?? 'Medicine';
-}
-
-function itemUnitPrice(i: { productId?: string; unitPrice?: number }): number {
-  return i.productId ? getMockPrice2(i.productId) : (i.unitPrice ?? 0);
-}
-
-function getMockPrice2(id: string): number {
-  return productPrices[id] || 2500;
+function itemIsRx(i: { productId?: string; product?: WebsiteProduct | null }): boolean {
+  return (
+    i.product?.isPrescriptionRequired ??
+    (i.productId ? productInfo[i.productId]?.isRx : undefined) ??
+    false
+  );
 }
 
 function formatPrice(n: number): string {
@@ -215,6 +232,15 @@ export default function CheckoutPage() {
   const deliveryAreas =
     deliveryAreasData && deliveryAreasData.length > 0 ? deliveryAreasData : mockDeliveryAreas;
 
+  // Signed-out shoppers get the auth drawer popped automatically (Sign In
+  // tab) — no need to click Sign In / Register first.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openAccountDrawer('signin');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -231,6 +257,8 @@ export default function CheckoutPage() {
 
   const selectedArea = deliveryAreas.find((a) => a.id === deliveryAreaId);
 
+  useCartProductHydration();
+
   const subtotal = items.reduce((sum, i) => sum + itemUnitPrice(i) * i.quantity, 0);
   const deliveryFee = selectedArea
     ? subtotal >= (selectedArea.freeDeliveryAbove || Infinity)
@@ -240,7 +268,7 @@ export default function CheckoutPage() {
       ? 0
       : 1500;
   const total = subtotal + deliveryFee;
-  const rxItems = items.filter((i) => !i.productId || isRxRequired(i.productId));
+  const rxItems = items.filter(itemIsRx);
 
   const canGoNext = () => {
     switch (step) {
@@ -264,7 +292,7 @@ export default function CheckoutPage() {
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
         items: items.map((i) => {
           if (i.productId) {
-            return { itemId: i.productId, quantity: i.quantity, unitPrice: getMockPrice2(i.productId) };
+            return { itemId: i.productId, quantity: i.quantity, unitPrice: itemUnitPrice(i) };
           }
           if (i.genericDrugCode) {
             return {
@@ -613,7 +641,7 @@ function StepCartReview({
         <Divider />
 
         {items.map((item) => {
-          const rx = !item.productId || isRxRequired(item.productId);
+          const rx = itemIsRx(item);
           const price = itemUnitPrice(item);
           return (
             <Group key={item.productId ?? item.name} justify="space-between" wrap="nowrap">
@@ -642,7 +670,7 @@ function StepCartReview({
                     ) : null}
                   </Group>
                   <Text size="xs" c={muted}>
-                    {item.productId ? getProductGeneric(item.productId) : 'Generic Medicine'}
+                    {itemGenericName(item)}
                   </Text>
                 </Box>
               </Group>
@@ -953,79 +981,17 @@ function StepPayment({
 }) {
   return (
     <Grid>
+      {/* Items/order summary on the LEFT — payment picks up on the right, */}
+      {/* matching the left-to-right flow of every other checkout step. */}
       <Grid.Col span={{ base: 12, md: 7 }}>
         <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
           <Stack gap="md">
             <Group gap={6}>
-              <CreditCard size={20} color={green} />
+              <ShoppingCart size={20} color={green} />
               <Text fw={900} size="lg">
-                Payment Method
+                Order Summary
               </Text>
             </Group>
-            <Divider />
-
-            <Radio.Group value={paymentMethod} onChange={setPaymentMethod}>
-              <Stack gap="xs">
-                {providers.length === 0 && (
-                  <Text size="sm" c={muted}>
-                    No online payment providers are enabled yet.
-                  </Text>
-                )}
-                {providers.map((p) => (
-                  <Paper
-                    key={p.id}
-                    radius={16}
-                    withBorder
-                    p="sm"
-                    style={{
-                      borderColor: paymentMethod === p.id ? green : line,
-                      background: paymentMethod === p.id ? soft : '#FFFFFF',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => setPaymentMethod(p.id)}
-                  >
-                    <Radio
-                      value={p.id}
-                      label={`${p.name} (${p.production ? 'Live' : 'Test'})`}
-                    />
-                  </Paper>
-                ))}
-              </Stack>
-            </Radio.Group>
-
-            <Divider />
-
-            <Text fw={800} size="sm">
-              Promo Code
-            </Text>
-            <Input
-              placeholder="Enter promo code"
-              radius="xl"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.currentTarget.value)}
-              styles={{ input: { borderColor: line } }}
-              rightSection={
-                <Button
-                  size="xs"
-                  radius="xl"
-                  color="green"
-                  variant="light"
-                  style={{ marginRight: 4 }}
-                >
-                  Apply
-                </Button>
-              }
-            />
-          </Stack>
-        </Paper>
-      </Grid.Col>
-
-      <Grid.Col span={{ base: 12, md: 5 }}>
-        <Paper radius={24} p="xl" withBorder style={{ borderColor: line, background: soft }}>
-          <Stack gap="md">
-            <Text fw={900} size="lg">
-              Order Summary
-            </Text>
             <Divider />
 
             {items.map((item) => (
@@ -1057,6 +1023,74 @@ function StepPayment({
                 {formatPrice(total)}
               </Text>
             </Group>
+          </Stack>
+        </Paper>
+      </Grid.Col>
+
+      {/* Payment method + promo on the RIGHT. */}
+      <Grid.Col span={{ base: 12, md: 5 }}>
+        <Paper radius={24} p="xl" withBorder style={{ borderColor: line, background: soft }}>
+          <Stack gap="md">
+            <Group gap={6}>
+              <CreditCard size={20} color={green} />
+              <Text fw={900} size="lg">
+                Payment Method
+              </Text>
+            </Group>
+            <Divider />
+
+            <Radio.Group value={paymentMethod} onChange={setPaymentMethod}>
+              <Stack gap="xs">
+                {providers.length === 0 && (
+                  <Text size="sm" c={muted}>
+                    No online payment providers are enabled yet.
+                  </Text>
+                )}
+                {providers.map((p) => (
+                  <Paper
+                    key={p.id}
+                    radius={16}
+                    withBorder
+                    p="sm"
+                    style={{
+                      borderColor: paymentMethod === p.id ? green : line,
+                      background: paymentMethod === p.id ? '#FFFFFF' : soft,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setPaymentMethod(p.id)}
+                  >
+                    <Radio
+                      value={p.id}
+                      label={`${p.name} (${p.production ? 'Live' : 'Test'})`}
+                    />
+                  </Paper>
+                ))}
+              </Stack>
+            </Radio.Group>
+
+            <Divider />
+
+            <Text fw={800} size="sm">
+              Promo Code
+            </Text>
+            <Input
+              placeholder="Enter promo code"
+              radius="xl"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.currentTarget.value)}
+              styles={{ input: { borderColor: line, background: '#FFFFFF' } }}
+              rightSection={
+                <Button
+                  size="xs"
+                  radius="xl"
+                  color="green"
+                  variant="light"
+                  style={{ marginRight: 4 }}
+                >
+                  Apply
+                </Button>
+              }
+            />
           </Stack>
         </Paper>
       </Grid.Col>

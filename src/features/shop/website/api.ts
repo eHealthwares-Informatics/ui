@@ -2,6 +2,8 @@ import type {
   HomepageData,
   WebsiteProduct,
   CategoryView,
+  ShopClassificationView,
+  ShopProductDetailResponse,
   HealthConcernView,
   PrescriptionView,
   ConsultationView,
@@ -18,8 +20,17 @@ import type {
   GenericDrugView,
   GenericDrugDetail,
   GenericProductSearchResult,
+  WebsiteSettings,
 } from './types';
 import { createAuthApiClient } from '@/lib/create-api-client';
+
+export interface WebPaymentProvider {
+  id: string;
+  code: string;
+  name: string;
+  providerType: string;
+  production: boolean;
+}
 
 const api = createAuthApiClient({
   baseURL: import.meta.env.VITE_RXSOFT_API_URL || 'https://rxsoft-backend.onrender.com/api',
@@ -27,19 +38,60 @@ const api = createAuthApiClient({
   onForbidden: 'ignore',
 });
 
+// /generic-drugs returns { data, meta: { page, limit, total } } while the shop
+// pages read a flat PaginatedResponse — normalize so both ListPagination
+// blocks on /shop/medicines see total/limit/page.
+function toPaginated<T>(payload: {
+  data?: T[];
+  page?: number;
+  limit?: number;
+  total?: number;
+  meta?: { page?: number; limit?: number; total?: number };
+}): PaginatedResponse<T> {
+  return {
+    data: payload.data ?? [],
+    page: payload.page ?? payload.meta?.page ?? 1,
+    limit: payload.limit ?? payload.meta?.limit ?? 0,
+    total: payload.total ?? payload.meta?.total ?? 0,
+  };
+}
+
 export const websiteApi = {
+  // Public storefront branding (website name + logo image)
+  getSettings: () => api.get<WebsiteSettings>('/website/settings').then((r) => r.data),
+
   // Homepage
   getHomepage: () => api.get<HomepageData>('/website/homepage').then((r) => r.data),
+
+  // Cart product details for a batch of item ids (public endpoint).
+  getCartProducts: (ids: string[]) =>
+    api
+      .get<WebsiteProduct[]>('/website/cart', { params: { ids: ids.join(',') } })
+      .then((r) => r.data),
 
   // Products
   listProducts: (params?: Record<string, string | number>) =>
     api.get<PaginatedResponse<WebsiteProduct>>('/website/products', { params }).then((r) => r.data),
 
   getProduct: (id: string) =>
+    api.get<ShopProductDetailResponse>(`/website/products/${id}`).then((r) => r.data),
+
+  listClassifications: (type?: string) =>
     api
-      .get<{ product: WebsiteProduct; reviews: ProductReviewView[]; related: WebsiteProduct[] }>(
-        `/website/products/${id}`
-      )
+      .get<{ data: ShopClassificationView[]; source?: string }>('/website/classifications', {
+        params: type ? { type } : undefined,
+      })
+      .then((r) => r.data),
+
+  getClassificationDetail: (
+    code: string,
+    params?: Record<string, string | number>
+  ) =>
+    api
+      .get<{
+        classification: ShopClassificationView & { drugCount: number; productCount: number };
+        products: WebsiteProduct[];
+      }>(`/website/classifications/${code}`, { params })
       .then((r) => r.data),
 
   // Generic Medicines
@@ -54,8 +106,11 @@ export const websiteApi = {
   // Generic Drugs (NDF/crosswalk)
   listGenericDrugs: (params?: Record<string, string | number>) =>
     api
-      .get<PaginatedResponse<GenericDrugView>>('/generic-drugs', { params })
-      .then((r) => r.data),
+      .get<{
+        data?: GenericDrugView[];
+        meta?: { page?: number; limit?: number; total?: number };
+      }>('/generic-drugs', { params })
+      .then((r) => toPaginated<GenericDrugView>(r.data)),
 
   getGenericDrug: (code: string) =>
     api.get<GenericDrugDetail>(`/generic-drugs/${encodeURIComponent(code)}`).then((r) => r.data),
@@ -165,6 +220,31 @@ export const websiteApi = {
       .then((r) => r.data),
 
   // Delivery Areas
+  listPaymentProviders: () =>
+    api
+      .get<WebPaymentProvider[]>('/website/payment-providers')
+      .then((r) => (Array.isArray(r.data) ? r.data : [])),
+
+  requestOtp: (data: { phone: string; channel?: 'sms' | 'whatsapp' }) =>
+    api
+      .post<{ sent: boolean; channel: string; code?: string }>('/website/auth/otp/request', data)
+      .then((r) => r.data),
+
+  verifyOtp: (data: { phone: string; code: string }) =>
+    api
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/otp/verify', data)
+      .then((r) => r.data),
+
+  googleSignIn: (accessToken: string) =>
+    api
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/google', { accessToken })
+      .then((r) => r.data),
+
+  facebookSignIn: (accessToken: string) =>
+    api
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/facebook', { accessToken })
+      .then((r) => r.data),
+
   listDeliveryAreas: () =>
     api.get<DeliveryAreaView[]>('/website/delivery-areas').then((r) => r.data),
 

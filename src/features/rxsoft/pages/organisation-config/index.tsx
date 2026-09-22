@@ -1,8 +1,10 @@
 import {
+  Box,
   Button,
   Card,
   Container,
   Group,
+  Image,
   Loader,
   NumberInput,
   Select,
@@ -21,6 +23,12 @@ type OrganisationConfig = {
   id: string;
   organizationId: string;
   posHeader: string | null;
+  websiteName: string | null;
+  logoUrl: string | null;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  contactWhatsApp: string | null;
+  contactAddress: string | null;
   defaultLoginTimeoutMinutes: number;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
@@ -30,6 +38,12 @@ type OrgOption = { id: string; name: string; code?: string };
 
 type Draft = {
   posHeader: string;
+  websiteName: string;
+  logoUrl: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactWhatsApp: string;
+  contactAddress: string;
   defaultLoginTimeoutMinutes: number | string;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
@@ -37,6 +51,12 @@ type Draft = {
 
 const emptyDraft: Draft = {
   posHeader: '',
+  websiteName: '',
+  logoUrl: '',
+  contactPhone: '',
+  contactEmail: '',
+  contactWhatsApp: '',
+  contactAddress: '',
   defaultLoginTimeoutMinutes: 480,
   defaultAllowPos: true,
   defaultAllowA4Print: false,
@@ -75,6 +95,12 @@ export function RxOrganisationConfigPage() {
     }
     setDraft({
       posHeader: config.posHeader ?? '',
+      websiteName: config.websiteName ?? '',
+      logoUrl: config.logoUrl ?? '',
+      contactPhone: config.contactPhone ?? '',
+      contactEmail: config.contactEmail ?? '',
+      contactWhatsApp: config.contactWhatsApp ?? '',
+      contactAddress: config.contactAddress ?? '',
       defaultLoginTimeoutMinutes: config.defaultLoginTimeoutMinutes,
       defaultAllowPos: config.defaultAllowPos,
       defaultAllowA4Print: config.defaultAllowA4Print,
@@ -87,6 +113,12 @@ export function RxOrganisationConfigPage() {
         `/organisation-config/by-organization/${organizationId}`,
         {
           posHeader: draft.posHeader || null,
+          websiteName: draft.websiteName || null,
+          logoUrl: draft.logoUrl || null,
+          contactPhone: draft.contactPhone || null,
+          contactEmail: draft.contactEmail || null,
+          contactWhatsApp: draft.contactWhatsApp || null,
+          contactAddress: draft.contactAddress || null,
           defaultLoginTimeoutMinutes:
             draft.defaultLoginTimeoutMinutes === ''
               ? undefined
@@ -153,6 +185,67 @@ export function RxOrganisationConfigPage() {
         {organizationId && !loadingConfig && (
           <Card withBorder radius="md" padding="lg">
             <Stack>
+              <TextInput
+                label="Website Name"
+                description="Caption shown in the storefront header (defaults to Damorex)."
+                placeholder="e.g. Damorex"
+                value={draft.websiteName}
+                onChange={(e) => setDraft((d) => ({ ...d, websiteName: e.currentTarget.value }))}
+              />
+              <TextInput
+                label="Logo Image URL"
+                description="Logo used as the storefront favicon and header logo (defaults to /sample_images/rx.ico)."
+                placeholder="e.g. /sample_images/rx.ico"
+                value={draft.logoUrl}
+                onChange={(e) => setDraft((d) => ({ ...d, logoUrl: e.currentTarget.value }))}
+              />
+              {draft.logoUrl && (
+                <Group gap="sm" align="center">
+                  <Box
+                    style={{
+                      width: 42,
+                      height: 42,
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      border: '1px solid #DDE7E2',
+                      background: '#fff',
+                    }}
+                  >
+                    <Image src={draft.logoUrl} alt="Logo preview" fit="contain" h="100%" />
+                  </Box>
+                  <Text size="sm" c="dimmed">
+                    Logo preview
+                  </Text>
+                </Group>
+              )}
+              <TextInput
+                label="Contact Phone"
+                description="Phone number shown on the storefront contact page."
+                placeholder="e.g. +2348022224166"
+                value={draft.contactPhone}
+                onChange={(e) => setDraft((d) => ({ ...d, contactPhone: e.currentTarget.value }))}
+              />
+              <TextInput
+                label="Contact Email"
+                description="Email address shown on the storefront contact page."
+                placeholder="e.g. info@damorex.com"
+                value={draft.contactEmail}
+                onChange={(e) => setDraft((d) => ({ ...d, contactEmail: e.currentTarget.value }))}
+              />
+              <TextInput
+                label="Contact WhatsApp"
+                description="WhatsApp number used for storefront enquiries."
+                placeholder="e.g. +2348022224166"
+                value={draft.contactWhatsApp}
+                onChange={(e) => setDraft((d) => ({ ...d, contactWhatsApp: e.currentTarget.value }))}
+              />
+              <TextInput
+                label="Contact Address"
+                description="Address shown on the storefront contact page."
+                placeholder="e.g. Lagos, Nigeria"
+                value={draft.contactAddress}
+                onChange={(e) => setDraft((d) => ({ ...d, contactAddress: e.currentTarget.value }))}
+              />
               <TextInput
                 label="POS Header"
                 description="Header text printed on POS receipts."

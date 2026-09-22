@@ -55,6 +55,10 @@ export type ExchangeMessage = {
   createdAt: string;
   status?: 'sent' | 'delivered' | 'read' | 'failed';
   optimistic?: boolean;
+  /** Message belongs to a conversation that has not been created yet. */
+  orphan?: boolean;
+  /** Set on conversation.message.created to link the pending thread to the real id. */
+  pendingConversationId?: string;
 };
 
 export type ExchangeMessagesResponse = {

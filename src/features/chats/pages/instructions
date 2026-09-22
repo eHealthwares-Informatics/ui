@@ -405,7 +405,11 @@ Implement websocket gateway.
 
 Events:
 
-* conversation.message.created
+* conversation.message.orphan (message belongs to a `pending-<participantId>`
+  conversation that does not exist yet — emitted for the inbound orphan and for
+  the "select an action" menu when the first message matches no questionnaire)
+* conversation.message.created (real conversation exists; carries
+  `pendingConversationId` so clients can migrate the pending thread)
 * conversation.updated
 * conversation.read
 * conversation.opened

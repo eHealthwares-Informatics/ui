@@ -31,6 +31,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { useCartStore } from '../website/cart-store';
+import { useCartProductHydration } from '../website/hooks';
 import { SectionHeading, ProductCard } from '../website/components';
 import { EmptyCart } from '../website/empty-states';
 import {
@@ -58,9 +59,7 @@ const productPrices: Record<string, number> = {
   '10': 900,
 };
 
-function getMockPrice(id: string): number {
-  return productPrices[id] || 2500;
-}
+
 
 const productInfo: Record<
   string,
@@ -113,28 +112,48 @@ const productInfo: Record<
   },
 };
 
-function getProductName(id: string): string {
-  return productInfo[id]?.name || 'Medication';
+// Helpers read the item's own product data (stored at add time by the cart
+// store, or hydrated from /website/cart for legacy persisted carts). The old
+// mock maps keyed '1'-'10' never matched real product ids — hence the
+// "Medication" fallbacks and fake prices.
+function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProduct | null }): string {
+  return (
+    i.name ||
+    i.product?.name ||
+    (i.productId ? productInfo[i.productId]?.name : undefined) ||
+    'Medication'
+  );
 }
 
-function getProductGeneric(id: string): string {
-  return productInfo[id]?.genericName || 'Generic';
+function itemUnitPrice(i: { productId?: string; unitPrice?: number; product?: WebsiteProduct | null }): number {
+  const p =
+    i.unitPrice ??
+    (i.product as any)?.unitPrice ??
+    (i.productId ? productPrices[i.productId] : undefined) ??
+    0;
+  return Number(p) || 0;
 }
 
-function getProductDosage(id: string): string {
-  return productInfo[id]?.dosage || '';
+function itemGenericName(i: { productId?: string; product?: WebsiteProduct | null }): string {
+  return (
+    i.product?.genericProduct?.pharmaceutics?.commonGenericName ||
+    i.product?.genericProduct?.name ||
+    (i.productId ? productInfo[i.productId]?.genericName : undefined) ||
+    'Generic Medicine'
+  );
 }
 
-function isRxRequired(id: string): boolean {
-  return productInfo[id]?.isRx || false;
+function itemDosage(i: { productId?: string; product?: WebsiteProduct | null }): string {
+  const gp = i.product?.genericProduct;
+  return [gp?.strength, gp?.dosageForm].filter(Boolean).join(' • ');
 }
 
-function itemLabel(i: { productId?: string; name?: string }): string {
-  return i.productId ? getProductName(i.productId) : i.name ?? 'Medicine';
-}
-
-function itemUnitPrice(i: { productId?: string; unitPrice?: number }): number {
-  return i.productId ? getMockPrice(i.productId) : (i.unitPrice ?? 0);
+function itemIsRx(i: { productId?: string; product?: WebsiteProduct | null }): boolean {
+  return (
+    i.product?.isPrescriptionRequired ??
+    (i.productId ? productInfo[i.productId]?.isRx : undefined) ??
+    false
+  );
 }
 
 function cartSubtotal(items: { productId?: string; unitPrice?: number; quantity: number }[]): number {
@@ -265,12 +284,12 @@ const mockRecentlyViewed: WebsiteProduct[] = [
   },
 ];
 
-function CartItemRow({ item }: { item: { productId?: string; name?: string; unitPrice?: number; quantity: number } }) {
+function CartItemRow({ item }: { item: { productId?: string; name?: string; unitPrice?: number; quantity: number; product?: WebsiteProduct | null } }) {
   const { updateQuantity, removeItem, saveForLater } = useCartStore();
   const key = item.productId ?? item.name;
   const price = itemUnitPrice(item);
   const lineTotal = price * item.quantity;
-  const rx = !item.productId || isRxRequired(item.productId);
+  const rx = itemIsRx(item);
 
   return (
     <Paper radius={20} p="md" withBorder style={{ borderColor: line }}>
@@ -305,11 +324,11 @@ function CartItemRow({ item }: { item: { productId?: string; name?: string; unit
                 ) : null}
               </Group>
               <Text size="sm" c={muted}>
-                {item.productId ? getProductGeneric(item.productId) : 'Generic Medicine'}
+                {itemGenericName(item)}
               </Text>
-              {getProductDosage(item.productId ?? '') ? (
+              {itemDosage(item) ? (
                 <Text size="xs" c={muted}>
-                  {getProductDosage(item.productId ?? '')}
+                  {itemDosage(item)}
                 </Text>
               ) : null}
               <Text fw={800} size="sm" c={green} mt={2}>
@@ -393,6 +412,7 @@ function CartItemRow({ item }: { item: { productId?: string; name?: string; unit
 export default function CartPage() {
   const { items, totalItems, savedForLater, moveToCart, removeSaved, clearCart } = useCartStore();
   const navigate = useNavigate();
+  useCartProductHydration();
 
   const subtotal = cartSubtotal(items);
   const deliveryFee = subtotal >= 10000 ? 0 : 1500;
@@ -490,7 +510,7 @@ export default function CartPage() {
                             <Group gap="sm" wrap="nowrap">
                               <Image
                                 src="https://placehold.co/48x48/16A34A/white?text=Rx"
-                                alt={item.name || getProductName(item.productId)}
+                                alt={item.name || 'Saved item'}
                                 w={44}
                                 h={44}
                                 fit="contain"
@@ -502,7 +522,7 @@ export default function CartPage() {
                               />
                               <Box>
                                 <Text fw={800} size="sm">
-                                  {item.name || getProductName(item.productId)}
+                                  {item.name || 'Saved item'}
                                 </Text>
                                 <Text size="xs" c={muted}>
                                   Qty: {item.quantity}
@@ -642,7 +662,7 @@ export default function CartPage() {
                         </Text>
                       </Group>
 
-                      {items.some((i) => !i.productId || isRxRequired(i.productId)) ? (
+                      {items.some(itemIsRx) ? (
                         <Alert
                           icon={<Stethoscope size={16} />}
                           color="orange"

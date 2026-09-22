@@ -175,4 +175,59 @@ test.describe('Damorex storefront', () => {
     }
     // Test passes either way — we're verifying no crash/error.
   });
+
+  /* ---- Sorting ---- */
+
+  const SORT_OPTIONS = [
+    { label: 'Regularly Purchased', sortBy: 'purchases', sortOrder: 'desc' },
+    { label: 'Name A-Z', sortBy: 'name', sortOrder: 'asc' },
+    { label: 'Name Z-A', sortBy: 'name', sortOrder: 'desc' },
+    { label: 'Lowest – Highest Price', sortBy: 'price', sortOrder: 'asc' },
+    { label: 'Highest – Lowest Price', sortBy: 'price', sortOrder: 'desc' },
+    { label: 'Newest', sortBy: 'createdAt', sortOrder: 'desc' },
+  ] as const;
+
+  test('sort select offers all six options and defaults to Regularly Purchased', async ({
+    page,
+  }) => {
+    await page.goto('/shop/shop');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: 'Shop Medicines' })).toBeVisible({
+      timeout: waits.shop.productGrid,
+    });
+
+    const sortSelect = page.getByLabel('Sort products');
+    await expect(sortSelect).toBeVisible({ timeout: waits.visible });
+
+    // All six approved options are present.
+    const labels = await sortSelect.locator('option').allInnerTexts();
+    expect(labels).toEqual(SORT_OPTIONS.map((o) => o.label));
+
+    // Default selection is Regularly Purchased.
+    await expect(sortSelect).toHaveValue('purchases');
+  });
+
+  test('changing the sort option requests the right sortBy/sortOrder from the API', async ({
+    page,
+  }) => {
+    await page.goto('/shop/shop');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: 'Shop Medicines' })).toBeVisible({
+      timeout: waits.shop.productGrid,
+    });
+
+    for (const option of SORT_OPTIONS) {
+      const requestPromise = page.waitForRequest(
+        (req) =>
+          req.url().includes('/website/products') &&
+          req.url().includes(`sortBy=${option.sortBy}`) &&
+          req.url().includes(`sortOrder=${option.sortOrder}`),
+        { timeout: waits.visible },
+      );
+      await page.getByLabel('Sort products').selectOption({ label: option.label });
+      await requestPromise;
+    }
+  });
 });

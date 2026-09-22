@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { BedsListPage } from '@/features/emr/pages/wards/beds-list-page';
+import { BedsListPage } from '@/features/emr/pages/wards/beds-list';
 
 export const Route = createFileRoute('/_authenticated/emr/wards/beds')({
   component: BedsListPage,

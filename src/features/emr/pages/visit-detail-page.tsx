@@ -17,6 +17,7 @@ import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
+import { VisitCommentsPanel } from '../components/visits/visit-comments';
 import { formatEnum } from '../lib/emr-constants';
 import type { Visit } from '../lib/emr-types';
 
@@ -220,6 +221,12 @@ export function VisitDetailPage() {
               )}
             </Table.Tbody>
           </Table>
+        </Card>
+        <Card withBorder radius="md" padding="lg">
+          <Group justify="space-between" mb="sm">
+            <Title order={4}>Comments</Title>
+          </Group>
+          <VisitCommentsPanel visitId={visitId} />
         </Card>
       </Stack>
     </RxPage>

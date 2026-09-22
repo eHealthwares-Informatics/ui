@@ -6,10 +6,10 @@ import { useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import { APPOINTMENT_TYPES, PRIORITIES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import { LocationPicker } from '../shared/location-picker';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { ReasonAutocomplete } from '../shared/reason-autocomplete';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
-import { LocationPicker } from '../shared/location-picker';
 
 export function AppointmentForm({
   onCreated,
@@ -65,7 +65,7 @@ export function AppointmentForm({
       });
       return data;
     },
-onSuccess: (created) => {
+    onSuccess: (created) => {
       notifications.show({ message: 'Appointment scheduled', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'appointments'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'dashboard'] });

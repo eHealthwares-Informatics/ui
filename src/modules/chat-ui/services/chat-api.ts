@@ -29,6 +29,7 @@ export async function fetchConversationInbox(params: InboxParams) {
       page: params.page ?? 1,
       ...(params.search?.trim() ? { search: params.search.trim() } : {}),
       ...(params.channelId ? { channelId: params.channelId } : {}),
+      ...(params.participantId ? { participantId: params.participantId } : {}),
       ...(params.status ? { status: params.status } : {}),
     },
   });

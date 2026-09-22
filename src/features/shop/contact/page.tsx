@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Box,
   Button,
   Container,
@@ -13,7 +14,7 @@ import {
 } from '@mantine/core';
 import { Mail, Phone, MapPin, MessageCircle, Send, Check } from 'lucide-react';
 import { useState } from 'react';
-import { useSubmitContact } from '../website/hooks';
+import { useSubmitContact, useWebsiteContact } from '../website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -21,7 +22,6 @@ import {
   ink,
   muted,
   line,
-  soft,
   buttonStyles,
 } from '../website/layout';
 import { PageLoader } from '../website/loaders';
@@ -34,6 +34,7 @@ export default function ContactPage() {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const { mutate: submit, isPending } = useSubmitContact();
+  const { contactPhone, contactEmail, contactWhatsApp, contactAddress } = useWebsiteContact();
 
   const handleSubmit = () => {
     submit(
@@ -161,9 +162,14 @@ export default function ContactPage() {
                   </ThemeIcon>
                   <Box>
                     <Text fw={800}>Phone</Text>
-                    <Text c="rgba(255,255,255,0.76)" size="sm">
-                      +234
-                    </Text>
+                    <Anchor
+                      href={`tel:${contactPhone}`}
+                      c="rgba(255,255,255,0.76)"
+                      size="sm"
+                      underline="never"
+                    >
+                      {contactPhone}
+                    </Anchor>
                   </Box>
                 </Group>
                 <Group gap="md">
@@ -172,9 +178,14 @@ export default function ContactPage() {
                   </ThemeIcon>
                   <Box>
                     <Text fw={800}>Email</Text>
-                    <Text c="rgba(255,255,255,0.76)" size="sm">
-                      info@damorex.com
-                    </Text>
+                    <Anchor
+                      href={`mailto:${contactEmail}`}
+                      c="rgba(255,255,255,0.76)"
+                      size="sm"
+                      underline="never"
+                    >
+                      {contactEmail}
+                    </Anchor>
                   </Box>
                 </Group>
                 <Group gap="md">
@@ -183,8 +194,25 @@ export default function ContactPage() {
                   </ThemeIcon>
                   <Box>
                     <Text fw={800}>WhatsApp</Text>
+                    <Anchor
+                      href={`https://wa.me/${contactWhatsApp.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      c="rgba(255,255,255,0.76)"
+                      size="sm"
+                      underline="never"
+                    >
+                      {contactWhatsApp}
+                    </Anchor>
+                  </Box>
+                </Group>
+                <Group gap="md">
+                  <ThemeIcon radius="xl" size={44} style={{ background: 'rgba(255,255,255,0.16)' }}>
+                    <MapPin size={22} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800}>Address</Text>
                     <Text c="rgba(255,255,255,0.76)" size="sm">
-                      Chat with our team
+                      {contactAddress}
                     </Text>
                   </Box>
                 </Group>

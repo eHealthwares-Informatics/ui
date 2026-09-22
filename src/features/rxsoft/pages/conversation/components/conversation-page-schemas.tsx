@@ -100,6 +100,21 @@ const pickUpdatePayload = (
   return payload;
 };
 
+/** Build the questionnaire `polisher` object from the editor fields. */
+const buildPolisher = (values: Record<string, unknown>) => {
+  const processorId = optionValue(values.polisherProcessorId);
+  const instructions = text(values.polisherInstructions).trim();
+  const enabled = bool(values.polisherEnabled, true);
+  if (!processorId && !instructions) {
+    return null;
+  }
+  return {
+    processorId: processorId || undefined,
+    enabled,
+    instructions: instructions || undefined,
+  };
+};
+
 const asyncField = (name: string, label: string, endpoint: string, labelKey = 'name'): Field => ({
   name,
   label,
@@ -391,6 +406,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
       itemEditConfig: questionOptionPageSchema,
     },
     jsonField('validationRules', 'Validation Rules'),
+    jsonField('aiConfig', 'AI Config (incl. processorId)'),
     jsonField('metadata', 'Metadata'),
   ]),
   defaultState: {
@@ -406,6 +422,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
     isActive: true,
     options: [],
     validationRules: [],
+    aiConfig: {},
     metadata: {},
   },
   buildFormState: (row) => ({
@@ -421,6 +438,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
     isActive: bool(row.isActive, true),
     options: jsonArray(row.options),
     validationRules: jsonArray(row.validationRules),
+    aiConfig: jsonObject(row.aiConfig),
     metadata: jsonObject(row.metadata),
   }),
   buildCreatePayload: (values) => ({
@@ -436,6 +454,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
     isActive: bool(values.isActive, true),
     options: jsonArray(values.options),
     validationRules: jsonArray(values.validationRules),
+    aiConfig: jsonObject(values.aiConfig),
     metadata: jsonObject(values.metadata),
   }),
   buildUpdatePayload: (values) =>
@@ -452,6 +471,7 @@ export const questionPageSchema: ModelConfig = withDefaultActions({
       isActive: (v) => bool(v, true),
       options: (v) => jsonArray(v),
       validationRules: (v) => jsonArray(v),
+      aiConfig: (v) => jsonObject(v),
       metadata: (v) => jsonObject(v),
     }),
 });
@@ -872,6 +892,16 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
         },
       ],
     },
+    {
+      title: 'Polisher',
+      description:
+        'Rewrites every message this questionnaire emits (questions, validation prompts, introduction, conclusion, menu) through the selected AI processor.',
+      fields: [
+        asyncField('polisherProcessorId', 'AI Processor', '/ai/processors'),
+        switchField('polisherEnabled', 'Enabled'),
+        { name: 'polisherInstructions', label: 'Instruction Override', type: 'textarea', col: 12 },
+      ],
+    },
   ],
   defaultState: {
     name: '',
@@ -888,24 +918,33 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     isMediaHandler: false,
     questions: [],
     workflowId: null,
+    polisherProcessorId: null,
+    polisherEnabled: true,
+    polisherInstructions: '',
   },
-  buildFormState: (row) => ({
-    id: text(row.id),
-    name: text(row.name),
-    code: text(row.code),
-    description: text(row.description),
-    allowBackNavigation: bool(row.allowBackNavigation, true),
-    allowMultipleSessions: bool(row.allowMultipleSessions),
-    processingStrategy: option(row.processingStrategy || 'STATIC'),
-    channelIds: jsonArray(row.channelIds),
-    tags: jsonArray(row.tags),
-    metadata: jsonObject(row.metadata),
-    isActive: bool(row.isActive, true),
-    isInit: bool(row.isInit),
-    isMediaHandler: bool(row.isMediaHandler),
-    questions: jsonArray(row.questions),
-    workflowId: option(row.workflowId),
-  }),
+  buildFormState: (row) => {
+    const polisher = jsonObject(row.polisher);
+    return {
+      id: text(row.id),
+      name: text(row.name),
+      code: text(row.code),
+      description: text(row.description),
+      allowBackNavigation: bool(row.allowBackNavigation, true),
+      allowMultipleSessions: bool(row.allowMultipleSessions),
+      processingStrategy: option(row.processingStrategy || 'STATIC'),
+      channelIds: jsonArray(row.channelIds),
+      tags: jsonArray(row.tags),
+      metadata: jsonObject(row.metadata),
+      isActive: bool(row.isActive, true),
+      isInit: bool(row.isInit),
+      isMediaHandler: bool(row.isMediaHandler),
+      questions: jsonArray(row.questions),
+      workflowId: option(row.workflowId),
+      polisherProcessorId: polisher.processorId ? option(polisher.processorId) : null,
+      polisherEnabled: bool(polisher.enabled, true),
+      polisherInstructions: text(polisher.instructions),
+    };
+  },
   buildCreatePayload: (values) => ({
     name: text(values.name).trim(),
     code: text(values.code).trim(),
@@ -921,11 +960,12 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
     isActive: bool(values.isActive, true),
     isInit: bool(values.isInit),
     isMediaHandler: bool(values.isMediaHandler),
+    polisher: buildPolisher(values),
     isDynamic: false,
     version: 1,
   }),
-  buildUpdatePayload: (values) =>
-    pickUpdatePayload(values, {
+  buildUpdatePayload: (values) => {
+    const payload = pickUpdatePayload(values, {
       name: (v) => text(v).trim(),
       code: (v) => text(v).trim(),
       description: (v) => text(v).trim() || undefined,
@@ -940,7 +980,16 @@ export const questionnairePageSchema: ModelConfig = withDefaultActions({
       isActive: (v) => bool(v, true),
       isInit: (v) => bool(v),
       isMediaHandler: (v) => bool(v),
-    }),
+    });
+    if (
+      'polisherProcessorId' in values ||
+      'polisherEnabled' in values ||
+      'polisherInstructions' in values
+    ) {
+      payload.polisher = buildPolisher(values);
+    }
+    return payload;
+  },
 });
 
 export const workflowInstancePageSchema: ModelConfig = {
@@ -1325,13 +1374,442 @@ export const aiConfigPageSchema: ModelConfig = {
   id: 'ai-config',
   apiProvider: conversationApi,
   title: 'AI Configuration',
-  description: 'Current AI provider configuration and routing defaults. Configured via environment variables.',
+  description: 'Current AI routing defaults and provider status (models + keys are stored in the database).',
   endpoint: '/ai/config',
   columns: [
     { key: 'setting', label: 'Setting' },
     { key: 'value', label: 'Value' },
   ],
 };
+
+const truncate = (value: unknown, max = 70): string => {
+  const text = String(value ?? '');
+  return text.length <= max ? text : `${text.slice(0, max)}…`;
+};
+
+export const aiCostPageSchema: ModelConfig = {
+  id: 'ai-costs',
+  apiProvider: conversationApi,
+  title: 'AI Costs',
+  description:
+    'Per-call cost observability — tokens, latency, outcome and estimated USD cost for every AI provider call.',
+  endpoint: '/ai/costs',
+  canDelete: false,
+  columns: [
+    {
+      key: 'calledAt',
+      label: 'Called',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+    { key: 'provider', label: 'Provider', sortable: true, filters: ColumnTypeFilters.STRING },
+    { key: 'model', label: 'Model', filters: ColumnTypeFilters.STRING },
+    { key: 'callType', label: 'Call Type' },
+    {
+      key: 'outcome',
+      label: 'Outcome',
+      render: (row) => {
+        const outcome = String(row.outcome ?? '');
+        const color =
+          outcome === 'success' ? 'green' : outcome === 'fallback_used' ? 'yellow' : 'red';
+        return <Text size="xs" fw={600} c={`${color}.7`}>{outcome || '—'}</Text>;
+      },
+    },
+    {
+      key: 'totalTokens',
+      label: 'Tokens',
+      render: (row) =>
+        `${Number(row.promptTokens ?? 0)} / ${Number(row.completionTokens ?? 0)}`,
+    },
+    {
+      key: 'costUsd',
+      label: 'Cost (USD)',
+      render: (row) => Number(row.costUsd ?? 0).toFixed(6),
+    },
+    {
+      key: 'latencyMs',
+      label: 'Latency',
+      render: (row) => `${Number(row.latencyMs ?? 0)} ms`,
+    },
+    { key: 'source', label: 'Source' },
+    {
+      key: 'conversationId',
+      label: 'Conversation',
+      render: (row) => shortText(row.conversationId),
+    },
+  ],
+};
+
+export const aiRequestLogPageSchema: ModelConfig = {
+  id: 'ai-request-logs',
+  apiProvider: conversationApi,
+  title: 'AI Request Logs',
+  description:
+    'Full request/response audit for AI calls — prompts, completions, tokens and errors.',
+  endpoint: '/ai/request-logs',
+  canDelete: false,
+  columns: [
+    {
+      key: 'calledAt',
+      label: 'Called',
+      dataType: ColumnDataType.DATE,
+      sortable: true,
+    },
+    { key: 'provider', label: 'Provider', sortable: true, filters: ColumnTypeFilters.STRING },
+    { key: 'model', label: 'Model', filters: ColumnTypeFilters.STRING },
+    { key: 'callType', label: 'Call Type' },
+    {
+      key: 'outcome',
+      label: 'Outcome',
+      render: (row) => (
+        <Text size="xs" fw={600} c={row.outcome === 'success' ? 'green.7' : 'red.7'}>
+          {String(row.outcome ?? '—')}
+        </Text>
+      ),
+    },
+    {
+      key: 'latencyMs',
+      label: 'Latency',
+      render: (row) => `${Number(row.latencyMs ?? 0)} ms`,
+    },
+    {
+      key: 'userMessage',
+      label: 'Request',
+      render: (row) => truncate(row.userMessage),
+    },
+    {
+      key: 'responseText',
+      label: 'Response',
+      render: (row) => truncate(row.responseText ?? row.error),
+    },
+    { key: 'source', label: 'Source' },
+  ],
+};
+
+const AI_PROVIDER_OPTIONS: Option[] = [
+  'openai',
+  'anthropic',
+  'gemini',
+  'deepseek',
+  'grok',
+  'openrouter',
+].map((value) => ({ value, label: value }));
+
+const AI_ROUTING_OPTIONS: Option[] = [
+  { value: 'direct', label: 'direct' },
+  { value: 'openrouter', label: 'openrouter' },
+];
+
+const AI_TIER_OPTIONS: Option[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(
+  (value) => ({ value, label: value }),
+);
+
+export const aiProviderPageSchema: ModelConfig = {
+  id: 'ai-providers',
+  apiProvider: conversationApi,
+  title: 'AI Providers',
+  description:
+    'Provider credentials. Set/rotate the shared API key here — a model uses its own key when set, otherwise it falls back to its provider key.',
+  endpoint: '/ai/providers',
+  canDelete: false,
+  columns: [
+    { key: 'code', label: 'Provider', sortable: true },
+    { key: 'name', label: 'Name' },
+    {
+      key: 'configured',
+      label: 'Configured',
+      render: (row) => ((row as any).configured ? '✅ Yes' : '❌ No'),
+    },
+    { key: 'modelCount', label: 'Models' },
+    { key: 'baseUrl', label: 'Base URL' },
+    { key: 'isActive', label: 'Active' },
+  ],
+  createFieldGroups: buildFields([
+    selectField('code', 'Provider Code', AI_PROVIDER_OPTIONS),
+    textField('name', 'Name'),
+    textField('apiKey', 'API Key'),
+    textField('baseUrl', 'Base URL'),
+    switchField('isActive', 'Active'),
+  ]),
+  defaultState: {
+    code: option('openai'),
+    name: '',
+    apiKey: '',
+    baseUrl: '',
+    isActive: true,
+  },
+  buildFormState: (row) => ({
+    // Never echo the stored key back to the client.
+    code: option(row.code),
+    name: text(row.name),
+    apiKey: '',
+    baseUrl: text(row.baseUrl),
+    isActive: bool(row.isActive, true),
+  }),
+  buildCreatePayload: (values) => ({
+    code: optionValue(values.code),
+    name: text(values.name).trim(),
+    apiKey: text(values.apiKey).trim() || undefined,
+    baseUrl: text(values.baseUrl).trim() || undefined,
+    isActive: bool(values.isActive, true),
+  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      // Only send apiKey when the admin typed a new one (empty = keep).
+      apiKey: (v) => (text(v).trim() ? text(v).trim() : undefined),
+      baseUrl: (v) => text(v).trim() || undefined,
+      isActive: (v) => bool(v, true),
+    }),
+};
+
+export const aiModelPageSchema: ModelConfig = withDefaultActions({
+  id: 'ai-models',
+  title: 'AI Models',
+  description:
+    'Manage AI models. Provider API keys live here as attributes (never the environment).',
+  endpoint: '/ai/models',
+  columns: [
+    { key: 'key', label: 'Key', sortable: true },
+    { key: 'label', label: 'Label' },
+    { key: 'provider', label: 'Provider', sortable: true },
+    { key: 'model', label: 'Model' },
+    { key: 'routing', label: 'Routing' },
+    { key: 'tier', label: 'Tier' },
+    { key: 'fallbackModel', label: 'Fallback' },
+    {
+      key: 'expiryDate',
+      label: 'Expiry',
+      render: (row) =>
+        (row as any).expiryDate
+          ? String((row as any).expiryDate).slice(0, 10)
+          : '—',
+    },
+    { key: 'retryCount', label: 'Retries' },
+    {
+      key: 'isDefault',
+      label: 'Default',
+      render: (row) => ((row as any).isDefault ? '✅' : '—'),
+    },
+    { key: 'isActive', label: 'Active', sortable: true },
+  ],
+  createFieldGroups: [
+    {
+      title: 'Model',
+      fields: [
+        textField('key', 'Key'),
+        textField('label', 'Label'),
+        selectField('provider', 'Provider', AI_PROVIDER_OPTIONS),
+        textField('model', 'Model String'),
+        selectField('routing', 'Routing', AI_ROUTING_OPTIONS),
+        selectField('tier', 'Tier', AI_TIER_OPTIONS),
+        { name: 'expiryDate', label: 'Expiry Date', type: 'date', col: 6 },
+        {
+          name: 'fallbackModel',
+          label: 'Fallback Model',
+          type: 'async-select',
+          col: 6,
+          searchParam: {
+            endpoint: '/ai/models',
+            queryParam: 'search',
+            minChars: 0,
+            valueKey: 'key',
+            labelKey: 'label',
+          },
+        },
+        { ...textField('retryCount', 'Retry Count'), type: 'number' },
+        { ...textField('fallbackRetryCount', 'Fallback Retry Count'), type: 'number' },
+        textField('apiKey', 'API Key'),
+        textField('baseUrl', 'Base URL'),
+        { ...textField('defaultTemperature', 'Default Temperature'), type: 'number' },
+        { ...textField('maxTokens', 'Max Tokens'), type: 'number' },
+        { ...textField('version', 'Version'), type: 'number' },
+      ],
+    },
+    {
+      title: 'Flags',
+      fields: [
+        switchField('supportsServerSideThreading', 'Server-side Threading'),
+        switchField('isDefault', 'Default Model'),
+        switchField('isActive', 'Active'),
+        jsonField('metadata', 'Metadata'),
+      ],
+    },
+  ],
+  defaultState: {
+    key: '',
+    label: '',
+    provider: option('openai'),
+    model: '',
+    routing: option('direct'),
+    tier: null,
+    expiryDate: null,
+    fallbackModel: null,
+    retryCount: 2,
+    fallbackRetryCount: 2,
+    apiKey: '',
+    baseUrl: '',
+    defaultTemperature: '',
+    maxTokens: '',
+    version: 1,
+    supportsServerSideThreading: false,
+    isDefault: false,
+    isActive: true,
+    metadata: {},
+  },
+  buildFormState: (row) => ({
+    key: text(row.key),
+    label: text(row.label),
+    provider: option(row.provider),
+    model: text(row.model),
+    routing: option(row.routing || 'direct'),
+    tier: row.tier ? option(row.tier) : null,
+    expiryDate: row.expiryDate ? String(row.expiryDate).slice(0, 10) : null,
+    fallbackModel: row.fallbackModel ? option(row.fallbackModel, row.fallbackModel) : null,
+    retryCount:
+      row.retryCount != null ? numberValue(row.retryCount, 0) : '',
+    fallbackRetryCount:
+      row.fallbackRetryCount != null ? numberValue(row.fallbackRetryCount, 0) : '',
+    apiKey: '',
+    baseUrl: text(row.baseUrl),
+    defaultTemperature: row.defaultTemperature != null ? String(row.defaultTemperature) : '',
+    maxTokens: row.maxTokens != null ? String(row.maxTokens) : '',
+    version: numberValue(row.version, 1),
+    supportsServerSideThreading: bool(row.supportsServerSideThreading),
+    isDefault: bool(row.isDefault),
+    isActive: bool(row.isActive, true),
+    metadata: jsonObject(row.metadata),
+  }),
+  buildCreatePayload: (values) => ({
+    key: text(values.key).trim(),
+    label: text(values.label).trim(),
+    provider: optionValue(values.provider),
+    model: text(values.model).trim(),
+    routing: optionValue(values.routing) || undefined,
+    tier: optionValue(values.tier) || undefined,
+    expiryDate: text(values.expiryDate).trim() || undefined,
+    fallbackModel: optionValue(values.fallbackModel) || undefined,
+    retryCount: text(values.retryCount).trim()
+      ? numberValue(values.retryCount, 0)
+      : undefined,
+    fallbackRetryCount: text(values.fallbackRetryCount).trim()
+      ? numberValue(values.fallbackRetryCount, 0)
+      : undefined,
+    apiKey: text(values.apiKey).trim(),
+    baseUrl: text(values.baseUrl).trim() || undefined,
+    defaultTemperature: text(values.defaultTemperature).trim()
+      ? numberValue(values.defaultTemperature, 0)
+      : undefined,
+    maxTokens: text(values.maxTokens).trim()
+      ? numberValue(values.maxTokens, 0)
+      : undefined,
+    version: numberValue(values.version, 1),
+    supportsServerSideThreading: bool(values.supportsServerSideThreading),
+    isDefault: bool(values.isDefault),
+    isActive: bool(values.isActive, true),
+    metadata: jsonObject(values.metadata),
+  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      label: (v) => text(v).trim(),
+      provider: (v) => optionValue(v),
+      model: (v) => text(v).trim(),
+      routing: (v) => optionValue(v) || undefined,
+      tier: (v) => optionValue(v) || undefined,
+      expiryDate: (v) => text(v).trim() || undefined,
+      fallbackModel: (v) => optionValue(v) || undefined,
+      retryCount: (v) => (text(v).trim() ? numberValue(v, 0) : undefined),
+      fallbackRetryCount: (v) => (text(v).trim() ? numberValue(v, 0) : undefined),
+      // Only send apiKey when the admin typed a new one.
+      apiKey: (v) => (text(v).trim() ? text(v).trim() : undefined),
+      baseUrl: (v) => text(v).trim() || undefined,
+      defaultTemperature: (v) =>
+        text(v).trim() ? numberValue(v, 0) : undefined,
+      maxTokens: (v) => (text(v).trim() ? numberValue(v, 0) : undefined),
+      version: (v) => numberValue(v, 1),
+      supportsServerSideThreading: (v) => bool(v),
+      isDefault: (v) => bool(v),
+      isActive: (v) => bool(v, true),
+      metadata: (v) => jsonObject(v),
+    }),
+});
+
+export const aiProcessorPageSchema: ModelConfig = withDefaultActions({
+  id: 'ai-processors',
+  title: 'AI Processors',
+  description:
+    'Reusable AI configurations (prompt + model). Attached to questions and to questionnaires as a polisher.',
+  endpoint: '/ai/processors',
+  columns: [
+    { key: 'key', label: 'Key', sortable: true },
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'modelKey', label: 'Model' },
+    { key: 'temperature', label: 'Temperature' },
+    { key: 'isActive', label: 'Active', sortable: true },
+  ],
+  createFieldGroups: buildFields([
+    textField('key', 'Key'),
+    textField('name', 'Name'),
+    {
+      name: 'modelKey',
+      label: 'Model',
+      type: 'async-select',
+      col: 6,
+      searchParam: {
+        endpoint: '/ai/models',
+        queryParam: 'search',
+        minChars: 0,
+        valueKey: 'key',
+        labelKey: 'label',
+      },
+    },
+    { ...textField('temperature', 'Temperature'), type: 'number' },
+    { name: 'systemPrompt', label: 'System Prompt', type: 'textarea', col: 12 },
+    jsonField('configJson', 'Config'),
+    { ...textField('version', 'Version'), type: 'number' },
+    switchField('isActive', 'Active'),
+  ]),
+  defaultState: {
+    key: '',
+    name: '',
+    modelKey: null,
+    temperature: 0.7,
+    systemPrompt: '',
+    configJson: {},
+    version: 1,
+    isActive: true,
+  },
+  buildFormState: (row) => ({
+    key: text(row.key),
+    name: text(row.name),
+    modelKey: row.modelKey ? option(row.modelKey, row.modelKey) : null,
+    temperature: numberValue(row.temperature, 0.7),
+    systemPrompt: text(row.systemPrompt),
+    configJson: jsonObject(row.configJson),
+    version: numberValue(row.version, 1),
+    isActive: bool(row.isActive, true),
+  }),
+  buildCreatePayload: (values) => ({
+    key: text(values.key).trim(),
+    name: text(values.name).trim(),
+    modelKey: optionValue(values.modelKey),
+    temperature: numberValue(values.temperature, 0.7),
+    systemPrompt: text(values.systemPrompt) || undefined,
+    configJson: jsonObject(values.configJson),
+    version: numberValue(values.version, 1),
+    isActive: bool(values.isActive, true),
+  }),
+  buildUpdatePayload: (values) =>
+    pickUpdatePayload(values, {
+      name: (v) => text(v).trim(),
+      modelKey: (v) => optionValue(v),
+      temperature: (v) => numberValue(v, 0.7),
+      systemPrompt: (v) => text(v) || undefined,
+      configJson: (v) => jsonObject(v),
+      version: (v) => numberValue(v, 1),
+      isActive: (v) => bool(v, true),
+    }),
+});
 
 export const broadcastPageSchema: ModelConfig = withDefaultActions({
   id: 'broadcasts',

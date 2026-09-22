@@ -55,8 +55,23 @@ export function useChatSocket(input: {
       }
     };
     const onDisconnect = () => setConnected(false);
+    // Orphan messages belong to a conversation that has not been created yet;
+    // surface them on the compose/pending thread immediately.
+    const onOrphan = (message: ExchangeMessage) => {
+      if (!message.conversationId?.startsWith('pending-')) {return;}
+      setPendingMessages((prev) =>
+        prev.some((item) => item.id === message.id) ? prev : [...prev, message]
+      );
+    };
     const onMessage = (message: ExchangeMessage) => {
       if (!message.conversationId) {return;}
+
+      // Once a real conversation exists the pending thread is superseded —
+      // drop the locally-held orphan messages (they are now backfilled and
+      // available through the paginated exchanges query).
+      if (message.pendingConversationId) {
+        setPendingMessages([]);
+      }
 
       // Messages routed through a "pending-" conversation id belong to the
       // compose thread (no real conversation exists yet). Surface them there
@@ -128,6 +143,7 @@ export function useChatSocket(input: {
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('conversation.message.created', onMessage);
+    socket.on('conversation.message.orphan', onOrphan);
     socket.on('conversation.updated', onUpdated);
     socket.on('conversation.read', onRead);
     socket.on('typing.started', onTypingStarted);
@@ -139,6 +155,7 @@ export function useChatSocket(input: {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('conversation.message.created', onMessage);
+      socket.off('conversation.message.orphan', onOrphan);
       socket.off('conversation.updated', onUpdated);
       socket.off('conversation.read', onRead);
       socket.off('typing.started', onTypingStarted);

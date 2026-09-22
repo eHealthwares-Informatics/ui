@@ -49,8 +49,8 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
     });
   }
 
-  function addBrand(id: string, name: string) {
-    addItem(id, 1);
+  function addBrand(id: string, name: string, price?: number | null) {
+    addItem(id, 1, { name, unitPrice: price != null ? Number(price) : undefined });
     const count = useCartStore.getState().totalItems;
     notifications.show({
       position: 'bottom-right',
@@ -211,7 +211,7 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
                               variant="light"
                               color="green"
                               leftSection={<ShoppingCart size={14} />}
-                              onClick={() => addBrand(b.id, b.name)}
+                              onClick={() => addBrand(b.id, b.name, b.unitPrice)}
                             >
                               Add
                             </Button>

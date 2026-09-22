@@ -7,8 +7,10 @@ import {
   Container,
   Grid,
   Group,
+  HoverCard,
   Image,
   Paper,
+  Pagination,
   Rating,
   SimpleGrid,
   Stack,
@@ -18,7 +20,9 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import {
   Baby,
   BadgeCheck,
@@ -50,6 +54,7 @@ import {
   QUESTIONNAIRE_CODES,
 } from './hl7-prescription';
 import productPlaceholder from '../sample_images/generic_product_image.png';
+import { websiteApi } from './api';
 import type { WebsiteProduct, HealthConcernView, TestimonialView } from './types';
 
 export const green = '#16A34A';
@@ -66,6 +71,124 @@ export const buttonStyles = {
       'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease, background-color 220ms ease',
   },
 };
+
+/**
+ * "<N> brands available" link with a hover popup listing the sibling brands
+ * (name + price) under the same generic drug. Brands are lazy-loaded on
+ * first hover. Shared by /shop/medicines and the product detail page.
+ */
+export function BrandCountLink({
+  code,
+  brandCount,
+  label,
+}: {
+  code: string;
+  brandCount: number;
+  label?: string;
+}) {
+  const navigate = useNavigate();
+  const [hovered, setHovered] = useState(false);
+  const { data } = useQuery({
+    queryKey: ['generic-drug-brands', code],
+    queryFn: () => websiteApi.getGenericDrug(code),
+    enabled: hovered,
+    staleTime: 60_000,
+  });
+  const brands = data?.similarBrands ?? [];
+
+  return (
+    <HoverCard
+      width={280}
+      shadow="md"
+      position="bottom-start"
+      openDelay={120}
+      closeDelay={50}
+      onOpen={() => setHovered(true)}
+      onClose={() => setHovered(false)}
+    >
+      <HoverCard.Target>
+        <Anchor
+          size="sm"
+          c={green}
+          fw={700}
+          onClick={() => navigate({ to: '/shop/medicines/$code', params: { code } })}
+        >
+          {label ?? `${brandCount} brand${brandCount === 1 ? '' : 's'} available`}
+        </Anchor>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Stack gap={4} p="xs">
+          <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+            Brands under this generic
+          </Text>
+          {brands.length === 0 ? (
+            <Text size="xs" c="dimmed">
+              Loading brands…
+            </Text>
+          ) : (
+            brands.slice(0, 6).map((b) => (
+              <Group key={b.id} justify="space-between" wrap="nowrap" gap={8}>
+                <Text size="xs" fw={500} lineClamp={1} style={{ flex: 1 }}>
+                  {b.name}
+                </Text>
+                <Text size="xs" c={green} style={{ flexShrink: 0 }}>
+                  {b.unitPrice != null ? `₦${Number(b.unitPrice).toLocaleString()}` : '—'}
+                </Text>
+              </Group>
+            ))
+          )}
+        </Stack>
+      </HoverCard.Dropdown>
+    </HoverCard>
+  );
+}
+
+/**
+ * Shared pager for listing pages. Renders nothing while a single page fits.
+ * `withCount` renders the top-bar variant: "Page X of Y · N items" on the
+ * left, pager on the right. Scrolls back to the top on page change.
+ */
+export function ListPagination({
+  total,
+  limit,
+  page,
+  onChange,
+  withCount = false,
+}: {
+  total?: number;
+  limit?: number;
+  page: number;
+  onChange: (page: number) => void;
+  withCount?: boolean;
+}) {
+  if (!total || !limit || limit <= 0 || total <= limit) {
+    return null;
+  }
+  const pages = Math.ceil(total / limit);
+  const pager = (
+    <Pagination
+      total={pages}
+      value={page}
+      onChange={(p) => {
+        onChange(p);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
+      radius="xl"
+      color="green"
+    />
+  );
+  if (withCount) {
+    return (
+      <Group justify="space-between" align="center" gap="md" wrap="nowrap">
+        <Text size="sm" c={muted} style={{ flexShrink: 0 }}>
+          Page {page} of {pages} · {total.toLocaleString()} item{total === 1 ? '' : 's'}
+        </Text>
+        {pager}
+      </Group>
+    );
+  }
+  return <Group justify="center">{pager}</Group>;
+}
 
 export function SectionHeading({
   eyebrow,
@@ -151,9 +274,12 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
   const navigate = useNavigate();
   const gp = product.genericProduct;
   const addItem = useCartStore((s) => s.addItem);
+  // Server resolves the concepts flag (isPrescriptionRequired); fall back to
+  // the nested product object when present, else to no-Rx.
+  const rxRequired = product.isPrescriptionRequired ?? gp?.isPrescriptionRequired ?? false;
 
   function addToCart() {
-    addItem(product.id, 1);
+    addItem(product.id, 1, { name: product.name, unitPrice: product.unitPrice ?? undefined, product });
     const count = useCartStore.getState().totalItems;
     notifications.show({
       position: 'bottom-right',
@@ -202,9 +328,17 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
             ₦{product.unitPrice.toLocaleString()}
           </Text>
         )}
-        <Text size="xs" c={muted}>
-          {gp?.isPrescriptionRequired ? 'Prescription required' : 'No prescription needed'}
-        </Text>
+        <Group gap={6}>
+          {rxRequired ? (
+            <Badge size="sm" radius="xl" variant="light" color="orange" leftSection={<Pill size={12} />}>
+              Prescription required
+            </Badge>
+          ) : (
+            <Badge size="sm" radius="xl" variant="light" color="green" leftSection={<BadgeCheck size={12} />}>
+              No prescription needed
+            </Badge>
+          )}
+        </Group>
         <Group grow gap={6}>
           <Tooltip label="Add to cart" withArrow position="top">
             <Button
@@ -213,13 +347,12 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
               style={{ background: green }}
               leftSection={<ShoppingCart size={16} />}
               styles={buttonStyles}
+              aria-label="Add to cart"
               onClick={(e) => {
                 e.stopPropagation();
                 addToCart();
               }}
-            >
-              Add to Cart
-            </Button>
+            />
           </Tooltip>
           <Tooltip label="View product details" withArrow position="top">
             <Button
@@ -647,7 +780,7 @@ export function NewsletterSection() {
   );
 }
 
-import logoImage from '../sample_images/sample_logo.png';
+import { useWebsiteBranding } from './hooks';
 
 function Heart(props: any) {
   return (
@@ -669,6 +802,7 @@ function Heart(props: any) {
 }
 
 export function Logo() {
+  const { websiteName, logoUrl } = useWebsiteBranding();
   return (
     <Group gap={10} wrap="nowrap">
       <Box
@@ -682,11 +816,11 @@ export function Logo() {
           boxShadow: '0 12px 24px rgba(22, 163, 74, 0.12)',
         }}
       >
-        <Image src={logoImage} alt="Damorex logo" fit="cover" h="100%" />
+        <Image src={logoUrl} alt={`${websiteName} logo`} fit="cover" h="100%" />
       </Box>
       <Box>
         <Text fw={900} size="xl" c={ink} lh={1}>
-          Damorex
+          {websiteName}
         </Text>
         <Text size="xs" c={green} fw={800} lh={1.1}>
           Rx Online Pharmacy

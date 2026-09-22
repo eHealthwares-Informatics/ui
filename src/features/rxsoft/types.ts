@@ -232,6 +232,7 @@ export type Field = {
     | 'text'
     | 'password'
     | 'switch'
+    | 'color'
     | 'async-select'
     | 'multi-async-select'
     | 'select'

@@ -1,9 +1,27 @@
+export interface DrugClassificationView {
+  code: string;
+  type: string;
+  name: string;
+}
+
+export interface ShopGenericDrugView {
+  code: string;
+  name: string;
+  genericClass: string | null;
+  pharmaceuticalClass: string | null;
+  averagePrice?: number | null;
+  brandCount?: number;
+  classifications: DrugClassificationView[];
+}
+
 export interface WebsiteProduct {
   id: string;
   name: string;
   code: string;
   barcode: string | null;
   category: { id: string; name: string; code: string } | null;
+  genericDrugCode?: string | null;
+  genericDrug?: ShopGenericDrugView | null;
   genericProduct: {
     id: string;
     name: string;
@@ -11,12 +29,22 @@ export interface WebsiteProduct {
     strength: string | null;
     isPrescriptionRequired: boolean;
     generalUse: string;
+    therapeuticClass?: string | null;
+    adultDosage?: string | null;
+    pediatricDosage?: string | null;
+    isControlledSubstance?: boolean;
+    classifications?: DrugClassificationView[];
     pharmaceutics: {
       commonBrandName: string | null;
       commonGenericName: string | null;
+      clinicalName?: string | null;
       dosage: string | null;
       indications: string | null;
       contraindications: string | null;
+      mechanism?: string | null;
+      drugClass?: string | null;
+      /** Pharmaceutics monograph text (excipients, formulation notes). */
+      pharmaceutics?: string | null;
     } | null;
   } | null;
   baseUomId: string;
@@ -27,6 +55,24 @@ export interface WebsiteProduct {
   mediumImageUrl?: string;
   largeImageUrl?: string;
   unitPrice?: number | null;
+  /** Resolved from concepts generic products; null/undefined when unknown (frontend defaults to no-Rx). */
+  isPrescriptionRequired?: boolean | null;
+}
+
+export interface ShopClassificationView {
+  code: string;
+  name: string;
+  type: string;
+}
+
+export interface ShopProductDetailResponse {
+  product: WebsiteProduct;
+  reviews: ProductReviewView[];
+  related: WebsiteProduct[];
+  frequentlyBought?: WebsiteProduct[];
+  genericDrug?: ShopGenericDrugView | null;
+  genericProduct?: WebsiteProduct['genericProduct'];
+  classifications?: Record<string, DrugClassificationView[]>;
 }
 
 export interface GenericMedicineVariant {
@@ -273,4 +319,14 @@ export interface GenericProductSearchResult {
   name: string;
   averagePrice: number | null;
   brandCount: number;
+}
+
+export interface WebsiteSettings {
+  organizationId: string;
+  websiteName: string;
+  logoUrl: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactWhatsApp: string;
+  contactAddress: string;
 }

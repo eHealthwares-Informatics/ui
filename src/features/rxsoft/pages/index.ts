@@ -17,6 +17,7 @@ export * from './payment-methods';
 export * from './payments';
 export * from './payment-transactions';
 export * from './payment-providers';
+export * from './organisation-payment-providers';
 export * from './pos-terminals';
 export * from './insurance-providers';
 export * from './pharmaceutics';

@@ -1,11 +1,13 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MoreHorizontal, Pencil } from 'lucide-react';
+import { MoreHorizontal, Pencil, Tags } from 'lucide-react';
 import type { PatientDetail } from '../../lib/emr-types';
 import { PatientEditForm } from './patient-edit-form';
+import { PatientTagsModal } from './patient-tags-modal';
 
 export function PatientRowActions({ row }: { row: Record<string, unknown> }) {
   const [opened, { open, close }] = useDisclosure(false);
+  const [tagsOpened, { open: openTags, close: closeTags }] = useDisclosure(false);
   const patient = row as unknown as PatientDetail;
 
   return (
@@ -20,9 +22,20 @@ export function PatientRowActions({ row }: { row: Record<string, unknown> }) {
           <Menu.Item leftSection={<Pencil size={14} />} onClick={open}>
             Edit Patient
           </Menu.Item>
+          <Menu.Item leftSection={<Tags size={14} />} onClick={openTags}>
+            Manage Tags
+          </Menu.Item>
         </Menu.Dropdown>
       </Menu>
       <PatientEditForm opened={opened} onClose={close} initial={patient} />
+      <PatientTagsModal
+        opened={tagsOpened}
+        onClose={closeTags}
+        patientId={String(row.id ?? '')}
+        patientName={
+          [row.firstName, row.lastName].filter(Boolean).join(' ') || String(row.patientId ?? '')
+        }
+      />
     </>
   );
 }

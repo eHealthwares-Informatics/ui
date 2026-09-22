@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { AdmissionsPage } from '@/features/emr/pages/wards/admissions-page';
+import { AdmissionsPage } from '@/features/emr/pages/wards/admissions';
 
 export const Route = createFileRoute('/_authenticated/emr/wards/admissions')({
   component: AdmissionsPage,

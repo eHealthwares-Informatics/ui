@@ -29,7 +29,7 @@ import { PaymentProvidersPicker } from '../shared/payment-providers-picker';
 
 function compact(values: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(values).filter(([, value]) => value !== '' && value != null),
+    Object.entries(values).filter(([, value]) => value !== '' && value != null)
   );
 }
 
@@ -94,8 +94,7 @@ export function PatientEditForm({
     validate: {
       firstName: (value) => (value.trim() ? null : 'First name is required'),
       lastName: (value) => (value.trim() ? null : 'Last name is required'),
-      email: (value) =>
-        value && !/^\S+@\S+\.\S+$/.test(value) ? 'Invalid email address' : null,
+      email: (value) => (value && !/^\S+@\S+\.\S+$/.test(value) ? 'Invalid email address' : null),
     },
   });
 

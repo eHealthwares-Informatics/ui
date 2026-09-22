@@ -2,13 +2,18 @@ import { ActionIcon, Button, Group, Menu, Modal, Stack, TextInput } from '@manti
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, View } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { emrApi } from '@/lib/emr-api';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import { AppointmentViewModal } from './appointment-view-modal';
 
-function useAppointmentMutation(successMessage: string, endpoint: string, body?: Record<string, unknown>) {
+function useAppointmentMutation(
+  successMessage: string,
+  endpoint: string,
+  body?: Record<string, unknown>
+) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
@@ -37,6 +42,7 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
   const [pending, setPending] = useState<ConfirmState>(null);
   const [cancelOpened, { open: openCancel, close: closeCancel }] = useDisclosure(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [viewOpened, { open: openView, close: closeView }] = useDisclosure(false);
 
   const checkIn = useAppointmentMutation('Appointment checked in', `${id}/check-in`, {});
   const complete = useAppointmentMutation('Appointment completed', `${id}/complete`);
@@ -56,10 +62,18 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
     setPending(null);
   };
 
-  const closed = status === 'COMPLETED' || status === 'CANCELLED' || status === 'NO_SHOW' || status === 'MISSED';
+  const closed =
+    status === 'COMPLETED' || status === 'CANCELLED' || status === 'NO_SHOW' || status === 'MISSED';
 
   if (closed) {
-    return <ActionIcon variant="subtle" color="gray" disabled aria-label="No actions"><MoreHorizontal size={16} /></ActionIcon>;
+    return (
+      <>
+        <ActionIcon variant="subtle" aria-label="Appointment actions" onClick={openView}>
+          <View size={16} />
+        </ActionIcon>
+        {viewOpened && <AppointmentViewModal row={row} onClose={closeView} />}
+      </>
+    );
   }
 
   const patientLabel = String(row.patientName ?? row.patientId ?? 'this appointment');
@@ -73,6 +87,9 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
+          <Menu.Item leftSection={<View size={14} />} onClick={openView}>
+            View
+          </Menu.Item>
           {(status === 'SCHEDULED' || status === 'CHECKED_IN') && (
             <Menu.Item onClick={() => setPending('checkIn')}>Check in</Menu.Item>
           )}
@@ -141,6 +158,8 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
           </Group>
         </Stack>
       </Modal>
+
+      {viewOpened && <AppointmentViewModal row={row} onClose={closeView} />}
     </>
   );
 }
