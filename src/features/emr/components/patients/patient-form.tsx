@@ -1,7 +1,17 @@
-import { Button, Group, Select, SimpleGrid, Stack, Textarea, TextInput } from '@mantine/core';
+import {
+  Button,
+  Group,
+  MultiSelect,
+  Select,
+  SimpleGrid,
+  Stack,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import {
   BLOOD_GROUPS,
@@ -27,6 +37,18 @@ export function PatientForm({
   onClose: () => void;
 }) {
   const queryClient = useQueryClient();
+  const [tagIds, setTagIds] = useState<string[]>([]);
+
+  const tagsQuery = useQuery({
+    queryKey: ['emr', 'tags', 'picker'],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: Array<{ id: string; name: string }> }>('/tags', {
+        params: { limit: 200, sortBy: 'name', sortOrder: 'asc' },
+      });
+      return res.data.data;
+    },
+  });
+
   const form = useForm({
     initialValues: {
       firstName: '',
@@ -55,7 +77,10 @@ export function PatientForm({
 
   const mutation = useMutation({
     mutationFn: async (values: typeof form.values) => {
-      const { data } = await emrApi.post('/patients', compact(values));
+      const { data } = await emrApi.post<{ id: string }>('/patients', compact(values));
+      if (tagIds.length > 0 && data?.id) {
+        await emrApi.put(`/patients/${data.id}/tags`, { tagIds });
+      }
       return data;
     },
     onSuccess: () => {
@@ -152,6 +177,18 @@ export function PatientForm({
         <PaymentProvidersPicker
           value={form.values.paymentProviderIds}
           onChange={(next) => form.setFieldValue('paymentProviderIds', next)}
+        />
+
+        <MultiSelect
+          label="Tags"
+          placeholder={
+            tagsQuery.data?.length ? 'Select tags' : 'No tags yet — create them under Configuration'
+          }
+          data={(tagsQuery.data ?? []).map((tag) => ({ value: tag.id, label: tag.name }))}
+          value={tagIds}
+          onChange={setTagIds}
+          searchable
+          clearable
         />
 
         <Textarea

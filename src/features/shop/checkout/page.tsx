@@ -29,7 +29,6 @@ import {
   CreditCard,
   FileUp,
   MapPin,
-  MessageCircle,
   MessageSquare,
   Package,
   Pill,
@@ -44,14 +43,13 @@ import type { WebsiteProduct } from '../website/types';
 import { useChatbotStore } from '../website/chatbot-store';
 import {
   toHL7Prescription,
-  buildWhatsAppUrl,
-  WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from '../website/hl7-prescription';
 import { useAuthStore } from '../website/auth-store';
 import { useCartStore } from '../website/cart-store';
 import { useAccountDrawerStore } from '../website/account-drawer-store';
 import { useCreateOrder, useDeliveryAreas } from '../website/hooks';
+import { websiteApi } from '../website/api';
 import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
 import {
   WebsiteLayout,
@@ -251,6 +249,18 @@ export default function CheckoutPage() {
     providers[0]?.id ?? null
   );
   const [promoCode, setPromoCode] = useState('');
+  // Coupon state: validated against POST /coupons/validate before apply, and
+  // passed to the order for server-side redemption + discount.
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountAmount: number;
+    type?: 'percent' | 'fixed';
+  } | null>(null);
+  const [couponStatus, setCouponStatus] = useState<{
+    kind: 'idle' | 'error' | 'success';
+    message: string;
+  }>({ kind: 'idle', message: '' });
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<OrderView | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const openAccountDrawer = useAccountDrawerStore((s) => s.open);
@@ -267,8 +277,40 @@ export default function CheckoutPage() {
     : subtotal >= 10000
       ? 0
       : 1500;
-  const total = subtotal + deliveryFee;
+  const total = Math.max(subtotal + deliveryFee - (appliedCoupon?.discountAmount ?? 0), 0);
   const rxItems = items.filter(itemIsRx);
+
+  const handleApplyCoupon = async () => {
+    const code = promoCode.trim();
+    if (!code) {
+      setAppliedCoupon(null);
+      setCouponStatus({ kind: 'idle', message: '' });
+      return;
+    }
+    setCheckingCoupon(true);
+    try {
+      const result = await websiteApi.validateCoupon(code, subtotal);
+      if (result.valid) {
+        setAppliedCoupon({
+          code: result.code,
+          discountAmount: result.discountAmount,
+          type: result.type,
+        });
+        setCouponStatus({
+          kind: 'success',
+          message: `Coupon ${result.code} applied — you save ${formatPrice(result.discountAmount)}.`,
+        });
+      } else {
+        setAppliedCoupon(null);
+        setCouponStatus({ kind: 'error', message: result.reason ?? 'Invalid coupon code.' });
+      }
+    } catch {
+      setAppliedCoupon(null);
+      setCouponStatus({ kind: 'error', message: 'Could not validate the coupon. Try again.' });
+    } finally {
+      setCheckingCoupon(false);
+    }
+  };
 
   const canGoNext = () => {
     switch (step) {
@@ -290,6 +332,7 @@ export default function CheckoutPage() {
       {
         paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
+        couponCode: appliedCoupon?.code,
         items: items.map((i) => {
           // Every line carries all available descriptive fields so the order is
           // readable before reconciliation: the item name as freetextName, plus
@@ -578,6 +621,10 @@ export default function CheckoutPage() {
                   deliveryFee={deliveryFee}
                   total={total}
                   totalItems={totalItems}
+                  appliedCoupon={appliedCoupon}
+                  checkingCoupon={checkingCoupon}
+                  couponStatus={couponStatus}
+                  onApplyCoupon={() => void handleApplyCoupon()}
                 />
               )}
             </>
@@ -922,27 +969,8 @@ function StepPrescriptionValidation({
               >
                 Upload Prescription
               </Button>
-              <Button
-                radius="xl"
-                variant="light"
-                color="green"
-                leftSection={<MessageCircle size={18} />}
-                onClick={() => {
-                  const cart = useCartStore.getState().items;
-                  const products = cart
-                    .map((ci) => ci.product)
-                    .filter(Boolean) as any[];
-                  const hl7 = products.length > 0
-                    ? toHL7Prescription(cart, { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACY_ORDER })
-                    : '';
-                  window.open(
-                    buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PHARMACY_ORDER),
-                    '_blank',
-                  );
-                }}
-              >
-                Contact Pharmacist
-              </Button>
+              {/* Order via chat: opens the pharmacist-technician bot in the
+                  on-site chatbot with the order payload. */}
               <Button
                 radius="xl"
                 variant="filled"
@@ -951,12 +979,12 @@ function StepPrescriptionValidation({
                 onClick={() => {
                   const cart = useCartStore.getState().items;
                   const hl7 = cart.length > 0
-                    ? toHL7Prescription(cart, { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACY_ORDER })
+                    ? toHL7Prescription(cart, { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN })
                     : '';
-                  useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACY_ORDER);
+                  useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
                 }}
               >
-                Chat
+                Order via Chat
               </Button>
             </Group>
 
@@ -981,6 +1009,10 @@ function StepPayment({
   deliveryFee,
   total,
   totalItems: _totalItems,
+  appliedCoupon,
+  checkingCoupon,
+  couponStatus,
+  onApplyCoupon,
 }: {
   providers: Array<{ id: string; name: string; providerType: string; production: boolean }>;
   paymentMethod: string | null;
@@ -992,6 +1024,10 @@ function StepPayment({
   deliveryFee: number;
   total: number;
   totalItems: number;
+  appliedCoupon: { code: string; discountAmount: number; type?: 'percent' | 'fixed' } | null;
+  checkingCoupon: boolean;
+  couponStatus: { kind: 'idle' | 'error' | 'success'; message: string };
+  onApplyCoupon: () => void;
 }) {
   return (
     <Grid>
@@ -1029,6 +1065,17 @@ function StepPayment({
               <Text fw={800}>{deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee)}</Text>
             </Group>
             <Divider />
+            {appliedCoupon && (
+              <>
+                <Group justify="space-between">
+                  <Text c={green}>Coupon ({appliedCoupon.code})</Text>
+                  <Text fw={800} c={green}>
+                    −{formatPrice(appliedCoupon.discountAmount)}
+                  </Text>
+                </Group>
+                <Divider />
+              </>
+            )}
             <Group justify="space-between">
               <Text fw={900} size="lg">
                 Total
@@ -1088,7 +1135,7 @@ function StepPayment({
               Promo Code
             </Text>
             <Input
-              placeholder="Enter promo code"
+              placeholder="Enter promo code (e.g. WELCOME20)"
               radius="xl"
               value={promoCode}
               onChange={(e) => setPromoCode(e.currentTarget.value)}
@@ -1099,12 +1146,29 @@ function StepPayment({
                   radius="xl"
                   color="green"
                   variant="light"
+                  loading={checkingCoupon}
                   style={{ marginRight: 4 }}
+                  onClick={onApplyCoupon}
                 >
                   Apply
                 </Button>
               }
             />
+            {couponStatus.kind !== 'idle' && (
+              <Text size="xs" c={couponStatus.kind === 'error' ? 'red' : green}>
+                {couponStatus.message}
+              </Text>
+            )}
+            {appliedCoupon && (
+              <Group justify="space-between">
+                <Text size="sm" c={green} fw={700}>
+                  Coupon {appliedCoupon.code}
+                </Text>
+                <Text size="sm" c={green} fw={800}>
+                  −{formatPrice(appliedCoupon.discountAmount)}
+                </Text>
+              </Group>
+            )}
           </Stack>
         </Paper>
       </Grid.Col>

@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Group,
+  Modal,
   SimpleGrid,
   Skeleton,
   Stack,
@@ -17,6 +18,8 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle } from 'lucide-react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
+import { EncounterForm } from '../components/encounters/encounter-form';
+import { RequestForm } from '../components/requests/request-form';
 import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
 import { AdmitFromVisitModal } from '../components/visits/admit-from-visit-modal';
@@ -81,11 +84,11 @@ export function VisitDetailPage() {
     },
     enabled: Boolean(visitId),
   });
-
   const [admitOpened, { open: openAdmit, close: closeAdmit }] = useDisclosure(false);
+  const [encounterOpened, { open: openEncounter, close: closeEncounter }] = useDisclosure(false);
+  const [requestOpened, { open: openRequest, close: closeRequest }] = useDisclosure(false);
   const activeAdmission =
     admissionQuery.data && admissionQuery.data.status === 'ADMITTED' ? admissionQuery.data : null;
-
   if (visitQuery.isLoading) {
     return (
       <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Visits', href: '/emr/visits' }]} title="">
@@ -176,6 +179,9 @@ export function VisitDetailPage() {
         <Card withBorder radius="md" padding="lg">
           <Group justify="space-between" mb="sm">
             <Title order={4}>Encounters ({encounters.length})</Title>
+            <Button size="compact-xs" variant="light" onClick={openEncounter}>
+              Add encounter
+            </Button>
           </Group>
           <Table striped highlightOnHover>
             <Table.Thead>
@@ -222,6 +228,9 @@ export function VisitDetailPage() {
         <Card withBorder radius="md" padding="lg">
           <Group justify="space-between" mb="sm">
             <Title order={4}>Requests ({requests.length})</Title>
+            <Button size="compact-xs" variant="light" onClick={openRequest}>
+              New request
+            </Button>
           </Group>
           <Table striped highlightOnHover>
             <Table.Thead>
@@ -281,6 +290,49 @@ export function VisitDetailPage() {
           void admissionQuery.refetch();
         }}
       />
+
+      <Modal
+        opened={encounterOpened}
+        onClose={closeEncounter}
+        title="Record Encounter"
+        size="lg"
+        centered
+      >
+        <EncounterForm
+          opened={encounterOpened}
+          onClose={closeEncounter}
+          onCreated={() => {
+            void encountersQuery.refetch();
+          }}
+          visit={{
+            id: visitId,
+            patientId: visit.patientId,
+            patientName: visit.patientName,
+          }}
+        />
+      </Modal>
+
+      <Modal
+        opened={requestOpened}
+        onClose={closeRequest}
+        title="New Clinical Request"
+        size="lg"
+        centered
+      >
+        <RequestForm
+          onClose={closeRequest}
+          onCreated={() => {
+            void requestsQuery.refetch();
+          }}
+          initialPatient={{
+            id: '',
+            patientId: visit.patientId,
+            patientName: visit.patientName ?? '',
+          }}
+          lockPatient
+          visitId={visitId}
+        />
+      </Modal>
     </RxPage>
   );
 }

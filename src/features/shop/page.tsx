@@ -58,10 +58,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useChatbotStore } from './website/chatbot-store';
-import { useProducts } from './website/hooks';
+import { useProducts, useHealthConcerns } from './website/hooks';
 import {
   toHL7Prescription,
-  buildWhatsAppUrl,
   WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from './website/hl7-prescription';
@@ -127,6 +126,31 @@ const healthConcerns = [
   { title: 'Respiratory Care', count: '85+ products', icon: Stethoscope, slug: 'respiratory-care' },
   { title: 'Digestive Health', count: '100+ products', icon: Pill, slug: 'digestive-health' },
 ];
+
+// Icon lookup for DB-backed concerns (they store an iconName string).
+const CONCERN_ICONS: Record<string, any> = {
+  mosquito: Pill,
+  activity: HeartPulse,
+  heart: Stethoscope,
+  pill: Pill,
+  plus: Plus,
+  stethoscope: Stethoscope,
+  baby: Baby,
+  user: User,
+  users: UsersRound,
+  sparkles: Sparkles,
+  minus: Minus,
+};
+
+function concernIcon(iconName?: string | null) {
+  if (!iconName) {return Pill;}
+  return CONCERN_ICONS[iconName.toLowerCase()] ?? Pill;
+}
+
+function formatConcernCount(count?: number | null): string {
+  if (count == null || count <= 0) {return 'Shop products';}
+  return `${count} product${count === 1 ? '' : 's'}`;
+}
 
 const categories = [
   {
@@ -272,6 +296,26 @@ export default function DamorexPage() {
   const { data: catalogData } = useProducts({ limit: 8 });
   const trendingProducts = trendingData?.data ?? [];
   const catalogProducts = catalogData?.data ?? [];
+
+  // Common Conditions: DB-backed concerns (with live product counts) when the
+  // mapping is seeded; the static mock above remains the fallback.
+  const { data: concernsData } = useHealthConcerns();
+  const dbConcerns = (Array.isArray(concernsData) ? concernsData : []) as Array<{
+    id: string;
+    name: string;
+    slug: string;
+    iconName?: string | null;
+    productCount?: number;
+  }>;
+  const activeConcerns =
+    dbConcerns && dbConcerns.length > 0
+      ? dbConcerns.map((c: { name: string; slug: string; iconName?: string | null; productCount?: number }) => ({
+          title: c.name,
+          count: formatConcernCount(c.productCount),
+          icon: concernIcon(c.iconName),
+          slug: c.slug,
+        }))
+      : healthConcerns;
 
   return (
     <WebsiteLayout>
@@ -646,7 +690,7 @@ export default function DamorexPage() {
             text="Browse practical care groups built around the health needs Nigerian families search for every day."
           />
           <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="md">
-            {healthConcerns.map((item) => (
+            {activeConcerns.map((item) => (
               <Card
                 className="lift-card"
                 key={item.title}
@@ -917,16 +961,13 @@ export default function DamorexPage() {
                       styles={buttonStyles}
                       onClick={() => {
                         const hl7 = toHL7Prescription(
-                          { product: item as unknown as WebsiteProduct, quantity: 1 },//TODO
-                          { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: item.name },
+                          { product: item as unknown as WebsiteProduct, quantity: 1 },
+                          { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN, customerName: item.name },
                         );
-                        window.open(
-                          buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY),
-                          '_blank',
-                        );
+                        useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
                       }}
                     >
-                      WhatsApp
+                      Order via Chat
                     </Button>
                     <Button
                       radius="xl"

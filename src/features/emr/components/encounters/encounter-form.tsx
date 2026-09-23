@@ -1,4 +1,14 @@
-import { Button, Group, Modal, Select, SimpleGrid, Stack, Text, Textarea, TextInput } from '@mantine/core';
+import {
+  Button,
+  Group,
+  Modal,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -14,13 +24,18 @@ export function EncounterForm({
   opened,
   onClose,
   onCreated,
+  visit,
 }: {
   opened: boolean;
   onClose: () => void;
   onCreated?: (record?: Record<string, unknown>) => void;
+  /** When recording against a visit: locks the patient and links the encounter. */
+  visit?: { id: string; patientId: string; patientName?: string | null };
 }) {
   const queryClient = useQueryClient();
-  const [patient, setPatient] = useState<PatientOption | null>(null);
+  const [patient, setPatient] = useState<PatientOption | null>(
+    visit ? { id: '', patientId: visit.patientId, patientName: visit.patientName ?? '' } : null
+  );
   const [patientError, setPatientError] = useState<string | null>(null);
   const [provider, setProvider] = useState<StaffOption | null>(null);
 
@@ -45,6 +60,7 @@ export function EncounterForm({
       const { data } = await emrApi.post('/encounters', {
         patientId: patient.patientId,
         // patientName: patient.patientName || undefined,
+        visitId: visit?.id,
         encounterType: values.encounterType,
         providerId: provider?.id ?? undefined,
         providerName: provider?.staffName || undefined,
@@ -58,7 +74,15 @@ export function EncounterForm({
       notifications.show({ message: 'Encounter recorded', color: 'teal' });
       queryClient.invalidateQueries({ queryKey: ['emr', 'encounters'] });
       queryClient.invalidateQueries({ queryKey: ['emr', 'visits'] });
-      onCreated?.({ ...(record as Record<string, unknown>), patientName: patient?.patientName ?? null });
+      if (visit) {
+        void queryClient.invalidateQueries({
+          queryKey: ['emr', 'visits', visit.id, 'encounters'],
+        });
+      }
+      onCreated?.({
+        ...(record as Record<string, unknown>),
+        patientName: patient?.patientName ?? null,
+      });
       onClose();
     },
     onError: (error) => {
@@ -79,6 +103,7 @@ export function EncounterForm({
               }
             }}
             required
+            disabled={Boolean(visit)}
             error={patientError}
           />
 

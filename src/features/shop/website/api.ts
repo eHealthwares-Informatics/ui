@@ -179,11 +179,25 @@ export const websiteApi = {
       .get<WebsiteProduct[]>('/website/cart', { params: { ids: ids.join(',') } })
       .then((r) => r.data),
 
+  // Coupons
+  validateCoupon: (code: string, subtotal: number) =>
+    api
+      .post<{
+        valid: boolean;
+        reason?: string;
+        code: string;
+        type?: 'percent' | 'fixed';
+        discountAmount: number;
+        subtotal: number;
+      }>('/coupons/validate', { code, subtotal })
+      .then((r) => r.data),
+
   // Orders
   createOrder: (data: {
     paymentMethod: string;
     prescriptionIds?: string[];
     notes?: string;
+    couponCode?: string;
     items: Array<{
       itemId?: string;
       freetextName?: string;

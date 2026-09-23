@@ -4,12 +4,14 @@ import {
   Avatar,
   Box,
   Button,
+  Chip,
+  FileButton,
   Group,
   Text,
   TextInput,
   Stack,
 } from '@mantine/core';
-import { MessageSquare, X, Send, Bot, Pencil } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, Pencil, Paperclip, FileText } from 'lucide-react';
 import { useChatbotStore } from './chatbot-store';
 import { useAuthStore } from './auth-store';
 import {
@@ -18,6 +20,7 @@ import {
   getStoredPhone,
   storePhone,
   type ChatMessage,
+  type ChatMessageAttachment,
 } from './chatbot-service';
 import { ChatPhoneGate } from './chat-phone-gate';
 import { TypingBubble } from '@/components/typing-dots';
@@ -32,6 +35,76 @@ interface ChoiceOption {
 interface ChoiceMessage {
   title: string;
   options: ChoiceOption[];
+}
+
+function fileToDataUri(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Render an attachment inside a bubble: inline image preview or a file chip. */
+function MessageAttachments({
+  attachments,
+  isUser,
+}: {
+  attachments: ChatMessageAttachment[];
+  isUser: boolean;
+}) {
+  if (!attachments?.length) {return null;}
+  return (
+    <Stack gap={6} mb={msgSpacing(attachments, isUser)}>
+      {attachments.map((att, i) => {
+        const src = att.url ?? att.data;
+        const isImage = att.mimeType?.startsWith('image/') ||
+          (!att.mimeType && att.data?.startsWith('data:image'));
+        if (src && isImage) {
+          return (
+            <Box
+              key={i}
+              component="img"
+              src={src}
+              alt={att.fileName ?? 'attachment'}
+              style={{
+                maxWidth: '100%',
+                maxHeight: 180,
+                borderRadius: 8,
+                display: 'block',
+                objectFit: 'cover',
+              }}
+            />
+          );
+        }
+        return src ? (
+          <Button
+            key={i}
+            component="a"
+            href={src}
+            target="_blank"
+            rel="noreferrer"
+            leftSection={<FileText size={14} />}
+            size="compact-sm"
+            variant={isUser ? 'white' : 'light'}
+            color={isUser ? 'green' : 'dark'}
+            radius="md"
+          >
+            {att.fileName ?? 'Download attachment'}
+          </Button>
+        ) : (
+          <Chip key={i} size="sm" value="" disabled>
+            <FileText size={12} /> {att.fileName ?? 'attachment'}
+          </Chip>
+        );
+      })}
+    </Stack>
+  );
+}
+
+function msgSpacing(attachments: ChatMessageAttachment[], isUser: boolean): string {
+  return attachments.length ? (isUser ? '0.25rem' : '0.25rem') : '0';
 }
 
 function parseChoiceMessage(text: string): ChoiceMessage | null {
@@ -65,6 +138,7 @@ export function ChatbotWidget() {
   const { open, initialMessage, questionnaireCode, close } = useChatbotStore();
   const authPhone = useAuthStore((state) => state.user?.phone);
   const [draft, setDraft] = useState('');
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const viewport = useRef<HTMLDivElement>(null);
   const [initialSent, setInitialSent] = useState(false);
   const [changingNumber, setChangingNumber] = useState(false);
@@ -104,9 +178,25 @@ export function ChatbotWidget() {
 
   const handleSend = () => {
     const text = draft.trim();
-    if (!text) {return;}
-    void send(text);
+    if (!text && pendingFiles.length === 0) {return;}
+    void (async () => {
+      const attachments: ChatMessageAttachment[] = [];
+      for (const file of pendingFiles) {
+        try {
+          attachments.push({
+            fileName: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            size: file.size,
+            data: await fileToDataUri(file),
+          });
+        } catch {
+          // Skip unreadable files rather than failing the whole send.
+        }
+      }
+      await session.send(text, undefined, attachments.length ? attachments : undefined);
+    })();
     setDraft('');
+    setPendingFiles([]);
   };
 
   const handleIdentity = (result: { phone: string; guest: boolean }) => {
@@ -303,6 +393,7 @@ export function ChatbotWidget() {
                       opacity: msg.optimistic ? 0.72 : 1,
                     }}
                   >
+                    <MessageAttachments attachments={msg.attachments ?? []} isUser={isUser} />
                     <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                       {msg.text}
                     </Text>
@@ -346,6 +437,24 @@ export function ChatbotWidget() {
               flexShrink: 0,
             }}
           >
+            <FileButton
+              onChange={(file) => {
+                if (file) {setPendingFiles((prev) => [...prev, file].slice(0, 3));}
+              }}
+              accept="image/*,application/pdf"
+            >
+              {(props) => (
+                <ActionIcon
+                  {...props}
+                  variant="subtle"
+                  color="gray"
+                  size={36}
+                  aria-label="Attach a file"
+                >
+                  <Paperclip size={16} />
+                </ActionIcon>
+              )}
+            </FileButton>
             <TextInput
               placeholder="Type a message..."
               value={draft}
@@ -366,11 +475,34 @@ export function ChatbotWidget() {
               color="green"
               size={36}
               onClick={handleSend}
-              disabled={!draft.trim() || sending}
+              disabled={(!draft.trim() && pendingFiles.length === 0) || sending}
             >
               <Send size={16} />
             </ActionIcon>
           </Group>
+
+          {pendingFiles.length > 0 && (
+            <Group
+              px="sm"
+              pb={6}
+              gap={6}
+              style={{ flexShrink: 0 }}
+            >
+              {pendingFiles.map((file, i) => (
+                <Chip
+                  key={`${file.name}-${i}`}
+                  size="sm"
+                  value={String(i)}
+                  checked
+                  onChange={() =>
+                    setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))
+                  }
+                >
+                  <FileText size={12} /> {file.name}
+                </Chip>
+              ))}
+            </Group>
+          )}
 
           {identity && (
             <Group

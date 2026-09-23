@@ -49,8 +49,6 @@ import { useChatbotStore } from './chatbot-store';
 import { useCartStore } from './cart-store';
 import {
   toHL7Prescription,
-  buildWhatsAppUrl,
-  WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from './hl7-prescription';
 import productPlaceholder from '../sample_images/generic_product_image.png';
@@ -371,25 +369,22 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
               <Eye size={16} />
             </Button>
           </Tooltip>
-          <Tooltip label="Ask about this on WhatsApp" withArrow position="top">
+          <Tooltip label="Order via chat — pharmacist technician bot" withArrow position="top">
             <Button
               radius="xl"
               size="sm"
               variant="light"
               color="green"
               p={8}
-              aria-label="WhatsApp enquiry"
+              aria-label="Order via chat"
               styles={buttonStyles}
               onClick={(e) => {
                 e.stopPropagation();
                 const hl7 = toHL7Prescription(
                   { product, quantity: 1 },
-                  { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                  { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN, customerName: product.name },
                 );
-                window.open(
-                  buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY),
-                  '_blank',
-                );
+                useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
               }}
             >
               <MessageCircle size={16} />

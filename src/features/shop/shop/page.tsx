@@ -18,7 +18,7 @@ import {
   useCombobox,
 } from '@mantine/core';
 import { ChevronDown, Search, SlidersHorizontal, Pill, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { EmptyProducts, EmptySearchResults } from '../website/empty-states';
 import { ProductCard, ListPagination } from '../website/components';
 import { useProducts, useCategories, useGenericProductSearch, useTherapeuticCategories, useClassifications } from '../website/hooks';
@@ -204,6 +204,24 @@ export default function ShopPage({
   const [gp, setGp] = useState<string | null>(
     typeof gpFromUrl === 'string' ? gpFromUrl : null,
   );
+  // Top-search parity: when the shopper arrives via the header search bar
+  // (?q=…) and hasn't picked a generic themselves, resolve the query against
+  // the EMDEx generic database and apply the best match as the Generic filter
+  // — identical to filtering by generic by hand. Name search stays as a
+  // fallback whenever nothing matches.
+  const topSearchQuery = typeof qFromUrl === 'string' ? qFromUrl : '';
+  const { data: topSearchGenerics } = useGenericProductSearch(topSearchQuery);
+  useEffect(() => {
+    if (!topSearchQuery || topSearchQuery.length < 2 || gpFromUrl) return;
+    const matches = (topSearchGenerics?.data ?? []) as Array<{ code: string; name: string }>;
+    if (!matches.length) return;
+    const wanted = topSearchQuery.toLowerCase();
+    const best =
+      matches.find((m) => m.name.toLowerCase() === wanted) ??
+      matches.find((m) => m.name.toLowerCase().startsWith(wanted)) ??
+      matches[0];
+    if (best?.code) setGp(best.code);
+  }, [topSearchQuery, topSearchGenerics, gpFromUrl]);
   const [classification, setClassification] = useState<string | null>(
     typeof classificationFromUrl === 'string' ? classificationFromUrl : null,
   );

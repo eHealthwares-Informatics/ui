@@ -29,12 +29,14 @@ type OrganisationConfig = {
   contactEmail: string | null;
   contactWhatsApp: string | null;
   contactAddress: string | null;
+  defaultPriceListId: string | null;
   defaultLoginTimeoutMinutes: number;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
 };
 
 type OrgOption = { id: string; name: string; code?: string };
+type PriceListOption = { id: string; name: string; code?: string; isDefault?: boolean };
 
 type Draft = {
   posHeader: string;
@@ -44,6 +46,7 @@ type Draft = {
   contactEmail: string;
   contactWhatsApp: string;
   contactAddress: string;
+  defaultPriceListId: string | null;
   defaultLoginTimeoutMinutes: number | string;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
@@ -57,6 +60,7 @@ const emptyDraft: Draft = {
   contactEmail: '',
   contactWhatsApp: '',
   contactAddress: '',
+  defaultPriceListId: null,
   defaultLoginTimeoutMinutes: 480,
   defaultAllowPos: true,
   defaultAllowA4Print: false,
@@ -88,6 +92,20 @@ export function RxOrganisationConfigPage() {
     },
   });
 
+  // Price lists of the selected organisation — candidates for the storefront
+  // default price list.
+  const { data: priceLists = [], isLoading: loadingPriceLists } = useQuery({
+    queryKey: ['config', 'price-lists', organizationId],
+    enabled: !!organizationId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/price-lists', {
+        params: { limit: 200, organizationId },
+      });
+      return (data?.data ?? data ?? []) as PriceListOption[];
+    },
+  });
+
   useEffect(() => {
     if (!config) {
       setDraft(emptyDraft);
@@ -101,6 +119,7 @@ export function RxOrganisationConfigPage() {
       contactEmail: config.contactEmail ?? '',
       contactWhatsApp: config.contactWhatsApp ?? '',
       contactAddress: config.contactAddress ?? '',
+      defaultPriceListId: config.defaultPriceListId ?? null,
       defaultLoginTimeoutMinutes: config.defaultLoginTimeoutMinutes,
       defaultAllowPos: config.defaultAllowPos,
       defaultAllowA4Print: config.defaultAllowA4Print,
@@ -119,6 +138,7 @@ export function RxOrganisationConfigPage() {
           contactEmail: draft.contactEmail || null,
           contactWhatsApp: draft.contactWhatsApp || null,
           contactAddress: draft.contactAddress || null,
+          defaultPriceListId: draft.defaultPriceListId || null,
           defaultLoginTimeoutMinutes:
             draft.defaultLoginTimeoutMinutes === ''
               ? undefined
@@ -131,6 +151,7 @@ export function RxOrganisationConfigPage() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(['organisation-config', organizationId], data);
+      queryClient.invalidateQueries({ queryKey: ['website'] });
       notifications.show({ color: 'green', message: 'Organisation configuration saved' });
     },
     onError: (err: any) => {
@@ -144,6 +165,11 @@ export function RxOrganisationConfigPage() {
   const orgData = organizations.map((o) => ({
     value: o.id,
     label: o.code ? `${o.code} - ${o.name}` : o.name,
+  }));
+
+  const priceListData = priceLists.map((p) => ({
+    value: p.id,
+    label: `${p.code ? `${p.code} — ` : ''}${p.name}${p.isDefault ? ' (current default)' : ''}`,
   }));
 
   return (
@@ -162,7 +188,7 @@ export function RxOrganisationConfigPage() {
             placeholder={loadingOrgs ? 'Loading organisations…' : 'Select an organisation'}
             data={orgData}
             value={organizationId}
-            onChange={setOrganizationId}
+            onChange={(value) => setOrganizationId(value ?? null)}
             searchable
             clearable
             disabled={loadingOrgs}
@@ -190,14 +216,20 @@ export function RxOrganisationConfigPage() {
                 description="Caption shown in the storefront header (defaults to Damorex)."
                 placeholder="e.g. Damorex"
                 value={draft.websiteName}
-                onChange={(e) => setDraft((d) => ({ ...d, websiteName: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const websiteName = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, websiteName }));
+                }}
               />
               <TextInput
                 label="Logo Image URL"
                 description="Logo used as the storefront favicon and header logo (defaults to /sample_images/rx.ico)."
                 placeholder="e.g. /sample_images/rx.ico"
                 value={draft.logoUrl}
-                onChange={(e) => setDraft((d) => ({ ...d, logoUrl: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const logoUrl = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, logoUrl }));
+                }}
               />
               {draft.logoUrl && (
                 <Group gap="sm" align="center">
@@ -218,40 +250,72 @@ export function RxOrganisationConfigPage() {
                   </Text>
                 </Group>
               )}
+              <Select
+                label="Default Price List"
+                description="Price list used for storefront prices and sorting. Falls back to the price list marked default when unset."
+                placeholder={
+                  loadingPriceLists ? 'Loading price lists…' : 'Select a price list'
+                }
+                data={priceListData}
+                value={draft.defaultPriceListId}
+                onChange={(value) => {
+                  const defaultPriceListId = value ?? null;
+                  setDraft((d) => ({ ...d, defaultPriceListId }));
+                }}
+                searchable
+                clearable
+                disabled={loadingPriceLists}
+                nothingFoundMessage="No price lists found"
+              />
               <TextInput
                 label="Contact Phone"
                 description="Phone number shown on the storefront contact page."
                 placeholder="e.g. +2348022224166"
                 value={draft.contactPhone}
-                onChange={(e) => setDraft((d) => ({ ...d, contactPhone: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const contactPhone = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, contactPhone }));
+                }}
               />
               <TextInput
                 label="Contact Email"
                 description="Email address shown on the storefront contact page."
                 placeholder="e.g. info@damorex.com"
                 value={draft.contactEmail}
-                onChange={(e) => setDraft((d) => ({ ...d, contactEmail: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const contactEmail = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, contactEmail }));
+                }}
               />
               <TextInput
                 label="Contact WhatsApp"
                 description="WhatsApp number used for storefront enquiries."
                 placeholder="e.g. +2348022224166"
                 value={draft.contactWhatsApp}
-                onChange={(e) => setDraft((d) => ({ ...d, contactWhatsApp: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const contactWhatsApp = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, contactWhatsApp }));
+                }}
               />
               <TextInput
                 label="Contact Address"
                 description="Address shown on the storefront contact page."
                 placeholder="e.g. Lagos, Nigeria"
                 value={draft.contactAddress}
-                onChange={(e) => setDraft((d) => ({ ...d, contactAddress: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const contactAddress = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, contactAddress }));
+                }}
               />
               <TextInput
                 label="POS Header"
                 description="Header text printed on POS receipts."
                 placeholder="e.g. RxSoft Pharmacy Ltd."
                 value={draft.posHeader}
-                onChange={(e) => setDraft((d) => ({ ...d, posHeader: e.currentTarget.value }))}
+                onChange={(e) => {
+                  const posHeader = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, posHeader }));
+                }}
               />
               <NumberInput
                 label="Default Login Timeout (minutes)"

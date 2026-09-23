@@ -14,6 +14,14 @@ import { useReplyingAnimation } from '@/lib/use-replying-animation';
 const ANON_PHONE_KEY = 'damorex-chatbot-phone';
 export const SHOP_WEB_CHANNEL_ID = '6ab1d8afcf668f7bdb084dbb';
 
+export interface ChatMessageAttachment {
+  fileName?: string;
+  mimeType?: string;
+  size?: number;
+  url?: string;
+  data?: string;
+}
+
 export interface ChatMessage {
   id: string;
   text: string;
@@ -21,6 +29,7 @@ export interface ChatMessage {
   createdAt: string;
   orphan?: boolean;
   optimistic?: boolean;
+  attachments?: ChatMessageAttachment[];
 }
 
 export interface RawExchangeMessage {
@@ -32,6 +41,7 @@ export interface RawExchangeMessage {
   text: string;
   questionId?: string;
   attribute?: string;
+  attachments?: ChatMessageAttachment[];
   createdAt: string;
   status?: string;
   orphan?: boolean;
@@ -176,6 +186,7 @@ export async function sendWebChatMessage(input: {
   text: string;
   conversationId?: string;
   questionnaireCode?: string;
+  attachments?: ChatMessageAttachment[];
 }): Promise<{ conversationId?: string; participantId?: string }> {
   const body: Record<string, unknown> = {
     channelId: SHOP_WEB_CHANNEL_ID,
@@ -187,6 +198,9 @@ export async function sendWebChatMessage(input: {
   }
   if (input.questionnaireCode) {
     body.questionnaireCode = input.questionnaireCode;
+  }
+  if (input.attachments?.length) {
+    body.attachments = input.attachments;
   }
 
   const response = await conversationApi.post('/webhooks/web', body);
@@ -244,6 +258,7 @@ function toChatMessage(raw: RawExchangeMessage): ChatMessage {
     role: raw.direction === 'inbound' ? 'user' : 'bot',
     createdAt: raw.createdAt,
     orphan: raw.orphan,
+    attachments: raw.attachments,
   };
 }
 
@@ -605,9 +620,9 @@ export function useShopChatThread(input: {
   }, [enabled, senderPhone, guest, queryClient, openConversation]);
 
   const send = useCallback(
-    async (text: string, questionnaireCode?: string) => {
+    async (text: string, questionnaireCode?: string, attachments?: ChatMessageAttachment[]) => {
       const trimmed = text.trim();
-      if (!trimmed || sending) {
+      if ((!trimmed && !attachments?.length) || sending) {
         return;
       }
 
@@ -618,6 +633,7 @@ export function useShopChatThread(input: {
         role: 'user',
         createdAt: new Date().toISOString(),
         optimistic: true,
+        attachments,
       };
       setOptimistic((prev) => [...prev, optimisticMessage]);
       setSending(true);
@@ -625,9 +641,10 @@ export function useShopChatThread(input: {
       try {
         const result = await sendWebChatMessage({
           senderPhone,
-          text: trimmed,
+          text: trimmed || (attachments?.length ? `Sent a file: ${attachments[0].fileName ?? 'attachment'}` : ''),
           conversationId: conversationIdRef.current ?? undefined,
           questionnaireCode,
+          attachments,
         });
         if (result?.conversationId && result.conversationId !== conversationIdRef.current) {
           openConversation(result.conversationId);

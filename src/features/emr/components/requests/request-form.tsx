@@ -19,9 +19,9 @@ import { useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import { PRIORITIES, REQUEST_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
-import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 
 type RequestItem = {
   name: string;
@@ -51,12 +51,15 @@ export function RequestForm({
   initialPatient,
   submitUrl,
   lockPatient = false,
+  visitId,
 }: {
   onCreated?: (created?: Record<string, unknown>) => void;
   onClose: () => void;
   initialPatient?: PatientOption | null;
   submitUrl?: string;
   lockPatient?: boolean;
+  /** Links the request to a visit (encounters/requests attach to visits). */
+  visitId?: string;
 }) {
   const queryClient = useQueryClient();
   const [patient, setPatient] = useState<PatientOption | null>(initialPatient ?? null);
@@ -103,6 +106,7 @@ export function RequestForm({
       const { data } = await emrApi.post(submitUrl ?? '/requests', {
         patientId: patient.patientId,
         patientName: patient.patientName || undefined,
+        visitId: visitId || undefined,
         requestType: values.requestType,
         priority: values.priority,
         orderingProviderId: orderingProvider?.id ?? undefined,
@@ -169,13 +173,27 @@ export function RequestForm({
           />
         </SimpleGrid>
 
-        <TextInput label="Diagnosis" placeholder="Working diagnosis" {...form.getInputProps('diagnosis')} />
-        <Textarea label="Clinical notes" autosize minRows={2} {...form.getInputProps('clinicalNotes')} />
+        <TextInput
+          label="Diagnosis"
+          placeholder="Working diagnosis"
+          {...form.getInputProps('diagnosis')}
+        />
+        <Textarea
+          label="Clinical notes"
+          autosize
+          minRows={2}
+          {...form.getInputProps('clinicalNotes')}
+        />
 
         <Divider label={`Items (${form.values.items.length})`} labelPosition="left" />
 
         {form.values.items.map((_, index) => (
-          <Stack key={index} gap="xs" p="sm" style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 8 }}>
+          <Stack
+            key={index}
+            gap="xs"
+            p="sm"
+            style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 8 }}
+          >
             <Group justify="space-between">
               <Text size="sm" fw={500}>
                 Item {index + 1}
@@ -200,8 +218,14 @@ export function RequestForm({
               value={itemRefs[index] ?? null}
               onChange={(next) => {
                 setItemRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
-                form.setFieldValue(`items.${index}.name`, next?.label ?? form.values.items[index].name);
-                form.setFieldValue(`items.${index}.code`, next?.code ?? form.values.items[index].code);
+                form.setFieldValue(
+                  `items.${index}.name`,
+                  next?.label ?? form.values.items[index].name
+                );
+                form.setFieldValue(
+                  `items.${index}.code`,
+                  next?.code ?? form.values.items[index].code
+                );
               }}
             />
             <TextInput
@@ -211,7 +235,11 @@ export function RequestForm({
               {...form.getInputProps(`items.${index}.name`)}
             />
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput label="Code" placeholder="Item or LOINC code" {...form.getInputProps(`items.${index}.code`)} />
+              <TextInput
+                label="Code"
+                placeholder="Item or LOINC code"
+                {...form.getInputProps(`items.${index}.code`)}
+              />
               <NumberInput
                 label="Quantity"
                 min={0}
@@ -220,13 +248,33 @@ export function RequestForm({
               />
             </SimpleGrid>
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
-              <TextInput label="Dose" placeholder="e.g. 500" {...form.getInputProps(`items.${index}.dose`)} />
-              <TextInput label="Dose unit" placeholder="e.g. mg" {...form.getInputProps(`items.${index}.doseUnit`)} />
-              <TextInput label="Frequency" placeholder="e.g. TDS" {...form.getInputProps(`items.${index}.frequency`)} />
+              <TextInput
+                label="Dose"
+                placeholder="e.g. 500"
+                {...form.getInputProps(`items.${index}.dose`)}
+              />
+              <TextInput
+                label="Dose unit"
+                placeholder="e.g. mg"
+                {...form.getInputProps(`items.${index}.doseUnit`)}
+              />
+              <TextInput
+                label="Frequency"
+                placeholder="e.g. TDS"
+                {...form.getInputProps(`items.${index}.frequency`)}
+              />
             </SimpleGrid>
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput label="Route" placeholder="e.g. Oral" {...form.getInputProps(`items.${index}.route`)} />
-              <TextInput label="Instructions" placeholder="Special instructions" {...form.getInputProps(`items.${index}.instructions`)} />
+              <TextInput
+                label="Route"
+                placeholder="e.g. Oral"
+                {...form.getInputProps(`items.${index}.route`)}
+              />
+              <TextInput
+                label="Instructions"
+                placeholder="Special instructions"
+                {...form.getInputProps(`items.${index}.instructions`)}
+              />
             </SimpleGrid>
           </Stack>
         ))}
