@@ -1,4 +1,4 @@
-import { Group } from '@mantine/core';
+import { Group, Modal } from '@mantine/core';
 import { useMemo } from 'react';
 import { DataPageShell } from '@/features/components/page/data-page-shell';
 import { AppointmentRowActions } from '../../components/appointments/appointment-actions';
@@ -12,7 +12,9 @@ export function AppointmentsPage() {
     () => ({
       ...appointmentsConfig,
       renderCreateModal: ({ onClose }: { onClose: () => void }) => (
-        <AppointmentForm onClose={onClose} />
+        <Modal opened onClose={onClose} title="New Appointment" size="lg">
+          <AppointmentForm onClose={onClose} />
+        </Modal>
       ),
       columns: [
         ...appointmentsConfig.columns,

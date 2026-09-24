@@ -13,10 +13,10 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, FileText, Stethoscope } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import {
@@ -41,6 +41,64 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
       </Text>
       <Text size="sm">{value || '—'}</Text>
     </Stack>
+  );
+}
+
+/**
+ * Live elapsed timer for an ACTIVE encounter. Auto-ends the encounter via
+ * [onAutoEnd] once [autoEndAfterHours] have elapsed.
+ */
+function LiveEncounterTimer({
+  startedAt,
+  endedAt,
+  autoEndAfterHours,
+  onAutoEnd,
+}: {
+  startedAt: string;
+  endedAt: string | null;
+  autoEndAfterHours: number;
+  onAutoEnd?: () => void;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (endedAt) return;
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [endedAt]);
+
+  useEffect(() => {
+    if (endedAt || !onAutoEnd) return;
+    const hours = (now - new Date(startedAt).getTime()) / 3_600_000;
+    if (hours >= autoEndAfterHours) onAutoEnd();
+  }, [now, startedAt, endedAt, autoEndAfterHours, onAutoEnd]);
+
+  if (endedAt) return null;
+
+  const ms = Math.max(0, now - new Date(startedAt).getTime());
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return (
+    <Card
+      withBorder
+      radius="md"
+      padding="sm"
+      mb="md"
+      style={{ borderColor: 'var(--mantine-color-blue-3)' }}
+    >
+      <Group gap="xs" justify="center">
+        <Text size="sm" fw={700} ff="monospace">
+          {pad(hours)}:{pad(minutes)}:{pad(seconds)}
+        </Text>
+        <Text size="xs" c="dimmed">
+          elapsed · auto-ends after {autoEndAfterHours}h
+        </Text>
+      </Group>
+    </Card>
   );
 }
 
@@ -87,13 +145,41 @@ export function EncounterDetailPage() {
   const requestsQuery = useQuery({
     queryKey: ['emr', 'encounters', encounterId, 'requests'],
     queryFn: async () => {
-      const res = await emrApi.get<{ data: Array<Record<string, unknown>> }>('/requests', {
-        params: { encounterId, limit: 100 },
-      });
-      return res.data.data;
+      // Requests of the encounter AND its whole visit.
+      const [byEncounter, byVisit] = await Promise.all([
+        emrApi.get<{ data: Array<Record<string, unknown>> }>('/requests', {
+          params: { encounterId, limit: 100 },
+        }),
+        encounter?.visitId
+          ? emrApi.get<{ data: Array<Record<string, unknown>> }>('/requests', {
+              params: { visitId: encounter.visitId, limit: 100 },
+            })
+          : Promise.resolve({ data: { data: [] as Array<Record<string, unknown>> } }),
+      ]);
+      const merged = new Map<string, Record<string, unknown>>();
+      for (const row of [...byEncounter.data.data, ...byVisit.data.data]) {
+        if (row && typeof row === 'object' && typeof row.id === 'string') {
+          merged.set(row.id, row);
+        }
+      }
+      return Array.from(merged.values());
     },
     enabled: Boolean(encounterId),
   });
+
+  const encounterMutationInProgress =
+    encounter?.status === 'ACTIVE';
+
+  const endEncounterMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await emrApi.patch(`/encounters/${encounterId}`, {
+        status: 'COMPLETED',
+        endedAt: new Date().toISOString(),
+      });
+      return data;
+    },
+  });
+  const endEncounterPending = endEncounterMutation.isPending;
 
   const activeEncounter: ActiveEncounter | null = encounter
     ? {
@@ -143,6 +229,24 @@ export function EncounterDetailPage() {
       description={encounter.reason ?? formatEnum(encounter.encounterType)}
       actions={
         <Group gap="sm">
+          {encounter.status !== 'COMPLETED' && (
+            <Button
+              variant="outline"
+              color="red"
+              loading={endEncounterPending}
+              onClick={() => {
+                endEncounterMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    void queryClient.invalidateQueries({
+                      queryKey: ['emr', 'encounters', encounterId],
+                    });
+                  },
+                });
+              }}
+            >
+              End Encounter
+            </Button>
+          )}
           <Button variant="light" leftSection={<Stethoscope size={16} />} onClick={openRequest}>
             Create Request
           </Button>
@@ -152,6 +256,25 @@ export function EncounterDetailPage() {
         </Group>
       }
     >
+      <LiveEncounterTimer
+        startedAt={encounter.encounterDatetime}
+        endedAt={encounter.endedAt ?? null}
+        autoEndAfterHours={8}
+        onAutoEnd={
+          encounterMutationInProgress
+            ? () => {
+                endEncounterMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    void queryClient.invalidateQueries({
+                      queryKey: ['emr', 'encounters', encounterId],
+                    });
+                  },
+                });
+              }
+            : undefined
+        }
+      />
+
       <Tabs defaultValue="details">
         <Tabs.List mb="md">
           <Tabs.Tab value="details">Details</Tabs.Tab>
@@ -167,6 +290,18 @@ export function EncounterDetailPage() {
           <Card withBorder radius="md" padding="lg">
             <Group gap="xs" wrap="wrap" mb="md">
               <Badge variant="light">{encounter.encounterNumber}</Badge>
+              <Badge
+                variant="filled"
+                color={
+                  encounter.status === 'COMPLETED'
+                    ? 'gray'
+                    : encounter.status === 'CANCELLED'
+                      ? 'red'
+                      : 'blue'
+                }
+              >
+                {encounter.status ?? 'ACTIVE'}
+              </Badge>
               <StatusBadge value={encounter.encounterType} kind="encounter" />
             </Group>
 
@@ -191,8 +326,28 @@ export function EncounterDetailPage() {
               )}
               <DetailRow label="Provider" value={encounter.providerName} />
               <DetailRow
-                label="Datetime"
+                label="Start"
                 value={new Date(encounter.encounterDatetime).toLocaleString()}
+              />
+              <DetailRow
+                label="End"
+                value={
+                  encounter.endedAt
+                    ? new Date(encounter.endedAt).toLocaleString()
+                    : encounter.status === 'ACTIVE'
+                      ? 'In progress'
+                      : '—'
+                }
+              />
+              <DetailRow
+                label="Created"
+                value={
+                  (encounter as unknown as { createdAt?: string }).createdAt
+                    ? new Date(
+                        (encounter as unknown as { createdAt?: string }).createdAt!,
+                      ).toLocaleString()
+                    : '—'
+                }
               />
             </SimpleGrid>
 

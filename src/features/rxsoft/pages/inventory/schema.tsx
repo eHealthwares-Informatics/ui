@@ -17,6 +17,11 @@ const stockBalancesColumns: Column[] = [
     filters: RELATION_FILTER({ endpoint: '/items', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 2 }),
   },
   {
+    key: 'itemCode',
+    label: 'Item Code',
+    render: (row) => (row as any).item?.code ?? '-',
+  },
+  {
     key: 'location',
     label: 'Location',
     render: (row) => (row as any).location?.name ?? (row as any).locationId ?? '-',

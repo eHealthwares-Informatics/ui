@@ -152,9 +152,11 @@ export type Encounter = {
   patientName: string | null;
   visitId: string | null;
   encounterType: string;
+  status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | string;
   providerId: string | null;
   providerName: string | null;
   encounterDatetime: string;
+  endedAt?: string | null;
   reason: string | null;
   notes: string | null;
 };

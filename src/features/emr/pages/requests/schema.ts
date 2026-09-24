@@ -1,4 +1,4 @@
-import { type Column, EQUALS_WITH_OPTIONS } from '@/features/rxsoft/types';
+import { ColumnDataType, ColumnTypeFilters, EQUALS_WITH_OPTIONS, type Column } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { badgeCol, dateTimeCol, patientCol } from '../../lib/emr-columns';
@@ -32,7 +32,19 @@ const columns: Column[] = [
     ...badgeCol('syncStatus', 'Sync', 'sync'),
     filters: EQUALS_WITH_OPTIONS(toSelectData(SYNC_STATUSES)),
   },
-  { ...dateTimeCol('requestedAt', 'Requested') },
+  {
+    ...dateTimeCol('requestedAt', 'Requested'),
+    sortable: true,
+    filters: ColumnTypeFilters.DATE,
+  },
+  {
+    key: 'createdAt',
+    label: 'Created',
+    dataType: ColumnDataType.DATE,
+    sortable: true,
+    filters: ColumnTypeFilters.DATE,
+    render: (row) => (row.createdAt ? new Date(String(row.createdAt)).toLocaleString() : '—'),
+  },
 ];
 
 export const requestsConfig: ModelConfig = {

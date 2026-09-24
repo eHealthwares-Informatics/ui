@@ -2,8 +2,10 @@ import {
   Badge,
   Button,
   Card,
+  CopyButton,
   Group,
   Modal,
+  Radio,
   Select,
   Stack,
   Text,
@@ -14,6 +16,7 @@ import {
   Table,
   Timeline,
   Alert,
+  Anchor,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -29,11 +32,18 @@ import {
   AlertTriangle,
   Eye,
   List,
+  ReceiptText,
+  CornerDownRight,
+  Link2,
+  Ban,
+  Copy,
 } from 'lucide-react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { RxPage } from '../../../components/page/rx-page';
 import { websiteOrdersConfig } from './schema';
+import { NotificationSettingsButton } from './notification-settings';
+import { flattenChildRows } from './order-children';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'yellow',
@@ -79,6 +89,17 @@ export function RxWebsiteOrdersPage() {
   const [postSaleOrderId, setPostSaleOrderId] = useState<string | null>(null);
   const [stockLocationId, setStockLocationId] = useState<string | null>(null);
   const [postOrgId, setPostOrgId] = useState<string | null>(null);
+  // Unreconciled-post options chosen in the "Cannot Post unreconciled Items" warning
+  const [postIgnoreUnreconciled, setPostIgnoreUnreconciled] = useState(false);
+  const [postCreateChildOrder, setPostCreateChildOrder] = useState(false);
+  // Answer to "has payment been made, or should it post as a receivable?"
+  const [postPaymentIntent, setPostPaymentIntent] = useState<'paid' | 'receivable'>('paid');
+  // Post-confirmation: invoice + payment balance link
+  const [postConfirmOpen, setPostConfirmOpen] = useState(false);
+  const [postResult, setPostResult] = useState<{ orderId: string | null; saleNumber: string | null; childOrderNumber: string | null; paymentLinkUrl: string | null } | null>(null);
+  const [paymentLinkState, setPaymentLinkState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [paymentLinkUrl, setPaymentLinkUrl] = useState<string | null>(null);
+  const [paymentLinkError, setPaymentLinkError] = useState<string | null>(null);
   const [matchCheckOpen, setMatchCheckOpen] = useState(false);
   const [matchCheckOrder, setMatchCheckOrder] = useState<any>(null);
   const [unmatchedItems, setUnmatchedItems] = useState<any[]>([]);
@@ -88,6 +109,10 @@ export function RxWebsiteOrdersPage() {
   const [reconcileVersion, setReconcileVersion] = useState(0);
   // Track orders reconciled client-side so icon disappears immediately
   const [reconciledOrderIds, setReconciledOrderIds] = useState<Set<string>>(new Set());
+  // Cancel-cascade prompt: parent order awaiting the "cancel children too?" answer
+  const [cascadeCancelOrder, setCascadeCancelOrder] = useState<any>(null);
+  // Per-row payment-link action state: `${orderId}:${token}` while a revoke is in flight
+  const [linkBusyKey, setLinkBusyKey] = useState<string | null>(null);
 
   const { data: locations = [] } = useQuery({
     queryKey: ['stock-locations', 'all'],
@@ -112,11 +137,21 @@ export function RxWebsiteOrdersPage() {
   };
 
   const statusUpdateMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      await rxsoftApi.patch(`/website/admin/orders/${id}/status`, { status });
+    mutationFn: async ({ id, status, cascadeCancelChildren }: { id: string; status: string; cascadeCancelChildren?: boolean }) => {
+      const { data } = await rxsoftApi.patch(`/website/admin/orders/${id}/status`, {
+        status,
+        cascadeCancelChildren: cascadeCancelChildren || undefined,
+      });
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       notifications.show({ message: 'Status updated.', color: 'green' });
+      if (Array.isArray(data?.cancelledChildren) && data.cancelledChildren.length > 0) {
+        notifications.show({
+          message: `Also cancelled child order(s): ${data.cancelledChildren.join(', ')}`,
+          color: 'orange',
+        });
+      }
       invalidateOrders();
     },
     onError: (err: any) => {
@@ -126,17 +161,44 @@ export function RxWebsiteOrdersPage() {
 
   const postSaleMutation = useMutation({
     mutationFn: async () => {
-      await rxsoftApi.post(`/website/admin/orders/${postSaleOrderId}/post-sale`, {
+      const { data } = await rxsoftApi.post(`/website/admin/orders/${postSaleOrderId}/post-sale`, {
         stockLocationId: stockLocationId || undefined,
         organizationId: postOrgId || undefined,
+        ignoreUnreconciled: postIgnoreUnreconciled || undefined,
+        createChildOrder: postCreateChildOrder || undefined,
+        paymentIntent: postPaymentIntent || undefined,
       });
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       notifications.show({ message: 'Order posted as sale.', color: 'green' });
       invalidateOrders();
       setPostSaleOpen(false);
       setStockLocationId(null);
       setPostOrgId(null);
+      setPostIgnoreUnreconciled(false);
+      setPostCreateChildOrder(false);
+      // Post-confirmation: invoice + payment balance link (useful when the
+      // eventual payment doesn't match the order total).
+      setPostResult({
+        orderId: postSaleOrderId,
+        saleNumber: data?.sale?.saleNumber ?? data?.saleNumber ?? null,
+        childOrderNumber: data?.childOrderNumber ?? null,
+        paymentLinkUrl: data?.paymentLinkUrl ?? null,
+      });
+      // Receivable posts come back with an auto-generated payment link —
+      // show it ready-to-copy immediately; otherwise start idle with a
+      // "Generate payment balance link" action.
+      if (data?.paymentLinkUrl) {
+        setPaymentLinkUrl(data.paymentLinkUrl);
+        setPaymentLinkState('ready');
+        setPaymentLinkError(null);
+      } else {
+        setPaymentLinkState('idle');
+        setPaymentLinkUrl(null);
+        setPaymentLinkError(null);
+      }
+      setPostConfirmOpen(true);
     },
     onError: (err: any) => {
       notifications.show({ message: err?.response?.data?.message ?? 'Post sale failed.', color: 'red' });
@@ -161,11 +223,98 @@ export function RxWebsiteOrdersPage() {
       setMatchCheckOpen(true);
       return;
     }
+    startPostSale(order, false, false);
+  }
+
+  /** Opens the Post-as-Sale modal with the chosen unreconciled-post options. */
+  function startPostSale(order: any, ignoreUnreconciled: boolean, createChildOrder: boolean) {
     setPostSaleOrderId(order.id);
     setStockLocationId(null);
     setPostOrgId(order.organizationId ?? null);
+    setPostIgnoreUnreconciled(ignoreUnreconciled);
+    setPostCreateChildOrder(createChildOrder);
+    setPostPaymentIntent('paid');
     setPostSaleOpen(true);
   }
+
+  const cancellableChildrenOf = (row: any): any[] =>
+    (row?.childOrders ?? []).filter(
+      (c: any) =>
+        (c.orderStatus === 'pending' || c.orderStatus === 'confirmed') &&
+        (c.items ?? []).some((i: any) => !i.itemId),
+    );
+
+  /** Status select hook: intercept parent cancels that would strand children. */
+  function handleStatusSelect(row: any, status: string) {
+    if (status === 'cancelled' && cancellableChildrenOf(row).length > 0) {
+      setCascadeCancelOrder(row);
+      return;
+    }
+    statusUpdateMutation.mutate({ id: row.id, status });
+  }
+
+  function confirmCascadeCancel(cascade: boolean) {
+    const order = cascadeCancelOrder;
+    setCascadeCancelOrder(null);
+    if (!order) {return;}
+    statusUpdateMutation.mutate({ id: order.id, status: 'cancelled', cascadeCancelChildren: cascade });
+  }
+
+  /** Generates an order payment link (customer /shop/pay/:token URL) after posting. */
+  async function handleGeneratePaymentLink() {
+    if (!postResult?.orderId) {return;}
+    setPaymentLinkState('loading');
+    setPaymentLinkError(null);
+    try {
+      const { data } = await rxsoftApi.post('/payment-links', {
+        type: 'order_payment',
+        orderId: postResult.orderId,
+      });
+      const url = data?.url ?? (data?.link?.token ? `/shop/pay/${data.link.token}` : null);
+      if (!url) {throw new Error('No link URL returned');}
+      setPaymentLinkUrl(url);
+      setPaymentLinkState('ready');
+    } catch (err: any) {
+      setPaymentLinkError(err?.response?.data?.message ?? 'Could not generate a payment link.');
+      setPaymentLinkState('error');
+    }
+  }
+
+  const handleGenerateLink = async (order: any) => {
+    setLinkBusyKey(`${order.id}:create`);
+    try {
+      const { data } = await rxsoftApi.post(`/orders/admin/orders/${order.id}/payment-link`);
+      if (data?.url) {
+        notifications.show({ message: `Payment link created for ${order.orderNumber}`, color: 'green' });
+        await qc.invalidateQueries({ queryKey: ['website-orders'] });
+      } else {
+        notifications.show({ message: 'Could not create a payment link.', color: 'red' });
+      }
+    } catch (err: any) {
+      notifications.show({ message: err?.response?.data?.message ?? 'Could not create a payment link.', color: 'red' });
+    } finally {
+      setLinkBusyKey(null);
+    }
+  };
+
+  const handleRevokeLink = async (order: any) => {
+    const token = order?.paymentLink?.token;
+    if (!token) {return;}
+    setLinkBusyKey(`${order.id}:revoke`);
+    try {
+      const { data } = await rxsoftApi.post(`/orders/admin/orders/${order.id}/payment-link/revoke`, { token });
+      if (data === true) {
+        notifications.show({ message: 'Payment link revoked', color: 'orange' });
+        await qc.invalidateQueries({ queryKey: ['website-orders'] });
+      } else {
+        notifications.show({ message: 'No active payment link to revoke.', color: 'red' });
+      }
+    } catch (err: any) {
+      notifications.show({ message: err?.response?.data?.message ?? 'Could not revoke the payment link.', color: 'red' });
+    } finally {
+      setLinkBusyKey(null);
+    }
+  };
 
   const config = useMemo(() => {
     const actionsColumn = {
@@ -175,6 +324,11 @@ export function RxWebsiteOrdersPage() {
         const hasFreetext = !reconciledOrderIds.has(row.id) && row.items?.some((i: any) => !i.itemId && !i.genericItemCode);
         return (
           <Group gap="xs">
+            {row.parentOrderId && (
+              <Tooltip label={`Child of order ${row.parentOrderNumber ?? row.parentOrderId}`}>
+                <Badge color="grape" variant="light" size="sm">child</Badge>
+              </Tooltip>
+            )}
             <Tooltip label="View order">
               <ActionIcon variant="light" onClick={() => openDetail(row)}>
                 <Eye size={16} />
@@ -208,7 +362,7 @@ export function RxWebsiteOrdersPage() {
                 value: s,
                 label: statusLabel(s || '-'),
               })) ?? [])}
-              onChange={(v) => v && statusUpdateMutation.mutate({ id: row.id, status: v })}
+              onChange={(v) => v && handleStatusSelect(row, v)}
               clearable
               style={{ width: 110 }}
             />
@@ -218,6 +372,7 @@ export function RxWebsiteOrdersPage() {
     };
     return {
       ...websiteOrdersConfig,
+      transformRows: flattenChildRows,
       columns: websiteOrdersConfig.columns
         .filter((c) => c.key !== 'createdAt')
         .map((c) =>
@@ -229,6 +384,33 @@ export function RxWebsiteOrdersPage() {
                     {statusLabel(row.orderStatus ?? 'pending')}
                   </Badge>
                 ),
+              }
+            : c,
+        )
+        .map((c) =>
+          c.key === 'orderNumber'
+            ? {
+                ...c,
+                render: (row: any) =>
+                  row._isChildRow ? (
+                    <Group gap={6} wrap="nowrap" ml={22}>
+                      <CornerDownRight size={13} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+                      <Text size="sm" fw={600} c="dark">
+                        {row.orderNumber}
+                      </Text>
+                      <Text size="xs" c="dimmed">{row.items?.length ?? 0} items</Text>
+                      {row.items?.some((i: any) => !i.itemId) ? (
+                        <Badge color="orange" variant="light" size="xs">unreconciled</Badge>
+                      ) : (
+                        <Badge color="green" variant="light" size="xs">reconciled</Badge>
+                      )}
+                    </Group>
+                  ) : (
+                    <Group gap={6} wrap="nowrap">
+                      {row.parentOrderId && <Badge color="grape" variant="light" size="sm">child</Badge>}
+                      <Text size="sm" fw={600} c="dark">{row.orderNumber}</Text>
+                    </Group>
+                  ),
               }
             : c,
         ).concat([
@@ -251,6 +433,74 @@ export function RxWebsiteOrdersPage() {
             ),
         },
         {
+          key: 'paymentLink',
+          label: 'Payment link',
+          render: (row: any) => {
+            const link = row.paymentLink;
+            if (row._isChildRow) {return null;}
+            if (!link) {
+              return row.orderStatus === 'cancelled' ? null : (
+                <Tooltip label="Generate a customer payment link (/shop/pay)">
+                  <Button
+                    size="compact-xs"
+                    variant="subtle"
+                    color="gray"
+                    loading={linkBusyKey === `${row.id}:create`}
+                    onClick={() => handleGenerateLink(row)}
+                  >
+                    + Link
+                  </Button>
+                </Tooltip>
+              );
+            }
+            const linkAbsolute = `${window.location.origin}${link.url}`;
+            const revoked = link.status !== 'active';
+            return (
+              <Group gap={4} wrap="nowrap">
+                <Anchor
+                  href={linkAbsolute}
+                  target="_blank"
+                  size="xs"
+                  style={{ fontFamily: 'monospace' }}
+                  onClick={(e) => {
+                    if (revoked) {e.preventDefault();}
+                  }}
+                >
+                  /shop/pay/{link.token.slice(0, 6)}…
+                </Anchor>
+                {!revoked && (
+                  <CopyButton value={linkAbsolute}>
+                    {({ copied, copy }: { copied: boolean; copy: () => void }) => (
+                      <Tooltip label={copied ? 'Copied!' : 'Copy link'}>
+                        <ActionIcon size="sm" variant="subtle" color={copied ? 'teal' : 'blue'} onClick={copy}>
+                          {copied ? <CircleCheck size={14} /> : <Copy size={14} />}
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </CopyButton>
+                )}
+                {!revoked ? (
+                  <Tooltip label="Revoke link">
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="red"
+                      loading={linkBusyKey === `${row.id}:revoke`}
+                      onClick={() => handleRevokeLink(row)}
+                    >
+                      <Ban size={14} />
+                    </ActionIcon>
+                  </Tooltip>
+                ) : (
+                  <Badge color={link.status === 'used' ? 'green' : 'gray'} variant="light" size="xs">
+                    {link.status}
+                  </Badge>
+                )}
+              </Group>
+            );
+          },
+        },
+        {
           key: 'createdAt',
           label: 'Date',
           render: (row: any) =>
@@ -259,20 +509,22 @@ export function RxWebsiteOrdersPage() {
         actionsColumn,
       ]),
     };
-  }, [statusUpdateMutation, reconcileVersion, reconciledOrderIds]);
-
-  return (
-    <RxPage title="Website Orders" description="Manage and fulfill orders placed via the website.">
-      
+  }, [statusUpdateMutation, reconcileVersion, reconciledOrderIds, linkBusyKey]);  return (
+    <RxPage
+      title="Website Orders"
+      description="Manage and fulfill orders placed via the website."
+      actions={<NotificationSettingsButton />}
+    >
+          
           <DataPageShell
             config={config}
           />
-      {/* Post as Sale — matching validation modal */}
-      <Modal opened={matchCheckOpen} onClose={() => setMatchCheckOpen(false)} title="Check and Validate" centered>
+      {/* Post as Sale — unreconciled warning with the 3 post options */}
+      <Modal opened={matchCheckOpen} onClose={() => setMatchCheckOpen(false)} title="Cannot Post unreconciled Items" centered>
         <Stack>
           <Alert icon={<AlertTriangle size={16} />} color="orange" title="Some items are unmatched">
             <Text size="sm">
-              {unmatchedItems.length} of {matchCheckOrder?.items?.length ?? 0} items still need to be matched to catalog items before this order can be posted as a sale:
+              {unmatchedItems.length} of {matchCheckOrder?.items?.length ?? 0} items are not reconciled to catalog items. Choose how to continue:
             </Text>
             <Stack gap={2} mt="xs">
               {unmatchedItems.map((item) => (
@@ -283,18 +535,42 @@ export function RxWebsiteOrdersPage() {
               ))}
             </Stack>
           </Alert>
-          <Group justify="flex-end">
-            <Button variant="light" onClick={() => setMatchCheckOpen(false)}>Cancel</Button>
+          <Stack gap="xs">
             <Button
+              fullWidth
+              variant="light"
               color="orange"
               onClick={() => {
                 setMatchCheckOpen(false);
-                if (matchCheckOrder) { openReconcile(matchCheckOrder); }
+                if (matchCheckOrder) { startPostSale(matchCheckOrder, true, false); }
               }}
             >
-              Match items now
+              Post reconciled and ignore
             </Button>
-          </Group>
+            <Button
+              fullWidth
+              color="orange"
+              onClick={() => {
+                setMatchCheckOpen(false);
+                if (matchCheckOrder) { startPostSale(matchCheckOrder, true, true); }
+              }}
+            >
+              Post reconciled and create child order
+            </Button>
+            <Button fullWidth variant="subtle" color="gray" onClick={() => setMatchCheckOpen(false)}>
+              Cancel
+            </Button>
+          </Stack>
+          <Anchor
+            size="xs"
+            ta="center"
+            onClick={() => {
+              setMatchCheckOpen(false);
+              if (matchCheckOrder) { openReconcile(matchCheckOrder); }
+            }}
+          >
+            Or match items now before posting
+          </Anchor>
         </Stack>
       </Modal>
 
@@ -302,6 +578,13 @@ export function RxWebsiteOrdersPage() {
       <Modal opened={postSaleOpen} onClose={() => { setPostSaleOpen(false); setStockLocationId(null); setPostOrgId(null); }} title="Post Order as Sale" centered>
         <Stack>
           <Text size="sm" c="dimmed">This will create a draft sale record from this order. Stock won&apos;t be depleted until the sale is completed.</Text>
+          {postIgnoreUnreconciled && (
+            <Alert icon={<AlertTriangle size={16} />} color="orange">
+              <Text size="sm">
+                Posting with unreconciled items {postCreateChildOrder ? '— a child order will be created for them.' : '— they will be excluded from the sale.'}
+              </Text>
+            </Alert>
+          )}
           <Select
             label="Organisation (optional)"
             value={postOrgId}
@@ -318,6 +601,17 @@ export function RxWebsiteOrdersPage() {
             searchable
             clearable
           />
+          <Radio.Group
+            label="Payment"
+            description="Has the customer paid in full, or should the balance be pursued as a receivable?"
+            value={postPaymentIntent}
+            onChange={(v) => v && setPostPaymentIntent(v as 'paid' | 'receivable')}
+          >
+            <Group mt="xs" gap="lg">
+              <Radio value="paid" label="Payment made in full" />
+              <Radio value="receivable" label="Post as receivable (customer pays later)" />
+            </Group>
+          </Radio.Group>
           <Group justify="flex-end">
             <Button variant="light" onClick={() => { setPostSaleOpen(false); setStockLocationId(null); setPostOrgId(null); }}>Cancel</Button>
             <Button onClick={() => postSaleMutation.mutate()} loading={postSaleMutation.isPending}>
@@ -326,6 +620,23 @@ export function RxWebsiteOrdersPage() {
           </Group>
         </Stack>
       </Modal>
+
+      <PostConfirmationModal
+        opened={postConfirmOpen}
+        onClose={() => setPostConfirmOpen(false)}
+        result={postResult}
+        linkState={paymentLinkState}
+        linkUrl={paymentLinkUrl}
+        linkError={paymentLinkError}
+        onGenerateLink={handleGeneratePaymentLink}
+      />
+
+      <CascadeCancelModal
+        order={cascadeCancelOrder}
+        cancellableChildren={cancellableChildrenOf(cascadeCancelOrder)}
+        onConfirm={confirmCascadeCancel}
+        onCancel={() => setCascadeCancelOrder(null)}
+      />
 
       <ReconcileModal
         order={reconcileOrder}
@@ -347,10 +658,113 @@ export function RxWebsiteOrdersPage() {
         opened={detailOpen}
         onClose={() => { setDetailOpen(false); setSelectedOrder(null); }}
         onStatusChange={invalidateOrders}
+        onCascadeCancelPrompt={(o) => setCascadeCancelOrder(o)}
       />
     </RxPage>
   );
 }
+function CascadeCancelModal({
+  order, cancellableChildren, onConfirm, onCancel,
+}: {
+  order: any;
+  cancellableChildren: any[];
+  onConfirm: (cascade: boolean) => void;
+  onCancel: () => void;
+}) {
+  if (!order) {return null;}
+  return (
+    <Modal opened={!!order} onClose={onCancel} title="Cancel child orders too?" centered>
+      <Stack>
+        <Alert icon={<AlertTriangle size={16} />} color="orange" title="This parent has open child orders">
+          <Text size="sm">
+            {cancellableChildren.length} child order(s) created for leftover unreconciled items are still open:
+          </Text>
+          <Stack gap={2} mt="xs">
+            {cancellableChildren.map((c: any) => (
+              <Text key={c.id} size="sm">
+                • {c.orderNumber} — {c.unreconciledItems} of {c.totalItems} item(s) unreconciled
+              </Text>
+            ))}
+          </Stack>
+        </Alert>
+        <Group justify="flex-end">
+          <Button variant="subtle" color="gray" onClick={onCancel}>
+            Go back
+          </Button>
+          <Button variant="light" color="red" onClick={() => onConfirm(false)}>
+            Cancel parent only
+          </Button>
+          <Button color="red" onClick={() => onConfirm(true)}>
+            Cancel parent + children
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
+function PostConfirmationModal({
+  opened, onClose, result, linkState, linkUrl, linkError, onGenerateLink,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  result: { orderId: string | null; saleNumber: string | null; childOrderNumber: string | null; paymentLinkUrl: string | null } | null;
+  linkState: 'idle' | 'loading' | 'ready' | 'error';
+  linkUrl: string | null;
+  linkError: string | null;
+  onGenerateLink: () => void;
+}) {
+  return (
+    <Modal opened={opened} onClose={onClose} title="Order Posted" centered>
+      <Stack>
+        <Alert icon={<ReceiptText size={18} />} color="blue" title="Send Customer Invoice with Payment Balance link">
+          <Text size="sm">
+            Send the customer an invoice with a payment balance link — use this if the eventual
+            payment doesn&apos;t match the order total.
+          </Text>
+        </Alert>
+
+        <Stack gap={4}>
+          {result?.saleNumber && (
+            <Text size="sm"><b>Sale:</b> {result.saleNumber}</Text>
+          )}
+          {result?.childOrderNumber && (
+            <Text size="sm" c="orange">
+              <b>Child order created:</b> {result.childOrderNumber} (holds the unreconciled items)
+            </Text>
+          )}
+        </Stack>
+
+        {linkState === 'ready' && linkUrl ? (
+          <Group justify="space-between" gap="xs" wrap="nowrap">
+            <Text size="sm" style={{ wordBreak: 'break-all' }}>{linkUrl}</Text>
+            <CopyButton value={linkUrl}>
+              {({ copied, copy }) => (
+                <Button size="compact-sm" variant={copied ? 'light' : 'filled'} color={copied ? 'green' : 'blue'} onClick={copy}>
+                  {copied ? 'Copied' : 'Copy link'}
+                </Button>
+              )}
+            </CopyButton>
+          </Group>
+        ) : null}
+
+        {linkState === 'error' && (
+          <Text size="sm" c="red">{linkError ?? 'Could not generate a payment link.'}</Text>
+        )}
+
+        <Group justify="flex-end" mt="xs">
+          {linkState !== 'ready' && (
+            <Button variant="light" color="blue" onClick={onGenerateLink} loading={linkState === 'loading'}>
+              Generate payment balance link
+            </Button>
+          )}
+          <Button variant="light" onClick={onClose}>Done</Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
 function ReconcileModal({
   order, opened, onClose, onReconciled, organizations = [], defaultOrgId = null,
 }: {
@@ -361,6 +775,16 @@ function ReconcileModal({
   const [draft, setDraft] = useState<Record<string, any>>({});
   const [orgId, setOrgId] = useState<string | null>(defaultOrgId);
   const [saving, setSaving] = useState<string | null>(null);
+  // Stock lookup: chosen location + fetched balances for every selected item
+  const [locationId, setLocationId] = useState<string | null>(null);
+  const { data: modalLocations = [] } = useQuery({
+    queryKey: ['stock-locations', 'reconcile', orgId ?? 'default'],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 200, ...(orgId ? { organizationId: orgId } : {}) } });
+      return data?.data ?? data ?? [];
+    },
+    enabled: opened,
+  });
 
   const freetextItems = order?.items?.filter((i: any) => !i.itemId) ?? [];
 
@@ -435,6 +859,30 @@ function ReconcileModal({
     return m;
   }, [itemResults, linkedMap]);
 
+  // Stock on hand for every currently-selected item at the chosen location.
+  const selectedLinkedIds = freetextItems
+    .map((i: any) => draft[i.id]?.itemId ?? i.itemId)
+    .filter(Boolean) as string[];
+  const { data: stockByItem = {} as Record<string, number | null> } = useQuery({
+    queryKey: ['reconcile-stock', orgId ?? 'default', locationId, selectedLinkedIds.join(',')],
+    queryFn: async () => {
+      if (!locationId || !selectedLinkedIds.length) { return {}; }
+      const { data } = await rxsoftApi.get('/inventory/stock-balances', {
+        params: { locationId, itemIds: selectedLinkedIds.join(','), limit: 200 },
+      });
+      const rows: any[] = data?.data ?? data ?? [];
+      const acc: Record<string, number> = {};
+      rows.forEach((b) => {
+        const key = b.itemId ?? b.item?.id;
+        if (key) { acc[key] = (acc[key] ?? 0) + Number(b.quantityOnHand ?? 0); }
+      });
+      const result: Record<string, number | null> = {};
+      selectedLinkedIds.forEach((id) => { result[id] = acc[id] ?? 0; });
+      return result;
+    },
+    enabled: !!locationId && selectedLinkedIds.length > 0,
+  });
+
   const saveMutation = useMutation({
     mutationFn: async ({ item }: { item: any }) => {
       const d = draft[item.id] ?? {};
@@ -468,15 +916,26 @@ function ReconcileModal({
           independently.
         </Text>
 
-        <Select
-          label="Organisation (optional)"
-          placeholder="Assign order to an organisation"
-          value={orgId}
-          onChange={setOrgId}
-          data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({ value: o.id, label: o.name }))}
-          searchable
-          clearable
-        />
+        <Group grow align="flex-end">
+          <Select
+            label="Organisation (optional)"
+            placeholder="Assign order to an organisation"
+            value={orgId}
+            onChange={(v) => { setOrgId(v); setLocationId(null); }}
+            data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({ value: o.id, label: o.name }))}
+            searchable
+            clearable
+          />
+          <Select
+            label="Stock location"
+            placeholder="Pick a location to see stock"
+            value={locationId}
+            onChange={setLocationId}
+            data={(Array.isArray(modalLocations) ? modalLocations : []).map((l: any) => ({ value: l.id, label: l.name }))}
+            searchable
+            clearable
+          />
+        </Group>
 
         {freetextItems.length === 0 ? (
           <Text c="dimmed" size="sm">No freetext items in this order.</Text>
@@ -491,6 +950,7 @@ function ReconcileModal({
                 <Table.Th>Qty</Table.Th>
                 <Table.Th>Amount (unit)</Table.Th>
                 <Table.Th>Total</Table.Th>
+                <Table.Th>Stock</Table.Th>
                 <Table.Th w={90} />
               </Table.Tr>
             </Table.Thead>
@@ -588,6 +1048,20 @@ function ReconcileModal({
                     </Table.Td>
                     <Table.Td>{(+total).toLocaleString()}</Table.Td>
                     <Table.Td>
+                      {(() => {
+                        const linkedId = d.itemId ?? item.itemId;
+                        if (!linkedId || !locationId) {return <Text size="xs" c="dimmed">—</Text>;}
+                        const qty = stockByItem[linkedId];
+                        if (qty === undefined || qty === null) {return <Text size="xs" c="dimmed">…</Text>;}
+                        const needed = item.quantity ?? 1;
+                        return (
+                          <Badge color={qty >= needed ? 'green' : 'orange'} variant="light" size="sm">
+                            {qty} on hand{qty < needed ? ` (need ${needed})` : ''}
+                          </Badge>
+                        );
+                      })()}
+                    </Table.Td>
+                    <Table.Td>
                       <Button
                         size="compact-xs"
                         color="green"
@@ -631,9 +1105,10 @@ function ReconcileModal({
 }
 
 function DetailModal({
-  orderId, opened, onClose, onStatusChange,
+  orderId, opened, onClose, onStatusChange, onCascadeCancelPrompt,
 }: {
   orderId: string | null; opened: boolean; onClose: () => void; onStatusChange: () => void;
+  onCascadeCancelPrompt: (order: any) => void;
 }) {
   const qc = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -688,6 +1163,12 @@ function DetailModal({
         <Stack>
           <Group>
             <Badge color={STATUS_COLORS[status] ?? 'gray'} size="lg">{statusLabel(status)}</Badge>
+            {order.parentOrderId && (
+              <Badge color="grape" variant="light" size="lg">Child of {order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId}</Badge>
+            )}
+            {order.paymentIntent === 'receivable' && (
+              <Badge color="orange" variant="light" size="lg">Receivable</Badge>
+            )}
           </Group>
 
           {order.items?.some((i: any) => !i.itemId) && (
@@ -796,8 +1277,22 @@ function DetailModal({
                 placeholder="Select status"
                 value={selectedStatus}
                 onChange={(v) => {
+                  if (!v) {return;}
+                  // Parents with open unreconciled children get the cascade prompt.
+                  if (
+                    v === 'cancelled' &&
+                    (order.childOrders ?? []).some(
+                      (c: any) =>
+                        (c.orderStatus === 'pending' || c.orderStatus === 'confirmed') &&
+                        (c.items ?? []).some((i: any) => !i.itemId),
+                    )
+                  ) {
+                    setSelectedStatus(null);
+                    onCascadeCancelPrompt(order);
+                    return;
+                  }
                   setSelectedStatus(v);
-                  if (v) {statusUpdateMutation.mutate(v);}
+                  statusUpdateMutation.mutate(v);
                 }}
                 data={allowed.map((s) => ({ value: s, label: statusLabel(s) }))}
                 style={{ width: 220 }}

@@ -2,12 +2,13 @@ import { ActionIcon, Button, Group, Menu, Modal, Stack, TextInput } from '@manti
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal, View } from 'lucide-react';
+import { CalendarClock, MoreHorizontal, View } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { emrApi } from '@/lib/emr-api';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import { AppointmentViewModal } from './appointment-view-modal';
+import { RescheduleAppointmentModal } from './reschedule-appointment-modal';
 
 function useAppointmentMutation(
   successMessage: string,
@@ -43,6 +44,7 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
   const [cancelOpened, { open: openCancel, close: closeCancel }] = useDisclosure(false);
   const [cancelReason, setCancelReason] = useState('');
   const [viewOpened, { open: openView, close: closeView }] = useDisclosure(false);
+  const [rescheduleOpened, { open: openReschedule, close: closeReschedule }] = useDisclosure(false);
 
   const checkIn = useAppointmentMutation('Appointment checked in', `${id}/check-in`, {});
   const complete = useAppointmentMutation('Appointment completed', `${id}/complete`);
@@ -92,6 +94,11 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
           </Menu.Item>
           {(status === 'SCHEDULED' || status === 'CHECKED_IN') && (
             <Menu.Item onClick={() => setPending('checkIn')}>Check in</Menu.Item>
+          )}
+          {(status === 'SCHEDULED' || status === 'CHECKED_IN') && (
+            <Menu.Item leftSection={<CalendarClock size={14} />} onClick={openReschedule}>
+              Reschedule
+            </Menu.Item>
           )}
           {status === 'IN_PROGRESS' && (
             <Menu.Item onClick={() => setPending('complete')}>Complete</Menu.Item>
@@ -160,6 +167,9 @@ export function AppointmentRowActions({ row }: { row: Record<string, unknown> })
       </Modal>
 
       {viewOpened && <AppointmentViewModal row={row} onClose={closeView} />}
+      {rescheduleOpened && (
+        <RescheduleAppointmentModal row={row} opened={rescheduleOpened} onClose={closeReschedule} />
+      )}
     </>
   );
 }

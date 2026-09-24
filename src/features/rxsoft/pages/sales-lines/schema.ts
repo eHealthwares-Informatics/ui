@@ -23,5 +23,7 @@ export function buildSalesLinesConfig(saleId: string | null): ModelConfig {
     endpoint: '/sales/lines',
     columns: saleColumns,
     listParams: saleId ? { saleId } : {},
+    canExport: true,
+    csvEndpoint: '/sales/lines/export',
   };
 }

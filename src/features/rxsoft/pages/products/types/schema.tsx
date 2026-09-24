@@ -668,10 +668,26 @@ export const itemColumns: Column[] = [
   { key: 'name', label: 'Item Name', filters: ColumnTypeFilters.STRING },
   { key: 'displayName', label: 'Display Name' },
   {
+    key: 'code',
+    label: 'Item Code',
+    render: (row) => (row as any).code ?? (row as any).itemCode ?? '-',
+    filters: ColumnTypeFilters.STRING,
+  },
+  {
+    key: 'baseUom',
+    label: 'UOM',
+    render: (row) => (row as any).baseUom?.name ?? (row as any).saleUom?.name ?? '-',
+  },
+  {
     key: 'genericProductCode',
     label: 'Generic Product',
     render: (row) => <GenericProductCell row={row} />,
     filters: ColumnTypeFilters.STRING,
+  },
+  {
+    key: 'genericDrug',
+    label: 'Generic Name',
+    render: (row) => (row as any).genericDrug?.name ?? (row as any).genericProduct?.name ?? '-',
   },
   // { key: 'code', label: 'Org Code' },
   // { key: 'barcode', label: 'Org Barcode' },

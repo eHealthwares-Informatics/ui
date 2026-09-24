@@ -8,7 +8,7 @@
 import axios from 'axios';
 
 const CONCEPTS_BASE_URL =
-  import.meta.env.VITE_CONCEPTS_API_URL || 'http://localhost:8004/api';
+  import.meta.env.VITE_CONCEPTS_API_URL || 'https://api.ehealthwares.com/concepts';
 
 const conceptsApi = axios.create({
   baseURL: CONCEPTS_BASE_URL,

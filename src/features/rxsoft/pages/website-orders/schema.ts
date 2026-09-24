@@ -46,4 +46,7 @@ export const websiteOrdersConfig: ModelConfig = {
   description: 'Manage and fulfill orders.',
   endpoint: '/website/admin/orders',
   columns: websiteOrdersColumns,
+  canExport: true,
+  // Dedicated orders export: same filters, no pagination.
+  csvEndpoint: '/orders/admin/orders/export',
 };
