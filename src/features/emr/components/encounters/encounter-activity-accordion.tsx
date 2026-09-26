@@ -15,6 +15,7 @@ import { formatEnum } from '../../lib/emr-constants';
 import type { FormSubmission } from '../../lib/emr-types';
 import { SubmissionSummary } from '../documentation/submission-summary';
 import { StatusBadge } from '../shared/status-badge';
+import { SchemaOutdatedBadge } from '../documentation/schema-outdated-badge';
 
 function formatDate(value: string | null | undefined): string {
   return value ? new Date(value).toLocaleString() : '—';
@@ -79,6 +80,7 @@ export function DocumentsAccordion({
               <Badge size="xs" variant="outline" style={{ flexShrink: 0 }}>
                 v{submission.formVersion}
               </Badge>
+              <SchemaOutdatedBadge submission={submission} />
               <StatusBadge value={submission.status} kind="submission" />
             </Group>
           </Accordion.Control>

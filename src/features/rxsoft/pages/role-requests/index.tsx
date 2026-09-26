@@ -20,6 +20,7 @@ import {
   rejectRoleRequest,
   RoleRequest,
 } from '../user-insights/api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const STATUS_COLOR: Record<RoleRequest['status'], string> = {
   pending: 'orange',
@@ -56,8 +57,8 @@ export function RoleRequestsPage() {
     onError: (e: any) =>
       notifications.show({
         color: 'red',
-        message: e?.response?.data?.message ?? e?.message ?? 'Failed to update',
-      }),
+        message: getApiErrorMessage(e),
+        }),
   });
 
   return (

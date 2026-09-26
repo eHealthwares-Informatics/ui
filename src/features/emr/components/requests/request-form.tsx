@@ -20,6 +20,7 @@ import { emrApi } from '@/lib/emr-api';
 import { PRIORITIES, REQUEST_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
+import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
 
@@ -32,6 +33,12 @@ type RequestItem = {
   route: string;
   quantity: number | '';
   instructions: string;
+  /** Which catalogue the line was picked from. */
+  itemKind?: 'STOCK_ITEM' | 'GENERIC_PRODUCT' | 'GENERIC_DRUG' | 'LOINC_TEST';
+  /** Stable cross-system reference for the line (rxsoft + LIS). */
+  referenceCode?: string;
+  /** LOINC code when the line came from the lab test picker. */
+  testDefinitionId?: string;
 };
 
 const EMPTY_ITEM: RequestItem = {
@@ -66,6 +73,7 @@ export function RequestForm({
   const [patientError, setPatientError] = useState<string | null>(null);
   const [orderingProvider, setOrderingProvider] = useState<StaffOption | null>(null);
   const [itemRefs, setItemRefs] = useState<(MasterItem | null)[]>([null]);
+  const [testRefs, setTestRefs] = useState<(LoincTest | null)[]>([null]);
 
   const form = useForm({
     initialValues: {
@@ -102,6 +110,9 @@ export function RequestForm({
           quantity:
             item.quantity === '' || item.quantity == null ? undefined : Number(item.quantity),
           instructions: item.instructions || undefined,
+          itemKind: item.itemKind || undefined,
+          referenceCode: item.referenceCode || undefined,
+          testDefinitionId: item.testDefinitionId || undefined,
         }));
       const { data } = await emrApi.post(submitUrl ?? '/requests', {
         patientId: patient.patientId,
@@ -205,6 +216,7 @@ export function RequestForm({
                   onClick={() => {
                     form.removeListItem('items', index);
                     setItemRefs((prev) => prev.filter((_, i) => i !== index));
+                    setTestRefs((prev) => prev.filter((_, i) => i !== index));
                   }}
                   aria-label="Remove item"
                 >
@@ -212,28 +224,55 @@ export function RequestForm({
                 </ActionIcon>
               )}
             </Group>
-            <MasterItemSearch
-              label="Item / Drug"
-              placeholder="Search stock items or generic products…"
-              value={itemRefs[index] ?? null}
-              onChange={(next) => {
-                setItemRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
-                form.setFieldValue(
-                  `items.${index}.name`,
-                  next?.label ?? form.values.items[index].name
-                );
-                form.setFieldValue(
-                  `items.${index}.code`,
-                  next?.code ?? form.values.items[index].code
-                );
-              }}
-            />
-            <TextInput
-              label="Name"
-              required
-              placeholder="Item / test / medication name"
-              {...form.getInputProps(`items.${index}.name`)}
-            />
+            {form.values.requestType === 'LAB' ? (
+              <LoincTestSearch
+                label="Lab test (LOINC)"
+                placeholder="Search LOINC tests…"
+                value={testRefs[index] ?? null}
+                onChange={(next) => {
+                  setTestRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
+                  form.setFieldValue(`items.${index}.itemKind`, next ? 'LOINC_TEST' : undefined);
+                  form.setFieldValue(
+                    `items.${index}.testDefinitionId`,
+                    next?.code ?? undefined,
+                  );
+                  form.setFieldValue(
+                    `items.${index}.name`,
+                    next ? `${next.name} (${next.code})` : form.values.items[index].name,
+                  );
+                  form.setFieldValue(`items.${index}.code`, next?.code ?? '');
+                  form.setFieldValue(
+                    `items.${index}.referenceCode`,
+                    next ? `LOINC_TEST:${next.code}` : undefined,
+                  );
+                }}
+              />
+            ) : (
+              <MasterItemSearch
+                label="Item / Drug"
+                placeholder="Search Stock, NDF or EMDEx catalogue…"
+                value={itemRefs[index] ?? null}
+                onChange={(next) => {
+                  setItemRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
+                  setTestRefs((prev) => prev.map((ref, i) => (i === index ? null : ref)));
+                  const referenceCode = next?.referenceCode;
+                  form.setFieldValue(`items.${index}.itemKind`, next?.kind);
+                  form.setFieldValue(`items.${index}.referenceCode`, referenceCode);
+                  // Name + code concatenation: e.g. "Paracetamol 500mg — PMC-0001".
+                  form.setFieldValue(
+                    `items.${index}.name`,
+                    next ? `${next.label} — ${next.code ?? next.id}` : form.values.items[index].name,
+                  );
+                  form.setFieldValue(`items.${index}.code`, next?.code ?? '');
+                }}
+              />
+            )}              <TextInput
+                label="Name"
+                required
+                placeholder="Item / test / medication name"
+                description="Filled from the picker as name + code"
+                {...form.getInputProps(`items.${index}.name`)}
+              />
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <TextInput
                 label="Code"
@@ -277,14 +316,13 @@ export function RequestForm({
               />
             </SimpleGrid>
           </Stack>
-        ))}
-
-        <Button
+        ))}          <Button
           variant="light"
           leftSection={<Plus size={15} />}
           onClick={() => {
             form.insertListItem('items', { ...EMPTY_ITEM });
             setItemRefs((prev) => [...prev, null]);
+            setTestRefs((prev) => [...prev, null]);
           }}
         >
           Add item

@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { WebsiteLayout, green, ink, darkGreen, muted, line, soft } from '../website/layout';
 import { clearPaySession, loadPaySession, payApi, savePaySession, type PaySession } from './payApi';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function naira(amount: number) {
   return `₦${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -65,7 +66,7 @@ export default function PayPage() {
         window.location.href = res.checkoutUrl;
       }
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? e?.message ?? 'Could not start payment');
+      setError(getApiErrorMessage(e));
     } finally {
       setStarting(false);
     }

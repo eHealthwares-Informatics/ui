@@ -15,7 +15,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { AlertCircle, FileText, Stethoscope } from 'lucide-react';
+import { AlertCircle, FileText, Share2, Stethoscope } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
@@ -23,6 +23,7 @@ import {
   DocumentationModal,
   type ActiveEncounter,
 } from '../components/documentation/documentation-modal';
+import { CreateReferralModal } from '../components/referrals/create-referral-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
 import { PatientLink } from '../components/shared/patient-link';
@@ -108,6 +109,7 @@ export function EncounterDetailPage() {
   const { encounterId } = useParams({ from: '/_authenticated/emr/encounters/$encounterId' });
   const [docOpened, { open: openDoc, close: closeDoc }] = useDisclosure(false);
   const [requestOpened, { open: openRequest, close: closeRequest }] = useDisclosure(false);
+  const [referralOpened, { open: openReferral, close: closeReferral }] = useDisclosure(false);
   const [viewSubmission, setViewSubmission] = useState<FormSubmission | null>(null);
   const [amendSubmission, setAmendSubmission] = useState<FormSubmission | null>(null);
 
@@ -250,6 +252,9 @@ export function EncounterDetailPage() {
           <Button variant="light" leftSection={<Stethoscope size={16} />} onClick={openRequest}>
             Create Request
           </Button>
+          <Button variant="light" leftSection={<Share2 size={16} />} onClick={openReferral}>
+            Refer to Specialist
+          </Button>
           <Button leftSection={<FileText size={16} />} onClick={openDoc}>
             Create Documentation
           </Button>
@@ -379,6 +384,18 @@ export function EncounterDetailPage() {
         onClose={closeDoc}
         activeEncounter={activeEncounter}
       />
+
+      {activeEncounter && (
+        <CreateReferralModal
+          opened={referralOpened}
+          onClose={closeReferral}
+          encounter={{
+            id: activeEncounter.id,
+            patientId: activeEncounter.patientId,
+            patientName: activeEncounter.patientName,
+          }}
+        />
+      )}
 
       <Modal
         opened={requestOpened}

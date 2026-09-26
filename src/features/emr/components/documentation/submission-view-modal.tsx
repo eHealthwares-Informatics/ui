@@ -7,6 +7,7 @@ import { useFormDefinition } from '../../hooks/use-form-definition';
 import type { FormSubmission } from '../../lib/emr-types';
 import { printSubmission } from '../../lib/print-submission';
 import { StatusBadge } from '../shared/status-badge';
+import { SchemaOutdatedBadge } from './schema-outdated-badge';
 
 function renderValue(value: unknown): string {
   if (value === null || value === undefined || value === '') {
@@ -72,6 +73,7 @@ export function SubmissionViewModal({
               {submission.formName}
             </Text>
             <Badge variant="light">v{submission.formVersion}</Badge>
+            <SchemaOutdatedBadge submission={submission} />
             <StatusBadge value={submission.status} kind="submission" />
           </Group>
 

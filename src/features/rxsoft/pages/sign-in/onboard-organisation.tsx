@@ -3,6 +3,7 @@ import { Box, Button, Group, PasswordInput, Progress, Text, TextInput, Stack, Lo
 import { Building2, User, Lock, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
 import { identityApi } from '@/lib/identity-api';
 import { useAuthStore } from '@/stores/auth-store';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type OnboardPayload = {
   code: string;
@@ -113,7 +114,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         setAlreadyProvisioned(true);
         return;
       }
-      setError(err?.response?.data?.message ?? err?.message ?? 'Onboarding failed. Please try again.');
+      setError(getApiErrorMessage(err));
     } finally {
       setRunning(false);
     }

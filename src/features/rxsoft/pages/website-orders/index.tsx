@@ -44,6 +44,7 @@ import { RxPage } from '../../../components/page/rx-page';
 import { websiteOrdersConfig } from './schema';
 import { NotificationSettingsButton } from './notification-settings';
 import { flattenChildRows } from './order-children';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'yellow',
@@ -136,6 +137,33 @@ export function RxWebsiteOrdersPage() {
     qc.invalidateQueries({ queryKey: ['website-order-detail'] });
   };
 
+  /** Patches one order's paymentLink inside every cached orders-list page. */
+  function patchRowLinkInCache(orderId: string, link: any) {
+    const patchRows = (rows: any[]) =>
+      rows.map((r) => (r?.id === orderId ? { ...r, paymentLink: link } : r));
+    const updater = (payload: any) => {
+      if (Array.isArray(payload)) {return patchRows(payload);}
+      if (Array.isArray(payload?.data)) {return { ...payload, data: patchRows(payload.data) };}
+      return payload;
+    };
+    qc.setQueriesData<any>({ queryKey: ['rxsoft-data-page', '/website/admin/orders'] }, updater);
+    qc.setQueriesData<any>({ queryKey: ['website-orders'] }, updater);
+  }
+
+  /**
+   * Fetches the order's current payment link (GET payment-link endpoint) and
+   * patches just that row in the cached lists — no full-list refetch.
+   */
+  async function refreshRowLink(orderId: string): Promise<any | null> {
+    try {
+      const { data } = await rxsoftApi.get(`/orders/admin/orders/${orderId}/payment-link`);
+      patchRowLinkInCache(orderId, data ?? null);
+      return data ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   const statusUpdateMutation = useMutation({
     mutationFn: async ({ id, status, cascadeCancelChildren }: { id: string; status: string; cascadeCancelChildren?: boolean }) => {
       const { data } = await rxsoftApi.patch(`/website/admin/orders/${id}/status`, {
@@ -155,7 +183,7 @@ export function RxWebsiteOrdersPage() {
       invalidateOrders();
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Status update failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 
@@ -201,7 +229,7 @@ export function RxWebsiteOrdersPage() {
       setPostConfirmOpen(true);
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Post sale failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 
@@ -274,8 +302,10 @@ export function RxWebsiteOrdersPage() {
       if (!url) {throw new Error('No link URL returned');}
       setPaymentLinkUrl(url);
       setPaymentLinkState('ready');
+      // Learn the new link into the cached list row without a full refetch.
+      if (postResult.orderId) {await refreshRowLink(postResult.orderId);}
     } catch (err: any) {
-      setPaymentLinkError(err?.response?.data?.message ?? 'Could not generate a payment link.');
+      setPaymentLinkError(getApiErrorMessage(err));
       setPaymentLinkState('error');
     }
   }
@@ -286,12 +316,13 @@ export function RxWebsiteOrdersPage() {
       const { data } = await rxsoftApi.post(`/orders/admin/orders/${order.id}/payment-link`);
       if (data?.url) {
         notifications.show({ message: `Payment link created for ${order.orderNumber}`, color: 'green' });
-        await qc.invalidateQueries({ queryKey: ['website-orders'] });
+        // Refresh just this row's link instead of refetching the whole list.
+        await refreshRowLink(order.id);
       } else {
         notifications.show({ message: 'Could not create a payment link.', color: 'red' });
       }
     } catch (err: any) {
-      notifications.show({ message: err?.response?.data?.message ?? 'Could not create a payment link.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     } finally {
       setLinkBusyKey(null);
     }
@@ -305,12 +336,14 @@ export function RxWebsiteOrdersPage() {
       const { data } = await rxsoftApi.post(`/orders/admin/orders/${order.id}/payment-link/revoke`, { token });
       if (data === true) {
         notifications.show({ message: 'Payment link revoked', color: 'orange' });
-        await qc.invalidateQueries({ queryKey: ['website-orders'] });
+        // Refresh just this row's link (flips the row to its revoked badge)
+        // instead of refetching the whole list.
+        await refreshRowLink(order.id);
       } else {
         notifications.show({ message: 'No active payment link to revoke.', color: 'red' });
       }
     } catch (err: any) {
-      notifications.show({ message: err?.response?.data?.message ?? 'Could not revoke the payment link.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     } finally {
       setLinkBusyKey(null);
     }
@@ -472,7 +505,17 @@ export function RxWebsiteOrdersPage() {
                   <CopyButton value={linkAbsolute}>
                     {({ copied, copy }: { copied: boolean; copy: () => void }) => (
                       <Tooltip label={copied ? 'Copied!' : 'Copy link'}>
-                        <ActionIcon size="sm" variant="subtle" color={copied ? 'teal' : 'blue'} onClick={copy}>
+                        <ActionIcon
+                          size="sm"
+                          variant="subtle"
+                          color={copied ? 'teal' : 'blue'}
+                          onClick={() => {
+                            copy();
+                            // Copy stays instant; the row's link state refreshes
+                            // in the background (picks up used/revoked flips).
+                            void refreshRowLink(row.id);
+                          }}
+                        >
                           {copied ? <CircleCheck size={14} /> : <Copy size={14} />}
                         </ActionIcon>
                       </Tooltip>
@@ -659,6 +702,13 @@ export function RxWebsiteOrdersPage() {
         onClose={() => { setDetailOpen(false); setSelectedOrder(null); }}
         onStatusChange={invalidateOrders}
         onCascadeCancelPrompt={(o) => setCascadeCancelOrder(o)}
+        onOpenOrder={(target) => {
+          // Breadcrumb navigation: swap the open detail modal to the related
+          // order. Invalidate cached detail/history so nothing stale lingers.
+          setSelectedOrder({ id: target.id, orderNumber: target.orderNumber });
+          qc.invalidateQueries({ queryKey: ['website-order-detail', target.id] });
+          qc.invalidateQueries({ queryKey: ['website-order-status-history', target.id] });
+        }}
       />
     </RxPage>
   );
@@ -902,7 +952,7 @@ function ReconcileModal({
       onReconciled();
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Save failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 
@@ -1105,10 +1155,12 @@ function ReconcileModal({
 }
 
 function DetailModal({
-  orderId, opened, onClose, onStatusChange, onCascadeCancelPrompt,
+  orderId, opened, onClose, onStatusChange, onCascadeCancelPrompt, onOpenOrder,
 }: {
   orderId: string | null; opened: boolean; onClose: () => void; onStatusChange: () => void;
   onCascadeCancelPrompt: (order: any) => void;
+  /** Opens another order's detail modal (breadcrumb navigation between related orders). */
+  onOpenOrder: (orderLike: { id: string; orderNumber: string }) => void;
 }) {
   const qc = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
@@ -1144,7 +1196,7 @@ function DetailModal({
       setSelectedStatus(null);
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 
@@ -1161,6 +1213,37 @@ function DetailModal({
         <Text c="dimmed">Order not found.</Text>
       ) : (
         <Stack>
+          {/* Parent ↔ child linkage — clickable in both directions. */}
+          {Boolean(order.parentOrderId || order.childOrders?.length) && (
+            <Group gap="xs">
+              {order.parentOrderId && (
+                <Anchor
+                  size="sm"
+                  underline="hover"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onOpenOrder({ id: order.parentOrderId, orderNumber: order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId });
+                  }}
+                >
+                  ↑ Parent: {order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId}
+                </Anchor>
+              )}
+              {(order.childOrders ?? []).map((c: any) => (
+                <Anchor
+                  key={c.id}
+                  size="sm"
+                  underline="hover"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onOpenOrder({ id: c.id, orderNumber: c.orderNumber });
+                  }}
+                >
+                  ↓ {c.orderNumber} · {statusLabel(c.orderStatus)}{c.unreconciledItems > 0 ? ` · ${c.unreconciledItems} to reconcile` : ''}
+                </Anchor>
+              ))}
+            </Group>
+          )}
+
           <Group>
             <Badge color={STATUS_COLORS[status] ?? 'gray'} size="lg">{statusLabel(status)}</Badge>
             {order.parentOrderId && (

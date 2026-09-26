@@ -16,6 +16,7 @@ import { FileUp, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { codingConceptApi } from '@/lib/coding-concept-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const codeSample = JSON.stringify(
   [
@@ -70,7 +71,7 @@ export function CodingConceptUploadPage() {
     onError: (error: any) =>
       notifications.show({
         color: 'red',
-        message: error?.response?.data?.message || 'Failed to upload concept codes',
+        message: getApiErrorMessage(error),
       }),
   });
 
@@ -84,7 +85,7 @@ export function CodingConceptUploadPage() {
     onError: (error: any) =>
       notifications.show({
         color: 'red',
-        message: error?.response?.data?.message || 'Failed to upload concept values',
+        message: getApiErrorMessage(error),
       }),
   });
 

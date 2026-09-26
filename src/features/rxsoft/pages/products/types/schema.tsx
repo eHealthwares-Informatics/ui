@@ -529,6 +529,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ColumnTypeFilters, type Column } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function ToggleActive({ row }: { row: Record<string, unknown> }) {
   const queryClient = useQueryClient();
@@ -542,8 +543,8 @@ function ToggleActive({ row }: { row: Record<string, unknown> }) {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? 'Failed to update visibility',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 

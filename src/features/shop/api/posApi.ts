@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { websiteApi } from '@/features/shop/website/api';
 import type { CreateSaleDto } from '../types';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export const salesKeys = {
   list: ['sales'] as any,
@@ -365,8 +366,8 @@ export function useUpdateUserPosConfig() {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? err?.message ?? 'Failed to update settings',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 }
@@ -500,8 +501,8 @@ export function useCompleteDispense() {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? err?.message ?? 'Failed to complete dispense',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 }

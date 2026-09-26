@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { priceListKeys } from '../../api/posApi';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface Props {
   opened: boolean;
@@ -92,7 +93,7 @@ export function PosSetPriceModal({
     } catch (err: any) {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? 'Failed to save price',
+        message: getApiErrorMessage(err),
       });
     } finally {
       setSaving(false);

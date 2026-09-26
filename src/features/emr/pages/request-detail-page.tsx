@@ -22,11 +22,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { AlertCircle, Check, Copy, RefreshCw, Send } from 'lucide-react';
+import { AlertCircle, Check, Copy, Pill, RefreshCw, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
+import { CreateMedicationModal } from '../components/medications/create-medication-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
 import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
@@ -105,6 +106,7 @@ export function RequestDetailPage() {
   const [reasonOpened, { open: openReason, close: closeReason }] = useDisclosure(false);
   const [viewSubmission, setViewSubmission] = useState<FormSubmission | null>(null);
   const [amendSubmission, setAmendSubmission] = useState<FormSubmission | null>(null);
+  const [medicationOpened, { open: openMedication, close: closeMedication }] = useDisclosure(false);
 
   const { data: request, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['emr', 'requests', requestId],
@@ -266,6 +268,10 @@ export function RequestDetailPage() {
 
   const availableTransitions = TRANSITIONS[request.status] ?? [];
   const canSync = request.requestType === 'LAB' || request.requestType === 'PRESCRIPTION';
+  const canCreateMedication =
+    request.requestType === 'PRESCRIPTION' &&
+    request.status !== 'CANCELLED' &&
+    request.status !== 'REJECTED';
 
   return (
     <RxPage
@@ -277,8 +283,20 @@ export function RequestDetailPage() {
       title={`Request ${request.requestNumber}`}
       description={request.diagnosis ?? formatEnum(request.requestType)}
       actions={
-        (canSync || availableTransitions.length > 0) && (
-          <Group gap="sm">
+        <Group gap="sm">
+          {canCreateMedication && (
+            <Button
+              size="sm"
+              variant="light"
+              color="teal"
+              leftSection={<Pill size={14} />}
+              onClick={openMedication}
+            >
+              Create Medication
+            </Button>
+          )}
+          {(canSync || availableTransitions.length > 0) && (
+            <>
             {canSync && (
               <Group gap="sm">
                 {request.syncStatus === 'FAILED' && (
@@ -315,8 +333,9 @@ export function RequestDetailPage() {
                 {transition.label}
               </Button>
             ))}
-          </Group>
-        )
+            </>
+          )}
+        </Group>
       }
     >
       <Tabs defaultValue="details">
@@ -626,6 +645,19 @@ export function RequestDetailPage() {
         onClose={() => setAmendSubmission(null)}
         submission={amendSubmission}
       />
+
+      {canCreateMedication && (
+        <CreateMedicationModal
+          opened={medicationOpened}
+          onClose={closeMedication}
+          request={{
+            requestId: request.id,
+            patientId: request.patientId,
+            patientName: request.patientName,
+          }}
+          items={request.items}
+        />
+      )}
     </RxPage>
   );
 }

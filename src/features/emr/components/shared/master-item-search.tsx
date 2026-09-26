@@ -4,26 +4,44 @@ import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { buildReferenceCode } from './master-item-meta';
 
-export type MasterItemKind = 'STOCK_ITEM' | 'GENERIC_PRODUCT';
+export type MasterItemKind = 'STOCK_ITEM' | 'GENERIC_PRODUCT' | 'GENERIC_DRUG';
 
 export type MasterItem = {
   id: string;
   label: string;
   code?: string;
   kind: MasterItemKind;
+  /**
+   * Stable cross-system reference sent to rxsoft / LIS with the request line.
+   * Format: `<KIND>:<code-or-id>` so the receiving system can tell which
+   * catalogue the code belongs to without extra context.
+   */
+  referenceCode?: string;
 };
 
 const KIND_LABEL: Record<MasterItemKind, string> = {
-  STOCK_ITEM: 'StockItem',
-  GENERIC_PRODUCT: 'Generic Product',
+  STOCK_ITEM: 'Stock',
+  GENERIC_PRODUCT: 'EMDEx',
+  GENERIC_DRUG: 'NDF',
+};
+
+const KIND_COLOR: Record<MasterItemKind, string> = {
+  STOCK_ITEM: 'blue',
+  GENERIC_PRODUCT: 'grape',
+  GENERIC_DRUG: 'orange',
 };
 
 function displayFor(item: MasterItem): string {
   return item.label + (item.code ? ` (${item.code})` : '');
 }
 
-/** Searchable flat list of stock items + generic products, tagged by kind. */
+function referenceCodeFor(item: MasterItem): string {
+  return buildReferenceCode(item);
+}
+
+/** Searchable flat list of stock items + generic products + generic drugs, tagged by source. */
 export function MasterItemSearch({
   label,
   placeholder = 'Search items or drugs…',
@@ -55,11 +73,14 @@ export function MasterItemSearch({
   const { data = [], isLoading } = useQuery({
     queryKey: ['emr', 'master-items', debounced, limit],
     queryFn: async () => {
-      const [itemsRes, productsRes] = await Promise.all([
+      const [itemsRes, productsRes, drugsRes] = await Promise.all([
         rxsoftApi.get<{ data: Array<Record<string, unknown>> }>('/items', {
           params: { search: debounced || undefined, limit, page: 1 },
         }),
         codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-products', {
+          params: { search: debounced || undefined, limit, page: 1 },
+        }),
+        codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-drugs', {
           params: { search: debounced || undefined, limit, page: 1 },
         }),
       ]);
@@ -81,7 +102,15 @@ export function MasterItemSearch({
           kind: 'GENERIC_PRODUCT' as const,
         }))
         .filter((item) => item.label);
-      return [...products, ...items];
+      const drugs: MasterItem[] = ((drugsRes.data?.data ?? []) as Array<Record<string, unknown>>)
+        .map((row) => ({
+          id: String(row.id),
+          label: String(row.name ?? ''),
+          code: row.code != null ? String(row.code) : undefined,
+          kind: 'GENERIC_DRUG' as const,
+        }))
+        .filter((item) => item.label);
+      return [...products, ...drugs, ...items];
     },
     enabled: Boolean(debounced),
     staleTime: 60_000,
@@ -95,7 +124,7 @@ export function MasterItemSearch({
       store={combobox}
       onOptionSubmit={(selectedValue) => {
         const found = data.find((item) => `${item.kind}:${item.id}` === selectedValue);
-        onChange(found ?? null);
+        onChange(found ? { ...found, referenceCode: referenceCodeFor(found) } : null);
         setQuery(found ? displayFor(found) : '');
         combobox.closeDropdown();
       }}
@@ -160,7 +189,7 @@ export function MasterItemSearch({
                     <Badge
                       size="xs"
                       variant="light"
-                      color={item.kind === 'STOCK_ITEM' ? 'blue' : 'grape'}
+                      color={KIND_COLOR[item.kind]}
                       style={{ flexShrink: 0 }}
                     >
                       {KIND_LABEL[item.kind]}

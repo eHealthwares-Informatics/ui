@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export function InlinePriceCell({ row }: { row: Record<string, unknown> }) {
   const [editing, setEditing] = useState(false);
@@ -19,8 +20,8 @@ export function InlinePriceCell({ row }: { row: Record<string, unknown> }) {
       queryClient.invalidateQueries({ queryKey: ['rxsoft-data-page', '/price-lists/items'] });
       setEditing(false);
     },
-    onError: () => {
-      notifications.show({ color: 'red', message: 'Failed to update price' });
+    onError: (error) => {
+      notifications.show({ color: 'red', message: getApiErrorMessage(error) });
     },
   });
 

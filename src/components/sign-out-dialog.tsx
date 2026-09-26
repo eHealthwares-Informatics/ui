@@ -16,7 +16,7 @@ export function SignOutDialog({ open, onOpenChange, ...props }: SignOutDialogPro
   const logoutAll = useAuthStore((state) => state.logoutAll);
 
   const redirectToSignIn = () => {
-    const currentPath = location.href;
+    const currentPath = location.pathname + location.search;
     navigate({
       to: '/sign-in',
       search: { redirect: currentPath },

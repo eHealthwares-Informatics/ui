@@ -7,6 +7,7 @@ import { FormProvider, useFormContext } from '@/features/components/form/form-co
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { RxPage } from '../../../components/page/rx-page';
 import { UOM_CATEGORY_CREATE_FIELDS } from './schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type UomCategoryFormState = {
   code: string;
@@ -35,7 +36,7 @@ function UomCategoryFormContent({ uomCategoryId }: { uomCategoryId: string }) {
     },
     onError: (error) => {
       notifications.show({
-        message: error instanceof Error ? error.message : 'Failed to update UOM.',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },

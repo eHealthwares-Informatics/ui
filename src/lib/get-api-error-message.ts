@@ -14,10 +14,14 @@ function pickPayloadMessage(
     const trimmed = payload.trim();
     return trimmed ? trimmed : undefined;
   }
+  // Priority: the custom `{ error: { message } }` envelope, then the classic
+  // NestJS/class-validator `{ message }` (string or array), then a plain
+  // `{ error: "..." }` string. `error` may hold the HTTP class ("Not Found"),
+  // so it must never outrank the real message.
   const candidate =
-    typeof payload.error === 'string'
-      ? payload.error
-      : (payload.error?.message ?? payload.message);
+    typeof payload.error === 'object'
+      ? (payload.error?.message ?? payload.message)
+      : (payload.message ?? payload.error);
   if (Array.isArray(candidate)) {
     const joined = candidate.filter(Boolean).join(', ').trim();
     return joined || undefined;

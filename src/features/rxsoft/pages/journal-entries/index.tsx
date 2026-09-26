@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { journalEntriesConfig } from './schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const statusColors: Record<string, string> = {
   draft: 'yellow',
@@ -22,8 +23,8 @@ export function RxJournalEntriesPage() {
       notifications.show({ message: 'Journal entry posted.', color: 'green' });
       qc.invalidateQueries({ queryKey: ['rxsoft-data-page'] });
     },
-    onError: () => {
-      notifications.show({ message: 'Failed to post journal entry.', color: 'red' });
+    onError: (error) => {
+      notifications.show({ message: getApiErrorMessage(error), color: 'red' });
     },
   });
 
@@ -35,8 +36,8 @@ export function RxJournalEntriesPage() {
       notifications.show({ message: 'Journal entry reversed.', color: 'green' });
       qc.invalidateQueries({ queryKey: ['rxsoft-data-page'] });
     },
-    onError: () => {
-      notifications.show({ message: 'Failed to reverse journal entry.', color: 'red' });
+    onError: (error) => {
+      notifications.show({ message: getApiErrorMessage(error), color: 'red' });
     },
   });
 

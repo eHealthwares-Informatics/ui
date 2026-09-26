@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { CommunicationRow } from '@/features/communication/components/shared';
 import { getArrayPayload } from '@/features/components/utils';
 import { conversationApi } from '@/lib/conversation-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export type ConversationRow = Record<string, unknown>;
 
@@ -122,15 +123,9 @@ export function getDirtyPayload(
 }
 
 export function getErrorMessage(error: unknown) {
-  if (typeof error === 'object' && error && 'response' in error) {
-    const data = (error as any).response?.data;
-    const msg = data?.message;
-    if (Array.isArray(msg)) {return msg.join(', ');}
-    if (typeof msg === 'string') {return msg;}
-  }
-
-  if (error instanceof Error) {return error.message;}
-  return 'Something went wrong';
+  // Delegate to the shared extractor so all envelope shapes
+  // ({error:{message}}, classic Nest {message}, arrays) are covered.
+  return getApiErrorMessage(error);
 }
 
 /* -----------------------------

@@ -3,6 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus, X } from 'lucide-react';
 import { getArrayPayload } from '@/features/components/utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { Option } from '@/features/rxsoft/types';
 import { communicationApi } from '@/lib/communication-api';
 
@@ -200,8 +201,7 @@ export function getDirtyPayload(
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return 'An unexpected error occurred';
+  // Delegate to the shared extractor so 4xx envelopes surface the server's
+  // message instead of axios's generic text.
+  return getApiErrorMessage(error);
 }

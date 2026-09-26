@@ -6,6 +6,7 @@ import { rxsoftApi } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { ReceiptDetailModal } from './detail-modal';
 import { receivingConfig } from './schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export function RxReceivingPage() {
   const qc = useQueryClient();
@@ -24,7 +25,7 @@ export function RxReceivingPage() {
       qc.invalidateQueries({ queryKey: ['rxsoft-data-page', '/receipts'] });
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Unpost failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 

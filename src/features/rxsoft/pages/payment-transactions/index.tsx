@@ -5,6 +5,7 @@ import { CheckCircle } from 'lucide-react';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { paymentTransactionsConfig } from './schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function VerifyButton({ reference }: { reference: string }) {
   const qc = useQueryClient();
@@ -20,8 +21,8 @@ function VerifyButton({ reference }: { reference: string }) {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? 'Failed to verify payment',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 

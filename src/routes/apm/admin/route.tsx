@@ -7,7 +7,7 @@ export const Route = createFileRoute('/apm/admin')({
   beforeLoad: ({ location }) => {
     const token = getAccessToken();
     if (!token) {
-      throw redirect({ to: '/sign-in', search: { redirect: location.href } });
+      throw redirect({ to: '/sign-in', search: { redirect: location.pathname + location.search } });
     }
   },
 });

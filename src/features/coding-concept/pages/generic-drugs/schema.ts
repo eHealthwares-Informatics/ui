@@ -68,7 +68,7 @@ export const genericDrugsConfig: ModelConfig = {
   id: 'generic-drugs',
   title: 'Generic Drugs',
   description: 'Manage generic drug reference records.',
-  endpoint: '/generic-products',
+  endpoint: '/generic-drugs',
   columns,
   createFields,
   buildCreatePayload,

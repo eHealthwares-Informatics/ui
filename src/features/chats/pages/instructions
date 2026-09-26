@@ -408,9 +408,12 @@ Events:
 * conversation.message.orphan (message belongs to a `pending-<participantId>`
   conversation that does not exist yet — emitted for the inbound orphan and for
   the "select an action" menu when the first message matches no questionnaire)
-* conversation.message.created (real conversation exists; carries
-  `pendingConversationId` so clients can migrate the pending thread)
-* conversation.updated
+* conversation.message.created (real conversation exists)
+* conversation.created (the webhook flow promoted a `pending-<participantId>`
+  thread to a real conversation; payload carries `oldConversationId` and
+  `newConversationId` so clients migrate the pending thread). Broadcast to all
+  connected sockets — clients filter by the ids they hold locally.
+* conversation.updated (conversation state change)
 * conversation.read
 * conversation.opened
 * conversation.closed

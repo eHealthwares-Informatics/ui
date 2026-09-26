@@ -7,6 +7,7 @@ import { Eye, Printer } from 'lucide-react';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { salesConfig } from './schema';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function CompleteSaleButton({ saleId }: { saleId: string }) {
   const qc = useQueryClient();
@@ -17,7 +18,7 @@ function CompleteSaleButton({ saleId }: { saleId: string }) {
       qc.invalidateQueries({ queryKey: ['rxsoft-data-page'] });
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Failed to complete sale.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 

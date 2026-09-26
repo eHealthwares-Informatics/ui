@@ -11,6 +11,7 @@ import { getDirtyFields } from '@/features/components/utils';
 import { FieldGroup } from '../form/FieldGroup';
 import { TabGroups } from '../form/tab-groups';
 import { RxPage } from './rx-page';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type DataPageFormProps = {
   config: ModelConfig;
@@ -126,7 +127,7 @@ export function DataPageForm({
       const action = mode === 'edit' ? 'update' : 'create';
       notifications.show({
         color: 'red',
-        message: `Failed to ${action} ${title.toLowerCase()} record - ${error.data?.message ?? error?.data?.error?.message ?? error?.response?.data?.message ?? error?.response?.data?.error?.message ?? error.message}`,
+        message: `Failed to ${action} ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
       });
     },
   });
@@ -157,7 +158,7 @@ export function DataPageForm({
       const action = mode === 'edit' ? 'update' : 'create';
       notifications.show({
         color: 'red',
-        message: `Failed to ${action} ${title.toLowerCase()} record - ${error.data?.message ?? error?.data?.error?.message ?? error?.response?.data?.message ?? error?.response?.data?.error?.message ?? error.message}`,
+        message: `Failed to ${action} ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
       });
       throw error;
     }

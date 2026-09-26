@@ -35,6 +35,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 import { buildReportHtml, printReportHtml, type PrintReportData } from './report-print';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const routeApi = getRouteApi('/_authenticated/lis/orders/$orderId/report');
 
@@ -419,10 +420,10 @@ export function OrderReportContent({
       });
       resultsQuery.refetch();
     },
-    onError: () => {
+    onError: (error) => {
       notifications.show({
         title: 'Error',
-        message: 'Failed to save result',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },
@@ -448,10 +449,10 @@ export function OrderReportContent({
         color: 'green',
       });
     },
-    onError: () => {
+    onError: (error) => {
       notifications.show({
         title: 'Error',
-        message: 'Failed to sign report',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },
@@ -515,7 +516,7 @@ export function OrderReportContent({
     onError: (err: any) => {
       notifications.show({
         title: 'Send failed',
-        message: err?.response?.data?.message ?? err?.message ?? 'Failed to send report',
+        message: getApiErrorMessage(err),
         color: 'red',
       });
     },

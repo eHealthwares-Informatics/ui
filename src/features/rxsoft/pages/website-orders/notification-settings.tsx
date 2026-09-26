@@ -4,6 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { Button, Group, Modal, Select, Stack, Switch, Table, Text } from '@mantine/core';
 import { Settings2 } from 'lucide-react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const CHANNELS = [
   { key: 'email', label: 'Email' },
@@ -77,7 +78,7 @@ export function NotificationSettingsButton() {
       setOpened(false);
     },
     onError: (err: any) => {
-      notifications.show({ message: err?.response?.data?.message ?? 'Save failed.', color: 'red' });
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
     },
   });
 

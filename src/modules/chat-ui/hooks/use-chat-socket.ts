@@ -66,13 +66,6 @@ export function useChatSocket(input: {
     const onMessage = (message: ExchangeMessage) => {
       if (!message.conversationId) {return;}
 
-      // Once a real conversation exists the pending thread is superseded —
-      // drop the locally-held orphan messages (they are now backfilled and
-      // available through the paginated exchanges query).
-      if (message.pendingConversationId) {
-        setPendingMessages([]);
-      }
-
       // Messages routed through a "pending-" conversation id belong to the
       // compose thread (no real conversation exists yet). Surface them there
       // until a real conversation is created and the pending is backfilled.
@@ -103,6 +96,18 @@ export function useChatSocket(input: {
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
       onConversationCreatedRef.current?.(message.conversationId);
     };
+    // The webhook flow promoted a pending-<participantId> thread to a real
+    // conversation. Drop the locally-held pending orphans (they are now
+    // backfilled into the real thread) and select the real conversation.
+    const onCreated = (payload: {
+      oldConversationId?: string;
+      newConversationId: string;
+    }) => {
+      if (!payload?.newConversationId) {return;}
+      setPendingMessages([]);
+      queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
+      onConversationCreatedRef.current?.(payload.newConversationId);
+    };
     const onUpdated = (payload?: { conversationId?: string }) => {
       if (payload?.conversationId?.startsWith('pending-')) {
         // No real conversation exists yet; keep the compose thread fresh by
@@ -114,9 +119,6 @@ export function useChatSocket(input: {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
-      if (payload?.conversationId) {
-        onConversationCreatedRef.current?.(payload.conversationId);
-      }
     };
     const onTypingStarted = (payload: { participantId?: string }) => {
       setTypingParticipantId(payload.participantId);
@@ -144,6 +146,7 @@ export function useChatSocket(input: {
     socket.on('disconnect', onDisconnect);
     socket.on('conversation.message.created', onMessage);
     socket.on('conversation.message.orphan', onOrphan);
+    socket.on('conversation.created', onCreated);
     socket.on('conversation.updated', onUpdated);
     socket.on('conversation.read', onRead);
     socket.on('typing.started', onTypingStarted);
@@ -156,6 +159,7 @@ export function useChatSocket(input: {
       socket.off('disconnect', onDisconnect);
       socket.off('conversation.message.created', onMessage);
       socket.off('conversation.message.orphan', onOrphan);
+      socket.off('conversation.created', onCreated);
       socket.off('conversation.updated', onUpdated);
       socket.off('conversation.read', onRead);
       socket.off('typing.started', onTypingStarted);

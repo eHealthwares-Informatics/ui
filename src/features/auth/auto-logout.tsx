@@ -36,7 +36,7 @@ export function AutoLogout({ children }: { children: React.ReactNode }) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const logoutAndRedirect = useCallback(() => {
-    const currentPath = window.location.href;
+    const currentPath = window.location.pathname + window.location.search;
     useAuthStore.getState().logout();
     navigate({ to: '/sign-in', search: { redirect: currentPath }, replace: true });
   }, [navigate]);

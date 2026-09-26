@@ -18,6 +18,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type OrganisationConfig = {
   id: string;
@@ -157,8 +158,8 @@ export function RxOrganisationConfigPage() {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? err?.message ?? 'Failed to save configuration',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 

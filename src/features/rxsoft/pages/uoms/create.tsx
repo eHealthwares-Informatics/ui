@@ -7,6 +7,7 @@ import { FormProvider, useFormContext } from '@/features/components/form/form-co
 import { FieldGroupSpec } from '@/features/components/form/types/form-context';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { RxPage } from '../../../components/page/rx-page';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type UomFormState = {
   code: string;
@@ -70,7 +71,7 @@ function UomFormContent({ uomId }: { uomId: string }) {
     },
     onError: (error) => {
       notifications.show({
-        message: error instanceof Error ? error.message : 'Failed to update UOM.',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },

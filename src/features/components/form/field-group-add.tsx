@@ -9,6 +9,7 @@ import {
 import { DataTable } from '../table/table';
 import { Props } from './FieldGroup';
 import { RenderField } from './RenderField';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index }: Props) {
   const parentId = String(formState.id) || '';
@@ -157,11 +158,7 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
         color: 'green',
       });
     } catch (err: any) {
-      const message =
-        err?.response?.data?.message ??
-        err?.response?.data?.error?.message ??
-        err?.message ??
-        'Failed to save price';
+      const message = getApiErrorMessage(err);
       const nextRows = rows.map((item) =>
         item.id === row.id ? { ...item, error: String(message) } : item
       );
@@ -209,11 +206,7 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
         color: 'green',
       });
     } catch (err: any) {
-      const message =
-        err?.response?.data?.message ??
-        err?.response?.data?.error?.message ??
-        err?.message ??
-        'Failed to save price';
+      const message = getApiErrorMessage(err);
       setError(String(message));
       notifications.show({ title: `${title  } save failed`, message: String(message), color: 'red' });
     } finally {

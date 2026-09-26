@@ -18,7 +18,9 @@ export type StatusKind =
   | 'bedType'
   | 'admission'
   | 'admissionType'
-  | 'dischargeType';
+  | 'dischargeType'
+  | 'referral'
+  | 'medication';
 
 const COLOR_MAPS: Record<StatusKind, Record<string, string>> = {
   appointment: {
@@ -141,6 +143,18 @@ const COLOR_MAPS: Record<StatusKind, Record<string, string>> = {
     TRANSFERRED: 'grape',
     SELF_DISCHARGE: 'gray',
     AMA: 'orange',
+  },
+  referral: {
+    PENDING: 'yellow',
+    ACCEPTED: 'teal',
+    DECLINED: 'red',
+    COMPLETED: 'blue',
+  },
+  medication: {
+    PRESCRIBED: 'yellow',
+    ADMINISTERED: 'teal',
+    PARTIALLY_ADMINISTERED: 'orange',
+    CANCELLED: 'gray',
   },
 };
 

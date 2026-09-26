@@ -10,6 +10,7 @@ import type {
   IssueReportPayload,
   DonationPayload,
 } from './types';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 // ── Homepage ─────────────────────────────────────────────────
 
@@ -112,10 +113,10 @@ function useSimpleMutation<T>(
       notifications.show({ title: 'Success', message: successMessage, color: 'green' });
       qc.invalidateQueries({ queryKey: ['apm'] });
     },
-    onError: () => {
+    onError: (error) => {
       notifications.show({
         title: 'Error',
-        message: 'Something went wrong. Please try again.',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },
@@ -163,10 +164,10 @@ export function useSubscribeNewsletter() {
       });
       qc.invalidateQueries({ queryKey: ['apm'] });
     },
-    onError: () => {
+    onError: (error) => {
       notifications.show({
         title: 'Error',
-        message: 'Could not subscribe. Please try again.',
+        message: getApiErrorMessage(error),
         color: 'red',
       });
     },

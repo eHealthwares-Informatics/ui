@@ -86,7 +86,7 @@ const queryClient = new QueryClient({
         if (error.response?.status === 401) {
           notifications.show({ title: 'Session expired!', message: error.message, color: 'red' });
           useAuthStore.getState().logout();
-          const redirect = `${router.history.location.href}`;
+          const redirect = router.history.location.pathname + router.history.location.search;
           router.navigate({ to: '/sign-in', search: { redirect } });
         }
         if (error.response?.status === 500) {

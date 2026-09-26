@@ -11,6 +11,7 @@ import { UserPopover } from '../../../components/popover/user-popover';
 import { StockMatrix } from './components/stock-matrix';
 import { stockBalancesConfig } from './schema';
 import { uomToBaseQuantity, type UomFactorInfo } from './utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function TransferModal({
   opened,
@@ -90,8 +91,8 @@ function TransferModal({
       qc.invalidateQueries({ queryKey: ['stock-movements'] });
       onClose();
     },
-    onError: () => {
-      notifications.show({ message: 'Transfer failed.', color: 'red' });
+    onError: (error) => {
+      notifications.show({ message: getApiErrorMessage(error), color: 'red' });
     },
   });
 
@@ -184,8 +185,8 @@ function AdjustModal({
       setDeltaQuantity(0);
       setReason('');
     },
-    onError: () => {
-      notifications.show({ message: 'Adjustment failed.', color: 'red' });
+    onError: (error) => {
+      notifications.show({ message: getApiErrorMessage(error), color: 'red' });
     },
   });
 
@@ -392,8 +393,8 @@ export function RxInventoryPage() {
       setDeltaQuantity('');
       setReason('');
     },
-    onError: () => {
-      notifications.show({ message: 'Failed to post adjustment.', color: 'red' });
+    onError: (error) => {
+      notifications.show({ message: getApiErrorMessage(error), color: 'red' });
     },
   });
 

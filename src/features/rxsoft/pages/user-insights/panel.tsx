@@ -32,6 +32,7 @@ import {
   listMyRoleRequests,
   listRoleCatalog,
 } from './api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function timeAgo(value: string | null | undefined): string {
   if (!value) {return '—';}
@@ -84,8 +85,8 @@ export function UserInsightsPanel() {
     onError: (e: any) =>
       notifications.show({
         color: 'red',
-        message: e?.response?.data?.message ?? e?.message ?? 'Failed to request role',
-      }),
+        message: getApiErrorMessage(e),
+        }),
   });
 
   const profile = me.data;

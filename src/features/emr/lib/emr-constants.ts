@@ -62,6 +62,17 @@ export const STAFF_CATEGORIES = [
 
 export const REQUEST_TYPES = ['PRESCRIPTION', 'LAB', 'RADIOLOGY', 'OTHER_TEST'] as const;
 
+export const REFERRAL_STATUSES = ['PENDING', 'ACCEPTED', 'DECLINED', 'COMPLETED'] as const;
+
+export const REFERRAL_PRIORITIES = ['ROUTINE', 'URGENT'] as const;
+
+export const MEDICATION_STATUSES = [
+  'PRESCRIBED',
+  'ADMINISTERED',
+  'PARTIALLY_ADMINISTERED',
+  'CANCELLED',
+] as const;
+
 export const REQUEST_STATUSES = ['REQUESTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'REJECTED'] as const;
 
 export const SYNC_STATUSES = ['NONE', 'PENDING', 'SYNCED', 'FAILED'] as const;

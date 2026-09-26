@@ -6,6 +6,7 @@ import { normalizeMultiSelectIds } from '@/features/shared/payload-utils';
 import { useApiProvider } from '../../../context/module-context';
 import { triggerBlobDownload } from '../export/download';
 import { getDirtyFields } from '../utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type MutationProps = {
   endpoint: string;
@@ -87,7 +88,7 @@ export const useCreateMutation = ({
     onError: (error: any) => {
       notifications.show({
         color: 'red',
-        message: `Failed to create ${title.toLowerCase()} record - ${error.data?.message ?? error?.data?.error?.message ?? error?.response?.data?.message ?? error?.response?.data?.error?.message ?? error.message}`,
+        message: `Failed to create ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
       });
     },
   });
@@ -142,9 +143,8 @@ export const useUpdateMutation = ({
       notifications.show({ message: `${title} record updated` });
     },
     onError: (error: any) => {
-      console.log({error})
       notifications.show({
-        message: `Failed to update ${title.toLowerCase()} record - ${error?.data?.error?.message ?? error?.response?.data?.error?.message}`,
+        message: `Failed to update ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
       });
     },
   });
@@ -174,10 +174,10 @@ export const useDeleteMutation = ({
       });
       notifications.show({ message: `${title} record deleted` });
     },
-    onError: () => {
+    onError: (error) => {
       notifications.show({
         color: 'red',
-        message: `Failed to delete ${title.toLowerCase()} record`,
+        message: `Failed to delete ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
       });
     },
   });
@@ -199,7 +199,10 @@ export const useExportMutation = ({ csvEndpoint, title, apiProvider }: ExportMut
       );
     },
     onSuccess: () => notifications.show({ message: `${title} export downloaded` }),
-    onError: () =>
-      notifications.show({ color: 'red', message: `Failed to export ${title.toLowerCase()}` }),
+    onError: (error) =>
+      notifications.show({
+        color: 'red',
+        message: `Failed to export ${title.toLowerCase()} - ${getApiErrorMessage(error)}`,
+      }),
   });
 };

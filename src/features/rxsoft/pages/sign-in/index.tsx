@@ -74,7 +74,13 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
       if (authState.user) {
         const firstModule = authState.modules[0];
         const fallbackRoot = '/';
-        const targetUrl = redirectTo || firstModule?.root || fallbackRoot;
+        let targetUrl = redirectTo || firstModule?.root || fallbackRoot;
+        try {
+          if (targetUrl.startsWith('http')) {
+            const parsed = new URL(targetUrl);
+            targetUrl = parsed.pathname + parsed.search;
+          }
+        } catch { /* not a valid URL, use as-is */ }
         const finalUrl = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
         window.location.href = finalUrl;
       }

@@ -11,7 +11,7 @@ export const websiteOrdersColumns: Column[] = [
   },
   {
     key: 'externalReference',
-    label: 'EMR Reference',
+    label: 'Ext Ref',
     render: (row: any) => row.externalReference ?? '-',
   },
   {

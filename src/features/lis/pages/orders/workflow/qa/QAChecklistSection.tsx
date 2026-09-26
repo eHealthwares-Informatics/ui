@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { lisApi } from '@/lib/lis-api';
 import { useOrderContext } from '../OrderContext';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface QaChecklistItem {
   id: string;
@@ -25,7 +26,7 @@ export function QAChecklistSection() {
         setItems(res.data?.data ?? []);
       })
       .catch((err) => {
-        setError(err?.response?.data?.message ?? err?.message ?? 'Failed to load QA checklist');
+        setError(getApiErrorMessage(err));
       })
       .finally(() => setLoading(false));
   }, []);

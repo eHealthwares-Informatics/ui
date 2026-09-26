@@ -38,6 +38,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useCartProductHydration } from '../website/hooks';
 import type { WebsiteProduct } from '../website/types';
 import { useChatbotStore } from '../website/chatbot-store';
@@ -262,6 +263,7 @@ export default function CheckoutPage() {
   }>({ kind: 'idle', message: '' });
   const [checkingCoupon, setCheckingCoupon] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<OrderView | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const openAccountDrawer = useAccountDrawerStore((s) => s.open);
 
@@ -328,6 +330,7 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = () => {
+    setOrderError(null);
     placeOrder(
       {
         paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
@@ -401,37 +404,49 @@ export default function CheckoutPage() {
             }
           );
         },
-        onError: () => {
-          setStep(4);
-          setPlacedOrder({
-            id: 'ERR',
-            orderNumber: `DMX-${Date.now().toString(36).toUpperCase()}`,
-            customerId: null,
-            paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
-            orderStatus: 'pending',
-            notes: null,
-            saleId: null,
-            createdBy: null,
-            subtotalAmount: 0,
-            totalAmount: 0,
-            createdAt: new Date().toISOString(),
-            items: [],
-            delivery: {
-              id: '',
-              address,
-              city,
-              state: state_,
-              phone,
-              shippingMethod: 'standard',
-              trackingNumber: null,
-              status: 'pending',
-              notes: null,
-            },
-          });
+        onError: (error) => {
+          setOrderError(getApiErrorMessage(error));
         },
       }
     );
   };
+
+  if (orderError) {
+    return (
+      <WebsiteLayout>
+        <Container size="sm" py={80}>
+          <Alert
+            icon={<AlertTriangle size={20} />}
+            title="Order failed"
+            color="red"
+            radius="lg"
+          >
+            {orderError}
+          </Alert>
+          <Group justify="center" mt="xl">
+            <Button
+              radius="xl"
+              variant="light"
+              color="green"
+              onClick={() => {
+                setOrderError(null);
+                setStep(3);
+              }}
+            >
+              Try again
+            </Button>
+            <Button
+              radius="xl"
+              variant="subtle"
+              onClick={() => navigate({ to: '/shop/shop' })}
+            >
+              Continue Shopping
+            </Button>
+          </Group>
+        </Container>
+      </WebsiteLayout>
+    );
+  }
 
   if (step === 4 && placedOrder) {
     return (

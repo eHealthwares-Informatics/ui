@@ -46,3 +46,4 @@ export * from './uoms';
 export * from './users';
 export * from './user-config';
 export * from './website-orders';
+export * from './website-prescriptions';

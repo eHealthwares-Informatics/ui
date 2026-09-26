@@ -129,6 +129,10 @@ export type FormSubmission = {
   submittedByName: string | null;
   submittedAt: string | null;
   amendedFromId: string | null;
+  /** True when the submission was filled against an older published schema. */
+  schemaOutdated?: boolean;
+  /** Published schema version of the form definition right now. */
+  schemaCurrentVersion?: number | null;
 };
 
 export type Visit = {

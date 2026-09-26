@@ -3,6 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface Props {
   opened: boolean;
@@ -58,8 +59,8 @@ export function StockAdjustModal({
     onError: (err: any) => {
       notifications.show({
         color: 'red',
-        message: err?.response?.data?.message ?? err.message ?? 'Failed to adjust stock',
-      });
+        message: getApiErrorMessage(err),
+        });
     },
   });
 

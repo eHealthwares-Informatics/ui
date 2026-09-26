@@ -16,6 +16,7 @@ import {
   Progress,
   Paper,
 } from '@mantine/core';
+import { DatePickerInput, DateTimePicker } from '@mantine/dates';
 import {
   Check,
   ChevronLeft,
@@ -94,10 +95,6 @@ export type QuestionnaireProps = {
 
 const MODE_STORAGE_KEY = 'rxsoft-questionnaire-mode';
 
-function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(' ');
-}
-
 export const SAMPLE_QUESTIONS: QuestionnaireQuestion[] = [
   {
     id: 'ux-1',
@@ -153,6 +150,8 @@ function getInputKind(question: QuestionnaireQuestion) {
   if (question.questionType === 'boolean') {return 'yes_no';}
   if (question.questionType === 'multi_choice') {return 'checkbox';}
   if (question.questionType === 'single_choice') {return 'radio';}
+  if (question.questionType === 'date') {return 'date';}
+  if (question.questionType === 'datetime') {return 'datetime';}
   if (question.renderMode === 'textarea') {return 'textarea';}
 
   return 'input';
@@ -750,6 +749,32 @@ function QuestionInput({
         disabled={!enabled}
         minRows={5}
         placeholder="Type your answer here..."
+      />
+    );
+  }
+
+  if (inputKind === 'date') {
+    return (
+      <DatePickerInput
+        value={typeof value === 'string' && value ? value : null}
+        onChange={(next) => onChange(next ?? '')}
+        disabled={!enabled}
+        clearable
+        valueFormat="YYYY-MM-DD"
+        placeholder="Pick a date"
+      />
+    );
+  }
+
+  if (inputKind === 'datetime') {
+    return (
+      <DateTimePicker
+        value={typeof value === 'string' && value ? value : null}
+        onChange={(next) => onChange(next ?? '')}
+        disabled={!enabled}
+        clearable
+        valueFormat="YYYY-MM-DD HH:mm:ss"
+        placeholder="Pick a date and time"
       />
     );
   }

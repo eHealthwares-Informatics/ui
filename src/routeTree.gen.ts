@@ -147,6 +147,7 @@ import { Route as AuthenticatedCodingConceptDrugComponentsIndexRouteImport } fro
 import { Route as AuthenticatedCodingConceptFacilitiesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/index'
 import { Route as AuthenticatedCodingConceptFormulationsIndexRouteImport } from './routes/_authenticated/coding-concept/formulations/index'
 import { Route as AuthenticatedCodingConceptGenericDrugsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-drugs/index'
+import { Route as AuthenticatedCodingConceptGenericProductsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-products/index'
 import { Route as AuthenticatedCodingConceptManufacturersIndexRouteImport } from './routes/_authenticated/coding-concept/manufacturers/index'
 import { Route as AuthenticatedCodingConceptPharmaceuticsIndexRouteImport } from './routes/_authenticated/coding-concept/pharmaceutics/index'
 import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
@@ -170,8 +171,10 @@ import { Route as AuthenticatedEmrDepartmentsIndexRouteImport } from './routes/_
 import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index'
 import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
+import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index'
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
+import { Route as AuthenticatedEmrReferralsIndexRouteImport } from './routes/_authenticated/emr/referrals/index'
 import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_authenticated/emr/requests/index'
 import { Route as AuthenticatedEmrRequestsRequestIdRouteImport } from './routes/_authenticated/emr/requests/$requestId'
 import { Route as AuthenticatedEmrStaffIndexRouteImport } from './routes/_authenticated/emr/staff/index'
@@ -279,6 +282,7 @@ import { Route as AuthenticatedRxsoftUserConfigIndexRouteImport } from './routes
 import { Route as AuthenticatedRxsoftUsersIndexRouteImport } from './routes/_authenticated/rxsoft/users/index'
 import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes/_authenticated/rxsoft/warehouses/index'
 import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
+import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index'
 import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
 import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId'
 import { Route as AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/index'
@@ -1049,6 +1053,12 @@ const AuthenticatedCodingConceptGenericDrugsIndexRoute =
     path: '/coding-concept/generic-drugs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCodingConceptGenericProductsIndexRoute =
+  AuthenticatedCodingConceptGenericProductsIndexRouteImport.update({
+    id: '/coding-concept/generic-products/',
+    path: '/coding-concept/generic-products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCodingConceptManufacturersIndexRoute =
   AuthenticatedCodingConceptManufacturersIndexRouteImport.update({
     id: '/coding-concept/manufacturers/',
@@ -1187,6 +1197,12 @@ const AuthenticatedEmrFormsIndexRoute =
     path: '/emr/forms/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrMedicationsIndexRoute =
+  AuthenticatedEmrMedicationsIndexRouteImport.update({
+    id: '/emr/medications/',
+    path: '/emr/medications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrPatientsIndexRoute =
   AuthenticatedEmrPatientsIndexRouteImport.update({
     id: '/emr/patients/',
@@ -1197,6 +1213,12 @@ const AuthenticatedEmrPatientsPatientIdRoute =
   AuthenticatedEmrPatientsPatientIdRouteImport.update({
     id: '/emr/patients/$patientId',
     path: '/emr/patients/$patientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrReferralsIndexRoute =
+  AuthenticatedEmrReferralsIndexRouteImport.update({
+    id: '/emr/referrals/',
+    path: '/emr/referrals/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEmrRequestsIndexRoute =
@@ -1841,6 +1863,12 @@ const AuthenticatedRxsoftWebsiteOrdersIndexRoute =
     path: '/rxsoft/website-orders/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftWebsitePrescriptionsIndexRoute =
+  AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport.update({
+    id: '/rxsoft/website-prescriptions/',
+    path: '/rxsoft/website-prescriptions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApmAdminPollingUnitsWardIdRoute =
   ApmAdminPollingUnitsWardIdRouteImport.update({
     id: '/polling-units/$wardId',
@@ -2199,6 +2227,7 @@ export interface FileRoutesByFullPath {
   '/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
   '/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute
   '/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
   '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
@@ -2217,7 +2246,9 @@ export interface FileRoutesByFullPath {
   '/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
   '/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
   '/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute
@@ -2311,6 +2342,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
   '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -2499,6 +2531,7 @@ export interface FileRoutesByTo {
   '/coding-concept/facilities': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
   '/coding-concept/formulations': typeof AuthenticatedCodingConceptFormulationsIndexRoute
   '/coding-concept/generic-drugs': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/coding-concept/generic-products': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
   '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
@@ -2517,7 +2550,9 @@ export interface FileRoutesByTo {
   '/emr/departments': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
   '/emr/staff': typeof AuthenticatedEmrStaffIndexRoute
   '/emr/tags': typeof AuthenticatedEmrTagsIndexRoute
@@ -2611,6 +2646,7 @@ export interface FileRoutesByTo {
   '/rxsoft/users': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/rxsoft/website-prescriptions': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
   '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -2805,6 +2841,7 @@ export interface FileRoutesById {
   '/_authenticated/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
   '/_authenticated/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute
   '/_authenticated/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/_authenticated/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/_authenticated/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/_authenticated/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
   '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
@@ -2823,7 +2860,9 @@ export interface FileRoutesById {
   '/_authenticated/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
   '/_authenticated/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
   '/_authenticated/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute
@@ -2917,6 +2956,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
   '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/_authenticated/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
   '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -3109,6 +3149,7 @@ export interface FileRouteTypes {
     | '/coding-concept/facilities/'
     | '/coding-concept/formulations/'
     | '/coding-concept/generic-drugs/'
+    | '/coding-concept/generic-products/'
     | '/coding-concept/manufacturers/'
     | '/coding-concept/pharmaceutics/'
     | '/conversation/channels/'
@@ -3127,7 +3168,9 @@ export interface FileRouteTypes {
     | '/emr/departments/'
     | '/emr/encounters/'
     | '/emr/forms/'
+    | '/emr/medications/'
     | '/emr/patients/'
+    | '/emr/referrals/'
     | '/emr/requests/'
     | '/emr/staff/'
     | '/emr/tags/'
@@ -3221,6 +3264,7 @@ export interface FileRouteTypes {
     | '/rxsoft/users/'
     | '/rxsoft/warehouses/'
     | '/rxsoft/website-orders/'
+    | '/rxsoft/website-prescriptions/'
     | '/coding-concept/facilities/hospitals/$hospitalId'
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -3409,6 +3453,7 @@ export interface FileRouteTypes {
     | '/coding-concept/facilities'
     | '/coding-concept/formulations'
     | '/coding-concept/generic-drugs'
+    | '/coding-concept/generic-products'
     | '/coding-concept/manufacturers'
     | '/coding-concept/pharmaceutics'
     | '/conversation/channels'
@@ -3427,7 +3472,9 @@ export interface FileRouteTypes {
     | '/emr/departments'
     | '/emr/encounters'
     | '/emr/forms'
+    | '/emr/medications'
     | '/emr/patients'
+    | '/emr/referrals'
     | '/emr/requests'
     | '/emr/staff'
     | '/emr/tags'
@@ -3521,6 +3568,7 @@ export interface FileRouteTypes {
     | '/rxsoft/users'
     | '/rxsoft/warehouses'
     | '/rxsoft/website-orders'
+    | '/rxsoft/website-prescriptions'
     | '/coding-concept/facilities/hospitals/$hospitalId'
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -3714,6 +3762,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coding-concept/facilities/'
     | '/_authenticated/coding-concept/formulations/'
     | '/_authenticated/coding-concept/generic-drugs/'
+    | '/_authenticated/coding-concept/generic-products/'
     | '/_authenticated/coding-concept/manufacturers/'
     | '/_authenticated/coding-concept/pharmaceutics/'
     | '/_authenticated/conversation/channels/'
@@ -3732,7 +3781,9 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/departments/'
     | '/_authenticated/emr/encounters/'
     | '/_authenticated/emr/forms/'
+    | '/_authenticated/emr/medications/'
     | '/_authenticated/emr/patients/'
+    | '/_authenticated/emr/referrals/'
     | '/_authenticated/emr/requests/'
     | '/_authenticated/emr/staff/'
     | '/_authenticated/emr/tags/'
@@ -3826,6 +3877,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/users/'
     | '/_authenticated/rxsoft/warehouses/'
     | '/_authenticated/rxsoft/website-orders/'
+    | '/_authenticated/rxsoft/website-prescriptions/'
     | '/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
     | '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
     | '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -4893,6 +4945,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/coding-concept/generic-products/': {
+      id: '/_authenticated/coding-concept/generic-products/'
+      path: '/coding-concept/generic-products'
+      fullPath: '/coding-concept/generic-products/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/manufacturers/': {
       id: '/_authenticated/coding-concept/manufacturers/'
       path: '/coding-concept/manufacturers'
@@ -5054,6 +5113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmrFormsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/medications/': {
+      id: '/_authenticated/emr/medications/'
+      path: '/emr/medications'
+      fullPath: '/emr/medications/'
+      preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/patients/': {
       id: '/_authenticated/emr/patients/'
       path: '/emr/patients'
@@ -5066,6 +5132,13 @@ declare module '@tanstack/react-router' {
       path: '/emr/patients/$patientId'
       fullPath: '/emr/patients/$patientId'
       preLoaderRoute: typeof AuthenticatedEmrPatientsPatientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/referrals/': {
+      id: '/_authenticated/emr/referrals/'
+      path: '/emr/referrals'
+      fullPath: '/emr/referrals/'
+      preLoaderRoute: typeof AuthenticatedEmrReferralsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/emr/requests/': {
@@ -5817,6 +5890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/website-prescriptions/': {
+      id: '/_authenticated/rxsoft/website-prescriptions/'
+      path: '/rxsoft/website-prescriptions'
+      fullPath: '/rxsoft/website-prescriptions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/apm/admin/polling-units/$wardId': {
       id: '/apm/admin/polling-units/$wardId'
       path: '/polling-units/$wardId'
@@ -6241,6 +6321,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCodingConceptFacilitiesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesIndexRoute
   AuthenticatedCodingConceptFormulationsIndexRoute: typeof AuthenticatedCodingConceptFormulationsIndexRoute
   AuthenticatedCodingConceptGenericDrugsIndexRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  AuthenticatedCodingConceptGenericProductsIndexRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   AuthenticatedCodingConceptManufacturersIndexRoute: typeof AuthenticatedCodingConceptManufacturersIndexRoute
   AuthenticatedCodingConceptPharmaceuticsIndexRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
   AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
@@ -6259,7 +6340,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrDepartmentsIndexRoute: typeof AuthenticatedEmrDepartmentsIndexRoute
   AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
+  AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
+  AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute
   AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
   AuthenticatedEmrStaffIndexRoute: typeof AuthenticatedEmrStaffIndexRoute
   AuthenticatedEmrTagsIndexRoute: typeof AuthenticatedEmrTagsIndexRoute
@@ -6352,6 +6435,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftUsersIndexRoute: typeof AuthenticatedRxsoftUsersIndexRoute
   AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute
   AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  AuthenticatedRxsoftWebsitePrescriptionsIndexRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -6474,6 +6558,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptFormulationsIndexRoute,
   AuthenticatedCodingConceptGenericDrugsIndexRoute:
     AuthenticatedCodingConceptGenericDrugsIndexRoute,
+  AuthenticatedCodingConceptGenericProductsIndexRoute:
+    AuthenticatedCodingConceptGenericProductsIndexRoute,
   AuthenticatedCodingConceptManufacturersIndexRoute:
     AuthenticatedCodingConceptManufacturersIndexRoute,
   AuthenticatedCodingConceptPharmaceuticsIndexRoute:
@@ -6507,7 +6593,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrDepartmentsIndexRoute: AuthenticatedEmrDepartmentsIndexRoute,
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
+  AuthenticatedEmrMedicationsIndexRoute: AuthenticatedEmrMedicationsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
+  AuthenticatedEmrReferralsIndexRoute: AuthenticatedEmrReferralsIndexRoute,
   AuthenticatedEmrRequestsIndexRoute: AuthenticatedEmrRequestsIndexRoute,
   AuthenticatedEmrStaffIndexRoute: AuthenticatedEmrStaffIndexRoute,
   AuthenticatedEmrTagsIndexRoute: AuthenticatedEmrTagsIndexRoute,
@@ -6658,6 +6746,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftWarehousesIndexRoute,
   AuthenticatedRxsoftWebsiteOrdersIndexRoute:
     AuthenticatedRxsoftWebsiteOrdersIndexRoute,
+  AuthenticatedRxsoftWebsitePrescriptionsIndexRoute:
+    AuthenticatedRxsoftWebsitePrescriptionsIndexRoute,
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute:
     AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute,
   AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute:

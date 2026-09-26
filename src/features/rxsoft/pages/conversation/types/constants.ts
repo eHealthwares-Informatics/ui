@@ -2,6 +2,7 @@ export const QUESTION_TYPE_OPTIONS = [
   'text',
   'number',
   'date',
+  'datetime',
   'email',
   'single_choice',
   'multi_choice',

@@ -26,6 +26,7 @@ import type {
   CreateGotvPayload,
   UpdateGotvPayload,
 } from './admin-types';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 // ── LGAs ──────────────────────────────────────────────────
 
@@ -148,9 +149,9 @@ export function useUpdateConversionScore() {
       notifications.show({ title: 'Score Updated', message: 'Conversion score saved.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to update score.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -163,9 +164,9 @@ export function useUpdatePollingUnit() {
       notifications.show({ title: 'Updated', message: 'Polling unit updated.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to update polling unit.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -177,9 +178,9 @@ export function useCreateStakeholder() {
       notifications.show({ title: 'Created', message: 'Stakeholder added.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to create stakeholder.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -192,9 +193,9 @@ export function useUpdateStakeholder() {
       notifications.show({ title: 'Updated', message: 'Stakeholder updated.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to update stakeholder.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -207,9 +208,9 @@ export function useCreateActivity() {
       notifications.show({ title: 'Activity Logged', message: 'Activity recorded.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to log activity.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -221,9 +222,9 @@ export function useCreateWhatsAppGroup() {
       notifications.show({ title: 'Group Created', message: 'WhatsApp group added.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to create group.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -297,9 +298,9 @@ export function useCreateCanvassingSession() {
       notifications.show({ title: 'Created', message: 'Canvassing session created.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to create session.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -312,9 +313,9 @@ export function useUpdateCanvassingSession() {
       notifications.show({ title: 'Updated', message: 'Session updated.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to update session.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -327,9 +328,9 @@ export function useAddSessionVisit() {
       notifications.show({ title: 'Visit Logged', message: 'Visit recorded.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to log visit.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -378,9 +379,9 @@ export function useCreateVolunteerAssignment() {
       notifications.show({ title: 'Assigned', message: 'Volunteer assigned.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to assign volunteer.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -393,9 +394,9 @@ export function useUpdateVolunteerAssignment() {
       notifications.show({ title: 'Updated', message: 'Assignment updated.', color: 'green' });
       invalidateApmAdmin(qc);
     },
-    onError: () => {
-      notifications.show({ title: 'Error', message: 'Failed to update assignment.', color: 'red' });
-    },
+    onError: (error) => {
+      notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' });
+      },
   });
 }
 
@@ -418,7 +419,7 @@ export function useCreateTour() {
   return useMutation({
     mutationFn: (data: CreateCandidateTourPayload) => apmAdminApi.createTour(data),
     onSuccess: () => { notifications.show({ title: 'Created', message: 'Tour created.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to create tour.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -427,7 +428,7 @@ export function useUpdateTour() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCandidateTourPayload }) => apmAdminApi.updateTour(id, data),
     onSuccess: () => { notifications.show({ title: 'Updated', message: 'Tour updated.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to update tour.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -442,7 +443,7 @@ export function useCreateContentAsset() {
   return useMutation({
     mutationFn: (data: CreateContentAssetPayload) => apmAdminApi.createContent(data),
     onSuccess: () => { notifications.show({ title: 'Created', message: 'Content added.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to create content.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -465,7 +466,7 @@ export function useCreateMention() {
   return useMutation({
     mutationFn: (data: CreateListeningMentionPayload) => apmAdminApi.createMention(data),
     onSuccess: () => { notifications.show({ title: 'Logged', message: 'Mention recorded.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to log mention.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -474,7 +475,7 @@ export function useUpdateMentionStatus() {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => apmAdminApi.updateMentionStatus(id, status),
     onSuccess: () => { notifications.show({ title: 'Updated', message: 'Status updated.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to update.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -489,7 +490,7 @@ export function useCreateResponse() {
   return useMutation({
     mutationFn: (data: CreateRapidResponsePayload) => apmAdminApi.createResponse(data),
     onSuccess: () => { notifications.show({ title: 'Response Sent', message: 'Rapid response published.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to send response.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -512,7 +513,7 @@ export function useCreateAgent() {
   return useMutation({
     mutationFn: (data: CreateAgentPayload) => apmAdminApi.createAgent(data),
     onSuccess: () => { notifications.show({ title: 'Created', message: 'Agent registered.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to create agent.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -521,7 +522,7 @@ export function useUpdateAgent() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAgentPayload }) => apmAdminApi.updateAgent(id, data),
     onSuccess: () => { notifications.show({ title: 'Updated', message: 'Agent updated.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to update agent.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -544,7 +545,7 @@ export function useCreateResult() {
   return useMutation({
     mutationFn: (data: CreateResultPayload) => apmAdminApi.createResult(data),
     onSuccess: () => { notifications.show({ title: 'Submitted', message: 'Result entry created.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to submit result.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -553,7 +554,7 @@ export function useVerifyResult() {
   return useMutation({
     mutationFn: (id: string) => apmAdminApi.verifyResult(id),
     onSuccess: () => { notifications.show({ title: 'Verified', message: 'Result verified.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to verify result.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -572,7 +573,7 @@ export function useCreateIncident() {
   return useMutation({
     mutationFn: (data: CreateIncidentPayload) => apmAdminApi.createIncident(data),
     onSuccess: () => { notifications.show({ title: 'Reported', message: 'Incident reported.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to report incident.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -581,7 +582,7 @@ export function useUpdateIncident() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateIncidentPayload }) => apmAdminApi.updateIncident(id, data),
     onSuccess: () => { notifications.show({ title: 'Updated', message: 'Incident updated.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to update incident.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -604,7 +605,7 @@ export function useCreateGotv() {
   return useMutation({
     mutationFn: (data: CreateGotvPayload) => apmAdminApi.createGotv(data),
     onSuccess: () => { notifications.show({ title: 'Logged', message: 'GOTV record created.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to create GOTV record.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }
 
@@ -613,6 +614,6 @@ export function useUpdateGotv() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateGotvPayload }) => apmAdminApi.updateGotv(id, data),
     onSuccess: () => { notifications.show({ title: 'Updated', message: 'GOTV record updated.', color: 'green' }); invalidateApmAdmin(qc); },
-    onError: () => { notifications.show({ title: 'Error', message: 'Failed to update GOTV record.', color: 'red' }); },
+    onError: (error) => { notifications.show({ title: 'Error', message: getApiErrorMessage(error), color: 'red' }); },
   });
 }

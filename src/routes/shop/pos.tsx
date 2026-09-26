@@ -25,7 +25,7 @@ export const Route = createFileRoute('/shop/pos')({
     if (!user) {
       throw redirect({
         to: '/sign-in',
-        search: { redirect: location.href },
+        search: { redirect: location.pathname + location.search },
       });
     }
     if (!hasPosPermission(user.permissions ?? [], user.roles ?? [])) {

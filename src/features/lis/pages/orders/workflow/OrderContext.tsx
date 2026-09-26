@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { lisApi } from '@/lib/lis-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export interface OrderItem {
   testDefinitionId: string;
@@ -287,7 +288,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         }
         dispatch({ type: 'MARK_CLEAN' });
       } catch (err: any) {
-        const msg = err?.response?.data?.message ?? err?.message ?? 'Save failed';
+        const msg = getApiErrorMessage(err);
         dispatch({ type: 'SET_ERROR', payload: msg });
       } finally {
         if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: false });
@@ -307,7 +308,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'MARK_CLEAN' });
       return data;
     } catch (err: any) {
-      const msg = err?.response?.data?.message ?? err?.message ?? 'Create failed';
+      const msg = getApiErrorMessage(err);
       dispatch({ type: 'SET_ERROR', payload: msg });
     } finally {
       dispatch({ type: 'SET_SUBMITTING', payload: false });
@@ -386,7 +387,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       });
       return data;
     } catch (err: any) {
-      const msg = err?.response?.data?.message ?? err?.message ?? 'Load failed';
+      const msg = getApiErrorMessage(err);
       dispatch({ type: 'SET_ERROR', payload: msg });
     }
   }, []);

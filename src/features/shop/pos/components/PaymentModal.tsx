@@ -24,6 +24,7 @@ import {
   usePosTerminals,
   useQueryPosPayment,
 } from '../../api/posApi';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface Props {
   opened: boolean;
@@ -145,7 +146,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       notifications.show({ color: 'blue', message: `POS charge started (${res.nextAction ?? 'swipe/pin on terminal'})` });
     } catch (e: any) {
       setPosStatus('failed');
-      notifications.show({ color: 'red', message: e?.response?.data?.message ?? e?.message ?? 'POS charge failed' });
+      notifications.show({ color: 'red', message: getApiErrorMessage(e) });
     }
   }
 
@@ -193,7 +194,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     } catch (e: any) {
       notifications.show({
         color: 'red',
-        message: e?.response?.data?.message ?? 'Failed to generate payment link',
+        message: getApiErrorMessage(e),
       });
     } finally {
       setIsGeneratingLink(false);

@@ -3,6 +3,7 @@ export * from './search';
 export * from './match';
 export * from './upload';
 export * from './generic-drugs';
+export * from './generic-products';
 export * from './drug-classifications';
 export * from './drug-classifications/detail';
 export * from './pharmaceutics';
