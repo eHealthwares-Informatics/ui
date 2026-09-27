@@ -290,7 +290,7 @@ function collectSpecFiles(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) collectSpecFiles(full, out);
-    else if (entry.name.endsWith('.spec.ts')) out.push(full);
+    else if (entry.name.endsWith('.spec.ts') || entry.name.endsWith('.generated.ts')) out.push(full);
   }
   return out;
 }
@@ -321,6 +321,9 @@ function scanSpecs() {
     const rel = relative(E2E_DIR, file).replaceAll('\\', '/');
     const text = readFileSync(file, 'utf-8');
     if (text.includes('skipIfBackendDown(')) gatedFiles.add(rel);
+    // The generated gate file lists TCs the suite deliberately skips per
+    // resource — they are resolved-as-gated, never covered.
+    if (rel.endsWith('tc-gated.generated.ts')) gatedFiles.add(rel);
     for (const m of text.matchAll(TC_ID_RE)) {
       if (!tcToFiles.has(m[0])) tcToFiles.set(m[0], new Set());
       tcToFiles.get(m[0]).add(rel);
