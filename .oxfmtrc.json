@@ -23,6 +23,7 @@
     "packages/*/*/styles.layer.css",
     "packages/*/*/styles/*.css",
     "docs/.next",
-    "docs/out"
+    "docs/out",
+    "src/routeTree.gen.ts"
   ]
 }
