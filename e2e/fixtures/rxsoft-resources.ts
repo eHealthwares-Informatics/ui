@@ -544,7 +544,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     canEdit: false,
     canDelete: true,
     hasExport: false,
-  },  {
+  },
+  {
     id: 'stock-locations',
     title: 'Stock Locations',
     route: '/rxsoft/stock-locations',
