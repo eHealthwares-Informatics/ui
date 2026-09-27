@@ -111,6 +111,11 @@ const child = spawn(args.cmd[0], args.cmd.slice(1), {
 });
 child.unref();
 
-state[args.name] = { pid: child.pid, log: logPath, cmd: args.cmd.join(' '), startedAt: new Date().toISOString() };
+state[args.name] = {
+  pid: child.pid,
+  log: logPath,
+  cmd: args.cmd.join(' '),
+  startedAt: new Date().toISOString(),
+};
 writeState(state);
 console.log(`started ${args.name} (pid ${child.pid}, log ${logPath})`);

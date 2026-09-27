@@ -28,7 +28,9 @@ test.describe('secondary auth pages', () => {
   test.setTimeout(60_000);
 
   // TC-AUTH-05 — sign-in-2 renders and validates credentials.
-  test('TC-AUTH-05 — sign-in-2 renders and submits the alternate sign-in form', async ({ page }) => {
+  test('TC-AUTH-05 — sign-in-2 renders and submits the alternate sign-in form', async ({
+    page,
+  }) => {
     await page.goto('/sign-in-2');
 
     const username = page.getByLabel('Username');
@@ -121,6 +123,8 @@ test.describe('secondary auth pages', () => {
     await pin.first().fill('123456');
     await expect(verify).toBeEnabled();
     await verify.click();
-    await expect(page.getByText('You submitted the following values:')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('You submitted the following values:')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });

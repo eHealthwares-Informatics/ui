@@ -1,7 +1,7 @@
+import { provisionOrganization, SEED_BASE_URL, activeAdminCredentials } from './utils/provision';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { provisionOrganization, SEED_BASE_URL, activeAdminCredentials } from './utils/provision';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -102,13 +102,19 @@ async function getIdentityToken(): Promise<string> {
  * {data: []}, {items: []}, {results: []}, a bare array, or {total: n}.
  */
 function countRows(body: unknown): number {
-  if (Array.isArray(body)) return body.length;
+  if (Array.isArray(body)) {
+    return body.length;
+  }
   if (body && typeof body === 'object') {
     const shaped = body as Record<string, unknown>;
     for (const key of ['data', 'items', 'results']) {
-      if (Array.isArray(shaped[key])) return (shaped[key] as unknown[]).length;
+      if (Array.isArray(shaped[key])) {
+        return (shaped[key] as unknown[]).length;
+      }
     }
-    if (typeof shaped.total === 'number') return shaped.total;
+    if (typeof shaped.total === 'number') {
+      return shaped.total;
+    }
   }
   return 0;
 }
@@ -185,7 +191,9 @@ async function verifySeedArtifacts(token: string): Promise<void> {
   }
 
   // eslint-disable-next-line no-console
-  console.log(`[global-setup] ✅ All ${SEED_ARTIFACTS.length} seed artifacts verified — ${SEED_ARTIFACTS.length} found`);
+  console.log(
+    `[global-setup] ✅ All ${SEED_ARTIFACTS.length} seed artifacts verified — ${SEED_ARTIFACTS.length} found`
+  );
 }
 
 export default async function globalSetup(): Promise<void> {
@@ -218,7 +226,9 @@ export default async function globalSetup(): Promise<void> {
       // Never fail the run on provisioning (fall back to DEFAULT org admin);
       // DEBUG log so CI can spot provisioning errors.
       // eslint-disable-next-line no-console
-      console.warn(`[global-setup] provisioning ${orgCode} failed — using DEFAULT org admin: ${(err as Error).message}`);
+      console.warn(
+        `[global-setup] provisioning ${orgCode} failed — using DEFAULT org admin: ${(err as Error).message}`
+      );
       orgCode = null;
     }
   }
@@ -241,8 +251,10 @@ export default async function globalSetup(): Promise<void> {
     }
   } else if (backendUp && !orgProvisioned) {
     // eslint-disable-next-line no-console
-    console.warn('[global-setup] ⚠️  Backend is up but org was NOT provisioned — artifact validation skipped. ' +
-      'Tests will use DEFAULT org admin (may fail if seeded data not found).');
+    console.warn(
+      '[global-setup] ⚠️  Backend is up but org was NOT provisioned — artifact validation skipped. ' +
+        'Tests will use DEFAULT org admin (may fail if seeded data not found).'
+    );
   }
 
   mkdirSync(join(__dirname, '.runtime'), { recursive: true });

@@ -18,7 +18,14 @@
  * No dependencies; shells out to `gh`.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, statSync, writeFileSync, appendFileSync, readdirSync } from 'node:fs';
+import {
+  existsSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+  appendFileSync,
+  readdirSync,
+} from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -72,20 +79,34 @@ function fetchBoardItems() {
     try {
       const cached = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
       if (Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-        log(`board: using cache from ${new Date(cached.fetchedAt).toISOString()} (${cached.items.length} items) — pass --no-cache to refetch`);
+        log(
+          `board: using cache from ${new Date(cached.fetchedAt).toISOString()} (${cached.items.length} items) — pass --no-cache to refetch`
+        );
         return cached.items;
       }
     } catch {
       // corrupt cache → ignore and refetch
     }
   }
-  const raw = gh(['project', 'item-list', String(PROJECT_NUMBER), '--owner', OWNER, '--limit', '1000', '--format', 'json']);
+  const raw = gh([
+    'project',
+    'item-list',
+    String(PROJECT_NUMBER),
+    '--owner',
+    OWNER,
+    '--limit',
+    '1000',
+    '--format',
+    'json',
+  ]);
   const data = JSON.parse(raw);
   const items = data.items ?? [];
   // Pagination guard: item-list caps at --limit. If the board grows past 1000
   // we must paginate before trusting totals — fail loudly instead.
   if (items.length >= 1000) {
-    throw new Error(`board returned ${items.length} items (>= limit 1000): pagination required, refusing to report partial coverage`);
+    throw new Error(
+      `board returned ${items.length} items (>= limit 1000): pagination required, refusing to report partial coverage`
+    );
   }
   writeFileSync(CACHE_FILE, JSON.stringify({ fetchedAt: Date.now(), items }));
   return items;
@@ -118,7 +139,9 @@ function parseUseCaseBody(body) {
       const specMatch = /\*\*Spec:\*\*(.*)/.exec(line);
       if (specMatch) {
         const paths = [...specMatch[1].matchAll(/`([^`]+)`/g)].map((m) => m[1].trim());
-        current.specPaths.push(...paths.filter((p) => p.endsWith('.spec.ts') || p.startsWith('tests/')));
+        current.specPaths.push(
+          ...paths.filter((p) => p.endsWith('.spec.ts') || p.startsWith('tests/'))
+        );
       }
     }
   }
@@ -152,7 +175,8 @@ function parseEpicBody(body) {
       const [, base, a, b] = range;
       const width = a.length;
       const out = [];
-      for (let n = Number(a); n <= Number(b); n++) out.push(`${base}${String(n).padStart(width, '0')}`);
+      for (let n = Number(a); n <= Number(b); n++)
+        out.push(`${base}${String(n).padStart(width, '0')}`);
       return out;
     }
     const slash = /^(TC-[A-Z]+-)(\d+)(?:\/(\d+))+$/.exec(token);
@@ -176,21 +200,23 @@ function parseEpicBody(body) {
       } else {
         // Paths appear both backticked (`tests/x.spec.ts`) and bare
         // (- tests/x.spec.ts, with the bold close ** glued to the last one).
-        const paths = [
-          ...line.matchAll(/`([^`]+)`/g),
-          ...line.matchAll(/(tests\/[^\s*`]+)/g),
-        ].map((m) => m[1].trim());
+        const paths = [...line.matchAll(/`([^`]+)`/g), ...line.matchAll(/(tests\/[^\s*`]+)/g)].map(
+          (m) => m[1].trim()
+        );
         for (const p of paths) {
           if (p.endsWith('.spec.ts') || p.startsWith('tests/')) epicSpecPaths.push(p);
         }
       }
     }
-    const cbTc = /-\s\[( |x|X)\][^\n]*?((?:TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:\.\.\d+|(?:\/\d+)+)?)/.exec(line);
+    const cbTc =
+      /-\s\[( |x|X)\][^\n]*?((?:TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:\.\.\d+|(?:\/\d+)+)?)/.exec(line);
     if (cbTc) {
       for (const id of expand(cbTc[2])) push(id, cbTc[1].toLowerCase() === 'x');
       continue;
     }
-    const headingTc = /^#{2,4}\s+((?:TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:\.\.\d+|(?:\/\d+)+)?)/.exec(line);
+    const headingTc = /^#{2,4}\s+((?:TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)(?:\.\.\d+|(?:\/\d+)+)?)/.exec(
+      line
+    );
     if (headingTc) for (const id of expand(headingTc[1])) push(id, false);
   }
   // Epic-level spec lists apply to every TC in the epic (coarse but correct:
@@ -210,8 +236,8 @@ function parseEntityBody(body) {
 }
 
 function classifyBoard(items) {
-  const epics = new Map();   // issue number -> epic
-  const tasks = new Map();   // issue number -> entity task
+  const epics = new Map(); // issue number -> epic
+  const tasks = new Map(); // issue number -> entity task
   const useCases = new Map(); // issue number -> use case
   for (const item of items) {
     const labels = parseLabels(item);
@@ -228,7 +254,12 @@ function classifyBoard(items) {
       phase: firstLabel(labels, 'phase:') ?? 'unphased',
       module: firstLabel(labels, 'module:') ?? 'unknown',
     };
-    if (labels.includes('type:epic')) epics.set(number, { ...common, childTasks: [], tcs: parseEpicBody(item.content?.body ?? '') });
+    if (labels.includes('type:epic'))
+      epics.set(number, {
+        ...common,
+        childTasks: [],
+        tcs: parseEpicBody(item.content?.body ?? ''),
+      });
     else if (labels.includes('type:task')) {
       const { ucs, parentEpic } = parseEntityBody(item.content?.body ?? '');
       tasks.set(number, { ...common, ucIds: ucs, parentEpic, tcs: {} });
@@ -240,12 +271,15 @@ function classifyBoard(items) {
   // Link tasks to epics + resolve UC issue numbers via UC id.
   const ucIdToIssue = new Map();
   for (const uc of useCases.values()) {
-    const idMatch = /\*\*(UC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\*\*/.exec(uc.body) ?? /`(UC-[A-Z0-9]+(?:-[A-Z0-9]+)*)`/.exec(uc.body);
+    const idMatch =
+      /\*\*(UC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\*\*/.exec(uc.body) ??
+      /`(UC-[A-Z0-9]+(?:-[A-Z0-9]+)*)`/.exec(uc.body);
     if (idMatch) ucIdToIssue.set(idMatch[1], uc.number);
   }
   for (const task of tasks.values()) {
     task.ucIssues = task.ucIds.map((id) => ucIdToIssue.get(id) ?? null);
-    if (task.parentEpic && epics.has(task.parentEpic)) epics.get(task.parentEpic).childTasks.push(task.number);
+    if (task.parentEpic && epics.has(task.parentEpic))
+      epics.get(task.parentEpic).childTasks.push(task.number);
   }
   return { epics, tasks, useCases };
 }
@@ -277,10 +311,12 @@ const LEGACY_ALIASES = {
 };
 
 function scanSpecs() {
-  const specDirs = ['tests', 'crud-suite'].map((d) => join(E2E_DIR, d)).filter((d) => existsSync(d));
+  const specDirs = ['tests', 'crud-suite']
+    .map((d) => join(E2E_DIR, d))
+    .filter((d) => existsSync(d));
   const files = specDirs.flatMap((d) => collectSpecFiles(d));
-  const tcToFiles = new Map();   // tc id -> Set<relative path>
-  const gatedFiles = new Set();  // files that use skipIfBackendDown
+  const tcToFiles = new Map(); // tc id -> Set<relative path>
+  const gatedFiles = new Set(); // files that use skipIfBackendDown
   for (const file of files) {
     const rel = relative(E2E_DIR, file).replaceAll('\\', '/');
     const text = readFileSync(file, 'utf-8');
@@ -311,7 +347,8 @@ function buildCoverage(board, specs) {
     if (state === 'missing-path' && tc.state === 'missing') tc.state = 'missing-path';
     else if (state === 'covered' || state === 'gated') {
       const better = state === 'gated' && tc.state === 'covered' ? 'covered' : state;
-      if (tc.state === 'missing' || tc.state === 'missing-path' || better === 'covered') tc.state = better;
+      if (tc.state === 'missing' || tc.state === 'missing-path' || better === 'covered')
+        tc.state = better;
     }
     for (const f of files) if (!tc.files.includes(f)) tc.files.push(f);
   };
@@ -335,7 +372,9 @@ function buildCoverage(board, specs) {
         noteTc(tc.id, 'missing-path', []);
       } else {
         noteTc(tc.id, 'missing', []);
-        tcMap.get(tc.id).declared = [...new Set([...(tcMap.get(tc.id).declared ?? []), ...tc.specPaths])];
+        tcMap.get(tc.id).declared = [
+          ...new Set([...(tcMap.get(tc.id).declared ?? []), ...tc.specPaths]),
+        ];
       }
     }
   }
@@ -352,7 +391,9 @@ function buildCoverage(board, specs) {
         noteTc(tc.id, hit.state, hit.files);
       } else if (tc.specPaths.length > 0) {
         noteTc(tc.id, 'missing', []);
-        tcMap.get(tc.id).declared = [...new Set([...(tcMap.get(tc.id).declared ?? []), ...tc.specPaths])];
+        tcMap.get(tc.id).declared = [
+          ...new Set([...(tcMap.get(tc.id).declared ?? []), ...tc.specPaths]),
+        ];
       }
     }
   }
@@ -371,13 +412,16 @@ function buildCoverage(board, specs) {
   }
   // Roll UCs up to entity tasks.
   for (const task of board.tasks.values()) {
-    task.ucObjects = task.ucIds.map((id) => [...board.useCases.values()].find((u) => u.body.includes(`**${id}**`))).filter(Boolean);
+    task.ucObjects = task.ucIds
+      .map((id) => [...board.useCases.values()].find((u) => u.body.includes(`**${id}**`)))
+      .filter(Boolean);
     task.complete =
-      task.ucObjects.length > 0 &&
-      task.ucObjects.every((u) => u.complete || u.status === 'Done');
+      task.ucObjects.length > 0 && task.ucObjects.every((u) => u.complete || u.status === 'Done');
     const all = task.ucObjects.flatMap((u) => u.tcs);
     task.tcTotal = all.length;
-    task.tcDone = all.filter((tc) => ['covered', 'gated'].includes(tcMap.get(tc.id)?.state ?? 'missing')).length;
+    task.tcDone = all.filter((tc) =>
+      ['covered', 'gated'].includes(tcMap.get(tc.id)?.state ?? 'missing')
+    ).length;
   }
   return tcMap;
 }
@@ -398,7 +442,15 @@ function storageStateNote() {
 function phaseRollup(board, tcMap) {
   const phases = new Map();
   const bump = (phase, uc) => {
-    if (!phases.has(phase)) phases.set(phase, { covered: 0, gated: 0, missing: 0, missingPath: 0, ucs: 0, ucsComplete: 0 });
+    if (!phases.has(phase))
+      phases.set(phase, {
+        covered: 0,
+        gated: 0,
+        missing: 0,
+        missingPath: 0,
+        ucs: 0,
+        ucsComplete: 0,
+      });
     const p = phases.get(phase);
     p.covered += uc.coverage.covered;
     p.gated += uc.coverage.gated;
@@ -427,12 +479,23 @@ function phaseRollup(board, tcMap) {
 function renderStatus(board, tcMap, specs) {
   const now = new Date().toISOString();
   const total = { covered: 0, gated: 0, missing: 0, missingPath: 0 };
-  for (const tc of tcMap.values()) total[tc.state === 'gated' ? 'gated' : tc.state === 'covered' ? 'covered' : tc.state === 'missing-path' ? 'missingPath' : 'missing']++;
+  for (const tc of tcMap.values())
+    total[
+      tc.state === 'gated'
+        ? 'gated'
+        : tc.state === 'covered'
+          ? 'covered'
+          : tc.state === 'missing-path'
+            ? 'missingPath'
+            : 'missing'
+    ]++;
   const mapped = total.covered + total.gated + total.missing;
   const lines = [];
   lines.push('# Tracker Status — RxSoft Alpha Test Plan');
   lines.push('');
-  lines.push(`> Generated ${now} · board: https://github.com/users/${OWNER}/projects/${PROJECT_NUMBER} · items: ${board.epics.size} epics / ${board.tasks.size} entity tasks / ${board.useCases.size} use cases`);
+  lines.push(
+    `> Generated ${now} · board: https://github.com/users/${OWNER}/projects/${PROJECT_NUMBER} · items: ${board.epics.size} epics / ${board.tasks.size} entity tasks / ${board.useCases.size} use cases`
+  );
   lines.push('');
   lines.push(`**Storage state:** ${storageStateNote()}`);
   lines.push('');
@@ -441,38 +504,64 @@ function renderStatus(board, tcMap, specs) {
   lines.push(`| covered | spec exists and runs unconditionally |`);
   lines.push(`| gated | spec exists but auto-skips when a backend/module is down |`);
   lines.push(`| missing | no spec found for the TC (declared path noted where present) |`);
-  lines.push(`| missing-path | UC issue does not declare a spec path for the TC — unmappable, fix the issue body |`);
+  lines.push(
+    `| missing-path | UC issue does not declare a spec path for the TC — unmappable, fix the issue body |`
+  );
   lines.push('');
   lines.push('## Totals');
   lines.push('');
   lines.push(`| Covered | Gated | Missing | Missing-path | TCs mapped | Coverage (of mappable) |`);
   lines.push(`|---|---|---|---|---|---|`);
   const pct = mapped ? (((total.covered + total.gated) / mapped) * 100).toFixed(1) : '0.0';
-  lines.push(`| ${total.covered} | ${total.gated} | ${total.missing} | ${total.missingPath} | ${mapped} | ${pct}% |`);
+  lines.push(
+    `| ${total.covered} | ${total.gated} | ${total.missing} | ${total.missingPath} | ${mapped} | ${pct}% |`
+  );
   lines.push('');
   lines.push('## Per-phase matrix');
   lines.push('');
   lines.push('| Phase | UCs | UCs complete | Covered | Gated | Missing | Missing-path |');
   lines.push('|---|---|---|---|---|---|---|');
-  const order = ['0-baseline', '1-rxsoft-crud', '2-catalog', '3-operations', '4-commerce', '5-modules', 'unphased'];
+  const order = [
+    '0-baseline',
+    '1-rxsoft-crud',
+    '2-catalog',
+    '3-operations',
+    '4-commerce',
+    '5-modules',
+    'unphased',
+  ];
   const phases = phaseRollup(board, tcMap);
-  for (const key of [...order.filter((k) => phases.has(k)), ...[...phases.keys()].filter((k) => !order.includes(k))]) {
+  for (const key of [
+    ...order.filter((k) => phases.has(k)),
+    ...[...phases.keys()].filter((k) => !order.includes(k)),
+  ]) {
     const p = phases.get(key);
-    lines.push(`| ${key} | ${p.ucs} | ${p.ucsComplete} | ${p.covered} | ${p.gated} | ${p.missing} | ${p.missingPath} |`);
+    lines.push(
+      `| ${key} | ${p.ucs} | ${p.ucsComplete} | ${p.covered} | ${p.gated} | ${p.missing} | ${p.missingPath} |`
+    );
   }
   lines.push('');
   lines.push('## Entity rollup');
   lines.push('');
   lines.push('| Module | Entity | Phase | TCs done / total | Complete | Issue |');
   lines.push('|---|---|---|---|---|---|');
-  const tasks = [...board.tasks.values()].sort((a, b) => a.module.localeCompare(b.module) || a.title.localeCompare(b.title));
+  const tasks = [...board.tasks.values()].sort(
+    (a, b) => a.module.localeCompare(b.module) || a.title.localeCompare(b.title)
+  );
   for (const t of tasks) {
-    lines.push(`| ${t.module} | ${t.title.replace(/^\[task\]\s*/i, '')} | ${t.phase} | ${t.tcDone}/${t.tcTotal} | ${t.complete ? '✅' : '—'} | [#${t.number}](${t.repo}/issues/${t.number}) |`);
+    lines.push(
+      `| ${t.module} | ${t.title.replace(/^\[task\]\s*/i, '')} | ${t.phase} | ${t.tcDone}/${t.tcTotal} | ${t.complete ? '✅' : '—'} | [#${t.number}](${t.repo}/issues/${t.number}) |`
+    );
   }
   lines.push('');
   lines.push('## Gated spec files');
   lines.push('');
-  lines.push([...specs.gatedFiles].sort().map((f) => `- ${f}`).join('\n') || '_none_');
+  lines.push(
+    [...specs.gatedFiles]
+      .sort()
+      .map((f) => `- ${f}`)
+      .join('\n') || '_none_'
+  );
   lines.push('');
   return lines.join('\n');
 }
@@ -486,7 +575,9 @@ async function writeBackIssues(board, tcMap) {
       const st = tcMap.get(tc.id)?.state;
       return !tc.checked && (st === 'covered' || st === 'gated');
     });
-    const checkedButMissing = uc.tcs.filter((tc) => tc.checked && tcMap.get(tc.id)?.state === 'missing');
+    const checkedButMissing = uc.tcs.filter(
+      (tc) => tc.checked && tcMap.get(tc.id)?.state === 'missing'
+    );
     const allDone = uc.coverage.covered + uc.coverage.gated === uc.tcs.length;
     if (uncheckedCovered.length > 0 || checkedButMissing.length > 0) {
       actions.push({ kind: 'edit-body', uc, uncheckedCovered, checkedButMissing, allDone });
@@ -501,7 +592,9 @@ async function writeBackIssues(board, tcMap) {
   log(`write-back: ${actions.length} action(s):`);
   for (const a of actions) {
     if (a.kind === 'edit-body') {
-      log(`  [edit] #${a.uc.number} ${a.uc.title} — check ${a.uncheckedCovered.length} TC box(es)${a.checkedButMissing.length ? `, UNcheck ${a.checkedButMissing.length} (spec no longer found)` : ''}`);
+      log(
+        `  [edit] #${a.uc.number} ${a.uc.title} — check ${a.uncheckedCovered.length} TC box(es)${a.checkedButMissing.length ? `, UNcheck ${a.checkedButMissing.length} (spec no longer found)` : ''}`
+      );
     } else {
       log(`  [close] #${a.uc.number} ${a.uc.title}`);
     }
@@ -514,13 +607,16 @@ async function writeBackIssues(board, tcMap) {
     if (a.kind === 'edit-body') {
       // Rebuild checkbox state per TC line from the coverage map — one pass,
       // covers both checking (covered) and unchecking (spec disappeared).
-      const edited = a.uc.body.split('\n').map((line) => {
-        const m = /\*\*(TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\*\*/.exec(line);
-        if (!m || !/^\s*-\s\[( |x|X)\]/.test(line)) return line;
-        const st = tcMap.get(m[1])?.state;
-        const want = st === 'covered' || st === 'gated' ? 'x' : ' ';
-        return line.replace(/^(\s*-\s)\[( |x|X)\]/, `$1[${want}]`);
-      }).join('\n');
+      const edited = a.uc.body
+        .split('\n')
+        .map((line) => {
+          const m = /\*\*(TC-[A-Z0-9]+(?:-[A-Z0-9]+)*)\*\*/.exec(line);
+          if (!m || !/^\s*-\s\[( |x|X)\]/.test(line)) return line;
+          const st = tcMap.get(m[1])?.state;
+          const want = st === 'covered' || st === 'gated' ? 'x' : ' ';
+          return line.replace(/^(\s*-\s)\[( |x|X)\]/, `$1[${want}]`);
+        })
+        .join('\n');
       if (edited !== a.uc.body) {
         const { mkdtempSync, writeFileSync: wf } = await import('node:fs');
         const { tmpdir } = await import('node:os');
@@ -555,7 +651,18 @@ async function writeBackStatus(board) {
     return;
   }
   for (const c of all) {
-    gh(['project', 'item-edit', '--id', c.itemId, '--project-id', 'PVT_kwHOD9-a1c4Bk0Po', '--field-id', STATUS_FIELD_ID, '--single-select-option-id', STATUS_OPTION_DONE]);
+    gh([
+      'project',
+      'item-edit',
+      '--id',
+      c.itemId,
+      '--project-id',
+      'PVT_kwHOD9-a1c4Bk0Po',
+      '--field-id',
+      STATUS_FIELD_ID,
+      '--single-select-option-id',
+      STATUS_OPTION_DONE,
+    ]);
     log(`  ✓ #${c.number} → Done`);
     await sleep(400);
   }
@@ -564,7 +671,10 @@ async function writeBackStatus(board) {
 // ── Progress log ────────────────────────────────────────────────────────────
 function appendProgress(entries) {
   if (!existsSync(PROGRESS_LOG)) {
-    writeFileSync(PROGRESS_LOG, '# Progress Log\n\nAppend-only. One entry per tracker run.\n\n| When (UTC) | Mode | Covered | Gated | Missing | Missing-path | Notes |\n|---|---|---|---|---|---|---|\n');
+    writeFileSync(
+      PROGRESS_LOG,
+      '# Progress Log\n\nAppend-only. One entry per tracker run.\n\n| When (UTC) | Mode | Covered | Gated | Missing | Missing-path | Notes |\n|---|---|---|---|---|---|---|\n'
+    );
   }
   appendFileSync(PROGRESS_LOG, entries);
 }
@@ -575,7 +685,9 @@ async function main() {
   log(`board-sync: fetching project ${PROJECT_NUMBER} (${OWNER}) — mode: ${mode}`);
   const items = fetchBoardItems();
   const board = classifyBoard(items);
-  log(`board: ${board.epics.size} epics / ${board.tasks.size} entity tasks / ${board.useCases.size} use cases`);
+  log(
+    `board: ${board.epics.size} epics / ${board.tasks.size} entity tasks / ${board.useCases.size} use cases`
+  );
   const specs = scanSpecs();
   log(`specs: ${specs.tcToFiles.size} distinct TC ids referenced across tests/ + crud-suite/`);
   const tcMap = buildCoverage(board, specs);
@@ -585,10 +697,19 @@ async function main() {
 
   const total = { covered: 0, gated: 0, missing: 0, missingPath: 0 };
   for (const tc of tcMap.values()) {
-    const key = tc.state === 'gated' ? 'gated' : tc.state === 'covered' ? 'covered' : tc.state === 'missing-path' ? 'missingPath' : 'missing';
+    const key =
+      tc.state === 'gated'
+        ? 'gated'
+        : tc.state === 'covered'
+          ? 'covered'
+          : tc.state === 'missing-path'
+            ? 'missingPath'
+            : 'missing';
     total[key]++;
   }
-  appendProgress(`| ${new Date().toISOString()} | ${mode} | ${total.covered} | ${total.gated} | ${total.missing} | ${total.missingPath} | ${FLAGS.updateIssues ? 'issue write-back' : FLAGS.setStatus ? 'status write-back' : 'report only'} |\n`);
+  appendProgress(
+    `| ${new Date().toISOString()} | ${mode} | ${total.covered} | ${total.gated} | ${total.missing} | ${total.missingPath} | ${FLAGS.updateIssues ? 'issue write-back' : FLAGS.setStatus ? 'status write-back' : 'report only'} |\n`
+  );
 
   await writeBackIssues(board, tcMap);
   await writeBackStatus(board);
