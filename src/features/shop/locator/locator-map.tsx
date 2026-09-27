@@ -43,8 +43,8 @@ const THEME = {
 export type MapVariant = 'dark' | 'light';
 
 const TILE_URLS: Record<MapVariant, string> = {
-  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+  light: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
 };
 
 /** Green-tinted dark basemap styles + themed Leaflet chrome, injected once. */
@@ -522,7 +522,7 @@ function LocatorMapInner({
       >
         <TileLayer
           key={activeVariant}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          attribution='&copy; <a href="https://stadiamaps.com/attributions/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URLS[activeVariant]}
         />
         <VariantClass variant={activeVariant} />
