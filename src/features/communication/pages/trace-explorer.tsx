@@ -21,7 +21,9 @@ export function TraceExplorerPage() {
   const { data, isLoading } = useQuery<any>({
     queryKey: ['communication', 'trace', searchId],
     queryFn: async () => {
-      if (!searchId) {return null;}
+      if (!searchId) {
+        return null;
+      }
       const res = await communicationApi.get(`/v1/flow/audit/${encodeURIComponent(searchId)}`);
       return res.data;
     },

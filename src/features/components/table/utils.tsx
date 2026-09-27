@@ -8,7 +8,9 @@ import { RenderField } from '../form/RenderField';
 // ------------------------
 
 export const resolveAutoFilterValue = (filter: ColumnFilter): FilterValue | null => {
-  if (filter.filterValue) {return filter.filterValue;}
+  if (filter.filterValue) {
+    return filter.filterValue;
+  }
   const now = dayjs();
 
   const startOfDay = (d: dayjs.Dayjs) => d.startOf('day');
@@ -93,8 +95,7 @@ export function getValueByPath(obj: Record<string, any>, path: string): any {
   return path.split('.').reduce((acc, key) => (acc != null ? acc[key] : undefined), obj);
 }
 
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function renderCell(row: Record<string, any>, column: Column) {
   let value = getValueByPath(row, column.key);
 
@@ -108,17 +109,11 @@ export function renderCell(row: Record<string, any>, column: Column) {
 
   if (column.editable && column.field?.updateField) {
     const update = column.field.updateField;
-    const updateField = (name: string, value: string) =>
-      update(row, name, value);
+    const updateField = (name: string, value: string) => update(row, name, value);
 
     return (
       <>
-        <RenderField
-          inTable
-          field={column.field}
-          value={value}
-          updateField={updateField}
-        />
+        <RenderField inTable field={column.field} value={value} updateField={updateField} />
         {column.error?.(row) && (
           <Text c="red" size="xs">
             {column.error(row)}

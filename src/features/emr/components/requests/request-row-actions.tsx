@@ -1,6 +1,6 @@
 import { ActionIcon, Menu } from '@mantine/core';
-import { useState } from 'react';
 import { History, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
 import { RequestTimelineModal } from './request-timeline-modal';
 
 export function RequestRowActions({ row }: { row: Record<string, unknown> }) {
@@ -16,10 +16,7 @@ export function RequestRowActions({ row }: { row: Record<string, unknown> }) {
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item
-            leftSection={<History size={14} />}
-            onClick={() => setTimelineRequestId(id)}
-          >
+          <Menu.Item leftSection={<History size={14} />} onClick={() => setTimelineRequestId(id)}>
             Timeline
           </Menu.Item>
         </Menu.Dropdown>

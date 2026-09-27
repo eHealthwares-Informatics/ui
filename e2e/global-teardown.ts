@@ -14,7 +14,7 @@ export default async function globalTeardown(): Promise<void> {
     // Cleaning up lazily is fine — the org is unique per run so nothing breaks.
     // eslint-disable-next-line no-console
     console.warn(
-      `[global-teardown] deprovisioning ${org.organizationCode} failed: ${(err as Error).message}`,
+      `[global-teardown] deprovisioning ${org.organizationCode} failed: ${(err as Error).message}`
     );
   }
 }

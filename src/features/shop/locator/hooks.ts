@@ -45,10 +45,7 @@ export function useStates(): ConceptsState[] {
       cancelled = true;
     };
   }, []);
-  return useMemo(
-    () => [...states].sort((a, b) => a.name.localeCompare(b.name)),
-    [states],
-  );
+  return useMemo(() => [...states].sort((a, b) => a.name.localeCompare(b.name)), [states]);
 }
 
 export function useLgas(stateCode: string | null): ConceptsLga[] {
@@ -98,7 +95,7 @@ export function useFacilitySearch(
   lgaCode: string | null,
   wardName: string | null,
   page: number,
-  limit = 12,
+  limit = 12
 ): PagedResult<FacilityRecord> {
   const [rows, setRows] = useState<FacilityRecord[]>([]);
   const [meta, setMeta] = useState<ListMeta | null>(null);
@@ -116,13 +113,17 @@ export function useFacilitySearch(
       limit,
     })
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows(res.data ?? []);
         setMeta(res.meta ?? null);
         setState('done');
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows([]);
         setMeta(null);
         setState('error');
@@ -149,7 +150,7 @@ export interface PharmacyFilters {
 export function usePharmacySearch(
   filters: PharmacyFilters,
   page: number,
-  limit = 12,
+  limit = 12
 ): PagedResult<PharmacyRecord> {
   const [rows, setRows] = useState<PharmacyRecord[]>([]);
   const [meta, setMeta] = useState<ListMeta | null>(null);
@@ -170,13 +171,17 @@ export function usePharmacySearch(
       limit,
     })
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows(res.data ?? []);
         setMeta(res.meta ?? null);
         setState('done');
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows([]);
         setMeta(null);
         setState('error');
@@ -207,7 +212,7 @@ export function useWardOptions(
   search: string,
   lgaCode: string | null,
   stateCode: string | null,
-  enabled: boolean,
+  enabled: boolean
 ): { options: WardOption[]; loading: boolean } {
   const [options, setOptions] = useState<WardOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -227,12 +232,16 @@ export function useWardOptions(
       limit: 100,
     })
       .then((w) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setOptions(w);
         setLoading(false);
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setOptions([]);
         setLoading(false);
       });
@@ -251,7 +260,7 @@ export function useWardOptions(
 export function useLocalityOptions(
   type: 'area' | 'neighbourhood' | 'settlement',
   search: string,
-  enabled: boolean,
+  enabled: boolean
 ): { options: LocalityOption[]; loading: boolean } {
   const [options, setOptions] = useState<LocalityOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -266,12 +275,16 @@ export function useLocalityOptions(
     setLoading(true);
     getLocalityOptions(type, { search: debouncedSearch || undefined, limit: 100 })
       .then((l) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setOptions(l);
         setLoading(false);
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setOptions([]);
         setLoading(false);
       });
@@ -306,7 +319,9 @@ export function useUserLocation() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const request = () => {
-    if (status === 'locating') return;
+    if (status === 'locating') {
+      return;
+    }
     setErrorMessage(null);
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setStatus('locating');
@@ -321,9 +336,14 @@ export function useUserLocation() {
       },
       (err) => {
         // Permission denied or device error → try IP-level fallback once.
-        fallbackIpLocate(setLocation, setStatus, setErrorMessage, err.code === 1 ? 'denied' : 'error');
+        fallbackIpLocate(
+          setLocation,
+          setStatus,
+          setErrorMessage,
+          err.code === 1 ? 'denied' : 'error'
+        );
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
   };
 
@@ -340,7 +360,7 @@ function fallbackIpLocate(
   setLocation: (l: UserLocation) => void,
   setStatus: (s: GeoStatus) => void,
   setErrorMessage: (m: string | null) => void,
-  primaryStatus: GeoStatus = 'error',
+  primaryStatus: GeoStatus = 'error'
 ) {
   const finish = (lat: number, lng: number) => {
     if (Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0)) {
@@ -360,14 +380,18 @@ function fallbackIpLocate(
   fetch('https://ipwho.is/')
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error('ipwho.is failed'))))
     .then((d: { success?: boolean; latitude?: number; longitude?: number }) => {
-      if (d?.success === false) return Promise.reject(new Error('ipwho.is no fix'));
+      if (d?.success === false) {
+        return Promise.reject(new Error('ipwho.is no fix'));
+      }
       finish(Number(d?.latitude), Number(d?.longitude));
     })
     .catch(() =>
       fetch('https://geolocation-db.com/json/')
         .then((r) => (r.ok ? r.json() : Promise.reject(new Error('geolocation-db failed'))))
-        .then((d: { latitude?: number; longitude?: number }) => finish(Number(d?.latitude), Number(d?.longitude)))
-        .catch(fail),
+        .then((d: { latitude?: number; longitude?: number }) =>
+          finish(Number(d?.latitude), Number(d?.longitude))
+        )
+        .catch(fail)
     );
 }
 
@@ -376,7 +400,7 @@ function fallbackIpLocate(
 export function useNearbyFacilities(
   location: UserLocation | null,
   radiusKm: number,
-  limit = 20,
+  limit = 20
 ): PagedResult<NearbyFacilityRecord> {
   const [rows, setRows] = useState<NearbyFacilityRecord[]>([]);
   const [meta, setMeta] = useState<ListMeta | null>(null);
@@ -393,13 +417,17 @@ export function useNearbyFacilities(
     setState('loading');
     getNearbyFacilities(location.latitude, location.longitude, radiusKm, limit)
       .then((rows_) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows(rows_ ?? []);
         setMeta({ page: 1, limit, total: rows_?.length ?? 0 });
         setState('done');
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows([]);
         setMeta(null);
         setState('error');
@@ -416,7 +444,7 @@ export function useNearbyFacilities(
 export function useNearbyPharmacies(
   location: UserLocation | null,
   radiusKm: number,
-  limit = 20,
+  limit = 20
 ): PagedResult<NearbyPharmacyRecord> {
   const [rows, setRows] = useState<NearbyPharmacyRecord[]>([]);
   const [meta, setMeta] = useState<ListMeta | null>(null);
@@ -433,13 +461,17 @@ export function useNearbyPharmacies(
     setState('loading');
     getNearbyPharmacies(location.latitude, location.longitude, radiusKm, limit)
       .then((rows_) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows(rows_ ?? []);
         setMeta({ page: 1, limit, total: rows_?.length ?? 0 });
         setState('done');
       })
       .catch(() => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setRows([]);
         setMeta(null);
         setState('error');

@@ -77,8 +77,18 @@ export function WardForm({
       <form onSubmit={form.onSubmit((values) => mutation.mutate(values))}>
         <Stack gap="sm">
           <Group align="flex-end" grow>
-            <TextInput label="Code" required placeholder="e.g. W3A" {...form.getInputProps('code')} />
-            <TextInput label="Name" required placeholder="e.g. Male General Ward" {...form.getInputProps('name')} />
+            <TextInput
+              label="Code"
+              required
+              placeholder="e.g. W3A"
+              {...form.getInputProps('code')}
+            />
+            <TextInput
+              label="Name"
+              required
+              placeholder="e.g. Male General Ward"
+              {...form.getInputProps('name')}
+            />
           </Group>
           <Group align="flex-end" grow>
             <Select
@@ -99,7 +109,12 @@ export function WardForm({
             placeholder="Owning department id (optional)"
             {...form.getInputProps('departmentId')}
           />
-          <Textarea label="Description" autosize minRows={2} {...form.getInputProps('description')} />
+          <Textarea
+            label="Description"
+            autosize
+            minRows={2}
+            {...form.getInputProps('description')}
+          />
           <Switch label="Active" {...form.getInputProps('isActive', { type: 'checkbox' })} />
           <Group justify="flex-end" mt="md">
             <Button variant="light" onClick={onClose} disabled={mutation.isPending}>

@@ -6,10 +6,10 @@ type ApiErrorPayload = {
   statusCode?: number;
 };
 
-function pickPayloadMessage(
-  payload: ApiErrorPayload | string | undefined,
-): string | undefined {
-  if (!payload) return undefined;
+function pickPayloadMessage(payload: ApiErrorPayload | string | undefined): string | undefined {
+  if (!payload) {
+    return undefined;
+  }
   if (typeof payload === 'string') {
     const trimmed = payload.trim();
     return trimmed ? trimmed : undefined;

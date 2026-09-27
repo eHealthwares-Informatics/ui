@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Badge, Group, Paper, Select, SimpleGrid, Stack, Table, Text, Title } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 
@@ -24,9 +24,7 @@ export function LisValidationDashboardPage() {
     });
   }, []);
 
-  const filtered = statusFilter
-    ? results.filter((r) => r.status === statusFilter)
-    : results;
+  const filtered = statusFilter ? results.filter((r) => r.status === statusFilter) : results;
 
   const colorMap: Record<string, string> = {
     PENDING: 'yellow',
@@ -46,16 +44,28 @@ export function LisValidationDashboardPage() {
       <Stack gap="md">
         <SimpleGrid cols={3}>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Pending</Text>
-            <Title order={2} c="yellow">{counts.PENDING}</Title>
+            <Text size="xs" c="dimmed">
+              Pending
+            </Text>
+            <Title order={2} c="yellow">
+              {counts.PENDING}
+            </Title>
           </Paper>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Technical Review</Text>
-            <Title order={2} c="blue">{counts.TECHNICAL_REVIEW}</Title>
+            <Text size="xs" c="dimmed">
+              Technical Review
+            </Text>
+            <Title order={2} c="blue">
+              {counts.TECHNICAL_REVIEW}
+            </Title>
           </Paper>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Finalized</Text>
-            <Title order={2} c="green">{counts.FINALIZED}</Title>
+            <Text size="xs" c="dimmed">
+              Finalized
+            </Text>
+            <Title order={2} c="green">
+              {counts.FINALIZED}
+            </Title>
           </Paper>
         </SimpleGrid>
 

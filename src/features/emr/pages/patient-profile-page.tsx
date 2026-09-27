@@ -24,10 +24,10 @@ import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { AppointmentForm } from '../components/appointments/appointment-form';
 import { DocumentationModal } from '../components/documentation/documentation-modal';
-import { PatientEditForm } from '../components/patients/patient-edit-form';
-import { RequestTimelineModal } from '../components/requests/request-timeline-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
+import { PatientEditForm } from '../components/patients/patient-edit-form';
+import { RequestTimelineModal } from '../components/requests/request-timeline-modal';
 import { StatusBadge } from '../components/shared/status-badge';
 import { formatEnum } from '../lib/emr-constants';
 import type { FormSubmission, PatientDetail } from '../lib/emr-types';
@@ -146,7 +146,7 @@ export function PatientProfilePage() {
 
   const fullName = useMemo(
     () => (patient ? [patient.firstName, patient.lastName].filter(Boolean).join(' ') : ''),
-    [patient],
+    [patient]
   );
 
   const handleScheduled = () => {
@@ -156,7 +156,10 @@ export function PatientProfilePage() {
 
   if (patientQuery.isLoading) {
     return (
-      <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Patients', href: '/emr/patients' }]} title="">
+      <RxPage
+        breadcrumbs={[{ label: 'EMR' }, { label: 'Patients', href: '/emr/patients' }]}
+        title=""
+      >
         <Stack gap="md">
           <Skeleton height={140} radius="md" />
           <Skeleton height={300} radius="md" />
@@ -167,7 +170,10 @@ export function PatientProfilePage() {
 
   if (patientQuery.isError || !patient) {
     return (
-      <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Patients', href: '/emr/patients' }]} title="Patient">
+      <RxPage
+        breadcrumbs={[{ label: 'EMR' }, { label: 'Patients', href: '/emr/patients' }]}
+        title="Patient"
+      >
         <Alert color="red" icon={<AlertCircle size={16} />} title="Unable to load patient">
           {patientQuery.error instanceof Error ? patientQuery.error.message : 'Patient not found.'}
         </Alert>
@@ -209,7 +215,11 @@ export function PatientProfilePage() {
                 <StatusBadge value={patient.isActive} kind="active" />
               </Group>
               <Group gap="xs" wrap="wrap">
-                {patient.gender && <Badge variant="dot" color="blue">{formatEnum(patient.gender)}</Badge>}
+                {patient.gender && (
+                  <Badge variant="dot" color="blue">
+                    {formatEnum(patient.gender)}
+                  </Badge>
+                )}
                 {ageFrom(patient.dateOfBirth) && (
                   <Text size="sm" c="dimmed">
                     {ageFrom(patient.dateOfBirth)} · {patient.dateOfBirth}
@@ -228,7 +238,10 @@ export function PatientProfilePage() {
             <DetailRow label="Phone" value={patient.phone} />
             <DetailRow label="Email" value={patient.email} />
             <DetailRow label="Address" value={patient.address} />
-            <DetailRow label="Marital status" value={patient.maritalStatus ? formatEnum(patient.maritalStatus) : undefined} />
+            <DetailRow
+              label="Marital status"
+              value={patient.maritalStatus ? formatEnum(patient.maritalStatus) : undefined}
+            />
             <DetailRow label="Blood group" value={patient.bloodGroup} />
           </SimpleGrid>
 
@@ -236,7 +249,14 @@ export function PatientProfilePage() {
             <DetailRow label="Genotype" value={patient.genotype} />
             <DetailRow label="Next of kin" value={patient.nextOfKinName} />
             <DetailRow label="Next of kin phone" value={patient.nextOfKinPhone} />
-            <DetailRow label="Relationship" value={patient.nextOfKinRelationship ? formatEnum(patient.nextOfKinRelationship) : undefined} />
+            <DetailRow
+              label="Relationship"
+              value={
+                patient.nextOfKinRelationship
+                  ? formatEnum(patient.nextOfKinRelationship)
+                  : undefined
+              }
+            />
           </SimpleGrid>
         </Card>
 
@@ -244,11 +264,17 @@ export function PatientProfilePage() {
         <Card withBorder radius="md" padding="lg">
           <Tabs value={activeTab} onChange={setActiveTab}>
             <Tabs.List mb="md">
-              <Tabs.Tab value="appointments">Appointments ({appointmentsQuery.data?.length ?? 0})</Tabs.Tab>
+              <Tabs.Tab value="appointments">
+                Appointments ({appointmentsQuery.data?.length ?? 0})
+              </Tabs.Tab>
               <Tabs.Tab value="visits">Visits ({visitsQuery.data?.length ?? 0})</Tabs.Tab>
-              <Tabs.Tab value="encounters">Encounters ({encountersQuery.data?.length ?? 0})</Tabs.Tab>
+              <Tabs.Tab value="encounters">
+                Encounters ({encountersQuery.data?.length ?? 0})
+              </Tabs.Tab>
               <Tabs.Tab value="requests">Requests ({requestsQuery.data?.length ?? 0})</Tabs.Tab>
-              <Tabs.Tab value="documentation">Documentation ({submissionsQuery.data?.length ?? 0})</Tabs.Tab>
+              <Tabs.Tab value="documentation">
+                Documentation ({submissionsQuery.data?.length ?? 0})
+              </Tabs.Tab>
             </Tabs.List>
 
             <Tabs.Panel value="appointments">
@@ -266,12 +292,16 @@ export function PatientProfilePage() {
                 <Table.Tbody>
                   {(appointmentsQuery.data ?? []).map((row) => (
                     <Table.Tr key={String(row.id)}>
-                      <Table.Td><Badge variant="light">{String(row.appointmentNumber)}</Badge></Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{String(row.appointmentNumber)}</Badge>
+                      </Table.Td>
                       <Table.Td>{formatEnum(String(row.appointmentType))}</Table.Td>
                       <Table.Td>{String(row.date ?? '—')}</Table.Td>
                       <Table.Td>{String(row.startTime ?? '—')}</Table.Td>
                       <Table.Td>{String(row.providerName ?? '—')}</Table.Td>
-                      <Table.Td><StatusBadge value={row.status} kind="appointment" /></Table.Td>
+                      <Table.Td>
+                        <StatusBadge value={row.status} kind="appointment" />
+                      </Table.Td>
                     </Table.Tr>
                   ))}
                   {(appointmentsQuery.data ?? []).length === 0 && (
@@ -297,11 +327,19 @@ export function PatientProfilePage() {
                 <Table.Tbody>
                   {(visitsQuery.data ?? []).map((row) => (
                     <Table.Tr key={String(row.id)}>
-                      <Table.Td><Badge variant="light">{String(row.visitNumber)}</Badge></Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{String(row.visitNumber)}</Badge>
+                      </Table.Td>
                       <Table.Td>{formatEnum(String(row.visitType))}</Table.Td>
-                      <Table.Td>{row.startDatetime ? new Date(String(row.startDatetime)).toLocaleString() : '—'}</Table.Td>
+                      <Table.Td>
+                        {row.startDatetime
+                          ? new Date(String(row.startDatetime)).toLocaleString()
+                          : '—'}
+                      </Table.Td>
                       <Table.Td>{String(row.providerName ?? '—')}</Table.Td>
-                      <Table.Td><StatusBadge value={row.status} kind="visit" /></Table.Td>
+                      <Table.Td>
+                        <StatusBadge value={row.status} kind="visit" />
+                      </Table.Td>
                     </Table.Tr>
                   ))}
                   {(visitsQuery.data ?? []).length === 0 && (
@@ -331,9 +369,17 @@ export function PatientProfilePage() {
                       style={{ cursor: 'pointer' }}
                       onClick={() => void navigate({ to: `/emr/encounters/${String(row.id)}` })}
                     >
-                      <Table.Td><Badge variant="light">{String(row.encounterNumber)}</Badge></Table.Td>
-                      <Table.Td><StatusBadge value={row.encounterType} kind="encounter" /></Table.Td>
-                      <Table.Td>{row.encounterDatetime ? new Date(String(row.encounterDatetime)).toLocaleString() : '—'}</Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{String(row.encounterNumber)}</Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <StatusBadge value={row.encounterType} kind="encounter" />
+                      </Table.Td>
+                      <Table.Td>
+                        {row.encounterDatetime
+                          ? new Date(String(row.encounterDatetime)).toLocaleString()
+                          : '—'}
+                      </Table.Td>
                       <Table.Td>{String(row.providerName ?? '—')}</Table.Td>
                       <Table.Td>{String(row.reason ?? '—')}</Table.Td>
                     </Table.Tr>
@@ -457,11 +503,19 @@ export function PatientProfilePage() {
                       style={{ cursor: 'pointer' }}
                       onClick={() => void navigate({ to: `/emr/requests/${String(row.id)}` })}
                     >
-                      <Table.Td><Badge variant="light">{String(row.requestNumber)}</Badge></Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{String(row.requestNumber)}</Badge>
+                      </Table.Td>
                       <Table.Td>{formatEnum(String(row.requestType))}</Table.Td>
-                      <Table.Td><StatusBadge value={row.priority} kind="priority" /></Table.Td>
-                      <Table.Td><StatusBadge value={row.status} kind="request" /></Table.Td>
-                      <Table.Td>{row.requestedAt ? new Date(String(row.requestedAt)).toLocaleString() : '—'}</Table.Td>
+                      <Table.Td>
+                        <StatusBadge value={row.priority} kind="priority" />
+                      </Table.Td>
+                      <Table.Td>
+                        <StatusBadge value={row.status} kind="request" />
+                      </Table.Td>
+                      <Table.Td>
+                        {row.requestedAt ? new Date(String(row.requestedAt)).toLocaleString() : '—'}
+                      </Table.Td>
                       <Table.Td onClick={(e) => e.stopPropagation()}>
                         <Button
                           size="compact-xs"
@@ -490,7 +544,9 @@ export function PatientProfilePage() {
       <DocumentationModal
         opened={docOpened}
         onClose={closeDoc}
-        initialPatient={patient ? { id: patient.id, patientId: patient.patientId, patientName: fullName } : null}
+        initialPatient={
+          patient ? { id: patient.id, patientId: patient.patientId, patientName: fullName } : null
+        }
         onSubmitted={() => void submissionsQuery.refetch()}
       />
 
@@ -522,13 +578,21 @@ export function PatientProfilePage() {
                 priority:
                   timelineRequest.priority != null ? String(timelineRequest.priority) : undefined,
                 requestType:
-                  timelineRequest.requestType != null ? String(timelineRequest.requestType) : undefined,
+                  timelineRequest.requestType != null
+                    ? String(timelineRequest.requestType)
+                    : undefined,
               }
             : null
         }
       />
 
-      <Modal opened={scheduleOpened} onClose={closeSchedule} title="Schedule Appointment" size="lg" centered>
+      <Modal
+        opened={scheduleOpened}
+        onClose={closeSchedule}
+        title="Schedule Appointment"
+        size="lg"
+        centered
+      >
         <AppointmentForm
           onClose={closeSchedule}
           onCreated={handleScheduled}

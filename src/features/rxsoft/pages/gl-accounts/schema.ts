@@ -20,8 +20,19 @@ const columns: Column[] = [
 const createFields: Field[] = [
   { name: 'accountCode', label: 'Account Code', required: true },
   { name: 'accountName', label: 'Account Name', required: true },
-  { name: 'accountType', label: 'Account Type', required: true, type: 'select', options: accountTypeOptions },
-  { name: 'allowsReconciliation', label: 'Allows Reconciliation', type: 'switch', defaultValue: false },
+  {
+    name: 'accountType',
+    label: 'Account Type',
+    required: true,
+    type: 'select',
+    options: accountTypeOptions,
+  },
+  {
+    name: 'allowsReconciliation',
+    label: 'Allows Reconciliation',
+    type: 'switch',
+    defaultValue: false,
+  },
   { name: 'isActive', label: 'Active', type: 'switch', defaultValue: true },
 ];
 

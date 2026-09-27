@@ -127,7 +127,9 @@ export function TestAssignmentSection() {
                         label: `Sample #${i + 1}`,
                       }))}
                       onChange={(v) => {
-                        if (v !== null) assignTest(item.testDefinitionId, Number(v));
+                        if (v !== null) {
+                          assignTest(item.testDefinitionId, Number(v));
+                        }
                       }}
                       clearable
                     />

@@ -12,6 +12,6 @@ export const useChatPhoneStore = create<ChatPhoneState>()(
       chatPhone: null,
       setChatPhone: (phone) => set({ chatPhone: phone }),
     }),
-    { name: 'rxsoft-admin-chat-phone' },
-  ),
+    { name: 'rxsoft-admin-chat-phone' }
+  )
 );

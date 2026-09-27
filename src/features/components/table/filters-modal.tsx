@@ -20,7 +20,9 @@ export default function FiltersModal({
 
   // Hydrate from appliedFilters when modal opens
   useEffect(() => {
-    if (!open) {return;}
+    if (!open) {
+      return;
+    }
 
     const initial: LocalFilter[] = Object.entries(appliedFilters)
       .filter(([_, v]) => v !== null)
@@ -59,7 +61,9 @@ export default function FiltersModal({
     Object.keys(appliedFilters).forEach((key) => updateFilters(key, null));
 
     filters.forEach((f) => {
-      if (!f.columnKey || !f.selectedFilter) {return;}
+      if (!f.columnKey || !f.selectedFilter) {
+        return;
+      }
 
       updateFilters(f.columnKey, {
         filter: f.selectedFilter,

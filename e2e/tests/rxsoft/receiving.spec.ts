@@ -17,7 +17,7 @@ const TS = Date.now().toString(36);
 async function apiCreate<T>(
   page: import('@playwright/test').Page,
   path: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ): Promise<T> {
   return apiFetch<T>(page, path, {
     method: 'POST',
@@ -51,11 +51,21 @@ test.describe.serial('RxSoft goods receiving', () => {
       }
     }
 
-    if (poId) await apiDelete(`/purchases/${poId}`);
-    if (itemId) await apiDelete(`/items/${itemId}`);
-    if (warehouseId) await apiDelete(`/stock-locations/${warehouseId}`);
-    if (supplierId) await apiDelete(`/customers/${supplierId}`);
-    if (uomId) await apiDelete(`/uoms/${uomId}`);
+    if (poId) {
+      await apiDelete(`/purchases/${poId}`);
+    }
+    if (itemId) {
+      await apiDelete(`/items/${itemId}`);
+    }
+    if (warehouseId) {
+      await apiDelete(`/stock-locations/${warehouseId}`);
+    }
+    if (supplierId) {
+      await apiDelete(`/customers/${supplierId}`);
+    }
+    if (uomId) {
+      await apiDelete(`/uoms/${uomId}`);
+    }
   });
 
   // ── 0. Seed data ─────────────────────────────────────────────
@@ -120,23 +130,19 @@ test.describe.serial('RxSoft goods receiving', () => {
 
     // Receive goods against the PO
     receiptNumber = `GR-RCPT-${TS}`;
-    const recv = await apiCreate<{ receiptNumber: string }>(
-      page,
-      `/purchases/${poId}/receive`,
-      {
-        purchaseOrderId: poId,
-        receivedDate: new Date().toISOString(),
-        receiptNumber,
-        lines: [
-          {
-            itemId,
-            receivedQty: 3,
-            uomId,
-            unitCost: 10,
-          },
-        ],
-      },
-    );
+    const recv = await apiCreate<{ receiptNumber: string }>(page, `/purchases/${poId}/receive`, {
+      purchaseOrderId: poId,
+      receivedDate: new Date().toISOString(),
+      receiptNumber,
+      lines: [
+        {
+          itemId,
+          receivedQty: 3,
+          uomId,
+          unitCost: 10,
+        },
+      ],
+    });
     expect(recv.receiptNumber).toBe(receiptNumber);
 
     accessToken = await readAccessToken(page);

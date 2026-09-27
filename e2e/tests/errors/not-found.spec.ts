@@ -6,7 +6,9 @@ test.describe('not-found (404) page', () => {
   // URLs (e.g. any unknown path) are swallowed by the global auth shell rather
   // than the router's notFoundComponent, so we assert the component via its
   // dedicated /404 route instead of relying on live catch-all routing.
-  test('renders the 404 page with recovery actions', async ({ page }) => {
+
+  // TC-ERR-02 — /404 renders the NotFoundError surface with recovery actions.
+  test('TC-ERR-02 — renders the 404 page with recovery actions', async ({ page }) => {
     await page.goto('/404');
 
     await expect(notFoundH1(page)).toBeVisible();

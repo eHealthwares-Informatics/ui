@@ -13,8 +13,8 @@ import { DatePickerInput, DateTimePicker } from '@mantine/dates';
 import { ArrowDown, ArrowUp, ArrowUpDown, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Column, ColumnDataType, ColumnFilter, FilterType, FilterValue } from '../../rxsoft/types';
-import { resolveAutoFilterValue } from './utils';
 import { AsyncSelectField } from '../form/async-field';
+import { resolveAutoFilterValue } from './utils';
 
 export type SortOrder = 'asc' | 'desc' | null;
 
@@ -39,22 +39,20 @@ export const TableHeader = ({
   const [tempFilter, setTempFilter] = useState<FilterValue | null>(filterValue || null);
 
   const isSorted = sortable && sortBy === column.key && !!sortOrder;
-  const sortIcon = !sortable
-    ? null
-    : sortOrder === 'asc' && sortBy === column.key
-      ? <ArrowUp size={14} />
-      : sortOrder === 'desc' && sortBy === column.key
-        ? <ArrowDown size={14} />
-        : <ArrowUpDown size={14} />;
+  const sortIcon = !sortable ? null : sortOrder === 'asc' && sortBy === column.key ? (
+    <ArrowUp size={14} />
+  ) : sortOrder === 'desc' && sortBy === column.key ? (
+    <ArrowDown size={14} />
+  ) : (
+    <ArrowUpDown size={14} />
+  );
 
   const handleSortClick = () => {
-    if (!onSortChange) return;
+    if (!onSortChange) {
+      return;
+    }
     const next: SortOrder =
-      sortBy !== column.key || !sortOrder
-        ? 'asc'
-        : sortOrder === 'asc'
-          ? 'desc'
-          : null;
+      sortBy !== column.key || !sortOrder ? 'asc' : sortOrder === 'asc' ? 'desc' : null;
     onSortChange(column.key, next);
   };
 
@@ -125,18 +123,24 @@ export const TableHeader = ({
                       handleFiltering({ ...filter, filterValue: { filter, value } })
                     }
                   />
-                ) : filter.async_option_config ?
+                ) : filter.async_option_config ? (
                   <AsyncSelectField
                     value={filter.filterValue?.value}
-                    field={{ name: filter.name, value: filter.filterValue?.value, searchParam: filter.async_option_config, label: '' }}
+                    field={{
+                      name: filter.name,
+                      value: filter.filterValue?.value,
+                      searchParam: filter.async_option_config,
+                      label: '',
+                    }}
                     onChange={(value) =>
                       handleFiltering({ ...filter, filterValue: { filter, value: value?.value } })
-                    } />
-                  : (
-                    <Menu.Item key={filter.type} onClick={() => handleFiltering(filter)}>
-                      {filter.name}
-                    </Menu.Item>
-                  )
+                    }
+                  />
+                ) : (
+                  <Menu.Item key={filter.type} onClick={() => handleFiltering(filter)}>
+                    {filter.name}
+                  </Menu.Item>
+                )
               )}
 
               <Menu.Item color="red" onClick={() => onFilterValueChange(null)}>

@@ -19,7 +19,7 @@ const TS = Date.now().toString(36);
 async function apiCreate<T>(
   page: import('@playwright/test').Page,
   path: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ): Promise<T> {
   return apiFetch<T>(page, path, {
     method: 'POST',
@@ -53,11 +53,21 @@ test.describe.serial('RxSoft purchases', () => {
     }
 
     // Delete in reverse dependency order
-    if (purchaseId) await apiDelete(`/purchases/${purchaseId}`);
-    if (itemId) await apiDelete(`/items/${itemId}`);
-    if (warehouseId) await apiDelete(`/stock-locations/${warehouseId}`);
-    if (supplierId) await apiDelete(`/customers/${supplierId}`);
-    if (uomId) await apiDelete(`/uoms/${uomId}`);
+    if (purchaseId) {
+      await apiDelete(`/purchases/${purchaseId}`);
+    }
+    if (itemId) {
+      await apiDelete(`/items/${itemId}`);
+    }
+    if (warehouseId) {
+      await apiDelete(`/stock-locations/${warehouseId}`);
+    }
+    if (supplierId) {
+      await apiDelete(`/customers/${supplierId}`);
+    }
+    if (uomId) {
+      await apiDelete(`/uoms/${uomId}`);
+    }
   });
 
   // ── Prerequisite seeding ─────────────────────────────────────
@@ -146,7 +156,9 @@ test.describe.serial('RxSoft purchases', () => {
     await expect(supplierSelect).toBeVisible();
     await supplierSelect.click();
     await supplierSelect.fill(`E2E Supplier ${TS}`);
-    const supplierOption = page.getByRole('option', { name: new RegExp(`E2E Supplier ${TS}`) }).first();
+    const supplierOption = page
+      .getByRole('option', { name: new RegExp(`E2E Supplier ${TS}`) })
+      .first();
     await expect(supplierOption).toBeVisible({ timeout: 15_000 });
     await supplierOption.click();
 
@@ -155,7 +167,9 @@ test.describe.serial('RxSoft purchases', () => {
     await expect(warehouseSelect).toBeVisible();
     await warehouseSelect.click();
     await warehouseSelect.fill(`E2E Warehouse ${TS}`);
-    const warehouseOption = page.getByRole('option', { name: new RegExp(`E2E Warehouse ${TS}`) }).first();
+    const warehouseOption = page
+      .getByRole('option', { name: new RegExp(`E2E Warehouse ${TS}`) })
+      .first();
     await expect(warehouseOption).toBeVisible({ timeout: 15_000 });
     await warehouseOption.click();
 
@@ -227,7 +241,11 @@ test.describe.serial('RxSoft purchases', () => {
 
     // Search for our purchase
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
-    const row = page.getByTestId('data-table-body').locator('tr').filter({ hasText: `PO-E2E-${TS}` }).first();
+    const row = page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .filter({ hasText: `PO-E2E-${TS}` })
+      .first();
     await expect(row).toBeVisible({ timeout: 15_000 });
 
     // Extract purchase ID from the Eye link's href
@@ -250,7 +268,11 @@ test.describe.serial('RxSoft purchases', () => {
 
     // Search for our purchase
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
-    const row = page.getByTestId('data-table-body').locator('tr').filter({ hasText: `PO-E2E-${TS}` }).first();
+    const row = page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .filter({ hasText: `PO-E2E-${TS}` })
+      .first();
     await expect(row).toBeVisible({ timeout: 15_000 });
 
     // Click the Eye icon to navigate to detail
@@ -259,7 +281,9 @@ test.describe.serial('RxSoft purchases', () => {
     await eyeLink.click();
 
     // Verify we navigated to the detail page
-    await page.waitForURL((url) => url.pathname.includes('/rxsoft/purchases/'), { timeout: 15_000 });
+    await page.waitForURL((url) => url.pathname.includes('/rxsoft/purchases/'), {
+      timeout: 15_000,
+    });
 
     // The detail view should show the PO number
     await expect(page.getByText(`PO-E2E-${TS}`, { exact: false })).toBeVisible({ timeout: 15_000 });
@@ -275,7 +299,11 @@ test.describe.serial('RxSoft purchases', () => {
     });
 
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
-    const row = page.getByTestId('data-table-body').locator('tr').filter({ hasText: `PO-E2E-${TS}` }).first();
+    const row = page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .filter({ hasText: `PO-E2E-${TS}` })
+      .first();
     await expect(row).toBeVisible({ timeout: 15_000 });
 
     // The row should contain the status
@@ -296,11 +324,18 @@ test.describe.serial('RxSoft purchases', () => {
     });
 
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
-    const row = page.getByTestId('data-table-body').locator('tr').filter({ hasText: `PO-E2E-${TS}` }).first();
+    const row = page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .filter({ hasText: `PO-E2E-${TS}` })
+      .first();
     await expect(row).toBeVisible({ timeout: 15_000 });
 
     // Click the trash icon
-    const trashButton = row.locator('button').filter({ has: page.locator('svg.lucide-trash-2') }).first();
+    const trashButton = row
+      .locator('button')
+      .filter({ has: page.locator('svg.lucide-trash-2') })
+      .first();
     await expect(trashButton).toBeVisible();
     await trashButton.click();
 

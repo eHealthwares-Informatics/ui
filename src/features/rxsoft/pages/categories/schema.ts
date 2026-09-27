@@ -4,7 +4,11 @@ import type { Column, Field, Option } from '../../types';
 const columns: Column[] = [
   { key: 'code', label: 'Code' },
   { key: 'name', label: 'Name' },
-  { key: 'parentId', label: 'Parent', render: (row) => (row.parent as { name?: string })?.name ?? '-' },
+  {
+    key: 'parentId',
+    label: 'Parent',
+    render: (row) => (row.parent as { name?: string })?.name ?? '-',
+  },
 ];
 
 const createFields: Field[] = [
@@ -21,7 +25,11 @@ const createFields: Field[] = [
 ];
 
 function buildCreatePayload(values: Record<string, unknown>) {
-  return { code: values.code, name: values.name, parentId: (values.parentId as Option).value || undefined };
+  return {
+    code: values.code,
+    name: values.name,
+    parentId: (values.parentId as Option).value || undefined,
+  };
 }
 
 export const categoriesConfig: ModelConfig = {
@@ -40,7 +48,9 @@ export const categoriesConfig: ModelConfig = {
     endpoint: '/categories/metrics',
     items: (data) => {
       const lastCreated = (data as any)?.lastCreated ?? data;
-      if (!lastCreated?.code) {return [];}
+      if (!lastCreated?.code) {
+        return [];
+      }
       return [{ label: 'Last Created', value: lastCreated.code, icon: 'Package', color: 'blue' }];
     },
   },

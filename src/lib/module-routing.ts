@@ -58,7 +58,7 @@ export function getModuleFromPath(pathname: string): ModuleId | null {
   }
   const sorted = [...modules].sort((a, b) => b.routes.length - a.routes.length);
   for (const mod of sorted) {
-    if (mod.routes.some((route) => pathname.startsWith(route + '/') || pathname === route)) {
+    if (mod.routes.some((route) => pathname.startsWith(`${route}/`) || pathname === route)) {
       return mod.id;
     }
   }

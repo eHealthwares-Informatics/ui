@@ -1,4 +1,9 @@
-export type PurchaseOrderStatus = 'draft' | 'approved' | 'partially_received' | 'received' | 'cancelled';
+export type PurchaseOrderStatus =
+  | 'draft'
+  | 'approved'
+  | 'partially_received'
+  | 'received'
+  | 'cancelled';
 
 export interface PoLineItem {
   id: string;
@@ -56,4 +61,10 @@ export interface GoodsReceipt {
   }>;
 }
 
-export const PO_STATUS_OPTIONS = ['draft', 'approved', 'partially_received', 'received', 'cancelled'] as const;
+export const PO_STATUS_OPTIONS = [
+  'draft',
+  'approved',
+  'partially_received',
+  'received',
+  'cancelled',
+] as const;

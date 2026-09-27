@@ -1,6 +1,6 @@
 import { Badge } from '@mantine/core';
-import type { ModelConfig } from '@/features/shared/model-schema';
 import type { Column } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
 
 const TYPE_META: Record<string, { label: string; color: string }> = {
   therapeutic: { label: 'Therapeutic', color: 'green' },

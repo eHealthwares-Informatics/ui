@@ -272,7 +272,12 @@ export function AsyncSelectField({
             const isSelected = selectedValues?.includes(option.value) ?? false;
             return (
               <Combobox.Option key={option.value} value={option.value}>
-                <Group justify="space-between" gap="xs" w="100%" data-testid={`async-option-${option.label}`}>
+                <Group
+                  justify="space-between"
+                  gap="xs"
+                  w="100%"
+                  data-testid={`async-option-${option.label}`}
+                >
                   <Text size="sm">{option.label}</Text>
                   {isSelected ? <Check size={14} /> : null}
                 </Group>

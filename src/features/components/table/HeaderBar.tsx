@@ -71,7 +71,11 @@ export const HeaderBar = ({
             onChange={(event) => setSearchValue(event.currentTarget.value)}
           />
           {hasFilterableColumns && (
-            <Button variant="subtle" leftSection={<Filter size={14} />} onClick={() => setOpen(true)}>
+            <Button
+              variant="subtle"
+              leftSection={<Filter size={14} />}
+              onClick={() => setOpen(true)}
+            >
               Filters
             </Button>
           )}
@@ -83,7 +87,11 @@ export const HeaderBar = ({
           {(onExportCsv || onExportPdf) && (
             <Menu shadow="md" width={160} withinPortal>
               <Menu.Target>
-                <Button data-testid="header-export" variant="subtle" leftSection={<Download size={14} />}>
+                <Button
+                  data-testid="header-export"
+                  variant="subtle"
+                  leftSection={<Download size={14} />}
+                >
                   Export
                 </Button>
               </Menu.Target>
@@ -106,7 +114,12 @@ export const HeaderBar = ({
             </Menu>
           )}
           {onDelete && (
-            <Button data-testid="header-delete" variant="subtle" leftSection={<Trash size={14} />} onClick={onDelete}>
+            <Button
+              data-testid="header-delete"
+              variant="subtle"
+              leftSection={<Trash size={14} />}
+              onClick={onDelete}
+            >
               Delete
             </Button>
           )}
@@ -116,7 +129,8 @@ export const HeaderBar = ({
         <Group gap="xs">
           {totalItems > 0 && (
             <Text size="xs" c="dimmed">
-              {(pageIndex - 1) * pageSize + 1}–{Math.min(pageIndex * pageSize, totalItems)} of {totalItems}
+              {(pageIndex - 1) * pageSize + 1}–{Math.min(pageIndex * pageSize, totalItems)} of{' '}
+              {totalItems}
             </Text>
           )}
           <ActionIcon variant="subtle" onClick={refresh}>

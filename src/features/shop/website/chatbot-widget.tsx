@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -12,8 +11,10 @@ import {
   Stack,
 } from '@mantine/core';
 import { MessageSquare, X, Send, Bot, Pencil, Paperclip, FileText } from 'lucide-react';
-import { useChatbotStore } from './chatbot-store';
+import { useEffect, useRef, useState } from 'react';
+import { TypingBubble } from '@/components/typing-dots';
 import { useAuthStore } from './auth-store';
+import { ChatPhoneGate } from './chat-phone-gate';
 import {
   useShopChatThread,
   useShopParticipant,
@@ -22,10 +23,9 @@ import {
   type ChatMessage,
   type ChatMessageAttachment,
 } from './chatbot-service';
-import { ChatPhoneGate } from './chat-phone-gate';
-import { TypingBubble } from '@/components/typing-dots';
-import { green, ink, muted, line, soft } from './layout';
+import { useChatbotStore } from './chatbot-store';
 import { QUESTIONNAIRE_CODES } from './hl7-prescription';
+import { green, ink, muted, line, soft } from './layout';
 
 interface ChoiceOption {
   value: string;
@@ -54,12 +54,15 @@ function MessageAttachments({
   attachments: ChatMessageAttachment[];
   isUser: boolean;
 }) {
-  if (!attachments?.length) {return null;}
+  if (!attachments?.length) {
+    return null;
+  }
   return (
     <Stack gap={6} mb={msgSpacing(attachments, isUser)}>
       {attachments.map((att, i) => {
         const src = att.url ?? att.data;
-        const isImage = att.mimeType?.startsWith('image/') ||
+        const isImage =
+          att.mimeType?.startsWith('image/') ||
           (!att.mimeType && att.data?.startsWith('data:image'));
         if (src && isImage) {
           return (
@@ -108,21 +111,32 @@ function msgSpacing(attachments: ChatMessageAttachment[], isUser: boolean): stri
 }
 
 function parseChoiceMessage(text: string): ChoiceMessage | null {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-  if (lines.length < 2) {return null;}
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length < 2) {
+    return null;
+  }
 
   const title = lines[0];
   const optionLines = lines.slice(1).filter((l) => l.includes(':'));
-  if (optionLines.length === 0) {return null;}
+  if (optionLines.length === 0) {
+    return null;
+  }
 
   const options: ChoiceOption[] = [];
   for (const line of optionLines) {
     const clean = line.replace(/\u200B/g, '').trim();
     const idx = clean.indexOf(':');
-    if (idx === -1) {continue;}
+    if (idx === -1) {
+      continue;
+    }
     const value = clean.slice(0, idx).trim();
     const label = clean.slice(idx + 1).trim();
-    if (!value || !label) {continue;}
+    if (!value || !label) {
+      continue;
+    }
     options.push({ value, label });
   }
 
@@ -143,7 +157,9 @@ export function ChatbotWidget() {
   const [initialSent, setInitialSent] = useState(false);
   const [changingNumber, setChangingNumber] = useState(false);
   const [identity, setIdentity] = useState<ChatIdentity | null>(() => {
-    if (authPhone) {return { phone: authPhone, guest: false };}
+    if (authPhone) {
+      return { phone: authPhone, guest: false };
+    }
     const stored = getStoredPhone();
     return stored ? { phone: stored, guest: true } : null;
   });
@@ -178,7 +194,9 @@ export function ChatbotWidget() {
 
   const handleSend = () => {
     const text = draft.trim();
-    if (!text && pendingFiles.length === 0) {return;}
+    if (!text && pendingFiles.length === 0) {
+      return;
+    }
     void (async () => {
       const attachments: ChatMessageAttachment[] = [];
       for (const file of pendingFiles) {
@@ -220,12 +238,7 @@ export function ChatbotWidget() {
           boxShadow: '0 8px 28px rgba(22, 163, 74, 0.35)',
           cursor: 'pointer',
         }}
-        onClick={() =>
-          useChatbotStore.getState().openWith(
-            '',
-            QUESTIONNAIRE_CODES.GENERAL_INQUIRY,
-          )
-        }
+        onClick={() => useChatbotStore.getState().openWith('', QUESTIONNAIRE_CODES.GENERAL_INQUIRY)}
       >
         <MessageSquare size={24} />
       </ActionIcon>
@@ -262,7 +275,12 @@ export function ChatbotWidget() {
         justify="space-between"
       >
         <Group gap={10}>
-          <Avatar size={34} radius="xl" color="white" style={{ background: 'rgba(255,255,255,0.2)' }}>
+          <Avatar
+            size={34}
+            radius="xl"
+            color="white"
+            style={{ background: 'rgba(255,255,255,0.2)' }}
+          >
             <Bot size={18} color="white" />
           </Avatar>
           <Box>
@@ -331,7 +349,7 @@ export function ChatbotWidget() {
             {(() => {
               const lastUserIdx = messages.reduce(
                 (last: number, m: ChatMessage, i: number) => (m.role === 'user' ? i : last),
-                -1,
+                -1
               );
               return messages.map((msg, idx) => {
                 const isUser = msg.role === 'user';
@@ -361,7 +379,9 @@ export function ChatbotWidget() {
                               opacity: answered ? 0.5 : 1,
                             }}
                             onClick={() => {
-                              if (!answered) {void send(opt.value);}
+                              if (!answered) {
+                                void send(opt.value);
+                              }
                             }}
                           >
                             {opt.label}
@@ -397,12 +417,7 @@ export function ChatbotWidget() {
                     <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                       {msg.text}
                     </Text>
-                    <Text
-                      size="xs"
-                      c={isUser ? 'rgba(255,255,255,0.6)' : muted}
-                      ta="right"
-                      mt={4}
-                    >
+                    <Text size="xs" c={isUser ? 'rgba(255,255,255,0.6)' : muted} ta="right" mt={4}>
                       {new Date(msg.createdAt).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -412,17 +427,11 @@ export function ChatbotWidget() {
                 );
               });
             })()}
-            {(typing || isLoading) && (
-              <TypingBubble background={soft} color={green} />
-            )}
+            {(typing || isLoading) && <TypingBubble background={soft} color={green} />}
           </Box>
 
           {ended && (
-            <Box
-              px="sm"
-              py={6}
-              style={{ background: soft, flexShrink: 0 }}
-            >
+            <Box px="sm" py={6} style={{ background: soft, flexShrink: 0 }}>
               <Text size="xs" c={muted} ta="center">
                 Conversation ended — send a message to start a new one.
               </Text>
@@ -439,7 +448,9 @@ export function ChatbotWidget() {
           >
             <FileButton
               onChange={(file) => {
-                if (file) {setPendingFiles((prev) => [...prev, file].slice(0, 3));}
+                if (file) {
+                  setPendingFiles((prev) => [...prev, file].slice(0, 3));
+                }
               }}
               accept="image/*,application/pdf"
             >
@@ -482,21 +493,14 @@ export function ChatbotWidget() {
           </Group>
 
           {pendingFiles.length > 0 && (
-            <Group
-              px="sm"
-              pb={6}
-              gap={6}
-              style={{ flexShrink: 0 }}
-            >
+            <Group px="sm" pb={6} gap={6} style={{ flexShrink: 0 }}>
               {pendingFiles.map((file, i) => (
                 <Chip
                   key={`${file.name}-${i}`}
                   size="sm"
                   value={String(i)}
                   checked
-                  onChange={() =>
-                    setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))
-                  }
+                  onChange={() => setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))}
                 >
                   <FileText size={12} /> {file.name}
                 </Chip>
@@ -505,13 +509,7 @@ export function ChatbotWidget() {
           )}
 
           {identity && (
-            <Group
-              px="sm"
-              pb={8}
-              gap={4}
-              justify="space-between"
-              style={{ flexShrink: 0 }}
-            >
+            <Group px="sm" pb={8} gap={4} justify="space-between" style={{ flexShrink: 0 }}>
               <Text size="10px" c={muted}>
                 {identity.guest ? 'Guest' : 'Verified'} · {identity.phone}
               </Text>

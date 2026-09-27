@@ -1,15 +1,32 @@
-import { Box, Card, Grid, Group, Skeleton, Stack, Text, Title, Badge, Table, Anchor } from '@mantine/core';
+import {
+  Box,
+  Card,
+  Grid,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Anchor,
+} from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { useConversionDashboard, useLgaConversion } from '../website/admin-hooks';
 import { apmBlue, apmGreen, ink, muted } from '../website/layout';
 
 function statusColor(status: string) {
   switch (status) {
-    case 'green': return '#16A34A';
-    case 'yellow': return '#EAB308';
-    case 'red': return '#DC2626';
-    case 'grey': return '#94A3B8';
-    default: return '#94A3B8';
+    case 'green':
+      return '#16A34A';
+    case 'yellow':
+      return '#EAB308';
+    case 'red':
+      return '#DC2626';
+    case 'grey':
+      return '#94A3B8';
+    default:
+      return '#94A3B8';
   }
 }
 
@@ -52,7 +69,9 @@ export function ConversionDashboard() {
           <Grid.Col key={stat.label} span={{ base: 6, sm: 4, md: 3 }}>
             <Card padding="lg" radius="md" withBorder>
               <Stack gap={4} align="center">
-                <Text size="sm" style={{ color: muted }}>{stat.label}</Text>
+                <Text size="sm" style={{ color: muted }}>
+                  {stat.label}
+                </Text>
                 <Text
                   fw={800}
                   style={{
@@ -70,7 +89,9 @@ export function ConversionDashboard() {
       </Grid>
 
       <Card padding="lg" radius="md" withBorder>
-        <Title order={4} mb="md" style={{ color: ink }}>LGA Conversion Status</Title>
+        <Title order={4} mb="md" style={{ color: ink }}>
+          LGA Conversion Status
+        </Title>
         {lgas && lgas.length > 0 ? (
           <Table striped highlightOnHover>
             <Table.Thead>
@@ -89,7 +110,9 @@ export function ConversionDashboard() {
                 <Table.Tr
                   key={lga.id}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => {/* navigate to LGA detail */}}
+                  onClick={() => {
+                    /* navigate to LGA detail */
+                  }}
                 >
                   <Table.Td>
                     <Anchor
@@ -110,7 +133,17 @@ export function ConversionDashboard() {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={lga.status === 'green' ? 'green' : lga.status === 'yellow' ? 'yellow' : lga.status === 'red' ? 'red' : 'gray'}>
+                    <Badge
+                      color={
+                        lga.status === 'green'
+                          ? 'green'
+                          : lga.status === 'yellow'
+                            ? 'yellow'
+                            : lga.status === 'red'
+                              ? 'red'
+                              : 'gray'
+                      }
+                    >
                       {lga.status}
                     </Badge>
                   </Table.Td>

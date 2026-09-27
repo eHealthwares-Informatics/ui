@@ -22,7 +22,9 @@ export async function runEffects<T extends FormState = FormState>(
   effects: FieldGroupEffect[] | undefined,
   context: EffectsContext<T>
 ): Promise<void> {
-  if (!effects || effects.length === 0) {return;}
+  if (!effects || effects.length === 0) {
+    return;
+  }
 
   const promises = effects.map((effect) => runEffect(effect, context));
   await Promise.all(promises);
@@ -231,7 +233,9 @@ export async function executeEffectsWithHandler<T extends FormState = FormState>
  * This creates reactive dependencies without direct React dependency
  */
 export function buildEffectDependencies(effects: FieldGroupEffect[] | undefined): string[] {
-  if (!effects) {return [];}
+  if (!effects) {
+    return [];
+  }
 
   const dependencies = new Set<string>();
 

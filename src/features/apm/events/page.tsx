@@ -1,8 +1,8 @@
 import { Box, Container, Group, Loader, SimpleGrid, Text } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
-import { WebsiteLayout, apmBlue, muted, soft } from '../website/layout';
 import { SectionHeading, EventCard } from '../website/components';
 import { useEvents } from '../website/hooks';
+import { WebsiteLayout, apmBlue, muted, soft } from '../website/layout';
 
 export default function EventsPage() {
   const { data, isLoading } = useEvents();
@@ -10,7 +10,10 @@ export default function EventsPage() {
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Events"
@@ -21,9 +24,13 @@ export default function EventsPage() {
       <Box py={80} style={{ background: '#fff' }}>
         <Container size="xl">
           {isLoading ? (
-            <Group justify="center"><Loader color={apmBlue} /></Group>
+            <Group justify="center">
+              <Loader color={apmBlue} />
+            </Group>
           ) : !data?.length ? (
-            <Text ta="center" style={{ color: muted }}>No events at this time. Join our newsletter to stay informed.</Text>
+            <Text ta="center" style={{ color: muted }}>
+              No events at this time. Join our newsletter to stay informed.
+            </Text>
           ) : (
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={24}>
               {data.map((event) => (

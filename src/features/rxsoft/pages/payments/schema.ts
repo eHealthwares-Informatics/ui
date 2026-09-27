@@ -20,13 +20,23 @@ const channelOptions = [
 
 const columns: Column[] = [
   { key: 'reference', label: 'Reference', filters: ColumnTypeFilters.STRING },
-  { key: 'amount', label: 'Amount', dataType: ColumnDataType.NUMBER, filters: ColumnTypeFilters.NUMBER },
+  {
+    key: 'amount',
+    label: 'Amount',
+    dataType: ColumnDataType.NUMBER,
+    filters: ColumnTypeFilters.NUMBER,
+  },
   { key: 'amountPaid', label: 'Amount Paid', dataType: ColumnDataType.NUMBER },
   { key: 'currency', label: 'Currency' },
   { key: 'status', label: 'Status', filters: [FILTERS.EQUALS, FILTERS.NOT_EQUALS] },
   { key: 'channel', label: 'Channel', filters: [FILTERS.EQUALS] },
   { key: 'sourceType', label: 'Source' },
-  { key: 'createdAt', label: 'Date', dataType: ColumnDataType.DATE, filters: ColumnTypeFilters.DATE },
+  {
+    key: 'createdAt',
+    label: 'Date',
+    dataType: ColumnDataType.DATE,
+    filters: ColumnTypeFilters.DATE,
+  },
 ];
 
 export const paymentsConfig: ModelConfig = {

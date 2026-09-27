@@ -12,11 +12,19 @@ type ResourcePopoverProps = {
 };
 
 function shortenId(id: string) {
-  if (id.length <= 8) {return id;}
+  if (id.length <= 8) {
+    return id;
+  }
   return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
-function ResourcePopoverInner({ resourceId, endpoint, children, render, fallback }: ResourcePopoverProps) {
+function ResourcePopoverInner({
+  resourceId,
+  endpoint,
+  children,
+  render,
+  fallback,
+}: ResourcePopoverProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const { data, isFetching } = useQuery({
@@ -28,7 +36,9 @@ function ResourcePopoverInner({ resourceId, endpoint, children, render, fallback
     enabled: isHovered && !!resourceId,
   });
 
-  if (!resourceId) {return <>{fallback ?? '-'}</>;}
+  if (!resourceId) {
+    return <>{fallback ?? '-'}</>;
+  }
 
   return (
     <HoverCard
@@ -54,7 +64,9 @@ function ResourcePopoverInner({ resourceId, endpoint, children, render, fallback
         ) : data ? (
           render(data)
         ) : (
-          <Text size="sm" c="dimmed">No data</Text>
+          <Text size="sm" c="dimmed">
+            No data
+          </Text>
         )}
       </HoverCard.Dropdown>
     </HoverCard>

@@ -18,23 +18,15 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { ChevronRight, Pill, Search, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { BrandCountLink } from '../website/components';
 import { websiteApi } from '../website/api';
-import { useGenericDrugs, useTherapeuticClasses, useClassifications } from '../website/hooks';
-import {
-  WebsiteLayout,
-  green,
-  ink,
-  muted,
-  line,
-  buttonStyles,
-} from '../website/layout';
 import { useCartStore } from '../website/cart-store';
+import { BrandCountLink } from '../website/components';
 import { ListPagination } from '../website/components';
-
+import { useGenericDrugs, useTherapeuticClasses, useClassifications } from '../website/hooks';
+import { WebsiteLayout, green, ink, muted, line, buttonStyles } from '../website/layout';
 import { SkeletonCards } from '../website/loaders';
 import { GenericDrugView } from '../website/types';
 
@@ -70,10 +62,26 @@ export default function ShopMedicinesPage() {
   // Unified classification options: one select combining all four labeled
   // sources (each classification keeps its source type for display).
   const classificationOptions = [
-    ...(therapeuticCls?.data ?? []).map((c) => ({ value: c.code, label: `[Therapeutic] ${c.name}`, type: c.type })),
-    ...(pharmaceuticalCls?.data ?? []).map((c) => ({ value: c.code, label: `[Pharmaceutical] ${c.name}`, type: c.type })),
-    ...(ndfCls?.data ?? []).map((c) => ({ value: c.code, label: `[NDF/EDL] ${c.name}`, type: c.type })),
-    ...(emdexCls?.data ?? []).map((c) => ({ value: c.code, label: `[EMDEx] ${c.name}`, type: c.type })),
+    ...(therapeuticCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[Therapeutic] ${c.name}`,
+      type: c.type,
+    })),
+    ...(pharmaceuticalCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[Pharmaceutical] ${c.name}`,
+      type: c.type,
+    })),
+    ...(ndfCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[NDF/EDL] ${c.name}`,
+      type: c.type,
+    })),
+    ...(emdexCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[EMDEx] ${c.name}`,
+      type: c.type,
+    })),
   ];
   const selectedClassification = classificationOptions.find((o) => o.value === classification);
 
@@ -82,8 +90,12 @@ export default function ShopMedicinesPage() {
     const out: Array<{ value: string; label: string }> = [];
     for (const c of classesData?.data ?? []) {
       for (const label of [c.genericClass, c.pharmaceuticalClass]) {
-        if (!label) { continue; }
-        if (seen.has(label)) { continue; }
+        if (!label) {
+          continue;
+        }
+        if (seen.has(label)) {
+          continue;
+        }
         seen.add(label);
         out.push({ value: label, label });
       }
@@ -154,29 +166,27 @@ export default function ShopMedicinesPage() {
                     leftSection={<Search size={18} />}
                     style={{ flex: 1 }}
                     styles={{ input: { borderColor: '#CFE5D7', color: ink } }}
-                  />  
-            <Box style={{ flex: 1 }}>
-              <Select
-                placeholder="Classification"
-                data={classificationOptions}
-                value={classification}
-                onChange={(v) => {
-                  setClassification(v);
-                  setPage(1);
-                }}
-                radius="xl"
-                clearable
-                searchable
-                limit={50}
-                maxDropdownHeight={280}
-                nothingFoundMessage="No classifications found"
-              />
-            </Box>
+                  />
+                  <Box style={{ flex: 1 }}>
+                    <Select
+                      placeholder="Classification"
+                      data={classificationOptions}
+                      value={classification}
+                      onChange={(v) => {
+                        setClassification(v);
+                        setPage(1);
+                      }}
+                      radius="xl"
+                      clearable
+                      searchable
+                      limit={50}
+                      maxDropdownHeight={280}
+                      nothingFoundMessage="No classifications found"
+                    />
+                  </Box>
                 </Group>
               </Stack>
             </Box>
-
-          
           </Group>
 
           {selectedClassification ? (
@@ -205,7 +215,13 @@ export default function ShopMedicinesPage() {
           ) : (
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
               {list.map((g) => (
-                <Card key={g.code} radius={20} withBorder padding="md" style={{ borderColor: line }}>
+                <Card
+                  key={g.code}
+                  radius={20}
+                  withBorder
+                  padding="md"
+                  style={{ borderColor: line }}
+                >
                   <Stack gap="sm">
                     <Group justify="space-between" align="flex-start" wrap="nowrap">
                       <Box style={{ flex: 1, minWidth: 0 }}>
@@ -272,7 +288,9 @@ export default function ShopMedicinesPage() {
                         variant="light"
                         color="green"
                         rightSection={<ChevronRight size={16} />}
-                        onClick={() => navigate({ to: '/shop/medicines/$code', params: { code: g.code } })}
+                        onClick={() =>
+                          navigate({ to: '/shop/medicines/$code', params: { code: g.code } })
+                        }
                       >
                         View
                       </Button>
@@ -295,7 +313,13 @@ export default function ShopMedicinesPage() {
   );
 }
 
-function PaperSearch({ search, onSearchChange }: { search: string; onSearchChange: (v: string) => void }) {
+function PaperSearch({
+  search,
+  onSearchChange,
+}: {
+  search: string;
+  onSearchChange: (v: string) => void;
+}) {
   return (
     <Stack
       p="md"

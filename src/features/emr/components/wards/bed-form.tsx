@@ -75,7 +75,12 @@ export function BedForm({
       <form onSubmit={form.onSubmit((values) => mutation.mutate(values))}>
         <Stack gap="sm">
           <Group align="flex-end" grow>
-            <TextInput label="Bed code" required placeholder="e.g. B-101" {...form.getInputProps('code')} />
+            <TextInput
+              label="Bed code"
+              required
+              placeholder="e.g. B-101"
+              {...form.getInputProps('code')}
+            />
             <Select
               label="Bed type"
               placeholder="Select type"

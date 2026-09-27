@@ -1,20 +1,51 @@
-import { useState } from 'react';
 import {
-  Box, Card, Grid, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, TextInput, Select, Textarea, Pagination,
+  Box,
+  Card,
+  Grid,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  TextInput,
+  Select,
+  Textarea,
+  Pagination,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useStakeholders, useLgas, useWards, useCreateStakeholder, useUpdateStakeholder } from '../website/admin-hooks';
-import { apmBlue, ink, muted } from '../website/layout';
+import { useState } from 'react';
+import {
+  useStakeholders,
+  useLgas,
+  useWards,
+  useCreateStakeholder,
+  useUpdateStakeholder,
+} from '../website/admin-hooks';
 import type { CreateStakeholderPayload, UpdateStakeholderPayload } from '../website/admin-types';
+import { apmBlue, ink, muted } from '../website/layout';
 
 const roleOptions = [
-  'chairman', 'councillor', 'party-leader', 'youth-leader',
-  'women-leader', 'religious-leader', 'community-leader',
+  'chairman',
+  'councillor',
+  'party-leader',
+  'youth-leader',
+  'women-leader',
+  'religious-leader',
+  'community-leader',
 ].map((r) => ({ value: r, label: r.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) }));
 
-const affiliationOptions = ['PDP', 'APC', 'APM', 'LP', 'Other'].map((a) => ({ value: a, label: a }));
-const influenceOptions = ['high', 'medium', 'low'].map((i) => ({ value: i, label: i.charAt(0).toUpperCase() + i.slice(1) }));
+const affiliationOptions = ['PDP', 'APC', 'APM', 'LP', 'Other'].map((a) => ({
+  value: a,
+  label: a,
+}));
+const influenceOptions = ['high', 'medium', 'low'].map((i) => ({
+  value: i,
+  label: i.charAt(0).toUpperCase() + i.slice(1),
+}));
 const statusOptions = ['untouched', 'engaged', 'leaning', 'won', 'lost', 'hostile'].map((s) => ({
   value: s,
   label: s.charAt(0).toUpperCase() + s.slice(1),
@@ -22,12 +53,18 @@ const statusOptions = ['untouched', 'engaged', 'leaning', 'won', 'lost', 'hostil
 
 function statusColor(status: string) {
   switch (status) {
-    case 'won': return 'green';
-    case 'leaning': return 'yellow';
-    case 'engaged': return 'blue';
-    case 'lost': return 'red';
-    case 'hostile': return 'orange';
-    default: return 'gray';
+    case 'won':
+      return 'green';
+    case 'leaning':
+      return 'yellow';
+    case 'engaged':
+      return 'blue';
+    case 'lost':
+      return 'red';
+    case 'hostile':
+      return 'orange';
+    default:
+      return 'gray';
   }
 }
 
@@ -49,7 +86,11 @@ export function StakeholdersPage() {
     notes: '',
   });
 
-  const { data, isLoading } = useStakeholders({ page, limit: 20, search: search || undefined } as any);
+  const { data, isLoading } = useStakeholders({
+    page,
+    limit: 20,
+    search: search || undefined,
+  } as any);
   const { data: lgas } = useLgas();
   const wardsQuery = useWards(form.lgaId);
   const createMutation = useCreateStakeholder();
@@ -57,18 +98,28 @@ export function StakeholdersPage() {
 
   const resetForm = () => {
     setForm({
-      name: '', phone: '', email: '', role: '', lgaId: '',
-      wardId: '', affiliation: '', influenceLevel: 'medium',
-      conversionStatus: 'untouched', notes: '',
+      name: '',
+      phone: '',
+      email: '',
+      role: '',
+      lgaId: '',
+      wardId: '',
+      affiliation: '',
+      influenceLevel: 'medium',
+      conversionStatus: 'untouched',
+      notes: '',
     });
     setEditingId(null);
   };
 
   const handleSubmit = () => {
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: form as UpdateStakeholderPayload }, {
-        onSuccess: close,
-      });
+      updateMutation.mutate(
+        { id: editingId, data: form as UpdateStakeholderPayload },
+        {
+          onSuccess: close,
+        }
+      );
     } else {
       createMutation.mutate(form, { onSuccess: close });
     }
@@ -94,9 +145,14 @@ export function StakeholdersPage() {
   return (
     <Stack gap="lg">
       <Group justify="space-between">
-        <Title order={3} style={{ color: ink }}>Stakeholder Management</Title>
+        <Title order={3} style={{ color: ink }}>
+          Stakeholder Management
+        </Title>
         <Button
-          onClick={() => { resetForm(); open(); }}
+          onClick={() => {
+            resetForm();
+            open();
+          }}
           style={{ background: apmBlue }}
         >
           Add Stakeholder
@@ -106,7 +162,10 @@ export function StakeholdersPage() {
       <TextInput
         placeholder="Search stakeholders..."
         value={search}
-        onChange={(e) => { setSearch(e.currentTarget.value); setPage(1); }}
+        onChange={(e) => {
+          setSearch(e.currentTarget.value);
+          setPage(1);
+        }}
         style={{ maxWidth: 400 }}
       />
 
@@ -132,19 +191,33 @@ export function StakeholdersPage() {
                   <Table.Td style={{ color: muted }}>{s.phone ?? '—'}</Table.Td>
                   <Table.Td>{s.role ? s.role.replace(/-/g, ' ') : '—'}</Table.Td>
                   <Table.Td>
-                    <Badge color={s.affiliation === 'APM' ? 'green' : s.affiliation === 'PDP' ? 'blue' : 'gray'}>
+                    <Badge
+                      color={
+                        s.affiliation === 'APM'
+                          ? 'green'
+                          : s.affiliation === 'PDP'
+                            ? 'blue'
+                            : 'gray'
+                      }
+                    >
                       {s.affiliation ?? '—'}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={s.influenceLevel === 'high' ? 'red' : s.influenceLevel === 'medium' ? 'yellow' : 'gray'}>
+                    <Badge
+                      color={
+                        s.influenceLevel === 'high'
+                          ? 'red'
+                          : s.influenceLevel === 'medium'
+                            ? 'yellow'
+                            : 'gray'
+                      }
+                    >
                       {s.influenceLevel}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={statusColor(s.conversionStatus)}>
-                      {s.conversionStatus}
-                    </Badge>
+                    <Badge color={statusColor(s.conversionStatus)}>{s.conversionStatus}</Badge>
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -176,29 +249,69 @@ export function StakeholdersPage() {
         size="lg"
       >
         <Stack gap="sm">
-          <TextInput label="Name" required value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.currentTarget.value })} />
-          <TextInput label="Phone" value={form.phone ?? ''}
-            onChange={(e) => setForm({ ...form, phone: e.currentTarget.value })} />
-          <TextInput label="Email" value={form.email ?? ''}
-            onChange={(e) => setForm({ ...form, email: e.currentTarget.value })} />
-          <Select label="Role" data={roleOptions} value={form.role || null}
-            onChange={(v) => setForm({ ...form, role: v ?? '' })} clearable />
-          <Select label="LGA" data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
+          <TextInput
+            label="Name"
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Phone"
+            value={form.phone ?? ''}
+            onChange={(e) => setForm({ ...form, phone: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Email"
+            value={form.email ?? ''}
+            onChange={(e) => setForm({ ...form, email: e.currentTarget.value })}
+          />
+          <Select
+            label="Role"
+            data={roleOptions}
+            value={form.role || null}
+            onChange={(v) => setForm({ ...form, role: v ?? '' })}
+            clearable
+          />
+          <Select
+            label="LGA"
+            data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
             value={form.lgaId || null}
-            onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })} searchable required />
-          <Select label="Ward" data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
+            onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })}
+            searchable
+            required
+          />
+          <Select
+            label="Ward"
+            data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
             value={form.wardId || null}
-            onChange={(v) => setForm({ ...form, wardId: v ?? '' })} clearable
-            disabled={!form.lgaId} />
-          <Select label="Affiliation" data={affiliationOptions} value={form.affiliation || null}
-            onChange={(v) => setForm({ ...form, affiliation: v ?? '' })} clearable />
-          <Select label="Influence Level" data={influenceOptions} value={form.influenceLevel}
-            onChange={(v) => setForm({ ...form, influenceLevel: v ?? 'medium' })} />
-          <Select label="Conversion Status" data={statusOptions} value={form.conversionStatus}
-            onChange={(v) => setForm({ ...form, conversionStatus: v ?? 'untouched' })} />
-          <Textarea label="Notes" value={form.notes ?? ''}
-            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })} />
+            onChange={(v) => setForm({ ...form, wardId: v ?? '' })}
+            clearable
+            disabled={!form.lgaId}
+          />
+          <Select
+            label="Affiliation"
+            data={affiliationOptions}
+            value={form.affiliation || null}
+            onChange={(v) => setForm({ ...form, affiliation: v ?? '' })}
+            clearable
+          />
+          <Select
+            label="Influence Level"
+            data={influenceOptions}
+            value={form.influenceLevel}
+            onChange={(v) => setForm({ ...form, influenceLevel: v ?? 'medium' })}
+          />
+          <Select
+            label="Conversion Status"
+            data={statusOptions}
+            value={form.conversionStatus}
+            onChange={(v) => setForm({ ...form, conversionStatus: v ?? 'untouched' })}
+          />
+          <Textarea
+            label="Notes"
+            value={form.notes ?? ''}
+            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })}
+          />
           <Button fullWidth onClick={handleSubmit} style={{ background: apmBlue }} mt="sm">
             {editingId ? 'Update' : 'Create'} Stakeholder
           </Button>

@@ -14,15 +14,9 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Clock4, HandCoins, KeyRound, ShieldCheck, UserRound, ScrollText } from 'lucide-react';
 import { useState } from 'react';
-import {
-  Clock4,
-  HandCoins,
-  KeyRound,
-  ShieldCheck,
-  UserRound,
-  ScrollText,
-} from 'lucide-react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import {
   createRoleRequest,
   getMe,
@@ -32,22 +26,31 @@ import {
   listMyRoleRequests,
   listRoleCatalog,
 } from './api';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function timeAgo(value: string | null | undefined): string {
-  if (!value) {return '—';}
+  if (!value) {
+    return '—';
+  }
   const then = new Date(value).getTime();
   const diff = Date.now() - then;
   const m = Math.floor(diff / 60000);
-  if (m < 1) {return 'just now';}
-  if (m < 60) {return `${m}m ago`;}
+  if (m < 1) {
+    return 'just now';
+  }
+  if (m < 60) {
+    return `${m}m ago`;
+  }
   const h = Math.floor(m / 60);
-  if (h < 24) {return `${h}h ago`;}
+  if (h < 24) {
+    return `${h}h ago`;
+  }
   return `${Math.floor(h / 24)}d ago`;
 }
 
 function formatDt(value: string | null | undefined): string {
-  if (!value) {return '—';}
+  if (!value) {
+    return '—';
+  }
   return new Date(value).toLocaleString();
 }
 
@@ -86,7 +89,7 @@ export function UserInsightsPanel() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(e),
-        }),
+      }),
   });
 
   const profile = me.data;
@@ -107,10 +110,18 @@ export function UserInsightsPanel() {
           <Box>
             <CardHeading icon={<Clock4 size={16} />} label="Session" />
             <Stack gap={2}>
-              <Text size="sm">Last login: <b>{formatDt(activity.data?.lastLoginAt)}</b></Text>
-              <Text size="sm" c="dimmed">({timeAgo(activity.data?.lastLoginAt)})</Text>
-              <Text size="sm">Logins: <b>{activity.data?.loginCount ?? 0}</b></Text>
-              <Text size="sm">Refreshes: <b>{activity.data?.refreshCount ?? 0}</b></Text>
+              <Text size="sm">
+                Last login: <b>{formatDt(activity.data?.lastLoginAt)}</b>
+              </Text>
+              <Text size="sm" c="dimmed">
+                ({timeAgo(activity.data?.lastLoginAt)})
+              </Text>
+              <Text size="sm">
+                Logins: <b>{activity.data?.loginCount ?? 0}</b>
+              </Text>
+              <Text size="sm">
+                Refreshes: <b>{activity.data?.refreshCount ?? 0}</b>
+              </Text>
             </Stack>
           </Box>
         </Grid.Col>
@@ -119,7 +130,9 @@ export function UserInsightsPanel() {
           <Box>
             <CardHeading icon={<UserRound size={16} />} label="User" />
             <Stack gap={2}>
-              <Text size="sm" fw={600}>{profile?.username}</Text>
+              <Text size="sm" fw={600}>
+                {profile?.username}
+              </Text>
               <Group gap={4}>
                 {currentRoles.map((r) => (
                   <Badge key={r} size="sm" variant="light" color="green">
@@ -148,12 +161,17 @@ export function UserInsightsPanel() {
           <Box>
             <CardHeading icon={<HandCoins size={16} />} label="Config" />
             <Stack gap={2}>
-              <Text size="sm">POS access: <b>{config.data?.allowPos ? 'Yes' : 'No'}</b></Text>
-              <Text size="sm">A4 print: <b>{config.data?.allowA4Print ? 'Yes' : 'No'}</b></Text>
-              <Text size="sm">Store: <b>{config.data?.storeId || 'default'}</b></Text>
               <Text size="sm">
-                Location:{' '}
-                <b>{config.data?.stockLocation?.name ?? '—'}</b>
+                POS access: <b>{config.data?.allowPos ? 'Yes' : 'No'}</b>
+              </Text>
+              <Text size="sm">
+                A4 print: <b>{config.data?.allowA4Print ? 'Yes' : 'No'}</b>
+              </Text>
+              <Text size="sm">
+                Store: <b>{config.data?.storeId || 'default'}</b>
+              </Text>
+              <Text size="sm">
+                Location: <b>{config.data?.stockLocation?.name ?? '—'}</b>
               </Text>
             </Stack>
           </Box>

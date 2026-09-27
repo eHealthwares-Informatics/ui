@@ -65,9 +65,7 @@ test('re-syncs the request to the external system (UC-40 re-sync)', async ({ pag
 
   await page.getByRole('button', { name: 'Re-sync' }).click();
   await expect(page.getByText('Request synced successfully')).toBeVisible();
-  expect(
-    posts.some((post) => post.url.endsWith('/requests/req-1/sync')),
-  ).toBe(true);
+  expect(posts.some((post) => post.url.endsWith('/requests/req-1/sync'))).toBe(true);
 });
 
 test('appends a note to the request timeline (UC-36 add note)', async ({ page }) => {
@@ -101,8 +99,8 @@ test('transitions a request and records it (UC-35 status transition)', async ({ 
     requests: [request],
     onRequest: (method, url, body) => {
       if (method === 'POST') {
-      posts.push({ method, url, body });
-    }
+        posts.push({ method, url, body });
+      }
     },
   });
   await page.goto('/emr/requests/req-1');

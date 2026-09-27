@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { Alert, Anchor, Button, Group, PinInput, Stack, Text, TextInput } from '@mantine/core';
 import { ArrowRight, Phone, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { useAuthStore } from './auth-store';
-import { green, ink, muted } from './layout';
 import { generateGuestPhone } from './chatbot-service';
+import { green, ink, muted } from './layout';
 
 export interface ChatPhoneGateResult {
   phone: string;

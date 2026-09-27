@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import {
   Accordion,
   ActionIcon,
@@ -14,11 +13,12 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useApiProvider } from '@/context/module-context';
-import { Field, Option } from '@/features/rxsoft/types';
 import { DataPageForm } from '@/features/components/page/data-page-form';
+import { Field, Option } from '@/features/rxsoft/types';
 import { AsyncSelectField } from './async-field';
 import { FieldGroup } from './FieldGroup';
 
@@ -29,7 +29,12 @@ type AccordionArrayProps = {
   onChange?: (items: any[]) => void;
 };
 
-export function AccordionArrayField({ field, items, parentFormState, onChange }: AccordionArrayProps) {
+export function AccordionArrayField({
+  field,
+  items,
+  parentFormState,
+  onChange,
+}: AccordionArrayProps) {
   const [editItem, setEditItem] = useState<{ item: any; index: number } | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -40,14 +45,12 @@ export function AccordionArrayField({ field, items, parentFormState, onChange }:
     }
     return {
       ...field.itemEditConfig,
-      createFieldGroups: (field.itemEditConfig.createFieldGroups ?? []).map(
-        (group: any) => ({
-          ...group,
-          fields: (group.fields ?? []).map((f: any) =>
-            f.name === field.relationshipId ? { ...f, type: 'hidden' as const } : f
-          ),
-        })
-      ),
+      createFieldGroups: (field.itemEditConfig.createFieldGroups ?? []).map((group: any) => ({
+        ...group,
+        fields: (group.fields ?? []).map((f: any) =>
+          f.name === field.relationshipId ? { ...f, type: 'hidden' as const } : f
+        ),
+      })),
       defaultState: {
         ...(field.itemEditConfig.defaultState ?? {}),
         [field.relationshipId]: parentId,
@@ -56,7 +59,9 @@ export function AccordionArrayField({ field, items, parentFormState, onChange }:
   }, [field.itemEditConfig, field.relationshipId, parentId]);
 
   const childInitialData = useMemo(() => {
-    if (!field.relationshipId) return undefined;
+    if (!field.relationshipId) {
+      return undefined;
+    }
     return { [field.relationshipId]: parentId };
   }, [field.relationshipId, parentId]);
 
@@ -82,13 +87,15 @@ export function AccordionArrayField({ field, items, parentFormState, onChange }:
   return (
     <Box>
       {items.length === 0 ? (
-        <Text size="sm" c="dimmed">No items</Text>
+        <Text size="sm" c="dimmed">
+          No items
+        </Text>
       ) : (
         <Accordion>
           {items.map((item, itemIndex) => {
             const label = field.itemRender
               ? field.itemRender(item)
-              : item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex);
+              : (item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex));
             return (
               <Accordion.Item key={item.id ?? itemIndex} value={String(item.id ?? itemIndex)}>
                 <Accordion.Control>
@@ -120,7 +127,12 @@ export function AccordionArrayField({ field, items, parentFormState, onChange }:
                     {Object.entries(item)
                       .filter(
                         ([key]) =>
-                          !['id', '_id', field.itemLabelKey ?? 'name', field.relationshipId].includes(key),
+                          ![
+                            'id',
+                            '_id',
+                            field.itemLabelKey ?? 'name',
+                            field.relationshipId,
+                          ].includes(key)
                       )
                       .map(([key, val]) => (
                         <Grid.Col key={key} span={6}>
@@ -237,13 +249,15 @@ export function JsonAccordionArrayField({ field, items, onChange }: AccordionArr
   return (
     <Box>
       {items.length === 0 ? (
-        <Text size="sm" c="dimmed">No items</Text>
+        <Text size="sm" c="dimmed">
+          No items
+        </Text>
       ) : (
         <Accordion>
           {items.map((item, itemIndex) => {
             const label = field.itemRender
               ? field.itemRender(item)
-              : item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex);
+              : (item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex));
             return (
               <Accordion.Item key={item.id ?? itemIndex} value={String(item.id ?? itemIndex)}>
                 <Accordion.Control>
@@ -270,10 +284,7 @@ export function JsonAccordionArrayField({ field, items, onChange }: AccordionArr
                 <Accordion.Panel>
                   <Stack gap={4}>
                     {Object.entries(item)
-                      .filter(
-                        ([key]) =>
-                          !['id', '_id', field.itemLabelKey ?? 'name'].includes(key),
-                      )
+                      .filter(([key]) => !['id', '_id', field.itemLabelKey ?? 'name'].includes(key))
                       .map(([key, val]) => (
                         <Group key={key} gap="xs" wrap="nowrap">
                           <Text size="xs" c="dimmed" style={{ width: 120 }}>
@@ -380,9 +391,7 @@ function JsonItemEditor({
   const fieldGroups = config.createFieldGroups ?? [];
 
   const handleSave = () => {
-    const payload = config.buildCreatePayload
-      ? config.buildCreatePayload(formState)
-      : formState;
+    const payload = config.buildCreatePayload ? config.buildCreatePayload(formState) : formState;
     onSaved(payload);
   };
 
@@ -421,7 +430,9 @@ export function AccordionSingleField({ field, value, onChange }: AccordionSingle
   const entityQuery = useQuery({
     queryKey: [endpoint, valueId],
     queryFn: async () => {
-      if (!valueId || !endpoint) {return null;}
+      if (!valueId || !endpoint) {
+        return null;
+      }
       const response = await apiProvider!.get(`${endpoint}/${valueId}`);
       return (response.data?.data ?? response.data) as Record<string, unknown>;
     },
@@ -436,7 +447,7 @@ export function AccordionSingleField({ field, value, onChange }: AccordionSingle
   };
 
   const label = valueId
-    ? (entityQuery.data?.[labelKey] as string) ?? valueLabel ?? valueId
+    ? ((entityQuery.data?.[labelKey] as string) ?? valueLabel ?? valueId)
     : `Select ${field.label}`;
 
   return (
@@ -468,7 +479,14 @@ export function AccordionSingleField({ field, value, onChange }: AccordionSingle
           <Stack gap="md" pt="md">
             <AsyncSelectField
               field={field}
-              value={!valueId ? null : { value: valueId, label: entityQuery.data?.[labelKey] as string ?? valueLabel ?? valueId }}
+              value={
+                !valueId
+                  ? null
+                  : {
+                      value: valueId,
+                      label: (entityQuery.data?.[labelKey] as string) ?? valueLabel ?? valueId,
+                    }
+              }
               onChange={(option: Option | null) => {
                 onChange?.(option?.value ?? null);
               }}

@@ -33,9 +33,9 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { lisApi } from '@/lib/lis-api';
 import { buildReportHtml, printReportHtml, type PrintReportData } from './report-print';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const routeApi = getRouteApi('/_authenticated/lis/orders/$orderId/report');
 
@@ -214,7 +214,9 @@ export function OrderReportContent({
 
   /* ---------- Init form values when order/results load ---------- */
   useEffect(() => {
-    if (!order?.items) return;
+    if (!order?.items) {
+      return;
+    }
     const map: Record<string, { value: string; notes: string; referenceRangeId?: string }> = {};
     for (const item of order.items) {
       const result = allResults.find((r) => r.orderItemId === item.id);
@@ -236,7 +238,9 @@ export function OrderReportContent({
   /* ---------- Helpers ---------- */
   const getRangesForItem = (item: OrderItem) => {
     const testId = item.testDefinitionId ?? item.testDefinition?.id;
-    if (!testId) return [];
+    if (!testId) {
+      return [];
+    }
     return allRanges.filter((r) => r.testId === testId);
   };
 
@@ -266,7 +270,10 @@ export function OrderReportContent({
     ranges: RefRange[],
     vals: Record<string, { value: string; notes: string; referenceRangeId?: string }>
   ): PrintReportData => {
-    const flagFor = (value: string, range: RefRange | undefined): PrintReportData['groups'][number]['rows'][number]['flag'] => {
+    const flagFor = (
+      value: string,
+      range: RefRange | undefined
+    ): PrintReportData['groups'][number]['rows'][number]['flag'] => {
       const v = Number(value);
       if (!range || value.trim() === '' || Number.isNaN(v)) {
         return '';
@@ -290,7 +297,8 @@ export function OrderReportContent({
       const result = results.find((r) => r.orderItemId === item.id);
       const val = vals[item.id] ?? {};
       const chosenRange =
-        itemRanges.find((r) => r.id === val.referenceRangeId) ?? pickDefaultRange(itemRanges, order);
+        itemRanges.find((r) => r.id === val.referenceRangeId) ??
+        pickDefaultRange(itemRanges, order);
       const value = val.value ?? result?.value ?? item.resultValue ?? '';
       const title = `${td?.name ?? 'Test'}:`;
       const group = groups.find((g) => g.title === title) ?? { title, rows: [] };
@@ -344,7 +352,7 @@ export function OrderReportContent({
         requestDate: fmt(order.requestedDate),
         reportDate: fmt(order.completedDate ?? order.updatedAt),
         reportUpdatedDate: 'N/A',
-        reportType: order.status === 'COMPLETED' ? 'FINAL REPORT' : order.status ?? '—',
+        reportType: order.status === 'COMPLETED' ? 'FINAL REPORT' : (order.status ?? '—'),
         priority: order.priority?.name ?? 'ROUTINE',
         specimenType: spec?.sampleTypeName ?? '—',
         comments: order.clinicalNotes ?? order.notes ?? '—',

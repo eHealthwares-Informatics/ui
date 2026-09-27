@@ -22,12 +22,12 @@ export function uomEffectiveFactor(uom?: UomFactorInfo | null): number {
 export function uomToBaseQuantity(
   quantity: number,
   fromUom?: UomFactorInfo | null,
-  baseUom?: UomFactorInfo | null,
+  baseUom?: UomFactorInfo | null
 ): number {
   if (!fromUom || !baseUom || !Number.isFinite(quantity)) {
     return quantity;
   }
   return Number(
-    ((quantity * uomEffectiveFactor(fromUom)) / uomEffectiveFactor(baseUom)).toFixed(4),
+    ((quantity * uomEffectiveFactor(fromUom)) / uomEffectiveFactor(baseUom)).toFixed(4)
   );
 }

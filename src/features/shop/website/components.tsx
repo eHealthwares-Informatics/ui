@@ -22,7 +22,6 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
 import {
   Baby,
   BadgeCheck,
@@ -45,14 +44,12 @@ import {
   Truck,
   User,
 } from 'lucide-react';
-import { useChatbotStore } from './chatbot-store';
-import { useCartStore } from './cart-store';
-import {
-  toHL7Prescription,
-  QUESTIONNAIRE_CODES,
-} from './hl7-prescription';
+import { useState } from 'react';
 import productPlaceholder from '../sample_images/generic_product_image.png';
 import { websiteApi } from './api';
+import { useCartStore } from './cart-store';
+import { useChatbotStore } from './chatbot-store';
+import { toHL7Prescription, QUESTIONNAIRE_CODES } from './hl7-prescription';
 import type { WebsiteProduct, HealthConcernView, TestimonialView } from './types';
 
 export const green = '#16A34A';
@@ -277,7 +274,11 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
   const rxRequired = product.isPrescriptionRequired ?? gp?.isPrescriptionRequired ?? false;
 
   function addToCart() {
-    addItem(product.id, 1, { name: product.name, unitPrice: product.unitPrice ?? undefined, product });
+    addItem(product.id, 1, {
+      name: product.name,
+      unitPrice: product.unitPrice ?? undefined,
+      product,
+    });
     const count = useCartStore.getState().totalItems;
     notifications.show({
       position: 'bottom-right',
@@ -308,7 +309,13 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
           position: 'relative',
         }}
       >
-        <Image src={product.mediumImageUrl || product.imageUrl || productPlaceholder} alt={product.name} h={190} fit="contain" p="lg" />
+        <Image
+          src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
+          alt={product.name}
+          h={190}
+          fit="contain"
+          p="lg"
+        />
       </Card.Section>
       <Stack mt="md" gap="sm">
         <Box>
@@ -328,11 +335,23 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
         )}
         <Group gap={6}>
           {rxRequired ? (
-            <Badge size="sm" radius="xl" variant="light" color="orange" leftSection={<Pill size={12} />}>
+            <Badge
+              size="sm"
+              radius="xl"
+              variant="light"
+              color="orange"
+              leftSection={<Pill size={12} />}
+            >
               Prescription required
             </Badge>
           ) : (
-            <Badge size="sm" radius="xl" variant="light" color="green" leftSection={<BadgeCheck size={12} />}>
+            <Badge
+              size="sm"
+              radius="xl"
+              variant="light"
+              color="green"
+              leftSection={<BadgeCheck size={12} />}
+            >
               No prescription needed
             </Badge>
           )}
@@ -382,7 +401,10 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 e.stopPropagation();
                 const hl7 = toHL7Prescription(
                   { product, quantity: 1 },
-                  { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN, customerName: product.name },
+                  {
+                    questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN,
+                    customerName: product.name,
+                  }
                 );
                 useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
               }}
@@ -403,7 +425,10 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 e.stopPropagation();
                 const hl7 = toHL7Prescription(
                   { product, quantity: 1 },
-                  { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                  {
+                    questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
+                    customerName: product.name,
+                  }
                 );
                 useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
               }}

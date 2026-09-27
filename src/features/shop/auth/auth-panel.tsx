@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Box,
   Button,
@@ -13,17 +12,11 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  KeyRound,
-  Lock,
-  Mail,
-  Phone,
-  User,
-  UserPlus,
-} from 'lucide-react';
+import { KeyRound, Lock, Mail, Phone, User, UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useAuthStore } from '../website/auth-store';
 import { green, ink, muted, line, buttonStyles } from '../website/components';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export type AuthTab = 'signin' | 'register';
 
@@ -76,11 +69,7 @@ interface AuthPanelProps {
  * (password first, OTP as automatic fallback once a code has been sent).
  * Social sign-in covers Google and Facebook; tokens are verified server-side.
  */
-export function AuthPanel({
-  variant,
-  initialTab = 'signin',
-  onSuccess,
-}: AuthPanelProps) {
+export function AuthPanel({ variant, initialTab = 'signin', onSuccess }: AuthPanelProps) {
   const navigate = useNavigate();
   const [tab, setTab] = useState<AuthTab>(initialTab);
 
@@ -212,7 +201,9 @@ export function AuthPanel({
     try {
       const { googleLogin } = await import('@/lib/social-auth');
       const accessToken = await googleLogin();
-      if (!accessToken) return;
+      if (!accessToken) {
+        return;
+      }
       setLoginLoading(true);
       await authGoogle(accessToken);
       finish();
@@ -230,7 +221,9 @@ export function AuthPanel({
     try {
       const { facebookLogin } = await import('@/lib/social-auth');
       const accessToken = await facebookLogin();
-      if (!accessToken) return;
+      if (!accessToken) {
+        return;
+      }
       setLoginLoading(true);
       await authFacebook(accessToken);
       finish();

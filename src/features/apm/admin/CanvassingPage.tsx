@@ -1,12 +1,31 @@
-import { useState } from 'react';
 import {
-  Box, Card, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, TextInput, Select, Textarea, Tabs, Grid,
+  Box,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  TextInput,
+  Select,
+  Textarea,
+  Tabs,
+  Grid,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 import {
-  useCanvassingStats, useCanvassingSessions, useCreateCanvassingSession,
-  useUpdateCanvassingSession, useAllVisitStats, useLgas, useWards,
+  useCanvassingStats,
+  useCanvassingSessions,
+  useCreateCanvassingSession,
+  useUpdateCanvassingSession,
+  useAllVisitStats,
+  useLgas,
+  useWards,
 } from '../website/admin-hooks';
 import { apmBlue, ink, muted } from '../website/layout';
 
@@ -17,7 +36,15 @@ export function CanvassingPage() {
   const { data: lgas } = useLgas();
   const createSession = useCreateCanvassingSession();
   const [opened, { open, close }] = useDisclosure(false);
-  const [form, setForm] = useState({ title: '', lgaId: '', wardId: '', teamLead: '', teamSize: 1, scheduledDate: '', notes: '' });
+  const [form, setForm] = useState({
+    title: '',
+    lgaId: '',
+    wardId: '',
+    teamLead: '',
+    teamSize: 1,
+    scheduledDate: '',
+    notes: '',
+  });
   const wardsQuery = useWards(form.lgaId);
 
   const statCards = [
@@ -30,22 +57,42 @@ export function CanvassingPage() {
   ];
 
   const handleCreate = () => {
-    createSession.mutate({
-      title: form.title,
-      lgaId: form.lgaId,
-      wardId: form.wardId || undefined,
-      teamLead: form.teamLead || undefined,
-      teamSize: form.teamSize,
-      scheduledDate: form.scheduledDate || undefined,
-      notes: form.notes || undefined,
-    }, { onSuccess: () => { close(); setForm({ title: '', lgaId: '', wardId: '', teamLead: '', teamSize: 1, scheduledDate: '', notes: '' }); } });
+    createSession.mutate(
+      {
+        title: form.title,
+        lgaId: form.lgaId,
+        wardId: form.wardId || undefined,
+        teamLead: form.teamLead || undefined,
+        teamSize: form.teamSize,
+        scheduledDate: form.scheduledDate || undefined,
+        notes: form.notes || undefined,
+      },
+      {
+        onSuccess: () => {
+          close();
+          setForm({
+            title: '',
+            lgaId: '',
+            wardId: '',
+            teamLead: '',
+            teamSize: 1,
+            scheduledDate: '',
+            notes: '',
+          });
+        },
+      }
+    );
   };
 
   return (
     <Stack gap="lg">
       <Group justify="space-between">
-        <Title order={3} style={{ color: ink }}>Canvassing Operations</Title>
-        <Button onClick={open} style={{ background: apmBlue }}>New Session</Button>
+        <Title order={3} style={{ color: ink }}>
+          Canvassing Operations
+        </Title>
+        <Button onClick={open} style={{ background: apmBlue }}>
+          New Session
+        </Button>
       </Group>
 
       <Grid>
@@ -53,8 +100,13 @@ export function CanvassingPage() {
           <Grid.Col key={s.label} span={{ base: 6, sm: 4, md: 2 }}>
             <Card padding="md" radius="md" withBorder>
               <Stack gap={2} align="center">
-                <Text size="xs" style={{ color: muted }}>{s.label}</Text>
-                <Text fw={800} style={{ fontSize: '1.5rem', color: s.color, lineHeight: 1.2 }}>{s.value}{s.label === 'Support Rate' ? '%' : ''}</Text>
+                <Text size="xs" style={{ color: muted }}>
+                  {s.label}
+                </Text>
+                <Text fw={800} style={{ fontSize: '1.5rem', color: s.color, lineHeight: 1.2 }}>
+                  {s.value}
+                  {s.label === 'Support Rate' ? '%' : ''}
+                </Text>
               </Stack>
             </Card>
           </Grid.Col>
@@ -92,7 +144,15 @@ export function CanvassingPage() {
                         <Table.Tr key={s.id}>
                           <Table.Td fw={600}>{s.title}</Table.Td>
                           <Table.Td>
-                            <Badge color={s.status === 'completed' ? 'green' : s.status === 'in-progress' ? 'yellow' : 'gray'}>
+                            <Badge
+                              color={
+                                s.status === 'completed'
+                                  ? 'green'
+                                  : s.status === 'in-progress'
+                                    ? 'yellow'
+                                    : 'gray'
+                              }
+                            >
                               {s.status}
                             </Badge>
                           </Table.Td>
@@ -105,7 +165,9 @@ export function CanvassingPage() {
                       ))}
                     {sessionsData?.items?.length === 0 && (
                       <Table.Tr>
-                        <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>No sessions yet</Table.Td>
+                        <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>
+                          No sessions yet
+                        </Table.Td>
                       </Table.Tr>
                     )}
                   </Table.Tbody>
@@ -118,16 +180,52 @@ export function CanvassingPage() {
 
       <Modal opened={opened} onClose={close} title="New Canvassing Session" size="md">
         <Stack gap="sm">
-          <TextInput label="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.currentTarget.value })} />
-          <Select label="LGA" data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
-            value={form.lgaId || null} onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })} searchable required />
-          <Select label="Ward" data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
-            value={form.wardId || null} onChange={(v) => setForm({ ...form, wardId: v ?? '' })} clearable />
-          <TextInput label="Team Lead" value={form.teamLead} onChange={(e) => setForm({ ...form, teamLead: e.currentTarget.value })} />
-          <TextInput label="Team Size" type="number" value={form.teamSize} onChange={(e) => setForm({ ...form, teamSize: parseInt(e.currentTarget.value) || 1 })} />
-          <TextInput label="Scheduled Date" type="datetime-local" value={form.scheduledDate} onChange={(e) => setForm({ ...form, scheduledDate: e.currentTarget.value })} />
-          <Textarea label="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })} />
-          <Button fullWidth onClick={handleCreate} style={{ background: apmBlue }} mt="sm">Create Session</Button>
+          <TextInput
+            label="Title"
+            required
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.currentTarget.value })}
+          />
+          <Select
+            label="LGA"
+            data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
+            value={form.lgaId || null}
+            onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })}
+            searchable
+            required
+          />
+          <Select
+            label="Ward"
+            data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
+            value={form.wardId || null}
+            onChange={(v) => setForm({ ...form, wardId: v ?? '' })}
+            clearable
+          />
+          <TextInput
+            label="Team Lead"
+            value={form.teamLead}
+            onChange={(e) => setForm({ ...form, teamLead: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Team Size"
+            type="number"
+            value={form.teamSize}
+            onChange={(e) => setForm({ ...form, teamSize: parseInt(e.currentTarget.value) || 1 })}
+          />
+          <TextInput
+            label="Scheduled Date"
+            type="datetime-local"
+            value={form.scheduledDate}
+            onChange={(e) => setForm({ ...form, scheduledDate: e.currentTarget.value })}
+          />
+          <Textarea
+            label="Notes"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })}
+          />
+          <Button fullWidth onClick={handleCreate} style={{ background: apmBlue }} mt="sm">
+            Create Session
+          </Button>
         </Stack>
       </Modal>
     </Stack>

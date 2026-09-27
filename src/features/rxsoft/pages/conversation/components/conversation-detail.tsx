@@ -7,9 +7,17 @@ import { conversationApi } from '@/lib/conversation-api';
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <Group gap="sm" justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', padding: '8px 0' }}>
-      <Text size="sm" c="dimmed">{label}</Text>
-      <Text size="sm" fw={500} style={{ textAlign: 'right' }}>{value}</Text>
+    <Group
+      gap="sm"
+      justify="space-between"
+      style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', padding: '8px 0' }}
+    >
+      <Text size="sm" c="dimmed">
+        {label}
+      </Text>
+      <Text size="sm" fw={500} style={{ textAlign: 'right' }}>
+        {value}
+      </Text>
     </Group>
   );
 }
@@ -29,11 +37,16 @@ export function RxConversationDetailsPage({ conversationId }: { conversationId: 
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'blue';
-      case 'COMPLETED': return 'green';
-      case 'STOPPED': return 'orange';
-      case 'CANCELLED': return 'red';
-      default: return 'gray';
+      case 'ACTIVE':
+        return 'blue';
+      case 'COMPLETED':
+        return 'green';
+      case 'STOPPED':
+        return 'orange';
+      case 'CANCELLED':
+        return 'red';
+      default:
+        return 'gray';
     }
   };
 
@@ -42,12 +55,15 @@ export function RxConversationDetailsPage({ conversationId }: { conversationId: 
       title="Conversation Details"
       breadcrumbs={[
         { label: 'Conversations', href: '/conversation' },
-        { label: conversationId.slice(0, 8) + '…' },
+        { label: `${conversationId.slice(0, 8)}…` },
       ]}
       onBack={() => navigate({ to: '/conversation' })}
       actions={
         <Group>
-          <Button variant="outline" onClick={() => navigate({ to: `/conversation/${conversationId}/edit` })}>
+          <Button
+            variant="outline"
+            onClick={() => navigate({ to: `/conversation/${conversationId}/edit` })}
+          >
             Edit
           </Button>
           <Button variant="outline" onClick={() => navigate({ to: '/conversation' })}>
@@ -56,44 +72,124 @@ export function RxConversationDetailsPage({ conversationId }: { conversationId: 
         </Group>
       }
     >
-      {query.isLoading && <Text size="sm" c="dimmed">Loading conversation...</Text>}
-      {query.isError && <Text size="sm" c="red">Failed to load conversation.</Text>}
+      {query.isLoading && (
+        <Text size="sm" c="dimmed">
+          Loading conversation...
+        </Text>
+      )}
+      {query.isError && (
+        <Text size="sm" c="red">
+          Failed to load conversation.
+        </Text>
+      )}
       {!query.isLoading && !query.isError && conversation && (
         <Stack gap="md">
           <Card withBorder p="md">
-            <Text fw={600} mb="xs">Overview</Text>
+            <Text fw={600} mb="xs">
+              Overview
+            </Text>
             <Stack gap={0}>
-              <DetailRow label="ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{conversationId}</Text>} />
+              <DetailRow
+                label="ID"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {conversationId}
+                  </Text>
+                }
+              />
               <DetailRow
                 label="Status"
-                value={<Badge color={statusColor(String(conversation.status ?? ''))} size="sm" variant="light">{String(conversation.status ?? '-')}</Badge>}
+                value={
+                  <Badge
+                    color={statusColor(String(conversation.status ?? ''))}
+                    size="sm"
+                    variant="light"
+                  >
+                    {String(conversation.status ?? '-')}
+                  </Badge>
+                }
               />
               <DetailRow label="State" value={String(conversation.state ?? '-')} />
-              <DetailRow label="Started At" value={conversation.startedAt ? new Date(conversation.startedAt as string).toLocaleString() : '-'} />
-              <DetailRow label="Ended At" value={conversation.endedAt ? new Date(conversation.endedAt as string).toLocaleString() : '-'} />
+              <DetailRow
+                label="Started At"
+                value={
+                  conversation.startedAt
+                    ? new Date(conversation.startedAt as string).toLocaleString()
+                    : '-'
+                }
+              />
+              <DetailRow
+                label="Ended At"
+                value={
+                  conversation.endedAt
+                    ? new Date(conversation.endedAt as string).toLocaleString()
+                    : '-'
+                }
+              />
             </Stack>
           </Card>
 
           <Card withBorder p="md">
-            <Text fw={600} mb="xs">Questionnaire</Text>
+            <Text fw={600} mb="xs">
+              Questionnaire
+            </Text>
             <Stack gap={0}>
-              <DetailRow label="Questionnaire ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{String(conversation.questionnaireId ?? '-')}</Text>} />
-              <DetailRow label="Channel ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{String(conversation.channelId ?? '-')}</Text>} />
-              <DetailRow label="Current Question ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{String(conversation.currentQuestionId ?? '-')}</Text>} />
+              <DetailRow
+                label="Questionnaire ID"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {String(conversation.questionnaireId ?? '-')}
+                  </Text>
+                }
+              />
+              <DetailRow
+                label="Channel ID"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {String(conversation.channelId ?? '-')}
+                  </Text>
+                }
+              />
+              <DetailRow
+                label="Current Question ID"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {String(conversation.currentQuestionId ?? '-')}
+                  </Text>
+                }
+              />
             </Stack>
           </Card>
 
           <Card withBorder p="md">
-            <Text fw={600} mb="xs">Participants</Text>
+            <Text fw={600} mb="xs">
+              Participants
+            </Text>
             <Stack gap={0}>
-              <DetailRow label="Host" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{String(conversation.hostParticipantId ?? '-')}</Text>} />
-              <DetailRow label="Bot" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{String(conversation.botParticipantId ?? '-')}</Text>} />
+              <DetailRow
+                label="Host"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {String(conversation.hostParticipantId ?? '-')}
+                  </Text>
+                }
+              />
+              <DetailRow
+                label="Bot"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {String(conversation.botParticipantId ?? '-')}
+                  </Text>
+                }
+              />
             </Stack>
           </Card>
 
           {Boolean(conversation.context) && (
             <Card withBorder p="md">
-              <Text fw={600} mb="xs">Context</Text>
+              <Text fw={600} mb="xs">
+                Context
+              </Text>
               <pre
                 style={{
                   overflowX: 'auto',

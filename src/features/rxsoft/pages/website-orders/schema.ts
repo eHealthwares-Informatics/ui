@@ -7,7 +7,8 @@ export const websiteOrdersColumns: Column[] = [
     key: 'origin',
     label: 'Origin',
     filters: ColumnTypeFilters.STRING,
-    render: (row: any) => (row.origin === 'emr-encounter-request' ? 'EMR Request' : row.origin ?? 'website'),
+    render: (row: any) =>
+      row.origin === 'emr-encounter-request' ? 'EMR Request' : (row.origin ?? 'website'),
   },
   {
     key: 'externalReference',
@@ -19,13 +20,12 @@ export const websiteOrdersColumns: Column[] = [
     label: 'Date',
     dataType: ColumnDataType.DATE,
     filters: ColumnTypeFilters.DATE,
-    render: (row: any) =>
-      row.createdAt ? new Date(row.createdAt).toLocaleString() : '-',
+    render: (row: any) => (row.createdAt ? new Date(row.createdAt).toLocaleString() : '-'),
   },
   {
     key: 'items',
     label: 'Items',
-    render: (row: any) => (row.items?.length ?? 0),
+    render: (row: any) => row.items?.length ?? 0,
   },
   { key: 'totalAmount', label: 'Total', dataType: ColumnDataType.NUMBER },
   {

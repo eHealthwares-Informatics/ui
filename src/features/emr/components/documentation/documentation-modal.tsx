@@ -16,9 +16,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FileText, AlertCircle, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
-import type { FormDefinition } from '../../lib/emr-types';
 import { formatEnum } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
+import type { FormDefinition } from '../../lib/emr-types';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import {
   DynamicFormFields,
@@ -107,16 +107,13 @@ export function DocumentationModal({
       [form.name, form.code, form.category, form.description ?? '']
         .join(' ')
         .toLowerCase()
-        .includes(query),
+        .includes(query)
     );
   }, [accessibleForms, formFilter]);
 
   // Keep the selection inside the filtered set as the user types.
   useEffect(() => {
-    if (
-      filteredForms.length > 0 &&
-      !filteredForms.some((form) => form.id === selectedFormId)
-    ) {
+    if (filteredForms.length > 0 && !filteredForms.some((form) => form.id === selectedFormId)) {
       setSelectedFormId(filteredForms[0].id);
     }
   }, [filteredForms, selectedFormId]);
@@ -168,13 +165,7 @@ export function DocumentationModal({
   });
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title="Create Documentation"
-      size="xl"
-      centered
-    >
+    <Modal opened={opened} onClose={onClose} title="Create Documentation" size="xl" centered>
       {isLoading ? (
         <Group justify="center" py="xl">
           <Loader size="sm" />
@@ -215,9 +206,7 @@ export function DocumentationModal({
                         borderRadius: 8,
                         cursor: 'pointer',
                         background:
-                          form.id === selectedFormId
-                            ? 'var(--mantine-color-blue-0)'
-                            : undefined,
+                          form.id === selectedFormId ? 'var(--mantine-color-blue-0)' : undefined,
                         border:
                           form.id === selectedFormId
                             ? '1px solid var(--mantine-color-blue-4)'

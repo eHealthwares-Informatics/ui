@@ -1,14 +1,4 @@
-import {
-  Box,
-  Container,
-  Group,
-  Input,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Box, Container, Group, Input, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
 import { Search, Pill, BookOpen, HeartPulse, Tags } from 'lucide-react';
@@ -30,8 +20,12 @@ export default function SearchPage() {
   // Keep the URL queryable so /shop/search?q=… is shareable and survives refresh.
   useEffect(() => {
     const p = new URLSearchParams();
-    if (debounced.trim()) {p.set('q', debounced.trim());}
-    if (type) {p.set('type', type);}
+    if (debounced.trim()) {
+      p.set('q', debounced.trim());
+    }
+    if (type) {
+      p.set('type', type);
+    }
     const qs = p.toString();
     history.replaceState(null, '', qs ? `/shop/search?${qs}` : '/shop/search');
   }, [debounced, type]);

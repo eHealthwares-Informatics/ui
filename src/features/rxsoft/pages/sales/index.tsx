@@ -1,13 +1,13 @@
-import { useMemo } from 'react';
 import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Eye, Printer } from 'lucide-react';
-import { DataPageShell } from '../../../components/page/data-page-shell';
-import { rxsoftApi } from '@/lib/rxsoft-api';
-import { salesConfig } from './schema';
+import { useMemo } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
+import { DataPageShell } from '../../../components/page/data-page-shell';
+import { salesConfig } from './schema';
 
 function CompleteSaleButton({ saleId }: { saleId: string }) {
   const qc = useQueryClient();
@@ -23,7 +23,12 @@ function CompleteSaleButton({ saleId }: { saleId: string }) {
   });
 
   return (
-    <Button size="compact-xs" color="green" onClick={() => mutation.mutate()} loading={mutation.isPending}>
+    <Button
+      size="compact-xs"
+      color="green"
+      onClick={() => mutation.mutate()}
+      loading={mutation.isPending}
+    >
       Complete Sale
     </Button>
   );
@@ -71,30 +76,33 @@ function PrintReceiptButton({ saleId }: { saleId: string }) {
 }
 
 export function RxSalesPage() {
-  const config = useMemo(() => ({
-    ...salesConfig,
-    columns: [
-      ...salesConfig.columns,
-      {
-        key: 'actions',
-        label: 'Actions',
-        render: (row: Record<string, unknown>) => {
-          const saleId = row.id as string;
-          const complete =
-            row.saleChannel === 'mobile' && row.status === 'draft' ? (
-              <CompleteSaleButton saleId={saleId} />
-            ) : null;
-          return (
-            <Group gap="xs">
-              <ViewLinesButton saleId={saleId} />
-              <PrintReceiptButton saleId={saleId} />
-              {complete}
-            </Group>
-          );
+  const config = useMemo(
+    () => ({
+      ...salesConfig,
+      columns: [
+        ...salesConfig.columns,
+        {
+          key: 'actions',
+          label: 'Actions',
+          render: (row: Record<string, unknown>) => {
+            const saleId = row.id as string;
+            const complete =
+              row.saleChannel === 'mobile' && row.status === 'draft' ? (
+                <CompleteSaleButton saleId={saleId} />
+              ) : null;
+            return (
+              <Group gap="xs">
+                <ViewLinesButton saleId={saleId} />
+                <PrintReceiptButton saleId={saleId} />
+                {complete}
+              </Group>
+            );
+          },
         },
-      },
-    ],
-  }), []);
+      ],
+    }),
+    []
+  );
 
   return <DataPageShell config={config} />;
 }

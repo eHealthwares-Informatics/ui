@@ -1,12 +1,28 @@
-import { useState } from 'react';
 import {
-  Box, Card, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, Select, Textarea, Grid,
+  Box,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  Select,
+  Textarea,
+  Grid,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 import {
-  useVolunteerAssignments, useVolunteerStats, useCreateVolunteerAssignment,
-  useUpdateVolunteerAssignment, useLgas, useWards,
+  useVolunteerAssignments,
+  useVolunteerStats,
+  useCreateVolunteerAssignment,
+  useUpdateVolunteerAssignment,
+  useLgas,
+  useWards,
 } from '../website/admin-hooks';
 import { apmBlue, ink, muted } from '../website/layout';
 
@@ -34,23 +50,56 @@ export function VolunteersPage() {
 
   const handleSubmit = () => {
     if (editId) {
-      updateAssignment.mutate({ id: editId, data: { wardId: form.wardId || undefined, role: form.role || undefined, notes: form.notes || undefined } }, { onSuccess: () => { close(); resetForm(); } });
+      updateAssignment.mutate(
+        {
+          id: editId,
+          data: {
+            wardId: form.wardId || undefined,
+            role: form.role || undefined,
+            notes: form.notes || undefined,
+          },
+        },
+        {
+          onSuccess: () => {
+            close();
+            resetForm();
+          },
+        }
+      );
     } else {
-      createAssignment.mutate({
-        volunteerId: form.volunteerId,
-        lgaId: form.lgaId,
-        wardId: form.wardId || undefined,
-        role: form.role || undefined,
-        notes: form.notes || undefined,
-      }, { onSuccess: () => { close(); resetForm(); } });
+      createAssignment.mutate(
+        {
+          volunteerId: form.volunteerId,
+          lgaId: form.lgaId,
+          wardId: form.wardId || undefined,
+          role: form.role || undefined,
+          notes: form.notes || undefined,
+        },
+        {
+          onSuccess: () => {
+            close();
+            resetForm();
+          },
+        }
+      );
     }
   };
 
   return (
     <Stack gap="lg">
       <Group justify="space-between">
-        <Title order={3} style={{ color: ink }}>Volunteer Assignments</Title>
-        <Button onClick={() => { resetForm(); open(); }} style={{ background: apmBlue }}>Assign Volunteer</Button>
+        <Title order={3} style={{ color: ink }}>
+          Volunteer Assignments
+        </Title>
+        <Button
+          onClick={() => {
+            resetForm();
+            open();
+          }}
+          style={{ background: apmBlue }}
+        >
+          Assign Volunteer
+        </Button>
       </Group>
 
       <Grid>
@@ -58,8 +107,12 @@ export function VolunteersPage() {
           <Grid.Col key={s.label} span={{ base: 6, sm: 4, md: 2 }}>
             <Card padding="md" radius="md" withBorder>
               <Stack gap={2} align="center">
-                <Text size="xs" style={{ color: muted }}>{s.label}</Text>
-                <Text fw={800} style={{ fontSize: '1.5rem', color: s.color }}>{s.value}</Text>
+                <Text size="xs" style={{ color: muted }}>
+                  {s.label}
+                </Text>
+                <Text fw={800} style={{ fontSize: '1.5rem', color: s.color }}>
+                  {s.value}
+                </Text>
               </Stack>
             </Card>
           </Grid.Col>
@@ -86,7 +139,15 @@ export function VolunteersPage() {
                   <Table.Td fw={600}>{a.volunteerId.slice(0, 8)}…</Table.Td>
                   <Table.Td style={{ color: muted }}>{a.role ?? '—'}</Table.Td>
                   <Table.Td>
-                    <Badge color={a.status === 'active' ? 'green' : a.status === 'inactive' ? 'gray' : 'yellow'}>
+                    <Badge
+                      color={
+                        a.status === 'active'
+                          ? 'green'
+                          : a.status === 'inactive'
+                            ? 'gray'
+                            : 'yellow'
+                      }
+                    >
                       {a.status}
                     </Badge>
                   </Table.Td>
@@ -94,12 +155,21 @@ export function VolunteersPage() {
                     {a.assignedAt ? new Date(a.assignedAt).toLocaleDateString() : '—'}
                   </Table.Td>
                   <Table.Td>
-                    <Button size="xs" variant="light" color="gray"
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="gray"
                       onClick={() => {
                         setEditId(a.id);
-                        setForm({ ...form, wardId: a.wardId ?? '', role: a.role ?? '', notes: a.notes ?? '' });
+                        setForm({
+                          ...form,
+                          wardId: a.wardId ?? '',
+                          role: a.role ?? '',
+                          notes: a.notes ?? '',
+                        });
                         open();
-                      }}>
+                      }}
+                    >
                       Edit
                     </Button>
                   </Table.Td>
@@ -107,7 +177,9 @@ export function VolunteersPage() {
               ))}
               {(assignments?.items ?? []).length === 0 && (
                 <Table.Tr>
-                  <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>No assignments yet</Table.Td>
+                  <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>
+                    No assignments yet
+                  </Table.Td>
                 </Table.Tr>
               )}
             </Table.Tbody>
@@ -115,15 +187,43 @@ export function VolunteersPage() {
         </Card>
       )}
 
-      <Modal opened={opened} onClose={close} title={editId ? 'Edit Assignment' : 'Assign Volunteer'} size="md">
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={editId ? 'Edit Assignment' : 'Assign Volunteer'}
+        size="md"
+      >
         <Stack gap="sm">
-          <Select label="LGA" data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
-            value={form.lgaId || null} onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })} searchable required />
-          <Select label="Ward" data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
-            value={form.wardId || null} onChange={(v) => setForm({ ...form, wardId: v ?? '' })} clearable />
-          <Select label="Role" data={['canvasser', 'team-lead', 'agent', 'mobilizer', 'data-entry'].map((r) => ({ value: r, label: r.replace(/-/g, ' ') }))}
-            value={form.role || null} onChange={(v) => setForm({ ...form, role: v ?? '' })} clearable />
-          <Textarea label="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })} />
+          <Select
+            label="LGA"
+            data={(lgas ?? []).map((l: any) => ({ value: l.id, label: l.name }))}
+            value={form.lgaId || null}
+            onChange={(v) => setForm({ ...form, lgaId: v ?? '', wardId: '' })}
+            searchable
+            required
+          />
+          <Select
+            label="Ward"
+            data={(wardsQuery.data ?? []).map((w: any) => ({ value: w.id, label: w.name }))}
+            value={form.wardId || null}
+            onChange={(v) => setForm({ ...form, wardId: v ?? '' })}
+            clearable
+          />
+          <Select
+            label="Role"
+            data={['canvasser', 'team-lead', 'agent', 'mobilizer', 'data-entry'].map((r) => ({
+              value: r,
+              label: r.replace(/-/g, ' '),
+            }))}
+            value={form.role || null}
+            onChange={(v) => setForm({ ...form, role: v ?? '' })}
+            clearable
+          />
+          <Textarea
+            label="Notes"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })}
+          />
           <Button fullWidth onClick={handleSubmit} style={{ background: apmBlue }} mt="sm">
             {editId ? 'Update' : 'Assign'}
           </Button>

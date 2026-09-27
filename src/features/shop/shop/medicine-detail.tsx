@@ -13,18 +13,11 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
-import { useGenericDrug } from '../website/hooks';
-import {
-  WebsiteLayout,
-  green,
-  ink,
-  muted,
-  line,
-  buttonStyles,
-} from '../website/layout';
+import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../website/cart-store';
+import { useGenericDrug } from '../website/hooks';
+import { WebsiteLayout, green, ink, muted, line, buttonStyles } from '../website/layout';
 
 export default function ShopMedicineDetailPage({ code }: { code: string }) {
   const navigate = useNavigate();
@@ -33,7 +26,9 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
   const addItem = useCartStore((s) => s.addItem);
 
   function addGeneric() {
-    if (!drug) {return;}
+    if (!drug) {
+      return;
+    }
     addGenericDrug({
       name: drug.name,
       genericDrugCode: drug.code,
@@ -80,7 +75,9 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
               <Stack gap={6}>
                 <Box style={{ height: 14, background: '#E8F0EC', borderRadius: 8, width: '50%' }} />
                 <Box style={{ height: 20, background: '#E8F0EC', borderRadius: 8, width: '70%' }} />
-                <Box style={{ height: 40, background: '#E8F0EC', borderRadius: 16, marginTop: 6 }} />
+                <Box
+                  style={{ height: 40, background: '#E8F0EC', borderRadius: 16, marginTop: 6 }}
+                />
               </Stack>
             </Card>
           ) : (
@@ -144,7 +141,12 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
                 </Stack>
               </Card>
 
-              <Card radius={20} withBorder padding="lg" style={{ borderColor: line, background: '#F7FBF9' }}>
+              <Card
+                radius={20}
+                withBorder
+                padding="lg"
+                style={{ borderColor: line, background: '#F7FBF9' }}
+              >
                 <Stack gap={2}>
                   <Group justify="space-between" align="baseline" wrap="nowrap">
                     <Text fw={700} style={{ color: ink }}>
@@ -161,9 +163,9 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
                     )}
                   </Group>
                   <Text size="xs" c={muted} lh={1.6}>
-                    This is the average of available brands. The actual price may be higher or
-                    lower since it is a generic / non-specific brand — your pharmacist will
-                    confirm before dispense.
+                    This is the average of available brands. The actual price may be higher or lower
+                    since it is a generic / non-specific brand — your pharmacist will confirm before
+                    dispense.
                   </Text>
                 </Stack>
               </Card>
@@ -177,7 +179,13 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
                 ) : (
                   <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
                     {drug.similarBrands.map((b) => (
-                      <Card key={b.id} radius={16} withBorder padding="sm" style={{ borderColor: line }}>
+                      <Card
+                        key={b.id}
+                        radius={16}
+                        withBorder
+                        padding="sm"
+                        style={{ borderColor: line }}
+                      >
                         <Group gap="sm" wrap="nowrap" align="center">
                           <Image
                             src={b.imageUrl || undefined}
@@ -185,7 +193,11 @@ export default function ShopMedicineDetailPage({ code }: { code: string }) {
                             w={48}
                             h={48}
                             fit="contain"
-                            style={{ borderRadius: 8, background: '#F1F8F4', border: `1px solid ${line}` }}
+                            style={{
+                              borderRadius: 8,
+                              background: '#F1F8F4',
+                              border: `1px solid ${line}`,
+                            }}
                           />
                           <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
                             <Text size="sm" fw={700} lineClamp={2}>

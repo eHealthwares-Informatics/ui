@@ -16,8 +16,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { useModuleTitle } from '@/features/shared/use-module-title';
-import { ChatbotWidget } from './chatbot-widget';
 import {
   ChevronDown,
   Clock3,
@@ -42,11 +40,13 @@ import {
   Upload,
   User,
 } from 'lucide-react';
-import { useWebsiteBranding, useWebsiteContact } from './hooks';
+import { useModuleTitle } from '@/features/shared/use-module-title';
 import AccountDrawer from './account-drawer';
 import { useAccountDrawerStore } from './account-drawer-store';
 import { useCartStore } from './cart-store';
+import { ChatbotWidget } from './chatbot-widget';
 import { ExpandableSearch } from './generic-search';
+import { useWebsiteBranding, useWebsiteContact } from './hooks';
 
 export const green = '#16A34A';
 export const darkGreen = '#0F6F35';
@@ -64,10 +64,34 @@ const navMenus = [
     desc: 'Browse our catalog of authentic medicines and healthcare products.',
     learnMore: '/shop/shop',
     items: [
-      { label: 'Shop Products', path: '/shop/shop', icon: Package, color: '#16A34A', desc: 'Browse our full catalog of medicines and healthcare products' },
-      { label: 'Shop Medicines', path: '/shop/medicines', icon: Pill, color: '#0EA5E9', desc: 'Browse medicines by generic name and find available brands' },
-      { label: 'Shop Supermarket Items', path: '/shop/supermarket', icon: ShoppingBasket, color: '#D97706', desc: 'Essential everyday items and supermarket products' },
-      { label: 'Categories', path: '/shop/categories', icon: LayoutGrid, color: '#7C3AED', desc: 'Browse products by category and therapeutic class' },
+      {
+        label: 'Shop Products',
+        path: '/shop/shop',
+        icon: Package,
+        color: '#16A34A',
+        desc: 'Browse our full catalog of medicines and healthcare products',
+      },
+      {
+        label: 'Shop Medicines',
+        path: '/shop/medicines',
+        icon: Pill,
+        color: '#0EA5E9',
+        desc: 'Browse medicines by generic name and find available brands',
+      },
+      {
+        label: 'Shop Supermarket Items',
+        path: '/shop/supermarket',
+        icon: ShoppingBasket,
+        color: '#D97706',
+        desc: 'Essential everyday items and supermarket products',
+      },
+      {
+        label: 'Categories',
+        path: '/shop/categories',
+        icon: LayoutGrid,
+        color: '#7C3AED',
+        desc: 'Browse products by category and therapeutic class',
+      },
     ],
   },
   {
@@ -77,8 +101,20 @@ const navMenus = [
     desc: 'Access health information, consultations, and wellness resources.',
     learnMore: '/shop/health-concerns',
     items: [
-      { label: 'Health Concerns', path: '/shop/health-concerns', icon: Stethoscope, color: '#E11D48', desc: 'Find medicines and advice for common health conditions' },
-      { label: 'Blog', path: '/shop/blog', icon: Newspaper, color: '#0EA5E9', desc: 'Read health tips, news, and pharmacy insights' },
+      {
+        label: 'Health Concerns',
+        path: '/shop/health-concerns',
+        icon: Stethoscope,
+        color: '#E11D48',
+        desc: 'Find medicines and advice for common health conditions',
+      },
+      {
+        label: 'Blog',
+        path: '/shop/blog',
+        icon: Newspaper,
+        color: '#0EA5E9',
+        desc: 'Read health tips, news, and pharmacy insights',
+      },
     ],
   },
   {
@@ -88,8 +124,20 @@ const navMenus = [
     desc: 'Find registered hospitals, clinics and pharmacies near you.',
     learnMore: '/shop/facility-locator',
     items: [
-      { label: 'Health Facility/Hospital Locator', path: '/shop/facility-locator', icon: Hospital, color: '#0D9488', desc: 'Search hospitals and clinics by name and location' },
-      { label: 'Pharmacy Drug Store Locator', path: '/shop/pharmacy-locator', icon: Pill, color: '#D97706', desc: 'Find licensed pharmacies and drug stores near you' },
+      {
+        label: 'Health Facility/Hospital Locator',
+        path: '/shop/facility-locator',
+        icon: Hospital,
+        color: '#0D9488',
+        desc: 'Search hospitals and clinics by name and location',
+      },
+      {
+        label: 'Pharmacy Drug Store Locator',
+        path: '/shop/pharmacy-locator',
+        icon: Pill,
+        color: '#D97706',
+        desc: 'Find licensed pharmacies and drug stores near you',
+      },
     ],
   },
   {
@@ -99,10 +147,34 @@ const navMenus = [
     desc: 'Get in touch with our pharmacists and support team.',
     learnMore: '/shop/contact',
     items: [
-      { label: 'Conversational shopping', path: '/shop/conversation', icon: MessagesSquare, color: '#0EA5E9', desc: 'Chat with our pharmacist and shop through the conversation' },
-      { label: 'Consult Pharmacist', path: '/shop/consult-pharmacist', icon: MessageCircle, color: '#16A34A', desc: 'Speak with a licensed pharmacist online' },
-      { label: 'Contact Us', path: '/shop/contact', icon: Mail, color: '#D97706', desc: 'Reach our customer support team' },
-      { label: 'Delivery Areas', path: '/shop/delivery-areas', icon: Truck, color: '#7C3AED', desc: 'Check delivery coverage and areas' },
+      {
+        label: 'Conversational shopping',
+        path: '/shop/conversation',
+        icon: MessagesSquare,
+        color: '#0EA5E9',
+        desc: 'Chat with our pharmacist and shop through the conversation',
+      },
+      {
+        label: 'Consult Pharmacist',
+        path: '/shop/consult-pharmacist',
+        icon: MessageCircle,
+        color: '#16A34A',
+        desc: 'Speak with a licensed pharmacist online',
+      },
+      {
+        label: 'Contact Us',
+        path: '/shop/contact',
+        icon: Mail,
+        color: '#D97706',
+        desc: 'Reach our customer support team',
+      },
+      {
+        label: 'Delivery Areas',
+        path: '/shop/delivery-areas',
+        icon: Truck,
+        color: '#7C3AED',
+        desc: 'Check delivery coverage and areas',
+      },
     ],
   },
 ];
@@ -116,8 +188,7 @@ export const buttonStyles = {
 
 export function WebsiteHeader() {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
-  const [cartHovered, { open: openCartHover, close: closeCartHover }] =
-    useDisclosure(false);
+  const [cartHovered, { open: openCartHover, close: closeCartHover }] = useDisclosure(false);
   const { websiteName, logoUrl } = useWebsiteBranding();
   const openAccount = useAccountDrawerStore((s) => s.open);
   const totalItems = useCartStore((s) => s.totalItems);
@@ -283,7 +354,11 @@ export function WebsiteHeader() {
                             >
                               <MenuIcon size={18} style={{ color: menu.color }} />
                             </Box>
-                            <Text fw={900} size="lg" style={{ color: ink, letterSpacing: '-0.02em' }}>
+                            <Text
+                              fw={900}
+                              size="lg"
+                              style={{ color: ink, letterSpacing: '-0.02em' }}
+                            >
                               {menu.label}
                             </Text>
                           </Group>
@@ -293,10 +368,17 @@ export function WebsiteHeader() {
                           <Anchor
                             size="sm"
                             fw={700}
-                            style={{ color: green, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                            style={{
+                              color: green,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                            }}
                             onClick={() => navigate({ to: menu.learnMore })}
                           >
-                            Learn more <ChevronDown size={12} style={{ transform: 'rotate(-90deg)' }} />
+                            Learn more{' '}
+                            <ChevronDown size={12} style={{ transform: 'rotate(-90deg)' }} />
                           </Anchor>
                         </Box>
 
@@ -327,10 +409,10 @@ export function WebsiteHeader() {
                                   transition: 'background 150ms ease',
                                 }}
                                 onMouseEnter={(e) => {
-                                  (e.currentTarget.style.background = '#f0f7f3');
+                                  e.currentTarget.style.background = '#f0f7f3';
                                 }}
                                 onMouseLeave={(e) => {
-                                  (e.currentTarget.style.background = 'transparent');
+                                  e.currentTarget.style.background = 'transparent';
                                 }}
                               >
                                 <Box
@@ -369,12 +451,8 @@ export function WebsiteHeader() {
             <Group gap={8} wrap="nowrap">
               <Box visibleFrom="md" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <ExpandableSearch
-                  onSelect={(gp) =>
-                    navigate({ to: '/shop/shop', search: { gp: gp as any } })
-                  }
-                  onSubmit={(text) =>
-                    navigate({ to: '/shop/shop', search: { q: text as any } })
-                  }
+                  onSelect={(gp) => navigate({ to: '/shop/shop', search: { gp: gp as any } })}
+                  onSubmit={(text) => navigate({ to: '/shop/shop', search: { q: text as any } })}
                 />
               </Box>
               <Button
@@ -407,7 +485,9 @@ export function WebsiteHeader() {
                 offset={10}
                 opened={cartHovered}
                 onChange={(next) => {
-                  if (!next) closeCartHover();
+                  if (!next) {
+                    closeCartHover();
+                  }
                 }}
                 trapFocus={false}
                 closeOnClickOutside={false}
@@ -511,8 +591,7 @@ export function WebsiteHeader() {
                               (item.product as { name?: string } | undefined)?.name ??
                               'Item';
                             const unitPrice =
-                              (item.product as { unitPrice?: number } | undefined)
-                                ?.unitPrice ??
+                              (item.product as { unitPrice?: number } | undefined)?.unitPrice ??
                               item.unitPrice ??
                               0;
                             return (
@@ -727,25 +806,33 @@ export function WebsiteFooter() {
                     key={link}
                     onClick={() => {
                       const path = link.toLowerCase().replace(/\s+/g, '-');
-                      if (path === 'prescription-upload')
-                        {navigate({ to: '/shop/upload-prescription' });}
-                      else if (path === 'consult-pharmacist')
-                        {navigate({ to: '/shop/consult-pharmacist' });}
-                      else if (path === 'delivery') {navigate({ to: '/shop/delivery-areas' });}
-                      else if (path === 'contact') {navigate({ to: '/shop/contact' });}
-                      else if (path === 'about-us') {navigate({ to: '/shop/about' });}
-                      else if (path === 'faqs') {navigate({ to: '/shop/faq' });}
-                      else if (path === 'privacy-policy')
-                        {navigate({ to: '/shop/privacy-policy' });}
-                      else if (path === 'terms') {navigate({ to: '/shop/terms' });}
-                      else if (path === 'careers') {navigate({ to: '/shop/about' });}
-                      else if (
+                      if (path === 'prescription-upload') {
+                        navigate({ to: '/shop/upload-prescription' });
+                      } else if (path === 'consult-pharmacist') {
+                        navigate({ to: '/shop/consult-pharmacist' });
+                      } else if (path === 'delivery') {
+                        navigate({ to: '/shop/delivery-areas' });
+                      } else if (path === 'contact') {
+                        navigate({ to: '/shop/contact' });
+                      } else if (path === 'about-us') {
+                        navigate({ to: '/shop/about' });
+                      } else if (path === 'faqs') {
+                        navigate({ to: '/shop/faq' });
+                      } else if (path === 'privacy-policy') {
+                        navigate({ to: '/shop/privacy-policy' });
+                      } else if (path === 'terms') {
+                        navigate({ to: '/shop/terms' });
+                      } else if (path === 'careers') {
+                        navigate({ to: '/shop/about' });
+                      } else if (
                         link === 'Medicines' ||
                         link === 'Supplements' ||
                         link === 'Wellness'
-                      )
-                        {navigate({ to: '/shop/shop' });}
-                      else {navigate({ to: '/shop' });}
+                      ) {
+                        navigate({ to: '/shop/shop' });
+                      } else {
+                        navigate({ to: '/shop' });
+                      }
                     }}
                     c="rgba(255,255,255,0.68)"
                     underline="never"
@@ -802,7 +889,9 @@ export function WebsiteFooter() {
               color="green"
               variant="light"
               style={{ cursor: 'pointer' }}
-              onClick={() => window.open(`https://wa.me/${contactWhatsApp.replace(/[^0-9]/g, '')}`, '_blank')}
+              onClick={() =>
+                window.open(`https://wa.me/${contactWhatsApp.replace(/[^0-9]/g, '')}`, '_blank')
+              }
             >
               <MessageCircle size={18} />
             </ThemeIcon>
@@ -839,19 +928,19 @@ export function WebsiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {showWidget && <ChatbotWidget />}
-    <Box
-      style={{
-        background:
-          'radial-gradient(circle at 8% 2%, rgba(34, 197, 94, 0.12), transparent 30%), radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.11), transparent 28%), #FFFFFF',
-        color: ink,
-        fontFamily:
-          'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        minHeight: '100vh',
-        overflowX: 'hidden',
-      }}
-    >
-      <style>
-        {`
+      <Box
+        style={{
+          background:
+            'radial-gradient(circle at 8% 2%, rgba(34, 197, 94, 0.12), transparent 30%), radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.11), transparent 28%), #FFFFFF',
+          color: ink,
+          fontFamily:
+            'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          minHeight: '100vh',
+          overflowX: 'hidden',
+        }}
+      >
+        <style>
+          {`
           .damorex-page *:focus-visible {
             outline: 3px solid rgba(14, 165, 233, 0.55);
             outline-offset: 3px;
@@ -906,14 +995,14 @@ export function WebsiteLayout({ children }: { children: React.ReactNode }) {
             }
           }
         `}
-      </style>
+        </style>
 
-      <Box className="damorex-page">
-        <WebsiteHeader />
-        <Box component="main">{children}</Box>
-        <WebsiteFooter />
+        <Box className="damorex-page">
+          <WebsiteHeader />
+          <Box component="main">{children}</Box>
+          <WebsiteFooter />
+        </Box>
       </Box>
-    </Box>
     </>
   );
 }

@@ -1,5 +1,5 @@
-import { SaleSession } from '../types';
 import { getUomEffectiveFactor } from '@/lib/uom-utils';
+import { SaleSession } from '../types';
 
 export { getUomEffectiveFactor };
 

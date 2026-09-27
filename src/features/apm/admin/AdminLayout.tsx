@@ -1,10 +1,25 @@
-import { useState } from 'react';
 import { Box, Group, NavLink, ScrollArea, Text, Title, Tooltip, ActionIcon } from '@mantine/core';
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import {
-  BarChart3, Users, MessageCircle, ArrowLeft, Map, Footprints, HeartHandshake,
-  Activity, Route, FileText, Radio, UserCheck, Vote, Shield, Bell, Menu, X,
+  BarChart3,
+  Users,
+  MessageCircle,
+  ArrowLeft,
+  Map,
+  Footprints,
+  HeartHandshake,
+  Activity,
+  Route,
+  FileText,
+  Radio,
+  UserCheck,
+  Vote,
+  Shield,
+  Bell,
+  Menu,
+  X,
 } from 'lucide-react';
+import { useState } from 'react';
 
 const adminNavItems = [
   { label: 'Dashboard', path: '/apm/admin/conversion', icon: BarChart3 },
@@ -55,12 +70,21 @@ export function AdminLayout() {
         }}
       >
         {/* Header */}
-        <Box style={{ padding: collapsed ? '12px 0' : '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <Box
+          style={{
+            padding: collapsed ? '12px 0' : '12px 16px',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
           <Group justify={collapsed ? 'center' : 'space-between'} wrap="nowrap">
             {!collapsed && (
               <Box style={{ lineHeight: 1.2 }}>
-                <Title order={5} style={{ color: '#fff', fontSize: 14, whiteSpace: 'nowrap' }}>APM Campaign</Title>
-                <Text size="xs" style={{ color: sidebarText, fontSize: 10, whiteSpace: 'nowrap' }}>Oyo 2027</Text>
+                <Title order={5} style={{ color: '#fff', fontSize: 14, whiteSpace: 'nowrap' }}>
+                  APM Campaign
+                </Title>
+                <Text size="xs" style={{ color: sidebarText, fontSize: 10, whiteSpace: 'nowrap' }}>
+                  Oyo 2027
+                </Text>
               </Box>
             )}
             <ActionIcon
@@ -105,7 +129,10 @@ export function AdminLayout() {
 
             if (collapsed) {
               return (
-                <Box key={item.path} style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}>
+                <Box
+                  key={item.path}
+                  style={{ display: 'flex', justifyContent: 'center', marginBottom: 2 }}
+                >
                   <Tooltip label={item.label} position="right" withArrow>
                     {link}
                   </Tooltip>
@@ -117,13 +144,24 @@ export function AdminLayout() {
         </ScrollArea>
 
         {/* Back to site */}
-        <Box style={{ padding: collapsed ? 8 : '8px 12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <Box
+          style={{
+            padding: collapsed ? 8 : '8px 12px',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
           <NavLink
             label={collapsed ? undefined : 'Back to Site'}
             leftSection={<ArrowLeft size={collapsed ? 18 : 16} />}
             onClick={() => navigate({ to: '/apm' })}
             styles={{
-              root: { borderRadius: 6, color: sidebarText, '&:hover': { background: sidebarHover }, padding: collapsed ? '8px 0' : '8px 12px', justifyContent: collapsed ? 'center' : undefined },
+              root: {
+                borderRadius: 6,
+                color: sidebarText,
+                '&:hover': { background: sidebarHover },
+                padding: collapsed ? '8px 0' : '8px 12px',
+                justifyContent: collapsed ? 'center' : undefined,
+              },
               section: { marginRight: collapsed ? 0 : 10 },
               body: { flex: collapsed ? 0 : undefined },
             }}
@@ -135,10 +173,18 @@ export function AdminLayout() {
       <Box style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <Box py="sm" px="lg" style={{ background: '#fff', borderBottom: '1px solid #E2E8F0' }}>
           <Group>
-            <ActionIcon variant="subtle" color="gray" onClick={() => setCollapsed(!collapsed)} size="sm" style={{ color: '#64748B' }}>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              onClick={() => setCollapsed(!collapsed)}
+              size="sm"
+              style={{ color: '#64748B' }}
+            >
               <Menu size={18} />
             </ActionIcon>
-            <Text size="sm" style={{ color: '#64748B' }}>APM Campaign Management — Oyo State 2027</Text>
+            <Text size="sm" style={{ color: '#64748B' }}>
+              APM Campaign Management — Oyo State 2027
+            </Text>
           </Group>
         </Box>
         <Box p="lg" style={{ flex: 1, overflow: 'auto' }}>

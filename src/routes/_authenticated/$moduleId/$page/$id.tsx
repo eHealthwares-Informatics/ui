@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { codingConceptApi } from '@/lib/coding-concept-api';
+import { useApiProvider } from '@/context/module-context';
 import { codingConceptView } from '@/features/coding-concept/schema/view';
-import { deriveView } from '@/features/components/view/derive-view';
 import { GenericViewComponent } from '@/features/components/view';
+import { deriveView } from '@/features/components/view/derive-view';
 import { useEnhancedCodingConceptView } from '@/features/components/view/ehannced-view';
 import { getModelConfig } from '@/features/registry';
 import type { View } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { modules } from '@/features/shared/module-data';
-import { useApiProvider } from '@/context/module-context';
+import { codingConceptApi } from '@/lib/coding-concept-api';
 
 export const Route = createFileRoute('/_authenticated/$moduleId/$page/$id')({
   component: GenericViewPage,
@@ -66,7 +66,9 @@ function CodingConceptDetailView({ id }: { id: string }) {
 
   const data = detailQuery.data?.data?.data;
 
-  if (!data) {return <div>Loading...</div>;}
+  if (!data) {
+    return <div>Loading...</div>;
+  }
 
   return <GenericViewComponent view={view as View<any>} data={data} />;
 }

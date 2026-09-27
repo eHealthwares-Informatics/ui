@@ -43,19 +43,11 @@ function Labelled({ label, value }: { label: string; value?: ReactNode }) {
 }
 
 /** Patient name/MRN cell that pops up a summary card on hover. */
-export function PatientHoverCard({
-  mrn,
-  label,
-}: {
-  mrn?: string | null;
-  label?: ReactNode;
-}) {
+export function PatientHoverCard({ mrn, label }: { mrn?: string | null; label?: ReactNode }) {
   const navigate = useNavigate();
   const { data: patient, isLoading, isError } = usePatientByMrn(mrn);
 
-  const name = patient
-    ? [patient.firstName, patient.lastName].filter(Boolean).join(' ')
-    : null;
+  const name = patient ? [patient.firstName, patient.lastName].filter(Boolean).join(' ') : null;
 
   if (isLoading) {
     return <Skeleton height={16} width={140} />;

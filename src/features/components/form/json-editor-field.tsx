@@ -12,7 +12,9 @@ type JsonEditorFieldProps = {
 };
 
 function formatJson(value: unknown) {
-  if (value == null || value === '') {return '';}
+  if (value == null || value === '') {
+    return '';
+  }
   if (typeof value === 'string') {
     try {
       return JSON.stringify(JSON.parse(value), null, 2);
@@ -47,7 +49,9 @@ export function JsonEditorField({
   }, [value]);
 
   const parseState = useMemo(() => {
-    if (!text.trim()) {return { valid: true, message: 'Empty JSON' };}
+    if (!text.trim()) {
+      return { valid: true, message: 'Empty JSON' };
+    }
     try {
       const parsed = JSON.parse(text);
       return { valid: true, message: 'Valid JSON', data: parsed };

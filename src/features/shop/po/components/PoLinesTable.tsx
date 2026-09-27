@@ -1,4 +1,18 @@
-import { ActionIcon, Button, Combobox, Group, InputBase, Modal, NumberInput, Select, Stack, Table, Text, Tooltip, useCombobox } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Combobox,
+  Group,
+  InputBase,
+  Modal,
+  NumberInput,
+  Select,
+  Stack,
+  Table,
+  Text,
+  Tooltip,
+  useCombobox,
+} from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronDown, DollarSign, Save, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -85,9 +99,7 @@ function UomChangeModal({
   const newUom = uomMap.get(newUomId);
 
   const sameCategory =
-    oldUom?.categoryId && newUom?.categoryId
-      ? oldUom.categoryId === newUom.categoryId
-      : null;
+    oldUom?.categoryId && newUom?.categoryId ? oldUom.categoryId === newUom.categoryId : null;
 
   const conversionText =
     oldUom && newUom && oldUom.factor && newUom.factor
@@ -155,7 +167,7 @@ function ItemSearchSelect({
         // Keep the already-selected item visible; hide items used on other
         // saved lines.
         .filter((o) => o.value === value || !excludeIds?.has(o.value)),
-    [items, excludeIds, value],
+    [items, excludeIds, value]
   );
 
   const selected = options.find((o) => o.value === value);
@@ -215,7 +227,9 @@ function PriceListCell({ itemId }: { itemId: string }) {
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['price-list-items', itemId],
     queryFn: async () => {
-      if (!itemId) return [];
+      if (!itemId) {
+        return [];
+      }
       const { data } = await rxsoftApi.get('/price-lists/items', {
         params: { itemId, limit: 10 },
       });
@@ -224,9 +238,27 @@ function PriceListCell({ itemId }: { itemId: string }) {
     enabled: !!itemId,
   });
 
-  if (!itemId) return <Text size="xs" c="dimmed">—</Text>;
-  if (isLoading) return <Text size="xs" c="dimmed">Loading...</Text>;
-  if (!items.length) return <Text size="xs" c="dimmed">No prices</Text>;
+  if (!itemId) {
+    return (
+      <Text size="xs" c="dimmed">
+        —
+      </Text>
+    );
+  }
+  if (isLoading) {
+    return (
+      <Text size="xs" c="dimmed">
+        Loading...
+      </Text>
+    );
+  }
+  if (!items.length) {
+    return (
+      <Text size="xs" c="dimmed">
+        No prices
+      </Text>
+    );
+  }
 
   return (
     <Stack gap={2}>
@@ -254,8 +286,14 @@ export function PoLinesTable({
   savingLines,
 }: Props) {
   const usedItemIds = useMemo(
-    () => new Set(lines.filter((l) => l.serverLineId).map((l) => l.itemId).filter(Boolean)),
-    [lines],
+    () =>
+      new Set(
+        lines
+          .filter((l) => l.serverLineId)
+          .map((l) => l.itemId)
+          .filter(Boolean)
+      ),
+    [lines]
   );
 
   const [pendingUom, setPendingUom] = useState<{
@@ -321,7 +359,11 @@ export function PoLinesTable({
 
             const canDelete = !isReadOnly && isDraftStatus && lines.length > 1;
             const canSave = !isReadOnly && isDraftStatus && !isSaved && !!pendingPoId;
-            const canReceive = !isReadOnly && isSaved && line.receivedQty > 0 && !line.isPosted &&
+            const canReceive =
+              !isReadOnly &&
+              isSaved &&
+              line.receivedQty > 0 &&
+              !line.isPosted &&
               (isApprovedStatus || isPartiallyReceivedStatus);
             const canUnpost = !isReadOnly && isSaved && line.isPosted;
 
@@ -407,10 +449,14 @@ export function PoLinesTable({
                   <Text size="xs">{line.lineSubtotal.toFixed(2)}</Text>
                 </Table.Td>
                 <Table.Td>
-                  <Text size="xs" fw={700}>{line.lineTotal.toFixed(2)}</Text>
+                  <Text size="xs" fw={700}>
+                    {line.lineTotal.toFixed(2)}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
-                  <Text size="xs" fw={700} c="green">{(line.receivedLineTotal ?? 0).toFixed(2)}</Text>
+                  <Text size="xs" fw={700} c="green">
+                    {(line.receivedLineTotal ?? 0).toFixed(2)}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   {canSave && (
@@ -428,28 +474,49 @@ export function PoLinesTable({
                   )}
                   {isSaved && !isReadOnly && (
                     <Tooltip label="Set price">
-                      <ActionIcon size="sm" color="cyan" variant="light" onClick={() => onSetPrice(line)}>
+                      <ActionIcon
+                        size="sm"
+                        color="cyan"
+                        variant="light"
+                        onClick={() => onSetPrice(line)}
+                      >
                         <DollarSign size={14} />
                       </ActionIcon>
                     </Tooltip>
                   )}
                   {canReceive && (
                     <Tooltip label={receiptNumber ? 'Receive' : 'Enter a receipt number first'}>
-                      <ActionIcon size="sm" color="green" variant="light" onClick={() => onReceiveLine(line)} disabled={!receiptNumber}>
+                      <ActionIcon
+                        size="sm"
+                        color="green"
+                        variant="light"
+                        onClick={() => onReceiveLine(line)}
+                        disabled={!receiptNumber}
+                      >
                         <Check size={14} />
                       </ActionIcon>
                     </Tooltip>
                   )}
                   {canUnpost && (
                     <Tooltip label="Unpost">
-                      <ActionIcon size="sm" color="orange" variant="light" onClick={() => onUnpostLine(line)}>
+                      <ActionIcon
+                        size="sm"
+                        color="orange"
+                        variant="light"
+                        onClick={() => onUnpostLine(line)}
+                      >
                         <X size={14} />
                       </ActionIcon>
                     </Tooltip>
                   )}
                   {canDelete && (
                     <Tooltip label="Delete">
-                      <ActionIcon size="sm" color="red" variant="light" onClick={() => onRemoveLine(line.id)}>
+                      <ActionIcon
+                        size="sm"
+                        color="red"
+                        variant="light"
+                        onClick={() => onRemoveLine(line.id)}
+                      >
                         <Trash2 size={14} />
                       </ActionIcon>
                     </Tooltip>

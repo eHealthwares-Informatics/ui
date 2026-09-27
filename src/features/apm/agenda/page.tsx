@@ -1,8 +1,8 @@
 import { Box, Container, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { WebsiteLayout, apmBlue, ink, muted, soft, apmGreen } from '../website/layout';
+import { useNavigate } from '@tanstack/react-router';
 import { SectionHeading, PrimaryButton, GreenBadge } from '../website/components';
 import { useAgenda } from '../website/hooks';
-import { useNavigate } from '@tanstack/react-router';
+import { WebsiteLayout, apmBlue, ink, muted, soft, apmGreen } from '../website/layout';
 
 const iconLUT: Record<string, React.ReactNode> = {
   CircleDollarSign: '💰',
@@ -20,7 +20,10 @@ export default function AgendaPage() {
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Oyo Next Agenda"
@@ -32,9 +35,13 @@ export default function AgendaPage() {
       <Box py={80} style={{ background: '#fff' }}>
         <Container size="xl">
           {isLoading ? (
-            <Group justify="center"><Loader color={apmBlue} /></Group>
+            <Group justify="center">
+              <Loader color={apmBlue} />
+            </Group>
           ) : !data?.length ? (
-            <Text ta="center" style={{ color: muted }}>Agenda items coming soon.</Text>
+            <Text ta="center" style={{ color: muted }}>
+              Agenda items coming soon.
+            </Text>
           ) : (
             <Stack gap={40}>
               {data.map((item) => (
@@ -45,7 +52,8 @@ export default function AgendaPage() {
                     borderRadius: 16,
                     background: '#fff',
                     border: '1px solid #E2E8F0',
-                    transition: 'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
+                    transition:
+                      'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
                   }}
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLDivElement;
@@ -76,14 +84,20 @@ export default function AgendaPage() {
                     </Box>
                     <Stack gap="xs" style={{ flex: 1 }}>
                       <Group gap="xs">
-                        <Title order={3} style={{ fontSize: '1.25rem', fontWeight: 700, color: ink, letterSpacing: '-0.02em' }}>
+                        <Title
+                          order={3}
+                          style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 700,
+                            color: ink,
+                            letterSpacing: '-0.02em',
+                          }}
+                        >
                           {item.title}
                         </Title>
                         {item.category && <GreenBadge>{item.category}</GreenBadge>}
                       </Group>
-                      <Text style={{ color: muted, lineHeight: 1.8 }}>
-                        {item.description}
-                      </Text>
+                      <Text style={{ color: muted, lineHeight: 1.8 }}>{item.description}</Text>
                     </Stack>
                   </Group>
                 </Box>

@@ -1,11 +1,15 @@
-import { filterNavGroupsByModule } from './sidebar-data';
 import type { NavItem } from '../types';
+import { filterNavGroupsByModule } from './sidebar-data';
 
 const conversationGroup: NavItem = {
   title: 'Conversation',
   items: [
     { title: 'Conversations', url: '/conversation', modules: ['conversation', 'admin'] },
-    { title: 'Participants', url: '/conversation/participants', modules: ['conversation', 'admin'] },
+    {
+      title: 'Participants',
+      url: '/conversation/participants',
+      modules: ['conversation', 'admin'],
+    },
   ],
 };
 
@@ -27,9 +31,7 @@ const mixedGroup: NavItem = {
 
 const noModulesGroup: NavItem = {
   title: 'Global',
-  items: [
-    { title: 'Settings', url: '/settings' },
-  ],
+  items: [{ title: 'Settings', url: '/settings' }],
 };
 
 describe('filterNavGroupsByModule', () => {

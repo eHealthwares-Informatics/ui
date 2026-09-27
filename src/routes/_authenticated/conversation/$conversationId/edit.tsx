@@ -28,10 +28,7 @@ function ConversationEditPage() {
       <RxPage
         title={conversationPageSchema.title}
         description={conversationPageSchema.description}
-        breadcrumbs={[
-          { label: 'Conversations', href: '/conversation' },
-          { label: conversationId },
-        ]}
+        breadcrumbs={[{ label: 'Conversations', href: '/conversation' }, { label: conversationId }]}
         onBack={() => navigate({ to: '/conversation' })}
       >
         <div>Loading...</div>
@@ -43,15 +40,12 @@ function ConversationEditPage() {
     <RxPage
       title={conversationPageSchema.title}
       description={conversationPageSchema.description}
-      breadcrumbs={[
-        { label: 'Conversations', href: '/conversation' },
-        { label: conversationId },
-      ]}
+      breadcrumbs={[{ label: 'Conversations', href: '/conversation' }, { label: conversationId }]}
       onBack={() => navigate({ to: '/conversation' })}
     >
       <DataPageForm
         config={conversationPageSchema}
-        initialData={data ? { ...data, id: (data.id ?? data._id) ?? conversationId } : null}
+        initialData={data ? { ...data, id: data.id ?? data._id ?? conversationId } : null}
         mode="edit"
       />
     </RxPage>

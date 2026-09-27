@@ -1,18 +1,4 @@
 import {
-  ActionIcon,
-  Button,
-  Card,
-  Checkbox,
-  Group,
-  Modal,
-  Select,
-  Stack,
-  Tabs,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
-import {
   DndContext,
   PointerSensor,
   closestCenter,
@@ -27,6 +13,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  ActionIcon,
+  Button,
+  Card,
+  Checkbox,
+  Group,
+  Modal,
+  Select,
+  Stack,
+  Tabs,
+  Text,
+  TextInput,
+  Textarea,
+} from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowDown, ArrowUp, Copy, Folder, GripVertical, Plus, Trash2 } from 'lucide-react';
@@ -105,9 +105,7 @@ function deriveKey(label: string): string {
     return '';
   }
   return words
-    .map((word, index) =>
-      index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
-    )
+    .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
     .join('');
 }
 
@@ -222,7 +220,10 @@ function validate(fields: BuilderField[], name: string, code: string, category: 
       }
       if (
         (field.type === 'select' || field.type === 'radio' || field.type === 'checkbox-group') &&
-        field.optionsText.trim().split('\n').filter((line) => line.trim()).length === 0
+        field.optionsText
+          .trim()
+          .split('\n')
+          .filter((line) => line.trim()).length === 0
       ) {
         errors.push(`${field.label || where} requires at least one option`);
       }
@@ -241,7 +242,10 @@ function validate(fields: BuilderField[], name: string, code: string, category: 
         if (field.type === 'tab' && field.fields.some((child) => child.type === 'tab')) {
           errors.push(`Tab ${label} cannot contain nested tabs`);
         }
-        if (field.type === 'col' && field.fields.some((child) => child.type === 'tab' || child.type === 'col')) {
+        if (
+          field.type === 'col' &&
+          field.fields.some((child) => child.type === 'tab' || child.type === 'col')
+        ) {
           errors.push(`Column ${label} can only contain fields or sections`);
         }
         walk(field.fields, `${kind} ${label}`);
@@ -283,7 +287,10 @@ function SortableFieldList({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={fields.map((field) => field.uid)} strategy={verticalListSortingStrategy}>
+      <SortableContext
+        items={fields.map((field) => field.uid)}
+        strategy={verticalListSortingStrategy}
+      >
         {fields.map((field, index) => (
           <SortableFieldItem key={field.uid} id={field.uid}>
             {(dragHandleProps) => children({ field, index, dragHandleProps })}
@@ -346,8 +353,7 @@ function FieldEditor({
 
   const updateChild = (index: number, next: BuilderField) =>
     patch({ fields: children.map((child, i) => (i === index ? next : child)) });
-  const removeChild = (index: number) =>
-    patch({ fields: children.filter((_, i) => i !== index) });
+  const removeChild = (index: number) => patch({ fields: children.filter((_, i) => i !== index) });
   const moveChild = (index: number, direction: -1 | 1) => {
     const next = [...children];
     const target = index + direction;
@@ -422,19 +428,10 @@ function FieldEditor({
             >
               <ArrowDown size={14} />
             </ActionIcon>
-            <ActionIcon
-              variant="subtle"
-              onClick={onDuplicate}
-              aria-label="Duplicate field"
-            >
+            <ActionIcon variant="subtle" onClick={onDuplicate} aria-label="Duplicate field">
               <Copy size={14} />
             </ActionIcon>
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              onClick={onRemove}
-              aria-label="Remove field"
-            >
+            <ActionIcon variant="subtle" color="red" onClick={onRemove} aria-label="Remove field">
               <Trash2 size={14} />
             </ActionIcon>
           </Group>
@@ -550,7 +547,8 @@ function FieldEditor({
             <Group gap={6}>
               <Folder size={14} style={{ color: 'var(--mantine-color-dimmed)' }} />
               <Text size="xs" c="dimmed" fw={600} tt="uppercase">
-                {field.type === 'tab' ? 'Fields in this tab' : 'Fields in this column'} ({children.length})
+                {field.type === 'tab' ? 'Fields in this tab' : 'Fields in this column'} (
+                {children.length})
               </Text>
             </Group>
             {children.length === 0 && (
@@ -560,10 +558,7 @@ function FieldEditor({
                   : 'No fields yet — add fields to this column below.'}
               </Text>
             )}
-            <SortableFieldList
-              fields={children}
-              onReorder={(next) => patch({ fields: next })}
-            >
+            <SortableFieldList fields={children} onReorder={(next) => patch({ fields: next })}>
               {({ field: child, index: childIndex, dragHandleProps: childHandle }) => (
                 <FieldEditor
                   key={child.uid}
@@ -654,7 +649,7 @@ export function FormBuilderModal({
 
   const setField = (index: number, patch: Partial<BuilderField>) => {
     setFields((current) =>
-      current.map((field, i) => (i === index ? { ...field, ...patch } : field)),
+      current.map((field, i) => (i === index ? { ...field, ...patch } : field))
     );
   };
 
@@ -764,8 +759,8 @@ export function FormBuilderModal({
               {fields.length === 0 && (
                 <Text size="sm" c="dimmed">
                   No fields yet — add your first field below. Use a Section field to group the
-                  fields that follow it, or a Tab field to organize fields into tabs. Drag the
-                  grip handle to reorder fields.
+                  fields that follow it, or a Tab field to organize fields into tabs. Drag the grip
+                  handle to reorder fields.
                 </Text>
               )}
 
@@ -775,9 +770,7 @@ export function FormBuilderModal({
                     key={field.uid}
                     field={field}
                     onChange={(next) => setField(index, next)}
-                    onRemove={() =>
-                      setFields((current) => current.filter((_, i) => i !== index))
-                    }
+                    onRemove={() => setFields((current) => current.filter((_, i) => i !== index))}
                     onDuplicate={() =>
                       setFields((current) => [
                         ...current.slice(0, index + 1),
@@ -810,11 +803,7 @@ export function FormBuilderModal({
                 : 'Live preview — sections render as dividers, tabs as tabbed sections, columns side-by-side, and every control matches the final form.'}
             </Text>
             {previewSchemaFieldsCount > 0 && (
-              <DynamicFormFields
-                schema={schema}
-                value={previewData}
-                onChange={setPreviewData}
-              />
+              <DynamicFormFields schema={schema} value={previewData} onChange={setPreviewData} />
             )}
           </Tabs.Panel>
 
@@ -840,7 +829,10 @@ export function FormBuilderModal({
                 minRows={16}
                 maxRows={32}
                 styles={{
-                  input: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 12 },
+                  input: {
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                    fontSize: 12,
+                  },
                 }}
               />
               <Group justify="flex-end">
@@ -869,7 +861,10 @@ export function FormBuilderModal({
                       }
                       setFields(schemaToBuilder(parsed as FormSchema));
                       setJsonDirty(false);
-                      notifications.show({ message: 'Schema applied to the visual editor', color: 'teal' });
+                      notifications.show({
+                        message: 'Schema applied to the visual editor',
+                        color: 'teal',
+                      });
                     } catch (error) {
                       notifications.show({
                         color: 'red',

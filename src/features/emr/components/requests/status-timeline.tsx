@@ -32,7 +32,13 @@ export function StatusTimeline({ history }: { history: RequestStatusHistory[] })
         return (
           <Timeline.Item
             key={entry.id}
-            title={isNote ? 'Note' : entry.fromStatus ? `${formatEnum(entry.fromStatus)} → ${formatEnum(entry.toStatus)}` : `Created · ${formatEnum(entry.toStatus)}`}
+            title={
+              isNote
+                ? 'Note'
+                : entry.fromStatus
+                  ? `${formatEnum(entry.fromStatus)} → ${formatEnum(entry.toStatus)}`
+                  : `Created · ${formatEnum(entry.toStatus)}`
+            }
             color={isNote ? 'gray' : timelineColor(entry.toStatus)}
           >
             <Text size="xs" c="dimmed">

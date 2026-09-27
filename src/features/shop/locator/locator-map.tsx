@@ -9,8 +9,8 @@
  */
 import 'leaflet/dist/leaflet.css';
 import { ActionIcon } from '@mantine/core';
-import { Moon, Sun } from 'lucide-react';
 import L from 'leaflet';
+import { Moon, Sun } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import {
   Circle,
@@ -49,7 +49,9 @@ const TILE_URLS: Record<MapVariant, string> = {
 
 /** Green-tinted dark basemap styles + themed Leaflet chrome, injected once. */
 function injectLocatorStyles() {
-  if (typeof document === 'undefined' || document.getElementById('locator-map-styles')) return;
+  if (typeof document === 'undefined' || document.getElementById('locator-map-styles')) {
+    return;
+  }
   const style = document.createElement('style');
   style.id = 'locator-map-styles';
   style.textContent = `
@@ -317,8 +319,12 @@ function FocusHandler({ focus }: { focus?: MapFocus | null }) {
     if (typeof window !== 'undefined') {
       (window as unknown as { __locatorMap?: L.Map }).__locatorMap = map;
     }
-    if (!focus) return;
-    if (!isValidLatLng(focus.latitude, focus.longitude)) return;
+    if (!focus) {
+      return;
+    }
+    if (!isValidLatLng(focus.latitude, focus.longitude)) {
+      return;
+    }
     map.flyTo([focus.latitude, focus.longitude], focus.zoom ?? 14, { duration: 0.9 });
   }, [focus, map]);
   return null;
@@ -387,7 +393,9 @@ function UserDotMarker({ userLocation }: { userLocation?: UserDot | null }) {
       setArrived(true);
     }
   }, [valid, arrived, map, userLocation]);
-  if (!valid) return null;
+  if (!valid) {
+    return null;
+  }
   const icon = L.divIcon({
     className: 'locator-user-dot',
     html: '<div class="locator-user-dot__inner"></div>',
@@ -462,11 +470,11 @@ function LocatorMapInner({
 
   const pins = useMemo(
     () => points.filter((p) => !p.bubble && isValidLatLng(p.latitude, p.longitude)),
-    [points],
+    [points]
   );
   const bubbles = useMemo(
     () => points.filter((p) => p.bubble && isValidLatLng(p.latitude, p.longitude)),
-    [points],
+    [points]
   );
 
   const clusterIcon = (cluster: { getChildCount: () => number }): L.DivIcon => {
@@ -492,72 +500,78 @@ function LocatorMapInner({
             : '',
           p.detail ?? '',
         ].join('');
-        return { key: p.key, lat: p.latitude, lng: p.longitude, icon: pinIcon(p.pinKind ?? 'facility', p.key === highlightKey), popupHtml: body };
+        return {
+          key: p.key,
+          lat: p.latitude,
+          lng: p.longitude,
+          icon: pinIcon(p.pinKind ?? 'facility', p.key === highlightKey),
+          popupHtml: body,
+        };
       }),
-    [pins, highlightKey],
+    [pins, highlightKey]
   );
 
   return (
     <div style={{ position: 'relative', width: '100%' }}>
-    <MapContainer
-      center={NIGERIA_CENTER}
-      zoom={6}
-      scrollWheelZoom
-      className={`locator-map locator-container--${activeVariant}`}
-      style={{ height, width: '100%', borderRadius: 16, zIndex: 0 }}
-    >
-      <TileLayer
-        key={activeVariant}
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url={TILE_URLS[activeVariant]}
-      />
-      <VariantClass variant={activeVariant} />
-      <FitBounds points={points} fitKey={fitKey} />
-      <FocusHandler focus={focus} />
-      <UserDotMarker userLocation={userLocation} />
-      <ViewportReporter onViewportChange={onViewportChange} />
-
-      {clusterMarkers.length > 0 && (
-        <MarkerClusterLayer
-          chunkedLoading
-          maxClusterRadius={45}
-          showCoverageOnHover={false}
-          iconCreateFunction={clusterIcon}
-          markers={clusterMarkers}
+      <MapContainer
+        center={NIGERIA_CENTER}
+        zoom={6}
+        scrollWheelZoom
+        className={`locator-map locator-container--${activeVariant}`}
+        style={{ height, width: '100%', borderRadius: 16, zIndex: 0 }}
+      >
+        <TileLayer
+          key={activeVariant}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url={TILE_URLS[activeVariant]}
         />
-      )}
+        <VariantClass variant={activeVariant} />
+        <FitBounds points={points} fitKey={fitKey} />
+        <FocusHandler focus={focus} />
+        <UserDotMarker userLocation={userLocation} />
+        <ViewportReporter onViewportChange={onViewportChange} />
 
-      {bubbles.map((p) => {
-        const radius = Math.min(30, 14 + Math.sqrt(p.bubble!.count) * 2.2);
-        const active = p.key === highlightKey;
-        const body = [
-          `<div style="font-weight:700;margin-bottom:2px;color:${THEME.text}">${escapeHtml(p.title)}${
-            p.bubble?.label ? ` — ${escapeHtml(p.bubble.label)}` : ''
-          }</div>`,
-          p.subtitle
-            ? `<div style="color:${THEME.textMuted};font-size:12px">${escapeHtml(p.subtitle)}</div>`
-            : '',
-          p.detail ?? '',
-        ].join('');
-        return (
-          <CircleMarker
-            key={p.key}
-            center={[p.latitude, p.longitude]}
-            radius={active ? radius + 4 : radius}
-            pathOptions={{
-              color: active ? THEME.teal : THEME.green,
-              weight: 2,
-              fillColor: active ? THEME.teal : THEME.green,
-              fillOpacity: 0.55,
-            }}
-            eventHandlers={{
-              add: (e) => (e.target as L.CircleMarker).bindPopup(body, { maxWidth: 300 }),
-            }}
+        {clusterMarkers.length > 0 && (
+          <MarkerClusterLayer
+            chunkedLoading
+            maxClusterRadius={45}
+            showCoverageOnHover={false}
+            iconCreateFunction={clusterIcon}
+            markers={clusterMarkers}
           />
-        );
-      })}
-    </MapContainer>
-    <VariantSwitch variant={activeVariant} onChange={setVariant} />
+        )}
+
+        {bubbles.map((p) => {
+          const radius = Math.min(30, 14 + Math.sqrt(p.bubble!.count) * 2.2);
+          const active = p.key === highlightKey;
+          const body = [
+            `<div style="font-weight:700;margin-bottom:2px;color:${THEME.text}">${escapeHtml(p.title)}${
+              p.bubble?.label ? ` — ${escapeHtml(p.bubble.label)}` : ''
+            }</div>`,
+            p.subtitle
+              ? `<div style="color:${THEME.textMuted};font-size:12px">${escapeHtml(p.subtitle)}</div>`
+              : '',
+            p.detail ?? '',
+          ].join('');
+          return (
+            <CircleMarker
+              key={p.key}
+              center={[p.latitude, p.longitude]}
+              radius={active ? radius + 4 : radius}
+              pathOptions={{
+                color: active ? THEME.teal : THEME.green,
+                weight: 2,
+                fillColor: active ? THEME.teal : THEME.green,
+                fillOpacity: 0.55,
+              }}
+              eventHandlers={{
+                add: (e) => (e.target as L.CircleMarker).bindPopup(body, { maxWidth: 300 }),
+              }}
+            />
+          );
+        })}
+      </MapContainer>
+      <VariantSwitch variant={activeVariant} onChange={setVariant} />
     </div>
   );
 }

@@ -43,7 +43,9 @@ export function CodingConceptSearchPage() {
   });
 
   const title = useMemo(() => {
-    if (!submitted?.term) {return 'Search a terminology concept';}
+    if (!submitted?.term) {
+      return 'Search a terminology concept';
+    }
     return `Search result for ${submitted.module}:${submitted.term}`;
   }, [submitted]);
 

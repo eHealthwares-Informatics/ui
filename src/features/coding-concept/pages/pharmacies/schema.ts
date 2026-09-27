@@ -1,5 +1,5 @@
-import type { ModelConfig } from '@/features/shared/model-schema';
 import { ColumnDataType, ColumnTypeFilters, type Column } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
 
 function matchLabel(value: unknown) {
   const text = String(value ?? '').trim();

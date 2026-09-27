@@ -7,9 +7,7 @@ import { getModelConfig } from '@/features/registry';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 
-export const Route = createFileRoute(
-  '/_authenticated/conversation/$page/$id/edit',
-)({
+export const Route = createFileRoute('/_authenticated/conversation/$page/$id/edit')({
   component: ConversationEntityEditPage,
 });
 
@@ -46,10 +44,7 @@ function ConversationEntityEditPage() {
   return (
     <RxPage
       title={modelConfig.title}
-      breadcrumbs={[
-        { label: modelConfig.title, href: `/conversation/${page}` },
-        { label: id },
-      ]}
+      breadcrumbs={[{ label: modelConfig.title, href: `/conversation/${page}` }, { label: id }]}
       onBack={() => navigate({ to: `/conversation/${page}` })}
     >
       <DataPageForm config={modelConfig} initialData={data} mode="edit" />

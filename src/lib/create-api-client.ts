@@ -1,8 +1,4 @@
-import axios, {
-  AxiosError,
-  type AxiosInstance,
-  type InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import { clearTokens, getAccessToken, getRefreshToken, persistTokens } from '@/lib/auth-tokens';
 
 export const IDENTITY_API_BASE_URL =
@@ -125,7 +121,7 @@ export function createAuthApiClient(options: CreateAuthApiClientOptions): AxiosI
         }
 
         return Promise.reject(error);
-      },
+      }
     );
   }
 

@@ -14,10 +14,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { emrApi } from '@/lib/emr-api';
 import { STAFF_CATEGORIES, STAFF_ROLE_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
-import { LocationPicker } from '../shared/location-picker';
 import { DepartmentPicker } from '../departments/department-picker';
+import { LocationPicker } from '../shared/location-picker';
 
-export function StaffForm({ onCreated, onClose }: { onCreated?: (created?: Record<string, unknown>) => void; onClose: () => void }) {
+export function StaffForm({
+  onCreated,
+  onClose,
+}: {
+  onCreated?: (created?: Record<string, unknown>) => void;
+  onClose: () => void;
+}) {
   const queryClient = useQueryClient();
 
   const form = useForm({

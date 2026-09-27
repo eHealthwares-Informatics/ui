@@ -36,7 +36,14 @@ export const ENCOUNTER_TYPES = [
   'OTHER',
 ] as const;
 
-export const STAFF_ROLE_TYPES = ['Doctor', 'Nurse', 'Technician', 'Therapist', 'Admin', 'Support'] as const;
+export const STAFF_ROLE_TYPES = [
+  'Doctor',
+  'Nurse',
+  'Technician',
+  'Therapist',
+  'Admin',
+  'Support',
+] as const;
 export const DEPARTMENT_TYPES = [
   'OPD',
   'INPATIENT',
@@ -73,7 +80,13 @@ export const MEDICATION_STATUSES = [
   'CANCELLED',
 ] as const;
 
-export const REQUEST_STATUSES = ['REQUESTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'REJECTED'] as const;
+export const REQUEST_STATUSES = [
+  'REQUESTED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'CANCELLED',
+  'REJECTED',
+] as const;
 
 export const SYNC_STATUSES = ['NONE', 'PENDING', 'SYNCED', 'FAILED'] as const;
 

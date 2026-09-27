@@ -64,7 +64,9 @@ export class CrudShellPage {
 
   /** Locates a row's action button by its lucide icon class (pencil / trash-2). */
   rowAction(text: string, iconClass: 'lucide-pencil' | 'lucide-trash-2'): Locator {
-    return this.getRow(text).locator('button').filter({ has: this.page.locator(`svg.${iconClass}`) });
+    return this.getRow(text)
+      .locator('button')
+      .filter({ has: this.page.locator(`svg.${iconClass}`) });
   }
 
   /** The label Text is the first child of a LabelField Stack; the field control is its next sibling. */
@@ -101,7 +103,9 @@ export class CrudShellPage {
 
   /** Opens edit on a row, applies the edit field(s), and submits. */
   async edit(resource: RxsoftCrudResource, token: string): Promise<void> {
-    if (!resource.editField) return;
+    if (!resource.editField) {
+      return;
+    }
     await this.fillField(resource.editField.label, resource.editField.value(token));
     await this.dialog.getByRole('button', { name: 'Update' }).click();
   }

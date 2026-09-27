@@ -2,11 +2,11 @@ import { Anchor } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { ReceiptDetailModal } from './detail-modal';
 import { receivingConfig } from './schema';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export function RxReceivingPage() {
   const qc = useQueryClient();
@@ -14,11 +14,20 @@ export function RxReceivingPage() {
   const [detailOpen, setDetailOpen] = useState(false);
 
   const unpostMutation = useMutation({
-    mutationFn: async ({ receiptLineId, password }: { receiptLineId: string; password: string }) => {
-      await rxsoftApi.post(`/purchases/${selectedReceipt?.purchaseOrder?.id ?? selectedReceipt?.purchaseOrderId}/unpost`, {
-        receiptLineId,
-        password,
-      });
+    mutationFn: async ({
+      receiptLineId,
+      password,
+    }: {
+      receiptLineId: string;
+      password: string;
+    }) => {
+      await rxsoftApi.post(
+        `/purchases/${selectedReceipt?.purchaseOrder?.id ?? selectedReceipt?.purchaseOrderId}/unpost`,
+        {
+          receiptLineId,
+          password,
+        }
+      );
     },
     onSuccess: () => {
       notifications.show({ message: 'Line unposted successfully.', color: 'green' });
@@ -48,10 +57,10 @@ export function RxReceivingPage() {
                 </Anchor>
               ),
             }
-          : col,
+          : col
       ),
     }),
-    [],
+    []
   );
 
   return (

@@ -18,14 +18,9 @@ import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getUomEffectiveFactor } from '@/lib/uom-utils';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import {
-  UomOption,
-  usePosItemPrice,
-  usePosItemUoms,
-  usePosItems,
-} from '../../api/posApi';
+import { getUomEffectiveFactor } from '@/lib/uom-utils';
+import { UomOption, usePosItemPrice, usePosItemUoms, usePosItems } from '../../api/posApi';
 import { SaleSession, CartItem, DispenseRow } from '../types';
 import { PosSetPriceModal } from './PosSetPriceModal';
 import { StockAdjustModal } from './StockAdjustModal';
@@ -81,11 +76,10 @@ function PosProductPicker({
       (Array.isArray(items) ? items : []).map((i) => ({
         value: i.id,
         label:
-          `${i.code || ''}${i.code ? ' - ' : ''}${i.displayName || i.name || ''}`.trim() ||
-          i.id,
+          `${i.code || ''}${i.code ? ' - ' : ''}${i.displayName || i.name || ''}`.trim() || i.id,
         item: i,
       })),
-    [items],
+    [items]
   );
 
   const submit = (val: string) => {
@@ -111,9 +105,7 @@ function PosProductPicker({
           onClick={() => combobox.openDropdown()}
           onFocus={() => combobox.openDropdown()}
           onBlur={() => setSearch('')}
-          rightSection={
-            isLoading ? <Loader size={14} /> : <ChevronDown size={14} />
-          }
+          rightSection={isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
         />
       </Combobox.Target>
       <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 20 }}>
@@ -168,7 +160,10 @@ function DispenseRowEditor({
   const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
   const { data: unitPrice = null } = usePosItemPrice(priceListId, selectedProductId);
 
-  const itemUomMap = useMemo(() => new Map(itemUoms.map((u) => [u.id, u as UomOption])), [itemUoms]);
+  const itemUomMap = useMemo(
+    () => new Map(itemUoms.map((u) => [u.id, u as UomOption])),
+    [itemUoms]
+  );
 
   const uomItemId = useRef<string | null>(null);
   useEffect(() => {
@@ -181,7 +176,9 @@ function DispenseRowEditor({
       setUomId(null);
       return;
     }
-    if (uomItemId.current === selectedProductId) { return; }
+    if (uomItemId.current === selectedProductId) {
+      return;
+    }
     uomItemId.current = selectedProductId;
     if (selected?.saleUomId && itemUoms.some((u) => u.id === selected.saleUomId)) {
       setUomId(selected.saleUomId);
@@ -199,7 +196,9 @@ function DispenseRowEditor({
   const { data: stockQty = null } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
     queryFn: async () => {
-      if (!selectedProductId || !stockLocationId) { return null; }
+      if (!selectedProductId || !stockLocationId) {
+        return null;
+      }
       const { data } = await rxsoftApi.get('/inventory/stock-balances/summary', {
         params: { itemId: selectedProductId, locationId: stockLocationId },
       });
@@ -273,7 +272,9 @@ function DispenseRowEditor({
         {selected?.imageUrl ? (
           <Image src={selected.imageUrl} w={40} h={40} fit="cover" />
         ) : (
-          <Text size="xs" c="dimmed">-</Text>
+          <Text size="xs" c="dimmed">
+            -
+          </Text>
         )}
       </Table.Td>
       <Table.Td fw={600}>{row.orderedLabel || '-'}</Table.Td>
@@ -283,17 +284,23 @@ function DispenseRowEditor({
       <Table.Td>
         {stockLocationId && selectedProductId ? (
           adjustedStockQty === null ? (
-            <Text size="xs" c="dimmed">-</Text>
+            <Text size="xs" c="dimmed">
+              -
+            </Text>
           ) : (
             <Text size="xs">{adjustedStockQty.toFixed(2)}</Text>
           )
         ) : (
-          <Text size="xs" c="dimmed">-</Text>
+          <Text size="xs" c="dimmed">
+            -
+          </Text>
         )}
       </Table.Td>
       <Table.Td>
         {!selectedProductId ? (
-          <Text size="xs" c="dimmed">-</Text>
+          <Text size="xs" c="dimmed">
+            -
+          </Text>
         ) : unitPriceDisplay === null ? (
           <Button size="xs" variant="light" color="cyan" onClick={() => setSetPriceOpen(true)}>
             SetPrice
@@ -315,15 +322,32 @@ function DispenseRowEditor({
         />
       </Table.Td>
       <Table.Td>
-        <NumberInput size="xs" min={1} value={quantity} onChange={(v) => setQuantity(Number(v) || 1)} w={80} />
+        <NumberInput
+          size="xs"
+          min={1}
+          value={quantity}
+          onChange={(v) => setQuantity(Number(v) || 1)}
+          w={80}
+        />
       </Table.Td>
       <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
       <Table.Td>
         <ActionIcon.Group>
-          <Button size="xs" leftSection={<Plus size={14} />} onClick={handleAdd} data-testid="pos-dispense-add-btn">
+          <Button
+            size="xs"
+            leftSection={<Plus size={14} />}
+            onClick={handleAdd}
+            data-testid="pos-dispense-add-btn"
+          >
             Add
           </Button>
-          <ActionIcon size="sm" color="red" variant="subtle" onClick={onRemove} aria-label="Remove dispense row">
+          <ActionIcon
+            size="sm"
+            color="red"
+            variant="subtle"
+            onClick={onRemove}
+            aria-label="Remove dispense row"
+          >
             <Trash2 size={14} />
           </ActionIcon>
         </ActionIcon.Group>
@@ -341,7 +365,14 @@ function DispenseRowEditor({
   );
 }
 
-export function ProductEntryTable({ session, onAddToCart, stockLocationId, dispenseRows, dispenseKey, onDispenseAdd }: Props) {
+export function ProductEntryTable({
+  session,
+  onAddToCart,
+  stockLocationId,
+  dispenseRows,
+  dispenseKey,
+  onDispenseAdd,
+}: Props) {
   const [selected, setSelected] = useState<SelectedProduct | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -539,91 +570,96 @@ export function ProductEntryTable({ session, onAddToCart, stockLocationId, dispe
               />
             ))
           ) : (
-          <Table.Tr>
-            <Table.Td>
-              {selected?.imageUrl ? (
-                <Image src={selected.imageUrl} w={40} h={40} fit="cover" />
-              ) : (
-                <Text size="xs" c="dimmed">
-                  -
-                </Text>
-              )}
-            </Table.Td>
-            <Table.Td>{itemCode || '-'}</Table.Td>
-            <Table.Td>
-              <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
-            </Table.Td>
-            <Table.Td>
-              {stockLocationId && selectedProductId ? (
-                adjustedStockQty === null ? (
-                  <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
-                    Set Stock
+            <Table.Tr>
+              <Table.Td>
+                {selected?.imageUrl ? (
+                  <Image src={selected.imageUrl} w={40} h={40} fit="cover" />
+                ) : (
+                  <Text size="xs" c="dimmed">
+                    -
+                  </Text>
+                )}
+              </Table.Td>
+              <Table.Td>{itemCode || '-'}</Table.Td>
+              <Table.Td>
+                <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
+              </Table.Td>
+              <Table.Td>
+                {stockLocationId && selectedProductId ? (
+                  adjustedStockQty === null ? (
+                    <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
+                      Set Stock
+                    </Button>
+                  ) : (
+                    <UnstyledButton
+                      onClick={openAdjustModal}
+                      style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      {adjustedStockQty.toFixed(2)}
+                    </UnstyledButton>
+                  )
+                ) : (
+                  <Text size="xs" c="dimmed">
+                    -
+                  </Text>
+                )}
+              </Table.Td>
+              <Table.Td>
+                {!selectedProductId || !selected ? (
+                  <Text size="xs" c="dimmed">
+                    -
+                  </Text>
+                ) : unitPriceDisplay === null ? (
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="cyan"
+                    onClick={() => setSetPriceOpen(true)}
+                    data-testid="pos-set-price-btn"
+                  >
+                    SetPrice
                   </Button>
                 ) : (
-                  <UnstyledButton
-                    onClick={openAdjustModal}
-                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                  >
-                    {adjustedStockQty.toFixed(2)}
-                  </UnstyledButton>
-                )
-              ) : (
-                <Text size="xs" c="dimmed">
-                  -
-                </Text>
-              )}
-            </Table.Td>
-            <Table.Td>
-              {!selectedProductId || !selected ? (
-                <Text size="xs" c="dimmed">
-                  -
-                </Text>
-              ) : unitPriceDisplay === null ? (
+                  unitPriceDisplay.toFixed(2)
+                )}
+              </Table.Td>
+              <Table.Td>
+                <Select
+                  size="xs"
+                  w={200}
+                  data-testid="pos-entry-uom"
+                  data={itemUoms.map((u) => ({
+                    value: u.id,
+                    label: u.name,
+                  }))}
+                  value={uomId}
+                  onChange={(v) => setUomId(v)}
+                  placeholder="Pick UOM"
+                  disabled={itemUoms.length === 0}
+                  maxDropdownHeight={300}
+                />
+              </Table.Td>
+              <Table.Td>
+                <NumberInput
+                  size="xs"
+                  min={1}
+                  value={quantity}
+                  onChange={(v) => setQuantity(Number(v) || 1)}
+                  w={80}
+                />
+              </Table.Td>
+              <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
+              <Table.Td>
                 <Button
                   size="xs"
-                  variant="light"
-                  color="cyan"
-                  onClick={() => setSetPriceOpen(true)}
-                  data-testid="pos-set-price-btn"
+                  leftSection={<Plus size={14} />}
+                  onClick={handleAdd}
+                  data-testid="pos-add-to-cart-btn"
                 >
-                  SetPrice
+                  Add
                 </Button>
-              ) : (
-                unitPriceDisplay.toFixed(2)
-              )}
-            </Table.Td>
-            <Table.Td>
-              <Select
-                size="xs"
-                w={200}
-                data-testid="pos-entry-uom"
-                data={itemUoms.map((u) => ({
-                  value: u.id,
-                  label: u.name,
-                }))}
-                value={uomId}
-                onChange={(v) => setUomId(v)}
-                placeholder="Pick UOM"
-                disabled={itemUoms.length === 0}
-                maxDropdownHeight={300}
-              />
-            </Table.Td>
-            <Table.Td>
-              <NumberInput
-                size="xs"
-                min={1}
-                value={quantity}
-                onChange={(v) => setQuantity(Number(v) || 1)}
-                w={80}
-              />
-            </Table.Td>
-            <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
-            <Table.Td>
-              <Button size="xs" leftSection={<Plus size={14} />} onClick={handleAdd} data-testid="pos-add-to-cart-btn">
-                Add
-              </Button>
-            </Table.Td>
-          </Table.Tr>
+              </Table.Td>
+            </Table.Tr>
           )}
         </Table.Tbody>
       </Table>

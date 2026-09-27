@@ -22,5 +22,9 @@ export function BedCell({ bedId }: { bedId?: string | null }) {
   if (!bed) {
     return bedId ? <Text size="sm">{String(bedId).slice(0, 8)}</Text> : <Text size="sm">—</Text>;
   }
-  return <Badge variant="light" color="teal">{String(bed.code)}</Badge>;
+  return (
+    <Badge variant="light" color="teal">
+      {String(bed.code)}
+    </Badge>
+  );
 }

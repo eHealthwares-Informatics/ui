@@ -16,7 +16,7 @@ interface CartStore {
   addItem: (
     productId: string,
     quantity?: number,
-    details?: { name?: string; unitPrice?: number; product?: CartItem['product'] },
+    details?: { name?: string; unitPrice?: number; product?: CartItem['product'] }
   ) => void;
   addGenericItem: (entry: {
     name?: string;
@@ -32,7 +32,7 @@ interface CartStore {
   }) => void;
   updateItemDetails: (
     productId: string,
-    details: { name?: string; unitPrice?: number; product?: CartItem['product'] },
+    details: { name?: string; unitPrice?: number; product?: CartItem['product'] }
   ) => void;
   updateQuantity: (productId: string | undefined, quantity: number) => void;
   removeItem: (productId: string | undefined) => void;
@@ -54,7 +54,7 @@ function lineKey(i: CartItem): string | undefined {
 function computeSubtotal(items: CartItem[]): number {
   return items.reduce(
     (sum, i) => sum + ((i.product as any)?.unitPrice ?? i.unitPrice ?? 0) * i.quantity,
-    0,
+    0
   );
 }
 
@@ -128,19 +128,19 @@ export const useCartStore = create<CartStore>()(
       },
 
       updateItemDetails: (productId, details) => {
-    set((state) => {
-      const items = state.items.map((i) =>
-        i.productId === productId ? { ...i, ...details } : i,
-      );
-      return {
-        items,
-        totalItems: items.reduce((sum, i) => sum + i.quantity, 0),
-        subtotal: computeSubtotal(items),
-      }; 
-    });
-  },
+        set((state) => {
+          const items = state.items.map((i) =>
+            i.productId === productId ? { ...i, ...details } : i
+          );
+          return {
+            items,
+            totalItems: items.reduce((sum, i) => sum + i.quantity, 0),
+            subtotal: computeSubtotal(items),
+          };
+        });
+      },
 
-  updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity) => {
         set((state) => {
           const keyed = (i: CartItem) => lineKey(i) === productId;
           if (quantity <= 0) {
@@ -151,9 +151,7 @@ export const useCartStore = create<CartStore>()(
               subtotal: computeSubtotal(items),
             };
           }
-          const items = state.items.map((i) =>
-            keyed(i) ? { ...i, quantity } : i
-          );
+          const items = state.items.map((i) => (keyed(i) ? { ...i, quantity } : i));
           return {
             items,
             totalItems: items.reduce((sum, i) => sum + i.quantity, 0),
@@ -214,9 +212,7 @@ export const useCartStore = create<CartStore>()(
           let items: CartItem[];
           if (existing) {
             items = state.items.map((i) =>
-              lineKey(i) === savedKey
-                ? { ...i, quantity: i.quantity + saved.quantity }
-                : i
+              lineKey(i) === savedKey ? { ...i, quantity: i.quantity + saved.quantity } : i
             );
           } else if (savedKey) {
             items = [

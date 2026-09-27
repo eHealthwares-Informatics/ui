@@ -67,7 +67,9 @@ export const usePOSStore = create<POSStore>()(
     addLine: (sessionId, line) => {
       set((state) => {
         const session = state.sessions[sessionId];
-        if (!session) {return state;}
+        if (!session) {
+          return state;
+        }
         const lines = mergeLine(session.lines, line);
         return {
           sessions: {
@@ -80,7 +82,9 @@ export const usePOSStore = create<POSStore>()(
     updateQuantity: (sessionId, lineId, quantity) => {
       set((state) => {
         const session = state.sessions[sessionId];
-        if (!session) {return state;}
+        if (!session) {
+          return state;
+        }
         const lines = session.lines.map((l) => (l.id === lineId ? { ...l, quantity } : l));
         return {
           sessions: {
@@ -93,7 +97,9 @@ export const usePOSStore = create<POSStore>()(
     removeLine: (sessionId, lineId) => {
       set((state) => {
         const session = state.sessions[sessionId];
-        if (!session) {return state;}
+        if (!session) {
+          return state;
+        }
         const lines = session.lines.filter((l) => l.id !== lineId);
         return {
           sessions: {
@@ -106,7 +112,9 @@ export const usePOSStore = create<POSStore>()(
     holdSession: (sessionId) => {
       set((state) => {
         const s = state.sessions[sessionId];
-        if (!s) {return state;}
+        if (!s) {
+          return state;
+        }
         return {
           sessions: { ...state.sessions, [sessionId]: { ...s, held: true, updatedAt: Date.now() } },
         };
@@ -115,7 +123,9 @@ export const usePOSStore = create<POSStore>()(
     resumeSession: (sessionId) => {
       set((state) => {
         const s = state.sessions[sessionId];
-        if (!s) {return state;}
+        if (!s) {
+          return state;
+        }
         return {
           sessions: {
             ...state.sessions,
@@ -129,7 +139,9 @@ export const usePOSStore = create<POSStore>()(
       const newId = `s_${Date.now()}`;
       set((state) => {
         const s = state.sessions[sessionId];
-        if (!s) {return state;}
+        if (!s) {
+          return state;
+        }
         const copy = { ...s, id: newId, createdAt: Date.now(), updatedAt: Date.now() };
         return { sessions: { ...state.sessions, [newId]: copy }, activeSessionId: newId };
       });
@@ -138,7 +150,9 @@ export const usePOSStore = create<POSStore>()(
     clearSession: (sessionId) => {
       set((state) => {
         const s = state.sessions[sessionId];
-        if (!s) {return state;}
+        if (!s) {
+          return state;
+        }
         return {
           sessions: { ...state.sessions, [sessionId]: { ...s, lines: [], updatedAt: Date.now() } },
         };
@@ -147,7 +161,9 @@ export const usePOSStore = create<POSStore>()(
     getTotals: (sessionId, orderDiscountPercent = 0, orderDiscountAmount = 0) => {
       const state = (usePOSStore as any).getState() as POSStore;
       const s = state.sessions[sessionId];
-      if (!s) {return null;}
+      if (!s) {
+        return null;
+      }
       return calculateOrderTotals(s.lines, orderDiscountPercent, orderDiscountAmount);
     },
   }))

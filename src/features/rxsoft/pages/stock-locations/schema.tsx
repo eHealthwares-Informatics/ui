@@ -66,7 +66,9 @@ export const stockLocationsConfig: ModelConfig = {
       label: 'Created At',
       dataType: ColumnDataType.DATE,
       render: (row) => {
-        if (!row.createdAt) {return '-';}
+        if (!row.createdAt) {
+          return '-';
+        }
 
         return new Date(row.createdAt as string).toLocaleString();
       },

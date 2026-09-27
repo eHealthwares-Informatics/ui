@@ -544,7 +544,7 @@ function ToggleActive({ row }: { row: Record<string, unknown> }) {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 
@@ -953,32 +953,56 @@ function flattenOptionValue(value: any): any {
 export function buildItemUpdatePayload(values: Record<string, any>) {
   const payload: Record<string, any> = {};
 
-  if (values.name !== undefined) payload.name = values.name;
-  if (values.category !== undefined) payload.categoryId = flattenOptionValue(values.category);
+  if (values.name !== undefined) {
+    payload.name = values.name;
+  }
+  if (values.category !== undefined) {
+    payload.categoryId = flattenOptionValue(values.category);
+  }
   if (values.genericProductCode !== undefined) {
     payload.genericProductCode = flattenOptionValue(values.genericProductCode);
   }
-  if (values.baseUom !== undefined) payload.baseUomId = flattenOptionValue(values.baseUom);
-  if (values.purchaseUom !== undefined) payload.purchaseUomId = flattenOptionValue(values.purchaseUom);
-  if (values.saleUom !== undefined) payload.saleUomId = flattenOptionValue(values.saleUom);
-  if (values.code !== undefined) payload.code = values.code || undefined;
-  if (values.barcode !== undefined) payload.barcode = values.barcode || undefined;
-  if (values.alias !== undefined) payload.alias = values.alias || undefined;
+  if (values.baseUom !== undefined) {
+    payload.baseUomId = flattenOptionValue(values.baseUom);
+  }
+  if (values.purchaseUom !== undefined) {
+    payload.purchaseUomId = flattenOptionValue(values.purchaseUom);
+  }
+  if (values.saleUom !== undefined) {
+    payload.saleUomId = flattenOptionValue(values.saleUom);
+  }
+  if (values.code !== undefined) {
+    payload.code = values.code || undefined;
+  }
+  if (values.barcode !== undefined) {
+    payload.barcode = values.barcode || undefined;
+  }
+  if (values.alias !== undefined) {
+    payload.alias = values.alias || undefined;
+  }
   if (values.isTrackable !== undefined) {
     payload.trackLot = values.isTrackable;
     payload.trackExpiry = values.isTrackable;
   }
-  if (values.isActive !== undefined) payload.isActive = values.isActive;
-  if (values.shelfLifeDays !== undefined) payload.shelfLifeDays = values.shelfLifeDays;
+  if (values.isActive !== undefined) {
+    payload.isActive = values.isActive;
+  }
+  if (values.shelfLifeDays !== undefined) {
+    payload.shelfLifeDays = values.shelfLifeDays;
+  }
   for (const field of ['imageUrl', 'smallImageUrl', 'mediumImageUrl', 'largeImageUrl'] as const) {
-    if (values[field] !== undefined) payload[field] = values[field] || undefined;
+    if (values[field] !== undefined) {
+      payload[field] = values[field] || undefined;
+    }
   }
 
   if (values.priceListItems !== undefined) {
     const priceListEntries = ((values.priceListItems as PendingPriceListEntry[] | undefined) ?? [])
       .filter((entry) => entry.priceList && hasNumericValue(entry.unitPrice))
       .map(buildPriceListPayload);
-    if (priceListEntries.length) payload.priceListItems = priceListEntries;
+    if (priceListEntries.length) {
+      payload.priceListItems = priceListEntries;
+    }
   }
 
   if (values.stockEntries !== undefined) {
@@ -989,7 +1013,9 @@ export function buildItemUpdatePayload(values: Record<string, any>) {
         deltaQuantity: Number(entry.quantity),
         reason: 'Initial stock setup from item creation',
       }));
-    if (stockItems.length) payload.stockItems = stockItems;
+    if (stockItems.length) {
+      payload.stockItems = stockItems;
+    }
   }
 
   return payload;

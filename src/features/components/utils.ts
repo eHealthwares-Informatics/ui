@@ -13,23 +13,39 @@ export function useDebouncedValue(value: string, delay: number) {
 }
 
 export function getArrayPayload(payload: unknown): Record<string, unknown>[] {
-  if (Array.isArray(payload)) {return payload as Record<string, unknown>[];}
+  if (Array.isArray(payload)) {
+    return payload as Record<string, unknown>[];
+  }
   if (payload && typeof payload === 'object') {
     const shaped = payload as Record<string, unknown>;
-    if (Array.isArray(shaped.data)) {return shaped.data as Record<string, unknown>[];}
-    if (Array.isArray(shaped.items)) {return shaped.items as Record<string, unknown>[];}
-    if (Array.isArray(shaped.results)) {return shaped.results as Record<string, unknown>[];}
+    if (Array.isArray(shaped.data)) {
+      return shaped.data as Record<string, unknown>[];
+    }
+    if (Array.isArray(shaped.items)) {
+      return shaped.items as Record<string, unknown>[];
+    }
+    if (Array.isArray(shaped.results)) {
+      return shaped.results as Record<string, unknown>[];
+    }
   }
   return [];
 }
 
 function isEqual(a: unknown, b: unknown): boolean {
-  if (a === b) {return true;}
-  if (a == null || b == null) {return a === b;}
-  if (typeof a !== typeof b) {return false;}
+  if (a === b) {
+    return true;
+  }
+  if (a == null || b == null) {
+    return a === b;
+  }
+  if (typeof a !== typeof b) {
+    return false;
+  }
 
   if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) {return false;}
+    if (a.length !== b.length) {
+      return false;
+    }
     return a.every((item, i) => isEqual(item, b[i]));
   }
 
@@ -45,7 +61,9 @@ function isEqual(a: unknown, b: unknown): boolean {
 
     const aKeys = Object.keys(aObj);
     const bKeys = Object.keys(bObj);
-    if (aKeys.length !== bKeys.length) {return false;}
+    if (aKeys.length !== bKeys.length) {
+      return false;
+    }
     return aKeys.every((key) => isEqual(aObj[key], bObj[key]));
   }
 
@@ -54,7 +72,7 @@ function isEqual(a: unknown, b: unknown): boolean {
 
 export function getDirtyFields(
   current: Record<string, unknown>,
-  initial: Record<string, unknown>,
+  initial: Record<string, unknown>
 ): Record<string, unknown> {
   const dirty: Record<string, unknown> = {};
   const allKeys = new Set([...Object.keys(current), ...Object.keys(initial)]);

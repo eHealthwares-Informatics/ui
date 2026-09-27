@@ -13,6 +13,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import {
   BadgeCheck,
@@ -25,18 +26,17 @@ import {
   Truck,
 } from 'lucide-react';
 import { useState } from 'react';
-import { notifications } from '@mantine/notifications';
+import productPlaceholder from '../sample_images/generic_product_image.png';
+import { useCartStore } from '../website/cart-store';
 import { useChatbotStore } from '../website/chatbot-store';
+import { ProductCard, BrandCountLink } from '../website/components';
+import { EmptyProducts } from '../website/empty-states';
 import {
   toHL7Prescription,
   buildWhatsAppUrl,
   WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from '../website/hl7-prescription';
-import productPlaceholder from '../sample_images/generic_product_image.png';
-import { useCartStore } from '../website/cart-store';
-import { ProductCard, BrandCountLink } from '../website/components';
-import { EmptyProducts } from '../website/empty-states';
 import { useProduct } from '../website/hooks';
 import {
   WebsiteLayout,
@@ -60,54 +60,51 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
 
   const product = data?.product;
-  const gp = (data?.genericProduct ?? product?.genericProduct ?? null) as
-    | {
-        id?: string | null;
-        name?: string | null;
-        strength?: string | null;
-        dosageForm?: string | null;
-        isPrescriptionRequired?: boolean;
-        therapeuticClass?: string | null;
-        adultDosage?: string | null;
-        pediatricDosage?: string | null;
-        isControlledSubstance?: boolean;
-        pharmaceutics?: {
-          commonBrandName?: string | null;
-          commonGenericName?: string | null;
-          clinicalName?: string | null;
-          drugClass?: string | null;
-          dosage?: string | null;
-          indications?: string | null;
-          contraindications?: string | null;
-          mechanism?: string | null;
-          pharmaceutics?: string | null;
-        } | null;
-      }
-    | null;
+  const gp = (data?.genericProduct ?? product?.genericProduct ?? null) as {
+    id?: string | null;
+    name?: string | null;
+    strength?: string | null;
+    dosageForm?: string | null;
+    isPrescriptionRequired?: boolean;
+    therapeuticClass?: string | null;
+    adultDosage?: string | null;
+    pediatricDosage?: string | null;
+    isControlledSubstance?: boolean;
+    pharmaceutics?: {
+      commonBrandName?: string | null;
+      commonGenericName?: string | null;
+      clinicalName?: string | null;
+      drugClass?: string | null;
+      dosage?: string | null;
+      indications?: string | null;
+      contraindications?: string | null;
+      mechanism?: string | null;
+      pharmaceutics?: string | null;
+    } | null;
+  } | null;
   const pharm = gp?.pharmaceutics ?? null;
 
   const hasDrugInfo = Boolean(
     gp?.dosageForm ||
-      gp?.therapeuticClass ||
-      gp?.adultDosage ||
-      gp?.pediatricDosage ||
-      gp?.isControlledSubstance ||
-      pharm?.commonBrandName ||
-      pharm?.commonGenericName ||
-      pharm?.clinicalName ||
-      pharm?.drugClass ||
-      pharm?.dosage ||
-      pharm?.indications ||
-      pharm?.contraindications ||
-      pharm?.mechanism ||
-      pharm?.pharmaceutics,
+    gp?.therapeuticClass ||
+    gp?.adultDosage ||
+    gp?.pediatricDosage ||
+    gp?.isControlledSubstance ||
+    pharm?.commonBrandName ||
+    pharm?.commonGenericName ||
+    pharm?.clinicalName ||
+    pharm?.drugClass ||
+    pharm?.dosage ||
+    pharm?.indications ||
+    pharm?.contraindications ||
+    pharm?.mechanism ||
+    pharm?.pharmaceutics
   );
   const drug = data?.genericDrug ?? product?.genericDrug ?? null;
   const classifications = data?.classifications;
   const frequentlyBought = data?.frequentlyBought ?? [];
   // Server resolves the concepts flag; fall back to the nested product, else no-Rx.
-  const rxRequired =
-    product?.isPrescriptionRequired ?? gp?.isPrescriptionRequired ?? false;
+  const rxRequired = product?.isPrescriptionRequired ?? gp?.isPrescriptionRequired ?? false;
 
   const goClassify = (code: string) =>
     navigate({ to: '/shop/shop', search: { classificationCode: code } as any });
@@ -135,7 +132,13 @@ export default function ProductDetailPage() {
                     border: `1px solid ${line}`,
                   }}
                 >
-                  <Image src={product.mediumImageUrl || product.imageUrl || productPlaceholder} alt={product.name} h={400} fit="contain" p="xl" />
+                  <Image
+                    src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
+                    alt={product.name}
+                    h={400}
+                    fit="contain"
+                    p="xl"
+                  />
                 </Paper>
               </Grid.Col>
 
@@ -157,7 +160,7 @@ export default function ProductDetailPage() {
                         {gp.name}
                       </Text>
                     ) : null}
-                    {(gp?.strength || gp?.dosageForm) ? (
+                    {gp?.strength || gp?.dosageForm ? (
                       <Group gap="xs">
                         {gp?.strength ? (
                           <Badge size="lg" radius="xl" variant="light" color="teal">
@@ -213,7 +216,9 @@ export default function ProductDetailPage() {
                     <Stack gap="md">
                       <Group>
                         <Text fw={950} size="xl" c={darkGreen}>
-                          {product.unitPrice != null ? `₦${product.unitPrice.toLocaleString()}` : 'Price on request'}
+                          {product.unitPrice != null
+                            ? `₦${product.unitPrice.toLocaleString()}`
+                            : 'Price on request'}
                         </Text>
                         <Text size="sm" c={muted}>
                           per unit
@@ -284,11 +289,18 @@ export default function ProductDetailPage() {
                           onClick={() => {
                             const hl7 = toHL7Prescription(
                               { product, quantity },
-                              { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                              {
+                                questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
+                                customerName: product.name,
+                              }
                             );
                             window.open(
-                              buildWhatsAppUrl(hl7, WEBSITE_PRESCRIPTION_PHONE, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY),
-                              '_blank',
+                              buildWhatsAppUrl(
+                                hl7,
+                                WEBSITE_PRESCRIPTION_PHONE,
+                                QUESTIONNAIRE_CODES.PRODUCT_INQUIRY
+                              ),
+                              '_blank'
                             );
                           }}
                         >
@@ -304,9 +316,14 @@ export default function ProductDetailPage() {
                           onClick={() => {
                             const hl7 = toHL7Prescription(
                               { product, quantity },
-                              { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: product.name },
+                              {
+                                questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
+                                customerName: product.name,
+                              }
                             );
-                            useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
+                            useChatbotStore
+                              .getState()
+                              .openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
                           }}
                         >
                           Chat
@@ -358,33 +375,48 @@ export default function ProductDetailPage() {
                     <Paper radius={20} p="md" withBorder style={{ borderColor: line }}>
                       <Stack gap="xs">
                         <Group justify="space-between">
-                          <Text fw={900} size="lg">Drug Information</Text>
-                          <Badge radius="xl" variant="light" color="green">{drug.code}</Badge>
+                          <Text fw={900} size="lg">
+                            Drug Information
+                          </Text>
+                          <Badge radius="xl" variant="light" color="green">
+                            {drug.code}
+                          </Badge>
                         </Group>
-                        <Text size="sm"><strong>Generic Drug:</strong> {drug.name}</Text>
+                        <Text size="sm">
+                          <strong>Generic Drug:</strong> {drug.name}
+                        </Text>
                         {drug.genericClass ? (
-                          <Text size="sm"><strong>Therapeutic Class:</strong> {drug.genericClass}</Text>
+                          <Text size="sm">
+                            <strong>Therapeutic Class:</strong> {drug.genericClass}
+                          </Text>
                         ) : null}
                         {drug.pharmaceuticalClass ? (
-                          <Text size="sm"><strong>Pharmaceutical Class:</strong> {drug.pharmaceuticalClass}</Text>
+                          <Text size="sm">
+                            <strong>Pharmaceutical Class:</strong> {drug.pharmaceuticalClass}
+                          </Text>
                         ) : null}
                         <Group gap="md">
                           {typeof drug.brandCount === 'number' && drug.brandCount > 0 ? (
                             <BrandCountLink code={drug.code} brandCount={drug.brandCount} />
                           ) : null}
                           {drug.averagePrice != null ? (
-                            <Text size="sm" c={muted}>Avg. ₦{drug.averagePrice.toLocaleString()}</Text>
+                            <Text size="sm" c={muted}>
+                              Avg. ₦{drug.averagePrice.toLocaleString()}
+                            </Text>
                           ) : null}
                         </Group>
                       </Stack>
                     </Paper>
                   ) : null}
 
-                  {classifications && Object.values(classifications).some((arr) => arr.length > 0) ? (
+                  {classifications &&
+                  Object.values(classifications).some((arr) => arr.length > 0) ? (
                     <Stack gap="xs">
                       {(['therapeutic', 'pharmaceutical', 'ndf', 'emdex'] as const).map((type) => {
                         const list = classifications[type] ?? [];
-                        if (list.length === 0) return null;
+                        if (list.length === 0) {
+                          return null;
+                        }
                         return (
                           <Group key={type} gap={6}>
                             <Text size="xs" c={muted} fw={700} w={110}>
@@ -439,7 +471,6 @@ export default function ProductDetailPage() {
                       In stock
                     </Badge>
                   </Group>
-
                 </Stack>
               </Grid.Col>
             </Grid>
@@ -564,7 +595,8 @@ export default function ProductDetailPage() {
                         ) : null}
                         {pharm?.commonGenericName ? (
                           <Text size="sm" c={muted}>
-                            <strong style={{ color: ink }}>Generic:</strong> {pharm.commonGenericName}
+                            <strong style={{ color: ink }}>Generic:</strong>{' '}
+                            {pharm.commonGenericName}
                           </Text>
                         ) : null}
                         {pharm?.clinicalName ? (
@@ -606,7 +638,11 @@ export default function ProductDetailPage() {
                           leftSection={<ShoppingCart size={16} />}
                           styles={buttonStyles}
                           onClick={() => {
-                            addItem(p.id, 1, { name: p.name, unitPrice: p.unitPrice ?? undefined, product: p });
+                            addItem(p.id, 1, {
+                              name: p.name,
+                              unitPrice: p.unitPrice ?? undefined,
+                              product: p,
+                            });
                             notifications.show({
                               message: `${p.name} added to cart`,
                               color: 'green',

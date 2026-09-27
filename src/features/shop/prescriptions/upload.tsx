@@ -37,13 +37,23 @@ export default function UploadPrescriptionPage() {
   const { mutate: submit, isPending } = useCreatePrescription();
 
   const handleUpload = () => {
-    if (!files.length) {return;}
+    if (!files.length) {
+      return;
+    }
     const formData = new FormData();
     files.forEach((f) => formData.append('files', f));
-    if (name) {formData.append('name', name);}
-    if (phone) {formData.append('phone', phone);}
-    if (email) {formData.append('email', email);}
-    if (notes) {formData.append('notes', notes);}
+    if (name) {
+      formData.append('name', name);
+    }
+    if (phone) {
+      formData.append('phone', phone);
+    }
+    if (email) {
+      formData.append('email', email);
+    }
+    if (notes) {
+      formData.append('notes', notes);
+    }
 
     submit(formData, {
       onSuccess: () => {

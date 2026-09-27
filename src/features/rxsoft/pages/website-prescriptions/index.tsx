@@ -1,17 +1,25 @@
-import { ActionIcon, Anchor, Badge, Button, Group, Image, Modal, Select, Stack, Text, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Anchor,
+  Badge,
+  Button,
+  Group,
+  Image,
+  Modal,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye } from 'lucide-react';
 import { useState } from 'react';
-import { DataPageShell } from '../../../components/page/data-page-shell';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
-import {
-  PRESCRIPTION_STATUSES,
-  prescriptionStatusColors,
-  prescriptionsConfig,
-} from './schema';
+import { rxsoftApi } from '@/lib/rxsoft-api';
+import { DataPageShell } from '../../../components/page/data-page-shell';
 import type { Column } from '../../types';
+import { PRESCRIPTION_STATUSES, prescriptionStatusColors, prescriptionsConfig } from './schema';
 
 type PrescriptionFile = {
   id: string;
@@ -69,12 +77,7 @@ function ViewFilesButton({ row }: { row: PrescriptionRow }) {
                   <Text size="sm" fw={500}>
                     {file.originalName}
                   </Text>
-                  <Anchor
-                    href={file.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    size="xs"
-                  >
+                  <Anchor href={file.fileUrl} target="_blank" rel="noreferrer" size="xs">
                     Open
                   </Anchor>
                 </Group>
@@ -101,10 +104,9 @@ function ChangeStatusButton({ row }: { row: PrescriptionRow }) {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { data } = await rxsoftApi.patch(
-        `/website/admin/prescriptions/${row.id}/status`,
-        { status },
-      );
+      const { data } = await rxsoftApi.patch(`/website/admin/prescriptions/${row.id}/status`, {
+        status,
+      });
       return data;
     },
     onSuccess: () => {
@@ -167,7 +169,7 @@ export function RxWebsitePrescriptionsPage() {
             <StatusBadge status={String(row.status ?? '')} />
           ),
         }
-      : column,
+      : column
   );
 
   return <DataPageShell config={{ ...prescriptionsConfig, columns: withBadge }} />;

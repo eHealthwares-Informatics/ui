@@ -1,7 +1,7 @@
+import { provisionOrganization, SEED_BASE_URL, activeAdminCredentials } from './utils/provision';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { provisionOrganization, SEED_BASE_URL, activeAdminCredentials } from './utils/provision';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -62,14 +62,20 @@ const SEED_ARTIFACTS: ArtifactCheck[] = [
   { name: 'UOMs', endpoint: '/uoms?limit=1' },
   { name: 'Categories', endpoint: '/categories?limit=1' },
   { name: 'Price Lists', endpoint: '/price-lists?limit=1' },
-  { name: 'Price List Items', endpoint: '/price-list-items?limit=1' },
+  // Price list items live UNDER the price list (no top-level controller):
+  // GET /price-lists/:priceListId/items. Resolved at runtime from the retail
+  // price list id; checked below after the main loop.
   { name: 'Suppliers', endpoint: '/suppliers?limit=1' },
   { name: 'Customers', endpoint: '/customers?limit=1' },
   { name: 'Payment Methods', endpoint: '/payment-methods?limit=1' },
-  { name: 'Branches', endpoint: '/branches?limit=1' },
+  // NOTE: there is no /branches controller — branch-shaped data lives in
+  // identity locations (HQ + STORE provisioned). Use stock locations instead.
+  { name: 'Stock Locations', endpoint: '/stock-locations?limit=1' },
   { name: 'Warehouses', endpoint: '/warehouses?limit=1' },
+  // NOTE: /roles returns a BARE ARRAY (no {data} envelope) — countRows handles it.
   { name: 'Roles', endpoint: '/roles?limit=1' },
   { name: 'Organizations', endpoint: '/organizations?limit=1' },
+  // GL accounts are org-scoped and provisioned per org by the seed service.
   { name: 'GL Accounts', endpoint: '/gl-accounts?limit=1' },
 ];
 
@@ -92,6 +98,28 @@ async function getIdentityToken(): Promise<string> {
 }
 
 /**
+ * Extracts the row count from any list response shape used by the backends:
+ * {data: []}, {items: []}, {results: []}, a bare array, or {total: n}.
+ */
+function countRows(body: unknown): number {
+  if (Array.isArray(body)) {
+    return body.length;
+  }
+  if (body && typeof body === 'object') {
+    const shaped = body as Record<string, unknown>;
+    for (const key of ['data', 'items', 'results']) {
+      if (Array.isArray(shaped[key])) {
+        return (shaped[key] as unknown[]).length;
+      }
+    }
+    if (typeof shaped.total === 'number') {
+      return shaped.total;
+    }
+  }
+  return 0;
+}
+
+/**
  * Verifies that all seed artifacts exist in the provisioned organisation.
  * Throws eagerly (fail-fast) with all missing artifacts listed in one message,
  * so CI knows exactly what seeds need investigation.
@@ -109,14 +137,43 @@ async function verifySeedArtifacts(token: string): Promise<void> {
         errors.push(`${artifact.name} — HTTP ${res.status}`);
         continue;
       }
-      const body = (await res.json()) as { data?: unknown[]; total?: number };
-      const count = body?.data?.length ?? body?.total ?? 0;
+      const count = countRows(await res.json());
       if (count === 0) {
         missing.push(artifact.name);
       }
     } catch (err) {
       errors.push(`${artifact.name} — ${(err as Error).message}`);
     }
+  }
+
+  // Price list items are nested under the retail price list:
+  // GET /price-lists/:id/items (no top-level /price-list-items controller).
+  try {
+    const plRes = await fetch(`${BACKEND_API_URL}/price-lists?limit=5`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!plRes.ok) {
+      errors.push(`Price List Items — cannot resolve price list (HTTP ${plRes.status})`);
+    } else {
+      const plBody = (await plRes.json()) as unknown;
+      const first = Array.isArray(plBody)
+        ? (plBody[0] as { id?: string } | undefined)
+        : ((plBody as { data?: Array<{ id?: string }> }).data?.[0] ?? undefined);
+      if (!first?.id) {
+        missing.push('Price List Items (no price list found to check under)');
+      } else {
+        const pliRes = await fetch(`${BACKEND_API_URL}/price-lists/${first.id}/items?limit=1`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!pliRes.ok) {
+          errors.push(`Price List Items — HTTP ${pliRes.status}`);
+        } else if (countRows(await pliRes.json()) === 0) {
+          missing.push('Price List Items');
+        }
+      }
+    }
+  } catch (err) {
+    errors.push(`Price List Items — ${(err as Error).message}`);
   }
 
   if (missing.length > 0 || errors.length > 0) {
@@ -134,7 +191,9 @@ async function verifySeedArtifacts(token: string): Promise<void> {
   }
 
   // eslint-disable-next-line no-console
-  console.log(`[global-setup] ✅ All ${SEED_ARTIFACTS.length} seed artifacts verified — ${SEED_ARTIFACTS.length} found`);
+  console.log(
+    `[global-setup] ✅ All ${SEED_ARTIFACTS.length} seed artifacts verified — ${SEED_ARTIFACTS.length} found`
+  );
 }
 
 export default async function globalSetup(): Promise<void> {
@@ -167,7 +226,9 @@ export default async function globalSetup(): Promise<void> {
       // Never fail the run on provisioning (fall back to DEFAULT org admin);
       // DEBUG log so CI can spot provisioning errors.
       // eslint-disable-next-line no-console
-      console.warn(`[global-setup] provisioning ${orgCode} failed — using DEFAULT org admin: ${(err as Error).message}`);
+      console.warn(
+        `[global-setup] provisioning ${orgCode} failed — using DEFAULT org admin: ${(err as Error).message}`
+      );
       orgCode = null;
     }
   }
@@ -190,8 +251,10 @@ export default async function globalSetup(): Promise<void> {
     }
   } else if (backendUp && !orgProvisioned) {
     // eslint-disable-next-line no-console
-    console.warn('[global-setup] ⚠️  Backend is up but org was NOT provisioned — artifact validation skipped. ' +
-      'Tests will use DEFAULT org admin (may fail if seeded data not found).');
+    console.warn(
+      '[global-setup] ⚠️  Backend is up but org was NOT provisioned — artifact validation skipped. ' +
+        'Tests will use DEFAULT org admin (may fail if seeded data not found).'
+    );
   }
 
   mkdirSync(join(__dirname, '.runtime'), { recursive: true });

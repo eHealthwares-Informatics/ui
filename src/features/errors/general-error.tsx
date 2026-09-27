@@ -18,7 +18,9 @@ export function GeneralError({ minimal = false, ...props }: GeneralErrorProps) {
           </Title>
         )}
 
-        <Text data-testid="error-general-body" fw={500}>Oops! Something went wrong :'</Text>
+        <Text data-testid="error-general-body" fw={500}>
+          Oops! Something went wrong :'
+        </Text>
 
         <Text size="sm" c="dimmed" ta="center">
           We apologize for the inconvenience. <br />
@@ -38,7 +40,9 @@ export function GeneralError({ minimal = false, ...props }: GeneralErrorProps) {
               Go Back
             </Button>
 
-            <Button data-testid="error-back-to-home" onClick={() => navigate({ to: '/' })}>Back to Home</Button>
+            <Button data-testid="error-back-to-home" onClick={() => navigate({ to: '/' })}>
+              Back to Home
+            </Button>
           </Group>
         )}
       </Stack>

@@ -169,7 +169,9 @@ function UploadPanel({
             leftSection={<Upload size={16} />}
             placeholder="Load file"
             onChange={async (file) => {
-              if (!file) {return;}
+              if (!file) {
+                return;
+              }
               const contents = await readFile(file);
               onChange(contents);
             }}

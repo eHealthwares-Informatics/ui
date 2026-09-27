@@ -1,5 +1,10 @@
+import {
+  ColumnDataType,
+  ColumnTypeFilters,
+  type Column,
+  type Field,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
-import { ColumnDataType, ColumnTypeFilters, type Column, type Field } from '@/features/rxsoft/types';
 
 const columns: Column[] = [
   { key: 'code', label: 'Code' },
@@ -9,9 +14,22 @@ const columns: Column[] = [
   { key: 'dosageForm', label: 'Dosage Form' },
   { key: 'strength', label: 'Strength' },
   { key: 'emdexCode', label: 'EMDEx Code' },
-  { key: 'isPrescriptionRequired', label: 'Rx Required', render: (r: any) => r.isPrescriptionRequired ? 'Yes' : 'No' },
-  { key: 'isControlledSubstance', label: 'Controlled', render: (r: any) => r.isControlledSubstance ? 'Yes' : 'No' },
-  { key: 'updatedAt', label: 'Updated', dataType: ColumnDataType.DATE, filters: ColumnTypeFilters.DATE },
+  {
+    key: 'isPrescriptionRequired',
+    label: 'Rx Required',
+    render: (r: any) => (r.isPrescriptionRequired ? 'Yes' : 'No'),
+  },
+  {
+    key: 'isControlledSubstance',
+    label: 'Controlled',
+    render: (r: any) => (r.isControlledSubstance ? 'Yes' : 'No'),
+  },
+  {
+    key: 'updatedAt',
+    label: 'Updated',
+    dataType: ColumnDataType.DATE,
+    filters: ColumnTypeFilters.DATE,
+  },
 ];
 
 const createFields: Field[] = [
@@ -51,10 +69,19 @@ function buildCreatePayload(values: Record<string, unknown>) {
 function buildUpdatePayload(values: Record<string, unknown>) {
   const payload: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(values)) {
-    if (k === 'code' || k === 'name' || k === 'therapeuticClass' || k === 'pharmaceuticalClass'
-      || k === 'dosageForm' || k === 'strength' || k === 'generalUse'
-      || k === 'adultDosage' || k === 'pediatricDosage' || k === 'appendixDosages'
-      || k === 'emdexCode') {
+    if (
+      k === 'code' ||
+      k === 'name' ||
+      k === 'therapeuticClass' ||
+      k === 'pharmaceuticalClass' ||
+      k === 'dosageForm' ||
+      k === 'strength' ||
+      k === 'generalUse' ||
+      k === 'adultDosage' ||
+      k === 'pediatricDosage' ||
+      k === 'appendixDosages' ||
+      k === 'emdexCode'
+    ) {
       payload[k] = v ?? undefined;
     }
     if (k === 'isPrescriptionRequired' || k === 'isControlledSubstance') {

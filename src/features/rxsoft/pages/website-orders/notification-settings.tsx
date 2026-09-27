@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { notifications } from '@mantine/notifications';
 import { Button, Group, Modal, Select, Stack, Switch, Table, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Settings2 } from 'lucide-react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 const CHANNELS = [
   { key: 'email', label: 'Email' },
@@ -35,13 +35,17 @@ export function NotificationSettingsButton() {
   // Load the facility's switches whenever one is chosen; missing keys mean
   // "never configured" and default to enabled.
   useEffect(() => {
-    if (!orgId) {return;}
+    if (!orgId) {
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     rxsoftApi
       .get(`/orders/admin/notification-settings/${orgId}`)
       .then(({ data }) => {
-        if (cancelled) {return;}
+        if (cancelled) {
+          return;
+        }
         const saved = data?.data ?? {};
         const merged: Record<string, boolean> = {};
         for (const c of CHANNELS) {
@@ -52,7 +56,9 @@ export function NotificationSettingsButton() {
         setValues(merged);
       })
       .catch(() => {
-        if (cancelled) {return;}
+        if (cancelled) {
+          return;
+        }
         const merged: Record<string, boolean> = {};
         for (const c of CHANNELS) {
           for (const s of SCENARIOS) {
@@ -62,7 +68,9 @@ export function NotificationSettingsButton() {
         setValues(merged);
       })
       .finally(() => {
-        if (!cancelled) {setLoading(false);}
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -90,12 +98,19 @@ export function NotificationSettingsButton() {
         leftSection={<Settings2 size={14} />}
         onClick={() => {
           setOpened(true);
-          if (!orgId && organizations[0]?.id) {setOrgId(organizations[0].id);}
+          if (!orgId && organizations[0]?.id) {
+            setOrgId(organizations[0].id);
+          }
         }}
       >
         Notifications
       </Button>
-      <Modal opened={opened} onClose={() => setOpened(false)} title="Order Notification Settings" centered>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title="Order Notification Settings"
+        centered
+      >
         <Stack>
           <Text size="sm" c="dimmed">
             Choose which channels send order notifications for each facility and scenario. Switches
@@ -104,7 +119,10 @@ export function NotificationSettingsButton() {
           <Select
             label="Facility (organisation)"
             placeholder="Select facility"
-            data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({ value: o.id, label: o.name }))}
+            data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({
+              value: o.id,
+              label: o.name,
+            }))}
             value={orgId}
             onChange={setOrgId}
             searchable
@@ -142,11 +160,19 @@ export function NotificationSettingsButton() {
               </Table.Tbody>
             </Table>
           ) : (
-            <Text size="sm" c="dimmed">Select a facility to configure its channels.</Text>
+            <Text size="sm" c="dimmed">
+              Select a facility to configure its channels.
+            </Text>
           )}
           <Group justify="flex-end">
-            <Button variant="light" onClick={() => setOpened(false)}>Cancel</Button>
-            <Button loading={saveMutation.isPending} disabled={!orgId || loading} onClick={() => saveMutation.mutate()}>
+            <Button variant="light" onClick={() => setOpened(false)}>
+              Cancel
+            </Button>
+            <Button
+              loading={saveMutation.isPending}
+              disabled={!orgId || loading}
+              onClick={() => saveMutation.mutate()}
+            >
               Save
             </Button>
           </Group>

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { websiteApi } from './api';
 import { persistTokens, getAccessToken, getRefreshToken, clearTokens } from '@/lib/auth-tokens';
+import { websiteApi } from './api';
 
 export interface WebsiteUser {
   id: string;
@@ -19,7 +19,12 @@ export interface WebsiteAuthStore {
   setUser: (user: WebsiteUser, token: string, refreshToken: string) => void;
   logout: () => void;
   login: (username: string, password: string) => Promise<void>;
-  register: (data: { username: string; email?: string; phone?: string; password: string }) => Promise<void>;
+  register: (data: {
+    username: string;
+    email?: string;
+    phone?: string;
+    password: string;
+  }) => Promise<void>;
   requestOtp: (phone: string) => Promise<{ sent: boolean; channel: string; code?: string }>;
   verifyOtp: (phone: string, code: string) => Promise<void>;
   googleSignIn: (accessToken: string) => Promise<void>;
@@ -37,10 +42,16 @@ function decodeToken(token: string): WebsiteUser {
   };
 }
 
-function tryImportAdminSession(): { user: WebsiteUser; accessToken: string; refreshToken: string } | null {
+function tryImportAdminSession(): {
+  user: WebsiteUser;
+  accessToken: string;
+  refreshToken: string;
+} | null {
   const token = getAccessToken();
   const refresh = getRefreshToken();
-  if (!token || !refresh) return null;
+  if (!token || !refresh) {
+    return null;
+  }
   try {
     return { user: decodeToken(token), accessToken: token, refreshToken: refresh };
   } catch {
@@ -70,14 +81,24 @@ export const useAuthStore = create<WebsiteAuthStore>()(
         const res = await websiteApi.login({ username, password });
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
-        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+        set({
+          user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          isAuthenticated: true,
+        });
       },
 
       register: async (data) => {
         const res = await websiteApi.register(data);
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
-        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+        set({
+          user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          isAuthenticated: true,
+        });
       },
 
       requestOtp: async (phone) => {
@@ -88,21 +109,36 @@ export const useAuthStore = create<WebsiteAuthStore>()(
         const res = await websiteApi.verifyOtp({ phone, code });
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
-        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+        set({
+          user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          isAuthenticated: true,
+        });
       },
 
       googleSignIn: async (accessToken) => {
         const res = await websiteApi.googleSignIn(accessToken);
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
-        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+        set({
+          user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          isAuthenticated: true,
+        });
       },
 
       facebookSignIn: async (accessToken) => {
         const res = await websiteApi.facebookSignIn(accessToken);
         persistTokens(res.accessToken, res.refreshToken);
         const user = decodeToken(res.accessToken);
-        set({ user, accessToken: res.accessToken, refreshToken: res.refreshToken, isAuthenticated: true });
+        set({
+          user,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+          isAuthenticated: true,
+        });
       },
     }),
     {
@@ -120,6 +156,6 @@ export const useAuthStore = create<WebsiteAuthStore>()(
         }
         return merged;
       },
-    },
-  ),
+    }
+  )
 );

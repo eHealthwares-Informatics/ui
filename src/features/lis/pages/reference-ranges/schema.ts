@@ -15,8 +15,25 @@ const columns: Column[] = [
 
 const allFields: FieldGroup['fields'] = [
   { name: 'alias', label: 'Alias', type: 'text', required: true, col: 6 },
-  { name: 'testId', label: 'Test Definition', type: 'async-select', searchParam: { endpoint: '/lis/test-definitions', valueKey: 'id', labelKey: 'name' }, required: true, col: 6 },
-  { name: 'gender', label: 'Gender', type: 'select', options: [{ value: 'MALE', label: 'Male' }, { value: 'FEMALE', label: 'Female' }, { value: 'DEFAULT', label: 'Default' }], col: 3 },
+  {
+    name: 'testId',
+    label: 'Test Definition',
+    type: 'async-select',
+    searchParam: { endpoint: '/lis/test-definitions', valueKey: 'id', labelKey: 'name' },
+    required: true,
+    col: 6,
+  },
+  {
+    name: 'gender',
+    label: 'Gender',
+    type: 'select',
+    options: [
+      { value: 'MALE', label: 'Male' },
+      { value: 'FEMALE', label: 'Female' },
+      { value: 'DEFAULT', label: 'Default' },
+    ],
+    col: 3,
+  },
   { name: 'active', label: 'Active', type: 'switch', col: 3 },
   { name: 'minAge', label: 'Min Age (days)', type: 'number', col: 3 },
   { name: 'maxAge', label: 'Max Age (days)', type: 'number', col: 3 },
@@ -24,7 +41,13 @@ const allFields: FieldGroup['fields'] = [
   { name: 'highValue', label: 'High Value', type: 'number', col: 3 },
   { name: 'riticaLow', label: 'Low Critical', type: 'number', col: 3 },
   { name: 'criticalHigh', label: 'High Critical', type: 'number', col: 3 },
-  { name: 'unitId', label: 'Unit', type: 'async-select', searchParam: { endpoint: '/lis/uoms', valueKey: 'id', labelKey: 'name' }, col: 4 },
+  {
+    name: 'unitId',
+    label: 'Unit',
+    type: 'async-select',
+    searchParam: { endpoint: '/lis/uoms', valueKey: 'id', labelKey: 'name' },
+    col: 4,
+  },
 ];
 
 const tabGroups: TabGroup[] = [
@@ -59,5 +82,5 @@ export const referenceRangesConfig: ModelConfig = {
   tabGroups,
   buildCreatePayload: (v) => buildPayload(v, allFields),
   buildUpdatePayload: (v) => buildPayload(v, allFields),
-  buildFormState
+  buildFormState,
 };

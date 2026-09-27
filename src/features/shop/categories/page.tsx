@@ -63,7 +63,9 @@ export default function CategoriesPage() {
                     // Filter the shop listing by this category instead of a
                     // separate per-category page — /shop/shop reads the param
                     // and pre-selects it in the Category filter.
-                    onClick={() => navigate({ to: '/shop/shop', search: { category: cat.code } as any })}
+                    onClick={() =>
+                      navigate({ to: '/shop/shop', search: { category: cat.code } as any })
+                    }
                   >
                     <Stack align="center" gap="sm">
                       <ThemeIcon radius="xl" size={52} color="green" variant="light">

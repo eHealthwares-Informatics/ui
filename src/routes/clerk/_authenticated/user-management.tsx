@@ -175,7 +175,9 @@ function Unauthorized() {
   const [countdown, setCountdown] = useState(COUNTDOWN);
 
   useEffect(() => {
-    if (cancelled) {return;}
+    if (cancelled) {
+      return;
+    }
 
     const interval = setInterval(() => {
       setCountdown((prev) => (prev > 0 ? prev - 1 : 0));

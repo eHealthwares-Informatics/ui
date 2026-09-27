@@ -33,8 +33,12 @@ export function MessageLogsPage() {
 
   const extraParams = useMemo(() => {
     const params: Record<string, unknown> = {};
-    if (statusFilter) {params.status = statusFilter;}
-    if (typeFilter) {params.messageType = typeFilter;}
+    if (statusFilter) {
+      params.status = statusFilter;
+    }
+    if (typeFilter) {
+      params.messageType = typeFilter;
+    }
     return params;
   }, [statusFilter, typeFilter]);
 

@@ -1,5 +1,10 @@
+import {
+  ColumnDataType,
+  ColumnTypeFilters,
+  type Column,
+  type Field,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
-import { ColumnDataType, ColumnTypeFilters, type Column, type Field } from '@/features/rxsoft/types';
 
 const columns: Column[] = [
   { key: 'code', label: 'Code' },
@@ -8,9 +13,23 @@ const columns: Column[] = [
   { key: 'drugClass', label: 'Drug Class' },
   { key: 'bodySystem', label: 'Body System' },
   { key: 'dosage', label: 'Dosage' },
-  { key: 'isControlledSubstance', label: 'Controlled', render: (r: any) => r.isControlledSubstance ? 'Yes' : 'No' },
-  { key: 'indications', label: 'Indications', render: (r: any) => (r.indications ?? '').slice(0, 60) + ((r.indications?.length ?? 0) > 60 ? '...' : '') },
-  { key: 'updatedAt', label: 'Updated', dataType: ColumnDataType.DATE, filters: ColumnTypeFilters.DATE },
+  {
+    key: 'isControlledSubstance',
+    label: 'Controlled',
+    render: (r: any) => (r.isControlledSubstance ? 'Yes' : 'No'),
+  },
+  {
+    key: 'indications',
+    label: 'Indications',
+    render: (r: any) =>
+      (r.indications ?? '').slice(0, 60) + ((r.indications?.length ?? 0) > 60 ? '...' : ''),
+  },
+  {
+    key: 'updatedAt',
+    label: 'Updated',
+    dataType: ColumnDataType.DATE,
+    filters: ColumnTypeFilters.DATE,
+  },
 ];
 
 const createFields: Field[] = [
@@ -34,7 +53,12 @@ const createFields: Field[] = [
   { name: 'drugInteractions', label: 'Drug Interactions', type: 'textarea', col: 12 },
   { name: 'ivIncompatibilities', label: 'IV Incompatibilities', type: 'textarea', col: 12 },
   { name: 'foodInteractions', label: 'Food Interactions', type: 'textarea', col: 12 },
-  { name: 'traditionalMedicineEffects', label: 'Traditional Medicine Effects', type: 'textarea', col: 12 },
+  {
+    name: 'traditionalMedicineEffects',
+    label: 'Traditional Medicine Effects',
+    type: 'textarea',
+    col: 12,
+  },
   // ── Dosing ─────────────────────────────────────────────────────────────
   { name: 'dosage', label: 'Dosage', type: 'textarea', col: 12 },
   { name: 'dosePerAgeRange', label: 'Dose per Age Range', type: 'textarea', col: 12 },
@@ -43,7 +67,12 @@ const createFields: Field[] = [
   // ── Patient-specific variables ─────────────────────────────────────────
   { name: 'bodyWeightAndAge', label: 'Body Weight & Age', type: 'textarea', col: 12 },
   { name: 'physiologicalVariables', label: 'Physiological Variables', type: 'textarea', col: 12 },
-  { name: 'pharmacokineticVariables', label: 'Pharmacokinetic Variables', type: 'textarea', col: 12 },
+  {
+    name: 'pharmacokineticVariables',
+    label: 'Pharmacokinetic Variables',
+    type: 'textarea',
+    col: 12,
+  },
   { name: 'diseaseVariables', label: 'Disease Variables', type: 'textarea', col: 12 },
   { name: 'environmentalVariables', label: 'Environmental Variables', type: 'textarea', col: 12 },
   { name: 'extremesOfAge', label: 'Extremes of Age', type: 'textarea', col: 12 },
@@ -68,10 +97,7 @@ const createFields: Field[] = [
 
 function buildCreatePayload(values: Record<string, unknown>) {
   const payload: Record<string, unknown> = { code: values.code };
-  for (const [
-    k,
-    v,
-  ] of ([
+  for (const [k, v] of [
     ['clinicalName', values.clinicalName],
     ['brandNames', values.brandNames],
     ['drugClass', values.drugClass],
@@ -113,7 +139,7 @@ function buildCreatePayload(values: Record<string, unknown>) {
     ['interactiveEffects', values.interactiveEffects],
     ['renalImpairment', values.renalImpairment],
     ['hepaticImpairment', values.hepaticImpairment],
-  ] as Array<[string, unknown]>)) {
+  ] as Array<[string, unknown]>) {
     payload[k] = v ?? undefined;
   }
   payload.isControlledSubstance = values.isControlledSubstance ?? false;

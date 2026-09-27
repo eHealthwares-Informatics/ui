@@ -25,6 +25,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {
@@ -43,10 +44,14 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { TypingBubble } from '@/components/typing-dots';
 import { conversationApi } from '@/lib/conversation-api';
+import { useReplyingAnimation } from '@/lib/use-replying-animation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useChatPhoneStore } from '@/stores/chat-phone-store';
+import { AddProjectionModal } from '../components/add-projection-modal';
+import { ParticipantModal } from '../components/participant-modal';
+import { PhoneSetupModal } from '../components/phone-setup-modal';
 import {
   useConversationInbox,
   useConversationMessages,
@@ -56,12 +61,13 @@ import {
   chatKeys,
 } from '../hooks/use-chat-queries';
 import { useChatSocket } from '../hooks/use-chat-socket';
-import { useReplyingAnimation } from '@/lib/use-replying-animation';
-import { TypingBubble } from '@/components/typing-dots';
-import { addProjection, findParticipantByPhone, createParticipant, listProjections, sendWebhookMessage } from '../services/chat-api';
-import { AddProjectionModal } from '../components/add-projection-modal';
-import { ParticipantModal } from '../components/participant-modal';
-import { PhoneSetupModal } from '../components/phone-setup-modal';
+import {
+  addProjection,
+  findParticipantByPhone,
+  createParticipant,
+  listProjections,
+  sendWebhookMessage,
+} from '../services/chat-api';
 import type {
   ChatMode,
   ConversationInboxItem,
@@ -71,8 +77,8 @@ import type {
   InboxMode,
   InboxStatus,
 } from '../types';
-import { getParticipantInitials, getParticipantName } from '../utils/participants';
 import { parseQuestionOptions } from '../utils/parse-options';
+import { getParticipantInitials, getParticipantName } from '../utils/participants';
 
 dayjs.extend(relativeTime);
 
@@ -98,7 +104,7 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inboxMode, setInboxMode] = useState<InboxMode>('admin');
   const [statusByMode, setStatusByMode] = useState<Partial<Record<InboxMode, InboxStatus | ''>>>(
-    {},
+    {}
   );
   const [channelFilter, setChannelFilter] = useState<string | null>(null);
   const [adminParticipantId, setAdminParticipantId] = useState<string | null>(null);
@@ -141,13 +147,17 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   });
 
   const handlePrevPage = () => {
-    if (pageIndex <= 0) {return;}
+    if (pageIndex <= 0) {
+      return;
+    }
     setPageIndex((index) => index - 1);
   };
 
   const handleNextPage = () => {
     const totalPages = Math.ceil((inboxQuery.data?.meta.total ?? 0) / 30);
-    if (pageIndex >= totalPages - 1) {return;}
+    if (pageIndex >= totalPages - 1) {
+      return;
+    }
     setPageIndex((index) => index + 1);
   };
 
@@ -158,7 +168,9 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   };
 
   useEffect(() => {
-    if (!effectivePhone || adminParticipantLoaded) {return;}
+    if (!effectivePhone || adminParticipantLoaded) {
+      return;
+    }
 
     (async () => {
       try {
@@ -181,9 +193,8 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
 
   const selectedConversation = useMemo(
     () =>
-      inboxQuery.data?.items
-        .find((item: any) => item.conversationId === selectedConversationId),
-    [inboxQuery.data, selectedConversationId],
+      inboxQuery.data?.items.find((item: any) => item.conversationId === selectedConversationId),
+    [inboxQuery.data, selectedConversationId]
   );
 
   // Fetch projections for the selected conversation to get participant info
@@ -196,7 +207,8 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   const activeParticipantId =
     mode === 'admin'
       ? projectionsQuery.data?.find((p) => p.type === 'BOT')?.participant?.id
-      : projectionsQuery.data?.find((p) => p.type === 'USER' || p.type === 'PATIENT')?.participant?.id;
+      : projectionsQuery.data?.find((p) => p.type === 'USER' || p.type === 'PATIENT')?.participant
+          ?.id;
   const pendingConversationId = composing
     ? adminParticipantId
       ? `pending-${adminParticipantId}`
@@ -220,7 +232,9 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
   const markRead = useMarkConversationRead();
 
   useEffect(() => {
-    if (!selectedConversationId || selectedConversationId.startsWith('pending-')) {return;}
+    if (!selectedConversationId || selectedConversationId.startsWith('pending-')) {
+      return;
+    }
 
     markRead.mutate({
       conversationId: selectedConversationId,
@@ -230,65 +244,70 @@ export function ChatUiPage({ mode = 'admin' }: ChatUiPageProps) {
 
   const conversations = inboxQuery.data?.items ?? [];
 
-  const handleAddMe = useCallback(async (conversationId: string) => {
-    if (!adminParticipantId) {return;}
-    try {
-      const data = await listProjections(conversationId);
-      const alreadyAdded = data.some((p) => p.participant.id === adminParticipantId);
-      if (!alreadyAdded) {
-        await addProjection({
-          conversationId,
-          participantId: adminParticipantId,
-          channelId: '',
-          role: 'AGENT',
-        });
+  const handleAddMe = useCallback(
+    async (conversationId: string) => {
+      if (!adminParticipantId) {
+        return;
       }
-    } catch {
-      console.warn('Failed to add self to conversation');
-    }
-  }, [adminParticipantId]);
+      try {
+        const data = await listProjections(conversationId);
+        const alreadyAdded = data.some((p) => p.participant.id === adminParticipantId);
+        if (!alreadyAdded) {
+          await addProjection({
+            conversationId,
+            participantId: adminParticipantId,
+            channelId: '',
+            role: 'AGENT',
+          });
+        }
+      } catch {
+        console.warn('Failed to add self to conversation');
+      }
+    },
+    [adminParticipantId]
+  );
 
   const inbox = (
-          <InboxSidebar
-            connected={socket.connected}
-            conversations={conversations}
-            error={inboxQuery.isError}
-            isFetchingNextPage={inboxQuery.isFetching}
-            loading={inboxQuery.isLoading}
-            onRetry={() => inboxQuery.refetch()}
-            onSearch={setSearch}
-            onSelect={(conversation) => {
-              setComposing(false);
-              setSelectedConversationId(conversation.conversationId);
-              setSidebarOpen(false);
-            }}
-            search={search}
-            selectedConversationId={selectedConversationId}
-            mode={inboxMode}
-            onModeChange={setInboxMode}
-            status={status}
-            onStatusChange={handleStatusChange}
-            onNewChat={startCompose}
-            onAddParticipant={(convId) => {
-              const item = conversations.find((c: any) => c.conversationId === convId);
-              setContextConversationId(convId);
-              setContextChannelId(item?.channelId);
-              openAddProjection();
-            }}
-            onRemoveParticipant={(convId) => {
-              setContextConversationId(convId);
-              openParticipantModal();
-            }}
-            onAddMe={handleAddMe}
-            channelFilter={channelFilter}
-            onChannelFilterChange={setChannelFilter}
-            channels={channels}
-            pageIndex={pageIndex}
-            canPrev={pageIndex > 0}
-            canNext={pageIndex < Math.ceil((inboxQuery.data?.meta.total ?? 0) / 30) - 1}
-            onPrev={handlePrevPage}
-            onNext={handleNextPage}
-          />
+    <InboxSidebar
+      connected={socket.connected}
+      conversations={conversations}
+      error={inboxQuery.isError}
+      isFetchingNextPage={inboxQuery.isFetching}
+      loading={inboxQuery.isLoading}
+      onRetry={() => inboxQuery.refetch()}
+      onSearch={setSearch}
+      onSelect={(conversation) => {
+        setComposing(false);
+        setSelectedConversationId(conversation.conversationId);
+        setSidebarOpen(false);
+      }}
+      search={search}
+      selectedConversationId={selectedConversationId}
+      mode={inboxMode}
+      onModeChange={setInboxMode}
+      status={status}
+      onStatusChange={handleStatusChange}
+      onNewChat={startCompose}
+      onAddParticipant={(convId) => {
+        const item = conversations.find((c: any) => c.conversationId === convId);
+        setContextConversationId(convId);
+        setContextChannelId(item?.channelId);
+        openAddProjection();
+      }}
+      onRemoveParticipant={(convId) => {
+        setContextConversationId(convId);
+        openParticipantModal();
+      }}
+      onAddMe={handleAddMe}
+      channelFilter={channelFilter}
+      onChannelFilterChange={setChannelFilter}
+      channels={channels}
+      pageIndex={pageIndex}
+      canPrev={pageIndex > 0}
+      canNext={pageIndex < Math.ceil((inboxQuery.data?.meta.total ?? 0) / 30) - 1}
+      onPrev={handlePrevPage}
+      onNext={handleNextPage}
+    />
   );
 
   return (
@@ -517,12 +536,7 @@ function InboxSidebar(props: {
       </ScrollArea>
 
       <Group justify="space-between" mt="xs" wrap="nowrap">
-        <Button
-          disabled={!props.canPrev}
-          onClick={props.onPrev}
-          size="xs"
-          variant="subtle"
-        >
+        <Button disabled={!props.canPrev} onClick={props.onPrev} size="xs" variant="subtle">
           Previous
         </Button>
         <Text c="dimmed" size="xs">
@@ -551,7 +565,8 @@ function ConversationListItem(props: {
   onAddMe: (conversationId: string) => void;
 }) {
   const conv = props.conversation;
-  const displayName = conv.questionnaire?.name ?? conv.channel?.name ?? conv.conversationId?.slice(0, 8) ?? 'Unknown';
+  const displayName =
+    conv.questionnaire?.name ?? conv.channel?.name ?? conv.conversationId?.slice(0, 8) ?? 'Unknown';
   const subtitle = conv.currentQuestion?.text ?? conv.status;
   const isActive = conv.status === 'ACTIVE';
 
@@ -582,7 +597,9 @@ function ConversationListItem(props: {
             setContextMenuOpened(true);
           }}
           onMouseDown={(e) => {
-            if (e.button === 2) {e.preventDefault();}
+            if (e.button === 2) {
+              e.preventDefault();
+            }
           }}
           px="xs"
           radius={0}
@@ -633,7 +650,9 @@ function ConversationListItem(props: {
             leftSection={<UserPlus size={14} />}
             onClick={() => {
               closeContextMenu();
-              if (props.conversation.conversationId) props.onAddMe(props.conversation.conversationId);
+              if (props.conversation.conversationId) {
+                props.onAddMe(props.conversation.conversationId);
+              }
             }}
             size="sm"
             variant="subtle"
@@ -646,7 +665,9 @@ function ConversationListItem(props: {
             leftSection={<UserPlus size={14} />}
             onClick={() => {
               closeContextMenu();
-              if (props.conversation.conversationId) props.onAddParticipant(props.conversation.conversationId);
+              if (props.conversation.conversationId) {
+                props.onAddParticipant(props.conversation.conversationId);
+              }
             }}
             size="sm"
             variant="subtle"
@@ -660,7 +681,9 @@ function ConversationListItem(props: {
             leftSection={<UserX size={14} />}
             onClick={() => {
               closeContextMenu();
-              if (props.conversation.conversationId) props.onRemoveParticipant(props.conversation.conversationId);
+              if (props.conversation.conversationId) {
+                props.onRemoveParticipant(props.conversation.conversationId);
+              }
             }}
             size="sm"
             variant="subtle"
@@ -698,7 +721,7 @@ function ConversationThread(props: {
   const sendMessage = useSendConversationMessage();
   const messages = useMemo(
     () => (messagesQuery.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse(),
-    [messagesQuery.data],
+    [messagesQuery.data]
   );
   // Lag inbound replies behind a typing indicator; history shows immediately.
   const { visible: visibleMessages, replying } = useReplyingAnimation(messages, {
@@ -706,10 +729,7 @@ function ConversationThread(props: {
     isIncoming: (message) => message.direction === 'outbound',
     getText: (message) => message.text,
   });
-  const groupedMessages = useMemo(
-    () => groupMessagesByDate(visibleMessages),
-    [visibleMessages],
-  );
+  const groupedMessages = useMemo(() => groupMessagesByDate(visibleMessages), [visibleMessages]);
   const showTyping =
     replying ||
     Boolean(props.typingParticipantId) ||
@@ -717,8 +737,8 @@ function ConversationThread(props: {
     messagesQuery.isLoading;
   const senderId =
     props.mode === 'admin'
-      ? projections.find(p => p.isPrimary)?.participant.id
-      : projections.find(p => p.type === 'USER' || p.type === 'PATIENT')?.participant.id;
+      ? projections.find((p) => p.isPrimary)?.participant.id
+      : projections.find((p) => p.type === 'USER' || p.type === 'PATIENT')?.participant.id;
 
   const hasMyProjection = projections.some((p) => p.participant.id === props.adminParticipantId);
   const isCompleted = props.conversation?.status === 'COMPLETED';
@@ -727,8 +747,12 @@ function ConversationThread(props: {
     isCompleted || !isWebChannel || (!hasMyProjection && !!props.adminParticipantId);
 
   useEffect(() => {
-    if (!props.conversation?.conversationId) {return;}
-    listProjections(props.conversation.conversationId).then(setProjections).catch(() => setProjections([]));
+    if (!props.conversation?.conversationId) {
+      return;
+    }
+    listProjections(props.conversation.conversationId)
+      .then(setProjections)
+      .catch(() => setProjections([]));
   }, [props.conversation?.conversationId]);
 
   useEffect(() => {
@@ -739,7 +763,9 @@ function ConversationThread(props: {
 
   const sendComposeText = async (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || composeSending) {return;}
+    if (!trimmed || composeSending) {
+      return;
+    }
     setComposeSending(true);
 
     const optimistic: ExchangeMessage = {
@@ -767,8 +793,10 @@ function ConversationThread(props: {
     } catch {
       setComposeMessages((prev) =>
         prev.map((message) =>
-          message.id === optimistic.id ? { ...message, status: 'failed', optimistic: false } : message
-        ),
+          message.id === optimistic.id
+            ? { ...message, status: 'failed', optimistic: false }
+            : message
+        )
       );
     } finally {
       setComposeSending(false);
@@ -776,7 +804,9 @@ function ConversationThread(props: {
   };
 
   const submitCompose = () => {
-    if (!draft.trim() || composeSending) {return;}
+    if (!draft.trim() || composeSending) {
+      return;
+    }
     void sendComposeText(draft);
   };
 
@@ -786,7 +816,9 @@ function ConversationThread(props: {
       byId.set(message.id, message);
     }
     for (const message of props.pendingMessages ?? []) {
-      if (!byId.has(message.id)) {byId.set(message.id, message);}
+      if (!byId.has(message.id)) {
+        byId.set(message.id, message);
+      }
     }
     const merged = [...byId.values()];
     for (const message of composeMessages) {
@@ -794,19 +826,23 @@ function ConversationThread(props: {
         (existing) =>
           existing.direction === 'inbound' &&
           existing.text === message.text &&
-          Math.abs(new Date(existing.createdAt).getTime() - new Date(message.createdAt).getTime()) < 5000,
+          Math.abs(new Date(existing.createdAt).getTime() - new Date(message.createdAt).getTime()) <
+            5000
       );
-      if (!duplicate) {merged.push(message);}
+      if (!duplicate) {
+        merged.push(message);
+      }
     }
     return [...merged].sort(
-      (left, right) =>
-        new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
+      (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
     );
   }, [composeMessages, pendingQuery.data?.items, props.pendingMessages]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || messagesQuery.isFetchingNextPage) {return;}
+    if (!viewport || messagesQuery.isFetchingNextPage) {
+      return;
+    }
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
   }, [messages.length, composeThread.length, props.conversation?.conversationId]);
 
@@ -824,8 +860,12 @@ function ConversationThread(props: {
               <MessagesSquare size={18} />
             </Avatar>
             <Box>
-              <Text fw={700} lineClamp={1}>New message</Text>
-              <Text c="dimmed" size="xs">Send the first message to start a chat</Text>
+              <Text fw={700} lineClamp={1}>
+                New message
+              </Text>
+              <Text c="dimmed" size="xs">
+                Send the first message to start a chat
+              </Text>
             </Box>
           </Group>
         </Group>
@@ -915,7 +955,15 @@ function ConversationThread(props: {
   const conversation = props.conversation;
 
   const submit = () => {
-    if (!draft.trim() || !senderId || !conversation.conversationId || sendMessage.isPending || inputDisabled) {return;}
+    if (
+      !draft.trim() ||
+      !senderId ||
+      !conversation.conversationId ||
+      sendMessage.isPending ||
+      inputDisabled
+    ) {
+      return;
+    }
 
     sendMessage.mutate({
       conversationId: conversation.conversationId,
@@ -932,7 +980,9 @@ function ConversationThread(props: {
     await messagesQuery.fetchNextPage();
 
     window.setTimeout(() => {
-      if (!viewport) {return;}
+      if (!viewport) {
+        return;
+      }
       viewport.scrollTop = viewport.scrollHeight - previousHeight;
     }, 0);
   };
@@ -947,11 +997,15 @@ function ConversationThread(props: {
             </ActionIcon>
           )}
           <Avatar radius="xl" color={conversation.status === 'ACTIVE' ? 'blue' : 'gray'}>
-            {(conversation.questionnaire?.name ?? conversation.channel?.name ?? '?').charAt(0).toUpperCase()}
+            {(conversation.questionnaire?.name ?? conversation.channel?.name ?? '?')
+              .charAt(0)
+              .toUpperCase()}
           </Avatar>
           <Box>
             <Text fw={700} lineClamp={1}>
-              {conversation.questionnaire?.name ?? conversation.channel?.name ?? conversation.conversationId?.slice(0, 8)}
+              {conversation.questionnaire?.name ??
+                conversation.channel?.name ??
+                conversation.conversationId?.slice(0, 8)}
             </Text>
             <Group gap={6}>
               <Badge color={props.connected ? 'green' : 'gray'} size="xs">
@@ -984,11 +1038,7 @@ function ConversationThread(props: {
         flex={1}
         viewportRef={viewportRef}
         onScrollPositionChange={({ y }) => {
-          if (
-            y <= 40 &&
-            messagesQuery.hasNextPage &&
-            !messagesQuery.isFetchingNextPage
-          ) {
+          if (y <= 40 && messagesQuery.hasNextPage && !messagesQuery.isFetchingNextPage) {
             void fetchOlderMessages();
           }
         }}
@@ -998,11 +1048,7 @@ function ConversationThread(props: {
             <Center>
               <Button
                 leftSection={
-                  messagesQuery.isFetchingNextPage ? (
-                    <Loader size={14} />
-                  ) : (
-                    <RefreshCw size={14} />
-                  )
+                  messagesQuery.isFetchingNextPage ? <Loader size={14} /> : <RefreshCw size={14} />
                 }
                 onClick={fetchOlderMessages}
                 size="xs"
@@ -1054,7 +1100,9 @@ function ConversationThread(props: {
                   message={message}
                   disabled={inputDisabled}
                   onOptionSelect={(value) => {
-                    if (!conversation.conversationId) return;
+                    if (!conversation.conversationId) {
+                      return;
+                    }
                     sendMessage.mutate({
                       conversationId: conversation.conversationId,
                       channelId: conversation.channelId,
@@ -1078,14 +1126,23 @@ function ConversationThread(props: {
 
       <Box bg="white" p="md">
         {isCompleted && (
-          <Text c="dimmed" size="sm" mb="xs" ta="center">This conversation has ended.</Text>
+          <Text c="dimmed" size="sm" mb="xs" ta="center">
+            This conversation has ended.
+          </Text>
         )}
         {!isCompleted && !hasMyProjection && !!props.adminParticipantId && (
-          <Text c="dimmed" size="sm" mb="xs" ta="center">Right-click the conversation and select <b>Add Me</b> to join.</Text>
+          <Text c="dimmed" size="sm" mb="xs" ta="center">
+            Right-click the conversation and select <b>Add Me</b> to join.
+          </Text>
         )}
         <Group align="flex-end" gap="xs" wrap="nowrap">
           <Tooltip label="Attach file">
-            <ActionIcon aria-label="Attach file" disabled={inputDisabled} size="lg" variant="subtle">
+            <ActionIcon
+              aria-label="Attach file"
+              disabled={inputDisabled}
+              size="lg"
+              variant="subtle"
+            >
               <Paperclip size={18} />
             </ActionIcon>
           </Tooltip>

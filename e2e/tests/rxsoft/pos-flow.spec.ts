@@ -19,7 +19,7 @@ const TS = Date.now().toString(36);
 async function apiCreate(
   page: import('@playwright/test').Page,
   path: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ) {
   return apiFetch<{ id: string }>(page, path, {
     method: 'POST',
@@ -48,40 +48,31 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // Find an existing item with stock
     const itemsRes = await apiFetch<{ data: Array<{ id: string; name: string }> }>(
       page,
-      '/items?limit=1',
+      '/items?limit=1'
     );
     itemId = itemsRes.data?.[0]?.id ?? '';
     expect(itemId).toBeTruthy();
 
     // Find a UOM
-    const uomsRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/uoms?limit=1',
-    );
+    const uomsRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/uoms?limit=1');
     uomId = uomsRes.data?.[0]?.id ?? '';
     expect(uomId).toBeTruthy();
 
     // Find a stock location
     const locRes = await apiFetch<{ data: Array<{ id: string }> }>(
       page,
-      '/stock-locations?limit=1',
+      '/stock-locations?limit=1'
     );
     locationId = locRes.data?.[0]?.id ?? '';
     expect(locationId).toBeTruthy();
 
     // Find a payment method
-    const pmRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/payment-methods?limit=1',
-    );
+    const pmRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/payment-methods?limit=1');
     paymentMethodId = pmRes.data?.[0]?.id ?? '';
     expect(paymentMethodId).toBeTruthy();
 
     // Find a customer
-    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/customers?limit=1',
-    );
+    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/customers?limit=1');
     customerId = custRes.data?.[0]?.id ?? '';
     // customer is optional for POS
   });
@@ -153,13 +144,13 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // The new sale should appear in the list
     await page.getByTestId('header-search').fill(saleNumber);
     await expect(
-      page.getByTestId('data-table-body').locator('tr').filter({ hasText: saleNumber }),
+      page.getByTestId('data-table-body').locator('tr').filter({ hasText: saleNumber })
     ).toBeVisible({ timeout: 15_000 });
 
     // Read the sale ID from API for later verification
     const searchRes = await apiFetch<{ data: Array<{ id: string }> }>(
       page,
-      `/sales?search=${saleNumber}&limit=1`,
+      `/sales?search=${saleNumber}&limit=1`
     );
     saleId = searchRes.data?.[0]?.id ?? '';
     expect(saleId).toBeTruthy();
@@ -204,7 +195,10 @@ test.describe.serial('POS Flow through Sales UI', () => {
     await expect(row).toBeVisible({ timeout: 15_000 });
 
     // Click the Eye icon (View Lines button)
-    const viewLinesBtn = row.locator('button').filter({ has: page.locator('svg.lucide-eye') }).first();
+    const viewLinesBtn = row
+      .locator('button')
+      .filter({ has: page.locator('svg.lucide-eye') })
+      .first();
     await expect(viewLinesBtn).toBeVisible();
     await viewLinesBtn.click();
 
@@ -267,14 +261,11 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // The print button opens a new window with the PDF blob URL.
     // We can't directly assert the PDF content, but we can verify
     // the API endpoint is reachable by making the same call directly.
-    const pdfRes = await page.request.get(
-      `http://localhost:8080/api/sales/${saleId}/receipt/pdf`,
-      {
-        headers: {
-          Authorization: `Bearer ${await readAccessToken(page)}`,
-        },
+    const pdfRes = await page.request.get(`http://localhost:8080/api/sales/${saleId}/receipt/pdf`, {
+      headers: {
+        Authorization: `Bearer ${await readAccessToken(page)}`,
       },
-    );
+    });
 
     // The endpoint should return either 200 (PDF) or 404 (no receipt template)
     // Either way, the endpoint is reachable — a 500 would indicate a bug
@@ -324,7 +315,9 @@ test.describe.serial('POS Flow through Sales UI', () => {
   /* ── Teardown: remove the created sale ────────────────────────── */
 
   test.afterAll(async ({ request }) => {
-    if (!saleId) return;
+    if (!saleId) {
+      return;
+    }
     const headers = accessToken
       ? { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
       : { 'Content-Type': 'application/json' };

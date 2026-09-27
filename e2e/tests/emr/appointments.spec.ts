@@ -86,9 +86,8 @@ test('filters appointments by patient via the column filter pattern', async ({ p
     .poll(() =>
       urls.some(
         (url) =>
-          url.includes('/api/appointments') &&
-          url.includes('patientName=FUZZY_MATCH%7Cada%7C'),
-      ),
+          url.includes('/api/appointments') && url.includes('patientName=FUZZY_MATCH%7Cada%7C')
+      )
     )
     .toBe(true);
 });

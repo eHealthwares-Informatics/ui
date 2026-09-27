@@ -28,7 +28,9 @@ export function LisResourcePage({ resource }: { resource: LisResourceConfig }) {
 
   async function checkCoverage(formState: Record<string, unknown>) {
     const testId = String(formState.testId ?? '');
-    if (!testId) {return;}
+    if (!testId) {
+      return;
+    }
     const result = await lisApi.get(`/lis/reference-ranges/coverage/${testId}`);
     const issues = result.data?.issues ?? [];
     setCoverage(

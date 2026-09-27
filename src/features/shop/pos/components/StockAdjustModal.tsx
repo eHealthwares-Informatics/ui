@@ -2,8 +2,8 @@ import { Button, Group, Modal, NumberInput, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 interface Props {
   opened: boolean;
@@ -41,7 +41,9 @@ export function StockAdjustModal({
   const adjustmentMutation = useMutation({
     mutationFn: async () => {
       const delta = newQty - currentQty;
-      if (delta === 0) {return;}
+      if (delta === 0) {
+        return;
+      }
 
       await rxsoftApi.post('/inventory/adjust-quantity', {
         itemId,
@@ -52,7 +54,10 @@ export function StockAdjustModal({
       });
     },
     onSuccess: () => {
-      notifications.show({ message: `Stock updated to ${newQty} ${uomName ?? ''}`, color: 'green' });
+      notifications.show({
+        message: `Stock updated to ${newQty} ${uomName ?? ''}`,
+        color: 'green',
+      });
       onAdjusted();
       onClose();
     },
@@ -60,7 +65,7 @@ export function StockAdjustModal({
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 
@@ -68,7 +73,10 @@ export function StockAdjustModal({
     <Modal opened={opened} onClose={onClose} title={`Set Stock Qty - ${itemName}`} centered>
       <Stack gap="md">
         <Text size="sm" c="dimmed">
-          Current stock: <Text span fw={600}>{currentQty}</Text>
+          Current stock:{' '}
+          <Text span fw={600}>
+            {currentQty}
+          </Text>
           {uomName && <Text span> {uomName}</Text>}
         </Text>
         <Text size="xs" c="dimmed">

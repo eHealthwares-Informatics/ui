@@ -1,6 +1,6 @@
+import { defineConfig } from '@playwright/test';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig } from '@playwright/test';
 
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 /** Playwright resolves `use.storageState` relative to the process CWD, so use an absolute path. */
@@ -42,7 +42,12 @@ export default defineConfig({
       name: 'admin',
       dependencies: ['setup'],
       testMatch: ['tests/**', 'crud-suite/**'],
-      testIgnore: ['**/auth.setup.ts', 'tests/emr/**', 'tests/auth/sign-in.spec.ts', 'tests/root/**'],
+      testIgnore: [
+        '**/auth.setup.ts',
+        'tests/emr/**',
+        'tests/auth/sign-in.spec.ts',
+        'tests/root/**',
+      ],
       use: {
         storageState: ADMIN_STORAGE_STATE,
       },

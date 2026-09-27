@@ -1,4 +1,11 @@
-import { ColumnDataType, EQUALS_WITH_OPTIONS, ColumnTypeFilters, RELATION_FILTER, type Column, type Option } from '@/features/rxsoft/types';
+import {
+  ColumnDataType,
+  EQUALS_WITH_OPTIONS,
+  ColumnTypeFilters,
+  RELATION_FILTER,
+  type Column,
+  type Option,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { UserPopover } from '../../../components/popover/user-popover';
 
@@ -14,7 +21,13 @@ const stockBalancesColumns: Column[] = [
     key: 'item',
     label: 'Item',
     render: (row) => (row as any).item?.name ?? (row as any).itemId ?? '-',
-    filters: RELATION_FILTER({ endpoint: '/items', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 2 }),
+    filters: RELATION_FILTER({
+      endpoint: '/items',
+      queryParam: 'search',
+      valueKey: 'id',
+      labelKey: 'name',
+      minChars: 2,
+    }),
   },
   {
     key: 'itemCode',
@@ -25,17 +38,34 @@ const stockBalancesColumns: Column[] = [
     key: 'location',
     label: 'Location',
     render: (row) => (row as any).location?.name ?? (row as any).locationId ?? '-',
-    filters: RELATION_FILTER({ endpoint: '/stock-locations', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 0 }),
+    filters: RELATION_FILTER({
+      endpoint: '/stock-locations',
+      queryParam: 'search',
+      valueKey: 'id',
+      labelKey: 'name',
+      minChars: 0,
+    }),
   },
-  { key: 'quantityOnHand', label: 'On Hand', dataType: ColumnDataType.NUMBER, filters: ColumnTypeFilters.NUMBER },
-  { key: 'quantityReserved', label: 'Reserved', dataType: ColumnDataType.NUMBER, filters: ColumnTypeFilters.NUMBER },
+  {
+    key: 'quantityOnHand',
+    label: 'On Hand',
+    dataType: ColumnDataType.NUMBER,
+    filters: ColumnTypeFilters.NUMBER,
+  },
+  {
+    key: 'quantityReserved',
+    label: 'Reserved',
+    dataType: ColumnDataType.NUMBER,
+    filters: ColumnTypeFilters.NUMBER,
+  },
   {
     key: 'available',
     label: 'Available',
     dataType: ColumnDataType.NUMBER,
     filters: ColumnTypeFilters.NUMBER,
     render: (row) => {
-      const available = Number((row as any).quantityOnHand ?? 0) - Number((row as any).quantityReserved ?? 0);
+      const available =
+        Number((row as any).quantityOnHand ?? 0) - Number((row as any).quantityReserved ?? 0);
       return String(available);
     },
   },
@@ -54,7 +84,9 @@ const stockMovementsColumns: Column[] = [
     render: (row) => {
       const from = (row as any).fromLocation?.name ?? (row as any).fromLocationId;
       const to = (row as any).toLocation?.name ?? (row as any).toLocationId;
-      if (from && to) {return `${from} → ${to}`;}
+      if (from && to) {
+        return `${from} → ${to}`;
+      }
       return from ?? to ?? '-';
     },
   },

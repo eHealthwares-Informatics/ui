@@ -3,8 +3,28 @@ import { RELATION_FILTER, type Column, type Field, type View } from '../../types
 
 const columns: Column[] = [
   { key: 'invoiceNumber', label: 'PO/Invoice' },
-  { key: 'supplier.name', label: 'Supplier', filters: RELATION_FILTER({ endpoint: '/customers', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 2 }) },
-  { key: 'warehouse.name', label: 'Warehouse', filters: RELATION_FILTER({ endpoint: '/stock-locations', queryParam: 'search', valueKey: 'id', labelKey: 'name', minChars: 0 }) },
+  {
+    key: 'supplier.name',
+    label: 'Supplier',
+    filters: RELATION_FILTER({
+      endpoint: '/customers',
+      queryParam: 'search',
+      valueKey: 'id',
+      labelKey: 'name',
+      minChars: 2,
+    }),
+  },
+  {
+    key: 'warehouse.name',
+    label: 'Warehouse',
+    filters: RELATION_FILTER({
+      endpoint: '/stock-locations',
+      queryParam: 'search',
+      valueKey: 'id',
+      labelKey: 'name',
+      minChars: 0,
+    }),
+  },
   { key: 'currencyCode', label: 'Currency' },
   { key: 'totalCost', label: 'Total Cost' },
   { key: 'status', label: 'Status' },
@@ -102,8 +122,18 @@ const purchasesView: View<any> = {
     {
       fields: [
         { key: 'invoiceNumber', label: 'PO Number', col: 4 },
-        { key: 'supplier.name', label: 'Supplier', col: 4, render: (_, data) => data.supplier?.name ?? '-' },
-        { key: 'warehouse.name', label: 'Warehouse', col: 4, render: (_, data) => data.warehouse?.name ?? '-' },
+        {
+          key: 'supplier.name',
+          label: 'Supplier',
+          col: 4,
+          render: (_, data) => data.supplier?.name ?? '-',
+        },
+        {
+          key: 'warehouse.name',
+          label: 'Warehouse',
+          col: 4,
+          render: (_, data) => data.warehouse?.name ?? '-',
+        },
         { key: 'orderDate', label: 'Order Date', col: 3 },
         { key: 'expectedDate', label: 'Expected Date', col: 3 },
         { key: 'status', label: 'Status', col: 3 },
@@ -129,7 +159,9 @@ const purchasesView: View<any> = {
 function buildCreatePayload(values: Record<string, unknown>) {
   return {
     supplierId: values.supplier ? (values.supplier as { value: string }).value : values.supplierId,
-    warehouseId: values.warehouse ? (values.warehouse as { value: string }).value : values.warehouseId,
+    warehouseId: values.warehouse
+      ? (values.warehouse as { value: string }).value
+      : values.warehouseId,
     productId: values.productId,
     purchaseUomId: values.purchaseUom ? (values.purchaseUom as { value: string }).value : undefined,
     quantity: Number(values.quantity || 0),

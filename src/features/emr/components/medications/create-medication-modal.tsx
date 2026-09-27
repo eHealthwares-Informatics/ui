@@ -1,12 +1,4 @@
-import {
-  Button,
-  Group,
-  Modal,
-  NativeSelect,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Button, Group, Modal, NativeSelect, Stack, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -95,7 +87,11 @@ export function CreateMedicationModal({
       <Stack gap="sm">
         <TextInput
           label="Patient"
-          value={request.patientName ? `${request.patientName} (${request.patientId})` : request.patientId}
+          value={
+            request.patientName
+              ? `${request.patientName} (${request.patientId})`
+              : request.patientId
+          }
           readOnly
         />
         <NativeSelect
@@ -118,7 +114,11 @@ export function CreateMedicationModal({
           onChange={(e) => setItemIndex(e.currentTarget.value)}
         />
         <Group grow>
-          <TextInput label="Dose (override)" value={dose} onChange={(e) => setDose(e.currentTarget.value)} />
+          <TextInput
+            label="Dose (override)"
+            value={dose}
+            onChange={(e) => setDose(e.currentTarget.value)}
+          />
           <TextInput
             label="Dose unit (override)"
             value={doseUnit}
@@ -150,7 +150,8 @@ export function CreateMedicationModal({
           />
         </Group>
         <Text size="xs" c="dimmed">
-          Each prescription item can be converted once. Leave overrides blank to use the item values.
+          Each prescription item can be converted once. Leave overrides blank to use the item
+          values.
         </Text>
         <Group justify="flex-end" mt="xs">
           <Button variant="default" onClick={onClose}>

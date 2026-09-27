@@ -7,20 +7,34 @@ import { conversationApi } from '@/lib/conversation-api';
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <Group gap="sm" justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', padding: '8px 0' }}>
-      <Text size="sm" c="dimmed">{label}</Text>
-      <Text size="sm" fw={500} style={{ textAlign: 'right' }}>{value}</Text>
+    <Group
+      gap="sm"
+      justify="space-between"
+      style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', padding: '8px 0' }}
+    >
+      <Text size="sm" c="dimmed">
+        {label}
+      </Text>
+      <Text size="sm" fw={500} style={{ textAlign: 'right' }}>
+        {value}
+      </Text>
     </Group>
   );
 }
 
 const statusColor = (status?: string) => {
   switch (status) {
-    case 'ACCEPTED': return 'green';
-    case 'BROADCASTING': return 'blue';
-    case 'AWAITING': return 'yellow';
-    case 'TIMED_OUT': case 'CANCELLED': return 'red';
-    default: return 'gray';
+    case 'ACCEPTED':
+      return 'green';
+    case 'BROADCASTING':
+      return 'blue';
+    case 'AWAITING':
+      return 'yellow';
+    case 'TIMED_OUT':
+    case 'CANCELLED':
+      return 'red';
+    default:
+      return 'gray';
   }
 };
 
@@ -44,20 +58,42 @@ function ConversationSection({ conversationId }: { conversationId: string }) {
 
   return (
     <Card withBorder p="md">
-      <Text fw={600} mb="xs">Conversation</Text>
+      <Text fw={600} mb="xs">
+        Conversation
+      </Text>
       {convQuery.isLoading ? (
-        <Text size="sm" c="dimmed">Loading conversation...</Text>
+        <Text size="sm" c="dimmed">
+          Loading conversation...
+        </Text>
       ) : convQuery.isError ? (
-        <Text size="sm" c="red">Failed to load conversation.</Text>
+        <Text size="sm" c="red">
+          Failed to load conversation.
+        </Text>
       ) : conv ? (
         <Stack gap={0}>
-          <DetailRow label="Conversation ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{conversationId}</Text>} />
-          <DetailRow label="Status" value={<Badge color={convStatus === 'ACTIVE' ? 'green' : 'gray'} size="sm" variant="light">{convStatus || '-'}</Badge>} />
+          <DetailRow
+            label="Conversation ID"
+            value={
+              <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                {conversationId}
+              </Text>
+            }
+          />
+          <DetailRow
+            label="Status"
+            value={
+              <Badge color={convStatus === 'ACTIVE' ? 'green' : 'gray'} size="sm" variant="light">
+                {convStatus || '-'}
+              </Badge>
+            }
+          />
           <DetailRow label="State" value={convState || '-'} />
           {qName ? <DetailRow label="Questionnaire" value={qName} /> : null}
         </Stack>
       ) : (
-        <Text size="sm" c="dimmed">No conversation data</Text>
+        <Text size="sm" c="dimmed">
+          No conversation data
+        </Text>
       )}
       <Button
         variant="subtle"
@@ -74,9 +110,13 @@ function ConversationSection({ conversationId }: { conversationId: string }) {
 function ProvidersCard({ providers }: { providers: Record<string, unknown>[] }) {
   return (
     <Card withBorder p="md">
-      <Text fw={600} mb="xs">Providers ({providers.length})</Text>
+      <Text fw={600} mb="xs">
+        Providers ({providers.length})
+      </Text>
       {providers.length === 0 ? (
-        <Text size="sm" c="dimmed">No providers assigned</Text>
+        <Text size="sm" c="dimmed">
+          No providers assigned
+        </Text>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {providers.map((p, i) => {
@@ -92,12 +132,26 @@ function ProvidersCard({ providers }: { providers: Record<string, unknown>[] }) 
                 justify="space-between"
                 style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', padding: '8px 0' }}
               >
-                <Text size="sm">{pFirst} {pLast}</Text>
+                <Text size="sm">
+                  {pFirst} {pLast}
+                </Text>
                 <Group gap="xs">
-                  {pPhone ? <Text size="xs" c="dimmed">{pPhone}</Text> : null}
-                  {pRole ? <Badge size="xs" variant="light">{pRole}</Badge> : null}
+                  {pPhone ? (
+                    <Text size="xs" c="dimmed">
+                      {pPhone}
+                    </Text>
+                  ) : null}
+                  {pRole ? (
+                    <Badge size="xs" variant="light">
+                      {pRole}
+                    </Badge>
+                  ) : null}
                   {pAccepted ? (
-                    <Badge size="xs" color={pAccepted === 'true' ? 'green' : 'gray'} variant="light">
+                    <Badge
+                      size="xs"
+                      color={pAccepted === 'true' ? 'green' : 'gray'}
+                      variant="light"
+                    >
                       {pAccepted === 'true' ? 'Accepted' : 'Pending'}
                     </Badge>
                   ) : null}
@@ -124,21 +178,22 @@ export function RxInviteDetailsPage({ inviteId }: { inviteId: string }) {
 
   const invite = query.data as Record<string, unknown> | undefined;
   const conversationId = invite?.conversationId ? String(invite.conversationId) : undefined;
-  const providers = (Array.isArray(invite?.providers) ? invite.providers : []) as Record<string, unknown>[];
+  const providers = (Array.isArray(invite?.providers) ? invite.providers : []) as Record<
+    string,
+    unknown
+  >[];
 
   const bStatus = invite ? String(invite.status ?? '') : '';
   const bChatMode = invite ? String(invite.chatMode) === 'true' : false;
   const bAcceptance = invite ? String(invite.acceptanceCount ?? '-') : '-';
   const bAccepted = invite ? String(invite.acceptedCount ?? 0) : '0';
 
-  const timeoutAt = invite?.timeoutAt
-    ? new Date(Number(invite.timeoutAt)).toLocaleString()
-    : '—';
-  const createdAt = invite?.createdAt
-    ? new Date(invite.createdAt as string).toLocaleString()
-    : '—';
+  const timeoutAt = invite?.timeoutAt ? new Date(Number(invite.timeoutAt)).toLocaleString() : '—';
+  const createdAt = invite?.createdAt ? new Date(invite.createdAt as string).toLocaleString() : '—';
 
-  const convSection = conversationId ? <ConversationSection conversationId={conversationId} /> : null;
+  const convSection = conversationId ? (
+    <ConversationSection conversationId={conversationId} />
+  ) : null;
 
   const target = invite?.target as Record<string, unknown> | undefined;
   const hasTarget = target && Object.keys(target).length > 0;
@@ -146,10 +201,7 @@ export function RxInviteDetailsPage({ inviteId }: { inviteId: string }) {
   return (
     <RxPage
       title="Invite Details"
-      breadcrumbs={[
-        { label: 'Invites', href: '/conversation/invites' },
-        { label: inviteId },
-      ]}
+      breadcrumbs={[{ label: 'Invites', href: '/conversation/invites' }, { label: inviteId }]}
       onBack={() => navigate({ to: '/conversation/invites' })}
       actions={
         <Button variant="outline" onClick={() => navigate({ to: '/conversation/invites' })}>
@@ -157,15 +209,32 @@ export function RxInviteDetailsPage({ inviteId }: { inviteId: string }) {
         </Button>
       }
     >
-      {query.isLoading && <Text size="sm" c="dimmed">Loading invite...</Text>}
-      {query.isError && <Text size="sm" c="red">Failed to load invite.</Text>}
+      {query.isLoading && (
+        <Text size="sm" c="dimmed">
+          Loading invite...
+        </Text>
+      )}
+      {query.isError && (
+        <Text size="sm" c="red">
+          Failed to load invite.
+        </Text>
+      )}
       {!query.isLoading && !query.isError && invite && (
         <Stack gap="md">
           {/* Overview */}
           <Card withBorder p="md">
-            <Text fw={600} mb="xs">Overview</Text>
+            <Text fw={600} mb="xs">
+              Overview
+            </Text>
             <Stack gap={0}>
-              <DetailRow label="ID" value={<Text size="xs" style={{ wordBreak: 'break-all' }}>{inviteId}</Text>} />
+              <DetailRow
+                label="ID"
+                value={
+                  <Text size="xs" style={{ wordBreak: 'break-all' }}>
+                    {inviteId}
+                  </Text>
+                }
+              />
               <DetailRow
                 label="Status"
                 value={
@@ -188,7 +257,9 @@ export function RxInviteDetailsPage({ inviteId }: { inviteId: string }) {
 
           {hasTarget && target && (
             <Card withBorder p="md">
-              <Text fw={600} mb="xs">Target</Text>
+              <Text fw={600} mb="xs">
+                Target
+              </Text>
               <pre
                 style={{
                   overflowX: 'auto',
@@ -205,7 +276,9 @@ export function RxInviteDetailsPage({ inviteId }: { inviteId: string }) {
           )}
 
           <Card withBorder p="md">
-            <Text fw={600} mb="xs">Raw Data</Text>
+            <Text fw={600} mb="xs">
+              Raw Data
+            </Text>
             <pre
               style={{
                 overflowX: 'auto',

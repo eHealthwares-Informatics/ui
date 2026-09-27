@@ -36,7 +36,9 @@ export function AppearanceForm() {
   });
 
   function onSubmit(data: AppearanceFormValues) {
-    if (data.theme !== colorScheme) {setColorScheme(data.theme);}
+    if (data.theme !== colorScheme) {
+      setColorScheme(data.theme);
+    }
     showSubmittedData(data);
   }
 

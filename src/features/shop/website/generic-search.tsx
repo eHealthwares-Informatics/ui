@@ -1,16 +1,8 @@
-import {
-  Box,
-  Combobox,
-  Group,
-  InputBase,
-  Stack,
-  Text,
-  useCombobox,
-} from '@mantine/core';
+import { Box, Combobox, Group, InputBase, Stack, Text, useCombobox } from '@mantine/core';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
-import { useGenericProductSearch } from './hooks';
 import { green, ink, line, muted } from './components';
+import { useGenericProductSearch } from './hooks';
 
 /**
  * Expand-on-hover search: collapses to an icon pill, expands on hover or
@@ -102,9 +94,7 @@ export function ExpandableSearch({
         <Combobox.Options style={{ maxHeight: 300, overflowY: 'auto' }}>
           {options.length === 0 ? (
             <Combobox.Empty>
-              {search.trim().length < 2
-                ? 'Type at least 2 characters…'
-                : 'No matching generics'}
+              {search.trim().length < 2 ? 'Type at least 2 characters…' : 'No matching generics'}
             </Combobox.Empty>
           ) : (
             options.map((o) => (
@@ -119,9 +109,7 @@ export function ExpandableSearch({
                     </Text>
                   </Stack>
                   <Text size="sm" fw={700} c={green} style={{ flexShrink: 0 }}>
-                    {o.averagePrice != null
-                      ? `₦${Number(o.averagePrice).toLocaleString()}`
-                      : '—'}
+                    {o.averagePrice != null ? `₦${Number(o.averagePrice).toLocaleString()}` : '—'}
                   </Text>
                 </Group>
               </Combobox.Option>
@@ -199,9 +187,7 @@ export function GenericSearchInput({
         <Combobox.Options style={{ maxHeight: 300, overflowY: 'auto' }}>
           {options.length === 0 ? (
             <Combobox.Empty>
-              {search.trim().length < 2
-                ? 'Type at least 2 characters…'
-                : 'No matching generics'}
+              {search.trim().length < 2 ? 'Type at least 2 characters…' : 'No matching generics'}
             </Combobox.Empty>
           ) : (
             options.map((o) => (
@@ -211,9 +197,7 @@ export function GenericSearchInput({
                     {o.label}
                   </Text>
                   <Text size="xs" c={green} style={{ flexShrink: 0 }}>
-                    {o.averagePrice != null
-                      ? `₦${Number(o.averagePrice).toLocaleString()}`
-                      : '—'}
+                    {o.averagePrice != null ? `₦${Number(o.averagePrice).toLocaleString()}` : '—'}
                   </Text>
                 </Group>
               </Combobox.Option>

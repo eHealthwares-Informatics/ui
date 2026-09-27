@@ -8,7 +8,9 @@ type ImageCellProps = {
 };
 
 export function ImageCell({ src, w = 40, h = 40, fallback }: ImageCellProps) {
-  if (!src) {return null;}
+  if (!src) {
+    return null;
+  }
 
   return (
     <Image

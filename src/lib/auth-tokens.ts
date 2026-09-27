@@ -58,9 +58,7 @@ export function getAccessToken(): string | null {
  * Returns the access token's absolute expiry timestamp in ms, or null when the
  * token carries no `exp` claim (e.g. missing/corrupt payload).
  */
-export function getAccessTokenExpiry(
-  accessToken: string | null = getAccessToken(),
-): number | null {
+export function getAccessTokenExpiry(accessToken: string | null = getAccessToken()): number | null {
   if (!accessToken) {
     return null;
   }

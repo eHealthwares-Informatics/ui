@@ -3,13 +3,7 @@ import { BadgeCheck, Calendar, MapPin } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { apmBlue, ink, muted, apmGreen } from './layout';
 
-export function SectionHeading({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle?: string;
-}) {
+export function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <Stack gap={4} style={{ textAlign: 'center', marginBottom: '3rem' }}>
       <Title
@@ -164,8 +158,7 @@ export function AchievementCard({
         root: {
           border: '1px solid #E2E8F0',
           background: '#fff',
-          transition:
-            'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
+          transition: 'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
@@ -177,7 +170,11 @@ export function AchievementCard({
         <ThemeIcon size={48} radius="xl" color={apmBlue} variant="light">
           {icon}
         </ThemeIcon>
-        <Text size="xs" fw={600} style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Text
+          size="xs"
+          fw={600}
+          style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}
+        >
           {category}
         </Text>
         <Text fw={700} style={{ fontSize: '1.1rem', color: ink, lineHeight: 1.4 }}>
@@ -223,8 +220,7 @@ export function NewsCard({
           border: '1px solid #E2E8F0',
           background: '#fff',
           textDecoration: 'none',
-          transition:
-            'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
+          transition: 'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
@@ -233,7 +229,11 @@ export function NewsCard({
       }}
     >
       <Stack gap="xs">
-        <Text size="xs" fw={600} style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Text
+          size="xs"
+          fw={600}
+          style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}
+        >
           {category}
         </Text>
         <Text fw={700} style={{ fontSize: '1.05rem', color: ink, lineHeight: 1.4 }}>
@@ -243,11 +243,17 @@ export function NewsCard({
           {excerpt}
         </Text>
         <Group gap="xs">
-          <Text size="xs" style={{ color: muted }}>{date}</Text>
+          <Text size="xs" style={{ color: muted }}>
+            {date}
+          </Text>
           {authorName && (
             <>
-              <Text size="xs" style={{ color: muted }}>·</Text>
-              <Text size="xs" style={{ color: muted }}>{authorName}</Text>
+              <Text size="xs" style={{ color: muted }}>
+                ·
+              </Text>
+              <Text size="xs" style={{ color: muted }}>
+                {authorName}
+              </Text>
             </>
           )}
         </Group>
@@ -290,8 +296,7 @@ export function EventCard({
           border: '1px solid #E2E8F0',
           background: '#fff',
           cursor: onClick ? 'pointer' : 'default',
-          transition:
-            'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
+          transition: 'transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms ease',
           '&:hover': {
             transform: 'translateY(-4px)',
             boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
@@ -300,7 +305,11 @@ export function EventCard({
       }}
     >
       <Stack gap="xs">
-        <Text size="xs" fw={600} style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Text
+          size="xs"
+          fw={600}
+          style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em' }}
+        >
           {category}
         </Text>
         <Text fw={700} style={{ fontSize: '1.05rem', color: ink, lineHeight: 1.4 }}>
@@ -314,11 +323,15 @@ export function EventCard({
         <Group gap="lg">
           <Group gap={6}>
             <MapPin size={14} color={muted} />
-            <Text size="xs" style={{ color: muted }}>{location}</Text>
+            <Text size="xs" style={{ color: muted }}>
+              {location}
+            </Text>
           </Group>
           <Group gap={6}>
             <Calendar size={14} color={muted} />
-            <Text size="xs" style={{ color: muted }}>{date} · {eventTime}</Text>
+            <Text size="xs" style={{ color: muted }}>
+              {date} · {eventTime}
+            </Text>
           </Group>
         </Group>
       </Stack>

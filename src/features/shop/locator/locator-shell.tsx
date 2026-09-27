@@ -1,9 +1,3 @@
-/**
- * Shared shell for the locator pages: hero band, filter bar (name search +
- * state/LGA selects + page-supplied extra selects), results list with
- * pagination on the left and the sticky Leaflet map on the right.
- */
-import type { ReactNode } from 'react';
 import {
   Alert,
   Anchor,
@@ -22,8 +16,14 @@ import {
   Select as MantineSelect,
 } from '@mantine/core';
 import { AlertTriangle, RotateCcw, Search, X } from 'lucide-react';
-import { LocatorMap, type MapFocus, type MapPoint } from './locator-map';
+/**
+ * Shared shell for the locator pages: hero band, filter bar (name search +
+ * state/LGA selects + page-supplied extra selects), results list with
+ * pagination on the left and the sticky Leaflet map on the right.
+ */
+import type { ReactNode } from 'react';
 import type { ConceptsState, ListMeta } from './api';
+import { LocatorMap, type MapFocus, type MapPoint } from './locator-map';
 
 export const locatorTheme = {
   green: '#16A34A',
@@ -172,11 +172,7 @@ export function LocatorShell(props: LocatorShellProps) {
               disabled={filtersDisabled}
               rightSection={
                 search ? (
-                  <Anchor
-                    c="dimmed"
-                    onClick={() => onSearchChange('')}
-                    aria-label="Clear search"
-                  >
+                  <Anchor c="dimmed" onClick={() => onSearchChange('')} aria-label="Clear search">
                     <X size={14} />
                   </Anchor>
                 ) : undefined
@@ -264,8 +260,8 @@ export function LocatorShell(props: LocatorShellProps) {
                 variant="light"
                 title="Could not load results"
               >
-                The facility registry service is unreachable right now. Please try
-                again in a moment.
+                The facility registry service is unreachable right now. Please try again in a
+                moment.
               </Alert>
             ) : loading && resultCount === 0 ? (
               <Stack gap="sm">

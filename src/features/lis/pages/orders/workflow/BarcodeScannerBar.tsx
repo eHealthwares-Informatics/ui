@@ -29,11 +29,15 @@ export function BarcodeScannerBar() {
     lisApi
       .get('/lis/orders', { params: { search: debounced.trim(), limit: 10 } })
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         setOrders(res.data?.data ?? []);
       })
       .catch(() => {
-        if (!cancelled) setOrders([]);
+        if (!cancelled) {
+          setOrders([]);
+        }
       });
     return () => {
       cancelled = true;
@@ -51,7 +55,9 @@ export function BarcodeScannerBar() {
 
   const handleSearch = async () => {
     const q = value.trim();
-    if (!q) return;
+    if (!q) {
+      return;
+    }
     try {
       const res = await lisApi.get('/lis/orders', { params: { search: q, limit: 5 } });
       const matches = res.data?.data ?? [];
@@ -74,7 +80,9 @@ export function BarcodeScannerBar() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key !== 'Enter') return;
+    if (e.key !== 'Enter') {
+      return;
+    }
     if (combobox.dropdownOpened) {
       const order = orders[combobox.getSelectedOptionIndex()];
       if (order) {
@@ -92,7 +100,9 @@ export function BarcodeScannerBar() {
         store={combobox}
         onOptionSubmit={(selectedValue) => {
           const order = orders.find((o) => o.id === selectedValue);
-          if (order) openOrder(order.id, order.orderNumber);
+          if (order) {
+            openOrder(order.id, order.orderNumber);
+          }
           combobox.closeDropdown();
         }}
       >

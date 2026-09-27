@@ -14,7 +14,7 @@ function hasPosPermission(permissions: string[], roles: string[]) {
       p === 'shop.*' ||
       p === 'rxsoft.*' ||
       p.startsWith('shop.pos.') ||
-      (p.endsWith('.*') && p.startsWith('shop.')),
+      (p.endsWith('.*') && p.startsWith('shop.'))
   );
 }
 

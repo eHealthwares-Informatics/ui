@@ -1,6 +1,6 @@
 import { ActionIcon } from '@mantine/core';
-import { Settings } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { Settings } from 'lucide-react';
 import type { ModelConfig } from '../../../shared/model-schema';
 import type { Column, Field } from '../../types';
 

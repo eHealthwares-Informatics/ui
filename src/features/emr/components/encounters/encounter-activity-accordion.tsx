@@ -13,9 +13,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { FileText, ClipboardList } from 'lucide-react';
 import { formatEnum } from '../../lib/emr-constants';
 import type { FormSubmission } from '../../lib/emr-types';
+import { SchemaOutdatedBadge } from '../documentation/schema-outdated-badge';
 import { SubmissionSummary } from '../documentation/submission-summary';
 import { StatusBadge } from '../shared/status-badge';
-import { SchemaOutdatedBadge } from '../documentation/schema-outdated-badge';
 
 function formatDate(value: string | null | undefined): string {
   return value ? new Date(value).toLocaleString() : '—';
@@ -53,7 +53,7 @@ export function DocumentsAccordion({
   }
 
   const sorted = [...submissions].sort((a, b) =>
-    (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''),
+    (b.submittedAt ?? '').localeCompare(a.submittedAt ?? '')
   );
 
   if (sorted.length === 0) {
@@ -94,19 +94,11 @@ export function DocumentsAccordion({
                 <SubmissionSummary submission={submission} />
               )}
               <Group gap={4} wrap="nowrap">
-                <Button
-                  size="compact-xs"
-                  variant="light"
-                  onClick={() => onView(submission)}
-                >
+                <Button size="compact-xs" variant="light" onClick={() => onView(submission)}>
                   View
                 </Button>
                 {submission.status === 'SUBMITTED' && onAmend && (
-                  <Button
-                    size="compact-xs"
-                    variant="outline"
-                    onClick={() => onAmend(submission)}
-                  >
+                  <Button size="compact-xs" variant="outline" onClick={() => onAmend(submission)}>
                     Amend
                   </Button>
                 )}
@@ -171,17 +163,20 @@ export function RequestsAccordion({
           <Accordion.Panel>
             <Stack gap="sm">
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-                <InfoLine
-                  label="Requested"
-                  value={formatDate(String(request.requestedAt ?? ''))}
-                />
+                <InfoLine label="Requested" value={formatDate(String(request.requestedAt ?? ''))} />
                 <InfoLine
                   label="Ordering provider"
                   value={String(request.orderingProviderName ?? '—')}
                 />
                 <InfoLine label="Diagnosis" value={String(request.diagnosis ?? '—')} />
               </SimpleGrid>
-              <Anchor component="button" type="button" size="sm" fw={500} onClick={visit(String(request.id))}>
+              <Anchor
+                component="button"
+                type="button"
+                size="sm"
+                fw={500}
+                onClick={visit(String(request.id))}
+              >
                 View full request
               </Anchor>
             </Stack>

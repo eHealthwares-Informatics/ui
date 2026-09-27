@@ -1,5 +1,5 @@
-import { expect, skipIfBackendDown, test } from '../fixtures/test';
 import { rxsoftResources, type RxsoftCrudResource } from '../fixtures/rxsoft-resources';
+import { expect, skipIfBackendDown, test } from '../fixtures/test';
 import { CrudShellPage } from '../page-objects/crud-shell.page';
 import { API_BASE_URL, readAccessToken } from '../utils/api';
 
@@ -9,12 +9,20 @@ function tokenFor(resource: RxsoftCrudResource): string {
 
 /** Mirrors src/features/components/utils.ts getArrayPayload for API responses. */
 function getRows(payload: unknown): Array<Record<string, unknown>> {
-  if (Array.isArray(payload)) return payload as Array<Record<string, unknown>>;
+  if (Array.isArray(payload)) {
+    return payload as Array<Record<string, unknown>>;
+  }
   if (payload && typeof payload === 'object') {
     const shaped = payload as Record<string, unknown>;
-    if (Array.isArray(shaped.data)) return shaped.data as Array<Record<string, unknown>>;
-    if (Array.isArray(shaped.items)) return shaped.items as Array<Record<string, unknown>>;
-    if (Array.isArray(shaped.results)) return shaped.results as Array<Record<string, unknown>>;
+    if (Array.isArray(shaped.data)) {
+      return shaped.data as Array<Record<string, unknown>>;
+    }
+    if (Array.isArray(shaped.items)) {
+      return shaped.items as Array<Record<string, unknown>>;
+    }
+    if (Array.isArray(shaped.results)) {
+      return shaped.results as Array<Record<string, unknown>>;
+    }
   }
   return [];
 }
@@ -95,21 +103,29 @@ for (const resource of rxsoftResources) {
       test.skip(!resource.hasExport, 'resource has no csv endpoint');
       await expect(crud.exportButton).toBeVisible();
       await crud.exportButton.click();
-      await expect(page.getByText(`${resource.title} export downloaded`)).toBeVisible({ timeout: 5_000 });
+      await expect(page.getByText(`${resource.title} export downloaded`)).toBeVisible({
+        timeout: 5_000,
+      });
     });
 
     test.afterAll(async ({ request }) => {
-      if (!accessToken) return;
+      if (!accessToken) {
+        return;
+      }
       const searchKey = updatedToken ?? createdToken;
       const listRes = await request.get(`${API_BASE_URL}${resource.endpoint}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: { search: searchKey, limit: 5 },
       });
-      if (!listRes.ok()) return;
+      if (!listRes.ok()) {
+        return;
+      }
       try {
         const body = (await listRes.json()) as unknown;
         for (const row of getRows(body)) {
-          if (!row.id) continue;
+          if (!row.id) {
+            continue;
+          }
           await request.delete(`${API_BASE_URL}${resource.endpoint}/${String(row.id)}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
           });

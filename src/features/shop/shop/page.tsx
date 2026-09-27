@@ -19,26 +19,44 @@ import {
 } from '@mantine/core';
 import { ChevronDown, Search, SlidersHorizontal, Pill, X } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
-import { EmptyProducts, EmptySearchResults } from '../website/empty-states';
 import { ProductCard, ListPagination } from '../website/components';
-import { useProducts, useCategories, useGenericProductSearch, useTherapeuticCategories, useClassifications } from '../website/hooks';
+import { EmptyProducts, EmptySearchResults } from '../website/empty-states';
 import {
-  WebsiteLayout,
-  green,
-  ink,
-  muted,
-  line,
-  soft,
-  buttonStyles,
-} from '../website/layout';
+  useProducts,
+  useCategories,
+  useGenericProductSearch,
+  useTherapeuticCategories,
+  useClassifications,
+} from '../website/hooks';
+import { WebsiteLayout, green, ink, muted, line, soft, buttonStyles } from '../website/layout';
 import { SkeletonCards } from '../website/loaders';
 
 const FILTER_DEFS = [
-  { id: 'search', label: 'Search', desc: 'Free-text search across product names and descriptions', icon: '🔍' },
-  { id: 'category', label: 'Category', desc: 'Browse by therapeutic category and product groupings', icon: '📁' },
+  {
+    id: 'search',
+    label: 'Search',
+    desc: 'Free-text search across product names and descriptions',
+    icon: '🔍',
+  },
+  {
+    id: 'category',
+    label: 'Category',
+    desc: 'Browse by therapeutic category and product groupings',
+    icon: '📁',
+  },
   { id: 'sort', label: 'Sort', desc: 'Order results by newest, name, or price', icon: '↕' },
-  { id: 'gp', label: 'Generic Product', desc: 'Filter by generic name from the EMDEx drug database', icon: '💊' },
-  { id: 'classification', label: 'Classification', desc: 'Filter by drug classification type — therapeutic, pharmaceutical, NDF, or EMDEx', icon: '🏷' },
+  {
+    id: 'gp',
+    label: 'Generic Product',
+    desc: 'Filter by generic name from the EMDEx drug database',
+    icon: '💊',
+  },
+  {
+    id: 'classification',
+    label: 'Classification',
+    desc: 'Filter by drug classification type — therapeutic, pharmaceutical, NDF, or EMDEx',
+    icon: '🏷',
+  },
 ];
 
 const CLASSIFICATION_SOURCES: Record<string, string> = {
@@ -125,7 +143,10 @@ function GenericFilter({
               variant="subtle"
               color="gray"
               size="xs"
-              onClick={() => { onChange(null); setQ(''); }}
+              onClick={() => {
+                onChange(null);
+                setQ('');
+              }}
               style={{ marginLeft: 4, flexShrink: 0 }}
             >
               <X size={12} />
@@ -147,9 +168,7 @@ function GenericFilter({
                     {o.label}
                   </Text>
                   <Text size="xs" c={green} style={{ flexShrink: 0 }}>
-                    {o.averagePrice != null
-                      ? `₦${Number(o.averagePrice).toLocaleString()}`
-                      : '—'}
+                    {o.averagePrice != null ? `₦${Number(o.averagePrice).toLocaleString()}` : '—'}
                   </Text>
                 </Group>
               </Combobox.Option>
@@ -192,7 +211,7 @@ export default function ShopPage({
   const categoryFromUrl = urlParams.get('category');
   const [search, setSearch] = useState(typeof qFromUrl === 'string' ? qFromUrl : '');
   const [category, setCategory] = useState<string | null>(
-    typeof categoryFromUrl === 'string' && categoryFromUrl ? categoryFromUrl : null,
+    typeof categoryFromUrl === 'string' && categoryFromUrl ? categoryFromUrl : null
   );
   const [page, setPage] = useState(1);
   // Defaults to Generic (image first); the shopper's own sort pick always
@@ -201,9 +220,7 @@ export default function ShopPage({
   // Compound option values (name_desc / price_desc) split into the API pair.
   const [sortField, sortDirRaw] = sort.split('_');
   const sortDir = sortDirRaw === 'desc' ? 'desc' : 'asc';
-  const [gp, setGp] = useState<string | null>(
-    typeof gpFromUrl === 'string' ? gpFromUrl : null,
-  );
+  const [gp, setGp] = useState<string | null>(typeof gpFromUrl === 'string' ? gpFromUrl : null);
   // Top-search parity: when the shopper arrives via the header search bar
   // (?q=…) and hasn't picked a generic themselves, resolve the query against
   // the EMDEx generic database and apply the best match as the Generic filter
@@ -212,39 +229,44 @@ export default function ShopPage({
   const topSearchQuery = typeof qFromUrl === 'string' ? qFromUrl : '';
   const { data: topSearchGenerics } = useGenericProductSearch(topSearchQuery);
   useEffect(() => {
-    if (!topSearchQuery || topSearchQuery.length < 2 || gpFromUrl) return;
+    if (!topSearchQuery || topSearchQuery.length < 2 || gpFromUrl) {
+      return;
+    }
     const matches = (topSearchGenerics?.data ?? []) as Array<{ code: string; name: string }>;
-    if (!matches.length) return;
+    if (!matches.length) {
+      return;
+    }
     const wanted = topSearchQuery.toLowerCase();
     const best =
       matches.find((m) => m.name.toLowerCase() === wanted) ??
       matches.find((m) => m.name.toLowerCase().startsWith(wanted)) ??
       matches[0];
-    if (best?.code) setGp(best.code);
+    if (best?.code) {
+      setGp(best.code);
+    }
   }, [topSearchQuery, topSearchGenerics, gpFromUrl]);
   const [classification, setClassification] = useState<string | null>(
-    typeof classificationFromUrl === 'string' ? classificationFromUrl : null,
+    typeof classificationFromUrl === 'string' ? classificationFromUrl : null
   );
   const [tClass, setTClass] = useState<string | null>(null);
-  const [visibleFilters, setVisibleFilters] = useState<string[]>(
-    FILTER_DEFS.map((f) => f.id),
-  );
+  const [visibleFilters, setVisibleFilters] = useState<string[]>(FILTER_DEFS.map((f) => f.id));
 
   const { data: categories } = useCategories();
 
   // Resolve the preset label against the real catalog: exact code/name first,
   // then a contains-match (so 'supermarket' finds 'supermarket-essentials').
   const presetCode = useMemo(() => {
-    if (!presetCategory || !categories?.length) return null;
+    if (!presetCategory || !categories?.length) {
+      return null;
+    }
     const q = presetCategory.toLowerCase();
     const list = categories as Array<{ code?: string; name?: string }>;
-    const exact = list.find(
-      (c) => c.code?.toLowerCase() === q || c.name?.toLowerCase() === q,
-    );
-    if (exact?.code) return exact.code;
+    const exact = list.find((c) => c.code?.toLowerCase() === q || c.name?.toLowerCase() === q);
+    if (exact?.code) {
+      return exact.code;
+    }
     const partial = list.find(
-      (c) =>
-        c.code?.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q),
+      (c) => c.code?.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q)
     );
     return partial?.code ?? null;
   }, [presetCategory, categories]);
@@ -253,7 +275,11 @@ export default function ShopPage({
   const [categoryTouched, setCategoryTouched] = useState(false);
   const activeCategory = categoryTouched ? category : (category ?? presetCode);
 
-  const { data: productsData, isPending, isFetching } = useProducts({
+  const {
+    data: productsData,
+    isPending,
+    isFetching,
+  } = useProducts({
     search,
     category: activeCategory || '',
     genericProductCode: gp || '',
@@ -275,16 +301,33 @@ export default function ShopPage({
   const showCategory = visibleFilters.includes('category');
   const showSort = visibleFilters.includes('sort');
   const showGp = visibleFilters.includes('gp');
-  const showTClass = FILTER_DEFS.findIndex((el) => el.id ==='tClass') > -1 && visibleFilters.includes('tClass');
+  const showTClass =
+    FILTER_DEFS.findIndex((el) => el.id === 'tClass') > -1 && visibleFilters.includes('tClass');
   const showClassification = visibleFilters.includes('classification');
 
   // Unified classification options: one select combining all four labeled
   // sources (each classification keeps its source type for display).
   const classificationOptions = [
-    ...(therapeuticCls?.data ?? []).map((c) => ({ value: c.code, label: `[Therapeutic] ${c.name}`, type: c.type })),
-    ...(pharmaceuticalCls?.data ?? []).map((c) => ({ value: c.code, label: `[Pharmaceutical] ${c.name}`, type: c.type })),
-    ...(ndfCls?.data ?? []).map((c) => ({ value: c.code, label: `[NDF/EDL] ${c.name}`, type: c.type })),
-    ...(emdexCls?.data ?? []).map((c) => ({ value: c.code, label: `[EMDEx] ${c.name}`, type: c.type })),
+    ...(therapeuticCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[Therapeutic] ${c.name}`,
+      type: c.type,
+    })),
+    ...(pharmaceuticalCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[Pharmaceutical] ${c.name}`,
+      type: c.type,
+    })),
+    ...(ndfCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[NDF/EDL] ${c.name}`,
+      type: c.type,
+    })),
+    ...(emdexCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[EMDEx] ${c.name}`,
+      type: c.type,
+    })),
   ];
   const selectedClassification = classificationOptions.find((o) => o.value === classification);
 
@@ -292,7 +335,9 @@ export default function ShopPage({
     const out: Array<{ value: string; label: string }> = [];
     const seen = new Set<string>();
     for (const c of therCategories?.data ?? []) {
-      if (!c.name || seen.has(c.code)) {continue;}
+      if (!c.name || seen.has(c.code)) {
+        continue;
+      }
       seen.add(c.code);
       out.push({ value: c.code, label: c.name });
     }
@@ -301,7 +346,7 @@ export default function ShopPage({
 
   function toggleFilter(id: string, on: boolean) {
     setVisibleFilters((prev) =>
-      on ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((f) => f !== id),
+      on ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((f) => f !== id)
     );
   }
 
@@ -367,7 +412,13 @@ export default function ShopPage({
       `}</style>
       <Container size="xl" py={{ base: 28, md: 48 }}>
         <Stack gap="xl">
-          <Box>            <Title order={1} className="damorex-heading" style={{ color: ink, letterSpacing: '-0.03em' }}>
+          <Box>
+            {' '}
+            <Title
+              order={1}
+              className="damorex-heading"
+              style={{ color: ink, letterSpacing: '-0.03em' }}
+            >
               {heading}
             </Title>
             <Text c={muted} size="lg" lh={1.7}>
@@ -385,140 +436,146 @@ export default function ShopPage({
             */}
             <Group align="center" gap="sm" wrap="nowrap" justify="space-between">
               {/* <Group align="center" gap="sm" wrap="nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}> */}
-                {showSearch && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <Box className="shop-filter-pill" style={{ width: '100%' }}>
-                      <span className="shop-filter-icon">
-                        <Search size={14} />
-                      </span>
-                      <input
-                        className="shop-filter-input"
-                        type="search"
-                        placeholder="Search products..."
-                        value={search}
-                        onChange={(e) => {
-                          setSearch(e.currentTarget.value);
-                          setPage(1);
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                )}
-                {showGp && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <GenericFilter
-                      value={gp}
-                      onChange={(v) => {
-                        setGp(v);
+              {showSearch && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <Box className="shop-filter-pill" style={{ width: '100%' }}>
+                    <span className="shop-filter-icon">
+                      <Search size={14} />
+                    </span>
+                    <input
+                      className="shop-filter-input"
+                      type="search"
+                      placeholder="Search products..."
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.currentTarget.value);
                         setPage(1);
                       }}
                     />
                   </Box>
-                )}
-                {showTClass && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <Box className="shop-filter-pill" style={{ width: '100%' }}>
-                      <span className="shop-filter-icon">
-                        <ChevronDown size={14} />
-                      </span>
-                      <Select
-                        placeholder="Therapeutic class"
-                        data={classOptions}
-                        value={tClass}
-                        onChange={(v) => { setTClass(v); setPage(1); }}
-                        searchable
-                        clearable
-                        limit={50}
-                        maxDropdownHeight={280}
-                        nothingFoundMessage="No classes found"
-                        size="xs"
-                        variant="unstyled"
-                        style={{ flex: 1, minWidth: 0 }}
-                      />
-                    </Box>
+                </Box>
+              )}
+              {showGp && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <GenericFilter
+                    value={gp}
+                    onChange={(v) => {
+                      setGp(v);
+                      setPage(1);
+                    }}
+                  />
+                </Box>
+              )}
+              {showTClass && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <Box className="shop-filter-pill" style={{ width: '100%' }}>
+                    <span className="shop-filter-icon">
+                      <ChevronDown size={14} />
+                    </span>
+                    <Select
+                      placeholder="Therapeutic class"
+                      data={classOptions}
+                      value={tClass}
+                      onChange={(v) => {
+                        setTClass(v);
+                        setPage(1);
+                      }}
+                      searchable
+                      clearable
+                      limit={50}
+                      maxDropdownHeight={280}
+                      nothingFoundMessage="No classes found"
+                      size="xs"
+                      variant="unstyled"
+                      style={{ flex: 1, minWidth: 0 }}
+                    />
                   </Box>
-                )}
-                {showClassification && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <Box className="shop-filter-pill" style={{ width: '100%' }}>
-                      <span className="shop-filter-icon">
-                        <ChevronDown size={14} />
-                      </span>
-                      <Select
-                        placeholder="Classification"
-                        data={classificationOptions}
-                        value={classification}
-                        onChange={(v) => { setClassification(v); setPage(1); }}
-                        searchable
-                        clearable
-                        limit={50}
-                        maxDropdownHeight={280}
-                        nothingFoundMessage="No classifications found"
-                        size="xs"
-                        variant="unstyled"
-                        style={{ flex: 1, minWidth: 0 }}
-                      />
-                    </Box>
+                </Box>
+              )}
+              {showClassification && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <Box className="shop-filter-pill" style={{ width: '100%' }}>
+                    <span className="shop-filter-icon">
+                      <ChevronDown size={14} />
+                    </span>
+                    <Select
+                      placeholder="Classification"
+                      data={classificationOptions}
+                      value={classification}
+                      onChange={(v) => {
+                        setClassification(v);
+                        setPage(1);
+                      }}
+                      searchable
+                      clearable
+                      limit={50}
+                      maxDropdownHeight={280}
+                      nothingFoundMessage="No classifications found"
+                      size="xs"
+                      variant="unstyled"
+                      style={{ flex: 1, minWidth: 0 }}
+                    />
                   </Box>
-                )}
-                {showCategory && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <Box className="shop-filter-pill" style={{ width: '100%' }}>
-                      <span className="shop-filter-icon">
-                        <ChevronDown size={14} />
-                      </span>
-                      <Select
-                        placeholder="Category"
-                        data={[
-                          { value: '', label: 'All Categories' },
-                          ...(categories || []).map((c: any) => ({
-                            value: c.code,
-                            label: c.name,
-                          })),
-                        ]}
-                        value={activeCategory}
-                        onChange={(v) => {
-                          // Manual selection (or clearing) beats the preset.
-                          setCategoryTouched(true);
-                          setCategory(v);
-                          setPage(1);
-                        }}
-                        clearable
-                        maxDropdownHeight={280}
-                        size="xs"
-                        variant="unstyled"
-                        style={{ flex: 1, minWidth: 0 }}
-                      />
-                    </Box>
+                </Box>
+              )}
+              {showCategory && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <Box className="shop-filter-pill" style={{ width: '100%' }}>
+                    <span className="shop-filter-icon">
+                      <ChevronDown size={14} />
+                    </span>
+                    <Select
+                      placeholder="Category"
+                      data={[
+                        { value: '', label: 'All Categories' },
+                        ...(categories || []).map((c: any) => ({
+                          value: c.code,
+                          label: c.name,
+                        })),
+                      ]}
+                      value={activeCategory}
+                      onChange={(v) => {
+                        // Manual selection (or clearing) beats the preset.
+                        setCategoryTouched(true);
+                        setCategory(v);
+                        setPage(1);
+                      }}
+                      clearable
+                      maxDropdownHeight={280}
+                      size="xs"
+                      variant="unstyled"
+                      style={{ flex: 1, minWidth: 0 }}
+                    />
                   </Box>
-                )}
-                {showSort && (
-                  <Box style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <Box className="shop-filter-pill" style={{ width: '100%' }}>
-                      <span className="shop-filter-icon">
-                        <ChevronDown size={14} />
-                      </span>
-                      <select
-                        className="shop-filter-input"
-                        aria-label="Sort products"
-                        value={sort}
-                        onChange={(e) => {
-                          setSort(e.currentTarget.value);
-                          setPage(1);
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <option value="purchases">Regularly Purchased</option>
-                        <option value="generic">Generic (image first)</option>
-                        <option value="name">Name A-Z</option>
-                        <option value="name_desc">Name Z-A</option>
-                        <option value="price">Lowest – Highest Price</option>
-                        <option value="price_desc">Highest – Lowest Price</option>
-                        <option value="createdAt">Newest</option>
-                      </select>
-                    </Box>
+                </Box>
+              )}
+              {showSort && (
+                <Box style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <Box className="shop-filter-pill" style={{ width: '100%' }}>
+                    <span className="shop-filter-icon">
+                      <ChevronDown size={14} />
+                    </span>
+                    <select
+                      className="shop-filter-input"
+                      aria-label="Sort products"
+                      value={sort}
+                      onChange={(e) => {
+                        setSort(e.currentTarget.value);
+                        setPage(1);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <option value="purchases">Regularly Purchased</option>
+                      <option value="generic">Generic (image first)</option>
+                      <option value="name">Name A-Z</option>
+                      <option value="name_desc">Name Z-A</option>
+                      <option value="price">Lowest – Highest Price</option>
+                      <option value="price_desc">Highest – Lowest Price</option>
+                      <option value="createdAt">Newest</option>
+                    </select>
                   </Box>
-                )}
+                </Box>
+              )}
               {/* </Group> */}
               <Box style={{ flexShrink: 0 }}>
                 <Popover width={300} position="bottom-end" withArrow shadow="md">

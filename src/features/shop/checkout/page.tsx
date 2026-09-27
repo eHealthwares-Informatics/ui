@@ -39,19 +39,15 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
-import { useCartProductHydration } from '../website/hooks';
-import type { WebsiteProduct } from '../website/types';
-import { useChatbotStore } from '../website/chatbot-store';
-import {
-  toHL7Prescription,
-  QUESTIONNAIRE_CODES,
-} from '../website/hl7-prescription';
+import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
+import { useAccountDrawerStore } from '../website/account-drawer-store';
+import { websiteApi } from '../website/api';
 import { useAuthStore } from '../website/auth-store';
 import { useCartStore } from '../website/cart-store';
-import { useAccountDrawerStore } from '../website/account-drawer-store';
+import { useChatbotStore } from '../website/chatbot-store';
+import { toHL7Prescription, QUESTIONNAIRE_CODES } from '../website/hl7-prescription';
+import { useCartProductHydration } from '../website/hooks';
 import { useCreateOrder, useDeliveryAreas } from '../website/hooks';
-import { websiteApi } from '../website/api';
-import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
 import {
   WebsiteLayout,
   green,
@@ -62,6 +58,7 @@ import {
   soft,
   buttonStyles,
 } from '../website/layout';
+import type { WebsiteProduct } from '../website/types';
 import type { OrderView, DeliveryAreaView } from '../website/types';
 
 const productPrices: Record<string, number> = {
@@ -132,7 +129,11 @@ const productInfo: Record<
 // add time, or hydrated from /website/cart for legacy persisted carts). The
 // old mock productInfo/productPrices maps keyed '1'-'10' never matched real
 // product ids, which is why checkout showed "Medication" with fake prices.
-function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProduct | null }): string {
+function itemLabel(i: {
+  productId?: string;
+  name?: string;
+  product?: WebsiteProduct | null;
+}): string {
   return (
     i.name ||
     i.product?.name ||
@@ -141,7 +142,11 @@ function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProd
   );
 }
 
-function itemUnitPrice(i: { productId?: string; unitPrice?: number; product?: WebsiteProduct | null }): number {
+function itemUnitPrice(i: {
+  productId?: string;
+  unitPrice?: number;
+  product?: WebsiteProduct | null;
+}): number {
   const p =
     i.unitPrice ??
     (i.product as any)?.unitPrice ??
@@ -246,9 +251,7 @@ export default function CheckoutPage() {
   const [state_, setState_] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryAreaId, setDeliveryAreaId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(
-    providers[0]?.id ?? null
-  );
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(providers[0]?.id ?? null);
   const [promoCode, setPromoCode] = useState('');
   // Coupon state: validated against POST /coupons/validate before apply, and
   // passed to the order for server-side redemption + discount.
@@ -415,12 +418,7 @@ export default function CheckoutPage() {
     return (
       <WebsiteLayout>
         <Container size="sm" py={80}>
-          <Alert
-            icon={<AlertTriangle size={20} />}
-            title="Order failed"
-            color="red"
-            radius="lg"
-          >
+          <Alert icon={<AlertTriangle size={20} />} title="Order failed" color="red" radius="lg">
             {orderError}
           </Alert>
           <Group justify="center" mt="xl">
@@ -435,11 +433,7 @@ export default function CheckoutPage() {
             >
               Try again
             </Button>
-            <Button
-              radius="xl"
-              variant="subtle"
-              onClick={() => navigate({ to: '/shop/shop' })}
-            >
+            <Button radius="xl" variant="subtle" onClick={() => navigate({ to: '/shop/shop' })}>
               Continue Shopping
             </Button>
           </Group>
@@ -653,8 +647,11 @@ export default function CheckoutPage() {
                 color="gray"
                 leftSection={<ArrowLeft size={18} />}
                 onClick={() => {
-                  if (step === 0) {navigate({ to: '/shop/cart' });}
-                  else {setStep(step - 1);}
+                  if (step === 0) {
+                    navigate({ to: '/shop/cart' });
+                  } else {
+                    setStep(step - 1);
+                  }
                 }}
                 disabled={step === 3 && isPending}
               >
@@ -905,7 +902,9 @@ function StepDeliveryDetails({
   );
 }
 
-function subtotalValue(items: { productId?: string; unitPrice?: number; quantity: number }[]): number {
+function subtotalValue(
+  items: { productId?: string; unitPrice?: number; quantity: number }[]
+): number {
   return items.reduce((sum, i) => sum + itemUnitPrice(i) * i.quantity, 0);
 }
 
@@ -993,10 +992,15 @@ function StepPrescriptionValidation({
                 leftSection={<MessageSquare size={18} />}
                 onClick={() => {
                   const cart = useCartStore.getState().items;
-                  const hl7 = cart.length > 0
-                    ? toHL7Prescription(cart, { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN })
-                    : '';
-                  useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
+                  const hl7 =
+                    cart.length > 0
+                      ? toHL7Prescription(cart, {
+                          questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN,
+                        })
+                      : '';
+                  useChatbotStore
+                    .getState()
+                    .openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
                 }}
               >
                 Order via Chat
@@ -1135,10 +1139,7 @@ function StepPayment({
                     }}
                     onClick={() => setPaymentMethod(p.id)}
                   >
-                    <Radio
-                      value={p.id}
-                      label={`${p.name} (${p.production ? 'Live' : 'Test'})`}
-                    />
+                    <Radio value={p.id} label={`${p.name} (${p.production ? 'Live' : 'Test'})`} />
                   </Paper>
                 ))}
               </Stack>

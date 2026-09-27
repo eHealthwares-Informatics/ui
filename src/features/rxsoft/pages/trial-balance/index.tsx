@@ -1,8 +1,8 @@
 import { Badge, Button, Card, Group, Stack, Table, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Download } from 'lucide-react';
+import { useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { rxsoftApi, downloadBlob } from '@/lib/rxsoft-api';
 
@@ -33,7 +33,7 @@ export function TrialBalancePage() {
   const handleExport = async () => {
     await downloadBlob(
       { method: 'GET', url: '/reports/trial-balance', params: { asOfDate, export: 'csv' } },
-      `trial_balance_${asOfDate}.csv`,
+      `trial_balance_${asOfDate}.csv`
     );
   };
 
@@ -59,19 +59,19 @@ export function TrialBalancePage() {
       <Stack gap="md">
         <Card withBorder>
           <Group>
-            <DatePickerInput
-              label="As of date"
-              value={asOfDate}
-              onChange={setAsOfDate}
-            />
+            <DatePickerInput label="As of date" value={asOfDate} onChange={setAsOfDate} />
           </Group>
         </Card>
 
         <Card withBorder>
           {isFetching ? (
-            <Text c="dimmed" size="sm">Loading...</Text>
+            <Text c="dimmed" size="sm">
+              Loading...
+            </Text>
           ) : rows.length === 0 ? (
-            <Text c="dimmed" size="sm">No data found for the selected date.</Text>
+            <Text c="dimmed" size="sm">
+              No data found for the selected date.
+            </Text>
           ) : (
             <Table striped withTableBorder withColumnBorders>
               <Table.Thead>
@@ -93,8 +93,12 @@ export function TrialBalancePage() {
                         {r.accountType}
                       </Badge>
                     </Table.Td>
-                    <Table.Td ta="right">{r.debitBalance > 0 ? r.debitBalance.toFixed(2) : ''}</Table.Td>
-                    <Table.Td ta="right">{r.creditBalance > 0 ? r.creditBalance.toFixed(2) : ''}</Table.Td>
+                    <Table.Td ta="right">
+                      {r.debitBalance > 0 ? r.debitBalance.toFixed(2) : ''}
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      {r.creditBalance > 0 ? r.creditBalance.toFixed(2) : ''}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>

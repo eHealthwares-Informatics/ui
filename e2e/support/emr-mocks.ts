@@ -145,7 +145,12 @@ function listResponse(data: unknown[], url: URL) {
   return {
     data,
     meta: { page, limit, total: data.length },
-    pagination: { page, limit, total: data.length, totalPages: Math.max(1, Math.ceil(data.length / limit)) },
+    pagination: {
+      page,
+      limit,
+      total: data.length,
+      totalPages: Math.max(1, Math.ceil(data.length / limit)),
+    },
   };
 }
 
@@ -262,7 +267,9 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
       // submission single (view modal)
       const submissionMatch = path.match(/^\/form-submissions\/([^/]+)$/);
       if (submissionMatch) {
-        const row = (opts.submissions ?? []).find((s: { id: string }) => s.id === submissionMatch[1]);
+        const row = (opts.submissions ?? []).find(
+          (s: { id: string }) => s.id === submissionMatch[1]
+        );
         if (!row) {
           return notFound(route);
         }
@@ -300,7 +307,7 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
                 }
                 return true;
               }),
-              url,
+              url
             ),
           });
         case '/staff':
@@ -323,7 +330,7 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
                 }
                 return true;
               }),
-              url,
+              url
             ),
           });
         case '/admissions':
@@ -336,7 +343,7 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
                 }
                 return true;
               }),
-              url,
+              url
             ),
           });
         case '/appointments':

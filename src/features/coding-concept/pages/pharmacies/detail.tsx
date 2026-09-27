@@ -145,10 +145,7 @@ export function CodedPharmacyDetailPage({ pharmacyId }: { pharmacyId: string }) 
                     Neighbourhood
                   </Text>
                   <Text fw={500}>
-                    {localityName(
-                      pharmacy.data.neighbourhoodLocality,
-                      pharmacy.data.neighbourhood,
-                    )}
+                    {localityName(pharmacy.data.neighbourhoodLocality, pharmacy.data.neighbourhood)}
                   </Text>
                 </Grid.Col>
                 <Grid.Col span={4}>

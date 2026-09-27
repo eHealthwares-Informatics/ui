@@ -3,13 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { usePatientByMrn } from '../../hooks/use-patient-by-mrn';
 
 /** Link to the patient profile, resolving the MRN to the patient UUID. */
-export function PatientLink({
-  mrn,
-  label,
-}: {
-  mrn: string;
-  label?: string;
-}) {
+export function PatientLink({ mrn, label }: { mrn: string; label?: string }) {
   const navigate = useNavigate();
   const { data: patient, isLoading, isError } = usePatientByMrn(mrn);
 

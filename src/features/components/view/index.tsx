@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Accordion,
   ActionIcon,
@@ -18,8 +17,9 @@ import {
 } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { Pencil } from 'lucide-react';
-import { View } from '@/features/rxsoft/types';
+import { useState } from 'react';
 import { DataPageForm } from '@/features/components/page/data-page-form';
+import { View } from '@/features/rxsoft/types';
 
 type Props<T> = {
   view: View<T>;
@@ -45,10 +45,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
       <Group justify="space-between" align="center">
         {view.title && <Title order={2}>{view.title}</Title>}
         {view.editConfig && !isLoading && (
-          <Button
-            leftSection={<Pencil size={16} />}
-            onClick={() => setEditOpen(true)}
-          >
+          <Button leftSection={<Pencil size={16} />} onClick={() => setEditOpen(true)}>
             Edit
           </Button>
         )}
@@ -81,9 +78,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
                   const nested = (data as any)?.[node];
                   if (Array.isArray(nested)) {
                     const code = parts[1];
-                    value = nested.find(
-                      (cc: any) => cc.attribute?.code === code,
-                    )?.value;
+                    value = nested.find((cc: any) => cc.attribute?.code === code)?.value;
                   } else if (nested != null && typeof nested === 'object') {
                     value = parts.reduce((acc: any, k: string) => acc?.[k], data);
                   } else {
@@ -99,9 +94,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
                       <Text size="sm" c="dimmed">
                         {field.label}
                       </Text>
-                      <Box>
-                        {field.render ? field.render(value, data) : String(value ?? '-')}
-                      </Box>
+                      <Box>{field.render ? field.render(value, data) : String(value ?? '-')}</Box>
                     </Stack>
                   </Grid.Col>
                 );
@@ -143,9 +136,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
 
                         return (
                           <Table.Td key={String(column.key)}>
-                            {column.render
-                              ? column.render(value, row)
-                              : String(value ?? '-')}
+                            {column.render ? column.render(value, row) : String(value ?? '-')}
                           </Table.Td>
                         );
                       })}
@@ -168,7 +159,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
       {view.accordions?.map((accordionSection, sectionIndex) => {
         const raw = isLoading ? [] : (data as any)[accordionSection.key as string];
         const items: any[] = Array.isArray(raw) ? raw : [];
-        console.log({items})
+        console.log({ items });
         return (
           <Card key={sectionIndex} withBorder radius="md" p="lg">
             <Title order={4} mb="md">
@@ -185,7 +176,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
               </Text>
             ) : (
               <Accordion>
-                {(items).map((item, itemIndex) => {
+                {items.map((item, itemIndex) => {
                   const label = accordionSection.renderLabel
                     ? accordionSection.renderLabel(item)
                     : (item[accordionSection.labelKey ?? 'name'] ?? String(item.id ?? itemIndex));
@@ -198,25 +189,26 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
                             {label}
                           </Text>
                           {accordionSection.itemEditConfig &&
-                            (!accordionSection.canEditItem || accordionSection.canEditItem(data, item)) && (
-                            <ActionIcon
-                              variant="subtle"
-                              color="gray"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const resolvedEndpoint = accordionSection.itemEditEndpoint
-                                  ? accordionSection.itemEditEndpoint(data, item)
-                                  : accordionSection.itemEditConfig.endpoint;
-                                setEditAccordionItem({
-                                  item,
-                                  config: accordionSection.itemEditConfig,
-                                  endpoint: resolvedEndpoint,
-                                });
-                              }}
-                            >
-                              <Pencil size={16} />
-                            </ActionIcon>
-                          )}
+                            (!accordionSection.canEditItem ||
+                              accordionSection.canEditItem(data, item)) && (
+                              <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const resolvedEndpoint = accordionSection.itemEditEndpoint
+                                    ? accordionSection.itemEditEndpoint(data, item)
+                                    : accordionSection.itemEditConfig.endpoint;
+                                  setEditAccordionItem({
+                                    item,
+                                    config: accordionSection.itemEditConfig,
+                                    endpoint: resolvedEndpoint,
+                                  });
+                                }}
+                              >
+                                <Pencil size={16} />
+                              </ActionIcon>
+                            )}
                         </Group>
                       </Accordion.Control>
                       <Accordion.Panel>
@@ -224,7 +216,7 @@ export function GenericViewComponent<T>({ view, data }: Props<T>) {
                           {Object.entries(item)
                             .filter(
                               ([key, _v]) =>
-                                !['id', '_id', accordionSection.labelKey ?? 'name'].includes(key),
+                                !['id', '_id', accordionSection.labelKey ?? 'name'].includes(key)
                             )
                             .map(([key, val]) => (
                               <Grid.Col key={key} span={6}>

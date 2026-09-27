@@ -9,7 +9,7 @@ async function pickSelectOption(
   page: import('@playwright/test').Page,
   testId: string,
   query: string,
-  optionLabel: string,
+  optionLabel: string
 ) {
   const select = page.getByTestId(testId);
   const t0 = Date.now();
@@ -30,9 +30,7 @@ async function pickSelectOption(
 test.describe('Damorex purchases', () => {
   /* ---- Smoke / render tests ---- */
 
-  test('renders the PO builder with lines table and action buttons', async ({
-    page,
-  }) => {
+  test('renders the PO builder with lines table and action buttons', async ({ page }) => {
     await page.goto('/shop/purchases');
     await page.waitForLoadState('networkidle');
 
@@ -42,9 +40,9 @@ test.describe('Damorex purchases', () => {
     const linesTable = page.getByTestId('po-lines-table');
     await expect(linesTable).toBeVisible({ timeout: waits.visible });
     for (const header of ['Item', 'UOM', 'Ordered Qty', 'Unit Cost']) {
-      await expect(
-        page.locator('th').filter({ hasText: header }).first(),
-      ).toBeVisible({ timeout: waits.visible });
+      await expect(page.locator('th').filter({ hasText: header }).first()).toBeVisible({
+        timeout: waits.visible,
+      });
     }
 
     await expect(page.getByTestId('po-add-line')).toBeVisible({ timeout: waits.visible });
@@ -52,35 +50,26 @@ test.describe('Damorex purchases', () => {
     await expect(page.getByTestId('po-submit-approve-btn')).toBeVisible({ timeout: waits.visible });
   });
 
-  test('blocks saving a draft until a supplier is selected', async ({
-    page,
-  }) => {
+  test('blocks saving a draft until a supplier is selected', async ({ page }) => {
     await page.goto('/shop/purchases');
     await page.waitForLoadState('networkidle');
 
     await page.getByTestId('po-save-draft-btn').click();
-    await expect(
-      page.getByText('Please select a supplier'),
-    ).toBeVisible({ timeout: waits.notification });
+    await expect(page.getByText('Please select a supplier')).toBeVisible({
+      timeout: waits.notification,
+    });
   });
 
-  test('blocks saving a draft until a warehouse is selected', async ({
-    page,
-  }) => {
+  test('blocks saving a draft until a warehouse is selected', async ({ page }) => {
     await page.goto('/shop/purchases');
     await page.waitForLoadState('networkidle');
 
-    await pickSelectOption(
-      page,
-      'po-supplier-select',
-      'Adediran',
-      'Adediran Pharma Imports',
-    );
+    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
 
     await page.getByTestId('po-save-draft-btn').click();
-    await expect(
-      page.getByText('Please select a warehouse'),
-    ).toBeVisible({ timeout: waits.notification });
+    await expect(page.getByText('Please select a warehouse')).toBeVisible({
+      timeout: waits.notification,
+    });
   });
 
   /* ---- Full PO create → save draft → approve ---- */
@@ -92,12 +81,7 @@ test.describe('Damorex purchases', () => {
     await page.waitForLoadState('networkidle');
 
     // 1. Select supplier from seed data.
-    await pickSelectOption(
-      page,
-      'po-supplier-select',
-      'Adediran',
-      'Adediran Pharma Imports',
-    );
+    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
 
     // 2. Select warehouse from seed data.
     await pickSelectOption(page, 'po-warehouse-select', 'Main', 'Main Warehouse');
@@ -129,20 +113,26 @@ test.describe('Damorex purchases', () => {
 
     // 5. Save as Draft.
     await timedWait('po:save-draft', () =>
-      page.getByTestId('po-save-draft-btn').click().then(() =>
-        expect(page.getByTestId('po-summary-status')).toBeVisible({
-          timeout: waits.po.statusBadge,
-        }),
-      ),
+      page
+        .getByTestId('po-save-draft-btn')
+        .click()
+        .then(() =>
+          expect(page.getByTestId('po-summary-status')).toBeVisible({
+            timeout: waits.po.statusBadge,
+          })
+        )
     );
 
     // 6. Submit & Approve.
     await timedWait('po:approve', () =>
-      page.getByTestId('po-submit-approve-btn').click().then(() =>
-        expect(page.getByTestId('po-summary-status')).toContainText('approved', {
-          timeout: waits.po.statusBadge,
-        }),
-      ),
+      page
+        .getByTestId('po-submit-approve-btn')
+        .click()
+        .then(() =>
+          expect(page.getByTestId('po-summary-status')).toContainText('approved', {
+            timeout: waits.po.statusBadge,
+          })
+        )
     );
   });
 
@@ -183,12 +173,7 @@ test.describe('Damorex purchases', () => {
     await page.waitForLoadState('networkidle');
 
     // Select a supplier.
-    await pickSelectOption(
-      page,
-      'po-supplier-select',
-      'Adediran',
-      'Adediran Pharma Imports',
-    );
+    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
 
     // Verify it was set.
     const supplierInput = page.getByPlaceholder('Supplier');

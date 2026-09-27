@@ -37,7 +37,7 @@ function buildCreatePayload(values: Record<string, unknown>) {
 }
 
 function buildUpdatePayload(values: Record<string, unknown>) {
-  console.log({values})
+  console.log({ values });
   return buildContentPayload(values, createFields);
 }
 

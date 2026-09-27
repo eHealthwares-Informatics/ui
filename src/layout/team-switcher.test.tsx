@@ -1,10 +1,14 @@
 import { render, screen } from '@test-utils';
-import { TeamSwitcher } from './team-switcher';
 import { ModuleProvider } from '@/context/module-provider';
+import { TeamSwitcher } from './team-switcher';
 
 // Mock @tanstack/react-router
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, ...props }: any) => <div data-testid="link" data-to={props.to}>{children}</div>,
+  Link: ({ children, ...props }: any) => (
+    <div data-testid="link" data-to={props.to}>
+      {children}
+    </div>
+  ),
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/' }),
 }));
@@ -58,9 +62,7 @@ describe('TeamSwitcher', () => {
   });
 
   it('renders the team switcher trigger button', () => {
-    mockState.modules = [
-      { id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' },
-    ];
+    mockState.modules = [{ id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' }];
     renderWithProviders(<TeamSwitcher />);
     expect(screen.getByTestId('team-switcher-trigger')).toBeInTheDocument();
   });
@@ -82,17 +84,13 @@ describe('TeamSwitcher', () => {
   });
 
   it('does not call fetchModules when modules are already loaded', () => {
-    mockState.modules = [
-      { id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' },
-    ];
+    mockState.modules = [{ id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' }];
     renderWithProviders(<TeamSwitcher />);
     expect(mockState.fetchModules).not.toHaveBeenCalled();
   });
 
   it('renders the ChevronsUpDown icon in the trigger', () => {
-    mockState.modules = [
-      { id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' },
-    ];
+    mockState.modules = [{ id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' }];
     const { container } = renderWithProviders(<TeamSwitcher />);
     const svgs = container.querySelectorAll('svg');
     expect(svgs.length).toBeGreaterThan(0);

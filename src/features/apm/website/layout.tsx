@@ -13,7 +13,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
 import {
   ChevronRight,
   Heart,
@@ -24,6 +23,7 @@ import {
   Send,
   Share2,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import logoImg from '../assets/logo.webp';
 
 export const apmBlue = '#0066CC';
@@ -102,7 +102,11 @@ export function WebsiteHeader() {
                 style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'contain' }}
               />
               <Box visibleFrom="sm">
-                <Text fw={800} size="lg" style={{ color: ink, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                <Text
+                  fw={800}
+                  size="lg"
+                  style={{ color: ink, letterSpacing: '-0.02em', lineHeight: 1.2 }}
+                >
                   Adekanmbi/APM
                 </Text>
                 <Text size="xs" style={{ color: muted }}>
@@ -166,7 +170,12 @@ export function WebsiteHeader() {
               >
                 <Share2 size={18} />
               </ActionIcon>
-              <Burger opened={opened} onClick={toggle} hiddenFrom="md" aria-label="Toggle navigation" />
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="md"
+                aria-label="Toggle navigation"
+              />
             </Group>
           </Group>
         </Container>
@@ -202,7 +211,10 @@ export function WebsiteHeader() {
                 <Divider my="sm" />
                 <Button
                   fullWidth
-                  onClick={() => { close(); navigate({ to: '/apm/join' }); }}
+                  onClick={() => {
+                    close();
+                    navigate({ to: '/apm/join' });
+                  }}
                   styles={{
                     root: {
                       background: apmBlue,
@@ -239,11 +251,11 @@ export function WebsiteFooter() {
           <Group align="flex-start" style={{ flexWrap: 'wrap' }} justify="space-between">
             <Box style={{ maxWidth: 320, minWidth: 240 }}>
               <Group gap={8} mb="md">
-                  <img
-                    src={logoImg}
-                    alt="APM"
-                    style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'contain' }}
-                  />
+                <img
+                  src={logoImg}
+                  alt="APM"
+                  style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'contain' }}
+                />
                 <Box>
                   <Text fw={800} size="lg" style={{ color: '#fff', lineHeight: 1.2 }}>
                     Adekanmbi/APM
@@ -254,7 +266,8 @@ export function WebsiteFooter() {
                 </Box>
               </Group>
               <Text size="sm" style={{ lineHeight: 1.8, marginBottom: 16 }}>
-                The official campaign website of Bimbo Adekanmbi, candidate for Governor of Oyo State under the Allied Peoples Movement.
+                The official campaign website of Bimbo Adekanmbi, candidate for Governor of Oyo
+                State under the Allied Peoples Movement.
               </Text>
               <Group gap="xs">
                 <ActionIcon variant="subtle" size="lg" color="gray" aria-label="Facebook">
@@ -354,9 +367,7 @@ export function WebsiteLayout({ children }: { children: ReactNode }) {
   return (
     <Box style={{ minHeight: '100vh', background: '#fff' }}>
       <WebsiteHeader />
-      <Box component="main">
-        {children}
-      </Box>
+      <Box component="main">{children}</Box>
       <WebsiteFooter />
     </Box>
   );

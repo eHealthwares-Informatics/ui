@@ -1,7 +1,16 @@
-import { ActionIcon, Image, NumberInput, Paper, ScrollArea, Select, Table, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Image,
+  NumberInput,
+  Paper,
+  ScrollArea,
+  Select,
+  Table,
+  Text,
+} from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { SaleSession } from '../types';
 
@@ -32,7 +41,9 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
 
   const uomMap = useMemo(() => {
     const map = new Map<string, UomOption>();
-    for (const u of allUoms) {map.set(u.id, u);}
+    for (const u of allUoms) {
+      map.set(u.id, u);
+    }
     return map;
   }, [allUoms]);
 
@@ -50,7 +61,7 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
               <Table.Th>UOM</Table.Th>
               <Table.Th>QTY</Table.Th>
               <Table.Th>TotalCost</Table.Th>
-               {session.status !== 'completed' &&(<Table.Th />)}
+              {session.status !== 'completed' && <Table.Th />}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -63,7 +74,9 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
                     {item.imageUrl ? (
                       <Image src={item.imageUrl} w={36} h={36} fit="cover" />
                     ) : (
-                      <Text size="xs" c="dimmed">-</Text>
+                      <Text size="xs" c="dimmed">
+                        -
+                      </Text>
                     )}
                   </Table.Td>
                   <Table.Td c="lime">{index + 1}</Table.Td>
@@ -75,7 +88,12 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
                       size="xs"
                       data={(() => {
                         const current = uomMap.get(item.uomId);
-                        if (!current?.categoryId) return Array.from(uomMap.values()).map((u) => ({ value: u.id, label: u.name }));
+                        if (!current?.categoryId) {
+                          return Array.from(uomMap.values()).map((u) => ({
+                            value: u.id,
+                            label: u.name,
+                          }));
+                        }
                         return Array.from(uomMap.values())
                           .filter((u) => u.categoryId === current.categoryId)
                           .map((u) => ({ value: u.id, label: u.name }));
@@ -103,11 +121,13 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
                   <Table.Td c="lime">
                     {(price * item.quantity * item.uomFactor).toFixed(2)}
                   </Table.Td>
-                  {session.status !== 'completed' &&(<Table.Td>
-                    <ActionIcon color="red" size="sm" onClick={() => onRemoveItem(item.id)}>
-                      <Trash2 size={14} />
-                    </ActionIcon>
-                  </Table.Td>)}
+                  {session.status !== 'completed' && (
+                    <Table.Td>
+                      <ActionIcon color="red" size="sm" onClick={() => onRemoveItem(item.id)}>
+                        <Trash2 size={14} />
+                      </ActionIcon>
+                    </Table.Td>
+                  )}
                 </Table.Tr>
               );
             })}

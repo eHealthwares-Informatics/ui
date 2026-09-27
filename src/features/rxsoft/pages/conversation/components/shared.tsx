@@ -174,7 +174,9 @@ export function TagInput({
 
   const addTag = (tag: string) => {
     const t = tag.trim();
-    if (!t || value.includes(t)) {return;}
+    if (!t || value.includes(t)) {
+      return;
+    }
     onChange([...value, t]);
   };
 
@@ -185,7 +187,9 @@ export function TagInput({
         placeholder={placeholder}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key !== 'Enter') {return;}
+          if (e.key !== 'Enter') {
+            return;
+          }
           e.preventDefault();
           addTag(input);
           setInput('');

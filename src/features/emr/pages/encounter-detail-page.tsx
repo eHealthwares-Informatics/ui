@@ -23,15 +23,18 @@ import {
   DocumentationModal,
   type ActiveEncounter,
 } from '../components/documentation/documentation-modal';
-import { CreateReferralModal } from '../components/referrals/create-referral-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
-import { PatientLink } from '../components/shared/patient-link';
+import {
+  DocumentsAccordion,
+  RequestsAccordion,
+} from '../components/encounters/encounter-activity-accordion';
+import { CreateReferralModal } from '../components/referrals/create-referral-modal';
 import { RequestForm } from '../components/requests/request-form';
+import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
-import { DocumentsAccordion, RequestsAccordion } from '../components/encounters/encounter-activity-accordion';
-import { formatEnum } from '../lib/emr-constants';
 import { usePatientByMrn } from '../hooks/use-patient-by-mrn';
+import { formatEnum } from '../lib/emr-constants';
 import type { Encounter, FormSubmission, Visit } from '../lib/emr-types';
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -63,18 +66,26 @@ function LiveEncounterTimer({
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (endedAt) return;
+    if (endedAt) {
+      return;
+    }
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(interval);
   }, [endedAt]);
 
   useEffect(() => {
-    if (endedAt || !onAutoEnd) return;
+    if (endedAt || !onAutoEnd) {
+      return;
+    }
     const hours = (now - new Date(startedAt).getTime()) / 3_600_000;
-    if (hours >= autoEndAfterHours) onAutoEnd();
+    if (hours >= autoEndAfterHours) {
+      onAutoEnd();
+    }
   }, [now, startedAt, endedAt, autoEndAfterHours, onAutoEnd]);
 
-  if (endedAt) return null;
+  if (endedAt) {
+    return null;
+  }
 
   const ms = Math.max(0, now - new Date(startedAt).getTime());
   const totalSeconds = Math.floor(ms / 1000);
@@ -169,8 +180,7 @@ export function EncounterDetailPage() {
     enabled: Boolean(encounterId),
   });
 
-  const encounterMutationInProgress =
-    encounter?.status === 'ACTIVE';
+  const encounterMutationInProgress = encounter?.status === 'ACTIVE';
 
   const endEncounterMutation = useMutation({
     mutationFn: async () => {
@@ -199,7 +209,10 @@ export function EncounterDetailPage() {
 
   if (encounterQuery.isLoading) {
     return (
-      <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Encounters', href: '/emr/encounters' }]} title="">
+      <RxPage
+        breadcrumbs={[{ label: 'EMR' }, { label: 'Encounters', href: '/emr/encounters' }]}
+        title=""
+      >
         <Skeleton height={200} radius="md" />
       </RxPage>
     );
@@ -286,9 +299,7 @@ export function EncounterDetailPage() {
           <Tabs.Tab value="documentation">
             Documentation ({submissionsQuery.data?.length ?? 0})
           </Tabs.Tab>
-          <Tabs.Tab value="requests">
-            Requests ({requestsQuery.data?.length ?? 0})
-          </Tabs.Tab>
+          <Tabs.Tab value="requests">Requests ({requestsQuery.data?.length ?? 0})</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="details">
@@ -349,7 +360,7 @@ export function EncounterDetailPage() {
                 value={
                   (encounter as unknown as { createdAt?: string }).createdAt
                     ? new Date(
-                        (encounter as unknown as { createdAt?: string }).createdAt!,
+                        (encounter as unknown as { createdAt?: string }).createdAt!
                       ).toLocaleString()
                     : '—'
                 }
@@ -374,16 +385,15 @@ export function EncounterDetailPage() {
 
         <Tabs.Panel value="requests">
           <Card withBorder radius="md" padding="lg">
-            <RequestsAccordion requests={requestsQuery.data ?? []} isLoading={requestsQuery.isLoading} />
+            <RequestsAccordion
+              requests={requestsQuery.data ?? []}
+              isLoading={requestsQuery.isLoading}
+            />
           </Card>
         </Tabs.Panel>
       </Tabs>
 
-      <DocumentationModal
-        opened={docOpened}
-        onClose={closeDoc}
-        activeEncounter={activeEncounter}
-      />
+      <DocumentationModal opened={docOpened} onClose={closeDoc} activeEncounter={activeEncounter} />
 
       {activeEncounter && (
         <CreateReferralModal

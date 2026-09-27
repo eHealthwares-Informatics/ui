@@ -2,11 +2,7 @@ import { ColumnTypeFilters, EQUALS_WITH_OPTIONS, type Column } from '@/features/
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { badgeCol, dateTimeCol, patientCol } from '../../lib/emr-columns';
-import {
-  MEDICATION_STATUSES,
-  formatEnum,
-  toSelectData,
-} from '../../lib/emr-constants';
+import { MEDICATION_STATUSES, formatEnum, toSelectData } from '../../lib/emr-constants';
 
 const columns: Column[] = [
   { key: 'medicationNumber', label: 'Medication #' },
@@ -15,8 +11,7 @@ const columns: Column[] = [
   {
     key: 'dose',
     label: 'Dose',
-    render: (row) =>
-      [row.dose, row.doseUnit].filter(Boolean).join(' ') || '—',
+    render: (row) => [row.dose, row.doseUnit].filter(Boolean).join(' ') || '—',
   },
   {
     key: 'route',

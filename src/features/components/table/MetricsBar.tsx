@@ -1,6 +1,14 @@
 import { Box, Group, Loader, Text, Tooltip } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart3, Package, AlertTriangle, CheckCircle, XCircle, ShoppingCart, DollarSign } from 'lucide-react';
+import {
+  BarChart3,
+  Package,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  ShoppingCart,
+  DollarSign,
+} from 'lucide-react';
 import { useModuleContext } from '@/context/module-context';
 import type { MetricsConfig } from '@/features/shared/model-schema';
 
@@ -19,11 +27,20 @@ function getIcon(name?: string): React.ReactNode {
 }
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+  new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
 
 function formatValue(value: string | number, format?: 'number' | 'currency'): string {
-  if (format === 'currency') {return formatCurrency(Number(value));}
-  if (typeof value === 'number') {return value.toLocaleString();}
+  if (format === 'currency') {
+    return formatCurrency(Number(value));
+  }
+  if (typeof value === 'number') {
+    return value.toLocaleString();
+  }
   return value;
 }
 
@@ -61,7 +78,13 @@ function StatCard({
   );
 }
 
-export function MetricsBar({ metricsConfig, params }: { metricsConfig: MetricsConfig; params?: Record<string, string> }) {
+export function MetricsBar({
+  metricsConfig,
+  params,
+}: {
+  metricsConfig: MetricsConfig;
+  params?: Record<string, string>;
+}) {
   const { apiProvider } = useModuleContext();
 
   const { data, isLoading } = useQuery({
@@ -72,14 +95,25 @@ export function MetricsBar({ metricsConfig, params }: { metricsConfig: MetricsCo
     },
   });
 
-  if (isLoading) {return <Loader size="xs" />;}
-  if (!data) {return null;}
+  if (isLoading) {
+    return <Loader size="xs" />;
+  }
+  if (!data) {
+    return null;
+  }
 
   const items = metricsConfig.items(data);
-  if (items.length === 0) {return null;}
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
-    <Box bg="gray.0" py={4} px="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+    <Box
+      bg="gray.0"
+      py={4}
+      px="md"
+      style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}
+    >
       <Group gap="xs" wrap="wrap">
         {items.map((item, i) => (
           <StatCard

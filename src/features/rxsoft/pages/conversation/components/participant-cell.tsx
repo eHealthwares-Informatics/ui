@@ -9,17 +9,29 @@ type ParticipantCellProps = {
 };
 
 function shortenId(id: string) {
-  if (id.length <= 8) {return id;}
+  if (id.length <= 8) {
+    return id;
+  }
   return `${id.slice(0, 4)}…${id.slice(-4)}`;
 }
 
 function participantLabel(p: Record<string, unknown> | undefined): string | null {
-  if (!p) {return null;}
+  if (!p) {
+    return null;
+  }
   const name = [p.firstName, p.lastName].filter(Boolean).join(' ').trim();
-  if (name) {return name;}
-  if (p.phone) {return String(p.phone);}
-  if (p.email) {return String(p.email);}
-  if (p.id) {return shortenId(String(p.id));}
+  if (name) {
+    return name;
+  }
+  if (p.phone) {
+    return String(p.phone);
+  }
+  if (p.email) {
+    return String(p.email);
+  }
+  if (p.id) {
+    return shortenId(String(p.id));
+  }
   return null;
 }
 
@@ -33,18 +45,14 @@ function ParticipantCellInner({ participantId, fallback }: ParticipantCellProps)
     enabled: !!participantId,
   });
 
-  if (!participantId) {return <>{fallback ?? '-'}</>;}
+  if (!participantId) {
+    return <>{fallback ?? '-'}</>;
+  }
 
   const label = participantLabel(data as Record<string, unknown> | undefined);
 
   return (
-    <HoverCard
-      position="top"
-      withArrow
-      shadow="md"
-      openDelay={300}
-      closeDelay={300}
-    >
+    <HoverCard position="top" withArrow shadow="md" openDelay={300} closeDelay={300}>
       <HoverCard.Target>
         <span style={{ cursor: 'pointer', borderBottom: '1px dashed var(--mantine-color-gray-5)' }}>
           {label ?? shortenId(participantId)}
@@ -58,13 +66,29 @@ function ParticipantCellInner({ participantId, fallback }: ParticipantCellProps)
           </Stack>
         ) : data ? (
           <Stack gap="xs" miw={200}>
-            {label && <Text fw={600} size="sm">{label}</Text>}
-            {data.phone && <Text size="xs" c="dimmed">Phone: {data.phone}</Text>}
-            {data.email && <Text size="xs" c="dimmed">Email: {data.email}</Text>}
-            <Text size="xs" c="dimmed">ID: {(String(participantId))}</Text>
+            {label && (
+              <Text fw={600} size="sm">
+                {label}
+              </Text>
+            )}
+            {data.phone && (
+              <Text size="xs" c="dimmed">
+                Phone: {data.phone}
+              </Text>
+            )}
+            {data.email && (
+              <Text size="xs" c="dimmed">
+                Email: {data.email}
+              </Text>
+            )}
+            <Text size="xs" c="dimmed">
+              ID: {String(participantId)}
+            </Text>
           </Stack>
         ) : (
-          <Text size="sm" c="dimmed">No data</Text>
+          <Text size="sm" c="dimmed">
+            No data
+          </Text>
         )}
       </HoverCard.Dropdown>
     </HoverCard>

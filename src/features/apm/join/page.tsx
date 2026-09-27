@@ -1,9 +1,9 @@
 import { Box, Container, Grid, Group, Stack, Text, TextInput, Title } from '@mantine/core';
-import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
+import { BadgeCheck, UsersRound } from 'lucide-react';
+import { useState } from 'react';
 import { SectionHeading, PrimaryButton } from '../website/components';
 import { useJoinMovement } from '../website/hooks';
-import { useState } from 'react';
-import { BadgeCheck, UsersRound } from 'lucide-react';
+import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 
 export default function JoinPage() {
   const { mutate, isPending } = useJoinMovement();
@@ -15,16 +15,29 @@ export default function JoinPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone) {return;}
+    if (!name || !phone) {
+      return;
+    }
     mutate(
       { name, phone, email: email || undefined, lga: lga || undefined, ward: ward || undefined },
-      { onSuccess: () => { setName(''); setPhone(''); setEmail(''); setLga(''); setWard(''); } },
+      {
+        onSuccess: () => {
+          setName('');
+          setPhone('');
+          setEmail('');
+          setLga('');
+          setWard('');
+        },
+      }
     );
   };
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Join The Movement"
@@ -50,8 +63,12 @@ export default function JoinPage() {
                     'Access exclusive campaign content and resources',
                   ].map((reason, i) => (
                     <Group key={i} gap="sm">
-                      <Text size="sm" style={{ color: apmBlue, fontWeight: 700 }}>{i + 1}.</Text>
-                      <Text size="sm" style={{ color: muted }}>{reason}</Text>
+                      <Text size="sm" style={{ color: apmBlue, fontWeight: 700 }}>
+                        {i + 1}.
+                      </Text>
+                      <Text size="sm" style={{ color: muted }}>
+                        {reason}
+                      </Text>
                     </Group>
                   ))}
                 </Stack>
@@ -68,7 +85,10 @@ export default function JoinPage() {
                   background: '#fff',
                 }}
               >
-                <Title order={3} style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}>
+                <Title
+                  order={3}
+                  style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}
+                >
                   Sign Up
                 </Title>
                 <Stack gap="md">
@@ -80,7 +100,10 @@ export default function JoinPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -90,7 +113,10 @@ export default function JoinPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         required
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                   </Grid>
@@ -99,7 +125,10 @@ export default function JoinPage() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <Grid gap="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -108,7 +137,10 @@ export default function JoinPage() {
                         placeholder="Your Local Government Area"
                         value={lga}
                         onChange={(e) => setLga(e.target.value)}
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -117,7 +149,10 @@ export default function JoinPage() {
                         placeholder="Your ward (optional)"
                         value={ward}
                         onChange={(e) => setWard(e.target.value)}
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                   </Grid>

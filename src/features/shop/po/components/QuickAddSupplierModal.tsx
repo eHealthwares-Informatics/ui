@@ -16,7 +16,9 @@ export function QuickAddSupplierModal({ opened, onClose, onSupplierCreated }: Pr
   const mutation = useCreateSupplier();
 
   async function handleSubmit() {
-    if (!name.trim()) {return;}
+    if (!name.trim()) {
+      return;
+    }
     const result = await mutation.mutateAsync({
       name: name.trim(),
       phone: phone.trim() || undefined,
@@ -33,13 +35,39 @@ export function QuickAddSupplierModal({ opened, onClose, onSupplierCreated }: Pr
   return (
     <Modal opened={opened} onClose={onClose} title="Quick Add Supplier" centered>
       <Stack>
-        <TextInput label="Name" value={name} onChange={(e) => setName(e.currentTarget.value)} placeholder="Supplier name" required />
-        <TextInput label="Phone" value={phone} onChange={(e) => setPhone(e.currentTarget.value)} placeholder="Phone number" />
-        <TextInput label="Email" value={email} onChange={(e) => setEmail(e.currentTarget.value)} placeholder="Email address" type="email" />
-        <TextInput label="Address" value={address} onChange={(e) => setAddress(e.currentTarget.value)} placeholder="Address" />
+        <TextInput
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.currentTarget.value)}
+          placeholder="Supplier name"
+          required
+        />
+        <TextInput
+          label="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.currentTarget.value)}
+          placeholder="Phone number"
+        />
+        <TextInput
+          label="Email"
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+          placeholder="Email address"
+          type="email"
+        />
+        <TextInput
+          label="Address"
+          value={address}
+          onChange={(e) => setAddress(e.currentTarget.value)}
+          placeholder="Address"
+        />
         <Group grow>
-          <Button loading={mutation.isPending} onClick={handleSubmit}>Create Supplier</Button>
-          <Button variant="light" onClick={onClose}>Cancel</Button>
+          <Button loading={mutation.isPending} onClick={handleSubmit}>
+            Create Supplier
+          </Button>
+          <Button variant="light" onClick={onClose}>
+            Cancel
+          </Button>
         </Group>
       </Stack>
     </Modal>

@@ -60,7 +60,10 @@ const STATUS_STYLES: Record<AppointmentStatus, StatusStyle> = {
   },
 };
 
-const PRIORITY_STYLE: Record<Priority, { color: string; dotColor: string; cardTint: string; borderColor: string }> = {
+const PRIORITY_STYLE: Record<
+  Priority,
+  { color: string; dotColor: string; cardTint: string; borderColor: string }
+> = {
   ROUTINE: { color: 'blue', dotColor: '#228be6', cardTint: '#e7f1ff', borderColor: '#a5c9f5' },
   URGENT: { color: 'yellow', dotColor: '#fab005', cardTint: '#fff9db', borderColor: '#ffe066' },
   EMERGENCY: { color: 'red', dotColor: '#fa5252', cardTint: '#fff5f5', borderColor: '#ffc9c9' },
@@ -77,7 +80,9 @@ export function appointmentStyle(appointment: Appointment): StatusStyle {
   return STATUS_STYLES[appointment.status];
 }
 
-export function appointmentAction(appointment: Appointment): { label: string; variant: 'filled' | 'light' | 'outline'; color: string } | null {
+export function appointmentAction(
+  appointment: Appointment
+): { label: string; variant: 'filled' | 'light' | 'outline'; color: string } | null {
   switch (appointment.status) {
     case 'SCHEDULED':
       return { label: 'Check In', variant: 'filled', color: 'blue' };

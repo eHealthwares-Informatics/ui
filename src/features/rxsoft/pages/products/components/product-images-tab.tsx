@@ -7,10 +7,30 @@ interface ProductImagesTabProps {
 }
 
 const imageFields = [
-  { field: 'imageUrl', label: 'Default Image', desc: 'Main product thumbnail', size: 'medium' as const },
-  { field: 'smallImageUrl', label: 'Small Image', desc: 'Used for list views', size: 'small' as const },
-  { field: 'mediumImageUrl', label: 'Medium Image', desc: 'Used for card layouts', size: 'medium' as const },
-  { field: 'largeImageUrl', label: 'Large Image', desc: 'Full-size detail image', size: 'large' as const },
+  {
+    field: 'imageUrl',
+    label: 'Default Image',
+    desc: 'Main product thumbnail',
+    size: 'medium' as const,
+  },
+  {
+    field: 'smallImageUrl',
+    label: 'Small Image',
+    desc: 'Used for list views',
+    size: 'small' as const,
+  },
+  {
+    field: 'mediumImageUrl',
+    label: 'Medium Image',
+    desc: 'Used for card layouts',
+    size: 'medium' as const,
+  },
+  {
+    field: 'largeImageUrl',
+    label: 'Large Image',
+    desc: 'Full-size detail image',
+    size: 'large' as const,
+  },
 ];
 
 export function ProductImagesTab({ values, onChange }: ProductImagesTabProps) {

@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useDebouncedValue } from '@mantine/hooks';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { websiteApi } from './api';
 import { resolveBranding, resolveContact } from './branding';
@@ -334,7 +334,7 @@ export function useCartProductIds(): string[] {
         .map((i) => i.productId)
         .filter((id): id is string => !!id)
         .sort(),
-    [items],
+    [items]
   );
 }
 
@@ -349,18 +349,26 @@ export function useCartProductHydration() {
   // Write-through: patch name/unitPrice (and the embedded product snapshot)
   // onto each cart item. needsPatch guards against re-render loops.
   useEffect(() => {
-    if (ids.length === 0) return;
+    if (ids.length === 0) {
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
         const products = await websiteApi.getCartProducts(ids);
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         const byId = new Map(products.map((p) => [p.id, p]));
         const store = useCartStore.getState();
         for (const item of store.items) {
-          if (!item.productId) continue;
+          if (!item.productId) {
+            continue;
+          }
           const p = byId.get(item.productId);
-          if (!p) continue;
+          if (!p) {
+            continue;
+          }
           const price = p.unitPrice != null ? Number(p.unitPrice) : undefined;
           const needsPatch =
             item.name !== p.name ||

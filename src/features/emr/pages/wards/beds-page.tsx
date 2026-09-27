@@ -66,7 +66,12 @@ export function BedAllocationsPage() {
   }, [admissionsData]);
 
   const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { AVAILABLE: 0, OCCUPIED: 0, MAINTENANCE: 0, OUT_OF_SERVICE: 0 };
+    const counts: Record<string, number> = {
+      AVAILABLE: 0,
+      OCCUPIED: 0,
+      MAINTENANCE: 0,
+      OUT_OF_SERVICE: 0,
+    };
     for (const bed of bedsData) {
       counts[bed.status] = (counts[bed.status] ?? 0) + 1;
     }
@@ -143,7 +148,9 @@ export function BedAllocationsPage() {
                           withBorder
                           radius="md"
                           padding="sm"
-                          style={{ borderColor: `var(--mantine-color-${STATUS_COLOR[bed.status]}-4)` }}
+                          style={{
+                            borderColor: `var(--mantine-color-${STATUS_COLOR[bed.status]}-4)`,
+                          }}
                         >
                           <Group justify="space-between" wrap="nowrap">
                             <Group gap={6} wrap="nowrap">
@@ -160,24 +167,24 @@ export function BedAllocationsPage() {
                               </Menu.Target>
                               <Menu.Dropdown>
                                 <Menu.Label>Set status</Menu.Label>
-                                {(['AVAILABLE', 'MAINTENANCE', 'OUT_OF_SERVICE'] as BedStatus[]).map(
-                                  (status) => (
-                                    <Menu.Item
-                                      key={status}
-                                      leftSection={
-                                        status === 'AVAILABLE' ? (
-                                          <ChevronDown size={14} />
-                                        ) : (
-                                          <Wrench size={14} />
-                                        )
-                                      }
-                                      disabled={bed.status === status}
-                                      onClick={() => setStatus.mutate({ id: bed.id, status })}
-                                    >
-                                      {status.replace(/_/g, ' ')}
-                                    </Menu.Item>
-                                  ),
-                                )}
+                                {(
+                                  ['AVAILABLE', 'MAINTENANCE', 'OUT_OF_SERVICE'] as BedStatus[]
+                                ).map((status) => (
+                                  <Menu.Item
+                                    key={status}
+                                    leftSection={
+                                      status === 'AVAILABLE' ? (
+                                        <ChevronDown size={14} />
+                                      ) : (
+                                        <Wrench size={14} />
+                                      )
+                                    }
+                                    disabled={bed.status === status}
+                                    onClick={() => setStatus.mutate({ id: bed.id, status })}
+                                  >
+                                    {status.replace(/_/g, ' ')}
+                                  </Menu.Item>
+                                ))}
                               </Menu.Dropdown>
                             </Menu>
                           </Group>

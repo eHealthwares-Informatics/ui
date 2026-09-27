@@ -12,13 +12,25 @@ export type PayLinkView = {
   currency: string;
   note?: string | null;
   userId?: string | null;
-  providers: Array<{ id: string; code: string; name: string; providerType: string; production: boolean }>;
+  providers: Array<{
+    id: string;
+    code: string;
+    name: string;
+    providerType: string;
+    production: boolean;
+  }>;
   order?: {
     id: string;
     orderNumber: string;
     totalAmount: number;
     subtotalAmount: number;
-    items: Array<{ id: string; itemId: string | null; freetextName: string | null; quantity: number; unitPrice: number }>;
+    items: Array<{
+      id: string;
+      itemId: string | null;
+      freetextName: string | null;
+      quantity: number;
+      unitPrice: number;
+    }>;
   };
   receivable?: {
     id: string;
@@ -31,24 +43,39 @@ export type PayLinkView = {
 };
 
 export const payApi = {
-  getLink: (token: string) => http.get<PayLinkView>(`/payment-links/public/${token}`).then((r) => r.data),
+  getLink: (token: string) =>
+    http.get<PayLinkView>(`/payment-links/public/${token}`).then((r) => r.data),
 
-  initialize: (token: string, body: { providerId?: string; paymentMethodId?: string; returnUrl?: string; callbackUrl?: string }) =>
+  initialize: (
+    token: string,
+    body: {
+      providerId?: string;
+      paymentMethodId?: string;
+      returnUrl?: string;
+      callbackUrl?: string;
+    }
+  ) =>
     http
-      .post<{ reference: string; checkoutUrl: string | null; provider: { code: string; name: string }; status: string }>(
-        `/payment-links/${token}/initialize`,
-        body
-      )
+      .post<{
+        reference: string;
+        checkoutUrl: string | null;
+        provider: { code: string; name: string };
+        status: string;
+      }>(`/payment-links/${token}/initialize`, body)
       .then((r) => r.data),
 
   status: (token: string) =>
     http
-      .get<{ link: { status: string }; payment: { status: string; reference: string } | null }>(`/payment-links/${token}/status`)
+      .get<{ link: { status: string }; payment: { status: string; reference: string } | null }>(
+        `/payment-links/${token}/status`
+      )
       .then((r) => r.data),
 
   complete: (token: string) =>
     http
-      .post<{ status: string; reference?: string; paid: boolean }>(`/payment-links/${token}/complete`)
+      .post<{ status: string; reference?: string; paid: boolean }>(
+        `/payment-links/${token}/complete`
+      )
       .then((r) => r.data),
 };
 
@@ -75,7 +102,9 @@ export function savePaySession(token: string, session: PaySession) {
 
 export function loadPaySession(token: string): PaySession | null {
   const raw = sessionStorage.getItem(SESSION_KEY(token));
-  if (!raw) return null;
+  if (!raw) {
+    return null;
+  }
   try {
     return JSON.parse(raw);
   } catch {

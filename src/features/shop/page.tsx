@@ -23,7 +23,6 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from '@tanstack/react-router';
-import productPlaceholder from './sample_images/generic_product_image.png';
 import {
   Baby,
   BadgeCheck,
@@ -57,18 +56,18 @@ import {
   Mail,
 } from 'lucide-react';
 import { useState } from 'react';
+import productPlaceholder from './sample_images/generic_product_image.png';
+import { websiteApi } from './website/api';
+import { useCartStore } from './website/cart-store';
 import { useChatbotStore } from './website/chatbot-store';
-import { useProducts, useHealthConcerns } from './website/hooks';
+import { SectionHeading, PrimaryButton, OutlineButton } from './website/components';
+import { GenericSearchInput } from './website/generic-search';
 import {
   toHL7Prescription,
   WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from './website/hl7-prescription';
-import { websiteApi } from './website/api';
-import type { WebsiteProduct } from './website/types';
-import { useCartStore } from './website/cart-store';
-import { GenericSearchInput } from './website/generic-search';
-import { SectionHeading, PrimaryButton, OutlineButton } from './website/components';
+import { useProducts, useHealthConcerns } from './website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -79,6 +78,7 @@ import {
   soft,
   buttonStyles,
 } from './website/layout';
+import type { WebsiteProduct } from './website/types';
 
 const heroImage = new URL('./sample_images/nappy-jkQzYGJ7dBA-unsplash.jpg', import.meta.url).href;
 const pharmacistImage = new URL(
@@ -143,12 +143,16 @@ const CONCERN_ICONS: Record<string, any> = {
 };
 
 function concernIcon(iconName?: string | null) {
-  if (!iconName) {return Pill;}
+  if (!iconName) {
+    return Pill;
+  }
   return CONCERN_ICONS[iconName.toLowerCase()] ?? Pill;
 }
 
 function formatConcernCount(count?: number | null): string {
-  if (count == null || count <= 0) {return 'Shop products';}
+  if (count == null || count <= 0) {
+    return 'Shop products';
+  }
   return `${count} product${count === 1 ? '' : 's'}`;
 }
 
@@ -309,12 +313,14 @@ export default function DamorexPage() {
   }>;
   const activeConcerns =
     dbConcerns && dbConcerns.length > 0
-      ? dbConcerns.map((c: { name: string; slug: string; iconName?: string | null; productCount?: number }) => ({
-          title: c.name,
-          count: formatConcernCount(c.productCount),
-          icon: concernIcon(c.iconName),
-          slug: c.slug,
-        }))
+      ? dbConcerns.map(
+          (c: { name: string; slug: string; iconName?: string | null; productCount?: number }) => ({
+            title: c.name,
+            count: formatConcernCount(c.productCount),
+            icon: concernIcon(c.iconName),
+            slug: c.slug,
+          })
+        )
       : healthConcerns;
 
   return (
@@ -377,9 +383,7 @@ export default function DamorexPage() {
                     </ThemeIcon>
                     <GenericSearchInput
                       size="lg"
-                      onSelect={(gp) =>
-                        navigate({ to: '/shop/shop', search: { gp: gp as any } })
-                      }
+                      onSelect={(gp) => navigate({ to: '/shop/shop', search: { gp: gp as any } })}
                       onSubmit={(text) =>
                         navigate({ to: `/shop/search?q=${encodeURIComponent(text)}` })
                       }
@@ -807,10 +811,7 @@ export default function DamorexPage() {
         <Container size="xl">
           <Stack gap="xl">
             <Group justify="space-between" align="end">
-              <SectionHeading
-                eyebrow="Browse categories"
-                title="Explore by category"
-              />
+              <SectionHeading eyebrow="Browse categories" title="Explore by category" />
               <Button
                 visibleFrom="sm"
                 radius="xl"
@@ -843,7 +844,13 @@ export default function DamorexPage() {
                       <ThemeIcon radius="xl" size={48} color="green" variant="light">
                         <item.icon size={22} />
                       </ThemeIcon>
-                      <Text size="xs" fw={800} ta="center" lh={1.2} style={{ wordBreak: 'break-word' }}>
+                      <Text
+                        size="xs"
+                        fw={800}
+                        ta="center"
+                        lh={1.2}
+                        style={{ wordBreak: 'break-word' }}
+                      >
                         {item.title}
                       </Text>
                     </Stack>
@@ -901,7 +908,13 @@ export default function DamorexPage() {
                   >
                     {item.badge}
                   </Badge>
-                  <Image src={(item as any).mediumImageUrl || (item as any).imageUrl || productImage} alt={item.name} h={190} fit="contain" p="lg" />
+                  <Image
+                    src={(item as any).mediumImageUrl || (item as any).imageUrl || productImage}
+                    alt={item.name}
+                    h={190}
+                    fit="contain"
+                    p="lg"
+                  />
                 </Card.Section>
                 <Stack mt="md" gap="sm">
                   <Box>
@@ -962,9 +975,14 @@ export default function DamorexPage() {
                       onClick={() => {
                         const hl7 = toHL7Prescription(
                           { product: item as unknown as WebsiteProduct, quantity: 1 },
-                          { questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN, customerName: item.name },
+                          {
+                            questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN,
+                            customerName: item.name,
+                          }
                         );
-                        useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
+                        useChatbotStore
+                          .getState()
+                          .openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
                       }}
                     >
                       Order via Chat
@@ -978,9 +996,14 @@ export default function DamorexPage() {
                       onClick={() => {
                         const hl7 = toHL7Prescription(
                           { product: item as unknown as WebsiteProduct, quantity: 1 },
-                          { questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY, customerName: item.name },
+                          {
+                            questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
+                            customerName: item.name,
+                          }
                         );
-                        useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
+                        useChatbotStore
+                          .getState()
+                          .openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
                       }}
                     >
                       Chat
@@ -996,10 +1019,7 @@ export default function DamorexPage() {
       <Container size="xl" py={{ base: 48, md: 76 }}>
         <Stack gap="xl">
           <Group justify="space-between" align="end">
-            <SectionHeading
-              eyebrow="Trending now"
-              title="Trending products for you!"
-            />
+            <SectionHeading eyebrow="Trending now" title="Trending products for you!" />
             <Button
               visibleFrom="sm"
               radius="xl"
@@ -1013,82 +1033,104 @@ export default function DamorexPage() {
             </Button>
           </Group>
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-            {trendingProducts.length > 0 ? trendingProducts.slice(0, 4).map((product) => (
-              <Card
-                key={product.id}
-                className="lift-card"
-                radius={24}
-                withBorder
-                padding="md"
-                style={{
-                  borderColor: line,
-                  boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
-                }}
-              >
-                <Card.Section
-                  style={{
-                    background: '#F1F8F4',
-                    borderBottom: `1px solid ${line}`,
-                    position: 'relative',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })}
-                >
-                  <Image
-                    src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
-                    alt={product.name}
-                    h={180}
-                    fit="contain"
-                    p="lg"
-                  />
-                </Card.Section>
-                <Stack mt="md" gap={6}>
-                  {product.category ? (
-                    <Badge radius="xl" color="green" variant="light" size="sm" w="fit-content">
-                      {product.category.name}
-                    </Badge>
-                  ) : null}
-                  <Text fw={900} lh={1.25} lineClamp={2}>
-                    {product.name}
-                  </Text>
-                  <Rating value={5} readOnly size="sm" />
-                  <Button
-                    radius="xl"
-                    color="green"
-                    fullWidth
-                    leftSection={<ShoppingCart size={16} />}
-                    styles={buttonStyles}
-                    style={{ background: green, marginTop: 4 }}                      onClick={(e) => {
-                      e.stopPropagation();
-                      useCartStore
-                        .getState()
-                        .addItem(product.id, 1, {
-                          name: product.name,
-                          unitPrice: (product as any).unitPrice ?? undefined,
-                          product: product as any,
-                        });
-                      notifications.show({
-                        message: 'Added to cart',
-                        color: 'green',
-                        icon: <ShoppingCart size={18} />,
-                      });
+            {trendingProducts.length > 0
+              ? trendingProducts.slice(0, 4).map((product) => (
+                  <Card
+                    key={product.id}
+                    className="lift-card"
+                    radius={24}
+                    withBorder
+                    padding="md"
+                    style={{
+                      borderColor: line,
+                      boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
                     }}
                   >
-                    Add to cart
-                  </Button>
-                </Stack>
-              </Card>
-            )) : Array.from({ length: 4 }).map((_, i) => (
-              <Card key={`trending-skel-${i}`} radius={24} withBorder padding="md" style={{ borderColor: line }}>
-                <Box style={{ background: '#F1F8F4', borderRadius: 16, height: 180 }} />
-                <Stack mt="md" gap={6}>
-                  <Box style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '60%' }} />
-                  <Box style={{ height: 16, background: '#E8F0EC', borderRadius: 8, width: '80%' }} />
-                  <Box style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '40%' }} />
-                  <Box style={{ height: 36, background: '#E8F0EC', borderRadius: 18, marginTop: 4 }} />
-                </Stack>
-              </Card>
-            ))}
+                    <Card.Section
+                      style={{
+                        background: '#F1F8F4',
+                        borderBottom: `1px solid ${line}`,
+                        position: 'relative',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() =>
+                        navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })
+                      }
+                    >
+                      <Image
+                        src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
+                        alt={product.name}
+                        h={180}
+                        fit="contain"
+                        p="lg"
+                      />
+                    </Card.Section>
+                    <Stack mt="md" gap={6}>
+                      {product.category ? (
+                        <Badge radius="xl" color="green" variant="light" size="sm" w="fit-content">
+                          {product.category.name}
+                        </Badge>
+                      ) : null}
+                      <Text fw={900} lh={1.25} lineClamp={2}>
+                        {product.name}
+                      </Text>
+                      <Rating value={5} readOnly size="sm" />
+                      <Button
+                        radius="xl"
+                        color="green"
+                        fullWidth
+                        leftSection={<ShoppingCart size={16} />}
+                        styles={buttonStyles}
+                        style={{ background: green, marginTop: 4 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          useCartStore.getState().addItem(product.id, 1, {
+                            name: product.name,
+                            unitPrice: (product as any).unitPrice ?? undefined,
+                            product: product as any,
+                          });
+                          notifications.show({
+                            message: 'Added to cart',
+                            color: 'green',
+                            icon: <ShoppingCart size={18} />,
+                          });
+                        }}
+                      >
+                        Add to cart
+                      </Button>
+                    </Stack>
+                  </Card>
+                ))
+              : Array.from({ length: 4 }).map((_, i) => (
+                  <Card
+                    key={`trending-skel-${i}`}
+                    radius={24}
+                    withBorder
+                    padding="md"
+                    style={{ borderColor: line }}
+                  >
+                    <Box style={{ background: '#F1F8F4', borderRadius: 16, height: 180 }} />
+                    <Stack mt="md" gap={6}>
+                      <Box
+                        style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '60%' }}
+                      />
+                      <Box
+                        style={{ height: 16, background: '#E8F0EC', borderRadius: 8, width: '80%' }}
+                      />
+                      <Box
+                        style={{ height: 12, background: '#E8F0EC', borderRadius: 8, width: '40%' }}
+                      />
+                      <Box
+                        style={{
+                          height: 36,
+                          background: '#E8F0EC',
+                          borderRadius: 18,
+                          marginTop: 4,
+                        }}
+                      />
+                    </Stack>
+                  </Card>
+                ))}
           </SimpleGrid>
         </Stack>
       </Container>
@@ -1111,11 +1153,19 @@ export default function DamorexPage() {
                   <Badge radius="xl" color="blue" variant="filled" size="lg" w="fit-content">
                     Limited time offer
                   </Badge>
-                  <Title order={3} className="damorex-heading" style={{ color: ink, letterSpacing: '-0.03em', maxWidth: 360 }}>
+                  <Title
+                    order={3}
+                    className="damorex-heading"
+                    style={{ color: ink, letterSpacing: '-0.03em', maxWidth: 360 }}
+                  >
                     Get 20% Off Your First Order
                   </Title>
                   <Text c={ink} lh={1.7} maw={400}>
-                    Use code <Text span fw={900}>WELCOME20</Text> at checkout. Valid for new customers on orders above ₦5,000.
+                    Use code{' '}
+                    <Text span fw={900}>
+                      WELCOME20
+                    </Text>{' '}
+                    at checkout. Valid for new customers on orders above ₦5,000.
                   </Text>
                   <PrimaryButton
                     leftSection={<ShoppingCart size={18} />}
@@ -1160,29 +1210,32 @@ export default function DamorexPage() {
                   }}
                 >
                   <Group gap="sm" wrap="nowrap" h="100%">
-                    <ThemeIcon radius="xl" size={44} style={{ background: 'rgba(255,255,255,0.15)' }}>
+                    <ThemeIcon
+                      radius="xl"
+                      size={44}
+                      style={{ background: 'rgba(255,255,255,0.15)' }}
+                    >
                       <Truck size={22} />
                     </ThemeIcon>
                     <Box>
-                      <Text fw={900} size="lg">Free Delivery</Text>
+                      <Text fw={900} size="lg">
+                        Free Delivery
+                      </Text>
                       <Text size="sm" c="rgba(255,255,255,0.82)" lh={1.5}>
                         On orders over ₦10,000 within Lagos
                       </Text>
                     </Box>
                   </Group>
                 </Paper>
-                <Paper
-                  radius={24}
-                  p="lg"
-                  withBorder
-                  style={{ borderColor: line, minHeight: 126 }}
-                >
+                <Paper radius={24} p="lg" withBorder style={{ borderColor: line, minHeight: 126 }}>
                   <Group gap="sm" wrap="nowrap" h="100%">
                     <ThemeIcon radius="xl" size={44} color="green" variant="light">
                       <ShieldCheck size={22} />
                     </ThemeIcon>
                     <Box>
-                      <Text fw={900} size="lg">Pharmacist Support</Text>
+                      <Text fw={900} size="lg">
+                        Pharmacist Support
+                      </Text>
                       <Text size="sm" c={muted} lh={1.5}>
                         Free consultation with every order
                       </Text>
@@ -1216,80 +1269,108 @@ export default function DamorexPage() {
             </Button>
           </Group>
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-            {catalogProducts.length > 0 ? catalogProducts.slice(0, 8).map((product) => (
-              <Card
-                key={product.id}
-                className="lift-card"
-                radius={24}
-                withBorder
-                padding="md"
-                style={{
-                  borderColor: line,
-                  boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
-                  cursor: 'pointer',
-                }}
-                onClick={() => navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })}
-              >
-                <Card.Section
-                  style={{
-                    background: '#F1F8F4',
-                    borderBottom: `1px solid ${line}`,
-                    position: 'relative',
-                  }}
-                >
-                  <Image src={product.mediumImageUrl || product.imageUrl || productPlaceholder} alt={product.name} h={170} fit="contain" p="lg" />
-                </Card.Section>
-                <Stack mt="md" gap={4}>
-                  {product.category ? (
-                    <Badge radius="xl" color="green" variant="light" size="sm" w="fit-content">
-                      {product.category.name}
-                    </Badge>
-                  ) : null}
-                  <Text fw={900} lh={1.25} lineClamp={2}>
-                    {product.name}
-                  </Text>
-                  {product.genericProduct ? (
-                    <Text size="sm" c={muted} lineClamp={1}>
-                      {product.genericProduct.name}
-                    </Text>
-                  ) : null}
-                  <Button
-                    radius="xl"
-                    color="green"
-                    fullWidth
-                    leftSection={<ShoppingCart size={16} />}
-                    styles={buttonStyles}
-                    style={{ background: green, marginTop: 6 }}                      onClick={(e) => {
-                      e.stopPropagation();
-                      useCartStore
-                        .getState()
-                        .addItem(product.id, 1, {
-                          name: product.name,
-                          unitPrice: (product as any).unitPrice ?? undefined,
-                          product: product as any,
-                        });
-                      notifications.show({
-                        message: 'Added to cart',
-                        color: 'green',
-                        icon: <ShoppingCart size={18} />,
-                      });
+            {catalogProducts.length > 0
+              ? catalogProducts.slice(0, 8).map((product) => (
+                  <Card
+                    key={product.id}
+                    className="lift-card"
+                    radius={24}
+                    withBorder
+                    padding="md"
+                    style={{
+                      borderColor: line,
+                      boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
+                      cursor: 'pointer',
                     }}
+                    onClick={() =>
+                      navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })
+                    }
                   >
-                    Add to cart
-                  </Button>
-                </Stack>
-              </Card>
-            )) : Array.from({ length: 8 }).map((_, i) => (
-              <Card key={`catalog-skel-${i}`} radius={24} withBorder padding="md" style={{ borderColor: line }}>
-                <Box style={{ background: '#F1F8F4', borderRadius: 16, height: 170 }} />
-                <Stack mt="md" gap={4}>
-                  <Box style={{ height: 10, background: '#E8F0EC', borderRadius: 8, width: '50%' }} />
-                  <Box style={{ height: 14, background: '#E8F0EC', borderRadius: 8, width: '70%' }} />
-                  <Box style={{ height: 10, background: '#E8F0EC', borderRadius: 8, width: '40%' }} />
-                  <Box style={{ height: 36, background: '#E8F0EC', borderRadius: 18, marginTop: 6 }} />
-                </Stack>
-              </Card>
-            ))}
+                    <Card.Section
+                      style={{
+                        background: '#F1F8F4',
+                        borderBottom: `1px solid ${line}`,
+                        position: 'relative',
+                      }}
+                    >
+                      <Image
+                        src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
+                        alt={product.name}
+                        h={170}
+                        fit="contain"
+                        p="lg"
+                      />
+                    </Card.Section>
+                    <Stack mt="md" gap={4}>
+                      {product.category ? (
+                        <Badge radius="xl" color="green" variant="light" size="sm" w="fit-content">
+                          {product.category.name}
+                        </Badge>
+                      ) : null}
+                      <Text fw={900} lh={1.25} lineClamp={2}>
+                        {product.name}
+                      </Text>
+                      {product.genericProduct ? (
+                        <Text size="sm" c={muted} lineClamp={1}>
+                          {product.genericProduct.name}
+                        </Text>
+                      ) : null}
+                      <Button
+                        radius="xl"
+                        color="green"
+                        fullWidth
+                        leftSection={<ShoppingCart size={16} />}
+                        styles={buttonStyles}
+                        style={{ background: green, marginTop: 6 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          useCartStore.getState().addItem(product.id, 1, {
+                            name: product.name,
+                            unitPrice: (product as any).unitPrice ?? undefined,
+                            product: product as any,
+                          });
+                          notifications.show({
+                            message: 'Added to cart',
+                            color: 'green',
+                            icon: <ShoppingCart size={18} />,
+                          });
+                        }}
+                      >
+                        Add to cart
+                      </Button>
+                    </Stack>
+                  </Card>
+                ))
+              : Array.from({ length: 8 }).map((_, i) => (
+                  <Card
+                    key={`catalog-skel-${i}`}
+                    radius={24}
+                    withBorder
+                    padding="md"
+                    style={{ borderColor: line }}
+                  >
+                    <Box style={{ background: '#F1F8F4', borderRadius: 16, height: 170 }} />
+                    <Stack mt="md" gap={4}>
+                      <Box
+                        style={{ height: 10, background: '#E8F0EC', borderRadius: 8, width: '50%' }}
+                      />
+                      <Box
+                        style={{ height: 14, background: '#E8F0EC', borderRadius: 8, width: '70%' }}
+                      />
+                      <Box
+                        style={{ height: 10, background: '#E8F0EC', borderRadius: 8, width: '40%' }}
+                      />
+                      <Box
+                        style={{
+                          height: 36,
+                          background: '#E8F0EC',
+                          borderRadius: 18,
+                          marginTop: 6,
+                        }}
+                      />
+                    </Stack>
+                  </Card>
+                ))}
           </SimpleGrid>
         </Stack>
       </Container>
@@ -1438,13 +1519,17 @@ export default function DamorexPage() {
                 <Badge radius="xl" color="green" variant="filled" size="lg" w="fit-content">
                   About Damorex
                 </Badge>
-                <Title order={2} className="damorex-heading" style={{ color: '#fff', letterSpacing: '-0.03em' }}>
+                <Title
+                  order={2}
+                  className="damorex-heading"
+                  style={{ color: '#fff', letterSpacing: '-0.03em' }}
+                >
                   Your Trusted Partner in Healthcare
                 </Title>
                 <Text c="rgba(255,255,255,0.76)" lh={1.7}>
-                  Damorex Pharmacy is a licensed online pharmacy dedicated to providing safe, authentic, and affordable
-                  medicines across Nigeria. With a network of branches and a team of licensed pharmacists, we ensure you
-                  receive the right care, every time.
+                  Damorex Pharmacy is a licensed online pharmacy dedicated to providing safe,
+                  authentic, and affordable medicines across Nigeria. With a network of branches and
+                  a team of licensed pharmacists, we ensure you receive the right care, every time.
                 </Text>
                 <Group gap={8}>
                   {[
@@ -1460,7 +1545,10 @@ export default function DamorexPage() {
                       variant="outline"
                       size="lg"
                       leftSection={<item.icon size={14} />}
-                      style={{ borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.88)' }}
+                      style={{
+                        borderColor: 'rgba(255,255,255,0.2)',
+                        color: 'rgba(255,255,255,0.88)',
+                      }}
                     >
                       {item.label}
                     </Badge>
@@ -1486,7 +1574,11 @@ export default function DamorexPage() {
                     }}
                   >
                     <Stack align="center" gap={4}>
-                      <Text fw={950} size="xxxl" style={{ color: green, fontSize: 42, lineHeight: 1 }}>
+                      <Text
+                        fw={950}
+                        size="xxxl"
+                        style={{ color: green, fontSize: 42, lineHeight: 1 }}
+                      >
                         {stat.value}
                       </Text>
                       <Text c="rgba(255,255,255,0.76)" ta="center" fw={700}>
@@ -1785,7 +1877,9 @@ export default function DamorexPage() {
                   style={{ background: green }}
                   disabled={subscribing}
                   onClick={async () => {
-                    if (!email && !phone) {return;}
+                    if (!email && !phone) {
+                      return;
+                    }
                     setSubscribing(true);
                     try {
                       await websiteApi.subscribe({ email, phone: phone || undefined });

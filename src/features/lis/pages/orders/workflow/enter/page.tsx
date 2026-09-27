@@ -14,7 +14,9 @@ export function OrderEnterPage() {
   const canSave = state.patientName && state.patientId && state.items.length > 0;
 
   const handleSaveAndNext = async () => {
-    if (!canSave) return;
+    if (!canSave) {
+      return;
+    }
     const result = await saveOrderEntry();
     if (result?.id) {
       dispatch({ type: 'MARK_STEP', payload: 'enter' });

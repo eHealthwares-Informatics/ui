@@ -1,10 +1,10 @@
 import { Box, Container, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { useParams } from '@tanstack/react-router';
-import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
-import { useEvent } from '../website/hooks';
-import { SectionHeading, PrimaryButton } from '../website/components';
 import { useNavigate } from '@tanstack/react-router';
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import { SectionHeading, PrimaryButton } from '../website/components';
+import { useEvent } from '../website/hooks';
+import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 
 export default function EventDetailPage() {
   const { id } = useParams({ from: '/apm/events/$id' });
@@ -15,7 +15,9 @@ export default function EventDetailPage() {
     return (
       <WebsiteLayout>
         <Container size="xl" py={120}>
-          <Group justify="center"><Loader color={apmBlue} /></Group>
+          <Group justify="center">
+            <Loader color={apmBlue} />
+          </Group>
         </Container>
       </WebsiteLayout>
     );
@@ -25,14 +27,21 @@ export default function EventDetailPage() {
     return (
       <WebsiteLayout>
         <Container size="xl" py={120}>
-          <Text ta="center" style={{ color: muted }}>Event not found.</Text>
+          <Text ta="center" style={{ color: muted }}>
+            Event not found.
+          </Text>
         </Container>
       </WebsiteLayout>
     );
   }
 
   const date = event.eventDate
-    ? new Date(event.eventDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(event.eventDate).toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
     : '';
 
   return (
@@ -40,7 +49,16 @@ export default function EventDetailPage() {
       <Box py={80} style={{ background: soft }}>
         <Container size="md">
           {event.category && (
-            <Text size="xs" fw={600} style={{ color: apmBlue, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>
+            <Text
+              size="xs"
+              fw={600}
+              style={{
+                color: apmBlue,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: 16,
+              }}
+            >
               {event.category}
             </Text>
           )}
@@ -61,19 +79,25 @@ export default function EventDetailPage() {
             {event.location && (
               <Group gap={8}>
                 <MapPin size={18} color={apmBlue} />
-                <Text size="md" style={{ color: ink, fontWeight: 500 }}>{event.location}</Text>
+                <Text size="md" style={{ color: ink, fontWeight: 500 }}>
+                  {event.location}
+                </Text>
               </Group>
             )}
             {date && (
               <Group gap={8}>
                 <Calendar size={18} color={apmBlue} />
-                <Text size="md" style={{ color: ink, fontWeight: 500 }}>{date}</Text>
+                <Text size="md" style={{ color: ink, fontWeight: 500 }}>
+                  {date}
+                </Text>
               </Group>
             )}
             {event.eventTime && (
               <Group gap={8}>
                 <Clock size={18} color={apmBlue} />
-                <Text size="md" style={{ color: ink, fontWeight: 500 }}>{event.eventTime}</Text>
+                <Text size="md" style={{ color: ink, fontWeight: 500 }}>
+                  {event.eventTime}
+                </Text>
               </Group>
             )}
           </Stack>

@@ -17,14 +17,16 @@ export function printPosReceipt(sale: {
       <td style="text-align:center">${item.qty}</td>
       <td>${item.name}</td>
       <td style="text-align:right">₦${item.total.toFixed(2)}</td>
-    </tr>`,
+    </tr>`
     )
     .join('');
 
   const headerText = sale.header || 'DAMOREX PHARMACY';
 
   const win = window.open('', '_blank');
-  if (!win) {return;}
+  if (!win) {
+    return;
+  }
   win.document.write(`
     <html>
     <head>
@@ -96,14 +98,16 @@ export function printInvoice(sale: {
       <td>${item.name}</td>
       <td style="text-align:right">₦${item.price.toFixed(2)}</td>
       <td style="text-align:right">₦${item.total.toFixed(2)}</td>
-    </tr>`,
+    </tr>`
     )
     .join('');
 
   const headerText = sale.header || 'DAMOREX PHARMACY';
 
   const win = window.open('', '_blank');
-  if (!win) {return;}
+  if (!win) {
+    return;
+  }
   win.document.write(`
     <html>
     <head>
@@ -176,14 +180,16 @@ export function printA4Receipt(sale: {
       <td>${item.name}</td>
       <td style="text-align:right">₦${item.price.toFixed(2)}</td>
       <td style="text-align:right">₦${item.total.toFixed(2)}</td>
-    </tr>`,
+    </tr>`
     )
     .join('');
 
   const headerText = sale.header || 'DAMOREX PHARMACY';
 
   const win = window.open('', '_blank');
-  if (!win) {return;}
+  if (!win) {
+    return;
+  }
   win.document.write(`
     <html>
     <head>

@@ -5,13 +5,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleContext } from '@/context/module-context';
+import { getDirtyFields } from '@/features/components/utils';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields, normalizeMultiSelectIds } from '@/features/shared/payload-utils';
-import { getDirtyFields } from '@/features/components/utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { FieldGroup } from '../form/FieldGroup';
 import { TabGroups } from '../form/tab-groups';
 import { RxPage } from './rx-page';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type DataPageFormProps = {
   config: ModelConfig;
@@ -81,9 +81,7 @@ export function DataPageForm({
     mutationFn: async (values: Record<string, unknown>) => {
       if (mode === 'edit') {
         const id = initialData?.id ?? (values as any).id ?? (initialData as any)?._id;
-        const changedValues = initialFormState
-          ? getDirtyFields(values, initialFormState)
-          : values;
+        const changedValues = initialFormState ? getDirtyFields(values, initialFormState) : values;
         const normalized = normalizeMultiSelectIds(changedValues, fields);
         const payload = buildUpdatePayload
           ? buildUpdatePayload(normalized, initialData ?? {})

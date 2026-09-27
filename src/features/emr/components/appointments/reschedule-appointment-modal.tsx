@@ -55,7 +55,12 @@ export function RescheduleAppointmentModal({
         <Stack gap="sm">
           <SimpleGrid cols={{ base: 1, sm: 3 }}>
             <TextInput label="Date" required type="date" {...form.getInputProps('date')} />
-            <TextInput label="Start time" required type="time" {...form.getInputProps('startTime')} />
+            <TextInput
+              label="Start time"
+              required
+              type="time"
+              {...form.getInputProps('startTime')}
+            />
             <TextInput label="End time" type="time" {...form.getInputProps('endTime')} />
           </SimpleGrid>
           <Group justify="flex-end">

@@ -1,5 +1,13 @@
+import type {
+  View,
+  ViewAccordion,
+  ViewField,
+  ViewFieldGroup,
+  Column,
+  Field,
+  FieldGroup,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
-import type { View, ViewAccordion, ViewField, ViewFieldGroup, Column, Field, FieldGroup } from '@/features/rxsoft/types';
 
 const HIDDEN_FIELD_TYPES = new Set(['hidden', 'password']);
 
@@ -8,7 +16,9 @@ function fieldToViewField(f: Field): ViewField<any> {
 }
 
 function columnToViewField(c: Column): ViewField<any> | null {
-  if (c.render) {return null;}
+  if (c.render) {
+    return null;
+  }
   if (c.key.includes('.')) {
     return {
       key: c.key,
@@ -36,24 +46,31 @@ function fieldGroupToViewFieldGroup(fg: FieldGroup): ViewFieldGroup<any> {
 
 function extractAccordionFields(fg: FieldGroup): ViewAccordion<any>[] {
   return fg.fields
-    .filter((f): f is Field & { type: 'accordion' | 'accordion-array' } => ACCORDION_TYPES.has(f.type ?? ''))
+    .filter((f): f is Field & { type: 'accordion' | 'accordion-array' } =>
+      ACCORDION_TYPES.has(f.type ?? '')
+    )
     .map((f) => ({
       key: f.name,
       title: f.label,
       labelKey: f.itemLabelKey ?? 'name',
       itemEditConfig: f.itemEditConfig,
-      itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string }).itemEditEndpoint,
+      itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string })
+        .itemEditEndpoint,
       canEditItem: (f as Field & { canEditItem?: (data: any, item: any) => boolean }).canEditItem,
     }));
 }
 
 function deriveEndpoint(endpoint: string): string {
-  if (endpoint.includes(':id')) {return endpoint;}
+  if (endpoint.includes(':id')) {
+    return endpoint;
+  }
   return `${endpoint.replace(/\/$/, '')}/:id`;
 }
 
 export function deriveView(config: ModelConfig): View<any> {
-  if (config.view) {return config.view;}
+  if (config.view) {
+    return config.view;
+  }
 
   const endpoint = deriveEndpoint(config.endpoint);
   const title = `${config.title} Details`;
@@ -68,7 +85,7 @@ export function deriveView(config: ModelConfig): View<any> {
       }
     }
     fieldGroups = config.tabGroups.flatMap((tab) =>
-      (tab.fieldGroups ?? []).map(fieldGroupToViewFieldGroup),
+      (tab.fieldGroups ?? []).map(fieldGroupToViewFieldGroup)
     );
   }
 
@@ -85,13 +102,16 @@ export function deriveView(config: ModelConfig): View<any> {
       fieldGroups = [{ title: 'Details', fields }];
     }
     accordions = config.createFields
-      .filter((f): f is Field & { type: 'accordion' | 'accordion-array' } => ACCORDION_TYPES.has(f.type ?? ''))
+      .filter((f): f is Field & { type: 'accordion' | 'accordion-array' } =>
+        ACCORDION_TYPES.has(f.type ?? '')
+      )
       .map((f) => ({
         key: f.name,
         title: f.label,
         labelKey: f.itemLabelKey ?? 'name',
         itemEditConfig: f.itemEditConfig,
-        itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string }).itemEditEndpoint,
+        itemEditEndpoint: (f as Field & { itemEditEndpoint?: (data: any, item: any) => string })
+          .itemEditEndpoint,
         canEditItem: (f as Field & { canEditItem?: (data: any, item: any) => boolean }).canEditItem,
       }));
   }

@@ -176,7 +176,9 @@ export default function BlogListPage() {
   const [page, setPage] = useState(1);
 
   const params: Record<string, string | number> = { page, limit: PER_PAGE };
-  if (search) {params.search = search;}
+  if (search) {
+    params.search = search;
+  }
 
   const { data, isLoading, isFetching } = useArticles(params);
   const articles = data?.data ?? [];

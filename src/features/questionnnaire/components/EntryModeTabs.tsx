@@ -11,7 +11,9 @@ export function EntryModeTabs({ value, onChange }: Props) {
     <Tabs
       value={value}
       onChange={(v) => {
-        if (v) {onChange(v as EntryMode);}
+        if (v) {
+          onChange(v as EntryMode);
+        }
       }}
     >
       <Tabs.List grow>

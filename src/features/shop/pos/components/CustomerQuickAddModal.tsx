@@ -14,7 +14,9 @@ export function CustomerQuickAddModal({ opened, onClose, onCustomerCreated }: Pr
   const mutation = useCreateCustomer();
 
   async function handleSubmit() {
-    if (!name.trim()) {return;}
+    if (!name.trim()) {
+      return;
+    }
     const result = await mutation.mutateAsync({
       name: name.trim(),
       phone: phone.trim() || undefined,

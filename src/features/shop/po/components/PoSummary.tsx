@@ -68,7 +68,13 @@ export function PoSummary({
         </Group>
         <Group>
           {canReceive > 0 && !isReadOnly && status && status !== 'draft' && (
-            <Button size="xs" color="green" onClick={onReceiveAll} disabled={!receiptNumber} data-testid="po-receive-all-btn">
+            <Button
+              size="xs"
+              color="green"
+              onClick={onReceiveAll}
+              disabled={!receiptNumber}
+              data-testid="po-receive-all-btn"
+            >
               Receive All ({canReceive})
             </Button>
           )}

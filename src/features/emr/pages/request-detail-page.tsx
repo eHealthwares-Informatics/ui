@@ -27,12 +27,12 @@ import { useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
-import { CreateMedicationModal } from '../components/medications/create-medication-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
-import { PatientLink } from '../components/shared/patient-link';
-import { StatusBadge } from '../components/shared/status-badge';
+import { CreateMedicationModal } from '../components/medications/create-medication-modal';
 import { RequestNoteComposer } from '../components/requests/request-note-composer';
 import { StatusTimeline } from '../components/requests/status-timeline';
+import { PatientLink } from '../components/shared/patient-link';
+import { StatusBadge } from '../components/shared/status-badge';
 import { formatEnum } from '../lib/emr-constants';
 import { getApiErrorMessage } from '../lib/emr-errors';
 import type { FormSubmission, RequestDetail, RequestStatus } from '../lib/emr-types';
@@ -108,7 +108,13 @@ export function RequestDetailPage() {
   const [amendSubmission, setAmendSubmission] = useState<FormSubmission | null>(null);
   const [medicationOpened, { open: openMedication, close: closeMedication }] = useDisclosure(false);
 
-  const { data: request, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: request,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['emr', 'requests', requestId],
     queryFn: async () => {
       const { data } = await emrApi.get<RequestDetail>(`/requests/${requestId}`);
@@ -149,7 +155,7 @@ export function RequestDetailPage() {
       }
     }
     return [...byId.values()].sort((a, b) =>
-      (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''),
+      (b.submittedAt ?? '').localeCompare(a.submittedAt ?? '')
     );
   }, [encounterSubmissionsQuery.data, visitSubmissionsQuery.data]);
 
@@ -244,7 +250,10 @@ export function RequestDetailPage() {
 
   if (isLoading) {
     return (
-      <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Clinical Requests', href: '/emr/requests' }]} title="">
+      <RxPage
+        breadcrumbs={[{ label: 'EMR' }, { label: 'Clinical Requests', href: '/emr/requests' }]}
+        title=""
+      >
         <Stack gap="md">
           <Skeleton height={120} radius="md" />
           <Skeleton height={300} radius="md" />
@@ -297,42 +306,42 @@ export function RequestDetailPage() {
           )}
           {(canSync || availableTransitions.length > 0) && (
             <>
-            {canSync && (
-              <Group gap="sm">
-                {request.syncStatus === 'FAILED' && (
+              {canSync && (
+                <Group gap="sm">
+                  {request.syncStatus === 'FAILED' && (
+                    <Button
+                      size="sm"
+                      color="orange"
+                      leftSection={<Send size={14} />}
+                      loading={resendMutation.isPending}
+                      onClick={() => resendMutation.mutate()}
+                    >
+                      Resend
+                    </Button>
+                  )}
                   <Button
                     size="sm"
-                    color="orange"
-                    leftSection={<Send size={14} />}
-                    loading={resendMutation.isPending}
-                    onClick={() => resendMutation.mutate()}
+                    variant="light"
+                    leftSection={<RefreshCw size={14} />}
+                    loading={syncMutation.isPending}
+                    onClick={() => syncMutation.mutate()}
                   >
-                    Resend
+                    Re-sync
                   </Button>
-                )}
+                </Group>
+              )}
+              {availableTransitions.map((transition) => (
                 <Button
+                  key={transition.to}
                   size="sm"
-                  variant="light"
-                  leftSection={<RefreshCw size={14} />}
-                  loading={syncMutation.isPending}
-                  onClick={() => syncMutation.mutate()}
+                  color={transition.color}
+                  variant={transition.color === 'red' ? 'outline' : 'filled'}
+                  loading={transitionMutation.isPending}
+                  onClick={() => handleTransitionClick(transition)}
                 >
-                  Re-sync
+                  {transition.label}
                 </Button>
-              </Group>
-            )}
-            {availableTransitions.map((transition) => (
-              <Button
-                key={transition.to}
-                size="sm"
-                color={transition.color}
-                variant={transition.color === 'red' ? 'outline' : 'filled'}
-                loading={transitionMutation.isPending}
-                onClick={() => handleTransitionClick(transition)}
-              >
-                {transition.label}
-              </Button>
-            ))}
+              ))}
             </>
           )}
         </Group>
@@ -345,170 +354,183 @@ export function RequestDetailPage() {
         </Tabs.List>
 
         <Tabs.Panel value="details">
-      <Stack gap="lg">
-        {/* HEADER DETAILS */}
-        <Card withBorder radius="md" padding="lg">
-          <Group gap="xs" wrap="wrap" mb="md">
-            <Badge variant="light">{request.requestNumber}</Badge>
-            <StatusBadge value={request.status} kind="request" />
-            <StatusBadge value={request.priority} kind="priority" />
-            <Badge variant="light" color="grape">
-              {formatEnum(request.requestType)}
-            </Badge>
-            <StatusBadge value={request.syncStatus} kind="sync" />
-          </Group>
+          <Stack gap="lg">
+            {/* HEADER DETAILS */}
+            <Card withBorder radius="md" padding="lg">
+              <Group gap="xs" wrap="wrap" mb="md">
+                <Badge variant="light">{request.requestNumber}</Badge>
+                <StatusBadge value={request.status} kind="request" />
+                <StatusBadge value={request.priority} kind="priority" />
+                <Badge variant="light" color="grape">
+                  {formatEnum(request.requestType)}
+                </Badge>
+                <StatusBadge value={request.syncStatus} kind="sync" />
+              </Group>
 
-          <SimpleGrid cols={{ base: 2, sm: 3, lg: 6 }} spacing="md">
-            <DetailRow
-              label="Patient"
-              value={
-                <PatientLink mrn={request.patientId} label={request.patientName ?? undefined} />
-              }
-            />
-            <DetailRow label="MRN" value={request.patientId} />
-            {request.encounterId && (
-              <DetailRow
-                label="Encounter"
-                value={
-                  <Anchor
-                    component="button"
-                    type="button"
-                    size="sm"
-                    fw={500}
-                    onClick={() => void navigate({ to: `/emr/encounters/${request.encounterId}` })}
-                  >
-                    View encounter
-                  </Anchor>
-                }
-              />
-            )}
-            {request.visitId && (
-              <DetailRow
-                label="Visit"
-                value={
-                  <Anchor
-                    component="button"
-                    type="button"
-                    size="sm"
-                    fw={500}
-                    onClick={() => void navigate({ to: `/emr/visits/${request.visitId}` })}
-                  >
-                    View visit
-                  </Anchor>
-                }
-              />
-            )}
-            <DetailRow label="Ordering provider" value={request.orderingProviderName} />
-            <DetailRow
-              label="Requested"
-              value={request.requestedAt ? new Date(request.requestedAt).toLocaleString() : undefined}
-            />
-            <DetailRow
-              label="Completed"
-              value={request.completedAt ? new Date(request.completedAt).toLocaleString() : undefined}
-            />
-            {request.externalOrderId && (
-              <DetailRow label="External order ID" value={<CopyValue value={request.externalOrderId} />} />
-            )}
-            {request.externalReference && (
-              <DetailRow label="External reference" value={<CopyValue value={request.externalReference} />} />
-            )}
-            {request.sendAttemptCount > 0 && (
-              <DetailRow
-                label="Send attempts"
-                value={`${request.sendAttemptCount}${request.sentAt ? ` — last sent ${new Date(request.sentAt).toLocaleString()}` : ''}`}
-              />
-            )}
-            {request.lastSyncedAt && (
-              <DetailRow
-                label="Last synced"
-                value={new Date(request.lastSyncedAt).toLocaleString()}
-              />
-            )}
-          </SimpleGrid>
+              <SimpleGrid cols={{ base: 2, sm: 3, lg: 6 }} spacing="md">
+                <DetailRow
+                  label="Patient"
+                  value={
+                    <PatientLink mrn={request.patientId} label={request.patientName ?? undefined} />
+                  }
+                />
+                <DetailRow label="MRN" value={request.patientId} />
+                {request.encounterId && (
+                  <DetailRow
+                    label="Encounter"
+                    value={
+                      <Anchor
+                        component="button"
+                        type="button"
+                        size="sm"
+                        fw={500}
+                        onClick={() =>
+                          void navigate({ to: `/emr/encounters/${request.encounterId}` })
+                        }
+                      >
+                        View encounter
+                      </Anchor>
+                    }
+                  />
+                )}
+                {request.visitId && (
+                  <DetailRow
+                    label="Visit"
+                    value={
+                      <Anchor
+                        component="button"
+                        type="button"
+                        size="sm"
+                        fw={500}
+                        onClick={() => void navigate({ to: `/emr/visits/${request.visitId}` })}
+                      >
+                        View visit
+                      </Anchor>
+                    }
+                  />
+                )}
+                <DetailRow label="Ordering provider" value={request.orderingProviderName} />
+                <DetailRow
+                  label="Requested"
+                  value={
+                    request.requestedAt ? new Date(request.requestedAt).toLocaleString() : undefined
+                  }
+                />
+                <DetailRow
+                  label="Completed"
+                  value={
+                    request.completedAt ? new Date(request.completedAt).toLocaleString() : undefined
+                  }
+                />
+                {request.externalOrderId && (
+                  <DetailRow
+                    label="External order ID"
+                    value={<CopyValue value={request.externalOrderId} />}
+                  />
+                )}
+                {request.externalReference && (
+                  <DetailRow
+                    label="External reference"
+                    value={<CopyValue value={request.externalReference} />}
+                  />
+                )}
+                {request.sendAttemptCount > 0 && (
+                  <DetailRow
+                    label="Send attempts"
+                    value={`${request.sendAttemptCount}${request.sentAt ? ` — last sent ${new Date(request.sentAt).toLocaleString()}` : ''}`}
+                  />
+                )}
+                {request.lastSyncedAt && (
+                  <DetailRow
+                    label="Last synced"
+                    value={new Date(request.lastSyncedAt).toLocaleString()}
+                  />
+                )}
+              </SimpleGrid>
 
-          {request.diagnosis && (
-            <Stack gap={2} mt="md">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-                Diagnosis
-              </Text>
-              <Text size="sm">{request.diagnosis}</Text>
-            </Stack>
-          )}
-          {request.clinicalNotes && (
-            <Stack gap={2} mt="md">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-                Clinical notes
-              </Text>
-              <Text size="sm">{request.clinicalNotes}</Text>
-            </Stack>
-          )}
-        </Card>
-
-        {/* STATUS TIMELINE */}
-        <Card withBorder radius="md" padding="lg">
-          <Group justify="space-between" mb="sm">
-            <Title order={4}>Activity</Title>
-            <Text size="xs" c="dimmed">
-              {request.statusHistory.length} event{request.statusHistory.length === 1 ? '' : 's'}
-            </Text>
-          </Group>
-          <StatusTimeline history={request.statusHistory} />
-          <RequestNoteComposer requestId={request.id} />
-        </Card>
-
-        {/* LINE ITEMS */}
-        <Card withBorder radius="md" padding="lg">
-          <Group justify="space-between" mb="sm">
-            <Title order={4}>Line Items ({request.items.length})</Title>
-            {request.syncError && (
-              <Text size="xs" c="red">
-                Sync error: {request.syncError}
-              </Text>
-            )}
-          </Group>
-          <Table striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>#</Table.Th>
-                <Table.Th>Item</Table.Th>
-                <Table.Th>Code</Table.Th>
-                <Table.Th>Dose</Table.Th>
-                <Table.Th>Frequency</Table.Th>
-                <Table.Th>Route</Table.Th>
-                <Table.Th>Qty</Table.Th>
-                <Table.Th>Instructions</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {request.items.length === 0 ? (
-                <Table.Tr>
-                  <Table.Td colSpan={8}>No line items.</Table.Td>
-                </Table.Tr>
-              ) : (
-                request.items.map((item, index) => (
-                  <Table.Tr key={item.id ?? index}>
-                    <Table.Td>{index + 1}</Table.Td>
-                    <Table.Td>
-                      <Text size="sm" fw={500}>
-                        {item.name}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>{item.code ?? '—'}</Table.Td>
-                    <Table.Td>
-                      {[item.dose, item.doseUnit].filter(Boolean).join(' ') || '—'}
-                    </Table.Td>
-                    <Table.Td>{item.frequency ?? '—'}</Table.Td>
-                    <Table.Td>{item.route ?? '—'}</Table.Td>
-                    <Table.Td>{item.quantity ?? '—'}</Table.Td>
-                    <Table.Td>{item.instructions ?? '—'}</Table.Td>
-                  </Table.Tr>
-                ))
+              {request.diagnosis && (
+                <Stack gap={2} mt="md">
+                  <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+                    Diagnosis
+                  </Text>
+                  <Text size="sm">{request.diagnosis}</Text>
+                </Stack>
               )}
-            </Table.Tbody>
-          </Table>
-        </Card>
-      </Stack>
+              {request.clinicalNotes && (
+                <Stack gap={2} mt="md">
+                  <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+                    Clinical notes
+                  </Text>
+                  <Text size="sm">{request.clinicalNotes}</Text>
+                </Stack>
+              )}
+            </Card>
+
+            {/* STATUS TIMELINE */}
+            <Card withBorder radius="md" padding="lg">
+              <Group justify="space-between" mb="sm">
+                <Title order={4}>Activity</Title>
+                <Text size="xs" c="dimmed">
+                  {request.statusHistory.length} event
+                  {request.statusHistory.length === 1 ? '' : 's'}
+                </Text>
+              </Group>
+              <StatusTimeline history={request.statusHistory} />
+              <RequestNoteComposer requestId={request.id} />
+            </Card>
+
+            {/* LINE ITEMS */}
+            <Card withBorder radius="md" padding="lg">
+              <Group justify="space-between" mb="sm">
+                <Title order={4}>Line Items ({request.items.length})</Title>
+                {request.syncError && (
+                  <Text size="xs" c="red">
+                    Sync error: {request.syncError}
+                  </Text>
+                )}
+              </Group>
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>#</Table.Th>
+                    <Table.Th>Item</Table.Th>
+                    <Table.Th>Code</Table.Th>
+                    <Table.Th>Dose</Table.Th>
+                    <Table.Th>Frequency</Table.Th>
+                    <Table.Th>Route</Table.Th>
+                    <Table.Th>Qty</Table.Th>
+                    <Table.Th>Instructions</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {request.items.length === 0 ? (
+                    <Table.Tr>
+                      <Table.Td colSpan={8}>No line items.</Table.Td>
+                    </Table.Tr>
+                  ) : (
+                    request.items.map((item, index) => (
+                      <Table.Tr key={item.id ?? index}>
+                        <Table.Td>{index + 1}</Table.Td>
+                        <Table.Td>
+                          <Text size="sm" fw={500}>
+                            {item.name}
+                          </Text>
+                        </Table.Td>
+                        <Table.Td>{item.code ?? '—'}</Table.Td>
+                        <Table.Td>
+                          {[item.dose, item.doseUnit].filter(Boolean).join(' ') || '—'}
+                        </Table.Td>
+                        <Table.Td>{item.frequency ?? '—'}</Table.Td>
+                        <Table.Td>{item.route ?? '—'}</Table.Td>
+                        <Table.Td>{item.quantity ?? '—'}</Table.Td>
+                        <Table.Td>{item.instructions ?? '—'}</Table.Td>
+                      </Table.Tr>
+                    ))
+                  )}
+                </Table.Tbody>
+              </Table>
+            </Card>
+          </Stack>
         </Tabs.Panel>
 
         <Tabs.Panel value="documentation">

@@ -109,7 +109,7 @@ export const BROADCAST_STATUS_OPTIONS = [
 ].map((value) => ({ value, label: value }));
 
 export const PROJECTION_ROLE_OPTIONS = ['USER', 'PATIENT', 'DOCTOR', 'NURSE', 'BOT'].map(
-  (value) => ({ value, label: value }),
+  (value) => ({ value, label: value })
 );
 
 export const PROJECTION_STATUS_OPTIONS = ['ACTIVE', 'PAUSED', 'ENDED'].map((value) => ({

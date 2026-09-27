@@ -33,8 +33,12 @@ const columns: Column[] = [
 ];
 
 function coerceJson(value: unknown): Record<string, unknown> | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  if (typeof value === 'object') return value as Record<string, unknown>;
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (typeof value === 'object') {
+    return value as Record<string, unknown>;
+  }
   try {
     return JSON.parse(String(value));
   } catch {
@@ -53,9 +57,22 @@ const createFields: Field[] = [
     options: providerTypeOptions,
     col: 6,
   },
-  { name: 'channel', label: 'Channel', required: true, type: 'select', options: channelOptions, col: 6 },
+  {
+    name: 'channel',
+    label: 'Channel',
+    required: true,
+    type: 'select',
+    options: channelOptions,
+    col: 6,
+  },
   { name: 'description', label: 'Description', col: 12 },
-  { name: 'production', label: 'Use Live credentials', type: 'switch', defaultValue: false, col: 6 },
+  {
+    name: 'production',
+    label: 'Use Live credentials',
+    type: 'switch',
+    defaultValue: false,
+    col: 6,
+  },
   { name: 'isActive', label: 'Active', type: 'switch', defaultValue: true, col: 6 },
   { name: 'testConfig', label: 'Test Credentials (JSON)', type: 'json', col: 12 },
   { name: 'liveConfig', label: 'Live Credentials (JSON)', type: 'json', col: 12 },
@@ -77,8 +94,12 @@ function buildCreatePayload(values: Record<string, unknown>) {
 
 function buildUpdatePayload(values: Record<string, unknown>): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
-  if (values.name !== undefined) { payload.name = values.name; }
-  if (values.code !== undefined) { payload.code = values.code; }
+  if (values.name !== undefined) {
+    payload.name = values.name;
+  }
+  if (values.code !== undefined) {
+    payload.code = values.code;
+  }
   if (values.providerType !== undefined) {
     payload.providerType = (values.providerType as any)?.value ?? values.providerType;
   }
@@ -88,22 +109,34 @@ function buildUpdatePayload(values: Record<string, unknown>): Record<string, unk
   if (values.description !== undefined) {
     payload.description = (values.description as string) || undefined;
   }
-  if (values.production !== undefined) { payload.production = values.production; }
-  if (values.isActive !== undefined) { payload.isActive = values.isActive; }
+  if (values.production !== undefined) {
+    payload.production = values.production;
+  }
+  if (values.isActive !== undefined) {
+    payload.isActive = values.isActive;
+  }
   if (values.testConfig !== undefined) {
     const cfg = coerceJson(values.testConfig);
-    if (cfg) { payload.testConfig = cfg; }
+    if (cfg) {
+      payload.testConfig = cfg;
+    }
   }
   if (values.liveConfig !== undefined) {
     const cfg = coerceJson(values.liveConfig);
-    if (cfg) { payload.liveConfig = cfg; }
+    if (cfg) {
+      payload.liveConfig = cfg;
+    }
   }
   return payload;
 }
 
 function stringifyJson(value: unknown): string {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
+  if (value == null) {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
   try {
     return JSON.stringify(value, null, 2);
   } catch {
@@ -124,7 +157,8 @@ function buildFormState(row: Record<string, unknown>): Record<string, unknown> {
 export const paymentProvidersConfig: ModelConfig = {
   id: 'payment-providers',
   title: 'Payment Providers',
-  description: 'Gateway providers (Paystack, Monnify, OPay, Moniepoint) with test & live credentials stored in the database.',
+  description:
+    'Gateway providers (Paystack, Monnify, OPay, Moniepoint) with test & live credentials stored in the database.',
   endpoint: '/payment-providers',
   columns,
   createFields,

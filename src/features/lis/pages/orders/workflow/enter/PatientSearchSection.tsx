@@ -28,23 +28,31 @@ interface Patient {
 }
 
 const parseDate = (s: string | null | undefined): Date | null => {
-  if (!s) return null;
+  if (!s) {
+    return null;
+  }
   const d = new Date(s);
   return isNaN(d.getTime()) ? null : d;
 };
 
 const ageFromDob = (dob: string | null | undefined): number | null => {
   const birth = parseDate(dob);
-  if (!birth) return null;
+  if (!birth) {
+    return null;
+  }
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
   const m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
+    age--;
+  }
   return age;
 };
 
 const dobFromAge = (age: number): string | null => {
-  if (!Number.isFinite(age) || age < 0) return null;
+  if (!Number.isFinite(age) || age < 0) {
+    return null;
+  }
   return `${new Date().getFullYear() - age}-01-01`;
 };
 

@@ -197,11 +197,7 @@ export function FormsPage() {
         </Card>
       </Stack>
 
-      <FormBuilderModal
-        opened={builderOpened}
-        onClose={closeBuilder}
-        initial={editing}
-      />
+      <FormBuilderModal opened={builderOpened} onClose={closeBuilder} initial={editing} />
     </RxPage>
   );
 }

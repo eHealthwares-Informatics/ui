@@ -18,19 +18,36 @@ export function ReceiptDetailModal({
   const [unpostLineId, setUnpostLineId] = useState<string | null>(null);
 
   function handleUnpost() {
-    if (!unpostLineId || !password) {return;}
+    if (!unpostLineId || !password) {
+      return;
+    }
     onUnpost(unpostLineId, password);
     setUnpostLineId(null);
     setPassword('');
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title={`Receipt #${receipt?.receiptNumber ?? ''}`} size="lg" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={`Receipt #${receipt?.receiptNumber ?? ''}`}
+      size="lg"
+      centered
+    >
       <Stack>
         <Group>
-          <Text size="sm"><b>PO:</b> {receipt?.purchaseOrder?.purchaseOrderNumber ?? receipt?.purchaseOrderId}</Text>
-          <Text size="sm"><b>Date:</b> {receipt?.receivedDate ? new Date(receipt.receivedDate).toLocaleDateString() : '-'}</Text>
-          {receipt?.note && <Text size="sm"><b>Note:</b> {receipt.note}</Text>}
+          <Text size="sm">
+            <b>PO:</b> {receipt?.purchaseOrder?.purchaseOrderNumber ?? receipt?.purchaseOrderId}
+          </Text>
+          <Text size="sm">
+            <b>Date:</b>{' '}
+            {receipt?.receivedDate ? new Date(receipt.receivedDate).toLocaleDateString() : '-'}
+          </Text>
+          {receipt?.note && (
+            <Text size="sm">
+              <b>Note:</b> {receipt.note}
+            </Text>
+          )}
         </Group>
 
         <Table striped withTableBorder withColumnBorders>
@@ -63,7 +80,9 @@ export function ReceiptDetailModal({
                 <Table.Td>
                   {!l.isUnposted && (
                     <Button
-                      size="compact-xs" variant="light" color="orange"
+                      size="compact-xs"
+                      variant="light"
+                      color="orange"
                       onClick={() => setUnpostLineId(l.id)}
                       loading={isUnposting && unpostLineId === l.id}
                     >
@@ -92,7 +111,13 @@ export function ReceiptDetailModal({
             >
               Confirm Unpost
             </Button>
-            <Button variant="light" onClick={() => { setUnpostLineId(null); setPassword(''); }}>
+            <Button
+              variant="light"
+              onClick={() => {
+                setUnpostLineId(null);
+                setPassword('');
+              }}
+            >
               Cancel
             </Button>
           </Group>

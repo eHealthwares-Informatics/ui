@@ -51,10 +51,9 @@ export function LoincTestSearch({
   const { data = [], isLoading } = useQuery({
     queryKey: ['emr', 'loinc-tests', debounced, limit],
     queryFn: async () => {
-      const res = await lisApi.get<{ data: Array<Record<string, unknown>> }>(
-        '/lis/loinc',
-        { params: { search: debounced || undefined, limit, page: 1 } },
-      );
+      const res = await lisApi.get<{ data: Array<Record<string, unknown>> }>('/lis/loinc', {
+        params: { search: debounced || undefined, limit, page: 1 },
+      });
       return ((res.data?.data ?? []) as Array<Record<string, unknown>>)
         .map((row) => ({
           id: String(row.id),
@@ -129,12 +128,7 @@ export function LoincTestSearch({
                   <Text size="sm" truncate>
                     {displayFor(test)}
                   </Text>
-                  <Badge
-                    size="xs"
-                    variant="light"
-                    color="teal"
-                    style={{ flexShrink: 0 }}
-                  >
+                  <Badge size="xs" variant="light" color="teal" style={{ flexShrink: 0 }}>
                     {test.system ?? 'LOINC'}
                   </Badge>
                 </Group>

@@ -71,7 +71,9 @@ export const usePosStore = create<PosStore>()(
 
       closeSession: (id) =>
         set((state) => {
-          if (state.sessions.length <= 1) return state;
+          if (state.sessions.length <= 1) {
+            return state;
+          }
           const filtered = state.sessions.filter((s) => s.id !== id);
           return {
             sessions: filtered,
@@ -83,7 +85,9 @@ export const usePosStore = create<PosStore>()(
       addItem: (sessionId, item) =>
         set((state) => ({
           sessions: state.sessions.map((session) => {
-            if (session.id !== sessionId) {return session;}
+            if (session.id !== sessionId) {
+              return session;
+            }
             const existing = session.cart.find((i) => i.code === item.code);
             if (existing) {
               existing.quantity += item.quantity;
@@ -103,7 +107,9 @@ export const usePosStore = create<PosStore>()(
       addItems: (sessionId, items) =>
         set((state) => ({
           sessions: state.sessions.map((session) => {
-            if (session.id !== sessionId) {return session;}
+            if (session.id !== sessionId) {
+              return session;
+            }
             const cart = [...session.cart];
             for (const item of items) {
               if (item.orderItemId) {

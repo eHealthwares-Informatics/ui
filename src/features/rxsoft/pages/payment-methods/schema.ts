@@ -19,7 +19,13 @@ const columns: Column[] = [
 const createFields: Field[] = [
   { name: 'code', label: 'Code', required: true },
   { name: 'name', label: 'Name', required: true },
-  { name: 'methodType', label: 'Method Type', required: true, type: 'select', options: methodTypeOptions },
+  {
+    name: 'methodType',
+    label: 'Method Type',
+    required: true,
+    type: 'select',
+    options: methodTypeOptions,
+  },
   { name: 'isActive', label: 'Active', type: 'switch', defaultValue: true },
 ];
 

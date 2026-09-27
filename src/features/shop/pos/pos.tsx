@@ -1,5 +1,12 @@
 import { Box, Grid, Paper, Stack } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCompleteDispense,
+  useOrganisationConfig,
+  useOrderDetail,
+  useUserPosConfig,
+  useStockLocations,
+} from '../api/posApi';
 import { CartTable } from './components/CartTable';
 import { HeldSalesDrawer } from './components/HeldSalesDrawer';
 import { InvoicePreviewModal } from './components/InvoicePreviewModal';
@@ -14,7 +21,6 @@ import type { Customer, DispenseRow } from './types';
 import { calculateTotals } from './utils/calculation';
 import { printPosReceipt, printA4Receipt, printInvoice } from './utils/print';
 import { useKeyboardShortcuts } from './utils/useKeyboardShortcuts';
-import { useCompleteDispense, useOrganisationConfig, useOrderDetail, useUserPosConfig, useStockLocations } from '../api/posApi';
 
 export default function PosSalesPage() {
   const {
@@ -73,8 +79,12 @@ export default function PosSalesPage() {
   }, [dispenseOrder]);
 
   const stockLocationName = useMemo(() => {
-    if (!stockLocationId) {return undefined;}
-    const loc = (Array.isArray(stockLocations) ? stockLocations : []).find((l: any) => l.id === stockLocationId);
+    if (!stockLocationId) {
+      return undefined;
+    }
+    const loc = (Array.isArray(stockLocations) ? stockLocations : []).find(
+      (l: any) => l.id === stockLocationId
+    );
     return loc?.name;
   }, [stockLocationId, stockLocations]);
 
@@ -84,38 +94,53 @@ export default function PosSalesPage() {
   );
 
   const totals = useMemo(() => {
-    if (!activeSession) {return { subtotal: 0, discount: 0, vat: 0, total: 0 };}
+    if (!activeSession) {
+      return { subtotal: 0, discount: 0, vat: 0, total: 0 };
+    }
     return calculateTotals(activeSession);
   }, [activeSession]);
 
-  const heldSalesCount = useMemo(
-    () => sessions.filter((s) => s.held).length,
-    [sessions]
-  );
+  const heldSalesCount = useMemo(() => sessions.filter((s) => s.held).length, [sessions]);
 
   useKeyboardShortcuts({
     createSale: createSession,
     holdSale: () => {
-      if (activeSession) {holdSale(activeSession.id);}
+      if (activeSession) {
+        holdSale(activeSession.id);
+      }
     },
     payment: () => setPaymentOpened(true),
   });
 
   useEffect(() => {
-    if (!userPosConfig || !activeSession) {return;}
-    if (defaultsAppliedForSessions.current.has(activeSession.id)) {return;}
+    if (!userPosConfig || !activeSession) {
+      return;
+    }
+    if (defaultsAppliedForSessions.current.has(activeSession.id)) {
+      return;
+    }
     defaultsAppliedForSessions.current.add(activeSession.id);
 
-    if (userPosConfig.autoSelectPriceList && userPosConfig.defaultPriceListId && !activeSession.priceListId) {
+    if (
+      userPosConfig.autoSelectPriceList &&
+      userPosConfig.defaultPriceListId &&
+      !activeSession.priceListId
+    ) {
       setPriceList(activeSession.id, userPosConfig.defaultPriceListId, '');
     }
 
-    if (userPosConfig.autoSelectCustomer && userPosConfig.defaultCustomerId && !activeSession.customerId) {
+    if (
+      userPosConfig.autoSelectCustomer &&
+      userPosConfig.defaultCustomerId &&
+      !activeSession.customerId
+    ) {
       setCustomer(activeSession.id, { id: userPosConfig.defaultCustomerId, name: '' });
     }
   }, [userPosConfig, activeSession.id]);
 
-  if (!activeSession) {return null;}
+  if (!activeSession) {
+    return null;
+  }
 
   function handleCustomerChange(customerId: string, customerName: string) {
     setCustomer(activeSession.id, { id: customerId, name: customerName } as Customer);
@@ -130,7 +155,7 @@ export default function PosSalesPage() {
   }
 
   function resetSession() {
-          createSession();
+    createSession();
     setDispenseOrderId(null);
   }
   function nextCustomer() {
@@ -189,7 +214,8 @@ export default function PosSalesPage() {
 
     if (printMode === 'print') {
       const items = activeSession.cart.map((item) => {
-        const price = activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+        const price =
+          activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
         return {
           code: item.code,
           name: item.name,
@@ -212,7 +238,8 @@ export default function PosSalesPage() {
       });
     } else if (printMode === 'print_wholesale') {
       const items = activeSession.cart.map((item) => {
-        const price = activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+        const price =
+          activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
         return {
           code: item.code,
           name: item.name,
@@ -238,7 +265,9 @@ export default function PosSalesPage() {
 
   function handlePrintHeldInvoice(sessionId: string) {
     const sale = sessions.find((s) => s.id === sessionId);
-    if (!sale || sale.cart.length === 0) {return;}
+    if (!sale || sale.cart.length === 0) {
+      return;
+    }
 
     const subtotal = sale.cart.reduce((sum, item) => {
       const price = sale.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
@@ -300,17 +329,16 @@ export default function PosSalesPage() {
           {/* PRODUCT ENTRY (dispense mode shows order lines as editable rows) */}
           {activeSession.status !== 'completed' && (
             <ProductEntryTable
-            session={activeSession}
-            onAddToCart={(item) => addItem(activeSession.id, item)}
-            stockLocationId={stockLocationId}
-            dispenseRows={dispenseOrderId ? dispenseRows : undefined}
-            dispenseKey={dispenseOrderId}
-            onDispenseAdd={
-              dispenseOrderId
-                ? (item) => addItems(activeSession.id, [item])
-                : undefined
-            }
-          />)}
+              session={activeSession}
+              onAddToCart={(item) => addItem(activeSession.id, item)}
+              stockLocationId={stockLocationId}
+              dispenseRows={dispenseOrderId ? dispenseRows : undefined}
+              dispenseKey={dispenseOrderId}
+              onDispenseAdd={
+                dispenseOrderId ? (item) => addItems(activeSession.id, [item]) : undefined
+              }
+            />
+          )}
 
           {/* MAIN AREA */}
           <Grid flex={1} gap={0}>

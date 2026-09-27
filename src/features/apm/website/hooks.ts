@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { apmApi } from './api';
 import type {
   VolunteerPayload,
@@ -10,7 +11,6 @@ import type {
   IssueReportPayload,
   DonationPayload,
 } from './types';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 // ── Homepage ─────────────────────────────────────────────────
 
@@ -102,10 +102,7 @@ export function useTestimonials() {
 
 // ── Mutations ────────────────────────────────────────────────
 
-function useSimpleMutation<T>(
-  fn: (data: T) => Promise<unknown>,
-  successMessage: string,
-) {
+function useSimpleMutation<T>(fn: (data: T) => Promise<unknown>, successMessage: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: fn,
@@ -126,36 +123,35 @@ function useSimpleMutation<T>(
 export function useRegisterVolunteer() {
   return useSimpleMutation<VolunteerPayload>(
     (data) => apmApi.registerVolunteer(data),
-    'Thank you for volunteering! We will contact you soon.',
+    'Thank you for volunteering! We will contact you soon.'
   );
 }
 
 export function useJoinMovement() {
   return useSimpleMutation<JoinMovementPayload>(
     (data) => apmApi.joinMovement(data),
-    'Welcome to the movement! Together we can build a better Oyo State.',
+    'Welcome to the movement! Together we can build a better Oyo State.'
   );
 }
 
 export function useSubmitContact() {
   return useSimpleMutation<ContactPayload>(
     (data) => apmApi.submitContact(data),
-    'Message sent successfully! We will respond shortly.',
+    'Message sent successfully! We will respond shortly.'
   );
 }
 
 export function useRegisterForEvent(eventId: string) {
   return useSimpleMutation<EventRegistrationPayload>(
     (data) => apmApi.registerForEvent(eventId, data),
-    'Registration confirmed!',
+    'Registration confirmed!'
   );
 }
 
 export function useSubscribeNewsletter() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { email: string; phone?: string }) =>
-      apmApi.subscribeNewsletter(data),
+    mutationFn: (data: { email: string; phone?: string }) => apmApi.subscribeNewsletter(data),
     onSuccess: () => {
       notifications.show({
         title: 'Subscribed!',
@@ -177,20 +173,20 @@ export function useSubscribeNewsletter() {
 export function useSubmitFeedback() {
   return useSimpleMutation<CitizenFeedbackPayload>(
     (data) => apmApi.submitFeedback(data),
-    'Thank you for your feedback!',
+    'Thank you for your feedback!'
   );
 }
 
 export function useReportIssue() {
   return useSimpleMutation<IssueReportPayload>(
     (data) => apmApi.reportIssue(data),
-    'Issue reported successfully.',
+    'Issue reported successfully.'
   );
 }
 
 export function useDonate() {
   return useSimpleMutation<DonationPayload>(
     (data) => apmApi.donate(data),
-    'Thank you for your donation!',
+    'Thank you for your donation!'
   );
 }

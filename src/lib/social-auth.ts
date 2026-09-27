@@ -8,11 +8,9 @@
  * exchanged for the app's own JWT pair. No redirect/fragment handling needed.
  */
 
-export const GOOGLE_CLIENT_ID =
-  (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) ?? '';
+export const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) ?? '';
 
-export const FACEBOOK_APP_ID =
-  (import.meta.env.VITE_FACEBOOK_APP_ID as string | undefined) ?? '';
+export const FACEBOOK_APP_ID = (import.meta.env.VITE_FACEBOOK_APP_ID as string | undefined) ?? '';
 
 type GoogleTokenClient = {
   requestAccessToken: (opts?: { prompt?: string }) => void;
@@ -42,12 +40,11 @@ type FacebookGlobal = {
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${src}"]`,
-    );
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
     if (existing) {
-      if (existing.dataset.loaded === 'true') resolve();
-      else {
+      if (existing.dataset.loaded === 'true') {
+        resolve();
+      } else {
         existing.addEventListener('load', () => resolve());
         existing.addEventListener('error', () => reject(new Error('Failed to load OAuth SDK')));
       }
@@ -137,10 +134,9 @@ export async function facebookLogin(): Promise<string | null> {
           resolve(token);
           return;
         }
-        FB.login(
-          (loginResponse) => resolve(extract(loginResponse)),
-          { scope: 'public_profile,email' },
-        );
+        FB.login((loginResponse) => resolve(extract(loginResponse)), {
+          scope: 'public_profile,email',
+        });
       });
     } catch (error) {
       reject(error instanceof Error ? error : new Error('Facebook sign-in failed'));

@@ -4,7 +4,9 @@ import { useOrderContext } from './OrderContext';
 export function OrderContextCard() {
   const { state } = useOrderContext();
 
-  if (!state.orderNumber && !state.patientName) return null;
+  if (!state.orderNumber && !state.patientName) {
+    return null;
+  }
 
   const completedSteps = [
     state.stepProgress.enter,

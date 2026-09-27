@@ -180,6 +180,6 @@ export const useAuthStore = create<AuthState>()(
         await pending;
       },
     }),
-    { name: 'rxsoft-admin-auth' },
-  ),
+    { name: 'rxsoft-admin-auth' }
+  )
 );

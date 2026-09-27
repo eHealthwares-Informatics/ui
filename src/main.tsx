@@ -7,12 +7,12 @@ import '@mantine/charts/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
+import * as Sentry from '@sentry/react';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import axios, { AxiosError } from 'axios';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import * as Sentry from '@sentry/react';
 import { handleServerError } from '@/lib/handle-server-error';
 import { getDefaultRoute } from '@/lib/subdomain';
 import { useAuthStore } from '@/stores/auth-store';
@@ -27,26 +27,23 @@ import { routeTree } from './routeTree.gen';
 // import './styles/tailwind-fallback.css'
 
 Sentry.init({
-   dsn: "https://5eab9ae2db7f91247e0cc2e33f9b3cab@o4511611278000128.ingest.us.sentry.io/4511611282259968",
+  dsn: 'https://5eab9ae2db7f91247e0cc2e33f9b3cab@o4511611278000128.ingest.us.sentry.io/4511611282259968',
   dataCollection: {
     // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/options/#dataCollection
     // userInfo: false,
     // httpBodies: []
   },
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration()
-  ],
+  integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
   // Tracing
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-  tracePropagationTargets: ["localhost", /^https:\/\/yourserver\.io\/api/],
+  tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
   // Session Replay
   replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
   replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.,
   // Enable logs to be sent to Sentry
-  enableLogs: true
+  enableLogs: true,
 });
 
 const queryClient = new QueryClient({
@@ -54,10 +51,16 @@ const queryClient = new QueryClient({
     queries: {
       retry: (failureCount, error) => {
         // eslint-disable-next-line no-console
-        if (import.meta.env.DEV) {console.log({ failureCount, error });}
+        if (import.meta.env.DEV) {
+          console.log({ failureCount, error });
+        }
 
-        if (failureCount >= 0 && import.meta.env.DEV) {return false;}
-        if (failureCount > 3 && import.meta.env.PROD) {return false;}
+        if (failureCount >= 0 && import.meta.env.DEV) {
+          return false;
+        }
+        if (failureCount > 3 && import.meta.env.PROD) {
+          return false;
+        }
 
         return !(error instanceof AxiosError && [401, 403].includes(error.response?.status ?? 0));
       },

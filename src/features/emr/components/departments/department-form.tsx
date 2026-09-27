@@ -16,7 +16,13 @@ import { DEPARTMENT_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import { LocationPicker } from '../shared/location-picker';
 
-export function DepartmentForm({ onCreated, onClose }: { onCreated?: (created?: Record<string, unknown>) => void; onClose: () => void }) {
+export function DepartmentForm({
+  onCreated,
+  onClose,
+}: {
+  onCreated?: (created?: Record<string, unknown>) => void;
+  onClose: () => void;
+}) {
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -61,7 +67,12 @@ export function DepartmentForm({ onCreated, onClose }: { onCreated?: (created?: 
     <form onSubmit={form.onSubmit((values) => mutation.mutate(values))}>
       <Stack gap="sm">
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <TextInput label="Code" required placeholder="e.g. CARDIOLOGY" {...form.getInputProps('code')} />
+          <TextInput
+            label="Code"
+            required
+            placeholder="e.g. CARDIOLOGY"
+            {...form.getInputProps('code')}
+          />
           <Select
             label="Type"
             required
@@ -71,7 +82,12 @@ export function DepartmentForm({ onCreated, onClose }: { onCreated?: (created?: 
           />
         </SimpleGrid>
 
-        <TextInput label="Name" required placeholder="e.g. Cardiology Department" {...form.getInputProps('name')} />
+        <TextInput
+          label="Name"
+          required
+          placeholder="e.g. Cardiology Department"
+          {...form.getInputProps('name')}
+        />
 
         <Textarea
           label="Description"

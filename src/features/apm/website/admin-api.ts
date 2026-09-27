@@ -39,10 +39,21 @@ import type {
   CreateRapidResponsePayload,
 } from './admin-types';
 import type {
-  PollingAgent, AgentStats, CreateAgentPayload, UpdateAgentPayload,
-  ResultEntry, ResultDashboard, CreateResultPayload,
-  IncidentReport, IncidentStats, CreateIncidentPayload, UpdateIncidentPayload,
-  GotvRecord, GotvStats, CreateGotvPayload, UpdateGotvPayload,
+  PollingAgent,
+  AgentStats,
+  CreateAgentPayload,
+  UpdateAgentPayload,
+  ResultEntry,
+  ResultDashboard,
+  CreateResultPayload,
+  IncidentReport,
+  IncidentStats,
+  CreateIncidentPayload,
+  UpdateIncidentPayload,
+  GotvRecord,
+  GotvStats,
+  CreateGotvPayload,
+  UpdateGotvPayload,
 } from './admin-types';
 import type { Stakeholder as StakeholderFull } from './admin-types';
 import type { PaginatedResponse } from './types';
@@ -78,8 +89,11 @@ export const apmAdminApi = {
   getWardPollingUnits: (wardId: string) =>
     rxsoftApi.get<PollingUnit[]>(`/apm/conversion/polling-units/${wardId}`).then((r) => r.data),
 
-  updateConversionScore: (entityType: string, entityId: string, data: UpdateConversionScorePayload) =>
-    rxsoftApi.put(`/apm/conversion/score/${entityType}/${entityId}`, data).then((r) => r.data),
+  updateConversionScore: (
+    entityType: string,
+    entityId: string,
+    data: UpdateConversionScorePayload
+  ) => rxsoftApi.put(`/apm/conversion/score/${entityType}/${entityId}`, data).then((r) => r.data),
 
   updatePollingUnit: (id: string, data: UpdatePollingUnitPayload) =>
     rxsoftApi.put(`/apm/conversion/polling-units/${id}`, data).then((r) => r.data),
@@ -87,10 +101,14 @@ export const apmAdminApi = {
   // ── Stakeholders ──────────────────────────────────────────
 
   listStakeholders: (params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<Stakeholder>>('/apm/stakeholders', { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<Stakeholder>>('/apm/stakeholders', { params })
+      .then((r) => r.data),
 
   listStakeholdersByLga: (lgaId: string, params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<Stakeholder>>(`/apm/stakeholders/lga/${lgaId}`, { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<Stakeholder>>(`/apm/stakeholders/lga/${lgaId}`, { params })
+      .then((r) => r.data),
 
   getStakeholder: (id: string) =>
     rxsoftApi.get<StakeholderFull>(`/apm/stakeholders/${id}`).then((r) => r.data),
@@ -112,7 +130,9 @@ export const apmAdminApi = {
   // ── WhatsApp Groups ───────────────────────────────────────
 
   listWhatsAppGroups: (level?: string) =>
-    rxsoftApi.get<WhatsAppGroup[]>('/apm/whatsapp/groups', { params: { level } }).then((r) => r.data),
+    rxsoftApi
+      .get<WhatsAppGroup[]>('/apm/whatsapp/groups', { params: { level } })
+      .then((r) => r.data),
 
   createWhatsAppGroup: (data: CreateWhatsAppGroupPayload) =>
     rxsoftApi.post('/apm/whatsapp/groups', data).then((r) => r.data),
@@ -123,7 +143,9 @@ export const apmAdminApi = {
     rxsoftApi.get<CanvassingStats>('/apm/canvassing/stats').then((r) => r.data),
 
   listCanvassingSessions: (params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<CanvassingSession>>('/apm/canvassing/sessions', { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<CanvassingSession>>('/apm/canvassing/sessions', { params })
+      .then((r) => r.data),
 
   getCanvassingSession: (id: string) =>
     rxsoftApi.get<CanvassingSession>(`/apm/canvassing/sessions/${id}`).then((r) => r.data),
@@ -135,10 +157,14 @@ export const apmAdminApi = {
     rxsoftApi.put(`/apm/canvassing/sessions/${id}`, data).then((r) => r.data),
 
   listSessionVisits: (sessionId: string) =>
-    rxsoftApi.get<CanvassingVisit[]>(`/apm/canvassing/sessions/${sessionId}/visits`).then((r) => r.data),
+    rxsoftApi
+      .get<CanvassingVisit[]>(`/apm/canvassing/sessions/${sessionId}/visits`)
+      .then((r) => r.data),
 
   getSessionVisitStats: (sessionId: string) =>
-    rxsoftApi.get<VisitStats>(`/apm/canvassing/sessions/${sessionId}/visit-stats`).then((r) => r.data),
+    rxsoftApi
+      .get<VisitStats>(`/apm/canvassing/sessions/${sessionId}/visit-stats`)
+      .then((r) => r.data),
 
   addSessionVisit: (sessionId: string, data: CreateCanvassingVisitPayload) =>
     rxsoftApi.post(`/apm/canvassing/sessions/${sessionId}/visits`, data).then((r) => r.data),
@@ -154,10 +180,14 @@ export const apmAdminApi = {
   // ── Volunteer Assignments ─────────────────────────────────
 
   listVolunteerAssignments: (params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<VolunteerAssignment>>('/apm/volunteer-assignments', { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<VolunteerAssignment>>('/apm/volunteer-assignments', { params })
+      .then((r) => r.data),
 
   listAssignmentsByWard: (wardId: string) =>
-    rxsoftApi.get<VolunteerAssignment[]>(`/apm/volunteer-assignments/ward/${wardId}`).then((r) => r.data),
+    rxsoftApi
+      .get<VolunteerAssignment[]>(`/apm/volunteer-assignments/ward/${wardId}`)
+      .then((r) => r.data),
 
   createVolunteerAssignment: (data: CreateVolunteerAssignmentPayload) =>
     rxsoftApi.post('/apm/volunteer-assignments', data).then((r) => r.data),
@@ -173,11 +203,9 @@ export const apmAdminApi = {
   listTours: (params?: Record<string, string | number>) =>
     rxsoftApi.get<PaginatedResponse<CandidateTour>>('/apm/tours', { params }).then((r) => r.data),
 
-  getTour: (id: string) =>
-    rxsoftApi.get<CandidateTour>(`/apm/tours/${id}`).then((r) => r.data),
+  getTour: (id: string) => rxsoftApi.get<CandidateTour>(`/apm/tours/${id}`).then((r) => r.data),
 
-  getTourStats: () =>
-    rxsoftApi.get<TourStats>('/apm/tours/stats').then((r) => r.data),
+  getTourStats: () => rxsoftApi.get<TourStats>('/apm/tours/stats').then((r) => r.data),
 
   createTour: (data: CreateCandidateTourPayload) =>
     rxsoftApi.post('/apm/tours', data).then((r) => r.data),
@@ -196,7 +224,9 @@ export const apmAdminApi = {
   // ── Listening Mentions ────────────────────────────────
 
   listMentions: (params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<ListeningMention>>('/apm/listening', { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<ListeningMention>>('/apm/listening', { params })
+      .then((r) => r.data),
 
   getMention: (id: string) =>
     rxsoftApi.get<ListeningMention>(`/apm/listening/${id}`).then((r) => r.data),
@@ -223,11 +253,9 @@ export const apmAdminApi = {
   listAgents: (params?: Record<string, string | number>) =>
     rxsoftApi.get<PaginatedResponse<PollingAgent>>('/apm/agents', { params }).then((r) => r.data),
 
-  getAgentStats: () =>
-    rxsoftApi.get<AgentStats>('/apm/agents/stats').then((r) => r.data),
+  getAgentStats: () => rxsoftApi.get<AgentStats>('/apm/agents/stats').then((r) => r.data),
 
-  getAgent: (id: string) =>
-    rxsoftApi.get<PollingAgent>(`/apm/agents/${id}`).then((r) => r.data),
+  getAgent: (id: string) => rxsoftApi.get<PollingAgent>(`/apm/agents/${id}`).then((r) => r.data),
 
   createAgent: (data: CreateAgentPayload) =>
     rxsoftApi.post('/apm/agents', data).then((r) => r.data),
@@ -246,22 +274,21 @@ export const apmAdminApi = {
   listResultsByLga: (lgaId: string) =>
     rxsoftApi.get<ResultEntry[]>(`/apm/results/lga/${lgaId}`).then((r) => r.data),
 
-  getResult: (id: string) =>
-    rxsoftApi.get<ResultEntry>(`/apm/results/${id}`).then((r) => r.data),
+  getResult: (id: string) => rxsoftApi.get<ResultEntry>(`/apm/results/${id}`).then((r) => r.data),
 
   createResult: (data: CreateResultPayload) =>
     rxsoftApi.post('/apm/results', data).then((r) => r.data),
 
-  verifyResult: (id: string) =>
-    rxsoftApi.put(`/apm/results/${id}/verify`, {}).then((r) => r.data),
+  verifyResult: (id: string) => rxsoftApi.put(`/apm/results/${id}/verify`, {}).then((r) => r.data),
 
   // ── Incident Reports ────────────────────────────────────────
 
   listIncidents: (params?: Record<string, string | number>) =>
-    rxsoftApi.get<PaginatedResponse<IncidentReport>>('/apm/incidents', { params }).then((r) => r.data),
+    rxsoftApi
+      .get<PaginatedResponse<IncidentReport>>('/apm/incidents', { params })
+      .then((r) => r.data),
 
-  getIncidentStats: () =>
-    rxsoftApi.get<IncidentStats>('/apm/incidents/stats').then((r) => r.data),
+  getIncidentStats: () => rxsoftApi.get<IncidentStats>('/apm/incidents/stats').then((r) => r.data),
 
   createIncident: (data: CreateIncidentPayload) =>
     rxsoftApi.post('/apm/incidents', data).then((r) => r.data),
@@ -274,14 +301,12 @@ export const apmAdminApi = {
   listGotv: (params?: Record<string, string | number>) =>
     rxsoftApi.get<PaginatedResponse<GotvRecord>>('/apm/gotv', { params }).then((r) => r.data),
 
-  getGotvStats: () =>
-    rxsoftApi.get<GotvStats>('/apm/gotv/stats').then((r) => r.data),
+  getGotvStats: () => rxsoftApi.get<GotvStats>('/apm/gotv/stats').then((r) => r.data),
 
   listGotvByPu: (pollingUnitId: string) =>
     rxsoftApi.get<GotvRecord[]>(`/apm/gotv/pu/${pollingUnitId}`).then((r) => r.data),
 
-  createGotv: (data: CreateGotvPayload) =>
-    rxsoftApi.post('/apm/gotv', data).then((r) => r.data),
+  createGotv: (data: CreateGotvPayload) => rxsoftApi.post('/apm/gotv', data).then((r) => r.data),
 
   updateGotv: (id: string, data: UpdateGotvPayload) =>
     rxsoftApi.put(`/apm/gotv/${id}`, data).then((r) => r.data),

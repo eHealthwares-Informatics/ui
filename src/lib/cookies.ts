@@ -9,7 +9,9 @@ const DEFAULT_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
  * Get a cookie value by name
  */
 export function getCookie(name: string): string | undefined {
-  if (typeof document === 'undefined') {return undefined;}
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
 
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -24,7 +26,9 @@ export function getCookie(name: string): string | undefined {
  * Set a cookie with name, value, and optional max age
  */
 export function setCookie(name: string, value: string, maxAge: number = DEFAULT_MAX_AGE): void {
-  if (typeof document === 'undefined') {return;}
+  if (typeof document === 'undefined') {
+    return;
+  }
 
   document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`;
 }
@@ -33,7 +37,9 @@ export function setCookie(name: string, value: string, maxAge: number = DEFAULT_
  * Remove a cookie by setting its max age to 0
  */
 export function removeCookie(name: string): void {
-  if (typeof document === 'undefined') {return;}
+  if (typeof document === 'undefined') {
+    return;
+  }
 
   document.cookie = `${name}=; path=/; max-age=0`;
 }

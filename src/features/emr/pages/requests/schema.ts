@@ -1,4 +1,9 @@
-import { ColumnDataType, ColumnTypeFilters, EQUALS_WITH_OPTIONS, type Column } from '@/features/rxsoft/types';
+import {
+  ColumnDataType,
+  ColumnTypeFilters,
+  EQUALS_WITH_OPTIONS,
+  type Column,
+} from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { badgeCol, dateTimeCol, patientCol } from '../../lib/emr-columns';

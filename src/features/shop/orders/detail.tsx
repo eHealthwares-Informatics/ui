@@ -30,18 +30,29 @@ const statusColors: Record<string, string> = {
 
 const statusLabel = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
 
-function timelineActive(order: {
-  orderStatus: string;
-  saleId: string | null;
-}): number {
-  if (order.orderStatus === 'cancelled') { return 1; }
-  if (order.orderStatus === 'delivered') { return 7; }
-  if (order.orderStatus === 'in_transit') { return 6; }
-  if (order.orderStatus === 'dispatched') { return 5; }
-  if (order.orderStatus === 'processing') { return 4; }
-  if (order.orderStatus === 'confirmed') { return 3; }
+function timelineActive(order: { orderStatus: string; saleId: string | null }): number {
+  if (order.orderStatus === 'cancelled') {
+    return 1;
+  }
+  if (order.orderStatus === 'delivered') {
+    return 7;
+  }
+  if (order.orderStatus === 'in_transit') {
+    return 6;
+  }
+  if (order.orderStatus === 'dispatched') {
+    return 5;
+  }
+  if (order.orderStatus === 'processing') {
+    return 4;
+  }
+  if (order.orderStatus === 'confirmed') {
+    return 3;
+  }
   // pending — payment counts as done once a sale is attached.
-  if (order.saleId) { return 2; }
+  if (order.saleId) {
+    return 2;
+  }
   return 1;
 }
 
@@ -133,7 +144,8 @@ export default function OrderDetailPage() {
                   {order.items.map((item, i) => (
                     <Group key={item.id || i} justify="space-between">
                       <Text>
-                        {item.freetextName ?? (item.itemId ? `Product #${item.itemId.slice(0, 8)}` : 'Item')}
+                        {item.freetextName ??
+                          (item.itemId ? `Product #${item.itemId.slice(0, 8)}` : 'Item')}
                       </Text>
                       <Group gap="md">
                         <Text c={muted}>x{item.quantity}</Text>

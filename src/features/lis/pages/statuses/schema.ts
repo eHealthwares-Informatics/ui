@@ -12,11 +12,18 @@ const columns: Column[] = [
 const createFields: Field[] = [
   { name: 'code', label: 'Code', type: 'text', required: true, col: 4 },
   { name: 'name', label: 'Name', type: 'text', required: true, col: 8 },
-  { name: 'domain', label: 'Domain', type: 'select', options: [
-    { value: 'ORDER', label: 'Order' },
-    { value: 'SAMPLE', label: 'Sample' },
-    { value: 'RESULT', label: 'Result' },
-  ], required: true, col: 4 },
+  {
+    name: 'domain',
+    label: 'Domain',
+    type: 'select',
+    options: [
+      { value: 'ORDER', label: 'Order' },
+      { value: 'SAMPLE', label: 'Sample' },
+      { value: 'RESULT', label: 'Result' },
+    ],
+    required: true,
+    col: 4,
+  },
   { name: 'description', label: 'Description', type: 'text', col: 8 },
   { name: 'sortOrder', label: 'Sort Order', type: 'number', col: 3 },
   { name: 'active', label: 'Active', type: 'switch', col: 3 },

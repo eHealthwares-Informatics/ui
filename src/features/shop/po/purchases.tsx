@@ -2,18 +2,36 @@ import { ActionIcon, Box, Button, Group, Paper, Stack, Text } from '@mantine/cor
 import { notifications } from '@mantine/notifications';
 import { Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import {
+  useAddPoLine,
+  useCreatePurchaseOrder,
+  useReceiveGoods,
+  useUnpostGoods,
+  useUpdatePurchaseOrder,
+} from './api/poApi';
 import { PoLinesTable } from './components/PoLinesTable';
 import { PoSettingsDrawer } from './components/PoSettingsDrawer';
 import { PoSummary } from './components/PoSummary';
 import { PoToolbar } from './components/PoToolbar';
 import { SetPriceModal } from './components/SetPriceModal';
-import { usePoStore, computeSubtotal, computeTotal } from './store/usePoStore';
-import { useAddPoLine, useCreatePurchaseOrder, useReceiveGoods, useUnpostGoods, useUpdatePurchaseOrder } from './api/poApi';
-import { printPo } from './utils/print';
 import { UnpostPasswordModal } from './components/UnpostPasswordModal';
+import { usePoStore, computeSubtotal, computeTotal } from './store/usePoStore';
+import { printPo } from './utils/print';
 
 export default function PurchasesPage() {
-  const { tabs, activeTabId, setActiveTab, addTab, closeTab, resetActiveTab, resetAll, autoPrint, defaultWarehouseId, settingsOpened, setSettingsOpened } = usePoStore();
+  const {
+    tabs,
+    activeTabId,
+    setActiveTab,
+    addTab,
+    closeTab,
+    resetActiveTab,
+    resetAll,
+    autoPrint,
+    defaultWarehouseId,
+    settingsOpened,
+    setSettingsOpened,
+  } = usePoStore();
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
   const supplierId = activeTab?.supplierId ?? '';
@@ -51,11 +69,19 @@ export default function PurchasesPage() {
 
   async function handleSaveDraft() {
     if (!supplierId) {
-      notifications.show({ title: 'Validation', message: 'Please select a supplier', color: 'red' });
+      notifications.show({
+        title: 'Validation',
+        message: 'Please select a supplier',
+        color: 'red',
+      });
       return;
     }
     if (!warehouseId) {
-      notifications.show({ title: 'Validation', message: 'Please select a warehouse', color: 'red' });
+      notifications.show({
+        title: 'Validation',
+        message: 'Please select a warehouse',
+        color: 'red',
+      });
       return;
     }
     const payload = {
@@ -77,7 +103,9 @@ export default function PurchasesPage() {
       ? await updateMutation.mutateAsync({ id: pendingPoId, payload })
       : await createMutation.mutateAsync(payload);
     const poId = result.id;
-    usePoStore.getState().setPendingPo(poId, result.invoiceNumber || result.purchaseOrderNumber, 'draft');
+    usePoStore
+      .getState()
+      .setPendingPo(poId, result.invoiceNumber || result.purchaseOrderNumber, 'draft');
     usePoStore.getState().updateTab(activeTabId, {
       lines: (result.lines || []).map((l: any) => ({
         id: crypto.randomUUID(),
@@ -93,7 +121,12 @@ export default function PurchasesPage() {
         lineSubtotal: l.lineSubtotal || 0,
         lineTotal: l.lineTotal || 0,
         receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
-        receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
+        receivedLineTotal: computeTotal(
+          l.receivedQty || 0,
+          l.unitCost,
+          l.discountPercent || 0,
+          l.taxPercent || 0
+        ),
         isDraft: false,
         isPosted: false,
         serverLineId: l.id,
@@ -103,11 +136,19 @@ export default function PurchasesPage() {
 
   async function handleSubmitApprove() {
     if (!supplierId) {
-      notifications.show({ title: 'Validation', message: 'Please select a supplier', color: 'red' });
+      notifications.show({
+        title: 'Validation',
+        message: 'Please select a supplier',
+        color: 'red',
+      });
       return;
     }
     if (!warehouseId) {
-      notifications.show({ title: 'Validation', message: 'Please select a warehouse', color: 'red' });
+      notifications.show({
+        title: 'Validation',
+        message: 'Please select a warehouse',
+        color: 'red',
+      });
       return;
     }
     const payload = {
@@ -128,7 +169,9 @@ export default function PurchasesPage() {
     const result = pendingPoId
       ? await updateMutation.mutateAsync({ id: pendingPoId, payload })
       : await createMutation.mutateAsync(payload);
-    usePoStore.getState().setPendingPo(result.id, result.invoiceNumber || result.purchaseOrderNumber, 'approved');
+    usePoStore
+      .getState()
+      .setPendingPo(result.id, result.invoiceNumber || result.purchaseOrderNumber, 'approved');
     usePoStore.getState().updateTab(activeTabId, {
       lines: (result.lines || []).map((l: any) => ({
         id: crypto.randomUUID(),
@@ -144,7 +187,12 @@ export default function PurchasesPage() {
         lineSubtotal: l.lineSubtotal || 0,
         lineTotal: l.lineTotal || 0,
         receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
-        receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
+        receivedLineTotal: computeTotal(
+          l.receivedQty || 0,
+          l.unitCost,
+          l.discountPercent || 0,
+          l.taxPercent || 0
+        ),
         isDraft: false,
         isPosted: false,
         serverLineId: l.id,
@@ -153,7 +201,9 @@ export default function PurchasesPage() {
   }
 
   async function handleSaveLine(line: any) {
-    if (!pendingPoId) {return;}
+    if (!pendingPoId) {
+      return;
+    }
     setSavingLines((prev) => new Set(prev).add(line.id));
     try {
       const result = await addLineMutation.mutateAsync({
@@ -184,7 +234,9 @@ export default function PurchasesPage() {
   }
 
   async function handleReceiveLine(line: any) {
-    if (!pendingPoId) {return;}
+    if (!pendingPoId) {
+      return;
+    }
     const payload = {
       purchaseOrderId: pendingPoId,
       receivedDate: new Date(receivedDate || new Date()).toISOString(),
@@ -232,13 +284,17 @@ export default function PurchasesPage() {
   }
 
   function handleSetPriceConfirm(unitCost: number) {
-    if (!setPriceLine) return;
+    if (!setPriceLine) {
+      return;
+    }
     usePoStore.getState().updateLine(setPriceLine.id, { unitCost });
     setSetPriceLine(null);
   }
 
   async function handleConfirmUnpost(password: string) {
-    if (!pendingPoId || !unpostTargetLine) {return;}
+    if (!pendingPoId || !unpostTargetLine) {
+      return;
+    }
     const receiptLineId = unpostTargetLine;
     await unpostMutation.mutateAsync({
       poId: pendingPoId,
@@ -255,8 +311,10 @@ export default function PurchasesPage() {
   function handlePrint() {
     printPo({
       purchaseOrderNumber: receiptNumber,
-      supplierName: usePoStore.getState().tabs.find((t) => t.id === activeTabId)?.supplierName || '',
-      warehouseName: usePoStore.getState().tabs.find((t) => t.id === activeTabId)?.warehouseName || '',
+      supplierName:
+        usePoStore.getState().tabs.find((t) => t.id === activeTabId)?.supplierName || '',
+      warehouseName:
+        usePoStore.getState().tabs.find((t) => t.id === activeTabId)?.warehouseName || '',
       orderDate: new Date().toISOString(),
       lines: lines.map((l) => ({
         itemCode: l.itemCode,
@@ -286,7 +344,9 @@ export default function PurchasesPage() {
               }}
               onClick={() => setActiveTab(tab.id)}
             >
-              <Text size="sm" fw={600}>{tab.label}</Text>
+              <Text size="sm" fw={600}>
+                {tab.label}
+              </Text>
               <ActionIcon
                 size="xs"
                 variant="subtle"
@@ -365,7 +425,10 @@ export default function PurchasesPage() {
 
       <UnpostPasswordModal
         opened={unpostModal}
-        onClose={() => { setUnpostModal(false); setUnpostTargetLine(null); }}
+        onClose={() => {
+          setUnpostModal(false);
+          setUnpostTargetLine(null);
+        }}
         onConfirm={handleConfirmUnpost}
         loading={unpostMutation.isPending}
       />
