@@ -1,8 +1,8 @@
 # Tracker Status — RxSoft Alpha Test Plan
 
-> Generated 2026-09-27T15:40:13.780Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 116 entity tasks / 593 use cases
+> Generated 2026-09-27T17:38:40.038Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 116 entity tasks / 593 use cases
 
-**Storage state:** ⚠️ `e2e/.auth/admin.json` is **stale** (603h old) — rerun `--project=setup` if admin suites 401/403.
+**Storage state:** ✅ admin storageState is fresh (1.0h old).
 
 | State | Meaning |
 |---|---|
