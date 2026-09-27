@@ -137,5 +137,6 @@ dist
 e2e/.auth/
 e2e/.runtime/
 e2e/reports/
+e2e/tracker/.board-cache.json
 test-results/
 playwright-report/

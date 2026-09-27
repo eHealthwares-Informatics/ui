@@ -6,7 +6,9 @@ test.describe('sign-in page', () => {
   // file extra headroom (config default is 60s).
   test.setTimeout(120_000);
 
-  test('renders username, password and submit fields', async ({ page, signInPage }) => {
+  // TC-AUTH-01 — Login success: goto /sign-in; fill admin/password; submit →
+  // Redirected off /sign-in; app shell visible.
+  test('TC-AUTH-01 — renders username, password and submit fields', async ({ page, signInPage }) => {
     await signInPage.goto();
 
     await expect(signInPage.usernameInput).toBeVisible();
@@ -16,18 +18,19 @@ test.describe('sign-in page', () => {
     await expect(page).toHaveTitle(/Welcome/);
   });
 
-  test('shows validation errors when submitting empty form', async ({ page, signInPage }) => {
+  // TC-AUTH-03 — Empty validation: submit empty form → per-field validation
+  // messages. The form ships defaultValues (admin/test), so clear both fields
+  // to exercise the zod "required" validation instead of a real login.
+  // Mantine's TextInput wraps the raw <input> in extra DOM, so Playwright's
+  // fill('') / clear() may not propagate through RHF's register handler.
+  // Triple-click selects all text, Backspace deletes it — this fires real
+  // keydown/input events that RHF reliably captures.
+  test('TC-AUTH-03 — shows validation errors when submitting empty form', async ({ page, signInPage }) => {
     await signInPage.goto();
 
     // Wait until the form is interactive (React hydration can lag under load).
     await expect(signInPage.submitButton).toBeEnabled();
 
-    // The form ships defaultValues (admin/test), so clear both fields to
-    // exercise the zod "required" validation instead of a real login.
-    // Mantine's TextInput wraps the raw <input> in extra DOM, so Playwright's
-    // fill('') / clear() may not propagate through RHF's register handler.
-    // Triple-click selects all text, Backspace deletes it — this fires real
-    // keydown/input events that RHF reliably captures.
     await signInPage.usernameInput.click({ clickCount: 3 });
     await signInPage.page.keyboard.press('Backspace');
     await signInPage.passwordInput.click({ clickCount: 3 });
@@ -39,7 +42,10 @@ test.describe('sign-in page', () => {
     await expect(page.getByText('Please enter your password')).toBeVisible({ timeout: 15_000 });
   });
 
-  test('rejects invalid credentials with an auth error', async ({ page, signInPage }) => {
+  // TC-AUTH-02 — Wrong credentials: fill admin/wrong; submit → inline error
+  // "Invalid credentials" (rendered from the auth store via data-testid
+  // `sign-in-error`).
+  test('TC-AUTH-02 — rejects invalid credentials with an auth error', async ({ page, signInPage }) => {
     await signInPage.goto();
 
     await signInPage.signIn('admin', 'wrong-password');
@@ -47,7 +53,8 @@ test.describe('sign-in page', () => {
     await signInPage.expectError(/Invalid credentials|Incorrect/);
   });
 
-  test('valid credentials redirect off /sign-in', async ({ page, signInPage }, testInfo) => {
+  // TC-AUTH-01 (success path) — valid credentials redirect off /sign-in.
+  test('TC-AUTH-01 — valid credentials redirect off /sign-in', async ({ page, signInPage }, testInfo) => {
     skipIfBackendDown(testInfo);
     await signInPage.goto();
 
@@ -57,7 +64,10 @@ test.describe('sign-in page', () => {
     await signInPage.expectSuccessRedirect();
   });
 
-  test('honours the redirect query parameter', async ({ page, signInPage }, testInfo) => {
+  // TC-AUTH-04 — Redirect preserved: goto /sign-in?redirect=/rxsoft/items;
+  // login → URL becomes /rxsoft/items. The sign-in route validates
+  // `redirect: z.string().optional()` in its search schema.
+  test('TC-AUTH-04 — honours the redirect query parameter', async ({ page, signInPage }, testInfo) => {
     skipIfBackendDown(testInfo);
     await signInPage.goto('/rxsoft/items');
 
