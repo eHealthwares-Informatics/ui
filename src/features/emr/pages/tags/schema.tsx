@@ -1,8 +1,4 @@
-import {
-  type Column,
-  type FieldGroup,
-  ColumnTypeFilters,
-} from '@/features/rxsoft/types';
+import { type Column, type FieldGroup, ColumnTypeFilters } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { dateTimeCol } from '../../lib/emr-columns';

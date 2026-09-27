@@ -1,20 +1,36 @@
-import { useState } from 'react';
 import {
-  Box, Card, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, Slider, Textarea,
+  Box,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  Slider,
+  Textarea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useParams, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useWardConversion, useUpdateConversionScore, useLgas } from '../website/admin-hooks';
 import { apmBlue, ink, muted } from '../website/layout';
 
 function statusColor(status: string) {
   switch (status) {
-    case 'green': return '#16A34A';
-    case 'yellow': return '#EAB308';
-    case 'red': return '#DC2626';
-    case 'grey': return '#94A3B8';
-    default: return '#94A3B8';
+    case 'green':
+      return '#16A34A';
+    case 'yellow':
+      return '#EAB308';
+    case 'red':
+      return '#DC2626';
+    case 'grey':
+      return '#94A3B8';
+    default:
+      return '#94A3B8';
   }
 }
 
@@ -41,12 +57,17 @@ export function WardsPage() {
   };
 
   const handleSaveScore = () => {
-    if (!selectedWard) {return;}
-    updateScore.mutate({
-      entityType: 'ward',
-      entityId: selectedWard.id,
-      data: { score, status, notes, assessedBy: 'admin' },
-    }, { onSuccess: close });
+    if (!selectedWard) {
+      return;
+    }
+    updateScore.mutate(
+      {
+        entityType: 'ward',
+        entityId: selectedWard.id,
+        data: { score, status, notes, assessedBy: 'admin' },
+      },
+      { onSuccess: close }
+    );
   };
 
   return (
@@ -55,7 +76,9 @@ export function WardsPage() {
         <Button variant="subtle" onClick={() => navigate({ to: '/apm/admin/lgas' })}>
           ← Back to LGAs
         </Button>
-        <Title order={3} style={{ color: ink }}>{lgaName} — Wards</Title>
+        <Title order={3} style={{ color: ink }}>
+          {lgaName} — Wards
+        </Title>
       </Group>
 
       {isLoading ? (
@@ -85,22 +108,42 @@ export function WardsPage() {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={ward.status === 'green' ? 'green' : ward.status === 'yellow' ? 'yellow' : ward.status === 'red' ? 'red' : 'gray'}>
+                    <Badge
+                      color={
+                        ward.status === 'green'
+                          ? 'green'
+                          : ward.status === 'yellow'
+                            ? 'yellow'
+                            : ward.status === 'red'
+                              ? 'red'
+                              : 'gray'
+                      }
+                    >
                       {ward.status}
                     </Badge>
                   </Table.Td>
                   <Table.Td>{ward.pollingUnitCount}</Table.Td>
                   <Table.Td>
-                    <Text fw={700} style={{ color: '#16A34A' }}>{ward.wonPollingUnits}</Text>
+                    <Text fw={700} style={{ color: '#16A34A' }}>
+                      {ward.wonPollingUnits}
+                    </Text>
                   </Table.Td>
                   <Table.Td>
                     <Group gap="xs">
-                      <Button size="xs" variant="light" style={{ color: apmBlue }}
-                        onClick={() => openScoreModal(ward)}>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        style={{ color: apmBlue }}
+                        onClick={() => openScoreModal(ward)}
+                      >
                         Score
                       </Button>
-                      <Button size="xs" variant="light" color="gray"
-                        onClick={() => navigate({ to: `/apm/admin/polling-units/${ward.id}` })}>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        color="gray"
+                        onClick={() => navigate({ to: `/apm/admin/polling-units/${ward.id}` })}
+                      >
                         PUs
                       </Button>
                     </Group>
@@ -121,7 +164,9 @@ export function WardsPage() {
 
       <Modal opened={opened} onClose={close} title={`Score: ${selectedWard?.name ?? ''}`} size="sm">
         <Stack gap="md">
-          <Text size="sm" style={{ color: muted }}>Conversion Score: {score}%</Text>
+          <Text size="sm" style={{ color: muted }}>
+            Conversion Score: {score}%
+          </Text>
           <Slider
             value={score}
             onChange={setScore}

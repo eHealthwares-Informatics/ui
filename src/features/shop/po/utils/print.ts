@@ -21,12 +21,14 @@ export function printPo(po: {
       <td style="text-align:right">${l.orderedQty}</td>
       <td style="text-align:right">${l.unitCost.toFixed(2)}</td>
       <td style="text-align:right">${l.lineTotal.toFixed(2)}</td>
-    </tr>`,
+    </tr>`
     )
     .join('');
 
   const win = window.open('', '_blank');
-  if (!win) {return;}
+  if (!win) {
+    return;
+  }
   win.document.write(`
     <html>
     <head>

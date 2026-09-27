@@ -7,8 +7,8 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import { lisApi } from '@/lib/lis-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { lisApi } from '@/lib/lis-api';
 
 export interface OrderItem {
   testDefinitionId: string;
@@ -278,9 +278,13 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const saveOrder = useCallback(
     async (silent = false) => {
       const s = stateRef.current;
-      if (!s.orderId) return;
+      if (!s.orderId) {
+        return;
+      }
       const payload = buildDirtyPayload();
-      if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: true });
+      if (!silent) {
+        dispatch({ type: 'SET_SUBMITTING', payload: true });
+      }
       dispatch({ type: 'SET_ERROR', payload: null });
       try {
         if (Object.keys(payload).length > 0) {
@@ -291,7 +295,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         const msg = getApiErrorMessage(err);
         dispatch({ type: 'SET_ERROR', payload: msg });
       } finally {
-        if (!silent) dispatch({ type: 'SET_SUBMITTING', payload: false });
+        if (!silent) {
+          dispatch({ type: 'SET_SUBMITTING', payload: false });
+        }
       }
     },
     [buildDirtyPayload]
@@ -431,6 +437,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
 
 export function useOrderContext() {
   const ctx = useContext(OrderContext);
-  if (!ctx) throw new Error('useOrderContext must be used within OrderProvider');
+  if (!ctx) {
+    throw new Error('useOrderContext must be used within OrderProvider');
+  }
   return ctx;
 }

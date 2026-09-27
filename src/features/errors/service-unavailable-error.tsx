@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Button, Center, Stack, Text, Title, Group, Loader } from '@mantine/core';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { WifiOff, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
 export function ServiceUnavailableError() {
   const navigate = useNavigate();
-  const { return: returnPath, url: failedUrl } = useSearch({ from: '/(errors)/service-unavailable' });
+  const { return: returnPath, url: failedUrl } = useSearch({
+    from: '/(errors)/service-unavailable',
+  });
   const [retryCount, setRetryCount] = useState(0);
   const [checking, setChecking] = useState(false);
 

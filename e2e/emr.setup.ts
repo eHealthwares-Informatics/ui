@@ -1,12 +1,16 @@
+import { test as setup } from '@playwright/test';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { test as setup } from '@playwright/test';
 
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 export const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
 
 function base64Url(input: string): string {
-  return Buffer.from(input).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return Buffer.from(input)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 /** Synthetic JWT the app's client-side decoder accepts (sub + username + exp). */
@@ -22,7 +26,7 @@ export function makeAccessToken(): string {
       organizationId: 'org-1',
       locationId: 'loc-1',
       exp: Math.floor(Date.now() / 1000) + 60 * 60,
-    }),
+    })
   );
   return `${header}.${payload}.test-signature`;
 }

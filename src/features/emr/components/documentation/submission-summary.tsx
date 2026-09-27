@@ -26,7 +26,9 @@ function summarizeValue(value: unknown): string {
     if (typeof record.label === 'string') {
       const caption =
         record.label + (typeof record.code === 'string' && record.code ? ` (${record.code})` : '');
-      return typeof record.kind === 'string' ? `${caption} · ${record.kind.replace(/_/g, ' ')}` : caption;
+      return typeof record.kind === 'string'
+        ? `${caption} · ${record.kind.replace(/_/g, ' ')}`
+        : caption;
     }
     return JSON.stringify(value);
   }
@@ -38,7 +40,7 @@ function summarizeValue(value: unknown): string {
   }
   if (Array.isArray(value)) {
     const parts = value.map((item) =>
-      typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item),
+      typeof item === 'object' && item !== null ? JSON.stringify(item) : String(item)
     );
     const joined = parts.join(', ');
     return joined.length > MAX_CHARS ? `${joined.slice(0, MAX_CHARS)}…` : joined;
@@ -58,7 +60,7 @@ export function SubmissionSummary({ submission }: { submission: FormSubmission }
       value !== null &&
       value !== undefined &&
       value !== '' &&
-      !(Array.isArray(value) && value.length === 0),
+      !(Array.isArray(value) && value.length === 0)
   );
 
   if (entries.length === 0) {

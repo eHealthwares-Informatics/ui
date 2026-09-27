@@ -31,9 +31,9 @@ import {
   Truck,
 } from 'lucide-react';
 import { useCartStore } from '../website/cart-store';
-import { useCartProductHydration } from '../website/hooks';
 import { SectionHeading, ProductCard } from '../website/components';
 import { EmptyCart } from '../website/empty-states';
+import { useCartProductHydration } from '../website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -58,8 +58,6 @@ const productPrices: Record<string, number> = {
   '9': 5200,
   '10': 900,
 };
-
-
 
 const productInfo: Record<
   string,
@@ -116,7 +114,11 @@ const productInfo: Record<
 // store, or hydrated from /website/cart for legacy persisted carts). The old
 // mock maps keyed '1'-'10' never matched real product ids — hence the
 // "Medication" fallbacks and fake prices.
-function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProduct | null }): string {
+function itemLabel(i: {
+  productId?: string;
+  name?: string;
+  product?: WebsiteProduct | null;
+}): string {
   return (
     i.name ||
     i.product?.name ||
@@ -125,7 +127,11 @@ function itemLabel(i: { productId?: string; name?: string; product?: WebsiteProd
   );
 }
 
-function itemUnitPrice(i: { productId?: string; unitPrice?: number; product?: WebsiteProduct | null }): number {
+function itemUnitPrice(i: {
+  productId?: string;
+  unitPrice?: number;
+  product?: WebsiteProduct | null;
+}): number {
   const p =
     i.unitPrice ??
     (i.product as any)?.unitPrice ??
@@ -156,7 +162,9 @@ function itemIsRx(i: { productId?: string; product?: WebsiteProduct | null }): b
   );
 }
 
-function cartSubtotal(items: { productId?: string; unitPrice?: number; quantity: number }[]): number {
+function cartSubtotal(
+  items: { productId?: string; unitPrice?: number; quantity: number }[]
+): number {
   return items.reduce((sum, i) => sum + itemUnitPrice(i) * i.quantity, 0);
 }
 
@@ -284,7 +292,17 @@ const mockRecentlyViewed: WebsiteProduct[] = [
   },
 ];
 
-function CartItemRow({ item }: { item: { productId?: string; name?: string; unitPrice?: number; quantity: number; product?: WebsiteProduct | null } }) {
+function CartItemRow({
+  item,
+}: {
+  item: {
+    productId?: string;
+    name?: string;
+    unitPrice?: number;
+    quantity: number;
+    product?: WebsiteProduct | null;
+  };
+}) {
   const { updateQuantity, removeItem, saveForLater } = useCartStore();
   const key = item.productId ?? item.name;
   const price = itemUnitPrice(item);
@@ -445,10 +463,7 @@ export default function CartPage() {
               <Grid.Col span={{ base: 12, lg: 8 }}>
                 <Stack gap="md">
                   {items.map((item) => (
-                    <CartItemRow
-                      key={item.productId ?? item.name}
-                      item={item}
-                    />
+                    <CartItemRow key={item.productId ?? item.name} item={item} />
                   ))}
 
                   <Paper
@@ -506,7 +521,11 @@ export default function CartPage() {
                         </Group>
                         <Divider />
                         {savedForLater.map((item) => (
-                          <Group key={item.productId || item.name} justify="space-between" wrap="nowrap">
+                          <Group
+                            key={item.productId || item.name}
+                            justify="space-between"
+                            wrap="nowrap"
+                          >
                             <Group gap="sm" wrap="nowrap">
                               <Image
                                 src="https://placehold.co/48x48/16A34A/white?text=Rx"

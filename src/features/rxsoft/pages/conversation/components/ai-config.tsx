@@ -1,14 +1,5 @@
+import { Badge, Card, Grid, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Badge,
-  Card,
-  Grid,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
 import { Brain } from 'lucide-react';
 import { conversationApi } from '@/lib/conversation-api';
 
@@ -55,8 +46,8 @@ export function RxAIConfigPage() {
         <div>
           <Title order={3}>AI Configuration</Title>
           <Text size="sm" c="dimmed">
-            Current routing defaults and provider status. Models and API keys are
-            managed under AI → Models.
+            Current routing defaults and provider status. Models and API keys are managed under AI →
+            Models.
           </Text>
         </div>
       </Group>
@@ -123,11 +114,7 @@ export function RxAIConfigPage() {
           {Object.entries(providers).map(([name, info]) => (
             <Grid.Col key={name} span={4}>
               <Group>
-                <Badge
-                  variant="light"
-                  color={info.configured ? 'green' : 'gray'}
-                  size="lg"
-                >
+                <Badge variant="light" color={info.configured ? 'green' : 'gray'} size="lg">
                   {name}
                 </Badge>
                 <Text size="sm" c={info.configured ? 'green' : 'dimmed'}>

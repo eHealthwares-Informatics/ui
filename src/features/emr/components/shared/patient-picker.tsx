@@ -56,12 +56,11 @@ export function PatientPicker({
         value: displayFor(patient),
         label: displayFor(patient),
       })),
-    [data],
+    [data]
   );
 
   const displayValue = value
-    ? value.patientId +
-      (value.patientName ? ` · ${value.patientName}` : '')
+    ? value.patientId + (value.patientName ? ` · ${value.patientName}` : '')
     : query;
 
   return (

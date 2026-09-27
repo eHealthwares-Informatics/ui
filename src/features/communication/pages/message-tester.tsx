@@ -83,8 +83,8 @@ export function MessageTesterPage() {
       return 'MSH|^~\\&|HEALTHSTACK|HS|SWITCH|RXSOFT|202604251200||ADT^A04|456|P|2.5\rPID|1||987654^^^HOSPITAL^MR||Smith^John||19780312|M';
     }
 
-    if (messageType === 'ORDER' && messageProtocol === 'CUSTOM_JSON')
-      {return JSON.stringify(
+    if (messageType === 'ORDER' && messageProtocol === 'CUSTOM_JSON') {
+      return JSON.stringify(
         {
           _id: 'order-123',
           documentationId: 'order-123',
@@ -100,7 +100,8 @@ export function MessageTesterPage() {
         },
         null,
         2
-      );}
+      );
+    }
 
     return JSON.stringify({}, null, 2);
   }, [messageType, messageProtocol, targetAE]);

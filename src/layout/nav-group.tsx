@@ -6,7 +6,9 @@ import { ReactNode } from 'react';
 import { NavItem } from './types';
 
 function isActive(pathname: string, href?: string, item?: NavItem) {
-  if (!href) {return false;}
+  if (!href) {
+    return false;
+  }
 
   return (
     pathname === href ||

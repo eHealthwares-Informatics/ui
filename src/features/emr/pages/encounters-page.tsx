@@ -18,14 +18,14 @@ import { FileText, Plus, Search, TimerReset } from 'lucide-react';
 import { useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
-import { EncounterForm } from '../components/encounters/encounter-form';
-import { EncounterTimer } from '../components/encounters/encounter-timer';
 import {
   DocumentationModal,
   type ActiveEncounter,
 } from '../components/documentation/documentation-modal';
-import { StatusBadge } from '../components/shared/status-badge';
+import { EncounterForm } from '../components/encounters/encounter-form';
+import { EncounterTimer } from '../components/encounters/encounter-timer';
 import { PatientHoverCard } from '../components/shared/patient-hover-card';
+import { StatusBadge } from '../components/shared/status-badge';
 import { formatEnum } from '../lib/emr-constants';
 
 const ACTIVE_ENCOUNTER_KEY = 'emr-active-encounter';
@@ -54,8 +54,8 @@ export function EncountersPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
-  const [activeEncounter, setActiveEncounter] = useState<ActiveEncounter | null>(
-    () => readActiveEncounter(),
+  const [activeEncounter, setActiveEncounter] = useState<ActiveEncounter | null>(() =>
+    readActiveEncounter()
   );
   const [recordOpened, { open: openRecord, close: closeRecord }] = useDisclosure(false);
   const [docOpened, { open: openDoc, close: closeDoc }] = useDisclosure(false);
@@ -123,11 +123,7 @@ export function EncountersPage() {
       description="Record clinical encounters and document patient care."
       actions={
         <Group gap="sm">
-          <Button
-            leftSection={<FileText size={16} />}
-            variant="light"
-            onClick={openDoc}
-          >
+          <Button leftSection={<FileText size={16} />} variant="light" onClick={openDoc}>
             Create Documentation
           </Button>
           <Button leftSection={<Plus size={16} />} onClick={openRecord}>
@@ -138,15 +134,18 @@ export function EncountersPage() {
     >
       <Stack gap="lg">
         {activeEncounter && (
-          <Card withBorder radius="md" padding="lg" style={{ background: 'var(--mantine-color-blue-0)' }}>
+          <Card
+            withBorder
+            radius="md"
+            padding="lg"
+            style={{ background: 'var(--mantine-color-blue-0)' }}
+          >
             <Group justify="space-between" align="flex-start" wrap="nowrap">
               <Stack gap={4}>
                 <Text size="xs" fw={600} c="blue" tt="uppercase">
                   Active Encounter · {activeEncounter.encounterNumber}
                 </Text>
-                <Title order={3}>
-                  {activeEncounter.patientName || activeEncounter.patientId}
-                </Title>
+                <Title order={3}>{activeEncounter.patientName || activeEncounter.patientId}</Title>
                 <Text size="sm" c="dimmed">
                   {formatEnum(activeEncounter.encounterType)}
                   {activeEncounter.providerName ? ` · ${activeEncounter.providerName}` : ''}
@@ -245,9 +244,7 @@ export function EncountersPage() {
                         <Table.Td>
                           <StatusBadge value={row.encounterType} kind="encounter" />
                         </Table.Td>
-                        <Table.Td>
-                          {started ? new Date(started).toLocaleString() : '—'}
-                        </Table.Td>
+                        <Table.Td>{started ? new Date(started).toLocaleString() : '—'}</Table.Td>
                         <Table.Td>
                           {today ? (
                             <EncounterTimer startIso={started} size="sm" />
@@ -281,11 +278,7 @@ export function EncountersPage() {
         onCreated={handleEncounterCreated}
       />
 
-      <DocumentationModal
-        opened={docOpened}
-        onClose={closeDoc}
-        activeEncounter={activeEncounter}
-      />
+      <DocumentationModal opened={docOpened} onClose={closeDoc} activeEncounter={activeEncounter} />
     </RxPage>
   );
 }

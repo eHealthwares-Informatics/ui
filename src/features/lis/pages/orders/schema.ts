@@ -9,7 +9,7 @@ const columns: Column[] = [
     key: 'source',
     label: 'Source',
     render: (row: any) =>
-      row.source === 'emr-encounter-request' ? 'EMR Request' : row.source ?? 'MANUAL',
+      row.source === 'emr-encounter-request' ? 'EMR Request' : (row.source ?? 'MANUAL'),
   },
   { key: 'status', label: 'Status' },
   { key: 'requestedDate', label: 'Requested' },

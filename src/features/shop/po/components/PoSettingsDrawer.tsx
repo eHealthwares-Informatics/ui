@@ -1,6 +1,6 @@
 import { Button, Drawer, Select, Stack, Switch } from '@mantine/core';
-import { usePoStore } from '../store/usePoStore';
 import { useWarehouses } from '../api/poApi';
+import { usePoStore } from '../store/usePoStore';
 
 export function PoSettingsDrawer() {
   const {
@@ -37,7 +37,9 @@ export function PoSettingsDrawer() {
           data={warehouseOpts}
           value={defaultWarehouseId || null}
           onChange={(v, opt) => {
-            if (v) {setDefaultWarehouse(v, opt.label);}
+            if (v) {
+              setDefaultWarehouse(v, opt.label);
+            }
           }}
           searchable
           clearable

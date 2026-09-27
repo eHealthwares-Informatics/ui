@@ -37,15 +37,17 @@ export function PhoneSetupModal({ opened, onSave }: Props) {
     >
       <Stack gap="sm">
         <Text size="sm">
-          Enter the phone number you want to use on the web channel. It will be shown as the
-          sender for your messages.
+          Enter the phone number you want to use on the web channel. It will be shown as the sender
+          for your messages.
         </Text>
         <TextInput
           autoFocus
           error={error}
           onChange={(event) => setPhone(event.currentTarget.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {submit();}
+            if (event.key === 'Enter') {
+              submit();
+            }
           }}
           placeholder="+1 555 000 1234"
           value={phone}

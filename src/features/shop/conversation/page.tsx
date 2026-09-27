@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -18,15 +17,8 @@ import {
   Title,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import {
-  ArrowLeft,
-  MessageCircle,
-  MessagesSquare,
-  Paperclip,
-  Search,
-  Send,
-} from 'lucide-react';
-import { WebsiteLayout, green, darkGreen, ink, muted, line, soft } from '../website/layout';
+import { ArrowLeft, MessageCircle, MessagesSquare, Paperclip, Search, Send } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { TypingBubble } from '@/components/typing-dots';
 import { useAuthStore } from '../website/auth-store';
 import { ChatPhoneGate } from '../website/chat-phone-gate';
@@ -39,6 +31,7 @@ import {
   type ChatMessage,
   type ShopConversationSummary,
 } from '../website/chatbot-service';
+import { WebsiteLayout, green, darkGreen, ink, muted, line, soft } from '../website/layout';
 
 interface ChatIdentity {
   phone: string;
@@ -54,7 +47,10 @@ const FILTERS: Array<{ value: Filter; label: string }> = [
 ];
 
 function parseChoiceMessage(text: string) {
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   if (lines.length < 2) {
     return null;
   }
@@ -70,7 +66,7 @@ function parseChoiceMessage(text: string) {
         : { value: clean.slice(0, idx).trim(), label: clean.slice(idx + 1).trim() };
     })
     .filter((option): option is { value: string; label: string } =>
-      Boolean(option?.value && option?.label),
+      Boolean(option?.value && option?.label)
     );
   return options.length > 0 ? { title, options } : null;
 }
@@ -132,8 +128,8 @@ export default function ShopConversationPage() {
                 Talk to a Damorex pharmacist
               </Title>
               <Text c={muted} size="sm" ta="center" lh={1.6}>
-                Ask about a medication, track an order, or upload a prescription. Verify your
-                number to keep your conversation history.
+                Ask about a medication, track an order, or upload a prescription. Verify your number
+                to keep your conversation history.
               </Text>
             </Stack>
             <ChatPhoneGate onDone={handleIdentity} />
@@ -174,7 +170,7 @@ function ConversationWorkspace(props: {
   const inboxQuery = useShopInbox(participantId);
   const conversations = useMemo(
     () => inboxQuery.data?.pages.flatMap((page) => page.items) ?? [],
-    [inboxQuery.data],
+    [inboxQuery.data]
   );
 
   const session = useShopChatThread({
@@ -222,8 +218,7 @@ function ConversationWorkspace(props: {
       }
       const name = conversationName(conversation).toLowerCase();
       return (
-        name.includes(query) ||
-        (conversation.lastMessage?.text ?? '').toLowerCase().includes(query)
+        name.includes(query) || (conversation.lastMessage?.text ?? '').toLowerCase().includes(query)
       );
     });
   }, [conversations, filter, search]);
@@ -272,7 +267,13 @@ function ConversationWorkspace(props: {
               setChanging(false);
             }}
           />
-          <Button variant="subtle" color="gray" size="xs" mt="md" onClick={() => setChanging(false)}>
+          <Button
+            variant="subtle"
+            color="gray"
+            size="xs"
+            mt="md"
+            onClick={() => setChanging(false)}
+          >
             Cancel
           </Button>
         </Paper>
@@ -453,11 +454,7 @@ function ConversationWorkspace(props: {
           style={{ background: soft, border: `1px solid ${line}`, borderRadius: 12 }}
         >
           <Group gap={8} wrap="nowrap">
-            <Box
-              w={8}
-              h={8}
-              style={{ borderRadius: '50%', background: green, flexShrink: 0 }}
-            />
+            <Box w={8} h={8} style={{ borderRadius: '50%', background: green, flexShrink: 0 }} />
             <Text size="xs" c={darkGreen} fw={600}>
               {selected.currentQuestion.text}
             </Text>
@@ -501,9 +498,7 @@ function ConversationWorkspace(props: {
               <Loader size="xs" />
             </Center>
           )}
-          {!session.isLoading && session.typing && (
-            <TypingBubble background={soft} color={green} />
-          )}
+          {!session.isLoading && session.typing && <TypingBubble background={soft} color={green} />}
         </Stack>
       </ScrollArea>
 

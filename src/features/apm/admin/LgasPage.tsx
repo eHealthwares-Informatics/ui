@@ -1,26 +1,55 @@
-import { useState } from 'react';
-import { Box, Card, Grid, Group, Skeleton, Stack, Text, Title, Badge, Table, Button, Modal, Slider, Textarea, TextInput } from '@mantine/core';
+import {
+  Box,
+  Card,
+  Grid,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  Slider,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
-import { useLgaConversion, useUpdateConversionScore, useWardConversion } from '../website/admin-hooks';
+import { useState } from 'react';
+import {
+  useLgaConversion,
+  useUpdateConversionScore,
+  useWardConversion,
+} from '../website/admin-hooks';
 import { apmBlue, ink, muted } from '../website/layout';
 
 function statusColor(status: string) {
   switch (status) {
-    case 'green': return '#16A34A';
-    case 'yellow': return '#EAB308';
-    case 'red': return '#DC2626';
-    case 'grey': return '#94A3B8';
-    default: return '#94A3B8';
+    case 'green':
+      return '#16A34A';
+    case 'yellow':
+      return '#EAB308';
+    case 'red':
+      return '#DC2626';
+    case 'grey':
+      return '#94A3B8';
+    default:
+      return '#94A3B8';
   }
 }
 
 function statusBadgeColor(status: string) {
   switch (status) {
-    case 'green': return 'green';
-    case 'yellow': return 'yellow';
-    case 'red': return 'red';
-    default: return 'gray';
+    case 'green':
+      return 'green';
+    case 'yellow':
+      return 'yellow';
+    case 'red':
+      return 'red';
+    default:
+      return 'gray';
   }
 }
 
@@ -43,17 +72,24 @@ export function LgasPage() {
   };
 
   const handleSaveScore = () => {
-    if (!selectedLga) {return;}
-    updateScore.mutate({
-      entityType: 'lga',
-      entityId: selectedLga.id,
-      data: { score, status, notes, assessedBy: 'admin' },
-    }, { onSuccess: close });
+    if (!selectedLga) {
+      return;
+    }
+    updateScore.mutate(
+      {
+        entityType: 'lga',
+        entityId: selectedLga.id,
+        data: { score, status, notes, assessedBy: 'admin' },
+      },
+      { onSuccess: close }
+    );
   };
 
   return (
     <Stack gap="lg">
-      <Title order={3} style={{ color: ink }}>LGA Conversion Overview</Title>
+      <Title order={3} style={{ color: ink }}>
+        LGA Conversion Overview
+      </Title>
 
       {isLoading ? (
         <Skeleton height={400} radius="md" />
@@ -79,7 +115,9 @@ export function LgasPage() {
                     <Text
                       fw={600}
                       style={{ color: apmBlue, cursor: 'pointer' }}
-                      onClick={() => {/* navigate to ward view */}}
+                      onClick={() => {
+                        /* navigate to ward view */
+                      }}
                     >
                       {lga.name}
                     </Text>
@@ -96,16 +134,26 @@ export function LgasPage() {
                   <Table.Td>{lga.wardCount}</Table.Td>
                   <Table.Td>{lga.pollingUnitCount}</Table.Td>
                   <Table.Td>
-                    <Text fw={700} style={{ color: '#16A34A' }}>{lga.wonPollingUnits}</Text>
+                    <Text fw={700} style={{ color: '#16A34A' }}>
+                      {lga.wonPollingUnits}
+                    </Text>
                   </Table.Td>
                   <Table.Td>
                     <Group gap="xs">
-                      <Button size="xs" variant="light" style={{ color: apmBlue }}
-                        onClick={() => openScoreModal(lga)}>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        style={{ color: apmBlue }}
+                        onClick={() => openScoreModal(lga)}
+                      >
                         Score
                       </Button>
-                      <Button size="xs" variant="light" color="gray"
-                        onClick={() => navigate({ to: `/apm/admin/wards/${lga.id}` })}>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        color="gray"
+                        onClick={() => navigate({ to: `/apm/admin/wards/${lga.id}` })}
+                      >
                         Wards
                       </Button>
                     </Group>
@@ -126,7 +174,9 @@ export function LgasPage() {
 
       <Modal opened={opened} onClose={close} title={`Score: ${selectedLga?.name ?? ''}`} size="sm">
         <Stack gap="md">
-          <Text size="sm" style={{ color: muted }}>Conversion Score: {score}%</Text>
+          <Text size="sm" style={{ color: muted }}>
+            Conversion Score: {score}%
+          </Text>
           <Slider
             value={score}
             onChange={setScore}

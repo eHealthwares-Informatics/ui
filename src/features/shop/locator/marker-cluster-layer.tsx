@@ -1,3 +1,5 @@
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 /**
  * MarkerClusterLayer — a thin react-leaflet wrapper around the underlying
  * `leaflet.markercluster` plugin. We drive it imperatively instead of via
@@ -10,8 +12,6 @@
  */
 import { createPathComponent } from '@react-leaflet/core';
 import L from 'leaflet';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
 import type { MarkerClusterGroupOptions } from 'leaflet';
 
@@ -62,18 +62,24 @@ function reconcile(instance: L.MarkerClusterGroup, markers: ClusterMarkerSpec[])
     }
     entry.spec = next;
   }
-  if (toRemove.length) instance.removeLayers(toRemove);
+  if (toRemove.length) {
+    instance.removeLayers(toRemove);
+  }
 
   // Bulk-add markers we have not created yet.
   const toAdd: L.Marker[] = [];
   for (const m of markers) {
-    if (registry.has(m.key)) continue;
+    if (registry.has(m.key)) {
+      continue;
+    }
     const marker = L.marker([m.lat, m.lng], { icon: m.icon, keyboard: false, title: m.key });
     marker.bindPopup(m.popupHtml, popupOptions);
     registry.set(m.key, { spec: m, marker });
     toAdd.push(marker);
   }
-  if (toAdd.length) instance.addLayers(toAdd);
+  if (toAdd.length) {
+    instance.addLayers(toAdd);
+  }
 }
 
 const MarkerClusterLayer = createPathComponent<L.MarkerClusterGroup, Props>(
@@ -88,7 +94,7 @@ const MarkerClusterLayer = createPathComponent<L.MarkerClusterGroup, Props>(
   (instance, props) => {
     reconcile(instance, props.markers);
     return true;
-  },
+  }
 );
 
 export default MarkerClusterLayer;

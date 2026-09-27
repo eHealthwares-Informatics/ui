@@ -1,17 +1,21 @@
 import { Alert, Group, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
+import { useNavigate } from '@tanstack/react-router';
 import { CalendarCheck, CheckCircle2, Clock4, Stethoscope, AlertCircle } from 'lucide-react';
 import { useMemo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import { RxPage } from '@/features/components/page/rx-page';
-import { useDashboardSummary } from '../hooks/use-emr-dashboard';
-import { MetricCard } from '../components/dashboard/metric-card';
 import { AppointmentRow } from '../components/dashboard/appointment-row';
+import { MetricCard } from '../components/dashboard/metric-card';
 import { ProviderLoad } from '../components/dashboard/provider-load';
 import { UpcomingList } from '../components/dashboard/upcoming-list';
+import { useDashboardSummary } from '../hooks/use-emr-dashboard';
 
 function greetingForHour(hour: number): string {
-  if (hour < 12) { return 'Good morning'; }
-  if (hour < 17) { return 'Good afternoon'; }
+  if (hour < 12) {
+    return 'Good morning';
+  }
+  if (hour < 17) {
+    return 'Good afternoon';
+  }
   return 'Good evening';
 }
 
@@ -28,7 +32,7 @@ export function EmrDashboardPage() {
         month: 'long',
         day: 'numeric',
       }),
-    [],
+    []
   );
 
   const handleAction = () => {
@@ -36,10 +40,7 @@ export function EmrDashboardPage() {
   };
 
   return (
-    <RxPage
-      breadcrumbs={[{ label: 'EMR' }, { label: 'Dashboard' }]}
-      title=""
-    >
+    <RxPage breadcrumbs={[{ label: 'EMR' }, { label: 'Dashboard' }]} title="">
       {/* GREETING */}
       <Stack gap={4} mb="lg">
         <Title order={2}>{greeting}</Title>
@@ -98,8 +99,12 @@ export function EmrDashboardPage() {
               iconColor="#7048e8"
               iconBg="grape"
               label="Average Wait Time"
-              value={data.metrics.averageWaitMinutes > 0 ? `${data.metrics.averageWaitMinutes}m` : '—'}
-              subtitle={data.metrics.averageWaitMinutes > 0 ? 'from scheduled start' : 'No check-ins yet'}
+              value={
+                data.metrics.averageWaitMinutes > 0 ? `${data.metrics.averageWaitMinutes}m` : '—'
+              }
+              subtitle={
+                data.metrics.averageWaitMinutes > 0 ? 'from scheduled start' : 'No check-ins yet'
+              }
             />
           </SimpleGrid>
 

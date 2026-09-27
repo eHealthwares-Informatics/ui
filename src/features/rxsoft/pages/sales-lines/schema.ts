@@ -3,10 +3,21 @@ import { ColumnDataType, ColumnTypeFilters, type Column } from '../../types';
 
 const saleColumns: Column[] = [
   { key: 'saleNumber', label: 'Sale', filters: ColumnTypeFilters.STRING },
-  { key: 'saleDate', label: 'Date', dataType: ColumnDataType.DATE, filters: ColumnTypeFilters.DATE, sortable: true },
+  {
+    key: 'saleDate',
+    label: 'Date',
+    dataType: ColumnDataType.DATE,
+    filters: ColumnTypeFilters.DATE,
+    sortable: true,
+  },
   { key: 'itemName', label: 'Item', filters: ColumnTypeFilters.STRING },
   { key: 'lineNumber', label: 'Line' },
-  { key: 'quantity', label: 'Qty', dataType: ColumnDataType.NUMBER, filters: ColumnTypeFilters.NUMBER },
+  {
+    key: 'quantity',
+    label: 'Qty',
+    dataType: ColumnDataType.NUMBER,
+    filters: ColumnTypeFilters.NUMBER,
+  },
   { key: 'uomName', label: 'UOM' },
   { key: 'unitPrice', label: 'Unit Price', dataType: ColumnDataType.NUMBER },
   { key: 'discountPercent', label: 'Disc %' },

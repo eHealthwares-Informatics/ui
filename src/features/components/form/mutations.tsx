@@ -3,10 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import type { AxiosInstance } from 'axios';
 import { Field } from '@/features/rxsoft/types';
 import { normalizeMultiSelectIds } from '@/features/shared/payload-utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useApiProvider } from '../../../context/module-context';
 import { triggerBlobDownload } from '../export/download';
 import { getDirtyFields } from '../utils';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type MutationProps = {
   endpoint: string;
@@ -195,7 +195,7 @@ export const useExportMutation = ({ csvEndpoint, title, apiProvider }: ExportMut
       await triggerBlobDownload(
         effectiveApiProvider!,
         { method: 'GET', url: csvEndpoint, params },
-        `${title.toLowerCase().replace(/\s+/g, '_')}.csv`,
+        `${title.toLowerCase().replace(/\s+/g, '_')}.csv`
       );
     },
     onSuccess: () => notifications.show({ message: `${title} export downloaded` }),

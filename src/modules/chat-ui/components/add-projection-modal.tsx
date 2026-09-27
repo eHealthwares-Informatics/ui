@@ -1,8 +1,20 @@
-import { ActionIcon, Alert, Button, Group, Input, Modal, Paper, Select, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Group,
+  Input,
+  Modal,
+  Paper,
+  Select,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AsyncSelectField } from '@/features/components/form/async-field';
+import type { Option } from '@/features/rxsoft/types';
 import {
   addProjection,
   createParticipant,
@@ -10,7 +22,6 @@ import {
   findParticipantByPhone,
 } from '../services/chat-api';
 import type { ParticipantRole } from '../types';
-import type { Option } from '@/features/rxsoft/types';
 
 type Entry = {
   participantId?: string;
@@ -45,20 +56,19 @@ function createEntry(defaultChannelId?: string): Entry {
   };
 }
 
-export function AddProjectionModal({
-  opened,
-  onClose,
-  conversationId,
-  defaultChannelId,
-}: Props) {
+export function AddProjectionModal({ opened, onClose, conversationId, defaultChannelId }: Props) {
   const queryClient = useQueryClient();
   const [entries, setEntries] = useState<Entry[]>([createEntry(defaultChannelId)]);
 
   useEffect(() => {
-    if (!opened) {return;}
+    if (!opened) {
+      return;
+    }
     setEntries([createEntry(defaultChannelId)]);
 
-    if (!defaultChannelId) {return;}
+    if (!defaultChannelId) {
+      return;
+    }
     fetchChannels()
       .then((channels) => {
         const match = (channels ?? []).find((c: any) => String(c.id) === defaultChannelId);
@@ -68,7 +78,7 @@ export function AddProjectionModal({
               index === 0
                 ? { ...entry, channelId: defaultChannelId, channelLabel: String(match.name ?? '') }
                 : entry
-            ),
+            )
           );
         }
       })
@@ -77,12 +87,16 @@ export function AddProjectionModal({
 
   const addMutation = useMutation({
     mutationFn: async (list: Entry[]) => {
-      if (!conversationId) {throw new Error('No conversation selected');}
+      if (!conversationId) {
+        throw new Error('No conversation selected');
+      }
       for (const entry of list) {
         let participantId = entry.participantId;
         if (!participantId) {
           const phone = entry.phone.trim();
-          if (!phone) {throw new Error('Each projection needs a phone number or participant');}
+          if (!phone) {
+            throw new Error('Each projection needs a phone number or participant');
+          }
           const existing = await findParticipantByPhone(phone);
           if (existing?.id) {
             participantId = existing.id;
@@ -91,7 +105,9 @@ export function AddProjectionModal({
             participantId = created.id;
           }
         }
-        if (!participantId) {throw new Error('Could not resolve participant');}
+        if (!participantId) {
+          throw new Error('Could not resolve participant');
+        }
         await addProjection({
           conversationId,
           participantId,
@@ -117,7 +133,9 @@ export function AddProjectionModal({
     entries.every((entry) => entry.channelId || defaultChannelId);
 
   const handleSubmit = () => {
-    if (!canSubmit) {return;}
+    if (!canSubmit) {
+      return;
+    }
     addMutation.mutate(entries);
   };
 
@@ -152,7 +170,9 @@ export function AddProjectionModal({
             <Stack gap="xs">
               <Group gap="xs" align="end">
                 <AsyncSelectField
-                  value={entry.participantId ? { value: entry.participantId, label: entry.phone } : null}
+                  value={
+                    entry.participantId ? { value: entry.participantId, label: entry.phone } : null
+                  }
                   field={{
                     name: `participant-${index}`,
                     label: 'Participant',
@@ -183,7 +203,9 @@ export function AddProjectionModal({
                 />
               )}
               <AsyncSelectField
-                value={entry.channelId ? { value: entry.channelId, label: entry.channelLabel } : null}
+                value={
+                  entry.channelId ? { value: entry.channelId, label: entry.channelLabel } : null
+                }
                 field={{
                   name: `channel-${index}`,
                   label: 'Channel',
@@ -198,7 +220,10 @@ export function AddProjectionModal({
                   placeholder: 'Select channel',
                 }}
                 onChange={(option) =>
-                  updateEntry(index, { channelId: option?.value || '', channelLabel: option?.label || '' })
+                  updateEntry(index, {
+                    channelId: option?.value || '',
+                    channelLabel: option?.label || '',
+                  })
                 }
               />
               <Select

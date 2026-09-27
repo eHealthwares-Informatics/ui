@@ -10,7 +10,14 @@ interface Props {
   stockLocationName?: string;
 }
 
-export function SaleTabs({ sessions, activeSessionId, onChange, onAdd, onClose, stockLocationName }: Props) {
+export function SaleTabs({
+  sessions,
+  activeSessionId,
+  onChange,
+  onAdd,
+  onClose,
+  stockLocationName,
+}: Props) {
   return (
     <Group px="md" py={4} bg="#d9edf5" justify="space-between">
       <Group gap={4}>
@@ -47,7 +54,9 @@ export function SaleTabs({ sessions, activeSessionId, onChange, onAdd, onClose, 
       </Group>
       <Group gap="xs">
         {stockLocationName && (
-          <Text size="xs" c="dimmed">Loc: {stockLocationName}</Text>
+          <Text size="xs" c="dimmed">
+            Loc: {stockLocationName}
+          </Text>
         )}
         <Text size="sm" fw={600}>
           {sessions.find((s) => s.id === activeSessionId)?.customerName || 'Walk-in'} |{' '}

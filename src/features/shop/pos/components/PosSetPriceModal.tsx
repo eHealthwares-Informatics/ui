@@ -2,9 +2,9 @@ import { Button, Group, Modal, NumberInput, Stack, Table, Text } from '@mantine/
 import { notifications } from '@mantine/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { priceListKeys } from '../../api/posApi';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface Props {
   opened: boolean;
@@ -38,7 +38,9 @@ export function PosSetPriceModal({
   const { data: entries = [], isLoading } = useQuery<PriceListItem[]>({
     queryKey: priceListKeys.items(itemId),
     queryFn: async () => {
-      if (!itemId) {return [];}
+      if (!itemId) {
+        return [];
+      }
       const { data } = await rxsoftApi.get('/price-lists/items', {
         params: { itemId, limit: 100 },
       });
@@ -68,7 +70,9 @@ export function PosSetPriceModal({
   }, [opened, existing?.id]);
 
   async function handleSave() {
-    if (!itemId || price === null || Number(price) < 0) {return;}
+    if (!itemId || price === null || Number(price) < 0) {
+      return;
+    }
     setSaving(true);
     try {
       if (existing) {
@@ -83,7 +87,10 @@ export function PosSetPriceModal({
           unitPrice: Number(price),
         });
       } else {
-        notifications.show({ color: 'orange', message: 'No price list selected on this POS session.' });
+        notifications.show({
+          color: 'orange',
+          message: 'No price list selected on this POS session.',
+        });
         return;
       }
       notifications.show({ message: `Price set to ${Number(price).toFixed(2)}`, color: 'green' });
@@ -108,9 +115,13 @@ export function PosSetPriceModal({
         </Text>
 
         {isLoading ? (
-          <Text size="sm" c="dimmed">Loading prices...</Text>
+          <Text size="sm" c="dimmed">
+            Loading prices...
+          </Text>
         ) : entries.length === 0 ? (
-          <Text size="sm" c="dimmed">No prices configured for this item yet.</Text>
+          <Text size="sm" c="dimmed">
+            No prices configured for this item yet.
+          </Text>
         ) : (
           <Table striped withTableBorder withColumnBorders>
             <Table.Thead>

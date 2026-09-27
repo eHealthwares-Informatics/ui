@@ -1,15 +1,17 @@
 import { Button, Card, Divider, Group, Stack, Table, Text, Title } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { Download } from 'lucide-react';
+import { useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { rxsoftApi, downloadBlob } from '@/lib/rxsoft-api';
 
 function sectionTable(title: string, accounts: any[], total: number, color: string) {
   return (
     <Stack gap="xs">
-      <Title order={5} c={color}>{title}</Title>
+      <Title order={5} c={color}>
+        {title}
+      </Title>
       <Table striped withTableBorder withColumnBorders>
         <Table.Thead>
           <Table.Tr>
@@ -21,7 +23,11 @@ function sectionTable(title: string, accounts: any[], total: number, color: stri
         <Table.Tbody>
           {accounts.length === 0 ? (
             <Table.Tr>
-              <Table.Td colSpan={3}><Text c="dimmed" size="sm">No accounts</Text></Table.Td>
+              <Table.Td colSpan={3}>
+                <Text c="dimmed" size="sm">
+                  No accounts
+                </Text>
+              </Table.Td>
             </Table.Tr>
           ) : (
             accounts.map((a: any) => (
@@ -64,8 +70,12 @@ export function IncomeStatementPage() {
 
   const handleExport = async () => {
     await downloadBlob(
-      { method: 'GET', url: '/reports/income-statement', params: { fromDate, toDate, export: 'csv' } },
-      `income_statement_${fromDate}_${toDate}.csv`,
+      {
+        method: 'GET',
+        url: '/reports/income-statement',
+        params: { fromDate, toDate, export: 'csv' },
+      },
+      `income_statement_${fromDate}_${toDate}.csv`
     );
   };
 
@@ -74,7 +84,13 @@ export function IncomeStatementPage() {
       title="Income Statement"
       description="Revenue, costs, and expenses for a period."
       actions={
-        <Button variant="subtle" leftSection={<Download size={14} />} onClick={handleExport} loading={isFetching} size="sm">
+        <Button
+          variant="subtle"
+          leftSection={<Download size={14} />}
+          onClick={handleExport}
+          loading={isFetching}
+          size="sm"
+        >
           Export
         </Button>
       }
@@ -89,28 +105,51 @@ export function IncomeStatementPage() {
 
         <Card withBorder>
           {isFetching ? (
-            <Text c="dimmed" size="sm">Loading...</Text>
+            <Text c="dimmed" size="sm">
+              Loading...
+            </Text>
           ) : !data ? (
-            <Text c="dimmed" size="sm">No data found.</Text>
+            <Text c="dimmed" size="sm">
+              No data found.
+            </Text>
           ) : (
             <Stack gap="lg">
-              {sectionTable('Revenue', data.revenue?.accounts ?? [], data.revenue?.total ?? 0, 'green')}
-              {sectionTable('Cost of Goods Sold', data.cogs?.accounts ?? [], data.cogs?.total ?? 0, 'red')}
+              {sectionTable(
+                'Revenue',
+                data.revenue?.accounts ?? [],
+                data.revenue?.total ?? 0,
+                'green'
+              )}
+              {sectionTable(
+                'Cost of Goods Sold',
+                data.cogs?.accounts ?? [],
+                data.cogs?.total ?? 0,
+                'red'
+              )}
 
               <Group justify="space-between" px="md">
                 <Text fw={600}>Gross Profit</Text>
-                <Text fw={600} c={data.grossProfit >= 0 ? 'green' : 'red'}>{data.grossProfit?.toFixed(2)}</Text>
+                <Text fw={600} c={data.grossProfit >= 0 ? 'green' : 'red'}>
+                  {data.grossProfit?.toFixed(2)}
+                </Text>
               </Group>
 
               <Divider />
 
-              {sectionTable('Operating Expenses', data.operatingExpenses?.accounts ?? [], data.operatingExpenses?.total ?? 0, 'orange')}
+              {sectionTable(
+                'Operating Expenses',
+                data.operatingExpenses?.accounts ?? [],
+                data.operatingExpenses?.total ?? 0,
+                'orange'
+              )}
 
               <Divider />
 
               <Group justify="space-between" px="md">
                 <Title order={4}>Net Income</Title>
-                <Title order={4} c={data.netIncome >= 0 ? 'green' : 'red'}>{data.netIncome?.toFixed(2)}</Title>
+                <Title order={4} c={data.netIncome >= 0 ? 'green' : 'red'}>
+                  {data.netIncome?.toFixed(2)}
+                </Title>
               </Group>
             </Stack>
           )}

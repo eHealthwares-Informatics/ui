@@ -35,7 +35,9 @@ export function DragAndDropList<TItem>({
   );
 
   function moveItem(from: number, to: number) {
-    if (from === to || to < 0 || to >= items.length) {return;}
+    if (from === to || to < 0 || to >= items.length) {
+      return;
+    }
 
     const nextItems = [...items];
     const [moved] = nextItems.splice(from, 1);
@@ -89,7 +91,9 @@ export function DragAndDropList<TItem>({
                 onDragStart={() => setDragIndex(index)}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={() => {
-                  if (dragIndex != null) {moveItem(dragIndex, index);}
+                  if (dragIndex != null) {
+                    moveItem(dragIndex, index);
+                  }
                   setDragIndex(null);
                 }}
                 onDragEnd={() => setDragIndex(null)}

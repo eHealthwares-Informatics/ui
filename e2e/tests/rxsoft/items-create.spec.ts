@@ -18,7 +18,7 @@ async function pickOption(
   fieldName: string,
   query: string,
   optionLabel: string,
-  { exact = false }: { exact?: boolean } = {},
+  { exact = false }: { exact?: boolean } = {}
 ) {
   const input = page.getByTestId(`async-select-${fieldName}`);
   await expect(input).toBeEnabled();
@@ -61,18 +61,20 @@ test.describe('RxSoft items create (wizard)', () => {
     await pickOption(page, 'purchaseUom', 'Doz', 'Dozen(s)');
     await pickOption(page, 'saleUom', 'Unit', 'Unit(s)');
 
-// First Next is "Create & Continue": the Price List tab has `waitFor: id`,
-// so stepping submits the item (POST). Remaining tabs advance with plain Next.
-await page.getByRole('button', { name: 'Create & Continue' }).click();
-await page.getByRole('button', { name: 'Next' }).click();
-await page.getByRole('button', { name: 'Next' }).click();
-// Final tab (Images) → Submit → PATCH finalise.
-await page.getByRole('button', { name: 'Submit' }).click();
+    // First Next is "Create & Continue": the Price List tab has `waitFor: id`,
+    // so stepping submits the item (POST). Remaining tabs advance with plain Next.
+    await page.getByRole('button', { name: 'Create & Continue' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+    // Final tab (Images) → Submit → PATCH finalise.
+    await page.getByRole('button', { name: 'Submit' }).click();
 
     // Back on the list; the created item is searchable.
     await page.waitForURL((url) => url.pathname === '/rxsoft/items', { timeout: 20_000 });
     await page.getByTestId('header-search').fill(token);
-    await expect(page.getByTestId('data-table-body').locator('tr').filter({ hasText: token }).first()).toBeVisible({
+    await expect(
+      page.getByTestId('data-table-body').locator('tr').filter({ hasText: token }).first()
+    ).toBeVisible({
       timeout: 15_000,
     });
   });

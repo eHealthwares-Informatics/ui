@@ -19,7 +19,14 @@ const createFieldGroups: FieldGroup[] = [
   {
     title: 'EQA Result',
     fields: [
-      { name: 'enrollmentId', label: 'Enrollment', type: 'async-select', searchParam: { endpoint: '/lis/eqa-enrollments', valueKey: 'id', labelKey: 'roundLabel' }, required: true, col: 6 },
+      {
+        name: 'enrollmentId',
+        label: 'Enrollment',
+        type: 'async-select',
+        searchParam: { endpoint: '/lis/eqa-enrollments', valueKey: 'id', labelKey: 'roundLabel' },
+        required: true,
+        col: 6,
+      },
       { name: 'sampleNumber', label: 'Sample Number', type: 'text', required: true, col: 6 },
       { name: 'value', label: 'Value', type: 'text', col: 12 },
     ],
@@ -29,7 +36,8 @@ const createFieldGroups: FieldGroup[] = [
 export const eqaResultsConfig: ModelConfig = {
   id: 'eqa-results',
   title: 'EQA Results',
-  description: 'Result submissions for EQA program samples, with performance evaluation including z-scores and pass/fail status.',
+  description:
+    'Result submissions for EQA program samples, with performance evaluation including z-scores and pass/fail status.',
   endpoint: '/lis/eqa-results',
   columns,
   createFieldGroups,

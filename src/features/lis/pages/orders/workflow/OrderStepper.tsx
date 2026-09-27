@@ -18,8 +18,12 @@ export function OrderStepper() {
 
   const getStepStatus = (index: number): 'stepInactive' | 'stepProgress' | 'stepComplete' => {
     const key = STEP_KEYS[index];
-    if (state.stepProgress[key]) return 'stepComplete';
-    if (index === state.currentStep) return 'stepProgress';
+    if (state.stepProgress[key]) {
+      return 'stepComplete';
+    }
+    if (index === state.currentStep) {
+      return 'stepProgress';
+    }
     return 'stepInactive';
   };
 

@@ -16,7 +16,7 @@ export function PatientLookup() {
   const lookup = useMutation({
     mutationFn: async (value: string) => {
       const { data } = await emrApi.get<PatientDetail>(
-        `/patients/by-mrn/${encodeURIComponent(value)}`,
+        `/patients/by-mrn/${encodeURIComponent(value)}`
       );
       return data;
     },

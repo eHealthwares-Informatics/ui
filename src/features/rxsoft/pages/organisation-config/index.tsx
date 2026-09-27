@@ -17,8 +17,8 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 type OrganisationConfig = {
   id: string;
@@ -87,7 +87,7 @@ export function RxOrganisationConfigPage() {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const { data } = await rxsoftApi.get(
-        `/organisation-config/by-organization/${organizationId}`,
+        `/organisation-config/by-organization/${organizationId}`
       );
       return data as OrganisationConfig;
     },
@@ -146,7 +146,7 @@ export function RxOrganisationConfigPage() {
               : Number(draft.defaultLoginTimeoutMinutes),
           defaultAllowPos: draft.defaultAllowPos,
           defaultAllowA4Print: draft.defaultAllowA4Print,
-        },
+        }
       );
       return data as OrganisationConfig;
     },
@@ -159,7 +159,7 @@ export function RxOrganisationConfigPage() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 
@@ -254,9 +254,7 @@ export function RxOrganisationConfigPage() {
               <Select
                 label="Default Price List"
                 description="Price list used for storefront prices and sorting. Falls back to the price list marked default when unset."
-                placeholder={
-                  loadingPriceLists ? 'Loading price lists…' : 'Select a price list'
-                }
+                placeholder={loadingPriceLists ? 'Loading price lists…' : 'Select a price list'}
                 data={priceListData}
                 value={draft.defaultPriceListId}
                 onChange={(value) => {
@@ -321,9 +319,7 @@ export function RxOrganisationConfigPage() {
               <NumberInput
                 label="Default Login Timeout (minutes)"
                 value={draft.defaultLoginTimeoutMinutes}
-                onChange={(value) =>
-                  setDraft((d) => ({ ...d, defaultLoginTimeoutMinutes: value }))
-                }
+                onChange={(value) => setDraft((d) => ({ ...d, defaultLoginTimeoutMinutes: value }))}
                 min={1}
                 allowDecimal={false}
               />

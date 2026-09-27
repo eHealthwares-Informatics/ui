@@ -13,7 +13,8 @@ interface Props {
 }
 
 export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
-  const { tabs, activeTabId, setSupplier, setWarehouse, setReceiptNumber, setPendingPo } = usePoStore();
+  const { tabs, activeTabId, setSupplier, setWarehouse, setReceiptNumber, setPendingPo } =
+    usePoStore();
   const activeTab = tabs.find((t) => t.id === activeTabId);
   const supplierId = activeTab?.supplierId ?? '';
   const warehouseId = activeTab?.warehouseId ?? '';
@@ -39,12 +40,12 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
     label: w.name,
   }));
 
-  const pendingPOpts = (Array.isArray(orders) ? orders : []).filter(
-    (o: any) => o.status === 'approved' || o.status === 'draft',
-  ).map((o: any) => ({
-    value: o.id,
-    label: `${o.invoiceNumber || o.purchaseOrderNumber}:${o.supplier?.name || ''}:${o.receiptNumber || o.status}`,
-  }));
+  const pendingPOpts = (Array.isArray(orders) ? orders : [])
+    .filter((o: any) => o.status === 'approved' || o.status === 'draft')
+    .map((o: any) => ({
+      value: o.id,
+      label: `${o.invoiceNumber || o.purchaseOrderNumber}:${o.supplier?.name || ''}:${o.receiptNumber || o.status}`,
+    }));
 
   return (
     <>
@@ -82,8 +83,17 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
                   taxPercent: l.taxPercent || 0,
                   lineSubtotal: l.lineSubtotal || 0,
                   lineTotal: l.lineTotal || 0,
-                  receivedSubtotal: computeSubtotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0),
-                  receivedLineTotal: computeTotal(l.receivedQty || 0, l.unitCost, l.discountPercent || 0, l.taxPercent || 0),
+                  receivedSubtotal: computeSubtotal(
+                    l.receivedQty || 0,
+                    l.unitCost,
+                    l.discountPercent || 0
+                  ),
+                  receivedLineTotal: computeTotal(
+                    l.receivedQty || 0,
+                    l.unitCost,
+                    l.discountPercent || 0,
+                    l.taxPercent || 0
+                  ),
                   isDraft: false,
                   isPosted: Number(l.receivedQty || 0) > 0,
                   serverLineId: l.id,
@@ -101,11 +111,15 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
           <Badge
             data-testid="po-status-badge"
             color={
-              activeTab.pendingPoStatus === 'draft' ? 'yellow' :
-              activeTab.pendingPoStatus === 'approved' ? 'blue' :
-              activeTab.pendingPoStatus === 'partially_received' ? 'orange' :
-              activeTab.pendingPoStatus === 'received' ? 'green' :
-              'gray'
+              activeTab.pendingPoStatus === 'draft'
+                ? 'yellow'
+                : activeTab.pendingPoStatus === 'approved'
+                  ? 'blue'
+                  : activeTab.pendingPoStatus === 'partially_received'
+                    ? 'orange'
+                    : activeTab.pendingPoStatus === 'received'
+                      ? 'green'
+                      : 'gray'
             }
             size="lg"
           >
@@ -120,7 +134,9 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
           data={supplierOpts}
           value={supplierId || null}
           onChange={(v, opt) => {
-            if (v) {setSupplier(v, opt.label);}
+            if (v) {
+              setSupplier(v, opt.label);
+            }
           }}
           onSearchChange={setSupplierSearch}
           searchable
@@ -139,7 +155,9 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
           data={warehouseOpts}
           value={warehouseId || null}
           onChange={(v, opt) => {
-            if (v) {setWarehouse(v, opt.label);}
+            if (v) {
+              setWarehouse(v, opt.label);
+            }
           }}
           onSearchChange={setWarehouseSearch}
           searchable
@@ -156,11 +174,22 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
           w={140}
         />
 
-        <Button size="xs" leftSection={<FileText size={14} />} onClick={onNew} data-testid="po-new-btn">
+        <Button
+          size="xs"
+          leftSection={<FileText size={14} />}
+          onClick={onNew}
+          data-testid="po-new-btn"
+        >
           New
         </Button>
 
-        <Button size="xs" color="red" leftSection={<RefreshCcw size={14} />} onClick={onReset} data-testid="po-reset-btn">
+        <Button
+          size="xs"
+          color="red"
+          leftSection={<RefreshCcw size={14} />}
+          onClick={onReset}
+          data-testid="po-reset-btn"
+        >
           Reset
         </Button>
 

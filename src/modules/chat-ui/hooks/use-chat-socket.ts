@@ -31,8 +31,7 @@ export function useChatSocket(input: {
   onConversationCreatedRef.current = onConversationCreated;
 
   const roomPayloadRef = useRef<{ conversationId?: string; participantId?: string }>({});
-  roomPayloadRef.current =
-    conversationId && participantId ? { conversationId, participantId } : {};
+  roomPayloadRef.current = conversationId && participantId ? { conversationId, participantId } : {};
   const pendingRoomPayloadRef = useRef<{ conversationId?: string; participantId?: string }>({});
   pendingRoomPayloadRef.current =
     pendingConversationId && pendingParticipantId
@@ -58,13 +57,17 @@ export function useChatSocket(input: {
     // Orphan messages belong to a conversation that has not been created yet;
     // surface them on the compose/pending thread immediately.
     const onOrphan = (message: ExchangeMessage) => {
-      if (!message.conversationId?.startsWith('pending-')) {return;}
+      if (!message.conversationId?.startsWith('pending-')) {
+        return;
+      }
       setPendingMessages((prev) =>
         prev.some((item) => item.id === message.id) ? prev : [...prev, message]
       );
     };
     const onMessage = (message: ExchangeMessage) => {
-      if (!message.conversationId) {return;}
+      if (!message.conversationId) {
+        return;
+      }
 
       // Messages routed through a "pending-" conversation id belong to the
       // compose thread (no real conversation exists yet). Surface them there
@@ -80,11 +83,15 @@ export function useChatSocket(input: {
         pages: ExchangeMessagesResponse[];
         pageParams: Array<string | undefined>;
       }>(chatKeys.messages(message.conversationId), (current) => {
-        if (!current) {return current;}
+        if (!current) {
+          return current;
+        }
         const exists = current.pages.some((page) =>
           page.items.some((item) => item.id === message.id)
         );
-        if (exists) {return current;}
+        if (exists) {
+          return current;
+        }
 
         const [firstPage, ...restPages] = current.pages;
         return {
@@ -99,11 +106,10 @@ export function useChatSocket(input: {
     // The webhook flow promoted a pending-<participantId> thread to a real
     // conversation. Drop the locally-held pending orphans (they are now
     // backfilled into the real thread) and select the real conversation.
-    const onCreated = (payload: {
-      oldConversationId?: string;
-      newConversationId: string;
-    }) => {
-      if (!payload?.newConversationId) {return;}
+    const onCreated = (payload: { oldConversationId?: string; newConversationId: string }) => {
+      if (!payload?.newConversationId) {
+        return;
+      }
       setPendingMessages([]);
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
       onConversationCreatedRef.current?.(payload.newConversationId);
@@ -129,7 +135,9 @@ export function useChatSocket(input: {
         pages: ConversationInboxResponse[];
         pageParams: Array<string | undefined>;
       }>({ queryKey: ['conversation-inbox'] }, (current) => {
-        if (!current) {return current;}
+        if (!current) {
+          return current;
+        }
         return {
           ...current,
           pages: current.pages.map((page) => ({
@@ -168,7 +176,9 @@ export function useChatSocket(input: {
   }, [queryClient]);
 
   useEffect(() => {
-    if (!conversationId || !participantId) {return;}
+    if (!conversationId || !participantId) {
+      return;
+    }
 
     const socket = getConversationSocket();
     const payload = {
@@ -183,7 +193,9 @@ export function useChatSocket(input: {
   }, [conversationId, participantId]);
 
   useEffect(() => {
-    if (!pendingConversationId || !pendingParticipantId) {return;}
+    if (!pendingConversationId || !pendingParticipantId) {
+      return;
+    }
 
     const socket = getConversationSocket();
     const payload = {

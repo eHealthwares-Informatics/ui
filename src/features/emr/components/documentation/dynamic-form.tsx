@@ -16,8 +16,8 @@ import {
   TextInput,
 } from '@mantine/core';
 import { Plus, Trash2 } from 'lucide-react';
-import type { FormFieldSchema, FormSchema } from '../../lib/emr-types';
 import { formatEnum } from '../../lib/emr-constants';
+import type { FormFieldSchema, FormSchema } from '../../lib/emr-types';
 import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 
 export type FormData = Record<string, unknown>;
@@ -55,7 +55,9 @@ function TableCell({
         />
       );
     case 'checkbox':
-      return <Checkbox checked={Boolean(value)} onChange={(e) => onChange(e.currentTarget.checked)} />;
+      return (
+        <Checkbox checked={Boolean(value)} onChange={(e) => onChange(e.currentTarget.checked)} />
+      );
     case 'textarea':
       return (
         <Textarea
@@ -91,7 +93,7 @@ function TableField({
 
   const updateRow = (rowIndex: number, columnKey: string, cellValue: unknown) => {
     const next = rows.map((row, index) =>
-      index === rowIndex ? { ...row, [columnKey]: cellValue } : row,
+      index === rowIndex ? { ...row, [columnKey]: cellValue } : row
     );
     onChange(next);
   };
@@ -102,7 +104,12 @@ function TableField({
         <Text size="sm" fw={500}>
           {field.label}
         </Text>
-        <Button size="compact-xs" variant="light" leftSection={<Plus size={13} />} onClick={() => onChange([...rows, {}])}>
+        <Button
+          size="compact-xs"
+          variant="light"
+          leftSection={<Plus size={13} />}
+          onClick={() => onChange([...rows, {}])}
+        >
           Add row
         </Button>
       </Group>
@@ -368,10 +375,7 @@ export function buildInitialFormData(schema: FormSchema): FormData {
 }
 
 /** Lightweight client-side validation mirroring the backend schema validator. */
-export function validateFormData(
-  schema: FormSchema,
-  data: FormData,
-): string[] {
+export function validateFormData(schema: FormSchema, data: FormData): string[] {
   const errors: string[] = [];
 
   const validateField = (field: FormFieldSchema): void => {

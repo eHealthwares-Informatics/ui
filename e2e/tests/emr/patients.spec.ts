@@ -59,8 +59,8 @@ test('registers a new patient (UC-01 register patient)', async ({ page }) => {
     patients,
     onRequest: (method, url, body) => {
       if (method === 'POST') {
-      posts.push({ method, url, body });
-    }
+        posts.push({ method, url, body });
+      }
     },
   });
   await page.goto('/emr/patients');

@@ -1,6 +1,5 @@
 import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
-
 import { adminCredentials } from '../fixtures/data';
 
 /**

@@ -6,14 +6,22 @@ import { conversationApi } from '@/lib/conversation-api';
 import { AnswerValue, ConversationSession } from './-types';
 
 export function getBooleanParam(value: string | null, fallback = true) {
-  if (value == null) {return fallback;}
+  if (value == null) {
+    return fallback;
+  }
   return ['1', 'true', 'yes'].includes(value.toLowerCase());
 }
 
 export function stringifyAnswer(value: AnswerValue) {
-  if (Array.isArray(value)) {return value.join(', ');}
-  if (typeof value === 'boolean') {return value ? 'Yes' : 'No';}
-  if (value == null) {return '';}
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+  if (value == null) {
+    return '';
+  }
   return String(value);
 }
 
@@ -42,9 +50,13 @@ export function buildSummaryMessage(
 }
 
 export async function resolveQuestions(session: ConversationSession) {
-  if (session.questions?.length) {return session.questions;}
+  if (session.questions?.length) {
+    return session.questions;
+  }
 
-  if (!session.questionnaireId) {return [];}
+  if (!session.questionnaireId) {
+    return [];
+  }
 
   const response = await conversationApi.get('/questions', {
     params: { questionnaireId: session.questionnaireId },

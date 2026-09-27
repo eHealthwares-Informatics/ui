@@ -27,7 +27,7 @@ export interface ReplyingAnimationResult<T> {
  */
 export function useReplyingAnimation<T extends { id: string }>(
   messages: T[],
-  options: ReplyingAnimationOptions<T>,
+  options: ReplyingAnimationOptions<T>
 ): ReplyingAnimationResult<T> {
   const {
     key = null,
@@ -71,7 +71,7 @@ export function useReplyingAnimation<T extends { id: string }>(
     }
 
     const incoming = messages.filter(
-      (message) => isIncomingRef.current(message) && !seenRef.current.has(message.id),
+      (message) => isIncomingRef.current(message) && !seenRef.current.has(message.id)
     );
 
     // First population of a thread is history — show it immediately.
@@ -98,10 +98,7 @@ export function useReplyingAnimation<T extends { id: string }>(
       seenRef.current.add(message.id);
       toHold[message.id] = true;
       const text = getTextRef.current?.(message) ?? '';
-      const delay = Math.min(
-        maxDelayMs,
-        Math.max(minDelayMs, Math.floor(text.length * perCharMs)),
-      );
+      const delay = Math.min(maxDelayMs, Math.max(minDelayMs, Math.floor(text.length * perCharMs)));
       cumulative += delay;
       const messageId = message.id;
       const timer = setTimeout(() => {
@@ -126,10 +123,7 @@ export function useReplyingAnimation<T extends { id: string }>(
 
   useEffect(() => clearTimers, []);
 
-  const visible = useMemo(
-    () => messages.filter((message) => !held[message.id]),
-    [messages, held],
-  );
+  const visible = useMemo(() => messages.filter((message) => !held[message.id]), [messages, held]);
 
   return { visible, replying: Object.keys(held).length > 0 };
 }

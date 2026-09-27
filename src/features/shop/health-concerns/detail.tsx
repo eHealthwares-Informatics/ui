@@ -44,13 +44,13 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { useChatbotStore } from '../website/chatbot-store';
+import { SectionHeading, PrimaryButton, OutlineButton, ProductCard } from '../website/components';
 import {
   toHL7Prescription,
   buildWhatsAppUrl,
   WEBSITE_PRESCRIPTION_PHONE,
   QUESTIONNAIRE_CODES,
 } from '../website/hl7-prescription';
-import { SectionHeading, PrimaryButton, OutlineButton, ProductCard } from '../website/components';
 import { useHealthConcernBySlug } from '../website/hooks';
 import { WebsiteLayout, green, darkGreen, ink, muted, line, soft } from '../website/layout';
 import type { BlogArticleView } from '../website/types';
@@ -857,7 +857,9 @@ export default function HealthConcernDetailPage() {
                     leftSection={<MessageSquare size={18} />}
                     onClick={() => {
                       const msg = `${QUESTIONNAIRE_CODES.HEALTH_CONSULTATION}\r\nI need information about ${concern?.name || 'a health concern'}`;
-                      useChatbotStore.getState().openWith(msg, QUESTIONNAIRE_CODES.HEALTH_CONSULTATION);
+                      useChatbotStore
+                        .getState()
+                        .openWith(msg, QUESTIONNAIRE_CODES.HEALTH_CONSULTATION);
                     }}
                   >
                     Chat
@@ -1275,9 +1277,7 @@ function ArticleCard({ article }: { article: BlogArticleView }) {
         boxShadow: '0 12px 36px rgba(15, 23, 42, 0.04)',
         cursor: 'pointer',
       }}
-      onClick={() =>
-        navigate({ to: `/shop/blog/${article.slug}`, params: { slug: article.slug } })
-      }
+      onClick={() => navigate({ to: `/shop/blog/${article.slug}`, params: { slug: article.slug } })}
     >
       <Stack gap="md" p="lg">
         {article.imageUrl ? (

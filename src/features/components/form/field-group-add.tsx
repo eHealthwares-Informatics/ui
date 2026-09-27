@@ -6,10 +6,10 @@ import {
   mergeRowToSaved,
   PricingMatrixRow,
 } from '@/features/rxsoft/pages/products/utils/pricing-matrix-helper';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { DataTable } from '../table/table';
 import { Props } from './FieldGroup';
 import { RenderField } from './RenderField';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index }: Props) {
   const parentId = String(formState.id) || '';
@@ -23,7 +23,6 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
     ...fieldGroup.defaultState,
     [fieldGroup.parentId || '']: parentId,
   });
-
 
   const syncRows = useCallback(
     (nextRows: Record<string, unknown>[], nextOriginalRows?: Record<string, unknown>[]) => {
@@ -153,7 +152,7 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
       const nextOriginalRows = originalRows.map((item) => (item.id === row.id ? savedRow : item));
       syncRows(nextRows, nextOriginalRows);
       notifications.show({
-        title: `${fieldGroup.title  } saved`,
+        title: `${fieldGroup.title} saved`,
         message: `${row.priceListName}  updated`,
         color: 'green',
       });
@@ -165,7 +164,7 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
       setRows(nextRows);
       updateField(rowsField, nextRows, index);
       notifications.show({
-        title: `${fieldGroup.title  } save failed`,
+        title: `${fieldGroup.title} save failed`,
         message: String(message),
         color: 'red',
       });
@@ -201,14 +200,14 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
       });
       await loadMatrix();
       notifications.show({
-        title: `${title  } saved`,
+        title: `${title} saved`,
         message: 'Manual price entry created',
         color: 'green',
       });
     } catch (err: any) {
       const message = getApiErrorMessage(err);
       setError(String(message));
-      notifications.show({ title: `${title  } save failed`, message: String(message), color: 'red' });
+      notifications.show({ title: `${title} save failed`, message: String(message), color: 'red' });
     } finally {
       setSavingRowId(null);
     }

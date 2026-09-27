@@ -24,8 +24,8 @@ const columns: Column[] = [
   { key: 'paymentProvider.name', label: 'Provider Name' },
   { key: 'paymentProvider.providerType', label: 'Provider Type' },
   { key: 'paymentProvider.channel', label: 'Channel' },
-  { key: 'isActive', label: 'Active', render: (row: any) => row.isActive ? 'Yes' : 'No' },
-  { key: 'isDefault', label: 'Default', render: (row: any) => row.isDefault ? 'Yes' : 'No' },
+  { key: 'isActive', label: 'Active', render: (row: any) => (row.isActive ? 'Yes' : 'No') },
+  { key: 'isDefault', label: 'Default', render: (row: any) => (row.isDefault ? 'Yes' : 'No') },
 ];
 
 const createFields: Field[] = [
@@ -47,8 +47,12 @@ const createFields: Field[] = [
 ];
 
 function coerceJson(value: unknown): Record<string, unknown> | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  if (typeof value === 'object') return value as Record<string, unknown>;
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (typeof value === 'object') {
+    return value as Record<string, unknown>;
+  }
   try {
     return JSON.parse(String(value));
   } catch {
@@ -67,14 +71,22 @@ function buildCreatePayload(values: Record<string, unknown>) {
 
 function buildUpdatePayload(values: Record<string, unknown>): Record<string, unknown> {
   const payload: Record<string, unknown> = {};
-  if (values.isActive !== undefined) { payload.isActive = values.isActive; }
-  if (values.isDefault !== undefined) { payload.isDefault = values.isDefault; }
+  if (values.isActive !== undefined) {
+    payload.isActive = values.isActive;
+  }
+  if (values.isDefault !== undefined) {
+    payload.isDefault = values.isDefault;
+  }
   return payload;
 }
 
 function stringifyJson(value: unknown): string {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
+  if (value == null) {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
   try {
     return JSON.stringify(value, null, 2);
   } catch {

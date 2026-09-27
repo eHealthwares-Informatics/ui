@@ -76,15 +76,17 @@ test('amends a submission from the encounter documentation tab (UC-32 amend)', a
   });
 });
 
-test('submits documentation against the active encounter (UC-30 documentation popup)', async ({ page }) => {
+test('submits documentation against the active encounter (UC-30 documentation popup)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     encounters: [encounter],
     forms,
     onRequest: (method, url, body) => {
       if (method === 'POST') {
-      posts.push({ method, url, body });
-    }
+        posts.push({ method, url, body });
+      }
     },
   });
   await page.goto('/emr/encounters/enc-1');

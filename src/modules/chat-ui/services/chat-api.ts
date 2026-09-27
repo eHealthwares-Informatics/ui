@@ -1,5 +1,5 @@
-import { conversationApi } from '@/lib/conversation-api';
 import { getArrayPayload } from '@/features/components/utils';
+import { conversationApi } from '@/lib/conversation-api';
 import type {
   ConversationInboxResponse,
   ConversationProjection,
@@ -36,9 +36,7 @@ export async function fetchConversationInbox(params: InboxParams) {
 
   const data = response.data;
   // Handle { data, meta } envelope, { data: [...], items, results }, or raw array
-  const raw = Array.isArray(data)
-    ? data
-    : (data?.data ?? data?.items ?? data?.results ?? []);
+  const raw = Array.isArray(data) ? data : (data?.data ?? data?.items ?? data?.results ?? []);
   const meta = data?.meta ?? { total: raw.length, page: 1, limit: 30 };
 
   // Add conversationId alias for backward compat with chat UI
@@ -132,14 +130,14 @@ export async function addProjection(input: {
       participantId: input.participantId,
       channelId: input.channelId,
       role: input.role,
-    },
+    }
   );
   return response.data;
 }
 
 export async function listProjections(conversationId: string) {
   const response = await conversationApi.get<ConversationProjection[]>(
-    `/conversations/${conversationId}/projections`,
+    `/conversations/${conversationId}/projections`
   );
   return response.data;
 }
@@ -149,7 +147,7 @@ export async function removeParticipantProjections(input: {
   participantId: string;
 }) {
   await conversationApi.delete(
-    `/conversations/${input.conversationId}/projections/${input.participantId}`,
+    `/conversations/${input.conversationId}/projections/${input.participantId}`
   );
 }
 

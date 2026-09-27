@@ -16,7 +16,14 @@ const tabGroups: TabGroup[] = [
       {
         title: 'Core Information',
         fields: [
-          { name: 'code', label: 'Code', type: 'text', required: true, col: 4, generateCode: { scope: 'loinc', seedField: 'component' } },
+          {
+            name: 'code',
+            label: 'Code',
+            type: 'text',
+            required: true,
+            col: 4,
+            generateCode: { scope: 'loinc', seedField: 'component' },
+          },
           { name: 'component', label: 'Component', type: 'text', col: 8 },
           { name: 'property', label: 'Property', type: 'text', col: 4 },
           { name: 'system', label: 'System', type: 'text', col: 4 },

@@ -15,7 +15,7 @@ export function formatDuration(ms: number): string {
  */
 export function useElapsedTimer(
   startIso: string | null | undefined,
-  tickMs = 1000,
+  tickMs = 1000
 ): { formatted: string; elapsedMs: number; isRunning: boolean } {
   const [now, setNow] = useState(() => Date.now());
 

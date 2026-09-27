@@ -25,7 +25,7 @@ const TS = Date.now().toString(36);
 async function apiCreate(
   page: import('@playwright/test').Page,
   path: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ) {
   return apiFetch<{ id: string }>(page, path, {
     method: 'POST',
@@ -37,7 +37,7 @@ async function pickOption(
   page: import('@playwright/test').Page,
   testId: string,
   query: string,
-  optionLabel: string,
+  optionLabel: string
 ) {
   const input = page.getByTestId(testId);
   await expect(input).toBeEnabled({ timeout: 15_000 });
@@ -89,9 +89,11 @@ test.describe.serial('Full Business Flow', () => {
       try {
         await request.patch(
           `http://localhost:8080/api/website/admin/orders/${websiteOrderId}/status`,
-          { headers, data: { status: 'cancelled' } },
+          { headers, data: { status: 'cancelled' } }
         );
-      } catch { /* may already be processed */ }
+      } catch {
+        /* may already be processed */
+      }
     }
 
     // 2. Delete price list item
@@ -100,7 +102,7 @@ test.describe.serial('Full Business Flow', () => {
         // Fetch the price list item ID then delete it
         const pliRes = await request.get(
           `http://localhost:8080/api/price-lists/${pricelistId}/items`,
-          { headers },
+          { headers }
         );
         if (pliRes.ok()) {
           const body = await pliRes.json();
@@ -111,27 +113,43 @@ test.describe.serial('Full Business Flow', () => {
             }
           }
         }
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
     }
 
     // 3. Delete pricelist
-    if (pricelistId) await apiDelete(`/price-lists/${pricelistId}`);
+    if (pricelistId) {
+      await apiDelete(`/price-lists/${pricelistId}`);
+    }
 
     // 4. Delete item
-    if (biscuitItemId) await apiDelete(`/items/${biscuitItemId}`);
+    if (biscuitItemId) {
+      await apiDelete(`/items/${biscuitItemId}`);
+    }
 
     // 5. Delete stock location
-    if (junksSalesLocationId) await apiDelete(`/stock-locations/${junksSalesLocationId}`);
+    if (junksSalesLocationId) {
+      await apiDelete(`/stock-locations/${junksSalesLocationId}`);
+    }
 
     // 6. Delete category
-    if (junksCategoryId) await apiDelete(`/categories/${junksCategoryId}`);
+    if (junksCategoryId) {
+      await apiDelete(`/categories/${junksCategoryId}`);
+    }
 
     // 7. Delete UOMs
-    if (dozenUomId) await apiDelete(`/uoms/${dozenUomId}`);
-    if (unitUomId) await apiDelete(`/uoms/${unitUomId}`);
+    if (dozenUomId) {
+      await apiDelete(`/uoms/${dozenUomId}`);
+    }
+    if (unitUomId) {
+      await apiDelete(`/uoms/${unitUomId}`);
+    }
 
     // 8. Delete UOM category
-    if (uomCategoryId) await apiDelete(`/uom-categories/${uomCategoryId}`);
+    if (uomCategoryId) {
+      await apiDelete(`/uom-categories/${uomCategoryId}`);
+    }
   });
 
   /* ── 1. Create UOM Category via API (no UI page for this) ────── */
@@ -185,12 +203,18 @@ test.describe.serial('Full Business Flow', () => {
     const searchInput = page.getByTestId('header-search');
     await searchInput.fill(`Unit-e2e-${TS}`);
     await expect(
-      page.getByTestId('data-table-body').locator('tr').filter({ hasText: `Unit-e2e-${TS}` }),
+      page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .filter({ hasText: `Unit-e2e-${TS}` })
     ).toBeVisible({ timeout: 10_000 });
 
     await searchInput.fill(`Dozen-e2e-${TS}`);
     await expect(
-      page.getByTestId('data-table-body').locator('tr').filter({ hasText: `Dozen-e2e-${TS}` }),
+      page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .filter({ hasText: `Dozen-e2e-${TS}` })
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -258,11 +282,17 @@ test.describe.serial('Full Business Flow', () => {
     await page.waitForURL((url) => url.pathname === '/rxsoft/items', { timeout: 20_000 });
     await page.getByTestId('header-search').fill(`Biscuit-${TS}`);
     await expect(
-      page.getByTestId('data-table-body').locator('tr').filter({ hasText: `Biscuit-${TS}` }),
+      page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .filter({ hasText: `Biscuit-${TS}` })
     ).toBeVisible({ timeout: 15_000 });
 
     // Read the item ID from the API for later use
-    const searchRes = await apiFetch<{ data: Array<{ id: string }> }>(page, `/items?search=Biscuit-${TS}&limit=1`);
+    const searchRes = await apiFetch<{ data: Array<{ id: string }> }>(
+      page,
+      `/items?search=Biscuit-${TS}&limit=1`
+    );
     biscuitItemId = searchRes.data?.[0]?.id ?? '';
     expect(biscuitItemId).toBeTruthy();
   });
@@ -291,7 +321,7 @@ test.describe.serial('Full Business Flow', () => {
     // Read the pricelist ID from API
     const searchRes = await apiFetch<{ data: Array<{ id: string }> }>(
       page,
-      `/price-lists?search=Retail-Prices e2e ${TS}&limit=1`,
+      `/price-lists?search=Retail-Prices e2e ${TS}&limit=1`
     );
     pricelistId = searchRes.data?.[0]?.id ?? '';
     expect(pricelistId).toBeTruthy();
@@ -325,8 +355,15 @@ test.describe.serial('Full Business Flow', () => {
     });
 
     // Click the edit (pencil) button on the first matching row
-    const row = page.getByTestId('data-table-body').locator('tr').filter({ hasText: `Biscuit-${TS}` }).first();
-    const pencil = row.locator('button').filter({ has: page.locator('svg.lucide-pencil') }).first();
+    const row = page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .filter({ hasText: `Biscuit-${TS}` })
+      .first();
+    const pencil = row
+      .locator('button')
+      .filter({ has: page.locator('svg.lucide-pencil') })
+      .first();
     await expect(pencil).toBeVisible();
     await pencil.click();
 
@@ -368,26 +405,22 @@ test.describe.serial('Full Business Flow', () => {
     expect(poRes.status).toBe('approved');
 
     // Receive goods
-    const recvRes = await apiFetch<{ receiptNumber: string }>(
-      page,
-      `/purchases/${poId}/receive`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          purchaseOrderId: poId,
-          receivedDate: new Date().toISOString(),
-          receiptNumber: `GR-E2E-${TS}`,
-          lines: [
-            {
-              itemId: biscuitItemId,
-              receivedQty: 2,
-              uomId: dozenUomId,
-              unitCost: 5,
-            },
-          ],
-        }),
-      },
-    );
+    const recvRes = await apiFetch<{ receiptNumber: string }>(page, `/purchases/${poId}/receive`, {
+      method: 'POST',
+      body: JSON.stringify({
+        purchaseOrderId: poId,
+        receivedDate: new Date().toISOString(),
+        receiptNumber: `GR-E2E-${TS}`,
+        lines: [
+          {
+            itemId: biscuitItemId,
+            receivedQty: 2,
+            uomId: dozenUomId,
+            unitCost: 5,
+          },
+        ],
+      }),
+    });
     expect(recvRes.receiptNumber).toBe(`GR-E2E-${TS}`);
   });
 
@@ -419,7 +452,12 @@ test.describe.serial('Full Business Flow', () => {
     let targetIndex = -1;
     for (let i = 0; i < rowCount; i++) {
       const avail = Number(
-        await rows.nth(i).locator('td').nth(5).innerText().catch(() => '0'),
+        await rows
+          .nth(i)
+          .locator('td')
+          .nth(5)
+          .innerText()
+          .catch(() => '0')
       );
       if (avail > 0) {
         targetIndex = i;
@@ -431,7 +469,7 @@ test.describe.serial('Full Business Flow', () => {
       // Fallback: use API for transfer if no UI row found
       const mainLocationRes = await apiFetch<{ data: Array<{ id: string }> }>(
         page,
-        '/stock-locations?search=Main&limit=1',
+        '/stock-locations?search=Main&limit=1'
       );
       const mainLocationId = mainLocationRes.data?.[0]?.id ?? '';
       await apiFetch(page, '/inventory/transfers', {
@@ -506,27 +544,23 @@ test.describe.serial('Full Business Flow', () => {
   /* ── 11. Website Order of 5 via API, then post via UI ───────── */
 
   test('14. creates website order for 5 Biscuits', async ({ page }) => {
-    const orderRes = await apiFetch<{ id: string; orderStatus: string }>(
-      page,
-      '/website/orders',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          customerId: 'cust-seed',
-          deliveryAddress: '123 E2E Lane',
-          city: 'Test City',
-          phone: '08000000000',
-          paymentMethod: 'cash',
-          items: [
-            {
-              itemId: biscuitItemId,
-              quantity: 5,
-              unitPrice: 100,
-            },
-          ],
-        }),
-      },
-    );
+    const orderRes = await apiFetch<{ id: string; orderStatus: string }>(page, '/website/orders', {
+      method: 'POST',
+      body: JSON.stringify({
+        customerId: 'cust-seed',
+        deliveryAddress: '123 E2E Lane',
+        city: 'Test City',
+        phone: '08000000000',
+        paymentMethod: 'cash',
+        items: [
+          {
+            itemId: biscuitItemId,
+            quantity: 5,
+            unitPrice: 100,
+          },
+        ],
+      }),
+    });
     websiteOrderId = orderRes.id;
     expect(orderRes.orderStatus).toBe('pending');
   });
@@ -574,7 +608,7 @@ test.describe.serial('Full Business Flow', () => {
     const processRes = await apiFetch<{ orderStatus: string }>(
       page,
       `/website/admin/orders/${websiteOrderId}/process`,
-      { method: 'POST', body: '{}' },
+      { method: 'POST', body: '{}' }
     );
     expect(processRes.orderStatus).toBe('processing');
   });
@@ -608,10 +642,10 @@ test.describe.serial('Full Business Flow', () => {
   });
 
   test('17. verifies purchase exists with correct values via API', async ({ page }) => {
-    const po = await apiFetch<{ status: string; lines: Array<{ itemId: string; receivedQty: number }> }>(
-      page,
-      `/purchases/${poId}`,
-    );
+    const po = await apiFetch<{
+      status: string;
+      lines: Array<{ itemId: string; receivedQty: number }>;
+    }>(page, `/purchases/${poId}`);
     expect(po.status).toBe('received');
     expect(po.lines).toHaveLength(1);
     expect(po.lines[0].itemId).toBe(biscuitItemId);
@@ -621,7 +655,7 @@ test.describe.serial('Full Business Flow', () => {
   test('18. verifies sale exists with correct values via API', async ({ page }) => {
     const sales = await apiFetch<{ data: Array<{ saleNumber: string; status: string }> }>(
       page,
-      `/sales?status=posted&limit=20`,
+      `/sales?status=posted&limit=20`
     );
     const sale = sales.data.find((s) => s.saleNumber === `POS-E2E-${TS}`);
     expect(sale).toBeDefined();
@@ -645,7 +679,7 @@ test.describe.serial('Full Business Flow', () => {
       data: Array<{ locationId: string; quantityOnHand: number }>;
     }>(
       page,
-      `/inventory/stock-balances?itemId=${biscuitItemId}&locationId=${junksSalesLocationId}`,
+      `/inventory/stock-balances?itemId=${biscuitItemId}&locationId=${junksSalesLocationId}`
     );
     const balance = balances.data?.[0];
     expect(balance).toBeDefined();

@@ -35,8 +35,7 @@ export const apmApi = {
   listNews: (params?: Record<string, string | number>) =>
     api.get<PaginatedResponse<NewsArticle>>('/apm/news', { params }).then((r) => r.data),
 
-  getNewsBySlug: (slug: string) =>
-    api.get<NewsArticle>(`/apm/news/${slug}`).then((r) => r.data),
+  getNewsBySlug: (slug: string) => api.get<NewsArticle>(`/apm/news/${slug}`).then((r) => r.data),
 
   // Events
   listEvents: () => api.get<CampaignEvent[]>('/apm/events').then((r) => r.data),
@@ -51,12 +50,10 @@ export const apmApi = {
     api.post('/apm/volunteer', data).then((r) => r.data),
 
   // Join Movement
-  joinMovement: (data: JoinMovementPayload) =>
-    api.post('/apm/join', data).then((r) => r.data),
+  joinMovement: (data: JoinMovementPayload) => api.post('/apm/join', data).then((r) => r.data),
 
   // Contact
-  submitContact: (data: ContactPayload) =>
-    api.post('/apm/contact', data).then((r) => r.data),
+  submitContact: (data: ContactPayload) => api.post('/apm/contact', data).then((r) => r.data),
 
   // Newsletter
   subscribeNewsletter: (data: { email: string; phone?: string }) =>
@@ -67,8 +64,7 @@ export const apmApi = {
     api.post('/apm/citizens-speak', data).then((r) => r.data),
 
   // Report Issue
-  reportIssue: (data: IssueReportPayload) =>
-    api.post('/apm/report', data).then((r) => r.data),
+  reportIssue: (data: IssueReportPayload) => api.post('/apm/report', data).then((r) => r.data),
 
   // Media
   listMedia: () => api.get<MediaAsset[]>('/apm/media').then((r) => r.data),
@@ -77,6 +73,5 @@ export const apmApi = {
   listTestimonials: () => api.get<Testimonial[]>('/apm/testimonials').then((r) => r.data),
 
   // Donate
-  donate: (data: DonationPayload) =>
-    api.post('/apm/donate', data).then((r) => r.data),
+  donate: (data: DonationPayload) => api.post('/apm/donate', data).then((r) => r.data),
 };

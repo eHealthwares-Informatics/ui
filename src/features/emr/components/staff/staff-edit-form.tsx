@@ -19,8 +19,8 @@ import { emrApi } from '@/lib/emr-api';
 import { STAFF_CATEGORIES, STAFF_ROLE_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import type { Staff } from '../../lib/emr-types';
-import { LocationPicker } from '../shared/location-picker';
 import { DepartmentPicker } from '../departments/department-picker';
+import { LocationPicker } from '../shared/location-picker';
 
 type FormValues = {
   firstName: string;

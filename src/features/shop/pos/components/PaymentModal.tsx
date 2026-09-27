@@ -12,9 +12,10 @@ import {
   TextInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, Link, Mail, Copy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import {
   useCreateSale,
@@ -24,7 +25,6 @@ import {
   usePosTerminals,
   useQueryPosPayment,
 } from '../../api/posApi';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 interface Props {
   opened: boolean;
@@ -42,7 +42,9 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [methodId, setMethodId] = useState<string | null>(null);
   const [terminalId, setTerminalId] = useState<string | null>(null);
   const [posRef, setPosRef] = useState<string | null>(null);
-  const [posStatus, setPosStatus] = useState<'idle' | 'initiating' | 'awaiting' | 'success' | 'failed'>('idle');
+  const [posStatus, setPosStatus] = useState<
+    'idle' | 'initiating' | 'awaiting' | 'success' | 'failed'
+  >('idle');
   const [providerId, setProviderId] = useState<string | null>(null);
   const [paymentLink, setPaymentLink] = useState<{ token: string; url: string } | null>(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
@@ -79,7 +81,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       const { data } = await rxsoftApi.get('/payment-providers/available', {
         params: { channel: 'web' },
       });
-      return (Array.isArray(data) ? data : data?.data ?? []) as Array<{
+      return (Array.isArray(data) ? data : (data?.data ?? [])) as Array<{
         id: string;
         code: string;
         name: string;
@@ -111,7 +113,8 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     (pm: any) => pm.id === methodId
   ) as { code?: string; methodType?: string } | undefined;
 
-  const usesTerminal = selectedMethod && (selectedMethod.code === 'POS' || selectedMethod.code === 'WEB');
+  const usesTerminal =
+    selectedMethod && (selectedMethod.code === 'POS' || selectedMethod.code === 'WEB');
   const usesWallet = selectedMethod?.code === 'WALLET';
   const usesTransfer = selectedMethod?.methodType === 'transfer';
   const balance = totals.total - paid;
@@ -119,12 +122,16 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
 
   useEffect(() => {
     return () => {
-      if (pollTimer.current) clearTimeout(pollTimer.current);
+      if (pollTimer.current) {
+        clearTimeout(pollTimer.current);
+      }
     };
   }, []);
 
   function clearPosState() {
-    if (pollTimer.current) clearTimeout(pollTimer.current);
+    if (pollTimer.current) {
+      clearTimeout(pollTimer.current);
+    }
     setPosRef(null);
     setPosStatus('idle');
     setPaymentLink(null);
@@ -139,11 +146,18 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     }
     setPosStatus('initiating');
     try {
-      const res = await initiate.mutateAsync({ amount: paid, terminalId, paymentMethodId: methodId });
+      const res = await initiate.mutateAsync({
+        amount: paid,
+        terminalId,
+        paymentMethodId: methodId,
+      });
       setPosRef(res.reference);
       setPosStatus('awaiting');
       pollPos(res.reference, 0);
-      notifications.show({ color: 'blue', message: `POS charge started (${res.nextAction ?? 'swipe/pin on terminal'})` });
+      notifications.show({
+        color: 'blue',
+        message: `POS charge started (${res.nextAction ?? 'swipe/pin on terminal'})`,
+      });
     } catch (e: any) {
       setPosStatus('failed');
       notifications.show({ color: 'red', message: getApiErrorMessage(e) });
@@ -167,7 +181,10 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           pollPos(reference, elapsed + POS_POLL_INTERVAL_MS);
         } else {
           setPosStatus('failed');
-          notifications.show({ color: 'orange', message: 'POS payment timed out — polling stopped' });
+          notifications.show({
+            color: 'orange',
+            message: 'POS payment timed out — polling stopped',
+          });
         }
       } catch {
         if (elapsed < POS_TERMINAL_TIMEOUT_MS) {
@@ -180,7 +197,9 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   }
 
   async function handleGenerateLink() {
-    if (!providerId) return;
+    if (!providerId) {
+      return;
+    }
     setIsGeneratingLink(true);
     try {
       const { data } = await rxsoftApi.post('/payment-links', {
@@ -202,13 +221,17 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   }
 
   function handleSendToCustomer() {
-    if (!paymentLink) return;
+    if (!paymentLink) {
+      return;
+    }
     window.open(paymentLink.url, '_blank');
     notifications.show({ color: 'green', message: 'Payment link opened for customer' });
   }
 
   function handleCopyLink() {
-    if (!paymentLink) return;
+    if (!paymentLink) {
+      return;
+    }
     navigator.clipboard.writeText(paymentLink.url);
     notifications.show({ color: 'green', message: 'Link copied to clipboard' });
   }
@@ -223,14 +246,20 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     }));
 
     let paymentReference: string | undefined;
-    let payAmount = paid;
+    const payAmount = paid;
 
     if (usesWallet) {
-      const res = await debitWallet.mutateAsync({ amount: payAmount, note: 'Sale paid from wallet' });
+      const res = await debitWallet.mutateAsync({
+        amount: payAmount,
+        note: 'Sale paid from wallet',
+      });
       paymentReference = res.reference;
     } else if (usesTerminal) {
       if (posStatus !== 'success' || !posRef) {
-        notifications.show({ color: 'red', message: 'Complete the POS charge before finalising the sale' });
+        notifications.show({
+          color: 'red',
+          message: 'Complete the POS charge before finalising the sale',
+        });
         return;
       }
       paymentReference = posRef;
@@ -304,7 +333,10 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
               value={terminalId}
               onChange={(v) => setTerminalId(v || null)}
               placeholder={terminals.length ? 'Select terminal' : 'No terminals configured'}
-              data={terminals.map((t) => ({ value: t.id, label: `${t.label ?? t.code} (${t.providerType})` }))}
+              data={terminals.map((t) => ({
+                value: t.id,
+                label: `${t.label ?? t.code} (${t.providerType})`,
+              }))}
               disabled={terminals.length === 0}
             />
             <Group grow>
@@ -405,7 +437,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
         {change > 0 && <Text c="green">Change: ₦{change.toFixed(2)}</Text>}
 
         <Group grow>
-          <Button loading={mutation.isPending} onClick={handleComplete} disabled={!canComplete} data-testid="pos-complete-sale-btn">
+          <Button
+            loading={mutation.isPending}
+            onClick={handleComplete}
+            disabled={!canComplete}
+            data-testid="pos-complete-sale-btn"
+          >
             Complete Sale
           </Button>
           <Button variant="light" onClick={onClose} data-testid="pos-cancel-payment-btn">

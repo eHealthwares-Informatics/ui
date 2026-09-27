@@ -1,9 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Group, PasswordInput, Progress, Text, TextInput, Stack, Loader } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Group,
+  PasswordInput,
+  Progress,
+  Text,
+  TextInput,
+  Stack,
+  Loader,
+} from '@mantine/core';
 import { Building2, User, Lock, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { identityApi } from '@/lib/identity-api';
 import { useAuthStore } from '@/stores/auth-store';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 type OnboardPayload = {
   code: string;
@@ -64,7 +74,9 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
   const [alreadyProvisioned, setAlreadyProvisioned] = useState(false);
 
   useEffect(() => {
-    if (!running) return undefined;
+    if (!running) {
+      return undefined;
+    }
     const timer = window.setInterval(() => {
       setStage((current) => Math.min(current + 1, PROVISIONING_STAGES.length - 1));
     }, STAGE_ADVANCE_MS);
@@ -96,7 +108,9 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
     setStage(0);
     setRunning(true);
     try {
-      await identityApi.post('/auth/onboard-organization', payload, { timeout: ONBOARD_TIMEOUT_MS });
+      await identityApi.post('/auth/onboard-organization', payload, {
+        timeout: ONBOARD_TIMEOUT_MS,
+      });
       await login(email, password);
       if (!useAuthStore.getState().user) {
         setError('Organisation created — please sign in with your new credentials.');
@@ -130,8 +144,8 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
           </Text>
         </Group>
         <Text size="sm" style={{ color: '#64748B' }}>
-          Organisation "{code.trim().toUpperCase()}" already exists. Please sign in with
-          your credentials — the admin email you entered is pre-filled for you.
+          Organisation "{code.trim().toUpperCase()}" already exists. Please sign in with your
+          credentials — the admin email you entered is pre-filled for you.
         </Text>
         <Button
           fullWidth
@@ -270,8 +284,8 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
               radius="sm"
             />
             <Text size="xs" style={{ color: '#9CA3AF' }}>
-              Provisioning runs across the identity, rxsoft and EMR backends. This can
-              take up to 2 minutes — please keep this tab open.
+              Provisioning runs across the identity, rxsoft and EMR backends. This can take up to 2
+              minutes — please keep this tab open.
             </Text>
           </Stack>
         )}

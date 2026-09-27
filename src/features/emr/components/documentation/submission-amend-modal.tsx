@@ -7,11 +7,7 @@ import { useFormDefinition } from '../../hooks/use-form-definition';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import type { FormSubmission } from '../../lib/emr-types';
 import { StatusBadge } from '../shared/status-badge';
-import {
-  DynamicFormFields,
-  validateFormData,
-  type FormData,
-} from './dynamic-form';
+import { DynamicFormFields, validateFormData, type FormData } from './dynamic-form';
 
 export function SubmissionAmendModal({
   opened,

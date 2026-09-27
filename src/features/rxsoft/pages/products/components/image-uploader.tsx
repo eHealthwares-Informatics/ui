@@ -1,8 +1,8 @@
-import { useState, useRef } from 'react';
 import { Box, Button, Group, Image, Paper, Text, Stack, ActionIcon, Loader } from '@mantine/core';
 import { Upload, X, Camera } from 'lucide-react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { useState, useRef } from 'react';
 import { green, ink, muted, line } from '@/features/shop/website/layout';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 interface ImageUploaderProps {
   value?: string;
@@ -31,7 +31,9 @@ export function ImageUploader({
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) {return;}
+    if (!file) {
+      return;
+    }
 
     setUploading(true);
     try {
@@ -43,13 +45,17 @@ export function ImageUploader({
       // upload failed
     } finally {
       setUploading(false);
-      if (inputRef.current) {inputRef.current.value = '';}
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
     }
   };
 
   const handleRemove = () => {
     onChange('');
-    if (inputRef.current) {inputRef.current.value = '';}
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   return (
@@ -76,34 +82,34 @@ export function ImageUploader({
         )}
 
         <Box
-        style={{
-          width: previewSize,
-          height: previewSize,
-          borderRadius: 8,
-          overflow: 'hidden',
-          border: value ? 'none' : `2px dashed ${line}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: value ? 'transparent' : '#FAFAFA',
-          position: 'relative',
-        }}
-      >
-        {uploading ? (
-          <Loader size={28} color={green} />
-        ) : value ? (
-          <Image
-            src={value}
-            alt={label}
-            w={previewSize}
-            h={previewSize}
-            fit="cover"
-            fallbackSrc="https://placehold.co/200x200?text=No+Image"
-          />
-        ) : (
-          <Upload size={28} color={muted} />
-        )}
-      </Box>
+          style={{
+            width: previewSize,
+            height: previewSize,
+            borderRadius: 8,
+            overflow: 'hidden',
+            border: value ? 'none' : `2px dashed ${line}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: value ? 'transparent' : '#FAFAFA',
+            position: 'relative',
+          }}
+        >
+          {uploading ? (
+            <Loader size={28} color={green} />
+          ) : value ? (
+            <Image
+              src={value}
+              alt={label}
+              w={previewSize}
+              h={previewSize}
+              fit="cover"
+              fallbackSrc="https://placehold.co/200x200?text=No+Image"
+            />
+          ) : (
+            <Upload size={28} color={muted} />
+          )}
+        </Box>
 
         <Group gap="xs">
           <Button

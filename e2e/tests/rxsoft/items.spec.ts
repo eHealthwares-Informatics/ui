@@ -16,7 +16,9 @@ test.describe('RxSoft items (catalog)', () => {
   test('list renders seeded catalog rows', async ({ page }) => {
     await page.goto('/rxsoft/items');
     await expect(page.getByTestId('page-title')).toHaveText('Items');
-    await expect(page.getByTestId('data-table-body').locator('tr').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('data-table-body').locator('tr').first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('edits an item through the wizard modal and the change persists', async ({ page }) => {
@@ -25,7 +27,12 @@ test.describe('RxSoft items (catalog)', () => {
     // Pick the first row in the catalog to edit.
     const firstRow = page.getByTestId('data-table-body').locator('tr').first();
     await expect(firstRow).toBeVisible({ timeout: 15_000 });
-    const originalName = (await firstRow.locator('td').nth(2).innerText().catch(() => '')) || 'item';
+    const originalName =
+      (await firstRow
+        .locator('td')
+        .nth(2)
+        .innerText()
+        .catch(() => '')) || 'item';
     const pencil = firstRow
       .locator('button')
       .filter({ has: page.locator('svg.lucide-pencil') })
@@ -60,7 +67,9 @@ test.describe('RxSoft items (catalog)', () => {
     // Back on the list; the renamed item is searchable.
     await page.waitForURL((url) => url.pathname === '/rxsoft/items');
     await page.getByTestId('header-search').fill(token);
-    await expect(page.getByTestId('data-table-body').locator('tr').filter({ hasText: token }).first()).toBeVisible({
+    await expect(
+      page.getByTestId('data-table-body').locator('tr').filter({ hasText: token }).first()
+    ).toBeVisible({
       timeout: 15_000,
     });
 
@@ -69,12 +78,16 @@ test.describe('RxSoft items (catalog)', () => {
 
   test.afterAll(async ({ request }) => {
     // Restore the original name via API so the catalog stays clean.
-    if (!accessToken) return;
+    if (!accessToken) {
+      return;
+    }
     const search = await request.get(`${API_BASE_URL}/items`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       params: { search: token, limit: 5 },
     });
-    if (!search.ok()) return;
+    if (!search.ok()) {
+      return;
+    }
     const body = (await search.json()) as any;
     const rows = Array.isArray(body.data) ? body.data : Array.isArray(body) ? body : [];
     for (const row of rows.slice(0, 1)) {

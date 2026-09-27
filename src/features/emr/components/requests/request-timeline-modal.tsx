@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Badge,
-  Group,
-  Loader,
-  Modal,
-  Stack,
-} from '@mantine/core';
+import { Alert, Badge, Group, Loader, Modal, Stack } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
 import { emrApi } from '@/lib/emr-api';
@@ -37,7 +30,7 @@ export function RequestTimelineModal({
     queryKey: ['emr', 'requests', requestId, 'history'],
     queryFn: async () => {
       const { data: res } = await emrApi.get<{ data: RequestStatusHistory[] }>(
-        `/requests/${requestId}/history`,
+        `/requests/${requestId}/history`
       );
       return res.data;
     },
@@ -49,7 +42,9 @@ export function RequestTimelineModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={summary?.requestNumber ? `Request ${summary.requestNumber} — Activity` : 'Request Activity'}
+      title={
+        summary?.requestNumber ? `Request ${summary.requestNumber} — Activity` : 'Request Activity'
+      }
       centered
     >
       {isLoading ? (

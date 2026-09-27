@@ -25,7 +25,14 @@ test.describe('RxSoft inventory transfers', () => {
     const rowCount = await rows.count();
     let targetIndex = -1;
     for (let i = 0; i < rowCount; i++) {
-      const avail = Number(await rows.nth(i).locator('td').nth(5).innerText().catch(() => '0'));
+      const avail = Number(
+        await rows
+          .nth(i)
+          .locator('td')
+          .nth(5)
+          .innerText()
+          .catch(() => '0')
+      );
       if (avail > 0) {
         targetIndex = i;
         break;

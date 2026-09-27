@@ -12,11 +12,12 @@ interface Props {
 
 export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayment }: Props) {
   const subtotal = useMemo(
-    () => session.cart.reduce((sum, item) => {
-      const price = session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
-      return sum + price * item.quantity * item.uomFactor;
-    }, 0),
-    [session.cart, session.pricingMode],
+    () =>
+      session.cart.reduce((sum, item) => {
+        const price = session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+        return sum + price * item.quantity * item.uomFactor;
+      }, 0),
+    [session.cart, session.pricingMode]
   );
 
   const discount = session.discount || 0;
@@ -48,11 +49,21 @@ export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayme
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title={`Invoice Preview - ${session.saleCode}`} size="lg" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={`Invoice Preview - ${session.saleCode}`}
+      size="lg"
+      centered
+    >
       <Stack gap="md">
         <Paper withBorder p="sm">
-          <Text size="sm" c="dimmed">Customer: {session.customerName || 'Walk-in'}</Text>
-          <Text size="sm" c="dimmed">Pricing: {session.pricingMode}</Text>
+          <Text size="sm" c="dimmed">
+            Customer: {session.customerName || 'Walk-in'}
+          </Text>
+          <Text size="sm" c="dimmed">
+            Pricing: {session.pricingMode}
+          </Text>
         </Paper>
 
         <ScrollArea h={300}>
@@ -70,11 +81,14 @@ export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayme
             <Table.Tbody>
               {session.cart.length === 0 && (
                 <Table.Tr>
-                  <Table.Td colSpan={6} ta="center">Cart is empty</Table.Td>
+                  <Table.Td colSpan={6} ta="center">
+                    Cart is empty
+                  </Table.Td>
                 </Table.Tr>
               )}
               {session.cart.map((item) => {
-                const price = session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+                const price =
+                  session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
                 const lineTotal = price * item.quantity * item.uomFactor;
                 return (
                   <Table.Tr key={item.id}>
@@ -100,7 +114,9 @@ export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayme
             {discount > 0 && (
               <Group justify="space-between">
                 <Text size="sm">Discount</Text>
-                <Text size="sm" c="red">-₦{discount.toFixed(2)}</Text>
+                <Text size="sm" c="red">
+                  -₦{discount.toFixed(2)}
+                </Text>
               </Group>
             )}
             {vatPercent > 0 && (
@@ -117,8 +133,12 @@ export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayme
         </Paper>
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="light" onClick={handlePrintInvoice}>Print Invoice</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="light" onClick={handlePrintInvoice}>
+            Print Invoice
+          </Button>
           <Button onClick={onProceedToPayment}>Proceed to Payment</Button>
         </Group>
       </Stack>

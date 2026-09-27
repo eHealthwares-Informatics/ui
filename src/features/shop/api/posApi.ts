@@ -1,10 +1,10 @@
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { websiteApi } from '@/features/shop/website/api';
-import type { CreateSaleDto } from '../types';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
+import type { CreateSaleDto } from '../types';
 
 export const salesKeys = {
   list: ['sales'] as any,
@@ -56,7 +56,11 @@ export function usePosTerminals() {
 
 export function useInitiatePosPayment() {
   return useMutation({
-    mutationFn: async (payload: { amount: number; terminalId: string; paymentMethodId?: string | null }) => {
+    mutationFn: async (payload: {
+      amount: number;
+      terminalId: string;
+      paymentMethodId?: string | null;
+    }) => {
       const { data } = await rxsoftApi.post('/payments/pos/initiate', payload);
       return data as { reference: string; nextAction?: string | null; status: string };
     },
@@ -116,7 +120,7 @@ export function useWebPaymentProviders(channel: 'web' | 'pos' = 'web') {
         return websiteApi.listPaymentProviders();
       }
       const { data } = await rxsoftApi.get('/payment-providers/available', { params: { channel } });
-      return (Array.isArray(data) ? data : data?.data ?? []) as Array<{
+      return (Array.isArray(data) ? data : (data?.data ?? [])) as Array<{
         id: string;
         code: string;
         name: string;
@@ -142,7 +146,12 @@ export function useInitializeWebPayment() {
       callbackUrl?: string | null;
     }) => {
       const { data } = await rxsoftApi.post('/payments/initialize', payload);
-      return data as { reference: string; checkoutUrl: string | null; status: string; provider: { code: string } };
+      return data as {
+        reference: string;
+        checkoutUrl: string | null;
+        status: string;
+        provider: { code: string };
+      };
     },
   });
 }
@@ -367,7 +376,7 @@ export function useUpdateUserPosConfig() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 }
@@ -484,14 +493,10 @@ export function useOrderDetail(id?: string) {
 export function useCompleteDispense() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: {
-      orderId: string;
-      saleId?: string;
-      saleNumber?: string;
-    }) => {
+    mutationFn: async (payload: { orderId: string; saleId?: string; saleNumber?: string }) => {
       const { data } = await rxsoftApi.post(
         `/orders/admin/orders/dispense/${payload.orderId}/complete`,
-        { saleId: payload.saleId, saleNumber: payload.saleNumber },
+        { saleId: payload.saleId, saleNumber: payload.saleNumber }
       );
       return data;
     },
@@ -502,7 +507,7 @@ export function useCompleteDispense() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 }

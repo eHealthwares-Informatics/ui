@@ -55,7 +55,11 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
         </Text>
         {children}
         <Group justify="flex-end" mt="lg">
-          <Button data-testid="confirm-dialog-cancel" variant="default" onClick={() => onOpenChange && onOpenChange(false)}>
+          <Button
+            data-testid="confirm-dialog-cancel"
+            variant="default"
+            onClick={() => onOpenChange && onOpenChange(false)}
+          >
             {cancelBtnText ?? 'Cancel'}
           </Button>
           <Button

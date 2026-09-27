@@ -202,7 +202,9 @@ export function ItemPriceListSetup({
   const missing = priceLists.filter((pl) => !resolved.some((x) => x.priceList.value === pl.id));
 
   const handleAdd = () => {
-    if (!selected) {return;}
+    if (!selected) {
+      return;
+    }
     updateEntry(selected, {});
     setSelected('');
   };
@@ -229,7 +231,9 @@ export function ItemPriceListSetup({
             .map((pl) => {
               const item = resolved.find((x) => x.priceList.value === pl.id);
 
-              if (!item || item.modified === 'deleted') {return null;}
+              if (!item || item.modified === 'deleted') {
+                return null;
+              }
 
               return (
                 <Card key={pl.id} withBorder p="sm">

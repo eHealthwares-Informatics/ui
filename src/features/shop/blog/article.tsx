@@ -88,7 +88,9 @@ export default function ArticlePage() {
   const related = data?.related || [];
 
   const headings = useMemo(() => {
-    if (!article?.content) {return [];}
+    if (!article?.content) {
+      return [];
+    }
     const regex = /<h([23])[^>]*>(.*?)<\/h\1>/gi;
     const results: { level: number; text: string; id: string }[] = [];
     let match;
@@ -104,7 +106,9 @@ export default function ArticlePage() {
   }, [article?.content]);
 
   const styledContent = useMemo(() => {
-    if (!article?.content) {return '';}
+    if (!article?.content) {
+      return '';
+    }
     let html = article.content;
     headings.forEach((h) => {
       const regex = new RegExp(

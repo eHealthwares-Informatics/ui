@@ -23,6 +23,9 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './vitest.setup.mjs',
+    // Playwright e2e specs are NOT vitest tests — without this exclude vitest
+    // picks up e2e/**/*.spec.ts and errors on test.describe() outside its runner.
+    exclude: ['**/node_modules/**', 'e2e/**', 'playwright/**', 'dist/**'],
   },
 
   resolve: {

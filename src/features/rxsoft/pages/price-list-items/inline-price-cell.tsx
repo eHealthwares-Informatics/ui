@@ -3,8 +3,8 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { useState } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 export function InlinePriceCell({ row }: { row: Record<string, unknown> }) {
   const [editing, setEditing] = useState(false);
@@ -38,10 +38,22 @@ export function InlinePriceCell({ row }: { row: Record<string, unknown> }) {
           decimalScale={2}
           fixedDecimalScale
         />
-        <ActionIcon size="sm" color="green" onClick={() => mutation.mutate(Number(value))} loading={mutation.isPending}>
+        <ActionIcon
+          size="sm"
+          color="green"
+          onClick={() => mutation.mutate(Number(value))}
+          loading={mutation.isPending}
+        >
           <Check size={14} />
         </ActionIcon>
-        <ActionIcon size="sm" color="gray" onClick={() => { setEditing(false); setValue(row.unitPrice as number); }}>
+        <ActionIcon
+          size="sm"
+          color="gray"
+          onClick={() => {
+            setEditing(false);
+            setValue(row.unitPrice as number);
+          }}
+        >
           <X size={14} />
         </ActionIcon>
       </Group>

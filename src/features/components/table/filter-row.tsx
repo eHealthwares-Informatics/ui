@@ -43,8 +43,7 @@ export function FilterRow({
   const availableFilters = column?.filters ?? [];
   const type = filter.selectedFilter?.type;
   const isDateColumn =
-    column?.dataType === ColumnDataType.DATE ||
-    column?.dataType === ColumnDataType.DATETIME;
+    column?.dataType === ColumnDataType.DATE || column?.dataType === ColumnDataType.DATETIME;
 
   return (
     <Group grow align="flex-end">

@@ -28,7 +28,9 @@ export function usePurchaseOrder(id?: string) {
   return useQuery({
     queryKey: poKeys.detail(id),
     queryFn: async () => {
-      if (!id) {return null;}
+      if (!id) {
+        return null;
+      }
       const { data } = await rxsoftApi.get(`/purchases/${id}`);
       return data as PurchaseOrder;
     },
@@ -79,7 +81,12 @@ export function useSuppliers(search?: string) {
 export function useCreateSupplier() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { name: string; phone?: string; email?: string; address?: string }) => {
+    mutationFn: async (payload: {
+      name: string;
+      phone?: string;
+      email?: string;
+      address?: string;
+    }) => {
       const { data } = await rxsoftApi.post('/suppliers', payload);
       return data as { id: string; name: string };
     },
@@ -119,7 +126,13 @@ export function useReceiveGoods() {
 export function useUnpostGoods() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ poId, payload }: { poId: string; payload: { receiptLineId: string; password: string } }) => {
+    mutationFn: async ({
+      poId,
+      payload,
+    }: {
+      poId: string;
+      payload: { receiptLineId: string; password: string };
+    }) => {
       const { data } = await rxsoftApi.post(`/purchases/${poId}/unpost`, payload);
       return data;
     },
@@ -134,7 +147,9 @@ export function useReceipts(poId?: string) {
   return useQuery({
     queryKey: receiptKeys.byPo(poId || ''),
     queryFn: async () => {
-      if (!poId) {return [];}
+      if (!poId) {
+        return [];
+      }
       const { data } = await rxsoftApi.get(`/purchases/${poId}/receipts`);
       return data?.data ?? data ?? [];
     },
@@ -159,9 +174,16 @@ export function useItemUoms(itemId: string | null) {
   return useQuery({
     queryKey: ['item-uoms', itemId],
     queryFn: async () => {
-      if (!itemId) {return [];}
+      if (!itemId) {
+        return [];
+      }
       const { data } = await rxsoftApi.get(`/items/${itemId}/uoms`);
-      return (data?.data ?? data ?? []) as Array<{ id: string; code: string; name: string; factor: number }>;
+      return (data?.data ?? data ?? []) as Array<{
+        id: string;
+        code: string;
+        name: string;
+        factor: number;
+      }>;
     },
     enabled: !!itemId,
     staleTime: 120_000,
@@ -184,7 +206,15 @@ export function useAddPoLine() {
 export function useUpdatePoLine() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ poId, lineId, payload }: { poId: string; lineId: string; payload: any }) => {
+    mutationFn: async ({
+      poId,
+      lineId,
+      payload,
+    }: {
+      poId: string;
+      lineId: string;
+      payload: any;
+    }) => {
       const { data } = await rxsoftApi.put(`/purchases/${poId}/lines/${lineId}`, payload);
       return data as PurchaseOrder;
     },

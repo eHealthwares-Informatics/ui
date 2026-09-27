@@ -8,7 +8,9 @@ export default function DeliveryAreasPage() {
 
   const grouped =
     areas?.reduce<Record<string, typeof areas>>((acc, area) => {
-      if (!acc[area.state]) {acc[area.state] = [];}
+      if (!acc[area.state]) {
+        acc[area.state] = [];
+      }
       acc[area.state].push(area);
       return acc;
     }, {}) || {};

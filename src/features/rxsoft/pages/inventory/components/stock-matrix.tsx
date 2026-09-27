@@ -12,7 +12,9 @@ export function StockMatrix({ itemId }: StockMatrixProps) {
     queryKey: ['stock-matrix', itemId],
     queryFn: async () => {
       const params: Record<string, unknown> = { limit: 200 };
-      if (itemId) {params.itemId = itemId;}
+      if (itemId) {
+        params.itemId = itemId;
+      }
       const { data } = await rxsoftApi.get('/inventory/stock-balances', { params });
       return (data?.data ?? []) as Record<string, any>[];
     },
@@ -27,7 +29,9 @@ export function StockMatrix({ itemId }: StockMatrixProps) {
       const itemName = b.item?.name ?? b.itemId ?? 'Unknown';
       locSet.add(locName);
 
-      if (!itemMap.has(itemName)) {itemMap.set(itemName, {});}
+      if (!itemMap.has(itemName)) {
+        itemMap.set(itemName, {});
+      }
       const row = itemMap.get(itemName)!;
       row[locName] = (row[locName] ?? 0) + Number(b.quantityOnHand ?? 0);
     }

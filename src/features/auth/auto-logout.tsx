@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useRef } from 'react';
-import { useAuthStore } from '@/stores/auth-store';
 import { getAccessTokenExpiry } from '@/lib/auth-tokens';
+import { useAuthStore } from '@/stores/auth-store';
 
 const FALLBACK_INACTIVITY_TIMEOUT = 30 * 60 * 1000;
 const MIN_GRACE_MS = 15 * 1000;
@@ -11,10 +11,7 @@ const MIN_GRACE_MS = 15 * 1000;
  * The token deadline wins but is clamped to a minimum grace period; when no
  * token is present a fixed inactivity window applies.
  */
-export function computeSessionDelay(
-  expiry: number | null,
-  now = Date.now(),
-): number {
+export function computeSessionDelay(expiry: number | null, now = Date.now()): number {
   if (expiry === null) {
     return FALLBACK_INACTIVITY_TIMEOUT;
   }

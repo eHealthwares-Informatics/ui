@@ -1,7 +1,7 @@
 import { Badge } from '@mantine/core';
 import { View } from '@/features/rxsoft/types';
-import { CodingConcept } from './type';
 import { codingModuleLabel } from '../pages/shared';
+import { CodingConcept } from './type';
 
 export const codingConceptView: View<CodingConcept> = {
   endpoint: '/concepts/:id',

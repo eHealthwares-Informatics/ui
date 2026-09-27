@@ -1,9 +1,28 @@
-import { Card, Text, Stack, Grid, Button, TextInput, Group, Table, Modal, Select, NumberInput, Badge, Combobox, InputBase, useCombobox, Pagination, ActionIcon } from '@mantine/core';
+import {
+  Card,
+  Text,
+  Stack,
+  Grid,
+  Button,
+  TextInput,
+  Group,
+  Table,
+  Modal,
+  Select,
+  NumberInput,
+  Badge,
+  Combobox,
+  InputBase,
+  useCombobox,
+  Pagination,
+  ActionIcon,
+} from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Download, Eye, Scale, Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi, downloadBlob } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { RxPage } from '../../../components/page/rx-page';
@@ -11,7 +30,6 @@ import { UserPopover } from '../../../components/popover/user-popover';
 import { StockMatrix } from './components/stock-matrix';
 import { stockBalancesConfig } from './schema';
 import { uomToBaseQuantity, type UomFactorInfo } from './utils';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function TransferModal({
   opened,
@@ -71,7 +89,8 @@ function TransferModal({
   const selectedUom = uomOptions.find((u) => u.id === uomId) ?? itemDetail?.baseUom ?? null;
   const baseUom = itemDetail?.baseUom ?? null;
 
-  const availableBase = Number(balance?.quantityOnHand ?? 0) - Number(balance?.quantityReserved ?? 0);
+  const availableBase =
+    Number(balance?.quantityOnHand ?? 0) - Number(balance?.quantityReserved ?? 0);
   const baseQuantity = uomToBaseQuantity(quantity, selectedUom, baseUom);
 
   const transferMutation = useMutation({
@@ -100,10 +119,11 @@ function TransferModal({
     <Modal opened={opened} onClose={onClose} title="Transfer Stock" centered>
       <Stack>
         <Text size="sm">
-          From: <Badge>{balance?.location?.name as string ?? balance?.locationId as string}</Badge>
+          From:{' '}
+          <Badge>{(balance?.location?.name as string) ?? (balance?.locationId as string)}</Badge>
         </Text>
         <Text size="sm">
-          Item: <Badge>{balance?.item?.name as string ?? balance?.itemId as string}</Badge>
+          Item: <Badge>{(balance?.item?.name as string) ?? (balance?.itemId as string)}</Badge>
         </Text>
         <Text size="sm">
           Available: <Badge color="blue">{availableBase}</Badge>
@@ -137,12 +157,18 @@ function TransferModal({
           value={quantity}
           onChange={(v) => setQuantity(Number(v) || 0)}
           min={0.001}
-          description={selectedUom?.name ? `Equals ${baseQuantity} ${baseUom?.name ?? 'base units'}` : undefined}
+          description={
+            selectedUom?.name
+              ? `Equals ${baseQuantity} ${baseUom?.name ?? 'base units'}`
+              : undefined
+          }
           required
         />
 
         <Group justify="flex-end">
-          <Button variant="light" onClick={onClose}>Cancel</Button>
+          <Button variant="light" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={() => transferMutation.mutate()}
             loading={transferMutation.isPending}
@@ -194,10 +220,11 @@ function AdjustModal({
     <Modal opened={opened} onClose={onClose} title="Stock Adjustment" centered>
       <Stack>
         <Text size="sm">
-          Item: <Badge>{balance?.item?.name as string ?? balance?.itemId as string}</Badge>
+          Item: <Badge>{(balance?.item?.name as string) ?? (balance?.itemId as string)}</Badge>
         </Text>
         <Text size="sm">
-          Location: <Badge>{balance?.location?.name as string ?? balance?.locationId as string}</Badge>
+          Location:{' '}
+          <Badge>{(balance?.location?.name as string) ?? (balance?.locationId as string)}</Badge>
         </Text>
         <Text size="sm">
           Current On Hand: <Badge color="blue">{Number(balance?.quantityOnHand ?? 0)}</Badge>
@@ -219,7 +246,9 @@ function AdjustModal({
         />
 
         <Group justify="flex-end">
-          <Button variant="light" onClick={onClose}>Cancel</Button>
+          <Button variant="light" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={() => adjustmentMutation.mutate()}
             loading={adjustmentMutation.isPending}
@@ -244,52 +273,58 @@ export function RxInventoryPage() {
   const [selectedBalance, setSelectedBalance] = useState<Record<string, unknown> | null>(null);
 
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
-  const [selectedAdjustBalance, setSelectedAdjustBalance] = useState<Record<string, unknown> | null>(null);
+  const [selectedAdjustBalance, setSelectedAdjustBalance] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
 
-  const balancesConfig = useMemo(() => ({
-    ...stockBalancesConfig,
-    columns: [
-      ...stockBalancesConfig.columns,
-      {
-        key: 'actions',
-        label: '',
-        render: (row: any) => (
-          <Group gap="xs">
-            <ActionIcon
-              variant="light"
-              title="View Movements"
-              onClick={() => {
-                setMovementItemId(row.itemId ?? row.item?.id ?? null);
-                setMovementLocationId(row.locationId ?? row.location?.id ?? null);
-              }}
-            >
-              <Eye size={16} />
-            </ActionIcon>
-            <ActionIcon
-              variant="light"
-              title="Transfer"
-              onClick={() => {
-                setSelectedBalance(row);
-                setTransferModalOpen(true);
-              }}
-            >
-              <ArrowRight size={16} />
-            </ActionIcon>
-            <ActionIcon
-              variant="light"
-              title="Adjust"
-              onClick={() => {
-                setSelectedAdjustBalance(row);
-                setAdjustModalOpen(true);
-              }}
-            >
-              <Scale size={16} />
-            </ActionIcon>
-          </Group>
-        ),
-      },
-    ],
-  }), []);
+  const balancesConfig = useMemo(
+    () => ({
+      ...stockBalancesConfig,
+      columns: [
+        ...stockBalancesConfig.columns,
+        {
+          key: 'actions',
+          label: '',
+          render: (row: any) => (
+            <Group gap="xs">
+              <ActionIcon
+                variant="light"
+                title="View Movements"
+                onClick={() => {
+                  setMovementItemId(row.itemId ?? row.item?.id ?? null);
+                  setMovementLocationId(row.locationId ?? row.location?.id ?? null);
+                }}
+              >
+                <Eye size={16} />
+              </ActionIcon>
+              <ActionIcon
+                variant="light"
+                title="Transfer"
+                onClick={() => {
+                  setSelectedBalance(row);
+                  setTransferModalOpen(true);
+                }}
+              >
+                <ArrowRight size={16} />
+              </ActionIcon>
+              <ActionIcon
+                variant="light"
+                title="Adjust"
+                onClick={() => {
+                  setSelectedAdjustBalance(row);
+                  setAdjustModalOpen(true);
+                }}
+              >
+                <Scale size={16} />
+              </ActionIcon>
+            </Group>
+          ),
+        },
+      ],
+    }),
+    []
+  );
 
   const balanceCombobox = useCombobox();
   const qc = useQueryClient();
@@ -318,20 +353,35 @@ export function RxInventoryPage() {
     },
   });
 
-  const movementQueryKey = ['stock-movements', movementItemId, movementLocationId, movementTypeFilter, fromDate, toDate, movementPage] as const;
+  const movementQueryKey = [
+    'stock-movements',
+    movementItemId,
+    movementLocationId,
+    movementTypeFilter,
+    fromDate,
+    toDate,
+    movementPage,
+  ] as const;
 
-  const {
-    data: movementsResponse,
-    isFetching: movementsLoading,
-  } = useQuery({
+  const { data: movementsResponse, isFetching: movementsLoading } = useQuery({
     queryKey: movementQueryKey,
     queryFn: async () => {
       const params: Record<string, unknown> = { page: movementPage, limit: MOVEMENT_LIMIT };
-      if (movementItemId) {params.itemId = movementItemId;}
-      if (movementLocationId) {params.locationId = movementLocationId;}
-      if (movementTypeFilter) {params.movementType = movementTypeFilter;}
-      if (fromDate) {params.fromDate = fromDate;}
-      if (toDate) {params.toDate = toDate;}
+      if (movementItemId) {
+        params.itemId = movementItemId;
+      }
+      if (movementLocationId) {
+        params.locationId = movementLocationId;
+      }
+      if (movementTypeFilter) {
+        params.movementType = movementTypeFilter;
+      }
+      if (fromDate) {
+        params.fromDate = fromDate;
+      }
+      if (toDate) {
+        params.toDate = toDate;
+      }
       const { data } = await rxsoftApi.get('/inventory/stock-movements', { params });
       return data;
     },
@@ -344,16 +394,26 @@ export function RxInventoryPage() {
   const handleExport = async () => {
     try {
       const params: Record<string, string> = {};
-      if (movementItemId) {params.itemId = movementItemId;}
-      if (movementLocationId) {params.locationId = movementLocationId;}
-      if (movementTypeFilter) {params.movementType = movementTypeFilter;}
-      if (fromDate) {params.fromDate = fromDate;}
-      if (toDate) {params.toDate = toDate;}
+      if (movementItemId) {
+        params.itemId = movementItemId;
+      }
+      if (movementLocationId) {
+        params.locationId = movementLocationId;
+      }
+      if (movementTypeFilter) {
+        params.movementType = movementTypeFilter;
+      }
+      if (fromDate) {
+        params.fromDate = fromDate;
+      }
+      if (toDate) {
+        params.toDate = toDate;
+      }
       params.limit = '10000';
 
       await downloadBlob(
         { method: 'GET', url: '/inventory/stock-movements/export', params },
-        'stock_movements.csv',
+        'stock_movements.csv'
       );
       notifications.show({ message: 'Stock movements exported.', color: 'green' });
     } catch {
@@ -365,7 +425,9 @@ export function RxInventoryPage() {
     queryKey: ['stock-balances', 'search', balanceSearch],
     queryFn: async () => {
       const params: Record<string, unknown> = { limit: 30 };
-      if (balanceSearch) {params.search = balanceSearch;}
+      if (balanceSearch) {
+        params.search = balanceSearch;
+      }
       const { data } = await rxsoftApi.get('/inventory/stock-balances', { params });
       const items = (data?.data ?? []) as Record<string, any>[];
       return items.map((b: any) => ({
@@ -454,7 +516,10 @@ export function RxInventoryPage() {
                   label="Product"
                   placeholder="All products"
                   value={movementItemId}
-                  onChange={(v) => { setMovementItemId(v); setMovementPage(1); }}
+                  onChange={(v) => {
+                    setMovementItemId(v);
+                    setMovementPage(1);
+                  }}
                   data={movementItems}
                   searchable
                   clearable
@@ -465,7 +530,10 @@ export function RxInventoryPage() {
                   label="Location"
                   placeholder="All locations"
                   value={movementLocationId}
-                  onChange={(v) => { setMovementLocationId(v); setMovementPage(1); }}
+                  onChange={(v) => {
+                    setMovementLocationId(v);
+                    setMovementPage(1);
+                  }}
                   data={(Array.isArray(locations) ? locations : []).map((l: any) => ({
                     value: l.id,
                     label: l.name,
@@ -479,7 +547,10 @@ export function RxInventoryPage() {
                   label="Type"
                   placeholder="All types"
                   value={movementTypeFilter}
-                  onChange={(v) => { setMovementTypeFilter(v); setMovementPage(1); }}
+                  onChange={(v) => {
+                    setMovementTypeFilter(v);
+                    setMovementPage(1);
+                  }}
                   data={[
                     { value: 'in', label: 'In' },
                     { value: 'out', label: 'Out' },
@@ -496,7 +567,10 @@ export function RxInventoryPage() {
                     label="From"
                     placeholder="Start date"
                     value={fromDate}
-                    onChange={(v) => { setFromDate(v); setMovementPage(1); }}
+                    onChange={(v) => {
+                      setFromDate(v);
+                      setMovementPage(1);
+                    }}
                     clearable
                     style={{ flex: 1 }}
                   />
@@ -504,7 +578,10 @@ export function RxInventoryPage() {
                     label="To"
                     placeholder="End date"
                     value={toDate}
-                    onChange={(v) => { setToDate(v); setMovementPage(1); }}
+                    onChange={(v) => {
+                      setToDate(v);
+                      setMovementPage(1);
+                    }}
                     clearable
                     style={{ flex: 1 }}
                   />
@@ -513,9 +590,13 @@ export function RxInventoryPage() {
             </Grid>
 
             {movementsLoading ? (
-              <Text c="dimmed" size="sm">Loading movements...</Text>
+              <Text c="dimmed" size="sm">
+                Loading movements...
+              </Text>
             ) : movementData.length === 0 ? (
-              <Text c="dimmed" size="sm">No stock movements found.</Text>
+              <Text c="dimmed" size="sm">
+                No stock movements found.
+              </Text>
             ) : (
               <>
                 <Table striped withTableBorder withColumnBorders>
@@ -557,7 +638,9 @@ export function RxInventoryPage() {
                             </Badge>
                           </Table.Td>
                           <Table.Td>{m.quantity}</Table.Td>
-                          <Table.Td><UserPopover userId={m.createdByUserId} fallback="-" /></Table.Td>
+                          <Table.Td>
+                            <UserPopover userId={m.createdByUserId} fallback="-" />
+                          </Table.Td>
                           <Table.Td>
                             {m.occurredAt ? new Date(m.occurredAt).toLocaleDateString() : '-'}
                           </Table.Td>
@@ -629,7 +712,11 @@ export function RxInventoryPage() {
                           <Combobox.Empty>No results</Combobox.Empty>
                         ) : (
                           balanceOptions.map((opt) => (
-                            <Combobox.Option key={opt.value} value={opt.value} data-testid="stock-balance-option">
+                            <Combobox.Option
+                              key={opt.value}
+                              value={opt.value}
+                              data-testid="stock-balance-option"
+                            >
                               {opt.label}
                             </Combobox.Option>
                           ))
@@ -660,7 +747,11 @@ export function RxInventoryPage() {
 
                 <Grid.Col span={12}>
                   <Group justify="flex-end">
-                    <Button type="submit" loading={adjustmentMutation.isPending} disabled={!selectedBalanceId}>
+                    <Button
+                      type="submit"
+                      loading={adjustmentMutation.isPending}
+                      disabled={!selectedBalanceId}
+                    >
                       Post Adjustment
                     </Button>
                   </Group>

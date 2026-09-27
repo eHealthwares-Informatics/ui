@@ -1,9 +1,22 @@
-import { useState } from 'react';
 import {
-  Anchor, Box, Card, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, TextInput, Select, NumberInput,
+  Anchor,
+  Box,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  TextInput,
+  Select,
+  NumberInput,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 import { useWhatsAppGroups, useCreateWhatsAppGroup } from '../website/admin-hooks';
 import { apmBlue, ink, muted } from '../website/layout';
 
@@ -32,7 +45,15 @@ export function WhatsAppGroupsPage() {
     createMutation.mutate(form, {
       onSuccess: () => {
         close();
-        setForm({ level: 'state', name: '', description: '', groupLink: '', adminName: '', adminPhone: '', memberCount: 0 });
+        setForm({
+          level: 'state',
+          name: '',
+          description: '',
+          groupLink: '',
+          adminName: '',
+          adminPhone: '',
+          memberCount: 0,
+        });
       },
     });
   };
@@ -40,7 +61,9 @@ export function WhatsAppGroupsPage() {
   return (
     <Stack gap="lg">
       <Group justify="space-between">
-        <Title order={3} style={{ color: ink }}>WhatsApp Command Groups</Title>
+        <Title order={3} style={{ color: ink }}>
+          WhatsApp Command Groups
+        </Title>
         <Button onClick={open} style={{ background: apmBlue }}>
           Add Group
         </Button>
@@ -83,54 +106,95 @@ export function WhatsAppGroupsPage() {
                 <Table.Tr key={g.id}>
                   <Table.Td fw={600}>{g.name}</Table.Td>
                   <Table.Td>
-                    <Badge color={g.level === 'state' ? 'blue' : g.level === 'senatorial' ? 'violet' : g.level === 'lga' ? 'teal' : 'gray'}>
+                    <Badge
+                      color={
+                        g.level === 'state'
+                          ? 'blue'
+                          : g.level === 'senatorial'
+                            ? 'violet'
+                            : g.level === 'lga'
+                              ? 'teal'
+                              : 'gray'
+                      }
+                    >
                       {g.level}
                     </Badge>
                   </Table.Td>
                   <Table.Td style={{ color: muted }}>
-                    {g.adminName ? `${g.adminName}${g.adminPhone ? ` (${g.adminPhone})` : ''}` : '—'}
+                    {g.adminName
+                      ? `${g.adminName}${g.adminPhone ? ` (${g.adminPhone})` : ''}`
+                      : '—'}
                   </Table.Td>
                   <Table.Td>{g.memberCount}</Table.Td>
                   <Table.Td>
                     {g.groupLink ? (
-                      <Anchor href={g.groupLink} target="_blank" size="sm">Open</Anchor>
-                    ) : '—'}
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {(groups ?? []).length === 0 && (
-                  <Table.Tr>
-                    <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>
-                      No WhatsApp groups found for this level
-                    </Table.Td>
-                  </Table.Tr>
-                )}
-              </Table.Tbody>
-            </Table>
-          </Card>
-        )}
+                      <Anchor href={g.groupLink} target="_blank" size="sm">
+                        Open
+                      </Anchor>
+                    ) : (
+                      '—'
+                    )}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+              {(groups ?? []).length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={5} style={{ textAlign: 'center', color: muted }}>
+                    No WhatsApp groups found for this level
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
+          </Table>
+        </Card>
+      )}
 
-        <Modal opened={opened} onClose={close} title="Add WhatsApp Group" size="md">
-          <Stack gap="sm">
-            <Select label="Level" data={levelOptions} value={form.level}
-              onChange={(v) => setForm({ ...form, level: v ?? 'state' })} required />
-            <TextInput label="Group Name" required value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.currentTarget.value })} />
-            <TextInput label="Description" value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.currentTarget.value })} />
-            <TextInput label="Group Link" value={form.groupLink}
-              onChange={(e) => setForm({ ...form, groupLink: e.currentTarget.value })} />
-            <TextInput label="Admin Name" value={form.adminName}
-              onChange={(e) => setForm({ ...form, adminName: e.currentTarget.value })} />
-            <TextInput label="Admin Phone" value={form.adminPhone}
-              onChange={(e) => setForm({ ...form, adminPhone: e.currentTarget.value })} />
-            <NumberInput label="Member Count" value={form.memberCount} min={0}
-              onChange={(v) => setForm({ ...form, memberCount: (v as number) ?? 0 })} />
-            <Button fullWidth onClick={handleSubmit} style={{ background: apmBlue }} mt="sm">
-              Create Group
-            </Button>
-          </Stack>
-        </Modal>
-      </Stack>
+      <Modal opened={opened} onClose={close} title="Add WhatsApp Group" size="md">
+        <Stack gap="sm">
+          <Select
+            label="Level"
+            data={levelOptions}
+            value={form.level}
+            onChange={(v) => setForm({ ...form, level: v ?? 'state' })}
+            required
+          />
+          <TextInput
+            label="Group Name"
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Description"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Group Link"
+            value={form.groupLink}
+            onChange={(e) => setForm({ ...form, groupLink: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Admin Name"
+            value={form.adminName}
+            onChange={(e) => setForm({ ...form, adminName: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Admin Phone"
+            value={form.adminPhone}
+            onChange={(e) => setForm({ ...form, adminPhone: e.currentTarget.value })}
+          />
+          <NumberInput
+            label="Member Count"
+            value={form.memberCount}
+            min={0}
+            onChange={(v) => setForm({ ...form, memberCount: (v as number) ?? 0 })}
+          />
+          <Button fullWidth onClick={handleSubmit} style={{ background: apmBlue }} mt="sm">
+            Create Group
+          </Button>
+        </Stack>
+      </Modal>
+    </Stack>
   );
 }

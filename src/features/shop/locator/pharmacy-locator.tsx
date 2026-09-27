@@ -5,9 +5,20 @@
  * centroid (the register carries no point coordinates); in nearby mode the
  * registry's settlement coordinates give precise, distance-sorted pins.
  */
-import { Badge, Box, Button, Divider, Group, SegmentedControl, Select, Stack, Text } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Group,
+  SegmentedControl,
+  Select,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { ListFilter, LocateFixed, MapPin, Navigation } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { WebsiteLayout } from '../website/layout';
 import type { NearbyPharmacyRecord, PharmacyRecord } from './api';
 import {
   useCentroids,
@@ -20,9 +31,8 @@ import {
   useUserLocation,
   useWardOptions,
 } from './hooks';
-import { WebsiteLayout } from '../website/layout';
-import { locatorTheme, LocatorShell, ResultCard } from './locator-shell';
 import { escapeHtml, type MapFocus, type MapPoint } from './locator-map';
+import { locatorTheme, LocatorShell, ResultCard } from './locator-shell';
 
 const RADIUS_OPTIONS = [
   { value: '5', label: 'Within 5 km' },
@@ -76,7 +86,7 @@ export default function PharmacyLocatorPage() {
       settlementName,
     },
     page,
-    12,
+    12
   );
   const near = useNearbyPharmacies(locationCtl.location, radiusKm, 50);
   const loadState = nearbyActive ? near.state : browse.state;
@@ -112,8 +122,7 @@ export default function PharmacyLocatorPage() {
     const byKey = new Map<string, { label: string; pharmacies: PharmacyRecord[] }>();
     for (const p of browse.rows) {
       const areaKey = p.lga?.code ?? p.lgaName ?? p.stateCode ?? p.premisesState ?? '?';
-      const label =
-        p.lga?.name ?? p.lgaName ?? p.stateName ?? p.premisesState ?? 'Unknown area';
+      const label = p.lga?.name ?? p.lgaName ?? p.stateName ?? p.premisesState ?? 'Unknown area';
       const bucket = byKey.get(areaKey) ?? { label, pharmacies: [] };
       bucket.pharmacies.push(p);
       byKey.set(areaKey, bucket);
@@ -133,8 +142,8 @@ export default function PharmacyLocatorPage() {
           .map(
             (p) =>
               `<div style="font-size:12px;color:${locatorTheme.text}">• ${escapeHtml(
-                p.premisesName || 'Unnamed premises',
-              )}</div>`,
+                p.premisesName || 'Unnamed premises'
+              )}</div>`
           )
           .join('')}${
           bucket.pharmacies.length > 6
@@ -148,13 +157,19 @@ export default function PharmacyLocatorPage() {
   // Click-to-zoom: nearby mode flies to the pharmacy's precise pin; browse
   // mode flies to its area bubble.
   const focus = useMemo<MapFocus | null>(() => {
-    if (!highlightKey) return null;
+    if (!highlightKey) {
+      return null;
+    }
     if (nearbyActive) {
       const point = mapPoints.find((pt) => pt.key === highlightKey);
-      return point ? { key: highlightKey, latitude: point.latitude, longitude: point.longitude, zoom: 15 } : null;
+      return point
+        ? { key: highlightKey, latitude: point.latitude, longitude: point.longitude, zoom: 15 }
+        : null;
     }
     const p = browse.rows.find((r) => `p-${r.id}` === highlightKey);
-    if (!p) return null;
+    if (!p) {
+      return null;
+    }
     const areaKey = p.lga?.code ?? p.lgaName ?? p.stateCode ?? p.premisesState ?? '?';
     const point = mapPoints.find((pt) => pt.key === `pb-${areaKey}`);
     if (point) {
@@ -168,10 +183,24 @@ export default function PharmacyLocatorPage() {
       nearbyActive
         ? `nearby|${locationCtl.location?.latitude},${locationCtl.location?.longitude}|${radiusKm}`
         : `${debouncedSearch}|${stateCode}|${lgaCode}|${wardName}|${areaName}|${neighbourhoodName}|${settlementName}|${page}`,
-    [nearbyActive, locationCtl.location, radiusKm, debouncedSearch, stateCode, lgaCode, wardName, areaName, neighbourhoodName, settlementName, page],
+    [
+      nearbyActive,
+      locationCtl.location,
+      radiusKm,
+      debouncedSearch,
+      stateCode,
+      lgaCode,
+      wardName,
+      areaName,
+      neighbourhoodName,
+      settlementName,
+      page,
+    ]
   );
 
-  const count = nearbyActive ? (near.meta?.total ?? near.rows.length) : (browse.meta?.total ?? browse.rows.length);
+  const count = nearbyActive
+    ? (near.meta?.total ?? near.rows.length)
+    : (browse.meta?.total ?? browse.rows.length);
 
   const toggleNearby = (active: boolean) => {
     setNearby(active);
@@ -233,7 +262,10 @@ export default function PharmacyLocatorPage() {
                   placeholder: 'All neighbourhoods',
                   value: neighbourhoodName,
                   onChange: (v) => setNeighbourhoodName(v),
-                  options: neighbourhoodOptions.options.map((n) => ({ value: n.name, label: n.name })),
+                  options: neighbourhoodOptions.options.map((n) => ({
+                    value: n.name,
+                    label: n.name,
+                  })),
                   loading: neighbourhoodOptions.loading,
                   onSearchChange: setNeighbourhoodSearch,
                   searchQuery: neighbourhoodSearch,
@@ -296,17 +328,13 @@ export default function PharmacyLocatorPage() {
               ? 'Determining your location…'
               : locationCtl.status === 'denied' || locationCtl.status === 'error'
                 ? (locationCtl.errorMessage ??
-                   'Location unavailable — allow location access in your browser, or switch to Browse and search by name.')
+                  'Location unavailable — allow location access in your browser, or switch to Browse and search by name.')
                 : locationCtl.location?.approx
                   ? `Using an approximate location (±~10 km). Showing pharmacies within ${radiusKm} km.`
                   : `Showing pharmacies within ${radiusKm} km of your location.`
         }
         userLocation={nearbyActive ? locationCtl.location : null}
-        meta={
-          nearbyActive
-            ? { page: 1, limit: 50, total: count }
-            : browse.meta
-        }
+        meta={nearbyActive ? { page: 1, limit: 50, total: count } : browse.meta}
         page={page}
         onPageChange={(p) => {
           setPage(p);
@@ -386,68 +414,70 @@ export default function PharmacyLocatorPage() {
               );
             })
           : browse.rows.map((p) => {
-          const key = `p-${p.id}`;
-          return (
-            <ResultCard
-              key={key}
-              selected={highlightKey === key}
-              onClick={() => setHighlightKey(highlightKey === key ? null : key)}
-            >
-              <Group justify="space-between" align="flex-start" wrap="nowrap">
-                <Box flex={1} miw={0}>
-                  <Text fw={800} size="md" c={locatorTheme.ink} truncate="end">
-                    {p.premisesName || 'Unnamed premises'}
-                  </Text>
-                  <Group gap={6} mt={4} wrap="wrap">
-                    {p.category ? (
-                      <Badge size="sm" variant="light" color="orange">
-                        {p.category}
-                      </Badge>
-                    ) : null}
-                    {p.yearLicenced ? (
-                      <Badge size="sm" variant="light" color="gray">
-                        Lic. {p.yearLicenced}
-                      </Badge>
-                    ) : null}
-                  </Group>
-                  {p.premisesAddress ? (
-                    <Text size="sm" c={locatorTheme.muted} mt={6}>
-                      <MapPin size={13} style={{ verticalAlign: -2, marginRight: 4 }} />
-                      {p.premisesAddress}
-                    </Text>
-                  ) : null}
-                  <Text size="sm" c={locatorTheme.muted} mt={4}>
-                    {areaLine(p)}
-                  </Text>
-                </Box>
-              </Group>
-              {pharmacistName(p) || p.certificateNo ? (
-                <>
-                  <Divider my="xs" color={locatorTheme.line} />
-                  <Group gap="md">
-                    {pharmacistName(p) ? (
-                      <Text size="xs" c={locatorTheme.muted}>
-                        Superintendent: {pharmacistName(p)}
+              const key = `p-${p.id}`;
+              return (
+                <ResultCard
+                  key={key}
+                  selected={highlightKey === key}
+                  onClick={() => setHighlightKey(highlightKey === key ? null : key)}
+                >
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <Box flex={1} miw={0}>
+                      <Text fw={800} size="md" c={locatorTheme.ink} truncate="end">
+                        {p.premisesName || 'Unnamed premises'}
                       </Text>
-                    ) : null}
-                    {p.certificateNo ? (
-                      <Text size="xs" c={locatorTheme.muted}>
-                        Cert. {p.certificateNo}
-                      </Text>
+                      <Group gap={6} mt={4} wrap="wrap">
+                        {p.category ? (
+                          <Badge size="sm" variant="light" color="orange">
+                            {p.category}
+                          </Badge>
+                        ) : null}
+                        {p.yearLicenced ? (
+                          <Badge size="sm" variant="light" color="gray">
+                            Lic. {p.yearLicenced}
+                          </Badge>
+                        ) : null}
+                      </Group>
+                      {p.premisesAddress ? (
+                        <Text size="sm" c={locatorTheme.muted} mt={6}>
+                          <MapPin size={13} style={{ verticalAlign: -2, marginRight: 4 }} />
+                          {p.premisesAddress}
+                        </Text>
                       ) : null}
+                      <Text size="sm" c={locatorTheme.muted} mt={4}>
+                        {areaLine(p)}
+                      </Text>
+                    </Box>
                   </Group>
-                </>
-              ) : null}
-            </ResultCard>
-          );
-        })}
+                  {pharmacistName(p) || p.certificateNo ? (
+                    <>
+                      <Divider my="xs" color={locatorTheme.line} />
+                      <Group gap="md">
+                        {pharmacistName(p) ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            Superintendent: {pharmacistName(p)}
+                          </Text>
+                        ) : null}
+                        {p.certificateNo ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            Cert. {p.certificateNo}
+                          </Text>
+                        ) : null}
+                      </Group>
+                    </>
+                  ) : null}
+                </ResultCard>
+              );
+            })}
       </LocatorShell>
     </WebsiteLayout>
   );
 }
 
 function pharmacistName(p: PharmacyRecord | NearbyPharmacyRecord): string | null {
-  if ('pharmacist' in p && p.pharmacist && p.pharmacist.trim()) return p.pharmacist.trim();
+  if ('pharmacist' in p && p.pharmacist && p.pharmacist.trim()) {
+    return p.pharmacist.trim();
+  }
   if ('pharmacistFirstName' in p) {
     const parts = [p.pharmacistFirstName, p.pharmacistLastName].filter(Boolean);
     return parts.length ? parts.join(' ') : null;
@@ -463,10 +493,14 @@ function areaLine(p: PharmacyRecord): string {
 function pharmacyContactHtml(p: NearbyPharmacyRecord): string {
   const rows: string[] = [];
   if (p.category) {
-    rows.push(`<div style="font-size:12px;color:${locatorTheme.text}">${escapeHtml(p.category)}</div>`);
+    rows.push(
+      `<div style="font-size:12px;color:${locatorTheme.text}">${escapeHtml(p.category)}</div>`
+    );
   }
   if (p.pharmacist) {
-    rows.push(`<div style="font-size:12px;color:${locatorTheme.text}">Superintendent: ${escapeHtml(p.pharmacist)}</div>`);
+    rows.push(
+      `<div style="font-size:12px;color:${locatorTheme.text}">Superintendent: ${escapeHtml(p.pharmacist)}</div>`
+    );
   }
   return rows.length ? `<div style="margin-top:6px">${rows.join('')}</div>` : '';
 }

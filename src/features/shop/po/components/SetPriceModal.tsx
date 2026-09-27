@@ -45,7 +45,9 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
   const { data: item } = useQuery({
     queryKey: ['item', itemId],
     queryFn: async () => {
-      if (!itemId) return null;
+      if (!itemId) {
+        return null;
+      }
       const { data } = await rxsoftApi.get(`/items/${itemId}`);
       return data as ItemWithUoms | null;
     },
@@ -75,9 +77,8 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
   const baseUom = allUoms.find((u) => u.id === item?.baseUomId);
   const purchaseUom = allUoms.find((u) => u.id === item?.purchaseUomId);
 
-  const conversionFactor = purchaseUom?.factor && baseUom?.factor
-    ? purchaseUom.factor / baseUom.factor
-    : null;
+  const conversionFactor =
+    purchaseUom?.factor && baseUom?.factor ? purchaseUom.factor / baseUom.factor : null;
 
   const unitCost = conversionFactor && price > 0 ? price / conversionFactor : price;
 
@@ -99,15 +100,17 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
 
         {purchaseUom && baseUom && purchaseUom.id !== baseUom.id && (
           <Text size="sm" c="dimmed">
-            Purchase UOM: <strong>{purchaseUom.name}</strong> = {conversionFactor?.toFixed(4)} <strong>{baseUom.name}</strong>
+            Purchase UOM: <strong>{purchaseUom.name}</strong> = {conversionFactor?.toFixed(4)}{' '}
+            <strong>{baseUom.name}</strong>
           </Text>
         )}
 
         <NumberInput
           label="Price"
-          description={purchaseUom && baseUom && purchaseUom.id !== baseUom.id
-            ? `Price per ${purchaseUom.name} (stored as ${baseUom.name} equivalent)`
-            : undefined
+          description={
+            purchaseUom && baseUom && purchaseUom.id !== baseUom.id
+              ? `Price per ${purchaseUom.name} (stored as ${baseUom.name} equivalent)`
+              : undefined
           }
           value={price}
           onChange={(v) => setPrice(Number(v) || 0)}
@@ -123,7 +126,9 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
         )}
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={() => onConfirm(unitCost)}>Confirm</Button>
         </Group>
       </Stack>

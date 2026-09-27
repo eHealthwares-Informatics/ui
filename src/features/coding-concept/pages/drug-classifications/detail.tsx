@@ -1,17 +1,23 @@
 import { Badge, Card, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@mantine/core';
-import { codingConceptApi } from '@/lib/coding-concept-api';
 import { RxPage } from '@/features/components/page/rx-page';
+import { codingConceptApi } from '@/lib/coding-concept-api';
 
 type Relations = {
   genericDrugs: Array<{ id: string; code: string; name: string }>;
   genericProducts: Array<{ id: string; code: string; name: string }>;
 };
 
-function LinkList({ items, emptyLabel }: { items: Array<{ id: string; code: string; name: string }>; emptyLabel: string }) {
+function LinkList({
+  items,
+  emptyLabel,
+}: {
+  items: Array<{ id: string; code: string; name: string }>;
+  emptyLabel: string;
+}) {
   if (items.length === 0) {
     return (
       <Text size="sm" c="dimmed">
@@ -33,7 +39,11 @@ function LinkList({ items, emptyLabel }: { items: Array<{ id: string; code: stri
   );
 }
 
-export function CodedDrugClassificationDetailPage({ classificationId }: { classificationId: string }) {
+export function CodedDrugClassificationDetailPage({
+  classificationId,
+}: {
+  classificationId: string;
+}) {
   const navigate = useNavigate();
 
   const { data: classification, isLoading: loadingCls } = useQuery({
@@ -47,7 +57,9 @@ export function CodedDrugClassificationDetailPage({ classificationId }: { classi
   const { data: relations, isLoading: loadingRel } = useQuery({
     queryKey: ['drug-classification', classificationId, 'relations'],
     queryFn: async () => {
-      const { data } = await codingConceptApi.get(`/drug-classifications/${classificationId}/relations`);
+      const { data } = await codingConceptApi.get(
+        `/drug-classifications/${classificationId}/relations`
+      );
       return data.data as Relations;
     },
   });
@@ -57,7 +69,11 @@ export function CodedDrugClassificationDetailPage({ classificationId }: { classi
       title="Drug Classification"
       description="Classification and its related generic drugs and products"
       actions={
-        <Button variant="subtle" leftSection={<ArrowLeft size={16} />} onClick={() => navigate({ to: '/coding-concept/drug-classifications' })}>
+        <Button
+          variant="subtle"
+          leftSection={<ArrowLeft size={16} />}
+          onClick={() => navigate({ to: '/coding-concept/drug-classifications' })}
+        >
           Back to Classifications
         </Button>
       }
@@ -81,13 +97,19 @@ export function CodedDrugClassificationDetailPage({ classificationId }: { classi
               <Title order={5} mb="sm">
                 Generic Drugs ({relations?.genericDrugs.length ?? 0})
               </Title>
-              <LinkList items={relations?.genericDrugs ?? []} emptyLabel="No generic drugs linked." />
+              <LinkList
+                items={relations?.genericDrugs ?? []}
+                emptyLabel="No generic drugs linked."
+              />
             </Card>
             <Card withBorder radius="md" p="md">
               <Title order={5} mb="sm">
                 Generic Products ({relations?.genericProducts.length ?? 0})
               </Title>
-              <LinkList items={relations?.genericProducts ?? []} emptyLabel="No generic products linked." />
+              <LinkList
+                items={relations?.genericProducts ?? []}
+                emptyLabel="No generic products linked."
+              />
             </Card>
           </SimpleGrid>
         )}

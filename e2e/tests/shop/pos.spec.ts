@@ -42,18 +42,15 @@ test.describe('Damorex POS', () => {
 
   /* ---- Add a product to cart ---- */
 
-  test('adds a product to the cart and shows it in the cart table', async ({
-    page,
-  }) => {
+  test('adds a product to the cart and shows it in the cart table', async ({ page }) => {
     await page.goto('/shop/pos');
     await page.waitForLoadState('networkidle');
 
     const productLabel = await addFirstProduct(page);
 
-    const itemName =
-      productLabel.includes(' - ')
-        ? productLabel.slice(productLabel.indexOf(' - ') + 3)
-        : productLabel;
+    const itemName = productLabel.includes(' - ')
+      ? productLabel.slice(productLabel.indexOf(' - ') + 3)
+      : productLabel;
     const cartRow = page
       .locator('table')
       .last()
@@ -76,17 +73,16 @@ test.describe('Damorex POS', () => {
     await page.waitForLoadState('networkidle');
 
     const productLabel = await addFirstProduct(page);
-    const itemName =
-      productLabel.includes(' - ')
-        ? productLabel.slice(productLabel.indexOf(' - ') + 3)
-        : productLabel;
+    const itemName = productLabel.includes(' - ')
+      ? productLabel.slice(productLabel.indexOf(' - ') + 3)
+      : productLabel;
     await expect(
-      page.locator('table').last().locator('tbody tr').filter({ hasText: itemName.trim() }).first(),
+      page.locator('table').last().locator('tbody tr').filter({ hasText: itemName.trim() }).first()
     ).toBeVisible({ timeout: waits.pos.cartUpdate });
 
     await page.getByTestId('pos-hold-sale-btn').click();
     await expect(
-      page.locator('table').last().locator('tbody tr').filter({ hasText: itemName.trim() }),
+      page.locator('table').last().locator('tbody tr').filter({ hasText: itemName.trim() })
     ).toHaveCount(0, { timeout: waits.pos.cartUpdate });
   });
 
@@ -97,10 +93,9 @@ test.describe('Damorex POS', () => {
     await page.waitForLoadState('networkidle');
 
     const productLabel = await addFirstProduct(page);
-    const itemName =
-      productLabel.includes(' - ')
-        ? productLabel.slice(productLabel.indexOf(' - ') + 3)
-        : productLabel;
+    const itemName = productLabel.includes(' - ')
+      ? productLabel.slice(productLabel.indexOf(' - ') + 3)
+      : productLabel;
     const cartRow = page
       .locator('table')
       .last()
@@ -131,7 +126,9 @@ test.describe('Damorex POS', () => {
     // Modal content is present.
     await expect(page.getByTestId('pos-payment-method')).toBeVisible({ timeout: waits.visible });
     await expect(page.getByTestId('pos-complete-sale-btn')).toBeVisible({ timeout: waits.visible });
-    await expect(page.getByTestId('pos-cancel-payment-btn')).toBeVisible({ timeout: waits.visible });
+    await expect(page.getByTestId('pos-cancel-payment-btn')).toBeVisible({
+      timeout: waits.visible,
+    });
 
     await page.getByTestId('pos-cancel-payment-btn').click();
   });

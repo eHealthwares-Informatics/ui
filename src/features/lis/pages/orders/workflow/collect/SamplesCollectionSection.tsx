@@ -57,9 +57,13 @@ export function SamplesCollectionSection() {
 
   const getDefaultCollectionMethod = (): string | null => {
     const firstItem = state.items[0];
-    if (!firstItem) return null;
+    if (!firstItem) {
+      return null;
+    }
     const td = testDefs.find((t) => t.id === firstItem.testDefinitionId);
-    if (!td?.methodId) return null;
+    if (!td?.methodId) {
+      return null;
+    }
     const m = methods.find((m) => m.id === td.methodId);
     return m?.name ?? null;
   };

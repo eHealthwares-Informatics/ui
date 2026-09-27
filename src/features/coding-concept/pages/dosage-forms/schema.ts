@@ -1,5 +1,5 @@
-import type { ModelConfig } from '@/features/shared/model-schema';
 import type { Column, Field } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
 
 const columns: Column[] = [
   { key: 'code', label: 'Code' },

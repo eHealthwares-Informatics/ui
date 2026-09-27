@@ -1,7 +1,7 @@
 import { ActionIcon, Badge, Button, Group, Select, Text } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus, RefreshCcw, Search, Settings } from 'lucide-react';
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useCustomers, useDispenseOrders, usePriceLists, useSearchSales } from '../../api/posApi';
 import { SaleSession } from '../types';
 import { CustomerQuickAddModal } from './CustomerQuickAddModal';
@@ -64,13 +64,12 @@ export function PosToolbar({
     label: `Dispense ${o.orderNumber}${o.externalReference ? ` · ${o.externalReference}` : ''} (${o.items?.length ?? 0} lines)`,
   }));
 
-  const loadData = [
-    ...orderData,
-    ...saleData,
-  ];
+  const loadData = [...orderData, ...saleData];
 
   function handleLoad(value: string | null) {
-    if (!value) { return; }
+    if (!value) {
+      return;
+    }
     if (value.startsWith(ORDER_OPTION_PREFIX)) {
       onLoadOrder(value.slice(ORDER_OPTION_PREFIX.length));
     } else {
@@ -87,7 +86,9 @@ export function PosToolbar({
           data={customerData}
           value={session.customerId || null}
           onChange={(value, option) => {
-            if (value) {onCustomerChange(value, option.label);}
+            if (value) {
+              onCustomerChange(value, option.label);
+            }
           }}
           onSearchChange={setCustomerSearch}
           searchable
@@ -110,7 +111,9 @@ export function PosToolbar({
           data={priceListData}
           value={session.priceListId || null}
           onChange={(value, option) => {
-            if (value) {onPriceListChange(value, option.label);}
+            if (value) {
+              onPriceListChange(value, option.label);
+            }
           }}
           onSearchChange={setPriceListSearch}
           searchable
@@ -120,7 +123,12 @@ export function PosToolbar({
         />
 
         <Button size="xs" leftSection={<Search size={14} />} onClick={onHeldSalesOpen}>
-          Held Sales {heldSalesCount > 0 && <Badge ml={4} size="xs">{heldSalesCount}</Badge>}
+          Held Sales{' '}
+          {heldSalesCount > 0 && (
+            <Badge ml={4} size="xs">
+              {heldSalesCount}
+            </Badge>
+          )}
         </Button>
 
         <Select
@@ -152,7 +160,13 @@ export function PosToolbar({
           Refresh
         </Button>
 
-        <Button size="xs" color="red" leftSection={<RefreshCcw size={14} />} onClick={onReset} disabled={session.status === 'completed'}>
+        <Button
+          size="xs"
+          color="red"
+          leftSection={<RefreshCcw size={14} />}
+          onClick={onReset}
+          disabled={session.status === 'completed'}
+        >
           Reset POS
         </Button>
 

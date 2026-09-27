@@ -23,8 +23,22 @@ const createFieldGroups: FieldGroup[] = [
   {
     title: 'QC Result',
     fields: [
-      { name: 'qcLotId', label: 'QC Lot', type: 'async-select', searchParam: { endpoint: '/lis/qc-lots', valueKey: 'id', labelKey: 'controlName' }, required: true, col: 6 },
-      { name: 'testDefinitionId', label: 'Test', type: 'async-select', searchParam: { endpoint: '/lis/test-definitions', valueKey: 'id', labelKey: 'name' }, required: true, col: 6 },
+      {
+        name: 'qcLotId',
+        label: 'QC Lot',
+        type: 'async-select',
+        searchParam: { endpoint: '/lis/qc-lots', valueKey: 'id', labelKey: 'controlName' },
+        required: true,
+        col: 6,
+      },
+      {
+        name: 'testDefinitionId',
+        label: 'Test',
+        type: 'async-select',
+        searchParam: { endpoint: '/lis/test-definitions', valueKey: 'id', labelKey: 'name' },
+        required: true,
+        col: 6,
+      },
       { name: 'value', label: 'Value', type: 'number', required: true, col: 4 },
       { name: 'measuredAt', label: 'Measured At', type: 'date', col: 4 },
       { name: 'instrument', label: 'Instrument', type: 'text', col: 4 },

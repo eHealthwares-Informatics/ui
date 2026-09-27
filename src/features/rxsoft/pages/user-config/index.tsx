@@ -15,8 +15,8 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
 
 type PosConfig = {
   id: string;
@@ -196,7 +196,7 @@ export function RxUserConfigPage() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(err),
-        });
+      });
     },
   });
 
@@ -299,9 +299,7 @@ export function RxUserConfigPage() {
               <Switch
                 label="Allow A4 Print (Wholesale)"
                 checked={draft.allowA4Print}
-                onChange={(e) =>
-                  setDraft((d) => ({ ...d, allowA4Print: e.currentTarget.checked }))
-                }
+                onChange={(e) => setDraft((d) => ({ ...d, allowA4Print: e.currentTarget.checked }))}
               />
               <Switch
                 label="Auto-select Stock Location"

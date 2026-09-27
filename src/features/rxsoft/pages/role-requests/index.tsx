@@ -13,6 +13,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import {
   approveRoleRequest,
   listAllRoleRequests,
@@ -20,7 +21,6 @@ import {
   rejectRoleRequest,
   RoleRequest,
 } from '../user-insights/api';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 const STATUS_COLOR: Record<RoleRequest['status'], string> = {
   pending: 'orange',
@@ -58,7 +58,7 @@ export function RoleRequestsPage() {
       notifications.show({
         color: 'red',
         message: getApiErrorMessage(e),
-        }),
+      }),
   });
 
   return (
@@ -85,13 +85,17 @@ export function RoleRequestsPage() {
           {isLoading ? (
             <Table.Tr>
               <Table.Td colSpan={5}>
-                <Text c="dimmed" size="sm">Loading…</Text>
+                <Text c="dimmed" size="sm">
+                  Loading…
+                </Text>
               </Table.Td>
             </Table.Tr>
           ) : requests.length === 0 ? (
             <Table.Tr>
               <Table.Td colSpan={5}>
-                <Text c="dimmed" size="sm">No role requests.</Text>
+                <Text c="dimmed" size="sm">
+                  No role requests.
+                </Text>
               </Table.Td>
             </Table.Tr>
           ) : (

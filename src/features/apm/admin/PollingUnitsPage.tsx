@@ -1,18 +1,37 @@
-import { useState } from 'react';
 import {
-  Box, Card, Group, Skeleton, Stack, Text, Title, Badge, Table,
-  Button, Modal, TextInput, Select, NumberInput, Textarea,
+  Box,
+  Card,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  Badge,
+  Table,
+  Button,
+  Modal,
+  TextInput,
+  Select,
+  NumberInput,
+  Textarea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useParams, useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useWardPollingUnits, useUpdatePollingUnit } from '../website/admin-hooks';
 import { apmBlue, apmGreen, ink, muted } from '../website/layout';
 
 const riskColors: Record<string, string> = {
-  green: '#16A34A', yellow: '#EAB308', red: '#DC2626', grey: '#94A3B8',
+  green: '#16A34A',
+  yellow: '#EAB308',
+  red: '#DC2626',
+  grey: '#94A3B8',
 };
 const conversionColors: Record<string, string> = {
-  won: '#16A34A', engaged: '#3B82F6', untouched: '#94A3B8', lost: '#DC2626',
+  won: '#16A34A',
+  engaged: '#3B82F6',
+  untouched: '#94A3B8',
+  lost: '#DC2626',
 };
 
 export function PollingUnitsPage() {
@@ -42,7 +61,9 @@ export function PollingUnitsPage() {
   };
 
   const handleSave = () => {
-    if (!selectedPu) {return;}
+    if (!selectedPu) {
+      return;
+    }
     updatePu.mutate({ id: selectedPu.id ?? selectedPu._id, data: form }, { onSuccess: close });
   };
 
@@ -52,7 +73,9 @@ export function PollingUnitsPage() {
         <Button variant="subtle" onClick={() => router.history.back()}>
           ← Back
         </Button>
-        <Title order={3} style={{ color: ink }}>Polling Units</Title>
+        <Title order={3} style={{ color: ink }}>
+          Polling Units
+        </Title>
       </Group>
 
       {isLoading ? (
@@ -76,24 +99,50 @@ export function PollingUnitsPage() {
             <Table.Tbody>
               {(pus ?? []).map((pu: any) => (
                 <Table.Tr key={pu.id ?? pu._id}>
-                  <Table.Td fw={600} style={{ fontSize: 13 }}>{pu.code}</Table.Td>
+                  <Table.Td fw={600} style={{ fontSize: 13 }}>
+                    {pu.code}
+                  </Table.Td>
                   <Table.Td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {pu.name}
                   </Table.Td>
                   <Table.Td>{pu.registeredVoters.toLocaleString()}</Table.Td>
                   <Table.Td>
-                    <Text fw={600} style={{ color: apmGreen }}>{pu.pastResultApm}</Text>
+                    <Text fw={600} style={{ color: apmGreen }}>
+                      {pu.pastResultApm}
+                    </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Text fw={600} style={{ color: '#3B82F6' }}>{pu.pastResultPdp}</Text>
+                    <Text fw={600} style={{ color: '#3B82F6' }}>
+                      {pu.pastResultPdp}
+                    </Text>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={pu.riskLevel === 'red' ? 'red' : pu.riskLevel === 'yellow' ? 'yellow' : pu.riskLevel === 'green' ? 'green' : 'gray'}>
+                    <Badge
+                      color={
+                        pu.riskLevel === 'red'
+                          ? 'red'
+                          : pu.riskLevel === 'yellow'
+                            ? 'yellow'
+                            : pu.riskLevel === 'green'
+                              ? 'green'
+                              : 'gray'
+                      }
+                    >
                       {pu.riskLevel}
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    <Badge color={pu.conversionStatus === 'won' ? 'green' : pu.conversionStatus === 'engaged' ? 'blue' : pu.conversionStatus === 'lost' ? 'red' : 'gray'}>
+                    <Badge
+                      color={
+                        pu.conversionStatus === 'won'
+                          ? 'green'
+                          : pu.conversionStatus === 'engaged'
+                            ? 'blue'
+                            : pu.conversionStatus === 'lost'
+                              ? 'red'
+                              : 'gray'
+                      }
+                    >
                       {pu.conversionStatus}
                     </Badge>
                   </Table.Td>
@@ -101,8 +150,12 @@ export function PollingUnitsPage() {
                     {pu.assignedAgentName ?? '—'}
                   </Table.Td>
                   <Table.Td>
-                    <Button size="xs" variant="light" style={{ color: apmBlue }}
-                      onClick={() => openEditModal(pu)}>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      style={{ color: apmBlue }}
+                      onClick={() => openEditModal(pu)}
+                    >
                       Edit
                     </Button>
                   </Table.Td>
@@ -122,30 +175,73 @@ export function PollingUnitsPage() {
 
       <Modal opened={opened} onClose={close} title={`Edit: ${selectedPu?.code ?? ''}`} size="md">
         <Stack gap="sm">
-          <Select label="Risk Level" data={['green', 'yellow', 'red', 'grey'].map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }))}
-            value={form.riskLevel} onChange={(v) => setForm({ ...form, riskLevel: v ?? 'grey' })} />
-          <Select label="Conversion Status" data={['untouched', 'engaged', 'won', 'lost'].map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }))}
-            value={form.conversionStatus} onChange={(v) => setForm({ ...form, conversionStatus: v ?? 'untouched' })} />
-          <NumberInput label="Registered Voters" value={form.registeredVoters} min={0}
-            onChange={(v) => setForm({ ...form, registeredVoters: (v as number) ?? 0 })} />
+          <Select
+            label="Risk Level"
+            data={['green', 'yellow', 'red', 'grey'].map((v) => ({
+              value: v,
+              label: v.charAt(0).toUpperCase() + v.slice(1),
+            }))}
+            value={form.riskLevel}
+            onChange={(v) => setForm({ ...form, riskLevel: v ?? 'grey' })}
+          />
+          <Select
+            label="Conversion Status"
+            data={['untouched', 'engaged', 'won', 'lost'].map((v) => ({
+              value: v,
+              label: v.charAt(0).toUpperCase() + v.slice(1),
+            }))}
+            value={form.conversionStatus}
+            onChange={(v) => setForm({ ...form, conversionStatus: v ?? 'untouched' })}
+          />
+          <NumberInput
+            label="Registered Voters"
+            value={form.registeredVoters}
+            min={0}
+            onChange={(v) => setForm({ ...form, registeredVoters: (v as number) ?? 0 })}
+          />
           <Group grow>
-            <NumberInput label="APM (Prev)" value={form.pastResultApm} min={0}
-              onChange={(v) => setForm({ ...form, pastResultApm: (v as number) ?? 0 })} />
-            <NumberInput label="PDP (Prev)" value={form.pastResultPdp} min={0}
-              onChange={(v) => setForm({ ...form, pastResultPdp: (v as number) ?? 0 })} />
+            <NumberInput
+              label="APM (Prev)"
+              value={form.pastResultApm}
+              min={0}
+              onChange={(v) => setForm({ ...form, pastResultApm: (v as number) ?? 0 })}
+            />
+            <NumberInput
+              label="PDP (Prev)"
+              value={form.pastResultPdp}
+              min={0}
+              onChange={(v) => setForm({ ...form, pastResultPdp: (v as number) ?? 0 })}
+            />
           </Group>
           <Group grow>
-            <NumberInput label="APC (Prev)" value={form.pastResultApc} min={0}
-              onChange={(v) => setForm({ ...form, pastResultApc: (v as number) ?? 0 })} />
-            <NumberInput label="Other (Prev)" value={form.pastResultOther} min={0}
-              onChange={(v) => setForm({ ...form, pastResultOther: (v as number) ?? 0 })} />
+            <NumberInput
+              label="APC (Prev)"
+              value={form.pastResultApc}
+              min={0}
+              onChange={(v) => setForm({ ...form, pastResultApc: (v as number) ?? 0 })}
+            />
+            <NumberInput
+              label="Other (Prev)"
+              value={form.pastResultOther}
+              min={0}
+              onChange={(v) => setForm({ ...form, pastResultOther: (v as number) ?? 0 })}
+            />
           </Group>
-          <TextInput label="Agent Name" value={form.assignedAgentName}
-            onChange={(e) => setForm({ ...form, assignedAgentName: e.currentTarget.value })} />
-          <TextInput label="Agent Phone" value={form.assignedAgentPhone}
-            onChange={(e) => setForm({ ...form, assignedAgentPhone: e.currentTarget.value })} />
-          <Textarea label="Notes" value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })} />
+          <TextInput
+            label="Agent Name"
+            value={form.assignedAgentName}
+            onChange={(e) => setForm({ ...form, assignedAgentName: e.currentTarget.value })}
+          />
+          <TextInput
+            label="Agent Phone"
+            value={form.assignedAgentPhone}
+            onChange={(e) => setForm({ ...form, assignedAgentPhone: e.currentTarget.value })}
+          />
+          <Textarea
+            label="Notes"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.currentTarget.value })}
+          />
           <Button fullWidth onClick={handleSave} style={{ background: apmBlue }} mt="sm">
             Save Changes
           </Button>

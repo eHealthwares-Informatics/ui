@@ -160,7 +160,7 @@ export interface LocalityOption {
 // ── API calls ──────────────────────────────────────────────────────────────
 
 export async function searchFacilities(
-  params: FacilitySearchParams,
+  params: FacilitySearchParams
 ): Promise<{ data: FacilityRecord[]; meta: ListMeta }> {
   const res = await conceptsApi.get('/v1/facilities', {
     params: {
@@ -176,20 +176,32 @@ export async function searchFacilities(
 }
 
 export async function searchPharmacies(
-  params: PharmacySearchParams,
+  params: PharmacySearchParams
 ): Promise<{ data: PharmacyRecord[]; meta: ListMeta }> {
   // Pharmacies API takes free-text `search`; named location filters go through
   // its shared filter DSL (field=TYPE|value|).
   const filterParams: Record<string, string | number> = {};
-  if (params.search) filterParams.search = params.search;
-  if (params.state) filterParams['state.code'] = `EQUALS|${params.state}|`;
-  if (params.lgaCode) filterParams['lga.code'] = `EQUALS|${params.lgaCode}|`;
-  if (params.wardName) filterParams['ward.name'] = `EQUALS|${params.wardName}|`;
-  if (params.areaName) filterParams['area.name'] = `EQUALS|${params.areaName}|`;
-  if (params.neighbourhoodName)
+  if (params.search) {
+    filterParams.search = params.search;
+  }
+  if (params.state) {
+    filterParams['state.code'] = `EQUALS|${params.state}|`;
+  }
+  if (params.lgaCode) {
+    filterParams['lga.code'] = `EQUALS|${params.lgaCode}|`;
+  }
+  if (params.wardName) {
+    filterParams['ward.name'] = `EQUALS|${params.wardName}|`;
+  }
+  if (params.areaName) {
+    filterParams['area.name'] = `EQUALS|${params.areaName}|`;
+  }
+  if (params.neighbourhoodName) {
     filterParams['neighbourhood.name'] = `EQUALS|${params.neighbourhoodName}|`;
-  if (params.settlementName)
+  }
+  if (params.settlementName) {
     filterParams['settlement.name'] = `EQUALS|${params.settlementName}|`;
+  }
   return conceptsApi
     .get('/v1/pharmacies', {
       params: {
@@ -213,7 +225,7 @@ export async function getLgas(stateCode: string): Promise<ConceptsLga[]> {
 }
 
 export async function getWardOptions(
-  opts: { search?: string; lga?: string; state?: string; limit?: number } = {},
+  opts: { search?: string; lga?: string; state?: string; limit?: number } = {}
 ): Promise<WardOption[]> {
   const res = await conceptsApi.get('/v1/facilities/wards-lite', { params: opts });
   return res.data.data;
@@ -221,7 +233,7 @@ export async function getWardOptions(
 
 export async function getLocalityOptions(
   type: 'area' | 'neighbourhood' | 'settlement',
-  opts: { search?: string; limit?: number } = {},
+  opts: { search?: string; limit?: number } = {}
 ): Promise<LocalityOption[]> {
   const res = await conceptsApi.get('/v1/localities/options', {
     params: { type, ...opts },
@@ -246,7 +258,7 @@ export async function getNearbyFacilities(
   lat: number,
   lng: number,
   radiusKm: number,
-  limit = 20,
+  limit = 20
 ): Promise<NearbyFacilityRecord[]> {
   const res = await conceptsApi.get('/v1/facilities/nearby', {
     params: { lat, lng, radius: radiusKm, limit },
@@ -263,7 +275,7 @@ export async function getNearbyPharmacies(
   lat: number,
   lng: number,
   radiusKm: number,
-  limit = 20,
+  limit = 20
 ): Promise<NearbyPharmacyRecord[]> {
   const res = await conceptsApi.get('/v1/pharmacies/nearby', {
     params: { lat, lng, radius: radiusKm, limit },

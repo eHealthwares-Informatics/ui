@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url';
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 export const ORG_STATE_PATH = join(E2E_DIR, '..', '.runtime', 'org-state.json');
 
-export const SEED_BASE_URL = (process.env.SEED_BASE_URL ?? 'http://localhost:8093').replace(/\/$/, '');
+export const SEED_BASE_URL = (process.env.SEED_BASE_URL ?? 'http://localhost:8093').replace(
+  /\/$/,
+  ''
+);
 export const SEED_API_KEY = process.env.SEED_PROVISION_API_KEY ?? process.env.SEED_API_KEY ?? '';
 
 export type OrgState = {
@@ -105,5 +108,8 @@ export function activeAdminCredentials(): { username: string; password: string }
   if (owner) {
     return { username: owner.username, password: owner.password };
   }
-  return { username: process.env.E2E_FALLBACK_USERNAME ?? 'admin', password: process.env.E2E_FALLBACK_PASSWORD ?? 'password' };
+  return {
+    username: process.env.E2E_FALLBACK_USERNAME ?? 'admin',
+    password: process.env.E2E_FALLBACK_PASSWORD ?? 'password',
+  };
 }

@@ -7,7 +7,9 @@ const REFRESH_TOKEN_KEY = 'rxsoft_admin_refresh_token';
  * Reads the current access token from the admin app's zustand localStorage
  * persistence. Returns null when the user is not authenticated.
  */
-export function readAccessToken(page: { evaluate: (fn: () => unknown) => unknown }): Promise<string | null> {
+export function readAccessToken(page: {
+  evaluate: (fn: () => unknown) => unknown;
+}): Promise<string | null> {
   return page.evaluate(() => window.localStorage.getItem('rxsoft_admin_access_token'));
 }
 
@@ -18,7 +20,7 @@ export function readAccessToken(page: { evaluate: (fn: () => unknown) => unknown
 export async function apiFetch<T>(
   page: { evaluate: (fn: () => unknown) => unknown },
   path: string,
-  init: RequestInit = {},
+  init: RequestInit = {}
 ): Promise<T> {
   const token = await readAccessToken(page);
   const headers: HeadersInit = {

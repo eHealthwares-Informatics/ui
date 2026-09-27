@@ -121,9 +121,7 @@ test.describe('Damorex storefront', () => {
 
   /* ---- Checkout page renders ---- */
 
-  test('checkout page renders with sign-in prompt when not authenticated', async ({
-    page,
-  }) => {
+  test('checkout page renders with sign-in prompt when not authenticated', async ({ page }) => {
     await page.goto('/shop/checkout');
     await page.waitForLoadState('networkidle');
 
@@ -224,7 +222,7 @@ test.describe('Damorex storefront', () => {
           req.url().includes('/website/products') &&
           req.url().includes(`sortBy=${option.sortBy}`) &&
           req.url().includes(`sortOrder=${option.sortOrder}`),
-        { timeout: waits.visible },
+        { timeout: waits.visible }
       );
       await page.getByLabel('Sort products').selectOption({ label: option.label });
       await requestPromise;

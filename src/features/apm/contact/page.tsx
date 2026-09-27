@@ -1,9 +1,19 @@
-import { Box, Container, Grid, Group, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
-import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
+import {
+  Box,
+  Container,
+  Grid,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+  Textarea,
+  Title,
+} from '@mantine/core';
+import { Mail, MapPin, Phone } from 'lucide-react';
+import { useState } from 'react';
 import { SectionHeading, PrimaryButton } from '../website/components';
 import { useSubmitContact } from '../website/hooks';
-import { useState } from 'react';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 
 export default function ContactPage() {
   const { mutate, isPending } = useSubmitContact();
@@ -15,16 +25,29 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !subject || !message) {return;}
+    if (!name || !email || !subject || !message) {
+      return;
+    }
     mutate(
       { name, email, phone: phone || undefined, subject, message },
-      { onSuccess: () => { setName(''); setEmail(''); setPhone(''); setSubject(''); setMessage(''); } },
+      {
+        onSuccess: () => {
+          setName('');
+          setEmail('');
+          setPhone('');
+          setSubject('');
+          setMessage('');
+        },
+      }
     );
   };
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Contact Us"
@@ -40,23 +63,35 @@ export default function ContactPage() {
                 <Box>
                   <Group gap="sm" mb="xs">
                     <Phone size={20} color={apmBlue} />
-                    <Text fw={600} style={{ color: ink }}>Phone</Text>
+                    <Text fw={600} style={{ color: ink }}>
+                      Phone
+                    </Text>
                   </Group>
-                  <Text size="sm" style={{ color: muted }}>0800-CALL-APM</Text>
+                  <Text size="sm" style={{ color: muted }}>
+                    0800-CALL-APM
+                  </Text>
                 </Box>
                 <Box>
                   <Group gap="sm" mb="xs">
                     <Mail size={20} color={apmBlue} />
-                    <Text fw={600} style={{ color: ink }}>Email</Text>
+                    <Text fw={600} style={{ color: ink }}>
+                      Email
+                    </Text>
                   </Group>
-                  <Text size="sm" style={{ color: muted }}>contact@adekanmbi2027.apm.ng</Text>
+                  <Text size="sm" style={{ color: muted }}>
+                    contact@adekanmbi2027.apm.ng
+                  </Text>
                 </Box>
                 <Box>
                   <Group gap="sm" mb="xs">
                     <MapPin size={20} color={apmBlue} />
-                    <Text fw={600} style={{ color: ink }}>Campaign Headquarters</Text>
+                    <Text fw={600} style={{ color: ink }}>
+                      Campaign Headquarters
+                    </Text>
                   </Group>
-                  <Text size="sm" style={{ color: muted }}>Ibadan, Oyo State, Nigeria</Text>
+                  <Text size="sm" style={{ color: muted }}>
+                    Ibadan, Oyo State, Nigeria
+                  </Text>
                 </Box>
               </Stack>
             </Grid.Col>
@@ -71,7 +106,10 @@ export default function ContactPage() {
                   background: '#fff',
                 }}
               >
-                <Title order={3} style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}>
+                <Title
+                  order={3}
+                  style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}
+                >
                   Send a Message
                 </Title>
                 <Stack gap="md">
@@ -83,7 +121,10 @@ export default function ContactPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -94,7 +135,10 @@ export default function ContactPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         type="email"
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                   </Grid>
@@ -103,7 +147,10 @@ export default function ContactPage() {
                     placeholder="08123456789"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <TextInput
                     label="Subject *"
@@ -111,7 +158,10 @@ export default function ContactPage() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     required
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <Textarea
                     label="Message *"
@@ -120,7 +170,10 @@ export default function ContactPage() {
                     onChange={(e) => setMessage(e.target.value)}
                     required
                     minRows={4}
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <PrimaryButton onClick={handleSubmit}>
                     {isPending ? 'Sending...' : 'Send Message'}

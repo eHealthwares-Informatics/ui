@@ -26,8 +26,12 @@ export function UnpostPasswordModal({ opened, onClose, onConfirm, loading }: Pro
           placeholder="password12"
         />
         <Group grow>
-          <Button loading={loading} onClick={handleSubmit}>Confirm Unpost</Button>
-          <Button variant="light" onClick={onClose}>Cancel</Button>
+          <Button loading={loading} onClick={handleSubmit}>
+            Confirm Unpost
+          </Button>
+          <Button variant="light" onClick={onClose}>
+            Cancel
+          </Button>
         </Group>
       </Stack>
     </Modal>

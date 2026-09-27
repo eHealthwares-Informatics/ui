@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { modules } from '@/features/shared/module-data';
 import { ModuleDashboardPage } from '@/features/rxsoft/pages/module-dashboard/page';
+import { modules } from '@/features/shared/module-data';
 
 export const Route = createFileRoute('/_authenticated/$moduleId/dashboard')({
   beforeLoad: ({ params }) => {

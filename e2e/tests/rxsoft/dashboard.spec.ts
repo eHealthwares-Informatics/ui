@@ -15,6 +15,8 @@ test.describe('RxSoft dashboard', () => {
 
     // KPIs render once the three reports requests resolve; tolerate the
     // error state so a down reports API does not hard-fail the spec.
-    await expect(page.locator('body')).toContainText(/Overview of sales performance|Failed to load dashboard reports\./);
+    await expect(page.locator('body')).toContainText(
+      /Overview of sales performance|Failed to load dashboard reports\./
+    );
   });
 });

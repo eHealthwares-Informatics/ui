@@ -8,7 +8,7 @@ export function usePatientByMrn(mrn: string | null | undefined) {
     queryKey: ['emr', 'patients', 'by-mrn', mrn],
     queryFn: async () => {
       const { data } = await emrApi.get<PatientDetail>(
-        `/patients/by-mrn/${encodeURIComponent(String(mrn))}`,
+        `/patients/by-mrn/${encodeURIComponent(String(mrn))}`
       );
       return data;
     },

@@ -204,7 +204,7 @@ export function getTimingSummary(): Record<
 export async function timedWait(
   actionKey: string,
   assertion: () => Promise<void>,
-  overrideTimeout?: number,
+  overrideTimeout?: number
 ): Promise<void> {
   const start = Date.now();
   const timeout = overrideTimeout ?? getAdaptiveTimeout(actionKey);
@@ -251,21 +251,41 @@ export const waits = {
   },
   /** POS-specific timeouts */
   pos: {
-    get productSelect() { return getAdaptiveTimeout('pos:product-select'); },
-    get cartUpdate() { return getAdaptiveTimeout('pos:cart-update'); },
-    get paymentModal() { return getAdaptiveTimeout('pos:payment-modal'); },
-    get saleComplete() { return getAdaptiveTimeout('pos:sale-complete'); },
+    get productSelect() {
+      return getAdaptiveTimeout('pos:product-select');
+    },
+    get cartUpdate() {
+      return getAdaptiveTimeout('pos:cart-update');
+    },
+    get paymentModal() {
+      return getAdaptiveTimeout('pos:payment-modal');
+    },
+    get saleComplete() {
+      return getAdaptiveTimeout('pos:sale-complete');
+    },
   },
   /** PO-specific timeouts */
   po: {
-    get saveDraft() { return getAdaptiveTimeout('po:save-draft'); },
-    get approve() { return getAdaptiveTimeout('po:approve'); },
-    get statusBadge() { return getAdaptiveTimeout('po:status-badge'); },
+    get saveDraft() {
+      return getAdaptiveTimeout('po:save-draft');
+    },
+    get approve() {
+      return getAdaptiveTimeout('po:approve');
+    },
+    get statusBadge() {
+      return getAdaptiveTimeout('po:status-badge');
+    },
   },
   /** Storefront timeouts */
   shop: {
-    get productGrid() { return getAdaptiveTimeout('shop:product-grid'); },
-    get addToCart() { return getAdaptiveTimeout('shop:add-to-cart'); },
-    get checkoutStep() { return getAdaptiveTimeout('shop:checkout-step'); },
+    get productGrid() {
+      return getAdaptiveTimeout('shop:product-grid');
+    },
+    get addToCart() {
+      return getAdaptiveTimeout('shop:add-to-cart');
+    },
+    get checkoutStep() {
+      return getAdaptiveTimeout('shop:checkout-step');
+    },
   },
 };

@@ -19,7 +19,9 @@ type InfoDrawerProps = {
 };
 
 export function InfoDrawer({ opened, onClose, info }: InfoDrawerProps) {
-  if (!info) {return null;}
+  if (!info) {
+    return null;
+  }
   return (
     <Drawer opened={opened} onClose={onClose} title={info.title} position="right" size="md">
       <Stack gap="md">
@@ -35,7 +37,9 @@ export function InfoDrawer({ opened, onClose, info }: InfoDrawerProps) {
 
         {info.fields && info.fields.length > 0 && (
           <>
-            <Title order={5} mt="sm">Key Fields</Title>
+            <Title order={5} mt="sm">
+              Key Fields
+            </Title>
             <Table striped>
               <Table.Thead>
                 <Table.Tr>
@@ -47,9 +51,13 @@ export function InfoDrawer({ opened, onClose, info }: InfoDrawerProps) {
                 {info.fields.map((f) => (
                   <Table.Tr key={f.name}>
                     <Table.Td>
-                      <Text size="sm" fw={500} ff="monospace">{f.name}</Text>
+                      <Text size="sm" fw={500} ff="monospace">
+                        {f.name}
+                      </Text>
                     </Table.Td>
-                    <Table.Td><Text size="sm">{f.description}</Text></Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{f.description}</Text>
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>

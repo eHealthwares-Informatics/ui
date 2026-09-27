@@ -7,7 +7,11 @@ import { AutoLogout } from '@/features/auth/auto-logout';
 import { useModuleFavicon } from '@/features/shared/use-module-favicon';
 import { useModuleTitle } from '@/features/shared/use-module-title';
 import { getCookie } from '@/lib/cookies';
-import { isRouteAllowedForModule, getModuleDashboard, getModuleFromPath } from '@/lib/module-routing';
+import {
+  isRouteAllowedForModule,
+  getModuleDashboard,
+  getModuleFromPath,
+} from '@/lib/module-routing';
 import { AppSidebar } from './app-sidebar';
 
 type AuthenticatedLayoutProps = {
@@ -42,7 +46,6 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
         navigate({ to: getModuleDashboard(inferred) });
       }
     }
-
   }, [pathname, moduleId, navigate]);
 
   return (

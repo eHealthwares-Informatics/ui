@@ -41,7 +41,9 @@ const TRANSFORMER_OPTIONS = ['uppercase', 'lowercase', 'regex', 'concat', 'split
 /* -------------------------- PATH UTILITIES -------------------------- */
 
 function flattenJsonPaths(obj: any, prefix = ''): string[] {
-  if (!obj || typeof obj !== 'object') {return [];}
+  if (!obj || typeof obj !== 'object') {
+    return [];
+  }
 
   return Object.keys(obj).flatMap((key) => {
     const path = prefix ? `${prefix}.${key}` : key;
@@ -69,8 +71,11 @@ function setValueAtPath(obj: any, path: string, value: any) {
 
   keys.forEach((key, i) => {
     const isLast = i === keys.length - 1;
-    if (isLast) {current[key] = value;}
-    else {current = current[key] ?? (current[key] = {});}
+    if (isLast) {
+      current[key] = value;
+    } else {
+      current = current[key] ?? (current[key] = {});
+    }
   });
 }
 
@@ -87,7 +92,9 @@ function executeTransformation(value: any, step: MappingStep, source: any) {
     const t =
       typeof step.transformation === 'string' ? { type: step.transformation } : step.transformation;
 
-    if (!t || step.type === 'field-map') {return { result: value };}
+    if (!t || step.type === 'field-map') {
+      return { result: value };
+    }
 
     switch (t.type) {
       case 'uppercase':
@@ -110,7 +117,9 @@ function executeTransformation(value: any, step: MappingStep, source: any) {
           result: String(value).split((t as MappingTransformation).params?.delimiter ?? ','),
         };
       case 'custom':
-        if (!(t as MappingTransformation).expression) {return { result: value };}
+        if (!(t as MappingTransformation).expression) {
+          return { result: value };
+        }
         if (process.env.NODE_ENV === 'production') {
           return { result: value };
         }
@@ -243,8 +252,11 @@ export function MappingEditorPage() {
 
     mapping.mappingSteps.forEach((s) => {
       const key = `${s.sourceField}->${s.targetField}`;
-      if (seen.has(key)) {dup.add(s.id);}
-      else {seen.add(key);}
+      if (seen.has(key)) {
+        dup.add(s.id);
+      } else {
+        seen.add(key);
+      }
     });
 
     return dup;

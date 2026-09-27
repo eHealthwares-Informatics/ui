@@ -41,7 +41,9 @@ export function AuditCenterPage() {
   } = useQuery({
     queryKey: ['communication', 'flow', 'audit', selectedId],
     queryFn: async () => {
-      if (!selectedId) {return null;}
+      if (!selectedId) {
+        return null;
+      }
       const res = await communicationApi.get(`/v1/flow/audit/${encodeURIComponent(selectedId)}`);
       return res.data;
     },

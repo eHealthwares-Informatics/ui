@@ -6,7 +6,8 @@ const columns: Column[] = [
   {
     key: 'purchaseOrder',
     label: 'PO #',
-    render: (row) => (row.purchaseOrder as { purchaseOrderNumber?: string })?.purchaseOrderNumber ?? '-',
+    render: (row) =>
+      (row.purchaseOrder as { purchaseOrderNumber?: string })?.purchaseOrderNumber ?? '-',
   },
   {
     key: 'receivedDate',

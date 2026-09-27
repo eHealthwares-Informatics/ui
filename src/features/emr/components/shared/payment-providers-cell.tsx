@@ -3,13 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { emrApi } from '@/lib/emr-api';
 import type { PaymentProvider } from '../../lib/emr-types';
 
-export function PaymentProvidersCell({
-  ids,
-  size = 'xs',
-}: {
-  ids: unknown;
-  size?: MantineSize;
-}) {
+export function PaymentProvidersCell({ ids, size = 'xs' }: { ids: unknown; size?: MantineSize }) {
   const { data = [] } = useQuery({
     queryKey: ['emr', 'payment-providers'],
     queryFn: async () => {
@@ -23,7 +17,11 @@ export function PaymentProvidersCell({
 
   const list = Array.isArray(ids) ? (ids as string[]) : [];
   if (!list.length) {
-    return <Badge variant="outline" color="gray" size={size}>—</Badge>;
+    return (
+      <Badge variant="outline" color="gray" size={size}>
+        —
+      </Badge>
+    );
   }
 
   const names = list

@@ -33,29 +33,47 @@ export function ProfileForm() {
 
     validate: {
       username: (value) => {
-        if (!value) {return 'Please enter your username.';}
-        if (value.length < 2) {return 'Username must be at least 2 characters.';}
-        if (value.length > 30) {return 'Username must not be longer than 30 characters.';}
+        if (!value) {
+          return 'Please enter your username.';
+        }
+        if (value.length < 2) {
+          return 'Username must be at least 2 characters.';
+        }
+        if (value.length > 30) {
+          return 'Username must not be longer than 30 characters.';
+        }
         return null;
       },
 
       email: (value) => {
-        if (!value) {return 'Please select an email to display.';}
+        if (!value) {
+          return 'Please select an email to display.';
+        }
         const ok = /^\S+@\S+\.\S+$/.test(value);
-        if (!ok) {return 'Invalid email';}
+        if (!ok) {
+          return 'Invalid email';
+        }
         return null;
       },
 
       bio: (value) => {
-        if (!value) {return 'Bio is required';}
-        if (value.length < 4) {return 'Bio must be at least 4 characters';}
-        if (value.length > 160) {return 'Bio must be under 160 characters';}
+        if (!value) {
+          return 'Bio is required';
+        }
+        if (value.length < 4) {
+          return 'Bio must be at least 4 characters';
+        }
+        if (value.length > 160) {
+          return 'Bio must be under 160 characters';
+        }
         return null;
       },
 
       urls: {
         value: (value) => {
-          if (!value) {return 'URL is required';}
+          if (!value) {
+            return 'URL is required';
+          }
           try {
             new URL(value);
             return null;

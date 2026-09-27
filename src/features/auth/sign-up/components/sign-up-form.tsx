@@ -14,14 +14,20 @@ export function SignUpForm(props: React.HTMLAttributes<HTMLFormElement>) {
 
     validate: {
       email: (value) => {
-        if (!value) {return 'Please enter your email';}
+        if (!value) {
+          return 'Please enter your email';
+        }
         const isValid = /^\S+@\S+\.\S+$/.test(value);
-        if (!isValid) {return 'Invalid email address';}
+        if (!isValid) {
+          return 'Invalid email address';
+        }
         return null;
       },
 
       password: (value) => {
-        if (!value) {return 'Please enter your password';}
+        if (!value) {
+          return 'Please enter your password';
+        }
         if (value.length < 7) {
           return 'Password must be at least 7 characters long';
         }
@@ -29,7 +35,9 @@ export function SignUpForm(props: React.HTMLAttributes<HTMLFormElement>) {
       },
 
       confirmPassword: (value, values) => {
-        if (!value) {return 'Please confirm your password';}
+        if (!value) {
+          return 'Please confirm your password';
+        }
         if (value !== values.password) {
           return "Passwords don't match";
         }

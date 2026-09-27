@@ -5,7 +5,7 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 export async function triggerBlobDownload(
   client: AxiosInstance,
   config: AxiosRequestConfig,
-  filename: string,
+  filename: string
 ): Promise<void> {
   const response = await client.request<Blob>({
     ...config,

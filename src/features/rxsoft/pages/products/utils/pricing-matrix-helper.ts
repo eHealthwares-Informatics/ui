@@ -77,7 +77,9 @@ export function mergePricingLists(
   priceLists: PriceList[],
   itemPriceItems: ItemPriceItem[] = []
 ): PricingMatrixRow[] {
-  if (!priceLists?.length) {return [];}
+  if (!priceLists?.length) {
+    return [];
+  }
 
   // Create a map for quick lookup
   const priceMap = new Map(itemPriceItems.map((item) => [item.priceListId, item]));

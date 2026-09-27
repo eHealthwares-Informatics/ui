@@ -1,14 +1,17 @@
 import { Anchor, Box, Container, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
-import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 import { SectionHeading } from '../website/components';
 import { useMedia } from '../website/hooks';
+import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 
 export default function MediaPage() {
   const { data, isLoading } = useMedia();
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Media Gallery"
@@ -19,7 +22,9 @@ export default function MediaPage() {
       <Box py={80} style={{ background: '#fff' }}>
         <Container size="xl">
           {isLoading ? (
-            <Group justify="center"><Loader color={apmBlue} /></Group>
+            <Group justify="center">
+              <Loader color={apmBlue} />
+            </Group>
           ) : !data?.length ? (
             <Stack ta="center" gap="md">
               <Text style={{ color: muted }}>Media content coming soon.</Text>
@@ -72,7 +77,18 @@ export default function MediaPage() {
                       </Box>
                     )}
                     {item.category && (
-                      <Text size="xs" style={{ color: 'rgba(255,255,255,0.7)', position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.4)', padding: '4px 10px', borderRadius: 8 }}>
+                      <Text
+                        size="xs"
+                        style={{
+                          color: 'rgba(255,255,255,0.7)',
+                          position: 'absolute',
+                          top: 12,
+                          right: 12,
+                          background: 'rgba(0,0,0,0.4)',
+                          padding: '4px 10px',
+                          borderRadius: 8,
+                        }}
+                      >
                         {item.category}
                       </Text>
                     )}
@@ -82,7 +98,8 @@ export default function MediaPage() {
                   </Text>
                   {item.description && (
                     <Text ta="center" size="xs" style={{ color: muted, marginTop: 4 }}>
-                      {item.description.slice(0, 80)}{(item.description?.length ?? 0) > 80 ? '…' : ''}
+                      {item.description.slice(0, 80)}
+                      {(item.description?.length ?? 0) > 80 ? '…' : ''}
                     </Text>
                   )}
                 </Anchor>

@@ -20,7 +20,10 @@ interface ItemDescriptor {
 
 function nowHL7(): string {
   const d = new Date();
-  return d.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+  return d
+    .toISOString()
+    .replace(/[-:T.Z]/g, '')
+    .slice(0, 14);
 }
 
 function msgId(): string {
@@ -34,14 +37,16 @@ export function toHL7Prescription(
     customerName?: string;
     customerPhone?: string;
     orderRef?: string;
-  },
+  }
 ): string {
   const items: ItemDescriptor[] = [];
 
   if (Array.isArray(input)) {
     for (const ci of input) {
       const p = ci.product;
-      if (!p) {continue;}
+      if (!p) {
+        continue;
+      }
       items.push({
         code: p.code,
         name: p.name,
@@ -61,7 +66,9 @@ export function toHL7Prescription(
     });
   }
 
-  if (!items.length) {return '';}
+  if (!items.length) {
+    return '';
+  }
 
   const orderRef = options?.orderRef ?? msgId();
   const patientId = options?.customerPhone ?? 'UNKNOWN';
@@ -79,13 +86,11 @@ export function toHL7Prescription(
 
   // MSH
   segments.push(
-    `MSH|^~\\&|${sender}|${facility}|${receiver}|${app}|${dateTime}||ORM^O01|${id}|P|2.5`,
+    `MSH|^~\\&|${sender}|${facility}|${receiver}|${app}|${dateTime}||ORM^O01|${id}|P|2.5`
   );
 
   // PID
-  segments.push(
-    `PID|1||${patientId}||${patientName}|||M|||${patientPhone}`,
-  );
+  segments.push(`PID|1||${patientId}||${patientName}|||M|||${patientPhone}`);
 
   // ORC
   segments.push(`ORC|NW|${orderRef}`);
@@ -94,13 +99,14 @@ export function toHL7Prescription(
   for (const item of items) {
     const strength = item.strength ?? '';
     const form = item.dosageForm ?? 'TAB';
-    const route = form.toLowerCase().includes('inj') || form.toLowerCase().includes('iv')
-      ? 'IV'
-      : form.toLowerCase().includes('top') || form.toLowerCase().includes('cream')
-        ? 'TOPICAL'
-        : 'ORAL';
+    const route =
+      form.toLowerCase().includes('inj') || form.toLowerCase().includes('iv')
+        ? 'IV'
+        : form.toLowerCase().includes('top') || form.toLowerCase().includes('cream')
+          ? 'TOPICAL'
+          : 'ORAL';
     segments.push(
-      `RXE|1|${item.code}^${item.name}^NDC|${strength}|${form}|||||${item.quantity}|PRN||1|${form}`,
+      `RXE|1|${item.code}^${item.name}^NDC|${strength}|${form}|||||${item.quantity}|PRN||1|${form}`
     );
     segments.push(`RXR|${route}`);
   }
@@ -111,7 +117,7 @@ export function toHL7Prescription(
 export function buildWhatsAppUrl(
   hl7Text: string,
   phone: string,
-  questionnaireCode: QuestionnaireCode,
+  questionnaireCode: QuestionnaireCode
 ): string {
   const prefix = `${questionnaireCode}`;
   const full = `${prefix}\r\nWEBSITE_PRESCRIPTION\r\n${hl7Text}`;

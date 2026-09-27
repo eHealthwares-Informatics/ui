@@ -12,12 +12,12 @@ import {
   Title,
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from '@tanstack/react-router';
 import { ShieldCheck, Wallet, CheckCircle2, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from '@tanstack/react-router';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { WebsiteLayout, green, ink, darkGreen, muted, line, soft } from '../website/layout';
 import { clearPaySession, loadPaySession, payApi, savePaySession, type PaySession } from './payApi';
-import { getApiErrorMessage } from '@/lib/get-api-error-message';
 
 function naira(amount: number) {
   return `₦${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -39,17 +39,23 @@ export default function PayPage() {
 
   const providers = link?.providers ?? [];
   useEffect(() => {
-    if (!providerId && providers.length) setProviderId(providers[0].id);
+    if (!providerId && providers.length) {
+      setProviderId(providers[0].id);
+    }
   }, [providers, providerId]);
 
   const paid = (link?.amount ?? 0) > 0;
   const returnUrl = useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
     return `${window.location.origin}/shop/pay/${token}`;
   }, [token]);
 
   const startPayment = useCallback(async () => {
-    if (!providerId) return;
+    if (!providerId) {
+      return;
+    }
     setStarting(true);
     setError(null);
     try {
@@ -73,18 +79,24 @@ export default function PayPage() {
   }, [providerId, token, returnUrl]);
 
   const refreshStatus = useCallback(async () => {
-    if (!token) return;
+    if (!token) {
+      return;
+    }
     try {
       const res = await payApi.status(token);
       setLiveStatus(res.payment?.status ?? res.link.status ?? 'pending');
-      if (res.payment?.status === 'success') clearPaySession(token);
+      if (res.payment?.status === 'success') {
+        clearPaySession(token);
+      }
     } catch {
       setLiveStatus('unknown');
     }
   }, [token]);
 
   useEffect(() => {
-    if (session) refreshStatus();
+    if (session) {
+      refreshStatus();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,7 +122,12 @@ export default function PayPage() {
               <Alert color="red" title="Payment link not found or expired" />
             ) : (
               <>
-                <Paper radius={24} p="xl" withBorder style={{ borderColor: line, background: soft }}>
+                <Paper
+                  radius={24}
+                  p="xl"
+                  withBorder
+                  style={{ borderColor: line, background: soft }}
+                >
                   <Stack gap="md">
                     {link.type === 'order_payment' && link.order ? (
                       <>
@@ -128,9 +145,7 @@ export default function PayPage() {
                             </Text>
                           </Group>
                         ))}
-                        <Box
-                          style={{ borderTop: `1px dashed ${line}`, marginTop: 4 }}
-                        />
+                        <Box style={{ borderTop: `1px dashed ${line}`, marginTop: 4 }} />
                       </>
                     ) : link.type === 'receivable' && link.receivable ? (
                       <>
@@ -140,21 +155,31 @@ export default function PayPage() {
                         </Group>
                         {link.receivable.customerName && (
                           <Group justify="space-between">
-                            <Text size="sm" c={muted}>Customer</Text>
-                            <Text size="sm" fw={700}>{link.receivable.customerName}</Text>
+                            <Text size="sm" c={muted}>
+                              Customer
+                            </Text>
+                            <Text size="sm" fw={700}>
+                              {link.receivable.customerName}
+                            </Text>
                           </Group>
                         )}
                         <Group justify="space-between">
-                          <Text size="sm" c={muted}>Original Amount</Text>
-                          <Text size="sm" fw={700}>{naira(link.receivable.originalAmount)}</Text>
+                          <Text size="sm" c={muted}>
+                            Original Amount
+                          </Text>
+                          <Text size="sm" fw={700}>
+                            {naira(link.receivable.originalAmount)}
+                          </Text>
                         </Group>
                         <Group justify="space-between">
-                          <Text size="sm" c={muted}>Outstanding</Text>
-                          <Text size="sm" fw={700} c={darkGreen}>{naira(link.receivable.outstandingAmount)}</Text>
+                          <Text size="sm" c={muted}>
+                            Outstanding
+                          </Text>
+                          <Text size="sm" fw={700} c={darkGreen}>
+                            {naira(link.receivable.outstandingAmount)}
+                          </Text>
                         </Group>
-                        <Box
-                          style={{ borderTop: `1px dashed ${line}`, marginTop: 4 }}
-                        />
+                        <Box style={{ borderTop: `1px dashed ${line}`, marginTop: 4 }} />
                       </>
                     ) : (
                       <Group justify="space-between">
@@ -198,7 +223,10 @@ export default function PayPage() {
                               }}
                               onClick={() => setProviderId(p.id)}
                             >
-                              <Radio value={p.id} label={`${p.name} (${p.production ? 'Live' : 'Test'})`} />
+                              <Radio
+                                value={p.id}
+                                label={`${p.name} (${p.production ? 'Live' : 'Test'})`}
+                              />
                             </Paper>
                           ))}
                         </Stack>
@@ -226,7 +254,12 @@ export default function PayPage() {
                 )}
 
                 {confirmed ? (
-                  <Paper radius={24} p="xl" withBorder style={{ borderColor: green, background: soft }}>
+                  <Paper
+                    radius={24}
+                    p="xl"
+                    withBorder
+                    style={{ borderColor: green, background: soft }}
+                  >
                     <Stack align="center" gap="sm">
                       <CheckCircle2 size={36} color={green} />
                       <Text fw={900} size="lg" c={darkGreen} className="damorex-heading">
@@ -243,7 +276,12 @@ export default function PayPage() {
                   </Paper>
                 ) : session ? (
                   <Group justify="center">
-                    <Button variant="light" radius="xl" leftSection={<RefreshCw size={16} />} onClick={refreshStatus}>
+                    <Button
+                      variant="light"
+                      radius="xl"
+                      leftSection={<RefreshCw size={16} />}
+                      onClick={refreshStatus}
+                    >
                       Check payment status
                     </Button>
                     <Text size="sm" c={muted}>

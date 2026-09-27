@@ -1,10 +1,10 @@
 import { Badge, Button, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DataPageShell } from '../../../components/page/data-page-shell';
-import { rxsoftApi } from '@/lib/rxsoft-api';
-import { journalEntriesConfig } from './schema';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { rxsoftApi } from '@/lib/rxsoft-api';
+import { DataPageShell } from '../../../components/page/data-page-shell';
+import { journalEntriesConfig } from './schema';
 
 const statusColors: Record<string, string> = {
   draft: 'yellow',
@@ -48,7 +48,11 @@ export function RxJournalEntriesPage() {
         render: (row: Record<string, unknown>) => {
           const status = row.status as string;
           const color = statusColors[status] ?? 'gray';
-          return <Badge color={color} variant="light">{status}</Badge>;
+          return (
+            <Badge color={color} variant="light">
+              {status}
+            </Badge>
+          );
         },
       };
     }

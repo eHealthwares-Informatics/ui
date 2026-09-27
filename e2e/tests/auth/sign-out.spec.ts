@@ -6,7 +6,9 @@ test.describe('sign-out', () => {
   test('signs the user out and returns to /sign-in', async ({ page, appLayout }) => {
     await page.goto('/');
 
-    await expect(page.getByText('Whoops!')).toHaveCount(0, { timeout: 1_000 }).catch(() => undefined);
+    await expect(page.getByText('Whoops!'))
+      .toHaveCount(0, { timeout: 1_000 })
+      .catch(() => undefined);
 
     await appLayout.openSignOut();
 

@@ -1,9 +1,19 @@
-import { Box, Container, Grid, Group, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
-import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
+import {
+  Box,
+  Container,
+  Grid,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+  Textarea,
+  Title,
+} from '@mantine/core';
+import { UsersRound, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
 import { SectionHeading, PrimaryButton } from '../website/components';
 import { useRegisterVolunteer } from '../website/hooks';
-import { useState } from 'react';
-import { UsersRound, MessageCircle } from 'lucide-react';
+import { WebsiteLayout, apmBlue, ink, muted, soft } from '../website/layout';
 
 export default function VolunteerPage() {
   const { mutate, isPending } = useRegisterVolunteer();
@@ -16,16 +26,37 @@ export default function VolunteerPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone) {return;}
+    if (!name || !phone) {
+      return;
+    }
     mutate(
-      { name, phone, email: email || undefined, lga: lga || undefined, ward: ward || undefined, skills: skills || undefined },
-      { onSuccess: () => { setName(''); setPhone(''); setEmail(''); setLga(''); setWard(''); setSkills(''); } },
+      {
+        name,
+        phone,
+        email: email || undefined,
+        lga: lga || undefined,
+        ward: ward || undefined,
+        skills: skills || undefined,
+      },
+      {
+        onSuccess: () => {
+          setName('');
+          setPhone('');
+          setEmail('');
+          setLga('');
+          setWard('');
+          setSkills('');
+        },
+      }
     );
   };
 
   return (
     <WebsiteLayout>
-      <Box py={80} style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}>
+      <Box
+        py={80}
+        style={{ background: `linear-gradient(135deg, ${soft} 0%, #DBEAFE 30%, #ffffff 100%)` }}
+      >
         <Container size="xl">
           <SectionHeading
             title="Become a Volunteer"
@@ -44,15 +75,19 @@ export default function VolunteerPage() {
                 </Title>
                 <Stack gap="sm">
                   {[
-                    'Be part of a movement shaping Oyo State\'s future',
+                    "Be part of a movement shaping Oyo State's future",
                     'Connect with like-minded citizens across all 33 LGAs',
                     'Develop leadership and community organizing skills',
                     'Receive campaign updates, talking points, and content packs',
                     'Help ensure continuity, stability, and progress',
                   ].map((reason, i) => (
                     <Group key={i} gap="sm">
-                      <Text size="sm" style={{ color: apmBlue, fontWeight: 700 }}>{i + 1}.</Text>
-                      <Text size="sm" style={{ color: muted }}>{reason}</Text>
+                      <Text size="sm" style={{ color: apmBlue, fontWeight: 700 }}>
+                        {i + 1}.
+                      </Text>
+                      <Text size="sm" style={{ color: muted }}>
+                        {reason}
+                      </Text>
                     </Group>
                   ))}
                 </Stack>
@@ -88,7 +123,10 @@ export default function VolunteerPage() {
                   background: '#fff',
                 }}
               >
-                <Title order={3} style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}>
+                <Title
+                  order={3}
+                  style={{ fontSize: '1.2rem', fontWeight: 700, color: ink, marginBottom: 24 }}
+                >
                   Registration Form
                 </Title>
                 <Stack gap="md">
@@ -100,7 +138,10 @@ export default function VolunteerPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -110,7 +151,10 @@ export default function VolunteerPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         required
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                   </Grid>
@@ -119,7 +163,10 @@ export default function VolunteerPage() {
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <Grid gap="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -128,7 +175,10 @@ export default function VolunteerPage() {
                         placeholder="Your Local Government Area"
                         value={lga}
                         onChange={(e) => setLga(e.target.value)}
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                     <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -137,7 +187,10 @@ export default function VolunteerPage() {
                         placeholder="Your ward (optional)"
                         value={ward}
                         onChange={(e) => setWard(e.target.value)}
-                        styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                        styles={{
+                          input: { borderColor: '#E2E8F0' },
+                          label: { color: ink, fontWeight: 500 },
+                        }}
                       />
                     </Grid.Col>
                   </Grid>
@@ -146,7 +199,10 @@ export default function VolunteerPage() {
                     placeholder="e.g., community organising, social media, events, door-to-door"
                     value={skills}
                     onChange={(e) => setSkills(e.target.value)}
-                    styles={{ input: { borderColor: '#E2E8F0' }, label: { color: ink, fontWeight: 500 } }}
+                    styles={{
+                      input: { borderColor: '#E2E8F0' },
+                      label: { color: ink, fontWeight: 500 },
+                    }}
                   />
                   <PrimaryButton onClick={handleSubmit}>
                     {isPending ? 'Registering...' : 'Register as Volunteer'}

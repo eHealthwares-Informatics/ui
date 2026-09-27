@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react';
 import {
   Card,
   Group,
@@ -14,15 +13,6 @@ import {
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from 'recharts';
-import {
   AlertTriangle,
   Ban,
   CheckCircle2,
@@ -35,6 +25,16 @@ import {
   UserPlus,
   XCircle,
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 
@@ -161,27 +161,123 @@ export function LisOrdersDashboardPage() {
   const drilldown = useDrilldownData(selectedMetric?.type ?? null, page, pageSize);
 
   const statCards: MetricCardDef[] = useMemo(() => {
-    if (!metrics) return [];
+    if (!metrics) {
+      return [];
+    }
     return [
-      { type: '', icon: ClipboardListIcon, color: 'blue', value: metrics.totalOrders, label: 'Total Orders', subtitle: '', clickable: false },
-      { type: 'orders-in-progress', icon: Clock, color: 'orange', value: metrics.ordersInProgress, label: 'In Progress', subtitle: 'Awaiting Result Entry', clickable: true },
-      { type: 'ready-for-validation', icon: Microscope, color: 'yellow', value: metrics.readyForValidation, label: 'Ready for Validation', subtitle: 'Awaiting Review', clickable: true },
-      { type: 'completed-today', icon: CheckCircle2, color: 'green', value: metrics.ordersCompletedToday, label: 'Completed Today', subtitle: '', clickable: true },
-      { type: 'partially-completed-today', icon: Ban, color: 'grape', value: metrics.partiallyCompletedToday, label: 'Partially Completed', subtitle: 'Awaiting Remaining Tests', clickable: true },
-      { type: 'entered-by-user-today', icon: UserPlus, color: 'cyan', value: metrics.ordersEnteredByUserToday, label: 'Entered by You', subtitle: '', clickable: true },
-      { type: 'rejected-today', icon: XCircle, color: 'red', value: metrics.ordersRejectedToday, label: 'Rejected Today', subtitle: '', clickable: true },
-      { type: 'unprinted-results', icon: Printer, color: 'teal', value: metrics.unPrintedResults, label: 'Unprinted Results', subtitle: '', clickable: true },
-      { type: 'received-today', icon: Inbox, color: 'blue', value: metrics.receivedToday, label: 'Electronic Orders', subtitle: '', clickable: true },
-      { type: 'average-turnaround', icon: TrendingUp, color: 'teal', value: `${metrics.averageTurnAroundTimeHours}h`, label: 'Avg TAT', subtitle: 'Reception to Validation', clickable: true },
-      { type: 'delayed-turnaround', icon: AlertTriangle, color: 'red', value: metrics.delayedTurnAroundCount, label: 'Delayed Turnaround', subtitle: '', clickable: true },
+      {
+        type: '',
+        icon: ClipboardListIcon,
+        color: 'blue',
+        value: metrics.totalOrders,
+        label: 'Total Orders',
+        subtitle: '',
+        clickable: false,
+      },
+      {
+        type: 'orders-in-progress',
+        icon: Clock,
+        color: 'orange',
+        value: metrics.ordersInProgress,
+        label: 'In Progress',
+        subtitle: 'Awaiting Result Entry',
+        clickable: true,
+      },
+      {
+        type: 'ready-for-validation',
+        icon: Microscope,
+        color: 'yellow',
+        value: metrics.readyForValidation,
+        label: 'Ready for Validation',
+        subtitle: 'Awaiting Review',
+        clickable: true,
+      },
+      {
+        type: 'completed-today',
+        icon: CheckCircle2,
+        color: 'green',
+        value: metrics.ordersCompletedToday,
+        label: 'Completed Today',
+        subtitle: '',
+        clickable: true,
+      },
+      {
+        type: 'partially-completed-today',
+        icon: Ban,
+        color: 'grape',
+        value: metrics.partiallyCompletedToday,
+        label: 'Partially Completed',
+        subtitle: 'Awaiting Remaining Tests',
+        clickable: true,
+      },
+      {
+        type: 'entered-by-user-today',
+        icon: UserPlus,
+        color: 'cyan',
+        value: metrics.ordersEnteredByUserToday,
+        label: 'Entered by You',
+        subtitle: '',
+        clickable: true,
+      },
+      {
+        type: 'rejected-today',
+        icon: XCircle,
+        color: 'red',
+        value: metrics.ordersRejectedToday,
+        label: 'Rejected Today',
+        subtitle: '',
+        clickable: true,
+      },
+      {
+        type: 'unprinted-results',
+        icon: Printer,
+        color: 'teal',
+        value: metrics.unPrintedResults,
+        label: 'Unprinted Results',
+        subtitle: '',
+        clickable: true,
+      },
+      {
+        type: 'received-today',
+        icon: Inbox,
+        color: 'blue',
+        value: metrics.receivedToday,
+        label: 'Electronic Orders',
+        subtitle: '',
+        clickable: true,
+      },
+      {
+        type: 'average-turnaround',
+        icon: TrendingUp,
+        color: 'teal',
+        value: `${metrics.averageTurnAroundTimeHours}h`,
+        label: 'Avg TAT',
+        subtitle: 'Reception to Validation',
+        clickable: true,
+      },
+      {
+        type: 'delayed-turnaround',
+        icon: AlertTriangle,
+        color: 'red',
+        value: metrics.delayedTurnAroundCount,
+        label: 'Delayed Turnaround',
+        subtitle: '',
+        clickable: true,
+      },
     ];
   }, [metrics]);
 
   const handleTileClick = (card: MetricCardDef) => {
-    if (!card.clickable) return;
+    if (!card.clickable) {
+      return;
+    }
     setPage(1);
     if (card.type === 'average-turnaround') {
-      setSelectedMetric({ type: 'average-turnaround', title: 'Average Turnaround Time', subtitle: '' });
+      setSelectedMetric({
+        type: 'average-turnaround',
+        title: 'Average Turnaround Time',
+        subtitle: '',
+      });
     } else {
       setSelectedMetric({ type: card.type, title: card.label, subtitle: card.subtitle });
     }
@@ -192,7 +288,7 @@ export function LisOrdersDashboardPage() {
     setPage(1);
   };
 
-  const columns = selectedMetric?.type ? COLUMNS[selectedMetric.type] ?? [] : [];
+  const columns = selectedMetric?.type ? (COLUMNS[selectedMetric.type] ?? []) : [];
   const drilldownData = drilldown.data?.data ?? [];
   const drilldownTotal = drilldown.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(drilldownTotal / pageSize));
@@ -203,7 +299,9 @@ export function LisOrdersDashboardPage() {
         {isLoading && (
           <Paper withBorder p="lg" radius="md" style={{ textAlign: 'center' }}>
             <Loader2 size={32} className="animate-spin" />
-            <Text size="sm" c="dimmed" mt="sm">Loading dashboard metrics...</Text>
+            <Text size="sm" c="dimmed" mt="sm">
+              Loading dashboard metrics...
+            </Text>
           </Paper>
         )}
 
@@ -247,11 +345,37 @@ export function LisOrdersDashboardPage() {
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={metrics.dailyTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                    <XAxis dataKey="date" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="#888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      allowDecimals={false}
+                    />
                     <RechartsTooltip />
-                    <Area type="monotone" dataKey="received" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.15} name="Received" />
-                    <Area type="monotone" dataKey="completed" stroke="#22c55e" fill="#22c55e" fillOpacity={0.15} name="Completed" />
+                    <Area
+                      type="monotone"
+                      dataKey="received"
+                      stroke="#22d3ee"
+                      fill="#22d3ee"
+                      fillOpacity={0.15}
+                      name="Received"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="completed"
+                      stroke="#22c55e"
+                      fill="#22c55e"
+                      fillOpacity={0.15}
+                      name="Completed"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </Stack>
@@ -270,16 +394,28 @@ export function LisOrdersDashboardPage() {
         {selectedMetric?.type === 'average-turnaround' && metrics ? (
           <SimpleGrid cols={3} spacing="md">
             <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">Reception → Result</Text>
-              <Text fw={700} size="xl">{metrics.tatSubMetrics.receptionToResultHours}h</Text>
+              <Text size="sm" c="dimmed">
+                Reception → Result
+              </Text>
+              <Text fw={700} size="xl">
+                {metrics.tatSubMetrics.receptionToResultHours}h
+              </Text>
             </Card>
             <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">Reception → Validation</Text>
-              <Text fw={700} size="xl">{metrics.tatSubMetrics.receptionToValidationHours}h</Text>
+              <Text size="sm" c="dimmed">
+                Reception → Validation
+              </Text>
+              <Text fw={700} size="xl">
+                {metrics.tatSubMetrics.receptionToValidationHours}h
+              </Text>
             </Card>
             <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">Result → Validation</Text>
-              <Text fw={700} size="xl">{metrics.tatSubMetrics.resultToValidationHours}h</Text>
+              <Text size="sm" c="dimmed">
+                Result → Validation
+              </Text>
+              <Text fw={700} size="xl">
+                {metrics.tatSubMetrics.resultToValidationHours}h
+              </Text>
             </Card>
           </SimpleGrid>
         ) : (
@@ -289,7 +425,9 @@ export function LisOrdersDashboardPage() {
                 <Loader2 size={24} className="animate-spin" />
               </Paper>
             ) : drilldownData.length === 0 ? (
-              <Text c="dimmed" ta="center" py="xl">No items found</Text>
+              <Text c="dimmed" ta="center" py="xl">
+                No items found
+              </Text>
             ) : (
               <>
                 <Table striped highlightOnHover>
@@ -328,11 +466,21 @@ export function LisOrdersDashboardPage() {
 
 function ClipboardListIcon(props: any) {
   return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
       <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <path d="M12 11h4" /><path d="M12 16h4" />
-      <path d="M8 11h.01" /><path d="M8 16h.01" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
     </svg>
   );
 }

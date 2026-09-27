@@ -1,7 +1,7 @@
+import type { TestInfo } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { TestInfo } from '@playwright/test';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const HEALTH_FILE = join(__dirname, '..', '.runtime', 'backend-health.json');
@@ -26,7 +26,9 @@ export type BackendScope = 'rxsoft' | 'conversation' | 'lis' | 'communication';
 
 /** Loads the health snapshot written by global-setup; treats a missing file as "down". */
 export function readBackendHealth(): BackendHealth {
-  if (!existsSync(HEALTH_FILE)) return DOWN;
+  if (!existsSync(HEALTH_FILE)) {
+    return DOWN;
+  }
   try {
     return { ...DOWN, ...(JSON.parse(readFileSync(HEALTH_FILE, 'utf-8')) as BackendHealth) };
   } catch {

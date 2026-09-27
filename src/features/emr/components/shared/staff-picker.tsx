@@ -11,7 +11,12 @@ export type StaffOption = {
   roleType: string;
 };
 
-function displayFor(staff: { staffNumber: string; firstName: string; lastName: string; roleType: string }): string {
+function displayFor(staff: {
+  staffNumber: string;
+  firstName: string;
+  lastName: string;
+  roleType: string;
+}): string {
   const name = [staff.firstName, staff.lastName].filter(Boolean).join(' ').trim();
   const base = name ? `${staff.staffNumber} · ${name}` : staff.staffNumber;
   return staff.roleType ? `${base} (${staff.roleType})` : base;
@@ -59,7 +64,7 @@ export function StaffPicker({
         value: displayFor(staff),
         label: displayFor(staff),
       })),
-    [data],
+    [data]
   );
 
   const displayValue = value

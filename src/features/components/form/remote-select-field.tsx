@@ -45,7 +45,9 @@ function RemoteSelectField({
   const query = useQuery({
     queryKey: ['rxsoft-search-control', endpoint, debouncedInput, staticParams] satisfies QueryKey,
     queryFn: async () => {
-      if (!endpoint) {return [] as Option[];}
+      if (!endpoint) {
+        return [] as Option[];
+      }
 
       const response = await apiClient.get(endpoint, {
         params: {

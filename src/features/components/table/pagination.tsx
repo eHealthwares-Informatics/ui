@@ -34,7 +34,12 @@ export function Pagination({
           </Text>
 
           {/* pagination */}
-          <MantinePagination data-testid="pagination-controls" value={activePage} onChange={onPageChange} total={totalPages} />
+          <MantinePagination
+            data-testid="pagination-controls"
+            value={activePage}
+            onChange={onPageChange}
+            total={totalPages}
+          />
 
           {/* page size */}
           <Select

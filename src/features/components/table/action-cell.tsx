@@ -59,7 +59,12 @@ export const ActionCell = ({
   return (
     <Group gap="xs">
       {detailPathBuilder && (
-        <ActionIcon variant="outline" component={Link} to={detailPathBuilder(row)} aria-label="View details">
+        <ActionIcon
+          variant="outline"
+          component={Link}
+          to={detailPathBuilder(row)}
+          aria-label="View details"
+        >
           <Eye size={16} />
         </ActionIcon>
       )}

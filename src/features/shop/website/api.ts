@@ -1,3 +1,4 @@
+import { createAuthApiClient } from '@/lib/create-api-client';
 import type {
   HomepageData,
   WebsiteProduct,
@@ -22,7 +23,6 @@ import type {
   GenericProductSearchResult,
   WebsiteSettings,
 } from './types';
-import { createAuthApiClient } from '@/lib/create-api-client';
 
 export interface WebPaymentProvider {
   id: string;
@@ -83,10 +83,7 @@ export const websiteApi = {
       })
       .then((r) => r.data),
 
-  getClassificationDetail: (
-    code: string,
-    params?: Record<string, string | number>
-  ) =>
+  getClassificationDetail: (code: string, params?: Record<string, string | number>) =>
     api
       .get<{
         classification: ShopClassificationView & { drugCount: number; productCount: number };
@@ -118,7 +115,7 @@ export const websiteApi = {
   listGenericDrugClasses: () =>
     api
       .get<{ data: Array<{ genericClass: string; pharmaceuticalClass: string }> }>(
-        '/generic-drugs/classes',
+        '/generic-drugs/classes'
       )
       .then((r) => r.data),
 
@@ -251,12 +248,16 @@ export const websiteApi = {
 
   googleSignIn: (accessToken: string) =>
     api
-      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/google', { accessToken })
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/google', {
+        accessToken,
+      })
       .then((r) => r.data),
 
   facebookSignIn: (accessToken: string) =>
     api
-      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/facebook', { accessToken })
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/oauth/facebook', {
+        accessToken,
+      })
       .then((r) => r.data),
 
   listDeliveryAreas: () =>
@@ -296,10 +297,14 @@ export const websiteApi = {
 
   // Auth
   register: (data: { username: string; email?: string; phone?: string; password: string }) =>
-    api.post<{ accessToken: string; refreshToken: string }>('/website/auth/register', data).then((r) => r.data),
+    api
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/register', data)
+      .then((r) => r.data),
 
   login: (data: { username: string; password: string }) =>
-    api.post<{ accessToken: string; refreshToken: string }>('/website/auth/login', data).then((r) => r.data),
+    api
+      .post<{ accessToken: string; refreshToken: string }>('/website/auth/login', data)
+      .then((r) => r.data),
 
   // Search
   search: (q: string, type?: string) =>

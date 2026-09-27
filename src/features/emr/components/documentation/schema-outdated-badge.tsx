@@ -8,9 +8,15 @@ import { AlertTriangle } from 'lucide-react';
 export function SchemaOutdatedBadge({
   submission,
 }: {
-  submission: { schemaOutdated?: boolean; formVersion?: number; schemaCurrentVersion?: number | null };
+  submission: {
+    schemaOutdated?: boolean;
+    formVersion?: number;
+    schemaCurrentVersion?: number | null;
+  };
 }) {
-  if (!submission.schemaOutdated) return null;
+  if (!submission.schemaOutdated) {
+    return null;
+  }
   const current = submission.schemaCurrentVersion;
   return (
     <Tooltip

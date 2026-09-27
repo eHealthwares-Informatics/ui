@@ -55,7 +55,7 @@ export function DepartmentPicker({
         label: displayFor(d),
         name: d.name,
       })),
-    [data],
+    [data]
   );
 
   const selectedLabel = value?.id ? (value.name ?? '') : '';

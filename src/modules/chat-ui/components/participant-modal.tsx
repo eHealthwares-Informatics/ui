@@ -1,10 +1,7 @@
 import { ActionIcon, Modal, Stack, Table, Text } from '@mantine/core';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
-import {
-  listProjections,
-  removeParticipantProjections,
-} from '../services/chat-api';
+import { listProjections, removeParticipantProjections } from '../services/chat-api';
 
 type Props = {
   opened: boolean;

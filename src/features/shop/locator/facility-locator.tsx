@@ -6,9 +6,20 @@
  * on the map (facilities are ~98% geo-tagged); the few without coordinates
  * aggregate as count bubbles on their LGA centroid.
  */
-import { Badge, Box, Button, Divider, Group, SegmentedControl, Select, Stack, Text } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Group,
+  SegmentedControl,
+  Select,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { ListFilter, LocateFixed, MapPin, Navigation } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { WebsiteLayout } from '../website/layout';
 import type { Centroid, FacilityRecord, NearbyFacilityRecord } from './api';
 import {
   useCentroids,
@@ -20,9 +31,8 @@ import {
   useUserLocation,
   useWardOptions,
 } from './hooks';
-import { WebsiteLayout } from '../website/layout';
-import { locatorTheme, LocatorShell, ResultCard } from './locator-shell';
 import { escapeHtml, type MapFocus, type MapPoint } from './locator-map';
+import { locatorTheme, LocatorShell, ResultCard } from './locator-shell';
 
 const RADIUS_OPTIONS = [
   { value: '5', label: 'Within 5 km' },
@@ -56,14 +66,7 @@ export default function FacilityLocatorPage() {
     setPage(1);
   }, [debouncedSearch, stateCode, lgaCode, wardName]);
 
-  const browse = useFacilitySearch(
-    debouncedSearch,
-    stateCode,
-    lgaCode,
-    wardName,
-    page,
-    12,
-  );
+  const browse = useFacilitySearch(debouncedSearch, stateCode, lgaCode, wardName, page, 12);
   const near = useNearbyFacilities(locationCtl.location, radiusKm, 50);
 
   const loadState = nearbyActive ? near.state : browse.state;
@@ -117,7 +120,9 @@ export default function FacilityLocatorPage() {
       // No coordinates → aggregate into a count bubble on the LGA centroid.
       const lga = f.lga?.code ?? f.lga?.name;
       const centroid = lga ? lgaCentroids.find((c) => c.code === lga) : undefined;
-      if (!lga || !centroid) continue;
+      if (!lga || !centroid) {
+        continue;
+      }
       const bucket = unlocatedByLga.get(lga) ?? {
         label: f.lga?.name ?? lga,
         count: 0,
@@ -148,9 +153,13 @@ export default function FacilityLocatorPage() {
   // centroid when the record carries no coordinates (browse mode only —
   // nearby records always have coordinates).
   const focus = useMemo<MapFocus | null>(() => {
-    if (!highlightKey) return null;
+    if (!highlightKey) {
+      return null;
+    }
     const row = rows.find((r) => r.key === highlightKey);
-    if (!row || row.point.bubble) return null;
+    if (!row || row.point.bubble) {
+      return null;
+    }
     return {
       key: highlightKey,
       latitude: row.point.latitude,
@@ -164,10 +173,21 @@ export default function FacilityLocatorPage() {
       nearbyActive
         ? `nearby|${locationCtl.location?.latitude},${locationCtl.location?.longitude}|${radiusKm}`
         : `${debouncedSearch}|${stateCode}|${lgaCode}|${wardName}|${page}`,
-    [nearbyActive, locationCtl.location, radiusKm, debouncedSearch, stateCode, lgaCode, wardName, page],
+    [
+      nearbyActive,
+      locationCtl.location,
+      radiusKm,
+      debouncedSearch,
+      stateCode,
+      lgaCode,
+      wardName,
+      page,
+    ]
   );
 
-  const count = nearbyActive ? (near.meta?.total ?? near.rows.length) : (browse.meta?.total ?? browse.rows.length);
+  const count = nearbyActive
+    ? (near.meta?.total ?? near.rows.length)
+    : (browse.meta?.total ?? browse.rows.length);
 
   const toggleNearby = (active: boolean) => {
     setNearby(active);
@@ -261,17 +281,13 @@ export default function FacilityLocatorPage() {
               ? 'Determining your location…'
               : locationCtl.status === 'denied' || locationCtl.status === 'error'
                 ? (locationCtl.errorMessage ??
-                   'Location unavailable — allow location access in your browser, or switch to Browse and search by name.')
+                  'Location unavailable — allow location access in your browser, or switch to Browse and search by name.')
                 : locationCtl.location?.approx
                   ? `Using an approximate location (±~10 km). Showing facilities within ${radiusKm} km.`
                   : `Showing facilities within ${radiusKm} km of your location.`
         }
         userLocation={nearbyActive ? locationCtl.location : null}
-        meta={
-          nearbyActive
-            ? { page: 1, limit: 50, total: count }
-            : browse.meta
-        }
+        meta={nearbyActive ? { page: 1, limit: 50, total: count } : browse.meta}
         page={page}
         onPageChange={(p) => {
           setPage(p);
@@ -334,8 +350,16 @@ export default function FacilityLocatorPage() {
                     <>
                       <Divider my="xs" color={locatorTheme.line} />
                       <Group gap="md">
-                        {f.phoneNumber ? <Text size="xs" c={locatorTheme.muted}>☎ {f.phoneNumber}</Text> : null}
-                        {f.emailAddress ? <Text size="xs" c={locatorTheme.muted}>✉ {f.emailAddress}</Text> : null}
+                        {f.phoneNumber ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            ☎ {f.phoneNumber}
+                          </Text>
+                        ) : null}
+                        {f.emailAddress ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            ✉ {f.emailAddress}
+                          </Text>
+                        ) : null}
                         {f.website ? (
                           <Text
                             size="xs"
@@ -404,8 +428,16 @@ export default function FacilityLocatorPage() {
                     <>
                       <Divider my="xs" color={locatorTheme.line} />
                       <Group gap="md">
-                        {f.phoneNumber ? <Text size="xs" c={locatorTheme.muted}>☎ {f.phoneNumber}</Text> : null}
-                        {f.emailAddress ? <Text size="xs" c={locatorTheme.muted}>✉ {f.emailAddress}</Text> : null}
+                        {f.phoneNumber ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            ☎ {f.phoneNumber}
+                          </Text>
+                        ) : null}
+                        {f.emailAddress ? (
+                          <Text size="xs" c={locatorTheme.muted}>
+                            ✉ {f.emailAddress}
+                          </Text>
+                        ) : null}
                         {f.website ? (
                           <Text
                             size="xs"
@@ -452,18 +484,18 @@ function contactHtml(phone: string | null, email: string | null, website: string
   const rows: string[] = [];
   if (phone) {
     rows.push(
-      `<div style="font-size:12px;color:${locatorTheme.text}">☎ ${escapeHtml(phone)}</div>`,
+      `<div style="font-size:12px;color:${locatorTheme.text}">☎ ${escapeHtml(phone)}</div>`
     );
   }
   if (email) {
     rows.push(
-      `<div style="font-size:12px;color:${locatorTheme.text}">✉ ${escapeHtml(email)}</div>`,
+      `<div style="font-size:12px;color:${locatorTheme.text}">✉ ${escapeHtml(email)}</div>`
     );
   }
   if (website) {
     const href = normalizeUrl(website);
     rows.push(
-      `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer" style="font-size:12px">Website ↗</a>`,
+      `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer" style="font-size:12px">Website ↗</a>`
     );
   }
   return rows.length ? `<div style="margin-top:6px">${rows.join('')}</div>` : '';

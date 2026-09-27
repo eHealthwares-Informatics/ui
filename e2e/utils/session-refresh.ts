@@ -46,7 +46,9 @@ async function loginSeed(): Promise<SessionSeed> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(creds),
   });
-  if (!res.ok) throw new Error(`login failed: ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`login failed: ${res.status}`);
+  }
   const pair = (await res.json()) as { accessToken: string; refreshToken: string };
   const payload = decodePayload(pair.accessToken);
   const exp = payload?.exp ?? 0;
@@ -112,7 +114,9 @@ export async function primeAdminSession(page: Page): Promise<void> {
     // Only authenticated contexts carry the access token; public/synthetic
     // (mocked EMR) contexts are left alone.
     const hasToken = ls.some((item) => item.name === ACCESS_TOKEN_KEY);
-    if (!hasToken) return;
+    if (!hasToken) {
+      return;
+    }
 
     const storedStore = ls.find((item) => item.name === STORE_KEY)?.value;
     let modules: unknown[] = [];
@@ -145,7 +149,7 @@ export async function primeAdminSession(page: Page): Promise<void> {
         window.localStorage.setItem('rxsoft_admin_refresh_token', refreshToken);
         window.localStorage.setItem('rxsoft-admin-auth', storeJson);
       },
-      { accessToken: seed.accessToken, refreshToken: seed.refreshToken, storeJson: store },
+      { accessToken: seed.accessToken, refreshToken: seed.refreshToken, storeJson: store }
     );
   } catch {
     // Never let a priming failure hard-fail a test — fall back to whatever
@@ -163,7 +167,9 @@ export function decodeUserFromAccessToken(token: string): {
   locationId: string | null;
 } | null {
   const payload = decodePayload(token);
-  if (!payload?.sub || !payload.username) return null;
+  if (!payload?.sub || !payload.username) {
+    return null;
+  }
   return {
     id: payload.sub,
     username: payload.username,

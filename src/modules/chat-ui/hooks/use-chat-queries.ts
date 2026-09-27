@@ -9,10 +9,7 @@ import {
   removeParticipantProjections,
   sendConversationMessage,
 } from '../services/chat-api';
-import type {
-  ExchangeMessage,
-  ExchangeMessagesResponse,
-} from '../types';
+import type { ExchangeMessage, ExchangeMessagesResponse } from '../types';
 
 export const chatKeys = {
   inbox: (search: string, status?: string, channelId?: string, participantId?: string) =>
@@ -26,7 +23,7 @@ export function useConversationInbox(
   search: string,
   status?: string,
   channelId?: string,
-  participantId?: string,
+  participantId?: string
 ) {
   return useQuery({
     queryKey: chatKeys.inbox(search, status, channelId, participantId),
@@ -67,9 +64,7 @@ export function useConversationMessages(conversationId?: string) {
  */
 export function useConversationThread(conversationId?: string) {
   const query = useConversationMessages(conversationId);
-  const messages = (query.data?.pages.flatMap((page) => page.items) ?? [])
-    .slice()
-    .reverse();
+  const messages = (query.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse();
   return { ...query, messages };
 }
 
@@ -128,13 +123,17 @@ export function useSendConversationMessage() {
       return { queryKey, optimisticId: optimisticMessage.id };
     },
     onError: (_error, _input, context) => {
-      if (!context) {return;}
+      if (!context) {
+        return;
+      }
 
       queryClient.setQueryData<{
         pages: ExchangeMessagesResponse[];
         pageParams: Array<string | undefined>;
       }>(context.queryKey, (current) => {
-        if (!current) {return current;}
+        if (!current) {
+          return current;
+        }
 
         return {
           ...current,
@@ -155,7 +154,9 @@ export function useSendConversationMessage() {
         pages: ExchangeMessagesResponse[];
         pageParams: Array<string | undefined>;
       }>(queryKey, (current) => {
-        if (!current || !context) {return current;}
+        if (!current || !context) {
+          return current;
+        }
 
         return {
           ...current,

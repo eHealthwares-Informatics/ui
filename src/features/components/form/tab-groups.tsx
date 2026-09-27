@@ -26,21 +26,21 @@ function TabGroupsComponent({
 
   const isStepDisabled = (stepIndex: number) => {
     const tab = tabGroups[stepIndex];
-    if (!tab?.waitFor) {return false;}
-    return typeof tab.waitFor === 'function'
-      ? !tab.waitFor(formState)
-      : !formState[tab.waitFor];
+    if (!tab?.waitFor) {
+      return false;
+    }
+    return typeof tab.waitFor === 'function' ? !tab.waitFor(formState) : !formState[tab.waitFor];
   };
 
   const hasUnsatisfiedWaitFor = useCallback(
     (stepIndex: number) => {
       const tab = tabGroups[stepIndex];
-      if (!tab?.waitFor) {return false;}
-      return typeof tab.waitFor === 'function'
-        ? !tab.waitFor(formState)
-        : !formState[tab.waitFor];
+      if (!tab?.waitFor) {
+        return false;
+      }
+      return typeof tab.waitFor === 'function' ? !tab.waitFor(formState) : !formState[tab.waitFor];
     },
-    [tabGroups, formState],
+    [tabGroups, formState]
   );
 
   const handleNext = async () => {
@@ -64,7 +64,12 @@ function TabGroupsComponent({
 
   return (
     <>
-      <Stepper active={activeStep} onStepClick={setActiveStep} allowNextStepsSelect={false} keepMounted>
+      <Stepper
+        active={activeStep}
+        onStepClick={setActiveStep}
+        allowNextStepsSelect={false}
+        keepMounted
+      >
         {tabGroups.map((tab, i) => (
           <Stepper.Step
             key={tab.value}
@@ -82,11 +87,19 @@ function TabGroupsComponent({
       </Stepper>
 
       <Group justify="flex-end" mt="xl">
-        <Button variant="outline" onClick={() => setActiveStep((s) => Math.max(0, s - 1))} disabled={activeStep === 0 || loading}>
+        <Button
+          variant="outline"
+          onClick={() => setActiveStep((s) => Math.max(0, s - 1))}
+          disabled={activeStep === 0 || loading}
+        >
           Previous
         </Button>
         {activeStep < tabGroups.length - 1 ? (
-          <Button onClick={handleNext} disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit} loading={loading}>
+          <Button
+            onClick={handleNext}
+            disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit}
+            loading={loading}
+          >
             {hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit ? 'Create & Continue' : 'Next'}
           </Button>
         ) : (

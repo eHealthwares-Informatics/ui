@@ -1,4 +1,15 @@
-import { Badge, Box, Container, Group, Paper, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Container,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+  Tooltip,
+} from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { Package, ChevronRight, AlertTriangle } from 'lucide-react';
 import { EmptyOrders } from '../website/empty-states';

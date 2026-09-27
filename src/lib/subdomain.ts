@@ -16,7 +16,9 @@ const HOST_ALIASES: Record<string, string> = {
 export function getSubdomain(): string {
   const host = window.location.hostname;
   const alias = HOST_ALIASES[host];
-  if (alias) return alias;
+  if (alias) {
+    return alias;
+  }
   const match = host.match(/^(.+?)\.ehealthwares\.com$/);
   return match?.[1] ?? '';
 }

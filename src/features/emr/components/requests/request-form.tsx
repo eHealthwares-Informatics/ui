@@ -19,8 +19,8 @@ import { useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import { PRIORITIES, REQUEST_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
-import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
+import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
 
@@ -154,7 +154,6 @@ export function RequestForm({
           disabled={lockPatient}
           error={patientError}
         />
-
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <Select
             label="Request type"
@@ -170,7 +169,6 @@ export function RequestForm({
             {...form.getInputProps('priority')}
           />
         </SimpleGrid>
-
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <StaffPicker
             value={orderingProvider}
@@ -183,7 +181,6 @@ export function RequestForm({
             {...form.getInputProps('requestedAt')}
           />
         </SimpleGrid>
-
         <TextInput
           label="Diagnosis"
           placeholder="Working diagnosis"
@@ -195,9 +192,7 @@ export function RequestForm({
           minRows={2}
           {...form.getInputProps('clinicalNotes')}
         />
-
         <Divider label={`Items (${form.values.items.length})`} labelPosition="left" />
-
         {form.values.items.map((_, index) => (
           <Stack
             key={index}
@@ -232,18 +227,15 @@ export function RequestForm({
                 onChange={(next) => {
                   setTestRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
                   form.setFieldValue(`items.${index}.itemKind`, next ? 'LOINC_TEST' : undefined);
-                  form.setFieldValue(
-                    `items.${index}.testDefinitionId`,
-                    next?.code ?? undefined,
-                  );
+                  form.setFieldValue(`items.${index}.testDefinitionId`, next?.code ?? undefined);
                   form.setFieldValue(
                     `items.${index}.name`,
-                    next ? `${next.name} (${next.code})` : form.values.items[index].name,
+                    next ? `${next.name} (${next.code})` : form.values.items[index].name
                   );
                   form.setFieldValue(`items.${index}.code`, next?.code ?? '');
                   form.setFieldValue(
                     `items.${index}.referenceCode`,
-                    next ? `LOINC_TEST:${next.code}` : undefined,
+                    next ? `LOINC_TEST:${next.code}` : undefined
                   );
                 }}
               />
@@ -261,18 +253,19 @@ export function RequestForm({
                   // Name + code concatenation: e.g. "Paracetamol 500mg — PMC-0001".
                   form.setFieldValue(
                     `items.${index}.name`,
-                    next ? `${next.label} — ${next.code ?? next.id}` : form.values.items[index].name,
+                    next ? `${next.label} — ${next.code ?? next.id}` : form.values.items[index].name
                   );
                   form.setFieldValue(`items.${index}.code`, next?.code ?? '');
                 }}
               />
-            )}              <TextInput
-                label="Name"
-                required
-                placeholder="Item / test / medication name"
-                description="Filled from the picker as name + code"
-                {...form.getInputProps(`items.${index}.name`)}
-              />
+            )}{' '}
+            <TextInput
+              label="Name"
+              required
+              placeholder="Item / test / medication name"
+              description="Filled from the picker as name + code"
+              {...form.getInputProps(`items.${index}.name`)}
+            />
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               <TextInput
                 label="Code"
@@ -316,7 +309,8 @@ export function RequestForm({
               />
             </SimpleGrid>
           </Stack>
-        ))}          <Button
+        ))}{' '}
+        <Button
           variant="light"
           leftSection={<Plus size={15} />}
           onClick={() => {
@@ -327,13 +321,11 @@ export function RequestForm({
         >
           Add item
         </Button>
-
         {patient && (
           <Text size="xs" c="dimmed">
             Ordering for {patient.patientId} — {patient.patientName}
           </Text>
         )}
-
         <Group justify="flex-end" mt="md">
           <Button variant="light" onClick={onClose} disabled={mutation.isPending}>
             Cancel

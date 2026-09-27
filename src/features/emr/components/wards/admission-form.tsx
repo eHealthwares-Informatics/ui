@@ -1,13 +1,4 @@
-import {
-  Button,
-  Group,
-  Select,
-  SimpleGrid,
-  Stack,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
+import { Button, Group, Select, SimpleGrid, Stack, Text, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -154,8 +145,16 @@ export function AdmissionForm({
           />
         </SimpleGrid>
 
-        <StaffPicker value={referringProvider} onChange={setReferringProvider} label="Referring provider" />
-        <TextInput label="Diagnosis" placeholder="Admission diagnosis (optional)" {...form.getInputProps('diagnosis')} />
+        <StaffPicker
+          value={referringProvider}
+          onChange={setReferringProvider}
+          label="Referring provider"
+        />
+        <TextInput
+          label="Diagnosis"
+          placeholder="Admission diagnosis (optional)"
+          {...form.getInputProps('diagnosis')}
+        />
         <Textarea label="Notes" autosize minRows={2} {...form.getInputProps('notes')} />
 
         {patient && (

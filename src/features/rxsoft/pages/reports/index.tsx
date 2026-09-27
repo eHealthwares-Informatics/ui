@@ -12,6 +12,7 @@ import {
   Text,
   ThemeIcon,
 } from '@mantine/core';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   BarChart3,
   BoxIcon,
@@ -26,7 +27,6 @@ import {
   TrendingUp,
   Warehouse,
 } from 'lucide-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { downloadBlob, rxsoftApi } from '@/lib/rxsoft-api';
 import { RxPage } from '../../../components/page/rx-page';

@@ -21,7 +21,7 @@ export function ModuleDashboardPage({ moduleId }: { moduleId: string }) {
     enabled: firstResources.length > 0,
     queryFn: async () => {
       const entries = await Promise.all(
-        firstResources.map(async (r) => [r, await getModelConfig(r).catch(() => null)] as const),
+        firstResources.map(async (r) => [r, await getModelConfig(r).catch(() => null)] as const)
       );
       return Object.fromEntries(entries) as Record<string, ModelConfig | null>;
     },

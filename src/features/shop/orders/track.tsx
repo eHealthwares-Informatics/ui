@@ -61,10 +61,19 @@ export default function TrackOrderPage() {
                   <Text fw={900} size="lg">
                     Order {order.orderNumber || `#${order.id.slice(0, 8)}`}
                   </Text>
-                  <Badge size="lg" radius="xl" color={
-                    order.orderStatus === 'delivered' ? 'green' : order.orderStatus === 'cancelled' ? 'red' : 'yellow'
-                  }>
-                    {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1).replace(/_/g, ' ')}
+                  <Badge
+                    size="lg"
+                    radius="xl"
+                    color={
+                      order.orderStatus === 'delivered'
+                        ? 'green'
+                        : order.orderStatus === 'cancelled'
+                          ? 'red'
+                          : 'yellow'
+                    }
+                  >
+                    {order.orderStatus.charAt(0).toUpperCase() +
+                      order.orderStatus.slice(1).replace(/_/g, ' ')}
                   </Badge>
                 </Group>
                 {order.delivery?.address ? (

@@ -53,11 +53,7 @@ interface PoStoreState {
   setSettingsOpened: (v: boolean) => void;
 }
 
-export const computeSubtotal = (
-  qty: number,
-  unitCost: number,
-  discountPercent: number,
-): number => {
+export const computeSubtotal = (qty: number, unitCost: number, discountPercent: number): number => {
   const raw = qty * unitCost;
   const discount = raw * (discountPercent / 100);
   return Number((raw - discount).toFixed(2));
@@ -67,7 +63,7 @@ export const computeTotal = (
   qty: number,
   unitCost: number,
   discountPercent: number,
-  taxPercent: number,
+  taxPercent: number
 ): number => {
   const subtotal = computeSubtotal(qty, unitCost, discountPercent);
   const tax = subtotal * (taxPercent / 100);
@@ -172,33 +168,58 @@ export const usePoStore = create<PoStoreState>((set, get) => ({
 
   setPendingPo: (id, label, status) => {
     const active = get().activeTabId;
-    get().updateTab(active, { pendingPoId: id, pendingPoLabel: label ?? '', pendingPoStatus: status ?? null });
+    get().updateTab(active, {
+      pendingPoId: id,
+      pendingPoLabel: label ?? '',
+      pendingPoStatus: status ?? null,
+    });
   },
 
   addLine: (line) => {
     const active = get().activeTabId;
     const tab = get().tabs.find((t) => t.id === active);
-    if (!tab) {return;}
+    if (!tab) {
+      return;
+    }
     get().updateTab(active, {
-      lines: [
-        ...tab.lines,
-        { ...emptyLine(), ...line },
-      ],
+      lines: [...tab.lines, { ...emptyLine(), ...line }],
     });
   },
 
   updateLine: (lineId, updates) => {
     const active = get().activeTabId;
     const tab = get().tabs.find((t) => t.id === active);
-    if (!tab) {return;}
+    if (!tab) {
+      return;
+    }
     get().updateTab(active, {
       lines: tab.lines.map((line) => {
-        if (line.id !== lineId) {return line;}
+        if (line.id !== lineId) {
+          return line;
+        }
         const updated = { ...line, ...updates };
-        updated.lineSubtotal = computeSubtotal(updated.orderedQty, updated.unitCost, updated.discountPercent);
-        updated.lineTotal = computeTotal(updated.orderedQty, updated.unitCost, updated.discountPercent, updated.taxPercent);
-        updated.receivedSubtotal = computeSubtotal(updated.receivedQty, updated.unitCost, updated.discountPercent);
-        updated.receivedLineTotal = computeTotal(updated.receivedQty, updated.unitCost, updated.discountPercent, updated.taxPercent);
+        updated.lineSubtotal = computeSubtotal(
+          updated.orderedQty,
+          updated.unitCost,
+          updated.discountPercent
+        );
+        updated.lineTotal = computeTotal(
+          updated.orderedQty,
+          updated.unitCost,
+          updated.discountPercent,
+          updated.taxPercent
+        );
+        updated.receivedSubtotal = computeSubtotal(
+          updated.receivedQty,
+          updated.unitCost,
+          updated.discountPercent
+        );
+        updated.receivedLineTotal = computeTotal(
+          updated.receivedQty,
+          updated.unitCost,
+          updated.discountPercent,
+          updated.taxPercent
+        );
         return updated;
       }),
     });
@@ -207,7 +228,9 @@ export const usePoStore = create<PoStoreState>((set, get) => ({
   removeLine: (lineId) => {
     const active = get().activeTabId;
     const tab = get().tabs.find((t) => t.id === active);
-    if (!tab) {return;}
+    if (!tab) {
+      return;
+    }
     get().updateTab(active, { lines: tab.lines.filter((l) => l.id !== lineId) });
   },
 

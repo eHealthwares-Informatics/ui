@@ -33,7 +33,9 @@ export const manufacturersConfig: ModelConfig = {
     endpoint: '/manufacturers/metrics',
     items: (data) => {
       const lastCreated = (data as any)?.lastCreated ?? data;
-      if (!lastCreated?.code) {return [];}
+      if (!lastCreated?.code) {
+        return [];
+      }
       return [{ label: 'Last Created', value: lastCreated.code, icon: 'Package', color: 'blue' }];
     },
   },

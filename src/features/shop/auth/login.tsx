@@ -1,9 +1,9 @@
 import { Box, Button, Container, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { CheckCircle2 } from 'lucide-react';
-import { AuthPanel } from './auth-panel';
 import { green, ink, muted, line } from '../website/components';
 import { WebsiteLayout } from '../website/layout';
+import { AuthPanel } from './auth-panel';
 
 const PERKS = [
   'Faster checkout with saved delivery details',

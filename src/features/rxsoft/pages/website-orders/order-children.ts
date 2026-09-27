@@ -22,7 +22,7 @@ export interface OrderChildRow {
  * row still exists in the list on its own page.
  */
 export function flattenChildRows<T extends Record<string, any>>(
-  rows: T[],
+  rows: T[]
 ): Array<T | (T & { _isChildRow: boolean; _parentId: string; _child: OrderChildRow })> {
   const out: any[] = [];
   for (const row of rows ?? []) {

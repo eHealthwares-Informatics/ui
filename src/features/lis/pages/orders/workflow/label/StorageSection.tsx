@@ -91,7 +91,12 @@ export function StorageSection() {
               <Badge color="violet" variant="light">
                 Sample #{Number(selectedSample) + 1}
               </Badge>
-              <Button size="xs" variant="subtle" color="gray" onClick={() => setSelectedSample(null)}>
+              <Button
+                size="xs"
+                variant="subtle"
+                color="gray"
+                onClick={() => setSelectedSample(null)}
+              >
                 Back
               </Button>
             </Group>
@@ -103,7 +108,11 @@ export function StorageSection() {
                 value={locationLabel(storageFor(Number(selectedSample)).storageLocationId)}
                 onChange={(value) => {
                   const loc = locationOptions.find((o) => o.label === value);
-                  updateSampleStorage(Number(selectedSample), 'storageLocationId', loc?.value ?? null);
+                  updateSampleStorage(
+                    Number(selectedSample),
+                    'storageLocationId',
+                    loc?.value ?? null
+                  );
                 }}
                 limit={20}
               />

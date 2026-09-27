@@ -185,7 +185,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
     textField('name', 'Name'),
     selectField('type', 'Type', CHANNEL_TYPE_OPTIONS),
     textField('code', 'Code'),
-     textField('provider', 'Provider'),
+    textField('provider', 'Provider'),
     textField('externalId', 'External ID'),
     asyncField('pseudoParticipantId', 'Pseudo Participant', '/participants', 'firstName'),
     switchField('isActive', 'Active'),
@@ -631,9 +631,21 @@ export const participantPageSchema: ModelConfig = withDefaultActions({
   description: 'Create participants and search by phone or email for questionnaire entry.',
   endpoint: '/participants',
   rowActions: [
-    { label: 'View Conversations', icon: MessageSquare, href: (row) => `/conversation?participantId=${String(row.id ?? row._id ?? '')}` },
-    { label: 'View Projections', icon: Users, href: (row) => `/conversation/projections?participantId=${String(row.id ?? row._id ?? '')}` },
-    { label: 'View Exchanges', icon: FileText, href: (row) => `/conversation/exchanges?participantId=${String(row.id ?? row._id ?? '')}` },
+    {
+      label: 'View Conversations',
+      icon: MessageSquare,
+      href: (row) => `/conversation?participantId=${String(row.id ?? row._id ?? '')}`,
+    },
+    {
+      label: 'View Projections',
+      icon: Users,
+      href: (row) => `/conversation/projections?participantId=${String(row.id ?? row._id ?? '')}`,
+    },
+    {
+      label: 'View Exchanges',
+      icon: FileText,
+      href: (row) => `/conversation/exchanges?participantId=${String(row.id ?? row._id ?? '')}`,
+    },
   ],
   columns: [
     { key: 'firstName', label: 'First Name' },
@@ -1167,7 +1179,7 @@ export const exchangePageSchema: ModelConfig = withDefaultActions({
       label: 'CreatedAt',
       dataType: ColumnDataType.DATE,
       filters: ColumnTypeFilters.DATE,
-      sortable: true
+      sortable: true,
     },
   ],
   detailPathBuilder: (row) => `/conversation/exchanges/${String(row.id)}`,
@@ -1268,7 +1280,9 @@ export const invitePageSchema: ModelConfig = {
       key: 'timeoutAt',
       label: 'Timeout',
       render: (row) => {
-        if (!row.timeoutAt) return '—';
+        if (!row.timeoutAt) {
+          return '—';
+        }
         const d = new Date(Number(row.timeoutAt));
         return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
       },
@@ -1288,7 +1302,8 @@ export const aiInstructionPageSchema: ModelConfig = {
   id: 'ai-instructions',
   apiProvider: conversationApi,
   title: 'AI Instructions',
-  description: 'Versioned AI instructions for question extraction, with scoring and promotion history.',
+  description:
+    'Versioned AI instructions for question extraction, with scoring and promotion history.',
   endpoint: '/ai/instructions',
   columns: [
     {
@@ -1331,7 +1346,8 @@ export const aiEvalLogPageSchema: ModelConfig = {
   id: 'ai-eval-logs',
   apiProvider: conversationApi,
   title: 'AI Eval Logs',
-  description: 'Audit trail of instruction improvement runs — scores, promotion decisions, and candidate content.',
+  description:
+    'Audit trail of instruction improvement runs — scores, promotion decisions, and candidate content.',
   endpoint: '/ai/eval-logs',
   columns: [
     {
@@ -1380,7 +1396,8 @@ export const aiConfigPageSchema: ModelConfig = {
   id: 'ai-config',
   apiProvider: conversationApi,
   title: 'AI Configuration',
-  description: 'Current AI routing defaults and provider status (models + keys are stored in the database).',
+  description:
+    'Current AI routing defaults and provider status (models + keys are stored in the database).',
   endpoint: '/ai/config',
   columns: [
     { key: 'setting', label: 'Setting' },
@@ -1418,14 +1435,17 @@ export const aiCostPageSchema: ModelConfig = {
         const outcome = String(row.outcome ?? '');
         const color =
           outcome === 'success' ? 'green' : outcome === 'fallback_used' ? 'yellow' : 'red';
-        return <Text size="xs" fw={600} c={`${color}.7`}>{outcome || '—'}</Text>;
+        return (
+          <Text size="xs" fw={600} c={`${color}.7`}>
+            {outcome || '—'}
+          </Text>
+        );
       },
     },
     {
       key: 'totalTokens',
       label: 'Tokens',
-      render: (row) =>
-        `${Number(row.promptTokens ?? 0)} / ${Number(row.completionTokens ?? 0)}`,
+      render: (row) => `${Number(row.promptTokens ?? 0)} / ${Number(row.completionTokens ?? 0)}`,
     },
     {
       key: 'costUsd',
@@ -1506,9 +1526,10 @@ const AI_ROUTING_OPTIONS: Option[] = [
   { value: 'openrouter', label: 'openrouter' },
 ];
 
-const AI_TIER_OPTIONS: Option[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map(
-  (value) => ({ value, label: value }),
-);
+const AI_TIER_OPTIONS: Option[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].map((value) => ({
+  value,
+  label: value,
+}));
 
 export const aiProviderPageSchema: ModelConfig = {
   id: 'ai-providers',
@@ -1587,9 +1608,7 @@ export const aiModelPageSchema: ModelConfig = withDefaultActions({
       key: 'expiryDate',
       label: 'Expiry',
       render: (row) =>
-        (row as any).expiryDate
-          ? String((row as any).expiryDate).slice(0, 10)
-          : '—',
+        (row as any).expiryDate ? String((row as any).expiryDate).slice(0, 10) : '—',
     },
     { key: 'retryCount', label: 'Retries' },
     {
@@ -1672,8 +1691,7 @@ export const aiModelPageSchema: ModelConfig = withDefaultActions({
     tier: row.tier ? option(row.tier) : null,
     expiryDate: row.expiryDate ? String(row.expiryDate).slice(0, 10) : null,
     fallbackModel: row.fallbackModel ? option(row.fallbackModel, row.fallbackModel) : null,
-    retryCount:
-      row.retryCount != null ? numberValue(row.retryCount, 0) : '',
+    retryCount: row.retryCount != null ? numberValue(row.retryCount, 0) : '',
     fallbackRetryCount:
       row.fallbackRetryCount != null ? numberValue(row.fallbackRetryCount, 0) : '',
     apiKey: '',
@@ -1695,9 +1713,7 @@ export const aiModelPageSchema: ModelConfig = withDefaultActions({
     tier: optionValue(values.tier) || undefined,
     expiryDate: text(values.expiryDate).trim() || undefined,
     fallbackModel: optionValue(values.fallbackModel) || undefined,
-    retryCount: text(values.retryCount).trim()
-      ? numberValue(values.retryCount, 0)
-      : undefined,
+    retryCount: text(values.retryCount).trim() ? numberValue(values.retryCount, 0) : undefined,
     fallbackRetryCount: text(values.fallbackRetryCount).trim()
       ? numberValue(values.fallbackRetryCount, 0)
       : undefined,
@@ -1706,9 +1722,7 @@ export const aiModelPageSchema: ModelConfig = withDefaultActions({
     defaultTemperature: text(values.defaultTemperature).trim()
       ? numberValue(values.defaultTemperature, 0)
       : undefined,
-    maxTokens: text(values.maxTokens).trim()
-      ? numberValue(values.maxTokens, 0)
-      : undefined,
+    maxTokens: text(values.maxTokens).trim() ? numberValue(values.maxTokens, 0) : undefined,
     version: numberValue(values.version, 1),
     supportsServerSideThreading: bool(values.supportsServerSideThreading),
     isDefault: bool(values.isDefault),
@@ -1729,8 +1743,7 @@ export const aiModelPageSchema: ModelConfig = withDefaultActions({
       // Only send apiKey when the admin typed a new one.
       apiKey: (v) => (text(v).trim() ? text(v).trim() : undefined),
       baseUrl: (v) => text(v).trim() || undefined,
-      defaultTemperature: (v) =>
-        text(v).trim() ? numberValue(v, 0) : undefined,
+      defaultTemperature: (v) => (text(v).trim() ? numberValue(v, 0) : undefined),
       maxTokens: (v) => (text(v).trim() ? numberValue(v, 0) : undefined),
       version: (v) => numberValue(v, 1),
       supportsServerSideThreading: (v) => bool(v),
@@ -1849,7 +1862,9 @@ export const broadcastPageSchema: ModelConfig = withDefaultActions({
       key: 'timeoutAt',
       label: 'Timeout',
       render: (row) => {
-        if (!row.timeoutAt) return '—';
+        if (!row.timeoutAt) {
+          return '—';
+        }
         const d = new Date(Number(row.timeoutAt));
         return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
       },
@@ -1858,7 +1873,9 @@ export const broadcastPageSchema: ModelConfig = withDefaultActions({
       key: 'createdAt',
       label: 'Created',
       render: (row) => {
-        if (!row.createdAt) return '—';
+        if (!row.createdAt) {
+          return '—';
+        }
         const d = new Date(row.createdAt as any);
         return Number.isFinite(d.getTime()) ? d.toLocaleString() : '—';
       },

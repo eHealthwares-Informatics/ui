@@ -43,17 +43,13 @@ test('publishes and unpublishes a form definition (UC-25/26)', async ({ page }) 
   await page.getByRole('button', { name: 'Form actions' }).nth(1).click();
   await page.getByRole('menuitem', { name: 'Publish' }).click();
   await expect(page.getByText('Form published')).toBeVisible();
-  expect(
-    posts.some((post) => post.url.endsWith('/form-definitions/form-2/publish')),
-  ).toBe(true);
+  expect(posts.some((post) => post.url.endsWith('/form-definitions/form-2/publish'))).toBe(true);
 
   // Unpublish the published one (first row)
   await page.getByRole('button', { name: 'Form actions' }).first().click();
   await page.getByRole('menuitem', { name: 'Unpublish' }).click();
   await expect(page.getByText('Form unpublished')).toBeVisible();
-  expect(
-    posts.some((post) => post.url.endsWith('/form-definitions/form-1/unpublish')),
-  ).toBe(true);
+  expect(posts.some((post) => post.url.endsWith('/form-definitions/form-1/unpublish'))).toBe(true);
 });
 
 test('builds a form with an item/drug searchable field type', async ({ page }) => {
@@ -101,8 +97,8 @@ test('builds and saves a new form definition (UC-24 form builder)', async ({ pag
     forms,
     onRequest: (method, url, body) => {
       if (method === 'POST') {
-      posts.push({ method, url, body });
-    }
+        posts.push({ method, url, body });
+      }
     },
   });
   await page.goto('/emr/forms');

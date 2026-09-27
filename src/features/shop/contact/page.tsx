@@ -15,15 +15,7 @@ import {
 import { Mail, Phone, MapPin, MessageCircle, Send, Check } from 'lucide-react';
 import { useState } from 'react';
 import { useSubmitContact, useWebsiteContact } from '../website/hooks';
-import {
-  WebsiteLayout,
-  green,
-  darkGreen,
-  ink,
-  muted,
-  line,
-  buttonStyles,
-} from '../website/layout';
+import { WebsiteLayout, green, darkGreen, ink, muted, line, buttonStyles } from '../website/layout';
 import { PageLoader } from '../website/loaders';
 
 export default function ContactPage() {

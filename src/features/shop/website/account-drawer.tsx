@@ -1,14 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Drawer,
-  Group,
-  Paper,
-  Stack,
-  Text,
-  ThemeIcon,
-} from '@mantine/core';
+import { Avatar, Box, Button, Drawer, Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import {
   CreditCard,
@@ -21,9 +11,9 @@ import {
   Stethoscope,
   Truck,
 } from 'lucide-react';
-import { useAuthStore } from './auth-store';
-import { useAccountDrawerStore } from './account-drawer-store';
 import { AuthPanel } from '../auth/auth-panel';
+import { useAccountDrawerStore } from './account-drawer-store';
+import { useAuthStore } from './auth-store';
 import { green, ink, muted, line, soft, buttonStyles } from './components';
 import { useOrders, usePrescriptions, useRewards } from './hooks';
 
@@ -37,7 +27,13 @@ const DASHBOARD_LINKS = [
   { label: 'Payment Methods', icon: CreditCard, path: '/shop/dashboard' },
 ];
 
-function LoggedOutView({ onSuccess, initialTab }: { onSuccess: () => void; initialTab: 'signin' | 'register' }) {
+function LoggedOutView({
+  onSuccess,
+  initialTab,
+}: {
+  onSuccess: () => void;
+  initialTab: 'signin' | 'register';
+}) {
   return (
     <Box p="xl">
       <Stack gap={4} mb="lg" align="center">

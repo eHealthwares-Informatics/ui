@@ -14,7 +14,7 @@ const MODULE_STORAGE_KEY = 'rxsoft_admin_selected_module';
  */
 const getInitialModule = (userModules: { id: string }[]): ModuleId => {
   if (typeof window === 'undefined') {
-    return userModules[0]?.id as ModuleId || 'rxsoft';
+    return (userModules[0]?.id as ModuleId) || 'rxsoft';
   }
 
   const stored = window.localStorage.getItem(MODULE_STORAGE_KEY);
@@ -61,7 +61,9 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
   // - If current selection isn't in the user's modules, switch to the first one they have
   // - If localStorage stored a module the user no longer has, update it
   useEffect(() => {
-    if (storeModules.length === 0) return;
+    if (storeModules.length === 0) {
+      return;
+    }
 
     const hasAccess = storeModules.some((m) => m.id === selectedModule);
     if (!hasAccess) {
@@ -103,10 +105,10 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
     const [isReady, setIsReady] = useState(false);
     // const attributeDefs = useAttributeDefinitionsBootstrap('LOINC');
     useEffect(() => {
-    // This runs AFTER the initial DOM render is complete
-    setIsReady(true);
-    console.log("React app is fully loaded and mounted!");
-  }, []);
+      // This runs AFTER the initial DOM render is complete
+      setIsReady(true);
+      console.log('React app is fully loaded and mounted!');
+    }, []);
 
     // const isReady = isPublicWebsiteRoute //|| //attributeDefs.isSuccess;
 

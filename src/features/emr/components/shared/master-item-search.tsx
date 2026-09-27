@@ -116,8 +116,7 @@ export function MasterItemSearch({
     staleTime: 60_000,
   });
 
-  const isSelected = (item: MasterItem) =>
-    value?.kind === item.kind && value.id === item.id;
+  const isSelected = (item: MasterItem) => value?.kind === item.kind && value.id === item.id;
 
   return (
     <Combobox
@@ -152,9 +151,7 @@ export function MasterItemSearch({
       </Combobox.Target>
 
       <Combobox.Dropdown>
-        <Combobox.Options
-          style={{ maxHeight: 260, overflowY: 'auto' }}
-        >
+        <Combobox.Options style={{ maxHeight: 260, overflowY: 'auto' }}>
           {isLoading ? (
             <Combobox.Empty>
               <Text size="sm" c="dimmed">

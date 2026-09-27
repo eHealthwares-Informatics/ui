@@ -18,11 +18,7 @@ export function ProviderLoad({ providers }: { providers: ProviderLoadEntry[] }) 
           {providers.map((provider, index) => (
             <Group key={provider.providerId || index} justify="space-between" wrap="nowrap">
               <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                <Avatar
-                  size="sm"
-                  radius="xl"
-                  color={AVATAR_COLORS[index % AVATAR_COLORS.length]}
-                >
+                <Avatar size="sm" radius="xl" color={AVATAR_COLORS[index % AVATAR_COLORS.length]}>
                   {provider.providerName
                     .split(' ')
                     .map((p) => p[0])

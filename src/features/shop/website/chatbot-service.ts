@@ -1,18 +1,15 @@
+import { notifications } from '@mantine/notifications';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
-import { notifications } from '@mantine/notifications';
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { conversationApi, CONVERSATION_API_BASE_URL } from '@/lib/conversation-api';
 import { getAccessToken } from '@/lib/auth-tokens';
+import { conversationApi, CONVERSATION_API_BASE_URL } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useReplyingAnimation } from '@/lib/use-replying-animation';
 
 const ANON_PHONE_KEY = 'damorex-chatbot-phone';
-export const SHOP_WEB_CHANNEL_ID = '6ab1d8afcf668f7bdb084dbb';
+/** Web-chat channel addressed by stable code (no hardcoded channel id). */
+export const SHOP_WEB_CHANNEL_CODE = 'DAMOREX_WEBCHAT';
 
 export interface ChatMessageAttachment {
   fileName?: string;
@@ -45,7 +42,6 @@ export interface RawExchangeMessage {
   createdAt: string;
   status?: string;
   orphan?: boolean;
-  pendingConversationId?: string;
 }
 
 export interface ShopConversationSummary {
@@ -109,10 +105,7 @@ export function clearStoredPhone(): void {
 let shopSocket: Socket | null = null;
 let socketIdentity: { phone?: string; guest?: boolean } = {};
 
-export function connectShopChat(identity: {
-  phone?: string;
-  guest?: boolean;
-}): Socket {
+export function connectShopChat(identity: { phone?: string; guest?: boolean }): Socket {
   const changed =
     identity.phone !== socketIdentity.phone || identity.guest !== socketIdentity.guest;
   socketIdentity = identity;
@@ -160,7 +153,7 @@ export function disconnectShopChat(): void {
 /* ------------------------------------------------------------------ */
 
 export async function findParticipantByPhone(
-  phone: string,
+  phone: string
 ): Promise<{ id: string; phone?: string } | null> {
   try {
     const response = await conversationApi.get('/participants', {
@@ -187,9 +180,10 @@ export async function sendWebChatMessage(input: {
   conversationId?: string;
   questionnaireCode?: string;
   attachments?: ChatMessageAttachment[];
+  newConversation?: boolean;
 }): Promise<{ conversationId?: string; participantId?: string }> {
   const body: Record<string, unknown> = {
-    channelId: SHOP_WEB_CHANNEL_ID,
+    channelCode: SHOP_WEB_CHANNEL_CODE,
     senderPhone: input.senderPhone,
     text: input.text,
   };
@@ -201,6 +195,9 @@ export async function sendWebChatMessage(input: {
   }
   if (input.attachments?.length) {
     body.attachments = input.attachments;
+  }
+  if (input.newConversation) {
+    body.newConversation = true;
   }
 
   const response = await conversationApi.post('/webhooks/web', body);
@@ -245,8 +242,7 @@ async function fetchShopInbox(input: {
 /* ------------------------------------------------------------------ */
 
 export const shopChatKeys = {
-  thread: (conversationId?: string | null) =>
-    ['shop-chat-thread', conversationId] as const,
+  thread: (conversationId?: string | null) => ['shop-chat-thread', conversationId] as const,
   inbox: (participantId?: string | null) => ['shop-chat-inbox', participantId] as const,
   participant: (phone?: string) => ['shop-chat-participant', phone] as const,
 };
@@ -265,7 +261,7 @@ function toChatMessage(raw: RawExchangeMessage): ChatMessage {
 function prependToThread(
   queryClient: ReturnType<typeof useQueryClient>,
   conversationId: string,
-  raw: RawExchangeMessage,
+  raw: RawExchangeMessage
 ): void {
   queryClient.setQueryData<{ pages: ThreadPage[]; pageParams: Array<string | undefined> }>(
     shopChatKeys.thread(conversationId),
@@ -273,9 +269,7 @@ function prependToThread(
       if (!current || current.pages.length === 0) {
         return current;
       }
-      const exists = current.pages.some((page) =>
-        page.items.some((item) => item.id === raw.id),
-      );
+      const exists = current.pages.some((page) => page.items.some((item) => item.id === raw.id));
       if (exists) {
         return current;
       }
@@ -284,7 +278,7 @@ function prependToThread(
         ...current,
         pages: [{ ...first, items: [raw, ...first.items] }, ...rest],
       };
-    },
+    }
   );
 }
 
@@ -323,17 +317,9 @@ export function useShopChatThread(input: {
   /** When known, lets the hook recover the real id if a creation event was missed. */
   participantId?: string | null;
 }) {
-  const {
-    senderPhone,
-    guest,
-    enabled = true,
-    initialConversationId = null,
-    participantId,
-  } = input;
+  const { senderPhone, guest, enabled = true, initialConversationId = null, participantId } = input;
   const queryClient = useQueryClient();
-  const [conversationId, setConversationIdState] = useState<string | null>(
-    initialConversationId,
-  );
+  const [conversationId, setConversationIdState] = useState<string | null>(initialConversationId);
   const [connected, setConnected] = useState(false);
   const [sending, setSending] = useState(false);
   const [awaitingReply, setAwaitingReply] = useState(false);
@@ -345,7 +331,7 @@ export function useShopChatThread(input: {
   const endedIdRef = useRef<string | null>(null);
   const replyCountRef = useRef(0);
   const pendingStartedAtRef = useRef<number>(
-    initialConversationId?.startsWith('pending-') ? Date.now() : 0,
+    initialConversationId?.startsWith('pending-') ? Date.now() : 0
   );
 
   const openConversation = useCallback((id: string | null) => {
@@ -378,9 +364,7 @@ export function useShopChatThread(input: {
   });
 
   const serverMessages = useMemo<ChatMessage[]>(() => {
-    const items = (threadQuery.data?.pages.flatMap((page) => page.items) ?? [])
-      .slice()
-      .reverse();
+    const items = (threadQuery.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse();
     return items.map(toChatMessage);
   }, [threadQuery.data]);
 
@@ -408,9 +392,7 @@ export function useShopChatThread(input: {
         const signature = `${message.role}|${message.text.trim()}`;
         const times = serverTimesBySignature.get(signature) ?? [];
         const optimisticTime = new Date(message.createdAt).getTime();
-        const covered = times.some(
-          (serverTime) => Math.abs(serverTime - optimisticTime) < 15_000,
-        );
+        const covered = times.some((serverTime) => Math.abs(serverTime - optimisticTime) < 15_000);
         if (!covered && !byId.has(message.id)) {
           byId.set(message.id, message);
         }
@@ -418,8 +400,7 @@ export function useShopChatThread(input: {
     }
 
     return [...byId.values()].sort(
-      (left, right) =>
-        new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime(),
+      (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
     );
   }, [serverMessages, optimistic]);
 
@@ -463,7 +444,7 @@ export function useShopChatThread(input: {
         clearTimeout(awaitingTimerRef.current);
       }
     },
-    [],
+    []
   );
 
   // Once the server copy is present, drop the local optimistic entry so it can
@@ -482,8 +463,7 @@ export function useShopChatThread(input: {
         return !serverMessages.some(
           (serverMessage) =>
             `${serverMessage.role}|${serverMessage.text.trim()}` === signature &&
-            Math.abs(new Date(serverMessage.createdAt).getTime() - optimisticTime) <
-              15_000,
+            Math.abs(new Date(serverMessage.createdAt).getTime() - optimisticTime) < 15_000
         );
       });
       return next.length === prev.length ? prev : next;
@@ -495,9 +475,7 @@ export function useShopChatThread(input: {
   // message is sent before the socket finishes joining rooms) can't strand the
   // UI on the pending id. Once a real conversation appears we adopt it.
   const discoveryEnabled =
-    enabled &&
-    Boolean(participantId) &&
-    Boolean(conversationId?.startsWith('pending-'));
+    enabled && Boolean(participantId) && Boolean(conversationId?.startsWith('pending-'));
 
   const discoveryQuery = useQuery({
     queryKey: ['shop-chat-discovery', participantId],
@@ -530,13 +508,7 @@ export function useShopChatThread(input: {
       });
       queryClient.invalidateQueries({ queryKey: ['shop-chat-inbox'] });
     }
-  }, [
-    discoveryEnabled,
-    discoveryQuery.data,
-    conversationId,
-    openConversation,
-    queryClient,
-  ]);
+  }, [discoveryEnabled, discoveryQuery.data, conversationId, openConversation, queryClient]);
 
   useEffect(() => {
     if (!enabled) {
@@ -602,10 +574,45 @@ export function useShopChatThread(input: {
       setEnded(true);
     };
 
+    // The webhook flow promoted our pending thread to a real conversation.
+    // Migrate immediately off the `pending-` placeholder. Broadcast to all
+    // sockets, so only act when it matches the thread/participant we hold.
+    const handleCreated = (payload: {
+      oldConversationId?: string;
+      newConversationId: string;
+      participantId?: string;
+    }) => {
+      if (!payload?.newConversationId) {
+        return;
+      }
+      const current = conversationIdRef.current;
+      const matchesPending = Boolean(
+        current && payload.oldConversationId && payload.oldConversationId === current
+      );
+      const matchesParticipant = Boolean(
+        participantId && payload.participantId && payload.participantId === participantId
+      );
+      if (!matchesPending && !matchesParticipant) {
+        return;
+      }
+      if (current === payload.newConversationId) {
+        return;
+      }
+      openConversation(payload.newConversationId);
+      queryClient.invalidateQueries({
+        queryKey: shopChatKeys.thread(payload.newConversationId),
+      });
+      if (current) {
+        queryClient.invalidateQueries({ queryKey: shopChatKeys.thread(current) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['shop-chat-inbox'] });
+    };
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('conversation.message.orphan', handleMessage);
     socket.on('conversation.message.created', handleMessage);
+    socket.on('conversation.created', handleCreated);
     socket.on('conversation.ended', handleEnded);
 
     setConnected(socket.connected);
@@ -615,9 +622,10 @@ export function useShopChatThread(input: {
       socket.off('disconnect', onDisconnect);
       socket.off('conversation.message.orphan', handleMessage);
       socket.off('conversation.message.created', handleMessage);
+      socket.off('conversation.created', handleCreated);
       socket.off('conversation.ended', handleEnded);
     };
-  }, [enabled, senderPhone, guest, queryClient, openConversation]);
+  }, [enabled, senderPhone, guest, participantId, queryClient, openConversation]);
 
   const send = useCallback(
     async (text: string, questionnaireCode?: string, attachments?: ChatMessageAttachment[]) => {
@@ -641,10 +649,15 @@ export function useShopChatThread(input: {
       try {
         const result = await sendWebChatMessage({
           senderPhone,
-          text: trimmed || (attachments?.length ? `Sent a file: ${attachments[0].fileName ?? 'attachment'}` : ''),
+          text:
+            trimmed ||
+            (attachments?.length ? `Sent a file: ${attachments[0].fileName ?? 'attachment'}` : ''),
           conversationId: conversationIdRef.current ?? undefined,
           questionnaireCode,
           attachments,
+          // A send with nothing open starts a fresh conversation, so the engine
+          // stales any abandoned pending-<participantId> before minting a new one.
+          newConversation: !conversationIdRef.current,
         });
         if (result?.conversationId && result.conversationId !== conversationIdRef.current) {
           openConversation(result.conversationId);
@@ -672,7 +685,7 @@ export function useShopChatThread(input: {
         setSending(false);
       }
     },
-    [senderPhone, sending, queryClient, openConversation, startAwaitingReply],
+    [senderPhone, sending, queryClient, openConversation, startAwaitingReply]
   );
 
   const clear = useCallback(() => {
