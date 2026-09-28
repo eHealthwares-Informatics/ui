@@ -98,7 +98,11 @@ export class CrudShellPage {
     return labelEl.locator('xpath=following-sibling::*[1]');
   }
 
-  async fillField(label: string, value: string, scope: 'dialog' | 'page' = 'dialog'): Promise<void> {
+  async fillField(
+    label: string,
+    value: string,
+    scope: 'dialog' | 'page' = 'dialog'
+  ): Promise<void> {
     const control = this.fieldRoot(label, scope);
     const input = control.locator('input, textarea').first();
     await input.fill(value);

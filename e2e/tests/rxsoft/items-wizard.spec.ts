@@ -1,6 +1,6 @@
-import { API_BASE_URL, readAccessToken } from '../../utils/api';
 import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import { CrudShellPage } from '../../page-objects/crud-shell.page';
+import { API_BASE_URL, readAccessToken } from '../../utils/api';
 
 /**
  * Phase 2 — Items ("Add Item" wizard) coverage.
@@ -96,7 +96,9 @@ test.describe('RxSoft Items wizard', () => {
       }
       if (clicked) return;
     }
-    throw new Error(`async-select-${fieldName}: no suggestion could be picked for [${queries.join(', ')}]`);
+    throw new Error(
+      `async-select-${fieldName}: no suggestion could be picked for [${queries.join(', ')}]`
+    );
   }
 
   /**
@@ -108,9 +110,7 @@ test.describe('RxSoft Items wizard', () => {
   async function stepToLastTab(): Promise<void> {
     for (let i = 0; i < 3; i += 1) {
       await stepButton('Next').click();
-      await expect(
-        stepButton('Next').or(stepButton('Submit')).first()
-      ).toBeVisible();
+      await expect(stepButton('Next').or(stepButton('Submit')).first()).toBeVisible();
     }
     await expect(stepButton('Submit')).toBeVisible();
   }
@@ -211,9 +211,11 @@ test.describe('RxSoft Items wizard', () => {
     // The stepper stays on the create page for the remaining tabs; once the
     // item has an id the locked tabs unlock. If the app instead returns to
     // the list, the created row (next test) proves the save.
-    await expect(stepButton('Price List')).toBeEnabled({ timeout: 30_000 }).catch(async () => {
-      await crud.page.goto('/rxsoft/items');
-    });
+    await expect(stepButton('Price List'))
+      .toBeEnabled({ timeout: 30_000 })
+      .catch(async () => {
+        await crud.page.goto('/rxsoft/items');
+      });
   });
 
   test('TC-RX-ITEMS-12 — Created record appears in the list', async () => {
@@ -295,14 +297,18 @@ test.describe('RxSoft Items wizard', () => {
       route.fulfill({ status: 500, body: JSON.stringify({ message: 'boom' }) })
     );
     await pickSuggestion('category', ['ca', 'ta', 'su']);
-    await crud.fillField('Item Name (Brand/Variety)', `E2E Item dup ${Date.now().toString(36)}`, 'page');
+    await crud.fillField(
+      'Item Name (Brand/Variety)',
+      `E2E Item dup ${Date.now().toString(36)}`,
+      'page'
+    );
     await pickSuggestion('baseUom', ['pi', 'bo', 'ea', 'ta']);
     await pickSuggestion('purchaseUom', ['bo', 'pi', 'ea']);
     await pickSuggestion('saleUom', ['ea', 'pi', 'bo']);
     await crud.page.getByRole('button', { name: 'Create & Continue' }).click();
-    await expect(
-      page.locator('.mantine-Notification-root, [role="alert"]').first()
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('.mantine-Notification-root, [role="alert"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
     await page.unroute('**/api/items');
   });
 
