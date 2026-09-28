@@ -630,8 +630,11 @@ async function writeBackIssues(board, tcMap) {
         await sleep(400);
       }
     } else if (a.kind === 'close-uc') {
-      log(`  ✓ closed #${a.uc.number}`);
-      await sleep(400);
+      if (FLAGS.updateIssues) {
+        gh(['issue', 'close', String(a.uc.number), '--repo', a.uc.repo, '--reason', 'completed']);
+        log(`  ✓ closed #${a.uc.number}`);
+        await sleep(400);
+      }
     }
   }
 }

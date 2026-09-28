@@ -87,20 +87,33 @@ export class CrudShellPage {
       .first();
   }
 
-  /** The label Text is the first child of a LabelField Stack; the field control is its next sibling. */
-  private fieldRoot(label: string): Locator {
-    const labelEl = this.dialog.getByText(label, { exact: false }).first();
+  /**
+   * Field control root. Scope 'dialog' (default) targets the open modal;
+   * scope 'page' targets full-page DataPageForm wizards (e.g. items create
+   * at /rxsoft/items/create) where the same LabelField structure is used.
+   */
+  private fieldRoot(label: string, scope: 'dialog' | 'page' = 'dialog'): Locator {
+    const root = scope === 'dialog' ? this.dialog : this.page;
+    const labelEl = root.getByText(label, { exact: false }).first();
     return labelEl.locator('xpath=following-sibling::*[1]');
   }
 
-  async fillField(label: string, value: string): Promise<void> {
-    const control = this.fieldRoot(label);
+  async fillField(
+    label: string,
+    value: string,
+    scope: 'dialog' | 'page' = 'dialog'
+  ): Promise<void> {
+    const control = this.fieldRoot(label, scope);
     const input = control.locator('input, textarea').first();
     await input.fill(value);
   }
 
-  async chooseOption(label: string, option: string): Promise<void> {
-    const control = this.fieldRoot(label);
+  async chooseOption(
+    label: string,
+    option: string,
+    scope: 'dialog' | 'page' = 'dialog'
+  ): Promise<void> {
+    const control = this.fieldRoot(label, scope);
     const combobox = control.locator('input[role="combobox"]');
     // Mantine Select renders a readonly input; if there is no combobox inside
     // the field root the control may BE the input (native select fallback).
