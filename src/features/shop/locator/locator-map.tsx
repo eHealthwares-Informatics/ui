@@ -43,8 +43,8 @@ const THEME = {
 export type MapVariant = 'dark' | 'light';
 
 const TILE_URLS: Record<MapVariant, string> = {
-  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-  light: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=dfa6bc43-0d5d-4d53-9724-65b6d2c9919b',
+  light: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=dfa6bc43-0d5d-4d53-9724-65b6d2c9919b',
 };
 
 /** Green-tinted dark basemap styles + themed Leaflet chrome, injected once. */
