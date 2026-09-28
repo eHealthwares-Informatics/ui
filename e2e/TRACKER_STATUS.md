@@ -1,8 +1,8 @@
 # Tracker Status — RxSoft Alpha Test Plan
 
-> Generated 2026-09-28T05:56:51.751Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 116 entity tasks / 593 use cases
+> Generated 2026-09-28T11:05:44.203Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 116 entity tasks / 593 use cases
 
-**Storage state:** ✅ admin storageState is fresh (6.6h old).
+**Storage state:** ✅ admin storageState is fresh (0.4h old).
 
 | State | Meaning |
 |---|---|
@@ -15,7 +15,7 @@
 
 | Covered | Gated | Missing | Missing-path | TCs mapped | Coverage (of mappable) |
 |---|---|---|---|---|---|
-| 72 | 88 | 1931 | 0 | 2091 | 7.7% |
+| 72 | 106 | 1913 | 0 | 2091 | 8.5% |
 
 ## Per-phase matrix
 
@@ -23,7 +23,7 @@
 |---|---|---|---|---|---|---|
 | 0-baseline | 1 | 1 | 12 | 4 | 0 | 0 |
 | 1-rxsoft-crud | 87 | 8 | 27 | 29 | 234 | 0 |
-| 2-catalog | 48 | 5 | 14 | 23 | 129 | 0 |
+| 2-catalog | 48 | 10 | 14 | 41 | 111 | 0 |
 | 3-operations | 47 | 3 | 9 | 14 | 135 | 0 |
 | 4-commerce | 65 | 4 | 10 | 18 | 182 | 0 |
 | 5-modules | 360 | 0 | 0 | 0 | 1251 | 0 |
@@ -108,7 +108,7 @@
 | rxsoft | [rxsoft] Income Statement — E2E | 4-commerce | 0/3 | — | [#197](ehealthwares/rxsoft/issues/197) |
 | rxsoft | [rxsoft] Insurance Providers — E2E | 1-rxsoft-crud | 7/21 | — | [#309](ehealthwares/rxsoft/issues/309) |
 | rxsoft | [rxsoft] Inventory — E2E | 3-operations | 0/16 | — | [#86](ehealthwares/rxsoft/issues/86) |
-| rxsoft | [rxsoft] Items — E2E | 2-catalog | 0/24 | — | [#28](ehealthwares/rxsoft/issues/28) |
+| rxsoft | [rxsoft] Items — E2E | 2-catalog | 18/24 | — | [#28](ehealthwares/rxsoft/issues/28) |
 | rxsoft | [rxsoft] Journal Entries — E2E | 1-rxsoft-crud | 7/21 | — | [#292](ehealthwares/rxsoft/issues/292) |
 | rxsoft | [rxsoft] Journal Entry Lines — E2E | 1-rxsoft-crud | 0/12 | — | [#299](ehealthwares/rxsoft/issues/299) |
 | rxsoft | [rxsoft] Journals — E2E | 1-rxsoft-crud | 7/21 | — | [#285](ehealthwares/rxsoft/issues/285) |
@@ -157,3 +157,4 @@
 - tests/communication/module.spec.ts
 - tests/conversation/module.spec.ts
 - tests/lis/module.spec.ts
+- tests/rxsoft/items-wizard.spec.ts

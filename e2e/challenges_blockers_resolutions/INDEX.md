@@ -21,4 +21,9 @@
 | Playwright webServer died mid-run → decouple Vite via daemon | phase-1.md | resolved | e2e-harness, services, vite |
 | Tracker semantics: gated ≠ missing (bulk-gate made epics falsely Done) | phase-1.md | resolved | tracker, methodology |
 | Ambiguous `admin` login across orgs in probe scripts | phase-1.md | resolved | seed, auth, probes |
-| Legacy-spec drift surfaced by fresh backend (dashboard, sign-in-2, shop; sign-in-2's second Password field is the phone sign-in — intentional, spec-side collision only) | phase-1.md | resolved | app-drift, follow-ups |
+| Items create wizard is a full page (createPathBuilder), not a modal; page-scope option added to CrudShellPage | phase-2.md | resolved | page-object, wizard |
+| Create page requires more fields than schema marks; quiet validation (no DOM error, no POST) | phase-2.md | resolved | wizard, validation |
+| async-selects lack role=combobox; use data-testid=async-select-<field>; options detach mid-click (retry) | phase-2.md | resolved | selectors, mantine |
+| Serial+retry re-runs the whole group per pass under load; 120s budgets + self-contained tests | phase-2.md | resolved | playwright, flake |
+| Created rows land beyond page 1 of a 39k-row includeAll catalog; search before asserting | phase-2.md | resolved | list, assertions |
+| Board 0/N counters move only when UC sub-issues close; complete UCs, then write back | phase-2.md | resolved | tracker, methodology |
