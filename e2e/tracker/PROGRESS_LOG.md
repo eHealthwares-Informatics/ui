@@ -21,3 +21,5 @@ Append-only. One entry per tracker run.
 | 2026-09-27T22:19:42.924Z | read-only | 72 | 88 | 1931 | 0 | report only |
 | 2026-09-27T23:40:43.105Z | read-only | 72 | 88 | 1931 | 0 | report only |
 | 2026-09-28T00:05:00Z | PHASE-1 SUITE GREEN | 72 | 88 | 1931 | 0 | crud-suite 119 passed / 0 failed / 127 skipped (v3, --retries=1); fixes: rxsoft pricing PATCH route (stacked @Put/@Patch dropped PATCH — real app bug), afterAll cleanup safeguard (roles proxy ignores search → was deleting org system roles), confirm-delete enable+force+retry, export toast 30s, settings.spec .first(), pageTitle exact match; tracker: gen-tc-coverage.mjs emits honest covered(60)/gated(84), board-sync scans *.generated.ts; legacy-spec drift documented C13; board untouched (dry-run) |
+| 2026-09-28T05:56:41.515Z | read-only | 72 | 88 | 1931 | 0 | report only |
+| 2026-09-28T05:56:51.770Z | WRITE | 72 | 88 | 1931 | 0 | issue write-back |

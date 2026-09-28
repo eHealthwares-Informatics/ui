@@ -21,4 +21,4 @@
 | Playwright webServer died mid-run → decouple Vite via daemon | phase-1.md | resolved | e2e-harness, services, vite |
 | Tracker semantics: gated ≠ missing (bulk-gate made epics falsely Done) | phase-1.md | resolved | tracker, methodology |
 | Ambiguous `admin` login across orgs in probe scripts | phase-1.md | resolved | seed, auth, probes |
-| Legacy-spec drift surfaced by fresh backend (dashboard, sign-in-2, shop) | phase-1.md | resolved | app-drift, follow-ups |
+| Legacy-spec drift surfaced by fresh backend (dashboard, sign-in-2, shop; sign-in-2's second Password field is the phone sign-in — intentional, spec-side collision only) | phase-1.md | resolved | app-drift, follow-ups |
