@@ -1,7 +1,9 @@
 import { Button, Group, Modal, Stack, Text } from '@mantine/core';
 import { Loader } from 'lucide-react';
+import { collectFields } from '@/features/shared/payload-utils';
 import { FieldGroup as FieldGroupType, TabGroup } from '../../rxsoft/types';
 import { FieldGroup } from './FieldGroup';
+import { useValidatedSubmit, buildZodSchema } from './submit';
 import { TabGroups } from './tab-groups';
 
 type FormProps = {
@@ -36,6 +38,9 @@ export const ModalDataForm = ({
   editingRow,
   renderCreateExtras,
 }: FormProps) => {
+  const fields = collectFields({ createFieldGroups: fieldGroups, tabGroups });
+  const handleSubmit = useValidatedSubmit({ fields, formState, mutation });
+
   const isWizard = Boolean(tabGroups);
 
   return (
@@ -49,8 +54,8 @@ export const ModalDataForm = ({
         content: { maxHeight: '90vh', overflowY: 'auto' },
       }}
     >
-      <Stack gap="lg">
-        <Text size="sm" c="dimmed">
+      <Stack gap="lg" data-testid="modal-form">
+        <Text size="sm" c="dimmed" data-testid="modal-title">
           Add a new record to the {title.toLowerCase()} module.
         </Text>
 
@@ -60,9 +65,7 @@ export const ModalDataForm = ({
               tabGroups={tabGroups}
               formState={formState}
               updateField={updateField}
-              onSubmit={() => {
-                mutation.mutate(formState);
-              }}
+              onSubmit={handleSubmit}
               isPending={mutation.isPending}
             />
           ) : (
@@ -85,13 +88,14 @@ export const ModalDataForm = ({
 
         {!isWizard && (
           <Group justify="flex-end">
-            <Button variant="outline" onClick={() => setShowModal(false)}>
+            <Button data-testid="form-cancel" variant="outline" onClick={() => setShowModal(false)}>
               Cancel
             </Button>
 
             <Button
+              data-testid={editingRow ? 'form-update' : 'form-create'}
               onClick={() => {
-                mutation.mutate(formState);
+                handleSubmit();
               }}
               disabled={mutation.isPending}
               leftSection={mutation.isPending ? <Loader size={16} /> : null}
