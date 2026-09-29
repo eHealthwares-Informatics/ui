@@ -180,6 +180,7 @@ export function useCreateSale(options?: { onSuccess?: (data: any) => void }) {
     mutationFn: (payload: CreateSaleDto) => createSale(payload),
     onSuccess: (data) => {
       qc.invalidateQueries(salesKeys.list);
+      qc.invalidateQueries({ queryKey: ['rxsoft-sales-analytics'] });
       options?.onSuccess?.(data);
     },
   });

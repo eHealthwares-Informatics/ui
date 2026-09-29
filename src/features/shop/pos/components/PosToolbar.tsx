@@ -93,7 +93,7 @@ export function PosToolbar({
           onSearchChange={setCustomerSearch}
           searchable
           clearable
-          w={220}
+          w={180}
           disabled={session.status === 'completed'}
         />
 
@@ -118,7 +118,7 @@ export function PosToolbar({
           onSearchChange={setPriceListSearch}
           searchable
           clearable
-          w={200}
+          w={170}
           disabled={session.status === 'completed'}
         />
 
@@ -139,7 +139,7 @@ export function PosToolbar({
           onChange={handleLoad}
           searchable
           clearable
-          w={260}
+          w={220}
           leftSection={<Search size={14} />}
           nothingFoundMessage="No sales or orders found"
         />

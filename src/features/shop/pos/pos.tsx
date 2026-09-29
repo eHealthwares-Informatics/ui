@@ -159,7 +159,17 @@ export default function PosSalesPage() {
     setDispenseOrderId(null);
   }
   function nextCustomer() {
+    // Preserve price list from current session
+    const priceListId = activeSession.priceListId;
+    const priceListName = activeSession.priceListName;
     createSession();
+    // Apply preserved price list to the new session
+    if (priceListId) {
+      const newSession = usePosStore.getState().sessions.at(-1);
+      if (newSession) {
+        setPriceList(newSession.id, priceListId, priceListName || '');
+      }
+    }
     closeSession(activeSession.id);
     setDispenseOrderId(null);
   }
@@ -285,7 +295,7 @@ export default function PosSalesPage() {
       };
     });
 
-    printInvoice({
+    printPosReceipt({
       saleNumber: sale.saleCode,
       customerName: sale.customerName,
       items,
@@ -293,6 +303,9 @@ export default function PosSalesPage() {
       discount: 0,
       vat: 0,
       total: subtotal,
+      paidAmount: subtotal,
+      changeAmount: 0,
+      header: orgConfig?.posHeader ?? undefined,
     });
   }
 
