@@ -882,6 +882,7 @@ export const itemsConfig: ModelConfig = {
   // Show the FULL catalog (LEFT JOIN organisation_items) including items that
   // are blacklisted for the current org, so they stay toggleable/editable.
   listParams: { includeAll: true },
+  defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
   metricsConfig: {
     endpoint: '/items/metrics',
     items: (data: any) => [

@@ -11,6 +11,7 @@ import { collectFields, normalizeMultiSelectIds } from '@/features/shared/payloa
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { FieldGroup } from '../form/FieldGroup';
 import { TabGroups } from '../form/tab-groups';
+import { useValidatedSubmit, buildZodSchema } from '../form/submit';
 import { RxPage } from './rx-page';
 
 type DataPageFormProps = {
@@ -130,6 +131,8 @@ export function DataPageForm({
     },
   });
 
+  const handleSubmit = useValidatedSubmit({ fields, formState, mutation });
+
   const handleStepSubmit = async (_stepIndex: number): Promise<Record<string, unknown> | void> => {
     try {
       if (mode === 'edit') {
@@ -179,7 +182,7 @@ export function DataPageForm({
               tabGroups={tabGroups}
               formState={formState}
               updateField={updateField}
-              onSubmit={() => mutation.mutate(formState)}
+              onSubmit={handleSubmit}
               isPending={mutation.isPending}
               onStepSubmit={handleStepSubmit}
             />
@@ -209,7 +212,7 @@ export function DataPageForm({
               Cancel
             </Button>
             <Button
-              onClick={() => mutation.mutate(formState)}
+              onClick={handleSubmit}
               disabled={mutation.isPending}
               leftSection={mutation.isPending ? <Loader size={16} /> : null}
             >

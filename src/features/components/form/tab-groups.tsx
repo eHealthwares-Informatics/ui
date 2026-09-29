@@ -74,6 +74,7 @@ function TabGroupsComponent({
           <Stepper.Step
             key={tab.value}
             label={tab.title}
+            data-testid={`wizard-tab-${tab.value}`}
             disabled={isStepDisabled(i)}
             onClick={() => {
               if (!isStepDisabled(i)) {
@@ -89,6 +90,7 @@ function TabGroupsComponent({
       <Group justify="flex-end" mt="xl">
         <Button
           variant="outline"
+          data-testid="form-previous"
           onClick={() => setActiveStep((s) => Math.max(0, s - 1))}
           disabled={activeStep === 0 || loading}
         >
@@ -96,6 +98,7 @@ function TabGroupsComponent({
         </Button>
         {activeStep < tabGroups.length - 1 ? (
           <Button
+            data-testid={hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit ? 'form-create-continue' : 'form-next'}
             onClick={handleNext}
             disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit}
             loading={loading}
@@ -104,7 +107,7 @@ function TabGroupsComponent({
           </Button>
         ) : (
           onSubmit && (
-            <Button onClick={onSubmit} disabled={loading} loading={loading}>
+            <Button data-testid="form-submit" onClick={onSubmit} disabled={loading} loading={loading}>
               {loading ? 'Submitting...' : 'Submit'}
             </Button>
           )

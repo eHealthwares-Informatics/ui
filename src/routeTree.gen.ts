@@ -8,2902 +8,2989 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password';
-import { Route as authOtpRouteImport } from './routes/(auth)/otp';
-import { Route as authSignInRouteImport } from './routes/(auth)/sign-in';
-import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2';
-import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up';
-import { Route as errors401RouteImport } from './routes/(errors)/401';
-import { Route as errors403RouteImport } from './routes/(errors)/403';
-import { Route as errors404RouteImport } from './routes/(errors)/404';
-import { Route as errors500RouteImport } from './routes/(errors)/500';
-import { Route as errors503RouteImport } from './routes/(errors)/503';
-import { Route as errorsServiceUnavailableRouteImport } from './routes/(errors)/service-unavailable';
-import { Route as rootRouteImport } from './routes/__root';
-import { Route as AuthenticatedModuleIdRouteImport } from './routes/_authenticated/$moduleId';
-import { Route as AuthenticatedModuleIdPageIdRouteImport } from './routes/_authenticated/$moduleId/$page/$id';
-import { Route as AuthenticatedModuleIdPageCreateRouteImport } from './routes/_authenticated/$moduleId/$page/create';
-import { Route as AuthenticatedModuleIdDashboardRouteImport } from './routes/_authenticated/$moduleId/dashboard';
-import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index';
-import { Route as AuthenticatedPageIdRouteImport } from './routes/_authenticated/$page/$id';
-import { Route as AuthenticatedPageIdEditRouteImport } from './routes/_authenticated/$page/$id/edit';
-import { Route as AuthenticatedPageCreateRouteImport } from './routes/_authenticated/$page/create';
-import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard';
-import { Route as AuthenticatedCodingConceptDashboardRouteImport } from './routes/_authenticated/coding-concept/dashboard';
-import { Route as AuthenticatedCodingConceptDosageFormsIndexRouteImport } from './routes/_authenticated/coding-concept/dosage-forms/index';
-import { Route as AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport } from './routes/_authenticated/coding-concept/drug-classifications/$classificationId';
-import { Route as AuthenticatedCodingConceptDrugClassificationsIndexRouteImport } from './routes/_authenticated/coding-concept/drug-classifications/index';
-import { Route as AuthenticatedCodingConceptDrugComponentsIndexRouteImport } from './routes/_authenticated/coding-concept/drug-components/index';
-import { Route as AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/$hospitalId';
-import { Route as AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/index';
-import { Route as AuthenticatedCodingConceptFacilitiesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/index';
-import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/$laboratoryId';
-import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/index';
-import { Route as AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/levels/index';
-import { Route as AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/lgas/index';
-import { Route as AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRouteImport } from './routes/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId';
-import { Route as AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/pharmacies/index';
-import { Route as AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/states/index';
-import { Route as AuthenticatedCodingConceptFacilitiesTypesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/types/index';
-import { Route as AuthenticatedCodingConceptFacilitiesWardsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/wards/index';
-import { Route as AuthenticatedCodingConceptFormulationsIndexRouteImport } from './routes/_authenticated/coding-concept/formulations/index';
-import { Route as AuthenticatedCodingConceptGenericDrugsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-drugs/index';
-import { Route as AuthenticatedCodingConceptGenericProductsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-products/index';
-import { Route as AuthenticatedCodingConceptIndexRouteImport } from './routes/_authenticated/coding-concept/index';
-import { Route as AuthenticatedCodingConceptManufacturersIndexRouteImport } from './routes/_authenticated/coding-concept/manufacturers/index';
-import { Route as AuthenticatedCodingConceptMatchRouteImport } from './routes/_authenticated/coding-concept/match';
-import { Route as AuthenticatedCodingConceptPharmaceuticsIndexRouteImport } from './routes/_authenticated/coding-concept/pharmaceutics/index';
-import { Route as AuthenticatedCodingConceptSearchRouteImport } from './routes/_authenticated/coding-concept/search';
-import { Route as AuthenticatedCodingConceptUploadRouteImport } from './routes/_authenticated/coding-concept/upload';
-import { Route as AuthenticatedCommunicationAesRouteRouteImport } from './routes/_authenticated/communication/aes/route';
-import { Route as AuthenticatedCommunicationAuditCenterRouteImport } from './routes/_authenticated/communication/audit-center';
-import { Route as AuthenticatedCommunicationCommunicationChannelsRouteRouteImport } from './routes/_authenticated/communication/communication-channels/route';
-import { Route as AuthenticatedCommunicationDashboardRouteImport } from './routes/_authenticated/communication/dashboard';
-import { Route as AuthenticatedCommunicationFlowGraphRouteImport } from './routes/_authenticated/communication/flow-graph';
-import { Route as AuthenticatedCommunicationMappingRouteRouteImport } from './routes/_authenticated/communication/mapping/route';
-import { Route as AuthenticatedCommunicationMessageLogsRouteRouteImport } from './routes/_authenticated/communication/message-logs/route';
-import { Route as AuthenticatedCommunicationMessageTemplatesRouteRouteImport } from './routes/_authenticated/communication/message-templates/route';
-import { Route as AuthenticatedCommunicationMessageTesterRouteImport } from './routes/_authenticated/communication/message-tester';
-import { Route as AuthenticatedCommunicationMessagesRouteRouteImport } from './routes/_authenticated/communication/messages/route';
-import { Route as AuthenticatedCommunicationNotificationTemplatesRouteRouteImport } from './routes/_authenticated/communication/notification-templates/route';
-import { Route as AuthenticatedCommunicationNotificationsRouteRouteImport } from './routes/_authenticated/communication/notifications/route';
-import { Route as AuthenticatedCommunicationRoutingRouteRouteImport } from './routes/_authenticated/communication/routing/route';
-import { Route as AuthenticatedCommunicationTraceExplorerRouteImport } from './routes/_authenticated/communication/trace-explorer';
-import { Route as AuthenticatedConversationConversationIdRouteImport } from './routes/_authenticated/conversation/$conversationId';
-import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit';
-import { Route as AuthenticatedConversationPageIdEditRouteImport } from './routes/_authenticated/conversation/$page/$id/edit';
-import { Route as AuthenticatedConversationAiConfigIndexRouteImport } from './routes/_authenticated/conversation/ai/config/index';
-import { Route as AuthenticatedConversationAiCostsIndexRouteImport } from './routes/_authenticated/conversation/ai/costs/index';
-import { Route as AuthenticatedConversationAiEvalLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/eval-logs/index';
-import { Route as AuthenticatedConversationAiInstructionsIndexRouteImport } from './routes/_authenticated/conversation/ai/instructions/index';
-import { Route as AuthenticatedConversationAiModelsIndexRouteImport } from './routes/_authenticated/conversation/ai/models/index';
-import { Route as AuthenticatedConversationAiProcessorsIndexRouteImport } from './routes/_authenticated/conversation/ai/processors/index';
-import { Route as AuthenticatedConversationAiProvidersIndexRouteImport } from './routes/_authenticated/conversation/ai/providers/index';
-import { Route as AuthenticatedConversationAiRequestLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/request-logs/index';
-import { Route as AuthenticatedConversationBroadcastsRouteRouteImport } from './routes/_authenticated/conversation/broadcasts/route';
-import { Route as AuthenticatedConversationChannelsIndexRouteImport } from './routes/_authenticated/conversation/channels/index';
-import { Route as AuthenticatedConversationChatsIndexRouteImport } from './routes/_authenticated/conversation/chats/index';
-import { Route as AuthenticatedConversationDashboardRouteImport } from './routes/_authenticated/conversation/dashboard';
-import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId';
-import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index';
-import { Route as AuthenticatedConversationIndexRouteImport } from './routes/_authenticated/conversation/index';
-import { Route as AuthenticatedConversationInvitesInviteIdRouteImport } from './routes/_authenticated/conversation/invites/$inviteId';
-import { Route as AuthenticatedConversationInvitesRouteRouteImport } from './routes/_authenticated/conversation/invites/route';
-import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index';
-import { Route as AuthenticatedConversationParticipantsIndexRouteImport } from './routes/_authenticated/conversation/participants/index';
-import { Route as AuthenticatedConversationProjectionsProjectionIdRouteImport } from './routes/_authenticated/conversation/projections/$projectionId';
-import { Route as AuthenticatedConversationProjectionsIndexRouteImport } from './routes/_authenticated/conversation/projections/index';
-import { Route as AuthenticatedConversationQuestionnairesIndexRouteImport } from './routes/_authenticated/conversation/questionnaires/index';
-import { Route as AuthenticatedConversationQuestionsIndexRouteImport } from './routes/_authenticated/conversation/questions/index';
-import { Route as AuthenticatedConversationWorkflowConfigurationIndexRouteImport } from './routes/_authenticated/conversation/workflow-configuration/index';
-import { Route as AuthenticatedConversationWorkflowEventsIndexRouteImport } from './routes/_authenticated/conversation/workflow-events/index';
-import { Route as AuthenticatedConversationWorkflowInstancesIndexRouteImport } from './routes/_authenticated/conversation/workflow-instances/index';
-import { Route as AuthenticatedConversationWorkflowsIndexRouteImport } from './routes/_authenticated/conversation/workflows/index';
-import { Route as AuthenticatedDashboardPurchasesRouteImport } from './routes/_authenticated/dashboard/purchases';
-import { Route as AuthenticatedDashboardSalesRouteImport } from './routes/_authenticated/dashboard/sales';
-import { Route as AuthenticatedEmrAppointmentsIndexRouteImport } from './routes/_authenticated/emr/appointments/index';
-import { Route as AuthenticatedEmrDashboardRouteImport } from './routes/_authenticated/emr/dashboard';
-import { Route as AuthenticatedEmrDepartmentsIndexRouteImport } from './routes/_authenticated/emr/departments/index';
-import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId';
-import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index';
-import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index';
-import { Route as AuthenticatedEmrIndexRouteImport } from './routes/_authenticated/emr/index';
-import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index';
-import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId';
-import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index';
-import { Route as AuthenticatedEmrReferralsIndexRouteImport } from './routes/_authenticated/emr/referrals/index';
-import { Route as AuthenticatedEmrRequestsRequestIdRouteImport } from './routes/_authenticated/emr/requests/$requestId';
-import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_authenticated/emr/requests/index';
-import { Route as AuthenticatedEmrStaffIndexRouteImport } from './routes/_authenticated/emr/staff/index';
-import { Route as AuthenticatedEmrTagsIndexRouteImport } from './routes/_authenticated/emr/tags/index';
-import { Route as AuthenticatedEmrVisitsVisitIdRouteImport } from './routes/_authenticated/emr/visits/$visitId';
-import { Route as AuthenticatedEmrVisitsIndexRouteImport } from './routes/_authenticated/emr/visits/index';
-import { Route as AuthenticatedEmrWardsAdmissionsRouteImport } from './routes/_authenticated/emr/wards/admissions';
-import { Route as AuthenticatedEmrWardsBedsRouteImport } from './routes/_authenticated/emr/wards/beds';
-import { Route as AuthenticatedEmrWardsBoardRouteImport } from './routes/_authenticated/emr/wards/board';
-import { Route as AuthenticatedEmrWardsDischargesRouteImport } from './routes/_authenticated/emr/wards/discharges';
-import { Route as AuthenticatedEmrWardsIndexRouteImport } from './routes/_authenticated/emr/wards/index';
-import { Route as AuthenticatedIdentityDashboardRouteImport } from './routes/_authenticated/identity/dashboard';
-import { Route as AuthenticatedIdentityIndexRouteImport } from './routes/_authenticated/identity/index';
-import { Route as AuthenticatedIdentityLocationsIndexRouteImport } from './routes/_authenticated/identity/locations/index';
-import { Route as AuthenticatedIdentityOrganizationsIndexRouteImport } from './routes/_authenticated/identity/organizations/index';
-import { Route as AuthenticatedIdentityPermissionsIndexRouteImport } from './routes/_authenticated/identity/permissions/index';
-import { Route as AuthenticatedIdentityRolesIndexRouteImport } from './routes/_authenticated/identity/roles/index';
-import { Route as AuthenticatedIdentityUsersIndexRouteImport } from './routes/_authenticated/identity/users/index';
-import { Route as AuthenticatedLisAttributeDefinitionsIndexRouteImport } from './routes/_authenticated/lis/attribute-definitions/index';
-import { Route as AuthenticatedLisDashboardRouteImport } from './routes/_authenticated/lis/dashboard';
-import { Route as AuthenticatedLisEqaEnrollmentsIndexRouteImport } from './routes/_authenticated/lis/eqa-enrollments/index';
-import { Route as AuthenticatedLisEqaProgramsIndexRouteImport } from './routes/_authenticated/lis/eqa-programs/index';
-import { Route as AuthenticatedLisEqaResultsIndexRouteImport } from './routes/_authenticated/lis/eqa-results/index';
-import { Route as AuthenticatedLisIndexRouteImport } from './routes/_authenticated/lis/index';
-import { Route as AuthenticatedLisLocationTypesIndexRouteImport } from './routes/_authenticated/lis/location-types/index';
-import { Route as AuthenticatedLisLocationsIndexRouteImport } from './routes/_authenticated/lis/locations/index';
-import { Route as AuthenticatedLisLoincIndexRouteImport } from './routes/_authenticated/lis/loinc/index';
-import { Route as AuthenticatedLisMethodsIndexRouteImport } from './routes/_authenticated/lis/methods/index';
-import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report';
-import { Route as AuthenticatedLisOrdersDashboardRouteImport } from './routes/_authenticated/lis/orders/dashboard';
-import { Route as AuthenticatedLisOrdersIndexRouteImport } from './routes/_authenticated/lis/orders/index';
-import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect';
-import { Route as AuthenticatedLisOrdersWorkflowEnterRouteImport } from './routes/_authenticated/lis/orders/workflow/enter';
-import { Route as AuthenticatedLisOrdersWorkflowLabelRouteImport } from './routes/_authenticated/lis/orders/workflow/label';
-import { Route as AuthenticatedLisOrdersWorkflowOrderRouteImport } from './routes/_authenticated/lis/orders/workflow/order';
-import { Route as AuthenticatedLisOrdersWorkflowQaRouteImport } from './routes/_authenticated/lis/orders/workflow/qa';
-import { Route as AuthenticatedLisOrdersWorkflowRouteRouteImport } from './routes/_authenticated/lis/orders/workflow/route';
-import { Route as AuthenticatedLisPanelsIndexRouteImport } from './routes/_authenticated/lis/panels/index';
-import { Route as AuthenticatedLisPatientsIndexRouteImport } from './routes/_authenticated/lis/patients/index';
-import { Route as AuthenticatedLisPrioritiesIndexRouteImport } from './routes/_authenticated/lis/priorities/index';
-import { Route as AuthenticatedLisProgramsIndexRouteImport } from './routes/_authenticated/lis/programs/index';
-import { Route as AuthenticatedLisQaChecklistItemsIndexRouteImport } from './routes/_authenticated/lis/qa-checklist-items/index';
-import { Route as AuthenticatedLisQcAlertsIndexRouteImport } from './routes/_authenticated/lis/qc-alerts/index';
-import { Route as AuthenticatedLisQcLotsIndexRouteImport } from './routes/_authenticated/lis/qc-lots/index';
-import { Route as AuthenticatedLisQcResultsIndexRouteImport } from './routes/_authenticated/lis/qc-results/index';
-import { Route as AuthenticatedLisReferenceRangesIndexRouteImport } from './routes/_authenticated/lis/reference-ranges/index';
-import { Route as AuthenticatedLisRejectionReasonsIndexRouteImport } from './routes/_authenticated/lis/rejection-reasons/index';
-import { Route as AuthenticatedLisResultSignaturesIndexRouteImport } from './routes/_authenticated/lis/result-signatures/index';
-import { Route as AuthenticatedLisResultsIndexRouteImport } from './routes/_authenticated/lis/results/index';
-import { Route as AuthenticatedLisSampleTypesIndexRouteImport } from './routes/_authenticated/lis/sample-types/index';
-import { Route as AuthenticatedLisSamplesIndexRouteImport } from './routes/_authenticated/lis/samples/index';
-import { Route as AuthenticatedLisStatusesIndexRouteImport } from './routes/_authenticated/lis/statuses/index';
-import { Route as AuthenticatedLisTestCategoriesIndexRouteImport } from './routes/_authenticated/lis/test-categories/index';
-import { Route as AuthenticatedLisTestDefinitionsIndexRouteImport } from './routes/_authenticated/lis/test-definitions/index';
-import { Route as AuthenticatedLisTestSectionsIndexRouteImport } from './routes/_authenticated/lis/test-sections/index';
-import { Route as AuthenticatedLisUomsIndexRouteImport } from './routes/_authenticated/lis/uoms/index';
-import { Route as AuthenticatedLisValidationDashboardIndexRouteImport } from './routes/_authenticated/lis/validation-dashboard/index';
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route';
-import { Route as AuthenticatedRxsoftAuditLogsIndexRouteImport } from './routes/_authenticated/rxsoft/audit-logs/index';
-import { Route as AuthenticatedRxsoftBranchesIndexRouteImport } from './routes/_authenticated/rxsoft/branches/index';
-import { Route as AuthenticatedRxsoftCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/categories/index';
-import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index';
-import { Route as AuthenticatedRxsoftDashboardRouteImport } from './routes/_authenticated/rxsoft/dashboard';
-import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index';
-import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index';
-import { Route as AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-careers/index';
-import { Route as AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-categories/index';
-import { Route as AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-contact-submissions/index';
-import { Route as AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-hero-slides/index';
-import { Route as AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-investors/index';
-import { Route as AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-partners/index';
-import { Route as AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-products/index';
-import { Route as AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-sections/index';
-import { Route as AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-services/index';
-import { Route as AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-settings/index';
-import { Route as AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-team/index';
-import { Route as AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-testimonials/index';
-import { Route as AuthenticatedRxsoftGlAccountsIndexRouteImport } from './routes/_authenticated/rxsoft/gl-accounts/index';
-import { Route as AuthenticatedRxsoftInsuranceProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/insurance-providers/index';
-import { Route as AuthenticatedRxsoftInventoryIndexRouteImport } from './routes/_authenticated/rxsoft/inventory/index';
-import { Route as AuthenticatedRxsoftItemsCreateRouteImport } from './routes/_authenticated/rxsoft/items/create';
-import { Route as AuthenticatedRxsoftItemsIndexRouteImport } from './routes/_authenticated/rxsoft/items/index';
-import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entries/index';
-import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index';
-import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index';
-import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index';
-import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index';
-import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index';
-import { Route as AuthenticatedRxsoftOrganizationsIndexRouteImport } from './routes/_authenticated/rxsoft/organizations/index';
-import { Route as AuthenticatedRxsoftPaymentMethodsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-methods/index';
-import { Route as AuthenticatedRxsoftPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/payment-providers/index';
-import { Route as AuthenticatedRxsoftPaymentTransactionsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-transactions/index';
-import { Route as AuthenticatedRxsoftPaymentsIndexRouteImport } from './routes/_authenticated/rxsoft/payments/index';
-import { Route as AuthenticatedRxsoftPharmaceuticsIndexRouteImport } from './routes/_authenticated/rxsoft/pharmaceutics/index';
-import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './routes/_authenticated/rxsoft/pos-terminals/index';
-import { Route as AuthenticatedRxsoftPriceListItemsIndexRouteImport } from './routes/_authenticated/rxsoft/price-list-items/index';
-import { Route as AuthenticatedRxsoftPriceListsIndexRouteImport } from './routes/_authenticated/rxsoft/price-lists/index';
-import { Route as AuthenticatedRxsoftPurchasesIndexRouteImport } from './routes/_authenticated/rxsoft/purchases/index';
-import { Route as AuthenticatedRxsoftReceivablesIndexRouteImport } from './routes/_authenticated/rxsoft/receivables/index';
-import { Route as AuthenticatedRxsoftReceivingIndexRouteImport } from './routes/_authenticated/rxsoft/receiving/index';
-import { Route as AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport } from './routes/_authenticated/rxsoft/reports/balance-sheet/index';
-import { Route as AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport } from './routes/_authenticated/rxsoft/reports/income-statement/index';
-import { Route as AuthenticatedRxsoftReportsIndexRouteImport } from './routes/_authenticated/rxsoft/reports/index';
-import { Route as AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport } from './routes/_authenticated/rxsoft/reports/trial-balance/index';
-import { Route as AuthenticatedRxsoftRoleRequestsIndexRouteImport } from './routes/_authenticated/rxsoft/role-requests/index';
-import { Route as AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport } from './routes/_authenticated/rxsoft/roles/$id/permissions/index';
-import { Route as AuthenticatedRxsoftRolesIndexRouteImport } from './routes/_authenticated/rxsoft/roles/index';
-import { Route as AuthenticatedRxsoftSalesLinesIndexRouteImport } from './routes/_authenticated/rxsoft/sales-lines/index';
-import { Route as AuthenticatedRxsoftSalesIndexRouteImport } from './routes/_authenticated/rxsoft/sales/index';
-import { Route as AuthenticatedRxsoftSettingsAccountRouteImport } from './routes/_authenticated/rxsoft/settings/account';
-import { Route as AuthenticatedRxsoftSettingsAppearanceRouteImport } from './routes/_authenticated/rxsoft/settings/appearance';
-import { Route as AuthenticatedRxsoftSettingsDisplayRouteImport } from './routes/_authenticated/rxsoft/settings/display';
-import { Route as AuthenticatedRxsoftSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/settings/index';
-import { Route as AuthenticatedRxsoftSettingsNotificationsRouteImport } from './routes/_authenticated/rxsoft/settings/notifications';
-import { Route as AuthenticatedRxsoftSettingsRouteRouteImport } from './routes/_authenticated/rxsoft/settings/route';
-import { Route as AuthenticatedRxsoftStockLocationsIndexRouteImport } from './routes/_authenticated/rxsoft/stock-locations/index';
-import { Route as AuthenticatedRxsoftSuppliersIndexRouteImport } from './routes/_authenticated/rxsoft/suppliers/index';
-import { Route as AuthenticatedRxsoftUomCategoryIndexRouteImport } from './routes/_authenticated/rxsoft/uom-category/index';
-import { Route as AuthenticatedRxsoftUomsUomIdRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId';
-import { Route as AuthenticatedRxsoftUomsUomIdEditRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId/edit';
-import { Route as AuthenticatedRxsoftUomsIndexRouteImport } from './routes/_authenticated/rxsoft/uoms/index';
-import { Route as AuthenticatedRxsoftUserConfigIndexRouteImport } from './routes/_authenticated/rxsoft/user-config/index';
-import { Route as AuthenticatedRxsoftUsersIndexRouteImport } from './routes/_authenticated/rxsoft/users/index';
-import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes/_authenticated/rxsoft/warehouses/index';
-import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index';
-import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index';
-import { Route as AuthenticatedWebsiteDashboardRouteImport } from './routes/_authenticated/website/dashboard';
-import { Route as ApmAchievementsRouteImport } from './routes/apm/achievements';
-import { Route as ApmAdminAgentsRouteImport } from './routes/apm/admin/agents';
-import { Route as ApmAdminCanvassingRouteImport } from './routes/apm/admin/canvassing';
-import { Route as ApmAdminContentRouteImport } from './routes/apm/admin/content';
-import { Route as ApmAdminConversionRouteImport } from './routes/apm/admin/conversion';
-import { Route as ApmAdminGotvRouteImport } from './routes/apm/admin/gotv';
-import { Route as ApmAdminIncidentsRouteImport } from './routes/apm/admin/incidents';
-import { Route as ApmAdminLgasRouteImport } from './routes/apm/admin/lgas';
-import { Route as ApmAdminListeningRouteImport } from './routes/apm/admin/listening';
-import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId';
-import { Route as ApmAdminResultsRouteImport } from './routes/apm/admin/results';
-import { Route as ApmAdminRouteRouteImport } from './routes/apm/admin/route';
-import { Route as ApmAdminSentimentRouteImport } from './routes/apm/admin/sentiment';
-import { Route as ApmAdminStakeholdersRouteImport } from './routes/apm/admin/stakeholders';
-import { Route as ApmAdminToursRouteImport } from './routes/apm/admin/tours';
-import { Route as ApmAdminVolunteersRouteImport } from './routes/apm/admin/volunteers';
-import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId';
-import { Route as ApmAdminWhatsappRouteImport } from './routes/apm/admin/whatsapp';
-import { Route as ApmAgendaRouteImport } from './routes/apm/agenda';
-import { Route as ApmContactRouteImport } from './routes/apm/contact';
-import { Route as ApmEventsRouteImport } from './routes/apm/events';
-import { Route as ApmEventsIdRouteImport } from './routes/apm/events.$id';
-import { Route as ApmIndexRouteImport } from './routes/apm/index';
-import { Route as ApmJoinRouteImport } from './routes/apm/join';
-import { Route as ApmMediaRouteImport } from './routes/apm/media';
-import { Route as ApmMeetRouteImport } from './routes/apm/meet';
-import { Route as ApmNewsRouteImport } from './routes/apm/news';
-import { Route as ApmNewsSlugRouteImport } from './routes/apm/news.$slug';
-import { Route as ApmVolunteerRouteImport } from './routes/apm/volunteer';
-import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route';
-import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route';
-import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management';
-import { Route as ClerkRouteRouteImport } from './routes/clerk/route';
-import { Route as IndexRouteImport } from './routes/index';
-import { Route as QuestionnaireIndexRouteImport } from './routes/questionnaire/index';
-import { Route as ShopAboutRouteImport } from './routes/shop/about';
-import { Route as ShopBlogRouteImport } from './routes/shop/blog';
-import { Route as ShopBlogSlugRouteImport } from './routes/shop/blog.$slug';
-import { Route as ShopBranchesRouteImport } from './routes/shop/branches';
-import { Route as ShopBranchesIdRouteImport } from './routes/shop/branches.$id';
-import { Route as ShopCartRouteImport } from './routes/shop/cart';
-import { Route as ShopCategoriesRouteImport } from './routes/shop/categories';
-import { Route as ShopCategoriesSlugRouteImport } from './routes/shop/categories.$slug';
-import { Route as ShopCheckoutRouteImport } from './routes/shop/checkout';
-import { Route as ShopConsultPharmacistRouteImport } from './routes/shop/consult-pharmacist';
-import { Route as ShopConsultationsRouteImport } from './routes/shop/consultations';
-import { Route as ShopContactRouteImport } from './routes/shop/contact';
-import { Route as ShopConversationRouteImport } from './routes/shop/conversation';
-import { Route as ShopDashboardRouteImport } from './routes/shop/dashboard';
-import { Route as ShopDeliveryAreasRouteImport } from './routes/shop/delivery-areas';
-import { Route as ShopFacilityLocatorRouteImport } from './routes/shop/facility-locator';
-import { Route as ShopFaqRouteImport } from './routes/shop/faq';
-import { Route as ShopForgotPasswordRouteImport } from './routes/shop/forgot-password';
-import { Route as ShopHealthConcernsRouteImport } from './routes/shop/health-concerns';
-import { Route as ShopHealthConcernsSlugRouteImport } from './routes/shop/health-concerns.$slug';
-import { Route as ShopIndexRouteImport } from './routes/shop/index';
-import { Route as ShopLoginRouteImport } from './routes/shop/login';
-import { Route as ShopMedicinesRouteImport } from './routes/shop/medicines';
-import { Route as ShopMedicinesCodeRouteImport } from './routes/shop/medicines.$code';
-import { Route as ShopMyPrescriptionsRouteImport } from './routes/shop/my-prescriptions';
-import { Route as ShopOrdersRouteImport } from './routes/shop/orders';
-import { Route as ShopOrdersIdRouteImport } from './routes/shop/orders_.$id';
-import { Route as ShopPayTokenRouteImport } from './routes/shop/pay.$token';
-import { Route as ShopPayReturnRouteImport } from './routes/shop/pay.return';
-import { Route as ShopPharmacyLocatorRouteImport } from './routes/shop/pharmacy-locator';
-import { Route as ShopPosRouteImport } from './routes/shop/pos';
-import { Route as ShopPos2RouteImport } from './routes/shop/pos2';
-import { Route as ShopPrivacyPolicyRouteImport } from './routes/shop/privacy-policy';
-import { Route as ShopPurchasesIndexRouteImport } from './routes/shop/purchases/index';
-import { Route as ShopRewardsRouteImport } from './routes/shop/rewards';
-import { Route as ShopSearchRouteImport } from './routes/shop/search';
-import { Route as ShopShopRouteImport } from './routes/shop/shop';
-import { Route as ShopShopSlugRouteImport } from './routes/shop/shop_.$slug';
-import { Route as ShopSupermarketRouteImport } from './routes/shop/supermarket';
-import { Route as ShopTermsRouteImport } from './routes/shop/terms';
-import { Route as ShopTrackOrderCodeRouteImport } from './routes/shop/track-order.$code';
-import { Route as ShopUploadPrescriptionRouteImport } from './routes/shop/upload-prescription';
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as authOtpRouteImport } from './routes/(auth)/otp'
+import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
+import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
+import { Route as errors401RouteImport } from './routes/(errors)/401'
+import { Route as errors403RouteImport } from './routes/(errors)/403'
+import { Route as errors404RouteImport } from './routes/(errors)/404'
+import { Route as errors500RouteImport } from './routes/(errors)/500'
+import { Route as errors503RouteImport } from './routes/(errors)/503'
+import { Route as errorsServiceUnavailableRouteImport } from './routes/(errors)/service-unavailable'
+import { Route as AuthenticatedModuleIdRouteImport } from './routes/_authenticated/$moduleId'
+import { Route as ApmIndexRouteImport } from './routes/apm/index'
+import { Route as ApmAchievementsRouteImport } from './routes/apm/achievements'
+import { Route as ApmAdminRouteRouteImport } from './routes/apm/admin/route'
+import { Route as ApmAgendaRouteImport } from './routes/apm/agenda'
+import { Route as ApmContactRouteImport } from './routes/apm/contact'
+import { Route as ApmEventsRouteImport } from './routes/apm/events'
+import { Route as ApmJoinRouteImport } from './routes/apm/join'
+import { Route as ApmMediaRouteImport } from './routes/apm/media'
+import { Route as ApmMeetRouteImport } from './routes/apm/meet'
+import { Route as ApmNewsRouteImport } from './routes/apm/news'
+import { Route as ApmVolunteerRouteImport } from './routes/apm/volunteer'
+import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
+import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
+import { Route as QuestionnaireIndexRouteImport } from './routes/questionnaire/index'
+import { Route as ShopIndexRouteImport } from './routes/shop/index'
+import { Route as ShopAboutRouteImport } from './routes/shop/about'
+import { Route as ShopBlogRouteImport } from './routes/shop/blog'
+import { Route as ShopBranchesRouteImport } from './routes/shop/branches'
+import { Route as ShopCartRouteImport } from './routes/shop/cart'
+import { Route as ShopCategoriesRouteImport } from './routes/shop/categories'
+import { Route as ShopCheckoutRouteImport } from './routes/shop/checkout'
+import { Route as ShopConsultPharmacistRouteImport } from './routes/shop/consult-pharmacist'
+import { Route as ShopConsultationsRouteImport } from './routes/shop/consultations'
+import { Route as ShopContactRouteImport } from './routes/shop/contact'
+import { Route as ShopConversationRouteImport } from './routes/shop/conversation'
+import { Route as ShopDashboardRouteImport } from './routes/shop/dashboard'
+import { Route as ShopDeliveryAreasRouteImport } from './routes/shop/delivery-areas'
+import { Route as ShopFacilityLocatorRouteImport } from './routes/shop/facility-locator'
+import { Route as ShopFaqRouteImport } from './routes/shop/faq'
+import { Route as ShopForgotPasswordRouteImport } from './routes/shop/forgot-password'
+import { Route as ShopHealthConcernsRouteImport } from './routes/shop/health-concerns'
+import { Route as ShopLoginRouteImport } from './routes/shop/login'
+import { Route as ShopMedicinesRouteImport } from './routes/shop/medicines'
+import { Route as ShopMyPrescriptionsRouteImport } from './routes/shop/my-prescriptions'
+import { Route as ShopOrdersRouteImport } from './routes/shop/orders'
+import { Route as ShopPharmacyLocatorRouteImport } from './routes/shop/pharmacy-locator'
+import { Route as ShopPosRouteImport } from './routes/shop/pos'
+import { Route as ShopPos2RouteImport } from './routes/shop/pos2'
+import { Route as ShopPrivacyPolicyRouteImport } from './routes/shop/privacy-policy'
+import { Route as ShopRewardsRouteImport } from './routes/shop/rewards'
+import { Route as ShopSearchRouteImport } from './routes/shop/search'
+import { Route as ShopShopRouteImport } from './routes/shop/shop'
+import { Route as ShopSupermarketRouteImport } from './routes/shop/supermarket'
+import { Route as ShopTermsRouteImport } from './routes/shop/terms'
+import { Route as ShopUploadPrescriptionRouteImport } from './routes/shop/upload-prescription'
+import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index'
+import { Route as AuthenticatedModuleIdDashboardRouteImport } from './routes/_authenticated/$moduleId/dashboard'
+import { Route as AuthenticatedPageIdRouteImport } from './routes/_authenticated/$page/$id'
+import { Route as AuthenticatedPageCreateRouteImport } from './routes/_authenticated/$page/create'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
+import { Route as AuthenticatedCodingConceptIndexRouteImport } from './routes/_authenticated/coding-concept/index'
+import { Route as AuthenticatedCodingConceptDashboardRouteImport } from './routes/_authenticated/coding-concept/dashboard'
+import { Route as AuthenticatedCodingConceptMatchRouteImport } from './routes/_authenticated/coding-concept/match'
+import { Route as AuthenticatedCodingConceptSearchRouteImport } from './routes/_authenticated/coding-concept/search'
+import { Route as AuthenticatedCodingConceptUploadRouteImport } from './routes/_authenticated/coding-concept/upload'
+import { Route as AuthenticatedCommunicationAesRouteRouteImport } from './routes/_authenticated/communication/aes/route'
+import { Route as AuthenticatedCommunicationAuditCenterRouteImport } from './routes/_authenticated/communication/audit-center'
+import { Route as AuthenticatedCommunicationCommunicationChannelsRouteRouteImport } from './routes/_authenticated/communication/communication-channels/route'
+import { Route as AuthenticatedCommunicationDashboardRouteImport } from './routes/_authenticated/communication/dashboard'
+import { Route as AuthenticatedCommunicationFlowGraphRouteImport } from './routes/_authenticated/communication/flow-graph'
+import { Route as AuthenticatedCommunicationMappingRouteRouteImport } from './routes/_authenticated/communication/mapping/route'
+import { Route as AuthenticatedCommunicationMessageLogsRouteRouteImport } from './routes/_authenticated/communication/message-logs/route'
+import { Route as AuthenticatedCommunicationMessageTemplatesRouteRouteImport } from './routes/_authenticated/communication/message-templates/route'
+import { Route as AuthenticatedCommunicationMessageTesterRouteImport } from './routes/_authenticated/communication/message-tester'
+import { Route as AuthenticatedCommunicationMessagesRouteRouteImport } from './routes/_authenticated/communication/messages/route'
+import { Route as AuthenticatedCommunicationNotificationTemplatesRouteRouteImport } from './routes/_authenticated/communication/notification-templates/route'
+import { Route as AuthenticatedCommunicationNotificationsRouteRouteImport } from './routes/_authenticated/communication/notifications/route'
+import { Route as AuthenticatedCommunicationRoutingRouteRouteImport } from './routes/_authenticated/communication/routing/route'
+import { Route as AuthenticatedCommunicationTraceExplorerRouteImport } from './routes/_authenticated/communication/trace-explorer'
+import { Route as AuthenticatedConversationIndexRouteImport } from './routes/_authenticated/conversation/index'
+import { Route as AuthenticatedConversationConversationIdRouteImport } from './routes/_authenticated/conversation/$conversationId'
+import { Route as AuthenticatedConversationBroadcastsRouteRouteImport } from './routes/_authenticated/conversation/broadcasts/route'
+import { Route as AuthenticatedConversationDashboardRouteImport } from './routes/_authenticated/conversation/dashboard'
+import { Route as AuthenticatedConversationInvitesRouteRouteImport } from './routes/_authenticated/conversation/invites/route'
+import { Route as AuthenticatedDashboardPurchasesRouteImport } from './routes/_authenticated/dashboard/purchases'
+import { Route as AuthenticatedDashboardSalesRouteImport } from './routes/_authenticated/dashboard/sales'
+import { Route as AuthenticatedEmrIndexRouteImport } from './routes/_authenticated/emr/index'
+import { Route as AuthenticatedEmrDashboardRouteImport } from './routes/_authenticated/emr/dashboard'
+import { Route as AuthenticatedIdentityIndexRouteImport } from './routes/_authenticated/identity/index'
+import { Route as AuthenticatedIdentityDashboardRouteImport } from './routes/_authenticated/identity/dashboard'
+import { Route as AuthenticatedLisIndexRouteImport } from './routes/_authenticated/lis/index'
+import { Route as AuthenticatedLisDashboardRouteImport } from './routes/_authenticated/lis/dashboard'
+import { Route as AuthenticatedRxsoftDashboardRouteImport } from './routes/_authenticated/rxsoft/dashboard'
+import { Route as AuthenticatedRxsoftSettingsRouteRouteImport } from './routes/_authenticated/rxsoft/settings/route'
+import { Route as AuthenticatedWebsiteDashboardRouteImport } from './routes/_authenticated/website/dashboard'
+import { Route as ApmAdminAgentsRouteImport } from './routes/apm/admin/agents'
+import { Route as ApmAdminCanvassingRouteImport } from './routes/apm/admin/canvassing'
+import { Route as ApmAdminContentRouteImport } from './routes/apm/admin/content'
+import { Route as ApmAdminConversionRouteImport } from './routes/apm/admin/conversion'
+import { Route as ApmAdminGotvRouteImport } from './routes/apm/admin/gotv'
+import { Route as ApmAdminIncidentsRouteImport } from './routes/apm/admin/incidents'
+import { Route as ApmAdminLgasRouteImport } from './routes/apm/admin/lgas'
+import { Route as ApmAdminListeningRouteImport } from './routes/apm/admin/listening'
+import { Route as ApmAdminResultsRouteImport } from './routes/apm/admin/results'
+import { Route as ApmAdminSentimentRouteImport } from './routes/apm/admin/sentiment'
+import { Route as ApmAdminStakeholdersRouteImport } from './routes/apm/admin/stakeholders'
+import { Route as ApmAdminToursRouteImport } from './routes/apm/admin/tours'
+import { Route as ApmAdminVolunteersRouteImport } from './routes/apm/admin/volunteers'
+import { Route as ApmAdminWhatsappRouteImport } from './routes/apm/admin/whatsapp'
+import { Route as ApmEventsIdRouteImport } from './routes/apm/events.$id'
+import { Route as ApmNewsSlugRouteImport } from './routes/apm/news.$slug'
+import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
+import { Route as ShopBlogSlugRouteImport } from './routes/shop/blog.$slug'
+import { Route as ShopBranchesIdRouteImport } from './routes/shop/branches.$id'
+import { Route as ShopCategoriesSlugRouteImport } from './routes/shop/categories.$slug'
+import { Route as ShopHealthConcernsSlugRouteImport } from './routes/shop/health-concerns.$slug'
+import { Route as ShopMedicinesCodeRouteImport } from './routes/shop/medicines.$code'
+import { Route as ShopOrdersIdRouteImport } from './routes/shop/orders_.$id'
+import { Route as ShopPayTokenRouteImport } from './routes/shop/pay.$token'
+import { Route as ShopPayReturnRouteImport } from './routes/shop/pay.return'
+import { Route as ShopPurchasesIndexRouteImport } from './routes/shop/purchases/index'
+import { Route as ShopShopSlugRouteImport } from './routes/shop/shop_.$slug'
+import { Route as ShopTrackOrderCodeRouteImport } from './routes/shop/track-order.$code'
+import { Route as AuthenticatedModuleIdPageIdRouteImport } from './routes/_authenticated/$moduleId/$page/$id'
+import { Route as AuthenticatedModuleIdPageCreateRouteImport } from './routes/_authenticated/$moduleId/$page/create'
+import { Route as AuthenticatedPageIdEditRouteImport } from './routes/_authenticated/$page/$id/edit'
+import { Route as AuthenticatedCodingConceptDosageFormsIndexRouteImport } from './routes/_authenticated/coding-concept/dosage-forms/index'
+import { Route as AuthenticatedCodingConceptDrugClassificationsIndexRouteImport } from './routes/_authenticated/coding-concept/drug-classifications/index'
+import { Route as AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport } from './routes/_authenticated/coding-concept/drug-classifications/$classificationId'
+import { Route as AuthenticatedCodingConceptDrugComponentsIndexRouteImport } from './routes/_authenticated/coding-concept/drug-components/index'
+import { Route as AuthenticatedCodingConceptFacilitiesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/index'
+import { Route as AuthenticatedCodingConceptFormulationsIndexRouteImport } from './routes/_authenticated/coding-concept/formulations/index'
+import { Route as AuthenticatedCodingConceptGenericDrugsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-drugs/index'
+import { Route as AuthenticatedCodingConceptGenericProductsIndexRouteImport } from './routes/_authenticated/coding-concept/generic-products/index'
+import { Route as AuthenticatedCodingConceptManufacturersIndexRouteImport } from './routes/_authenticated/coding-concept/manufacturers/index'
+import { Route as AuthenticatedCodingConceptPharmaceuticsIndexRouteImport } from './routes/_authenticated/coding-concept/pharmaceutics/index'
+import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
+import { Route as AuthenticatedConversationChannelsIndexRouteImport } from './routes/_authenticated/conversation/channels/index'
+import { Route as AuthenticatedConversationChatsIndexRouteImport } from './routes/_authenticated/conversation/chats/index'
+import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index'
+import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
+import { Route as AuthenticatedConversationInvitesInviteIdRouteImport } from './routes/_authenticated/conversation/invites/$inviteId'
+import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index'
+import { Route as AuthenticatedConversationParticipantsIndexRouteImport } from './routes/_authenticated/conversation/participants/index'
+import { Route as AuthenticatedConversationProjectionsIndexRouteImport } from './routes/_authenticated/conversation/projections/index'
+import { Route as AuthenticatedConversationProjectionsProjectionIdRouteImport } from './routes/_authenticated/conversation/projections/$projectionId'
+import { Route as AuthenticatedConversationQuestionnairesIndexRouteImport } from './routes/_authenticated/conversation/questionnaires/index'
+import { Route as AuthenticatedConversationQuestionsIndexRouteImport } from './routes/_authenticated/conversation/questions/index'
+import { Route as AuthenticatedConversationWorkflowConfigurationIndexRouteImport } from './routes/_authenticated/conversation/workflow-configuration/index'
+import { Route as AuthenticatedConversationWorkflowEventsIndexRouteImport } from './routes/_authenticated/conversation/workflow-events/index'
+import { Route as AuthenticatedConversationWorkflowInstancesIndexRouteImport } from './routes/_authenticated/conversation/workflow-instances/index'
+import { Route as AuthenticatedConversationWorkflowsIndexRouteImport } from './routes/_authenticated/conversation/workflows/index'
+import { Route as AuthenticatedEmrAppointmentsIndexRouteImport } from './routes/_authenticated/emr/appointments/index'
+import { Route as AuthenticatedEmrDepartmentsIndexRouteImport } from './routes/_authenticated/emr/departments/index'
+import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index'
+import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
+import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
+import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index'
+import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
+import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
+import { Route as AuthenticatedEmrReferralsIndexRouteImport } from './routes/_authenticated/emr/referrals/index'
+import { Route as AuthenticatedEmrRequestsIndexRouteImport } from './routes/_authenticated/emr/requests/index'
+import { Route as AuthenticatedEmrRequestsRequestIdRouteImport } from './routes/_authenticated/emr/requests/$requestId'
+import { Route as AuthenticatedEmrStaffIndexRouteImport } from './routes/_authenticated/emr/staff/index'
+import { Route as AuthenticatedEmrTagsIndexRouteImport } from './routes/_authenticated/emr/tags/index'
+import { Route as AuthenticatedEmrVisitsIndexRouteImport } from './routes/_authenticated/emr/visits/index'
+import { Route as AuthenticatedEmrVisitsVisitIdRouteImport } from './routes/_authenticated/emr/visits/$visitId'
+import { Route as AuthenticatedEmrWardsIndexRouteImport } from './routes/_authenticated/emr/wards/index'
+import { Route as AuthenticatedEmrWardsAdmissionsRouteImport } from './routes/_authenticated/emr/wards/admissions'
+import { Route as AuthenticatedEmrWardsBedsRouteImport } from './routes/_authenticated/emr/wards/beds'
+import { Route as AuthenticatedEmrWardsBoardRouteImport } from './routes/_authenticated/emr/wards/board'
+import { Route as AuthenticatedEmrWardsDischargesRouteImport } from './routes/_authenticated/emr/wards/discharges'
+import { Route as AuthenticatedIdentityLocationsIndexRouteImport } from './routes/_authenticated/identity/locations/index'
+import { Route as AuthenticatedIdentityOrganizationsIndexRouteImport } from './routes/_authenticated/identity/organizations/index'
+import { Route as AuthenticatedIdentityPermissionsIndexRouteImport } from './routes/_authenticated/identity/permissions/index'
+import { Route as AuthenticatedIdentityRolesIndexRouteImport } from './routes/_authenticated/identity/roles/index'
+import { Route as AuthenticatedIdentityUsersIndexRouteImport } from './routes/_authenticated/identity/users/index'
+import { Route as AuthenticatedLisAttributeDefinitionsIndexRouteImport } from './routes/_authenticated/lis/attribute-definitions/index'
+import { Route as AuthenticatedLisEqaEnrollmentsIndexRouteImport } from './routes/_authenticated/lis/eqa-enrollments/index'
+import { Route as AuthenticatedLisEqaProgramsIndexRouteImport } from './routes/_authenticated/lis/eqa-programs/index'
+import { Route as AuthenticatedLisEqaResultsIndexRouteImport } from './routes/_authenticated/lis/eqa-results/index'
+import { Route as AuthenticatedLisLocationTypesIndexRouteImport } from './routes/_authenticated/lis/location-types/index'
+import { Route as AuthenticatedLisLocationsIndexRouteImport } from './routes/_authenticated/lis/locations/index'
+import { Route as AuthenticatedLisLoincIndexRouteImport } from './routes/_authenticated/lis/loinc/index'
+import { Route as AuthenticatedLisMethodsIndexRouteImport } from './routes/_authenticated/lis/methods/index'
+import { Route as AuthenticatedLisOrdersIndexRouteImport } from './routes/_authenticated/lis/orders/index'
+import { Route as AuthenticatedLisOrdersDashboardRouteImport } from './routes/_authenticated/lis/orders/dashboard'
+import { Route as AuthenticatedLisOrdersWorkflowRouteRouteImport } from './routes/_authenticated/lis/orders/workflow/route'
+import { Route as AuthenticatedLisPanelsIndexRouteImport } from './routes/_authenticated/lis/panels/index'
+import { Route as AuthenticatedLisPatientsIndexRouteImport } from './routes/_authenticated/lis/patients/index'
+import { Route as AuthenticatedLisPrioritiesIndexRouteImport } from './routes/_authenticated/lis/priorities/index'
+import { Route as AuthenticatedLisProgramsIndexRouteImport } from './routes/_authenticated/lis/programs/index'
+import { Route as AuthenticatedLisQaChecklistItemsIndexRouteImport } from './routes/_authenticated/lis/qa-checklist-items/index'
+import { Route as AuthenticatedLisQcAlertsIndexRouteImport } from './routes/_authenticated/lis/qc-alerts/index'
+import { Route as AuthenticatedLisQcLotsIndexRouteImport } from './routes/_authenticated/lis/qc-lots/index'
+import { Route as AuthenticatedLisQcResultsIndexRouteImport } from './routes/_authenticated/lis/qc-results/index'
+import { Route as AuthenticatedLisReferenceRangesIndexRouteImport } from './routes/_authenticated/lis/reference-ranges/index'
+import { Route as AuthenticatedLisRejectionReasonsIndexRouteImport } from './routes/_authenticated/lis/rejection-reasons/index'
+import { Route as AuthenticatedLisResultSignaturesIndexRouteImport } from './routes/_authenticated/lis/result-signatures/index'
+import { Route as AuthenticatedLisResultsIndexRouteImport } from './routes/_authenticated/lis/results/index'
+import { Route as AuthenticatedLisSampleTypesIndexRouteImport } from './routes/_authenticated/lis/sample-types/index'
+import { Route as AuthenticatedLisSamplesIndexRouteImport } from './routes/_authenticated/lis/samples/index'
+import { Route as AuthenticatedLisStatusesIndexRouteImport } from './routes/_authenticated/lis/statuses/index'
+import { Route as AuthenticatedLisTestCategoriesIndexRouteImport } from './routes/_authenticated/lis/test-categories/index'
+import { Route as AuthenticatedLisTestDefinitionsIndexRouteImport } from './routes/_authenticated/lis/test-definitions/index'
+import { Route as AuthenticatedLisTestSectionsIndexRouteImport } from './routes/_authenticated/lis/test-sections/index'
+import { Route as AuthenticatedLisUomsIndexRouteImport } from './routes/_authenticated/lis/uoms/index'
+import { Route as AuthenticatedLisValidationDashboardIndexRouteImport } from './routes/_authenticated/lis/validation-dashboard/index'
+import { Route as AuthenticatedRxsoftAuditLogsIndexRouteImport } from './routes/_authenticated/rxsoft/audit-logs/index'
+import { Route as AuthenticatedRxsoftBranchesIndexRouteImport } from './routes/_authenticated/rxsoft/branches/index'
+import { Route as AuthenticatedRxsoftCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/categories/index'
+import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
+import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
+import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
+import { Route as AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-careers/index'
+import { Route as AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-categories/index'
+import { Route as AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-contact-submissions/index'
+import { Route as AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-hero-slides/index'
+import { Route as AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-investors/index'
+import { Route as AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-partners/index'
+import { Route as AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-products/index'
+import { Route as AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-sections/index'
+import { Route as AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-services/index'
+import { Route as AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-settings/index'
+import { Route as AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-team/index'
+import { Route as AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-testimonials/index'
+import { Route as AuthenticatedRxsoftGlAccountsIndexRouteImport } from './routes/_authenticated/rxsoft/gl-accounts/index'
+import { Route as AuthenticatedRxsoftInsuranceProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/insurance-providers/index'
+import { Route as AuthenticatedRxsoftInventoryIndexRouteImport } from './routes/_authenticated/rxsoft/inventory/index'
+import { Route as AuthenticatedRxsoftItemsIndexRouteImport } from './routes/_authenticated/rxsoft/items/index'
+import { Route as AuthenticatedRxsoftItemsCreateRouteImport } from './routes/_authenticated/rxsoft/items/create'
+import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entries/index'
+import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
+import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
+import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
+import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
+import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index'
+import { Route as AuthenticatedRxsoftOrganizationsIndexRouteImport } from './routes/_authenticated/rxsoft/organizations/index'
+import { Route as AuthenticatedRxsoftPaymentMethodsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-methods/index'
+import { Route as AuthenticatedRxsoftPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/payment-providers/index'
+import { Route as AuthenticatedRxsoftPaymentTransactionsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-transactions/index'
+import { Route as AuthenticatedRxsoftPaymentsIndexRouteImport } from './routes/_authenticated/rxsoft/payments/index'
+import { Route as AuthenticatedRxsoftPharmaceuticsIndexRouteImport } from './routes/_authenticated/rxsoft/pharmaceutics/index'
+import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './routes/_authenticated/rxsoft/pos-terminals/index'
+import { Route as AuthenticatedRxsoftPriceListItemsIndexRouteImport } from './routes/_authenticated/rxsoft/price-list-items/index'
+import { Route as AuthenticatedRxsoftPriceListsIndexRouteImport } from './routes/_authenticated/rxsoft/price-lists/index'
+import { Route as AuthenticatedRxsoftPurchasesIndexRouteImport } from './routes/_authenticated/rxsoft/purchases/index'
+import { Route as AuthenticatedRxsoftReceivablesIndexRouteImport } from './routes/_authenticated/rxsoft/receivables/index'
+import { Route as AuthenticatedRxsoftReceivingIndexRouteImport } from './routes/_authenticated/rxsoft/receiving/index'
+import { Route as AuthenticatedRxsoftReportsIndexRouteImport } from './routes/_authenticated/rxsoft/reports/index'
+import { Route as AuthenticatedRxsoftRoleRequestsIndexRouteImport } from './routes/_authenticated/rxsoft/role-requests/index'
+import { Route as AuthenticatedRxsoftRolesIndexRouteImport } from './routes/_authenticated/rxsoft/roles/index'
+import { Route as AuthenticatedRxsoftSalesLinesIndexRouteImport } from './routes/_authenticated/rxsoft/sales-lines/index'
+import { Route as AuthenticatedRxsoftSalesIndexRouteImport } from './routes/_authenticated/rxsoft/sales/index'
+import { Route as AuthenticatedRxsoftSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/settings/index'
+import { Route as AuthenticatedRxsoftSettingsAccountRouteImport } from './routes/_authenticated/rxsoft/settings/account'
+import { Route as AuthenticatedRxsoftSettingsAppearanceRouteImport } from './routes/_authenticated/rxsoft/settings/appearance'
+import { Route as AuthenticatedRxsoftSettingsDisplayRouteImport } from './routes/_authenticated/rxsoft/settings/display'
+import { Route as AuthenticatedRxsoftSettingsNotificationsRouteImport } from './routes/_authenticated/rxsoft/settings/notifications'
+import { Route as AuthenticatedRxsoftStockLocationsIndexRouteImport } from './routes/_authenticated/rxsoft/stock-locations/index'
+import { Route as AuthenticatedRxsoftSuppliersIndexRouteImport } from './routes/_authenticated/rxsoft/suppliers/index'
+import { Route as AuthenticatedRxsoftUomCategoryIndexRouteImport } from './routes/_authenticated/rxsoft/uom-category/index'
+import { Route as AuthenticatedRxsoftUomsIndexRouteImport } from './routes/_authenticated/rxsoft/uoms/index'
+import { Route as AuthenticatedRxsoftUomsUomIdRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId'
+import { Route as AuthenticatedRxsoftUserConfigIndexRouteImport } from './routes/_authenticated/rxsoft/user-config/index'
+import { Route as AuthenticatedRxsoftUsersIndexRouteImport } from './routes/_authenticated/rxsoft/users/index'
+import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes/_authenticated/rxsoft/warehouses/index'
+import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
+import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index'
+import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
+import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId'
+import { Route as AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/index'
+import { Route as AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
+import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/index'
+import { Route as AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport } from './routes/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
+import { Route as AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/levels/index'
+import { Route as AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/lgas/index'
+import { Route as AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/pharmacies/index'
+import { Route as AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRouteImport } from './routes/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
+import { Route as AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/states/index'
+import { Route as AuthenticatedCodingConceptFacilitiesTypesIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/types/index'
+import { Route as AuthenticatedCodingConceptFacilitiesWardsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/wards/index'
+import { Route as AuthenticatedConversationPageIdEditRouteImport } from './routes/_authenticated/conversation/$page/$id/edit'
+import { Route as AuthenticatedConversationAiConfigIndexRouteImport } from './routes/_authenticated/conversation/ai/config/index'
+import { Route as AuthenticatedConversationAiCostsIndexRouteImport } from './routes/_authenticated/conversation/ai/costs/index'
+import { Route as AuthenticatedConversationAiEvalLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/eval-logs/index'
+import { Route as AuthenticatedConversationAiInstructionsIndexRouteImport } from './routes/_authenticated/conversation/ai/instructions/index'
+import { Route as AuthenticatedConversationAiModelsIndexRouteImport } from './routes/_authenticated/conversation/ai/models/index'
+import { Route as AuthenticatedConversationAiProcessorsIndexRouteImport } from './routes/_authenticated/conversation/ai/processors/index'
+import { Route as AuthenticatedConversationAiProvidersIndexRouteImport } from './routes/_authenticated/conversation/ai/providers/index'
+import { Route as AuthenticatedConversationAiRequestLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/request-logs/index'
+import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
+import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect'
+import { Route as AuthenticatedLisOrdersWorkflowEnterRouteImport } from './routes/_authenticated/lis/orders/workflow/enter'
+import { Route as AuthenticatedLisOrdersWorkflowLabelRouteImport } from './routes/_authenticated/lis/orders/workflow/label'
+import { Route as AuthenticatedLisOrdersWorkflowOrderRouteImport } from './routes/_authenticated/lis/orders/workflow/order'
+import { Route as AuthenticatedLisOrdersWorkflowQaRouteImport } from './routes/_authenticated/lis/orders/workflow/qa'
+import { Route as AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport } from './routes/_authenticated/rxsoft/reports/balance-sheet/index'
+import { Route as AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport } from './routes/_authenticated/rxsoft/reports/income-statement/index'
+import { Route as AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport } from './routes/_authenticated/rxsoft/reports/trial-balance/index'
+import { Route as AuthenticatedRxsoftUomsUomIdEditRouteImport } from './routes/_authenticated/rxsoft/uoms/$uomId/edit'
+import { Route as AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport } from './routes/_authenticated/rxsoft/roles/$id/permissions/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
   path: '/clerk',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const authOtpRoute = authOtpRouteImport.update({
   id: '/(auth)/otp',
   path: '/otp',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const authSignInRoute = authSignInRouteImport.update({
   id: '/(auth)/sign-in',
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const authSignIn2Route = authSignIn2RouteImport.update({
   id: '/(auth)/sign-in-2',
   path: '/sign-in-2',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const authSignUpRoute = authSignUpRouteImport.update({
   id: '/(auth)/sign-up',
   path: '/sign-up',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const errors401Route = errors401RouteImport.update({
   id: '/(errors)/401',
   path: '/401',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const errors403Route = errors403RouteImport.update({
   id: '/(errors)/403',
   path: '/403',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const errors404Route = errors404RouteImport.update({
   id: '/(errors)/404',
   path: '/404',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const errors500Route = errors500RouteImport.update({
   id: '/(errors)/500',
   path: '/500',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const errors503Route = errors503RouteImport.update({
   id: '/(errors)/503',
   path: '/503',
   getParentRoute: () => rootRouteImport,
-} as any);
-const errorsServiceUnavailableRoute = errorsServiceUnavailableRouteImport.update({
-  id: '/(errors)/service-unavailable',
-  path: '/service-unavailable',
-  getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const errorsServiceUnavailableRoute =
+  errorsServiceUnavailableRouteImport.update({
+    id: '/(errors)/service-unavailable',
+    path: '/service-unavailable',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedModuleIdRoute = AuthenticatedModuleIdRouteImport.update({
   id: '/$moduleId',
   path: '/$moduleId',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const ApmIndexRoute = ApmIndexRouteImport.update({
   id: '/apm/',
   path: '/apm/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmAchievementsRoute = ApmAchievementsRouteImport.update({
   id: '/apm/achievements',
   path: '/apm/achievements',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmAdminRouteRoute = ApmAdminRouteRouteImport.update({
   id: '/apm/admin',
   path: '/apm/admin',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmAgendaRoute = ApmAgendaRouteImport.update({
   id: '/apm/agenda',
   path: '/apm/agenda',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmContactRoute = ApmContactRouteImport.update({
   id: '/apm/contact',
   path: '/apm/contact',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmEventsRoute = ApmEventsRouteImport.update({
   id: '/apm/events',
   path: '/apm/events',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmJoinRoute = ApmJoinRouteImport.update({
   id: '/apm/join',
   path: '/apm/join',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmMediaRoute = ApmMediaRouteImport.update({
   id: '/apm/media',
   path: '/apm/media',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmMeetRoute = ApmMeetRouteImport.update({
   id: '/apm/meet',
   path: '/apm/meet',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmNewsRoute = ApmNewsRouteImport.update({
   id: '/apm/news',
   path: '/apm/news',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ApmVolunteerRoute = ApmVolunteerRouteImport.update({
   id: '/apm/volunteer',
   path: '/apm/volunteer',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => ClerkRouteRoute,
-} as any);
+} as any)
 const ClerkAuthenticatedRouteRoute = ClerkAuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => ClerkRouteRoute,
-} as any);
+} as any)
 const QuestionnaireIndexRoute = QuestionnaireIndexRouteImport.update({
   id: '/questionnaire/',
   path: '/questionnaire/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/shop/',
   path: '/shop/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopAboutRoute = ShopAboutRouteImport.update({
   id: '/shop/about',
   path: '/shop/about',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopBlogRoute = ShopBlogRouteImport.update({
   id: '/shop/blog',
   path: '/shop/blog',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopBranchesRoute = ShopBranchesRouteImport.update({
   id: '/shop/branches',
   path: '/shop/branches',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopCartRoute = ShopCartRouteImport.update({
   id: '/shop/cart',
   path: '/shop/cart',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
   id: '/shop/categories',
   path: '/shop/categories',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopCheckoutRoute = ShopCheckoutRouteImport.update({
   id: '/shop/checkout',
   path: '/shop/checkout',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopConsultPharmacistRoute = ShopConsultPharmacistRouteImport.update({
   id: '/shop/consult-pharmacist',
   path: '/shop/consult-pharmacist',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopConsultationsRoute = ShopConsultationsRouteImport.update({
   id: '/shop/consultations',
   path: '/shop/consultations',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopContactRoute = ShopContactRouteImport.update({
   id: '/shop/contact',
   path: '/shop/contact',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopConversationRoute = ShopConversationRouteImport.update({
   id: '/shop/conversation',
   path: '/shop/conversation',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopDashboardRoute = ShopDashboardRouteImport.update({
   id: '/shop/dashboard',
   path: '/shop/dashboard',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopDeliveryAreasRoute = ShopDeliveryAreasRouteImport.update({
   id: '/shop/delivery-areas',
   path: '/shop/delivery-areas',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopFacilityLocatorRoute = ShopFacilityLocatorRouteImport.update({
   id: '/shop/facility-locator',
   path: '/shop/facility-locator',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopFaqRoute = ShopFaqRouteImport.update({
   id: '/shop/faq',
   path: '/shop/faq',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopForgotPasswordRoute = ShopForgotPasswordRouteImport.update({
   id: '/shop/forgot-password',
   path: '/shop/forgot-password',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopHealthConcernsRoute = ShopHealthConcernsRouteImport.update({
   id: '/shop/health-concerns',
   path: '/shop/health-concerns',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopLoginRoute = ShopLoginRouteImport.update({
   id: '/shop/login',
   path: '/shop/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopMedicinesRoute = ShopMedicinesRouteImport.update({
   id: '/shop/medicines',
   path: '/shop/medicines',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopMyPrescriptionsRoute = ShopMyPrescriptionsRouteImport.update({
   id: '/shop/my-prescriptions',
   path: '/shop/my-prescriptions',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopOrdersRoute = ShopOrdersRouteImport.update({
   id: '/shop/orders',
   path: '/shop/orders',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPharmacyLocatorRoute = ShopPharmacyLocatorRouteImport.update({
   id: '/shop/pharmacy-locator',
   path: '/shop/pharmacy-locator',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPosRoute = ShopPosRouteImport.update({
   id: '/shop/pos',
   path: '/shop/pos',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPos2Route = ShopPos2RouteImport.update({
   id: '/shop/pos2',
   path: '/shop/pos2',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPrivacyPolicyRoute = ShopPrivacyPolicyRouteImport.update({
   id: '/shop/privacy-policy',
   path: '/shop/privacy-policy',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopRewardsRoute = ShopRewardsRouteImport.update({
   id: '/shop/rewards',
   path: '/shop/rewards',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopSearchRoute = ShopSearchRouteImport.update({
   id: '/shop/search',
   path: '/shop/search',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopShopRoute = ShopShopRouteImport.update({
   id: '/shop/shop',
   path: '/shop/shop',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopSupermarketRoute = ShopSupermarketRouteImport.update({
   id: '/shop/supermarket',
   path: '/shop/supermarket',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopTermsRoute = ShopTermsRouteImport.update({
   id: '/shop/terms',
   path: '/shop/terms',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopUploadPrescriptionRoute = ShopUploadPrescriptionRouteImport.update({
   id: '/shop/upload-prescription',
   path: '/shop/upload-prescription',
   getParentRoute: () => rootRouteImport,
-} as any);
-const AuthenticatedModuleIdIndexRoute = AuthenticatedModuleIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedModuleIdRoute,
-} as any);
-const AuthenticatedModuleIdDashboardRoute = AuthenticatedModuleIdDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedModuleIdRoute,
-} as any);
+} as any)
+const AuthenticatedModuleIdIndexRoute =
+  AuthenticatedModuleIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedModuleIdRoute,
+  } as any)
+const AuthenticatedModuleIdDashboardRoute =
+  AuthenticatedModuleIdDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedModuleIdRoute,
+  } as any)
 const AuthenticatedPageIdRoute = AuthenticatedPageIdRouteImport.update({
   id: '/$page/$id',
   path: '/$page/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
 const AuthenticatedPageCreateRoute = AuthenticatedPageCreateRouteImport.update({
   id: '/$page/create',
   path: '/$page/create',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedAdminDashboardRoute = AuthenticatedAdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedCodingConceptIndexRoute = AuthenticatedCodingConceptIndexRouteImport.update({
-  id: '/coding-concept/',
-  path: '/coding-concept/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin/dashboard',
+    path: '/admin/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptIndexRoute =
+  AuthenticatedCodingConceptIndexRouteImport.update({
+    id: '/coding-concept/',
+    path: '/coding-concept/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCodingConceptDashboardRoute =
   AuthenticatedCodingConceptDashboardRouteImport.update({
     id: '/coding-concept/dashboard',
     path: '/coding-concept/dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedCodingConceptMatchRoute = AuthenticatedCodingConceptMatchRouteImport.update({
-  id: '/coding-concept/match',
-  path: '/coding-concept/match',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedCodingConceptSearchRoute = AuthenticatedCodingConceptSearchRouteImport.update({
-  id: '/coding-concept/search',
-  path: '/coding-concept/search',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedCodingConceptUploadRoute = AuthenticatedCodingConceptUploadRouteImport.update({
-  id: '/coding-concept/upload',
-  path: '/coding-concept/upload',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedCodingConceptMatchRoute =
+  AuthenticatedCodingConceptMatchRouteImport.update({
+    id: '/coding-concept/match',
+    path: '/coding-concept/match',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptSearchRoute =
+  AuthenticatedCodingConceptSearchRouteImport.update({
+    id: '/coding-concept/search',
+    path: '/coding-concept/search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCodingConceptUploadRoute =
+  AuthenticatedCodingConceptUploadRouteImport.update({
+    id: '/coding-concept/upload',
+    path: '/coding-concept/upload',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCommunicationAesRouteRoute =
   AuthenticatedCommunicationAesRouteRouteImport.update({
     id: '/communication/aes',
     path: '/communication/aes',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationAuditCenterRoute =
   AuthenticatedCommunicationAuditCenterRouteImport.update({
     id: '/communication/audit-center',
     path: '/communication/audit-center',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationCommunicationChannelsRouteRoute =
   AuthenticatedCommunicationCommunicationChannelsRouteRouteImport.update({
     id: '/communication/communication-channels',
     path: '/communication/communication-channels',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationDashboardRoute =
   AuthenticatedCommunicationDashboardRouteImport.update({
     id: '/communication/dashboard',
     path: '/communication/dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationFlowGraphRoute =
   AuthenticatedCommunicationFlowGraphRouteImport.update({
     id: '/communication/flow-graph',
     path: '/communication/flow-graph',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationMappingRouteRoute =
   AuthenticatedCommunicationMappingRouteRouteImport.update({
     id: '/communication/mapping',
     path: '/communication/mapping',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationMessageLogsRouteRoute =
   AuthenticatedCommunicationMessageLogsRouteRouteImport.update({
     id: '/communication/message-logs',
     path: '/communication/message-logs',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationMessageTemplatesRouteRoute =
   AuthenticatedCommunicationMessageTemplatesRouteRouteImport.update({
     id: '/communication/message-templates',
     path: '/communication/message-templates',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationMessageTesterRoute =
   AuthenticatedCommunicationMessageTesterRouteImport.update({
     id: '/communication/message-tester',
     path: '/communication/message-tester',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationMessagesRouteRoute =
   AuthenticatedCommunicationMessagesRouteRouteImport.update({
     id: '/communication/messages',
     path: '/communication/messages',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationNotificationTemplatesRouteRoute =
   AuthenticatedCommunicationNotificationTemplatesRouteRouteImport.update({
     id: '/communication/notification-templates',
     path: '/communication/notification-templates',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationNotificationsRouteRoute =
   AuthenticatedCommunicationNotificationsRouteRouteImport.update({
     id: '/communication/notifications',
     path: '/communication/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationRoutingRouteRoute =
   AuthenticatedCommunicationRoutingRouteRouteImport.update({
     id: '/communication/routing',
     path: '/communication/routing',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCommunicationTraceExplorerRoute =
   AuthenticatedCommunicationTraceExplorerRouteImport.update({
     id: '/communication/trace-explorer',
     path: '/communication/trace-explorer',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedConversationIndexRoute = AuthenticatedConversationIndexRouteImport.update({
-  id: '/conversation/',
-  path: '/conversation/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedConversationIndexRoute =
+  AuthenticatedConversationIndexRouteImport.update({
+    id: '/conversation/',
+    path: '/conversation/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationConversationIdRoute =
   AuthenticatedConversationConversationIdRouteImport.update({
     id: '/conversation/$conversationId',
     path: '/conversation/$conversationId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationBroadcastsRouteRoute =
   AuthenticatedConversationBroadcastsRouteRouteImport.update({
     id: '/conversation/broadcasts',
     path: '/conversation/broadcasts',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationDashboardRoute =
   AuthenticatedConversationDashboardRouteImport.update({
     id: '/conversation/dashboard',
     path: '/conversation/dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationInvitesRouteRoute =
   AuthenticatedConversationInvitesRouteRouteImport.update({
     id: '/conversation/invites',
     path: '/conversation/invites',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedDashboardPurchasesRoute = AuthenticatedDashboardPurchasesRouteImport.update({
-  id: '/dashboard/purchases',
-  path: '/dashboard/purchases',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedDashboardSalesRoute = AuthenticatedDashboardSalesRouteImport.update({
-  id: '/dashboard/sales',
-  path: '/dashboard/sales',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedDashboardPurchasesRoute =
+  AuthenticatedDashboardPurchasesRouteImport.update({
+    id: '/dashboard/purchases',
+    path: '/dashboard/purchases',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardSalesRoute =
+  AuthenticatedDashboardSalesRouteImport.update({
+    id: '/dashboard/sales',
+    path: '/dashboard/sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrIndexRoute = AuthenticatedEmrIndexRouteImport.update({
   id: '/emr/',
   path: '/emr/',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrDashboardRoute = AuthenticatedEmrDashboardRouteImport.update({
-  id: '/emr/dashboard',
-  path: '/emr/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedIdentityIndexRoute = AuthenticatedIdentityIndexRouteImport.update({
-  id: '/identity/',
-  path: '/identity/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedIdentityDashboardRoute = AuthenticatedIdentityDashboardRouteImport.update({
-  id: '/identity/dashboard',
-  path: '/identity/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
+const AuthenticatedEmrDashboardRoute =
+  AuthenticatedEmrDashboardRouteImport.update({
+    id: '/emr/dashboard',
+    path: '/emr/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIdentityIndexRoute =
+  AuthenticatedIdentityIndexRouteImport.update({
+    id: '/identity/',
+    path: '/identity/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIdentityDashboardRoute =
+  AuthenticatedIdentityDashboardRouteImport.update({
+    id: '/identity/dashboard',
+    path: '/identity/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisIndexRoute = AuthenticatedLisIndexRouteImport.update({
   id: '/lis/',
   path: '/lis/',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisDashboardRoute = AuthenticatedLisDashboardRouteImport.update({
-  id: '/lis/dashboard',
-  path: '/lis/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftDashboardRoute = AuthenticatedRxsoftDashboardRouteImport.update({
-  id: '/rxsoft/dashboard',
-  path: '/rxsoft/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftSettingsRouteRoute = AuthenticatedRxsoftSettingsRouteRouteImport.update({
-  id: '/rxsoft/settings',
-  path: '/rxsoft/settings',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedWebsiteDashboardRoute = AuthenticatedWebsiteDashboardRouteImport.update({
-  id: '/website/dashboard',
-  path: '/website/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+} as any)
+const AuthenticatedLisDashboardRoute =
+  AuthenticatedLisDashboardRouteImport.update({
+    id: '/lis/dashboard',
+    path: '/lis/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftDashboardRoute =
+  AuthenticatedRxsoftDashboardRouteImport.update({
+    id: '/rxsoft/dashboard',
+    path: '/rxsoft/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftSettingsRouteRoute =
+  AuthenticatedRxsoftSettingsRouteRouteImport.update({
+    id: '/rxsoft/settings',
+    path: '/rxsoft/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedWebsiteDashboardRoute =
+  AuthenticatedWebsiteDashboardRouteImport.update({
+    id: '/website/dashboard',
+    path: '/website/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApmAdminAgentsRoute = ApmAdminAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminCanvassingRoute = ApmAdminCanvassingRouteImport.update({
   id: '/canvassing',
   path: '/canvassing',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminContentRoute = ApmAdminContentRouteImport.update({
   id: '/content',
   path: '/content',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminConversionRoute = ApmAdminConversionRouteImport.update({
   id: '/conversion',
   path: '/conversion',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminGotvRoute = ApmAdminGotvRouteImport.update({
   id: '/gotv',
   path: '/gotv',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminIncidentsRoute = ApmAdminIncidentsRouteImport.update({
   id: '/incidents',
   path: '/incidents',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminLgasRoute = ApmAdminLgasRouteImport.update({
   id: '/lgas',
   path: '/lgas',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminListeningRoute = ApmAdminListeningRouteImport.update({
   id: '/listening',
   path: '/listening',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminResultsRoute = ApmAdminResultsRouteImport.update({
   id: '/results',
   path: '/results',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminSentimentRoute = ApmAdminSentimentRouteImport.update({
   id: '/sentiment',
   path: '/sentiment',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminStakeholdersRoute = ApmAdminStakeholdersRouteImport.update({
   id: '/stakeholders',
   path: '/stakeholders',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminToursRoute = ApmAdminToursRouteImport.update({
   id: '/tours',
   path: '/tours',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminVolunteersRoute = ApmAdminVolunteersRouteImport.update({
   id: '/volunteers',
   path: '/volunteers',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmAdminWhatsappRoute = ApmAdminWhatsappRouteImport.update({
   id: '/whatsapp',
   path: '/whatsapp',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const ApmEventsIdRoute = ApmEventsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ApmEventsRoute,
-} as any);
+} as any)
 const ApmNewsSlugRoute = ApmNewsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ApmNewsRoute,
-} as any);
-const ClerkAuthenticatedUserManagementRoute = ClerkAuthenticatedUserManagementRouteImport.update({
-  id: '/user-management',
-  path: '/user-management',
-  getParentRoute: () => ClerkAuthenticatedRouteRoute,
-} as any);
+} as any)
+const ClerkAuthenticatedUserManagementRoute =
+  ClerkAuthenticatedUserManagementRouteImport.update({
+    id: '/user-management',
+    path: '/user-management',
+    getParentRoute: () => ClerkAuthenticatedRouteRoute,
+  } as any)
 const ShopBlogSlugRoute = ShopBlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ShopBlogRoute,
-} as any);
+} as any)
 const ShopBranchesIdRoute = ShopBranchesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ShopBranchesRoute,
-} as any);
+} as any)
 const ShopCategoriesSlugRoute = ShopCategoriesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ShopCategoriesRoute,
-} as any);
+} as any)
 const ShopHealthConcernsSlugRoute = ShopHealthConcernsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ShopHealthConcernsRoute,
-} as any);
+} as any)
 const ShopMedicinesCodeRoute = ShopMedicinesCodeRouteImport.update({
   id: '/$code',
   path: '/$code',
   getParentRoute: () => ShopMedicinesRoute,
-} as any);
+} as any)
 const ShopOrdersIdRoute = ShopOrdersIdRouteImport.update({
   id: '/shop/orders_/$id',
   path: '/shop/orders/$id',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPayTokenRoute = ShopPayTokenRouteImport.update({
   id: '/shop/pay/$token',
   path: '/shop/pay/$token',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPayReturnRoute = ShopPayReturnRouteImport.update({
   id: '/shop/pay/return',
   path: '/shop/pay/return',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopPurchasesIndexRoute = ShopPurchasesIndexRouteImport.update({
   id: '/shop/purchases/',
   path: '/shop/purchases/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopShopSlugRoute = ShopShopSlugRouteImport.update({
   id: '/shop/shop_/$slug',
   path: '/shop/shop/$slug',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ShopTrackOrderCodeRoute = ShopTrackOrderCodeRouteImport.update({
   id: '/shop/track-order/$code',
   path: '/shop/track-order/$code',
   getParentRoute: () => rootRouteImport,
-} as any);
-const AuthenticatedModuleIdPageIdRoute = AuthenticatedModuleIdPageIdRouteImport.update({
-  id: '/$page/$id',
-  path: '/$page/$id',
-  getParentRoute: () => AuthenticatedModuleIdRoute,
-} as any);
-const AuthenticatedModuleIdPageCreateRoute = AuthenticatedModuleIdPageCreateRouteImport.update({
-  id: '/$page/create',
-  path: '/$page/create',
-  getParentRoute: () => AuthenticatedModuleIdRoute,
-} as any);
+} as any)
+const AuthenticatedModuleIdPageIdRoute =
+  AuthenticatedModuleIdPageIdRouteImport.update({
+    id: '/$page/$id',
+    path: '/$page/$id',
+    getParentRoute: () => AuthenticatedModuleIdRoute,
+  } as any)
+const AuthenticatedModuleIdPageCreateRoute =
+  AuthenticatedModuleIdPageCreateRouteImport.update({
+    id: '/$page/create',
+    path: '/$page/create',
+    getParentRoute: () => AuthenticatedModuleIdRoute,
+  } as any)
 const AuthenticatedPageIdEditRoute = AuthenticatedPageIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
   getParentRoute: () => AuthenticatedPageIdRoute,
-} as any);
+} as any)
 const AuthenticatedCodingConceptDosageFormsIndexRoute =
   AuthenticatedCodingConceptDosageFormsIndexRouteImport.update({
     id: '/coding-concept/dosage-forms/',
     path: '/coding-concept/dosage-forms/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptDrugClassificationsIndexRoute =
   AuthenticatedCodingConceptDrugClassificationsIndexRouteImport.update({
     id: '/coding-concept/drug-classifications/',
     path: '/coding-concept/drug-classifications/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute =
-  AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport.update({
-    id: '/coding-concept/drug-classifications/$classificationId',
-    path: '/coding-concept/drug-classifications/$classificationId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport.update(
+    {
+      id: '/coding-concept/drug-classifications/$classificationId',
+      path: '/coding-concept/drug-classifications/$classificationId',
+      getParentRoute: () => AuthenticatedRouteRoute,
+    } as any,
+  )
 const AuthenticatedCodingConceptDrugComponentsIndexRoute =
   AuthenticatedCodingConceptDrugComponentsIndexRouteImport.update({
     id: '/coding-concept/drug-components/',
     path: '/coding-concept/drug-components/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesIndexRoute =
   AuthenticatedCodingConceptFacilitiesIndexRouteImport.update({
     id: '/coding-concept/facilities/',
     path: '/coding-concept/facilities/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFormulationsIndexRoute =
   AuthenticatedCodingConceptFormulationsIndexRouteImport.update({
     id: '/coding-concept/formulations/',
     path: '/coding-concept/formulations/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptGenericDrugsIndexRoute =
   AuthenticatedCodingConceptGenericDrugsIndexRouteImport.update({
     id: '/coding-concept/generic-drugs/',
     path: '/coding-concept/generic-drugs/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptGenericProductsIndexRoute =
   AuthenticatedCodingConceptGenericProductsIndexRouteImport.update({
     id: '/coding-concept/generic-products/',
     path: '/coding-concept/generic-products/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptManufacturersIndexRoute =
   AuthenticatedCodingConceptManufacturersIndexRouteImport.update({
     id: '/coding-concept/manufacturers/',
     path: '/coding-concept/manufacturers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptPharmaceuticsIndexRoute =
   AuthenticatedCodingConceptPharmaceuticsIndexRouteImport.update({
     id: '/coding-concept/pharmaceutics/',
     path: '/coding-concept/pharmaceutics/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationConversationIdEditRoute =
   AuthenticatedConversationConversationIdEditRouteImport.update({
     id: '/edit',
     path: '/edit',
     getParentRoute: () => AuthenticatedConversationConversationIdRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationChannelsIndexRoute =
   AuthenticatedConversationChannelsIndexRouteImport.update({
     id: '/conversation/channels/',
     path: '/conversation/channels/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationChatsIndexRoute =
   AuthenticatedConversationChatsIndexRouteImport.update({
     id: '/conversation/chats/',
     path: '/conversation/chats/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationExchangesIndexRoute =
   AuthenticatedConversationExchangesIndexRouteImport.update({
     id: '/conversation/exchanges/',
     path: '/conversation/exchanges/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationExchangesExchangeIdRoute =
   AuthenticatedConversationExchangesExchangeIdRouteImport.update({
     id: '/conversation/exchanges/$exchangeId',
     path: '/conversation/exchanges/$exchangeId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationInvitesInviteIdRoute =
   AuthenticatedConversationInvitesInviteIdRouteImport.update({
     id: '/$inviteId',
     path: '/$inviteId',
     getParentRoute: () => AuthenticatedConversationInvitesRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationOptionListsIndexRoute =
   AuthenticatedConversationOptionListsIndexRouteImport.update({
     id: '/conversation/option-lists/',
     path: '/conversation/option-lists/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationParticipantsIndexRoute =
   AuthenticatedConversationParticipantsIndexRouteImport.update({
     id: '/conversation/participants/',
     path: '/conversation/participants/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationProjectionsIndexRoute =
   AuthenticatedConversationProjectionsIndexRouteImport.update({
     id: '/conversation/projections/',
     path: '/conversation/projections/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationProjectionsProjectionIdRoute =
   AuthenticatedConversationProjectionsProjectionIdRouteImport.update({
     id: '/conversation/projections/$projectionId',
     path: '/conversation/projections/$projectionId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationQuestionnairesIndexRoute =
   AuthenticatedConversationQuestionnairesIndexRouteImport.update({
     id: '/conversation/questionnaires/',
     path: '/conversation/questionnaires/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationQuestionsIndexRoute =
   AuthenticatedConversationQuestionsIndexRouteImport.update({
     id: '/conversation/questions/',
     path: '/conversation/questions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationWorkflowConfigurationIndexRoute =
   AuthenticatedConversationWorkflowConfigurationIndexRouteImport.update({
     id: '/conversation/workflow-configuration/',
     path: '/conversation/workflow-configuration/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationWorkflowEventsIndexRoute =
   AuthenticatedConversationWorkflowEventsIndexRouteImport.update({
     id: '/conversation/workflow-events/',
     path: '/conversation/workflow-events/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationWorkflowInstancesIndexRoute =
   AuthenticatedConversationWorkflowInstancesIndexRouteImport.update({
     id: '/conversation/workflow-instances/',
     path: '/conversation/workflow-instances/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationWorkflowsIndexRoute =
   AuthenticatedConversationWorkflowsIndexRouteImport.update({
     id: '/conversation/workflows/',
     path: '/conversation/workflows/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedEmrAppointmentsIndexRoute = AuthenticatedEmrAppointmentsIndexRouteImport.update({
-  id: '/emr/appointments/',
-  path: '/emr/appointments/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrDepartmentsIndexRoute = AuthenticatedEmrDepartmentsIndexRouteImport.update({
-  id: '/emr/departments/',
-  path: '/emr/departments/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrEncountersIndexRoute = AuthenticatedEmrEncountersIndexRouteImport.update({
-  id: '/emr/encounters/',
-  path: '/emr/encounters/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedEmrAppointmentsIndexRoute =
+  AuthenticatedEmrAppointmentsIndexRouteImport.update({
+    id: '/emr/appointments/',
+    path: '/emr/appointments/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrDepartmentsIndexRoute =
+  AuthenticatedEmrDepartmentsIndexRouteImport.update({
+    id: '/emr/departments/',
+    path: '/emr/departments/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrEncountersIndexRoute =
+  AuthenticatedEmrEncountersIndexRouteImport.update({
+    id: '/emr/encounters/',
+    path: '/emr/encounters/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrEncountersEncounterIdRoute =
   AuthenticatedEmrEncountersEncounterIdRouteImport.update({
     id: '/emr/encounters/$encounterId',
     path: '/emr/encounters/$encounterId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedEmrFormsIndexRoute = AuthenticatedEmrFormsIndexRouteImport.update({
-  id: '/emr/forms/',
-  path: '/emr/forms/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrMedicationsIndexRoute = AuthenticatedEmrMedicationsIndexRouteImport.update({
-  id: '/emr/medications/',
-  path: '/emr/medications/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrPatientsIndexRoute = AuthenticatedEmrPatientsIndexRouteImport.update({
-  id: '/emr/patients/',
-  path: '/emr/patients/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrPatientsPatientIdRoute = AuthenticatedEmrPatientsPatientIdRouteImport.update({
-  id: '/emr/patients/$patientId',
-  path: '/emr/patients/$patientId',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrReferralsIndexRoute = AuthenticatedEmrReferralsIndexRouteImport.update({
-  id: '/emr/referrals/',
-  path: '/emr/referrals/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrRequestsIndexRoute = AuthenticatedEmrRequestsIndexRouteImport.update({
-  id: '/emr/requests/',
-  path: '/emr/requests/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrRequestsRequestIdRoute = AuthenticatedEmrRequestsRequestIdRouteImport.update({
-  id: '/emr/requests/$requestId',
-  path: '/emr/requests/$requestId',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrStaffIndexRoute = AuthenticatedEmrStaffIndexRouteImport.update({
-  id: '/emr/staff/',
-  path: '/emr/staff/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrTagsIndexRoute = AuthenticatedEmrTagsIndexRouteImport.update({
-  id: '/emr/tags/',
-  path: '/emr/tags/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrVisitsIndexRoute = AuthenticatedEmrVisitsIndexRouteImport.update({
-  id: '/emr/visits/',
-  path: '/emr/visits/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrVisitsVisitIdRoute = AuthenticatedEmrVisitsVisitIdRouteImport.update({
-  id: '/emr/visits/$visitId',
-  path: '/emr/visits/$visitId',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrWardsIndexRoute = AuthenticatedEmrWardsIndexRouteImport.update({
-  id: '/emr/wards/',
-  path: '/emr/wards/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrWardsAdmissionsRoute = AuthenticatedEmrWardsAdmissionsRouteImport.update({
-  id: '/emr/wards/admissions',
-  path: '/emr/wards/admissions',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrWardsBedsRoute = AuthenticatedEmrWardsBedsRouteImport.update({
-  id: '/emr/wards/beds',
-  path: '/emr/wards/beds',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrWardsBoardRoute = AuthenticatedEmrWardsBoardRouteImport.update({
-  id: '/emr/wards/board',
-  path: '/emr/wards/board',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedEmrWardsDischargesRoute = AuthenticatedEmrWardsDischargesRouteImport.update({
-  id: '/emr/wards/discharges',
-  path: '/emr/wards/discharges',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedEmrFormsIndexRoute =
+  AuthenticatedEmrFormsIndexRouteImport.update({
+    id: '/emr/forms/',
+    path: '/emr/forms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrMedicationsIndexRoute =
+  AuthenticatedEmrMedicationsIndexRouteImport.update({
+    id: '/emr/medications/',
+    path: '/emr/medications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrPatientsIndexRoute =
+  AuthenticatedEmrPatientsIndexRouteImport.update({
+    id: '/emr/patients/',
+    path: '/emr/patients/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrPatientsPatientIdRoute =
+  AuthenticatedEmrPatientsPatientIdRouteImport.update({
+    id: '/emr/patients/$patientId',
+    path: '/emr/patients/$patientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrReferralsIndexRoute =
+  AuthenticatedEmrReferralsIndexRouteImport.update({
+    id: '/emr/referrals/',
+    path: '/emr/referrals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrRequestsIndexRoute =
+  AuthenticatedEmrRequestsIndexRouteImport.update({
+    id: '/emr/requests/',
+    path: '/emr/requests/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrRequestsRequestIdRoute =
+  AuthenticatedEmrRequestsRequestIdRouteImport.update({
+    id: '/emr/requests/$requestId',
+    path: '/emr/requests/$requestId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrStaffIndexRoute =
+  AuthenticatedEmrStaffIndexRouteImport.update({
+    id: '/emr/staff/',
+    path: '/emr/staff/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrTagsIndexRoute =
+  AuthenticatedEmrTagsIndexRouteImport.update({
+    id: '/emr/tags/',
+    path: '/emr/tags/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrVisitsIndexRoute =
+  AuthenticatedEmrVisitsIndexRouteImport.update({
+    id: '/emr/visits/',
+    path: '/emr/visits/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrVisitsVisitIdRoute =
+  AuthenticatedEmrVisitsVisitIdRouteImport.update({
+    id: '/emr/visits/$visitId',
+    path: '/emr/visits/$visitId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrWardsIndexRoute =
+  AuthenticatedEmrWardsIndexRouteImport.update({
+    id: '/emr/wards/',
+    path: '/emr/wards/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrWardsAdmissionsRoute =
+  AuthenticatedEmrWardsAdmissionsRouteImport.update({
+    id: '/emr/wards/admissions',
+    path: '/emr/wards/admissions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrWardsBedsRoute =
+  AuthenticatedEmrWardsBedsRouteImport.update({
+    id: '/emr/wards/beds',
+    path: '/emr/wards/beds',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrWardsBoardRoute =
+  AuthenticatedEmrWardsBoardRouteImport.update({
+    id: '/emr/wards/board',
+    path: '/emr/wards/board',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrWardsDischargesRoute =
+  AuthenticatedEmrWardsDischargesRouteImport.update({
+    id: '/emr/wards/discharges',
+    path: '/emr/wards/discharges',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedIdentityLocationsIndexRoute =
   AuthenticatedIdentityLocationsIndexRouteImport.update({
     id: '/identity/locations/',
     path: '/identity/locations/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedIdentityOrganizationsIndexRoute =
   AuthenticatedIdentityOrganizationsIndexRouteImport.update({
     id: '/identity/organizations/',
     path: '/identity/organizations/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedIdentityPermissionsIndexRoute =
   AuthenticatedIdentityPermissionsIndexRouteImport.update({
     id: '/identity/permissions/',
     path: '/identity/permissions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedIdentityRolesIndexRoute = AuthenticatedIdentityRolesIndexRouteImport.update({
-  id: '/identity/roles/',
-  path: '/identity/roles/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedIdentityUsersIndexRoute = AuthenticatedIdentityUsersIndexRouteImport.update({
-  id: '/identity/users/',
-  path: '/identity/users/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedIdentityRolesIndexRoute =
+  AuthenticatedIdentityRolesIndexRouteImport.update({
+    id: '/identity/roles/',
+    path: '/identity/roles/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIdentityUsersIndexRoute =
+  AuthenticatedIdentityUsersIndexRouteImport.update({
+    id: '/identity/users/',
+    path: '/identity/users/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisAttributeDefinitionsIndexRoute =
   AuthenticatedLisAttributeDefinitionsIndexRouteImport.update({
     id: '/lis/attribute-definitions/',
     path: '/lis/attribute-definitions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisEqaEnrollmentsIndexRoute =
   AuthenticatedLisEqaEnrollmentsIndexRouteImport.update({
     id: '/lis/eqa-enrollments/',
     path: '/lis/eqa-enrollments/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisEqaProgramsIndexRoute = AuthenticatedLisEqaProgramsIndexRouteImport.update({
-  id: '/lis/eqa-programs/',
-  path: '/lis/eqa-programs/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisEqaResultsIndexRoute = AuthenticatedLisEqaResultsIndexRouteImport.update({
-  id: '/lis/eqa-results/',
-  path: '/lis/eqa-results/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisEqaProgramsIndexRoute =
+  AuthenticatedLisEqaProgramsIndexRouteImport.update({
+    id: '/lis/eqa-programs/',
+    path: '/lis/eqa-programs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisEqaResultsIndexRoute =
+  AuthenticatedLisEqaResultsIndexRouteImport.update({
+    id: '/lis/eqa-results/',
+    path: '/lis/eqa-results/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisLocationTypesIndexRoute =
   AuthenticatedLisLocationTypesIndexRouteImport.update({
     id: '/lis/location-types/',
     path: '/lis/location-types/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisLocationsIndexRoute = AuthenticatedLisLocationsIndexRouteImport.update({
-  id: '/lis/locations/',
-  path: '/lis/locations/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisLoincIndexRoute = AuthenticatedLisLoincIndexRouteImport.update({
-  id: '/lis/loinc/',
-  path: '/lis/loinc/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisMethodsIndexRoute = AuthenticatedLisMethodsIndexRouteImport.update({
-  id: '/lis/methods/',
-  path: '/lis/methods/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisOrdersIndexRoute = AuthenticatedLisOrdersIndexRouteImport.update({
-  id: '/lis/orders/',
-  path: '/lis/orders/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisOrdersDashboardRoute = AuthenticatedLisOrdersDashboardRouteImport.update({
-  id: '/lis/orders/dashboard',
-  path: '/lis/orders/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisLocationsIndexRoute =
+  AuthenticatedLisLocationsIndexRouteImport.update({
+    id: '/lis/locations/',
+    path: '/lis/locations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisLoincIndexRoute =
+  AuthenticatedLisLoincIndexRouteImport.update({
+    id: '/lis/loinc/',
+    path: '/lis/loinc/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisMethodsIndexRoute =
+  AuthenticatedLisMethodsIndexRouteImport.update({
+    id: '/lis/methods/',
+    path: '/lis/methods/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersIndexRoute =
+  AuthenticatedLisOrdersIndexRouteImport.update({
+    id: '/lis/orders/',
+    path: '/lis/orders/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisOrdersDashboardRoute =
+  AuthenticatedLisOrdersDashboardRouteImport.update({
+    id: '/lis/orders/dashboard',
+    path: '/lis/orders/dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisOrdersWorkflowRouteRoute =
   AuthenticatedLisOrdersWorkflowRouteRouteImport.update({
     id: '/lis/orders/workflow',
     path: '/lis/orders/workflow',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisPanelsIndexRoute = AuthenticatedLisPanelsIndexRouteImport.update({
-  id: '/lis/panels/',
-  path: '/lis/panels/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisPatientsIndexRoute = AuthenticatedLisPatientsIndexRouteImport.update({
-  id: '/lis/patients/',
-  path: '/lis/patients/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisPrioritiesIndexRoute = AuthenticatedLisPrioritiesIndexRouteImport.update({
-  id: '/lis/priorities/',
-  path: '/lis/priorities/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisProgramsIndexRoute = AuthenticatedLisProgramsIndexRouteImport.update({
-  id: '/lis/programs/',
-  path: '/lis/programs/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisPanelsIndexRoute =
+  AuthenticatedLisPanelsIndexRouteImport.update({
+    id: '/lis/panels/',
+    path: '/lis/panels/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisPatientsIndexRoute =
+  AuthenticatedLisPatientsIndexRouteImport.update({
+    id: '/lis/patients/',
+    path: '/lis/patients/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisPrioritiesIndexRoute =
+  AuthenticatedLisPrioritiesIndexRouteImport.update({
+    id: '/lis/priorities/',
+    path: '/lis/priorities/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisProgramsIndexRoute =
+  AuthenticatedLisProgramsIndexRouteImport.update({
+    id: '/lis/programs/',
+    path: '/lis/programs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisQaChecklistItemsIndexRoute =
   AuthenticatedLisQaChecklistItemsIndexRouteImport.update({
     id: '/lis/qa-checklist-items/',
     path: '/lis/qa-checklist-items/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisQcAlertsIndexRoute = AuthenticatedLisQcAlertsIndexRouteImport.update({
-  id: '/lis/qc-alerts/',
-  path: '/lis/qc-alerts/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisQcLotsIndexRoute = AuthenticatedLisQcLotsIndexRouteImport.update({
-  id: '/lis/qc-lots/',
-  path: '/lis/qc-lots/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisQcResultsIndexRoute = AuthenticatedLisQcResultsIndexRouteImport.update({
-  id: '/lis/qc-results/',
-  path: '/lis/qc-results/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisQcAlertsIndexRoute =
+  AuthenticatedLisQcAlertsIndexRouteImport.update({
+    id: '/lis/qc-alerts/',
+    path: '/lis/qc-alerts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisQcLotsIndexRoute =
+  AuthenticatedLisQcLotsIndexRouteImport.update({
+    id: '/lis/qc-lots/',
+    path: '/lis/qc-lots/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisQcResultsIndexRoute =
+  AuthenticatedLisQcResultsIndexRouteImport.update({
+    id: '/lis/qc-results/',
+    path: '/lis/qc-results/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisReferenceRangesIndexRoute =
   AuthenticatedLisReferenceRangesIndexRouteImport.update({
     id: '/lis/reference-ranges/',
     path: '/lis/reference-ranges/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisRejectionReasonsIndexRoute =
   AuthenticatedLisRejectionReasonsIndexRouteImport.update({
     id: '/lis/rejection-reasons/',
     path: '/lis/rejection-reasons/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisResultSignaturesIndexRoute =
   AuthenticatedLisResultSignaturesIndexRouteImport.update({
     id: '/lis/result-signatures/',
     path: '/lis/result-signatures/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisResultsIndexRoute = AuthenticatedLisResultsIndexRouteImport.update({
-  id: '/lis/results/',
-  path: '/lis/results/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisSampleTypesIndexRoute = AuthenticatedLisSampleTypesIndexRouteImport.update({
-  id: '/lis/sample-types/',
-  path: '/lis/sample-types/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisSamplesIndexRoute = AuthenticatedLisSamplesIndexRouteImport.update({
-  id: '/lis/samples/',
-  path: '/lis/samples/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisStatusesIndexRoute = AuthenticatedLisStatusesIndexRouteImport.update({
-  id: '/lis/statuses/',
-  path: '/lis/statuses/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisResultsIndexRoute =
+  AuthenticatedLisResultsIndexRouteImport.update({
+    id: '/lis/results/',
+    path: '/lis/results/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisSampleTypesIndexRoute =
+  AuthenticatedLisSampleTypesIndexRouteImport.update({
+    id: '/lis/sample-types/',
+    path: '/lis/sample-types/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisSamplesIndexRoute =
+  AuthenticatedLisSamplesIndexRouteImport.update({
+    id: '/lis/samples/',
+    path: '/lis/samples/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisStatusesIndexRoute =
+  AuthenticatedLisStatusesIndexRouteImport.update({
+    id: '/lis/statuses/',
+    path: '/lis/statuses/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisTestCategoriesIndexRoute =
   AuthenticatedLisTestCategoriesIndexRouteImport.update({
     id: '/lis/test-categories/',
     path: '/lis/test-categories/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisTestDefinitionsIndexRoute =
   AuthenticatedLisTestDefinitionsIndexRouteImport.update({
     id: '/lis/test-definitions/',
     path: '/lis/test-definitions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedLisTestSectionsIndexRoute = AuthenticatedLisTestSectionsIndexRouteImport.update({
-  id: '/lis/test-sections/',
-  path: '/lis/test-sections/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedLisUomsIndexRoute = AuthenticatedLisUomsIndexRouteImport.update({
-  id: '/lis/uoms/',
-  path: '/lis/uoms/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisTestSectionsIndexRoute =
+  AuthenticatedLisTestSectionsIndexRouteImport.update({
+    id: '/lis/test-sections/',
+    path: '/lis/test-sections/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLisUomsIndexRoute =
+  AuthenticatedLisUomsIndexRouteImport.update({
+    id: '/lis/uoms/',
+    path: '/lis/uoms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisValidationDashboardIndexRoute =
   AuthenticatedLisValidationDashboardIndexRouteImport.update({
     id: '/lis/validation-dashboard/',
     path: '/lis/validation-dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftAuditLogsIndexRoute = AuthenticatedRxsoftAuditLogsIndexRouteImport.update({
-  id: '/rxsoft/audit-logs/',
-  path: '/rxsoft/audit-logs/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftBranchesIndexRoute = AuthenticatedRxsoftBranchesIndexRouteImport.update({
-  id: '/rxsoft/branches/',
-  path: '/rxsoft/branches/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftAuditLogsIndexRoute =
+  AuthenticatedRxsoftAuditLogsIndexRouteImport.update({
+    id: '/rxsoft/audit-logs/',
+    path: '/rxsoft/audit-logs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftBranchesIndexRoute =
+  AuthenticatedRxsoftBranchesIndexRouteImport.update({
+    id: '/rxsoft/branches/',
+    path: '/rxsoft/branches/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftCategoriesIndexRoute =
   AuthenticatedRxsoftCategoriesIndexRouteImport.update({
     id: '/rxsoft/categories/',
     path: '/rxsoft/categories/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftCustomersIndexRoute = AuthenticatedRxsoftCustomersIndexRouteImport.update({
-  id: '/rxsoft/customers/',
-  path: '/rxsoft/customers/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftCustomersIndexRoute =
+  AuthenticatedRxsoftCustomersIndexRouteImport.update({
+    id: '/rxsoft/customers/',
+    path: '/rxsoft/customers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftDrugComponentsIndexRoute =
   AuthenticatedRxsoftDrugComponentsIndexRouteImport.update({
     id: '/rxsoft/drug-components/',
     path: '/rxsoft/drug-components/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresArticlesIndexRoute =
   AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-articles/',
     path: '/rxsoft/ehealthwares-articles/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresCareersIndexRoute =
   AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-careers/',
     path: '/rxsoft/ehealthwares-careers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute =
   AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-categories/',
     path: '/rxsoft/ehealthwares-categories/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute =
   AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-contact-submissions/',
     path: '/rxsoft/ehealthwares-contact-submissions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute =
   AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-hero-slides/',
     path: '/rxsoft/ehealthwares-hero-slides/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute =
   AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-investors/',
     path: '/rxsoft/ehealthwares-investors/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresPartnersIndexRoute =
   AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-partners/',
     path: '/rxsoft/ehealthwares-partners/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresProductsIndexRoute =
   AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-products/',
     path: '/rxsoft/ehealthwares-products/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresSectionsIndexRoute =
   AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-sections/',
     path: '/rxsoft/ehealthwares-sections/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresServicesIndexRoute =
   AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-services/',
     path: '/rxsoft/ehealthwares-services/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresSettingsIndexRoute =
   AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-settings/',
     path: '/rxsoft/ehealthwares-settings/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresTeamIndexRoute =
   AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-team/',
     path: '/rxsoft/ehealthwares-team/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute =
   AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-testimonials/',
     path: '/rxsoft/ehealthwares-testimonials/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftGlAccountsIndexRoute =
   AuthenticatedRxsoftGlAccountsIndexRouteImport.update({
     id: '/rxsoft/gl-accounts/',
     path: '/rxsoft/gl-accounts/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftInsuranceProvidersIndexRoute =
   AuthenticatedRxsoftInsuranceProvidersIndexRouteImport.update({
     id: '/rxsoft/insurance-providers/',
     path: '/rxsoft/insurance-providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftInventoryIndexRoute = AuthenticatedRxsoftInventoryIndexRouteImport.update({
-  id: '/rxsoft/inventory/',
-  path: '/rxsoft/inventory/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftItemsIndexRoute = AuthenticatedRxsoftItemsIndexRouteImport.update({
-  id: '/rxsoft/items/',
-  path: '/rxsoft/items/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftItemsCreateRoute = AuthenticatedRxsoftItemsCreateRouteImport.update({
-  id: '/rxsoft/items/create',
-  path: '/rxsoft/items/create',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftInventoryIndexRoute =
+  AuthenticatedRxsoftInventoryIndexRouteImport.update({
+    id: '/rxsoft/inventory/',
+    path: '/rxsoft/inventory/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftItemsIndexRoute =
+  AuthenticatedRxsoftItemsIndexRouteImport.update({
+    id: '/rxsoft/items/',
+    path: '/rxsoft/items/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftItemsCreateRoute =
+  AuthenticatedRxsoftItemsCreateRouteImport.update({
+    id: '/rxsoft/items/create',
+    path: '/rxsoft/items/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftJournalEntriesIndexRoute =
   AuthenticatedRxsoftJournalEntriesIndexRouteImport.update({
     id: '/rxsoft/journal-entries/',
     path: '/rxsoft/journal-entries/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftJournalEntryLinesIndexRoute =
   AuthenticatedRxsoftJournalEntryLinesIndexRouteImport.update({
     id: '/rxsoft/journal-entry-lines/',
     path: '/rxsoft/journal-entry-lines/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftJournalsIndexRoute = AuthenticatedRxsoftJournalsIndexRouteImport.update({
-  id: '/rxsoft/journals/',
-  path: '/rxsoft/journals/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftJournalsIndexRoute =
+  AuthenticatedRxsoftJournalsIndexRouteImport.update({
+    id: '/rxsoft/journals/',
+    path: '/rxsoft/journals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftManufacturersIndexRoute =
   AuthenticatedRxsoftManufacturersIndexRouteImport.update({
     id: '/rxsoft/manufacturers/',
     path: '/rxsoft/manufacturers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftOrganisationConfigIndexRoute =
   AuthenticatedRxsoftOrganisationConfigIndexRouteImport.update({
     id: '/rxsoft/organisation-config/',
     path: '/rxsoft/organisation-config/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute =
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport.update({
     id: '/rxsoft/organisation-payment-providers/',
     path: '/rxsoft/organisation-payment-providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftOrganizationsIndexRoute =
   AuthenticatedRxsoftOrganizationsIndexRouteImport.update({
     id: '/rxsoft/organizations/',
     path: '/rxsoft/organizations/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPaymentMethodsIndexRoute =
   AuthenticatedRxsoftPaymentMethodsIndexRouteImport.update({
     id: '/rxsoft/payment-methods/',
     path: '/rxsoft/payment-methods/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPaymentProvidersIndexRoute =
   AuthenticatedRxsoftPaymentProvidersIndexRouteImport.update({
     id: '/rxsoft/payment-providers/',
     path: '/rxsoft/payment-providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPaymentTransactionsIndexRoute =
   AuthenticatedRxsoftPaymentTransactionsIndexRouteImport.update({
     id: '/rxsoft/payment-transactions/',
     path: '/rxsoft/payment-transactions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftPaymentsIndexRoute = AuthenticatedRxsoftPaymentsIndexRouteImport.update({
-  id: '/rxsoft/payments/',
-  path: '/rxsoft/payments/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftPaymentsIndexRoute =
+  AuthenticatedRxsoftPaymentsIndexRouteImport.update({
+    id: '/rxsoft/payments/',
+    path: '/rxsoft/payments/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftPharmaceuticsIndexRoute =
   AuthenticatedRxsoftPharmaceuticsIndexRouteImport.update({
     id: '/rxsoft/pharmaceutics/',
     path: '/rxsoft/pharmaceutics/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPosTerminalsIndexRoute =
   AuthenticatedRxsoftPosTerminalsIndexRouteImport.update({
     id: '/rxsoft/pos-terminals/',
     path: '/rxsoft/pos-terminals/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPriceListItemsIndexRoute =
   AuthenticatedRxsoftPriceListItemsIndexRouteImport.update({
     id: '/rxsoft/price-list-items/',
     path: '/rxsoft/price-list-items/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftPriceListsIndexRoute =
   AuthenticatedRxsoftPriceListsIndexRouteImport.update({
     id: '/rxsoft/price-lists/',
     path: '/rxsoft/price-lists/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftPurchasesIndexRoute = AuthenticatedRxsoftPurchasesIndexRouteImport.update({
-  id: '/rxsoft/purchases/',
-  path: '/rxsoft/purchases/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftPurchasesIndexRoute =
+  AuthenticatedRxsoftPurchasesIndexRouteImport.update({
+    id: '/rxsoft/purchases/',
+    path: '/rxsoft/purchases/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftReceivablesIndexRoute =
   AuthenticatedRxsoftReceivablesIndexRouteImport.update({
     id: '/rxsoft/receivables/',
     path: '/rxsoft/receivables/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftReceivingIndexRoute = AuthenticatedRxsoftReceivingIndexRouteImport.update({
-  id: '/rxsoft/receiving/',
-  path: '/rxsoft/receiving/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftReportsIndexRoute = AuthenticatedRxsoftReportsIndexRouteImport.update({
-  id: '/rxsoft/reports/',
-  path: '/rxsoft/reports/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftReceivingIndexRoute =
+  AuthenticatedRxsoftReceivingIndexRouteImport.update({
+    id: '/rxsoft/receiving/',
+    path: '/rxsoft/receiving/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftReportsIndexRoute =
+  AuthenticatedRxsoftReportsIndexRouteImport.update({
+    id: '/rxsoft/reports/',
+    path: '/rxsoft/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftRoleRequestsIndexRoute =
   AuthenticatedRxsoftRoleRequestsIndexRouteImport.update({
     id: '/rxsoft/role-requests/',
     path: '/rxsoft/role-requests/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftRolesIndexRoute = AuthenticatedRxsoftRolesIndexRouteImport.update({
-  id: '/rxsoft/roles/',
-  path: '/rxsoft/roles/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftRolesIndexRoute =
+  AuthenticatedRxsoftRolesIndexRouteImport.update({
+    id: '/rxsoft/roles/',
+    path: '/rxsoft/roles/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftSalesLinesIndexRoute =
   AuthenticatedRxsoftSalesLinesIndexRouteImport.update({
     id: '/rxsoft/sales-lines/',
     path: '/rxsoft/sales-lines/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftSalesIndexRoute = AuthenticatedRxsoftSalesIndexRouteImport.update({
-  id: '/rxsoft/sales/',
-  path: '/rxsoft/sales/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftSettingsIndexRoute = AuthenticatedRxsoftSettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftSalesIndexRoute =
+  AuthenticatedRxsoftSalesIndexRouteImport.update({
+    id: '/rxsoft/sales/',
+    path: '/rxsoft/sales/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftSettingsIndexRoute =
+  AuthenticatedRxsoftSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
+  } as any)
 const AuthenticatedRxsoftSettingsAccountRoute =
   AuthenticatedRxsoftSettingsAccountRouteImport.update({
     id: '/account',
     path: '/account',
     getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftSettingsAppearanceRoute =
   AuthenticatedRxsoftSettingsAppearanceRouteImport.update({
     id: '/appearance',
     path: '/appearance',
     getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftSettingsDisplayRoute =
   AuthenticatedRxsoftSettingsDisplayRouteImport.update({
     id: '/display',
     path: '/display',
     getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftSettingsNotificationsRoute =
   AuthenticatedRxsoftSettingsNotificationsRouteImport.update({
     id: '/notifications',
     path: '/notifications',
     getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftStockLocationsIndexRoute =
   AuthenticatedRxsoftStockLocationsIndexRouteImport.update({
     id: '/rxsoft/stock-locations/',
     path: '/rxsoft/stock-locations/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftSuppliersIndexRoute = AuthenticatedRxsoftSuppliersIndexRouteImport.update({
-  id: '/rxsoft/suppliers/',
-  path: '/rxsoft/suppliers/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftSuppliersIndexRoute =
+  AuthenticatedRxsoftSuppliersIndexRouteImport.update({
+    id: '/rxsoft/suppliers/',
+    path: '/rxsoft/suppliers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftUomCategoryIndexRoute =
   AuthenticatedRxsoftUomCategoryIndexRouteImport.update({
     id: '/rxsoft/uom-category/',
     path: '/rxsoft/uom-category/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftUomsIndexRoute = AuthenticatedRxsoftUomsIndexRouteImport.update({
-  id: '/rxsoft/uoms/',
-  path: '/rxsoft/uoms/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
-const AuthenticatedRxsoftUomsUomIdRoute = AuthenticatedRxsoftUomsUomIdRouteImport.update({
-  id: '/rxsoft/uoms/$uomId',
-  path: '/rxsoft/uoms/$uomId',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftUomsIndexRoute =
+  AuthenticatedRxsoftUomsIndexRouteImport.update({
+    id: '/rxsoft/uoms/',
+    path: '/rxsoft/uoms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftUomsUomIdRoute =
+  AuthenticatedRxsoftUomsUomIdRouteImport.update({
+    id: '/rxsoft/uoms/$uomId',
+    path: '/rxsoft/uoms/$uomId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftUserConfigIndexRoute =
   AuthenticatedRxsoftUserConfigIndexRouteImport.update({
     id: '/rxsoft/user-config/',
     path: '/rxsoft/user-config/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftUsersIndexRoute = AuthenticatedRxsoftUsersIndexRouteImport.update({
-  id: '/rxsoft/users/',
-  path: '/rxsoft/users/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftUsersIndexRoute =
+  AuthenticatedRxsoftUsersIndexRouteImport.update({
+    id: '/rxsoft/users/',
+    path: '/rxsoft/users/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftWarehousesIndexRoute =
   AuthenticatedRxsoftWarehousesIndexRouteImport.update({
     id: '/rxsoft/warehouses/',
     path: '/rxsoft/warehouses/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftWebsiteOrdersIndexRoute =
   AuthenticatedRxsoftWebsiteOrdersIndexRouteImport.update({
     id: '/rxsoft/website-orders/',
     path: '/rxsoft/website-orders/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftWebsitePrescriptionsIndexRoute =
   AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport.update({
     id: '/rxsoft/website-prescriptions/',
     path: '/rxsoft/website-prescriptions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const ApmAdminPollingUnitsWardIdRoute = ApmAdminPollingUnitsWardIdRouteImport.update({
-  id: '/polling-units/$wardId',
-  path: '/polling-units/$wardId',
-  getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+  } as any)
+const ApmAdminPollingUnitsWardIdRoute =
+  ApmAdminPollingUnitsWardIdRouteImport.update({
+    id: '/polling-units/$wardId',
+    path: '/polling-units/$wardId',
+    getParentRoute: () => ApmAdminRouteRoute,
+  } as any)
 const ApmAdminWardsLgaIdRoute = ApmAdminWardsLgaIdRouteImport.update({
   id: '/wards/$lgaId',
   path: '/wards/$lgaId',
   getParentRoute: () => ApmAdminRouteRoute,
-} as any);
+} as any)
 const AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute =
   AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport.update({
     id: '/coding-concept/facilities/hospitals/',
     path: '/coding-concept/facilities/hospitals/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute =
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport.update({
     id: '/coding-concept/facilities/hospitals/$hospitalId',
     path: '/coding-concept/facilities/hospitals/$hospitalId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute =
   AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport.update({
     id: '/coding-concept/facilities/laboratories/',
     path: '/coding-concept/facilities/laboratories/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute =
-  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport.update({
-    id: '/coding-concept/facilities/laboratories/$laboratoryId',
-    path: '/coding-concept/facilities/laboratories/$laboratoryId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport.update(
+    {
+      id: '/coding-concept/facilities/laboratories/$laboratoryId',
+      path: '/coding-concept/facilities/laboratories/$laboratoryId',
+      getParentRoute: () => AuthenticatedRouteRoute,
+    } as any,
+  )
 const AuthenticatedCodingConceptFacilitiesLevelsIndexRoute =
   AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport.update({
     id: '/coding-concept/facilities/levels/',
     path: '/coding-concept/facilities/levels/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesLgasIndexRoute =
   AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport.update({
     id: '/coding-concept/facilities/lgas/',
     path: '/coding-concept/facilities/lgas/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute =
   AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport.update({
     id: '/coding-concept/facilities/pharmacies/',
     path: '/coding-concept/facilities/pharmacies/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute =
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRouteImport.update({
     id: '/coding-concept/facilities/pharmacies/$pharmacyId',
     path: '/coding-concept/facilities/pharmacies/$pharmacyId',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesStatesIndexRoute =
   AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport.update({
     id: '/coding-concept/facilities/states/',
     path: '/coding-concept/facilities/states/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesTypesIndexRoute =
   AuthenticatedCodingConceptFacilitiesTypesIndexRouteImport.update({
     id: '/coding-concept/facilities/types/',
     path: '/coding-concept/facilities/types/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedCodingConceptFacilitiesWardsIndexRoute =
   AuthenticatedCodingConceptFacilitiesWardsIndexRouteImport.update({
     id: '/coding-concept/facilities/wards/',
     path: '/coding-concept/facilities/wards/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationPageIdEditRoute =
   AuthenticatedConversationPageIdEditRouteImport.update({
     id: '/conversation/$page/$id/edit',
     path: '/conversation/$page/$id/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiConfigIndexRoute =
   AuthenticatedConversationAiConfigIndexRouteImport.update({
     id: '/conversation/ai/config/',
     path: '/conversation/ai/config/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiCostsIndexRoute =
   AuthenticatedConversationAiCostsIndexRouteImport.update({
     id: '/conversation/ai/costs/',
     path: '/conversation/ai/costs/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiEvalLogsIndexRoute =
   AuthenticatedConversationAiEvalLogsIndexRouteImport.update({
     id: '/conversation/ai/eval-logs/',
     path: '/conversation/ai/eval-logs/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiInstructionsIndexRoute =
   AuthenticatedConversationAiInstructionsIndexRouteImport.update({
     id: '/conversation/ai/instructions/',
     path: '/conversation/ai/instructions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiModelsIndexRoute =
   AuthenticatedConversationAiModelsIndexRouteImport.update({
     id: '/conversation/ai/models/',
     path: '/conversation/ai/models/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiProcessorsIndexRoute =
   AuthenticatedConversationAiProcessorsIndexRouteImport.update({
     id: '/conversation/ai/processors/',
     path: '/conversation/ai/processors/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiProvidersIndexRoute =
   AuthenticatedConversationAiProvidersIndexRouteImport.update({
     id: '/conversation/ai/providers/',
     path: '/conversation/ai/providers/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedConversationAiRequestLogsIndexRoute =
   AuthenticatedConversationAiRequestLogsIndexRouteImport.update({
     id: '/conversation/ai/request-logs/',
     path: '/conversation/ai/request-logs/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisOrdersOrderIdReportRoute =
   AuthenticatedLisOrdersOrderIdReportRouteImport.update({
     id: '/lis/orders/$orderId/report',
     path: '/lis/orders/$orderId/report',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisOrdersWorkflowCollectRoute =
   AuthenticatedLisOrdersWorkflowCollectRouteImport.update({
     id: '/collect',
     path: '/collect',
     getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisOrdersWorkflowEnterRoute =
   AuthenticatedLisOrdersWorkflowEnterRouteImport.update({
     id: '/enter',
     path: '/enter',
     getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisOrdersWorkflowLabelRoute =
   AuthenticatedLisOrdersWorkflowLabelRouteImport.update({
     id: '/label',
     path: '/label',
     getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedLisOrdersWorkflowOrderRoute =
   AuthenticatedLisOrdersWorkflowOrderRouteImport.update({
     id: '/order',
     path: '/order',
     getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
-  } as any);
-const AuthenticatedLisOrdersWorkflowQaRoute = AuthenticatedLisOrdersWorkflowQaRouteImport.update({
-  id: '/qa',
-  path: '/qa',
-  getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
-} as any);
+  } as any)
+const AuthenticatedLisOrdersWorkflowQaRoute =
+  AuthenticatedLisOrdersWorkflowQaRouteImport.update({
+    id: '/qa',
+    path: '/qa',
+    getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
+  } as any)
 const AuthenticatedRxsoftReportsBalanceSheetIndexRoute =
   AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport.update({
     id: '/rxsoft/reports/balance-sheet/',
     path: '/rxsoft/reports/balance-sheet/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftReportsIncomeStatementIndexRoute =
   AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport.update({
     id: '/rxsoft/reports/income-statement/',
     path: '/rxsoft/reports/income-statement/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 const AuthenticatedRxsoftReportsTrialBalanceIndexRoute =
   AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport.update({
     id: '/rxsoft/reports/trial-balance/',
     path: '/rxsoft/reports/trial-balance/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
-const AuthenticatedRxsoftUomsUomIdEditRoute = AuthenticatedRxsoftUomsUomIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => AuthenticatedRxsoftUomsUomIdRoute,
-} as any);
+  } as any)
+const AuthenticatedRxsoftUomsUomIdEditRoute =
+  AuthenticatedRxsoftUomsUomIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedRxsoftUomsUomIdRoute,
+  } as any)
 const AuthenticatedRxsoftRolesIdPermissionsIndexRoute =
   AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport.update({
     id: '/rxsoft/roles/$id/permissions/',
     path: '/rxsoft/roles/$id/permissions/',
     getParentRoute: () => AuthenticatedRouteRoute,
-  } as any);
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/clerk': typeof ClerkauthRouteRoute;
-  '/apm/admin': typeof ApmAdminRouteRouteWithChildren;
-  '/forgot-password': typeof authForgotPasswordRoute;
-  '/otp': typeof authOtpRoute;
-  '/sign-in': typeof authSignInRoute;
-  '/sign-in-2': typeof authSignIn2Route;
-  '/sign-up': typeof authSignUpRoute;
-  '/401': typeof errors401Route;
-  '/403': typeof errors403Route;
-  '/404': typeof errors404Route;
-  '/500': typeof errors500Route;
-  '/503': typeof errors503Route;
-  '/service-unavailable': typeof errorsServiceUnavailableRoute;
-  '/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren;
-  '/apm/achievements': typeof ApmAchievementsRoute;
-  '/apm/agenda': typeof ApmAgendaRoute;
-  '/apm/contact': typeof ApmContactRoute;
-  '/apm/events': typeof ApmEventsRouteWithChildren;
-  '/apm/join': typeof ApmJoinRoute;
-  '/apm/media': typeof ApmMediaRoute;
-  '/apm/meet': typeof ApmMeetRoute;
-  '/apm/news': typeof ApmNewsRouteWithChildren;
-  '/apm/volunteer': typeof ApmVolunteerRoute;
-  '/shop/about': typeof ShopAboutRoute;
-  '/shop/blog': typeof ShopBlogRouteWithChildren;
-  '/shop/branches': typeof ShopBranchesRouteWithChildren;
-  '/shop/cart': typeof ShopCartRoute;
-  '/shop/categories': typeof ShopCategoriesRouteWithChildren;
-  '/shop/checkout': typeof ShopCheckoutRoute;
-  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute;
-  '/shop/consultations': typeof ShopConsultationsRoute;
-  '/shop/contact': typeof ShopContactRoute;
-  '/shop/conversation': typeof ShopConversationRoute;
-  '/shop/dashboard': typeof ShopDashboardRoute;
-  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute;
-  '/shop/facility-locator': typeof ShopFacilityLocatorRoute;
-  '/shop/faq': typeof ShopFaqRoute;
-  '/shop/forgot-password': typeof ShopForgotPasswordRoute;
-  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren;
-  '/shop/login': typeof ShopLoginRoute;
-  '/shop/medicines': typeof ShopMedicinesRouteWithChildren;
-  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute;
-  '/shop/orders': typeof ShopOrdersRoute;
-  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute;
-  '/shop/pos': typeof ShopPosRoute;
-  '/shop/pos2': typeof ShopPos2Route;
-  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute;
-  '/shop/rewards': typeof ShopRewardsRoute;
-  '/shop/search': typeof ShopSearchRoute;
-  '/shop/shop': typeof ShopShopRoute;
-  '/shop/supermarket': typeof ShopSupermarketRoute;
-  '/shop/terms': typeof ShopTermsRoute;
-  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute;
-  '/apm/': typeof ApmIndexRoute;
-  '/questionnaire/': typeof QuestionnaireIndexRoute;
-  '/shop/': typeof ShopIndexRoute;
-  '/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute;
-  '/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute;
-  '/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute;
-  '/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute;
-  '/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute;
-  '/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute;
-  '/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute;
-  '/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute;
-  '/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute;
-  '/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute;
-  '/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren;
-  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren;
-  '/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute;
-  '/$page/$id': typeof AuthenticatedPageIdRouteWithChildren;
-  '/$page/create': typeof AuthenticatedPageCreateRoute;
-  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute;
-  '/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute;
-  '/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute;
-  '/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute;
-  '/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute;
-  '/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute;
-  '/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute;
-  '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute;
-  '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute;
-  '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute;
-  '/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren;
-  '/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute;
-  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute;
-  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute;
-  '/emr/dashboard': typeof AuthenticatedEmrDashboardRoute;
-  '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute;
-  '/lis/dashboard': typeof AuthenticatedLisDashboardRoute;
-  '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute;
-  '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute;
-  '/apm/admin/agents': typeof ApmAdminAgentsRoute;
-  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute;
-  '/apm/admin/content': typeof ApmAdminContentRoute;
-  '/apm/admin/conversion': typeof ApmAdminConversionRoute;
-  '/apm/admin/gotv': typeof ApmAdminGotvRoute;
-  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute;
-  '/apm/admin/lgas': typeof ApmAdminLgasRoute;
-  '/apm/admin/listening': typeof ApmAdminListeningRoute;
-  '/apm/admin/results': typeof ApmAdminResultsRoute;
-  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute;
-  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute;
-  '/apm/admin/tours': typeof ApmAdminToursRoute;
-  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute;
-  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute;
-  '/apm/events/$id': typeof ApmEventsIdRoute;
-  '/apm/news/$slug': typeof ApmNewsSlugRoute;
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute;
-  '/shop/blog/$slug': typeof ShopBlogSlugRoute;
-  '/shop/branches/$id': typeof ShopBranchesIdRoute;
-  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute;
-  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute;
-  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute;
-  '/shop/orders/$id': typeof ShopOrdersIdRoute;
-  '/shop/pay/$token': typeof ShopPayTokenRoute;
-  '/shop/pay/return': typeof ShopPayReturnRoute;
-  '/shop/shop/$slug': typeof ShopShopSlugRoute;
-  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute;
-  '/$moduleId/': typeof AuthenticatedModuleIdIndexRoute;
-  '/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute;
-  '/conversation/': typeof AuthenticatedConversationIndexRoute;
-  '/emr/': typeof AuthenticatedEmrIndexRoute;
-  '/identity/': typeof AuthenticatedIdentityIndexRoute;
-  '/lis/': typeof AuthenticatedLisIndexRoute;
-  '/shop/purchases/': typeof ShopPurchasesIndexRoute;
-  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren;
-  '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute;
-  '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute;
-  '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute;
-  '/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute;
-  '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute;
-  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute;
-  '/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute;
-  '/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute;
-  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute;
-  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute;
-  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute;
-  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute;
-  '/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute;
-  '/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute;
-  '/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute;
-  '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute;
-  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute;
-  '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute;
-  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute;
-  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute;
-  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute;
-  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute;
-  '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren;
-  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute;
-  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute;
-  '/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute;
-  '/coding-concept/drug-classifications/': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute;
-  '/coding-concept/drug-components/': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute;
-  '/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute;
-  '/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute;
-  '/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute;
-  '/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute;
-  '/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute;
-  '/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute;
-  '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute;
-  '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute;
-  '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute;
-  '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute;
-  '/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute;
-  '/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute;
-  '/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute;
-  '/conversation/questions/': typeof AuthenticatedConversationQuestionsIndexRoute;
-  '/conversation/workflow-configuration/': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute;
-  '/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute;
-  '/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute;
-  '/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute;
-  '/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute;
-  '/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute;
-  '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute;
-  '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute;
-  '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute;
-  '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute;
-  '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute;
-  '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute;
-  '/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute;
-  '/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute;
-  '/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute;
-  '/emr/wards/': typeof AuthenticatedEmrWardsIndexRoute;
-  '/identity/locations/': typeof AuthenticatedIdentityLocationsIndexRoute;
-  '/identity/organizations/': typeof AuthenticatedIdentityOrganizationsIndexRoute;
-  '/identity/permissions/': typeof AuthenticatedIdentityPermissionsIndexRoute;
-  '/identity/roles/': typeof AuthenticatedIdentityRolesIndexRoute;
-  '/identity/users/': typeof AuthenticatedIdentityUsersIndexRoute;
-  '/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute;
-  '/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute;
-  '/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute;
-  '/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute;
-  '/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute;
-  '/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute;
-  '/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute;
-  '/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute;
-  '/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute;
-  '/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute;
-  '/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute;
-  '/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute;
-  '/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute;
-  '/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute;
-  '/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute;
-  '/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute;
-  '/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute;
-  '/lis/reference-ranges/': typeof AuthenticatedLisReferenceRangesIndexRoute;
-  '/lis/rejection-reasons/': typeof AuthenticatedLisRejectionReasonsIndexRoute;
-  '/lis/result-signatures/': typeof AuthenticatedLisResultSignaturesIndexRoute;
-  '/lis/results/': typeof AuthenticatedLisResultsIndexRoute;
-  '/lis/sample-types/': typeof AuthenticatedLisSampleTypesIndexRoute;
-  '/lis/samples/': typeof AuthenticatedLisSamplesIndexRoute;
-  '/lis/statuses/': typeof AuthenticatedLisStatusesIndexRoute;
-  '/lis/test-categories/': typeof AuthenticatedLisTestCategoriesIndexRoute;
-  '/lis/test-definitions/': typeof AuthenticatedLisTestDefinitionsIndexRoute;
-  '/lis/test-sections/': typeof AuthenticatedLisTestSectionsIndexRoute;
-  '/lis/uoms/': typeof AuthenticatedLisUomsIndexRoute;
-  '/lis/validation-dashboard/': typeof AuthenticatedLisValidationDashboardIndexRoute;
-  '/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute;
-  '/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute;
-  '/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute;
-  '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute;
-  '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute;
-  '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute;
-  '/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute;
-  '/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute;
-  '/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute;
-  '/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute;
-  '/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute;
-  '/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute;
-  '/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute;
-  '/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute;
-  '/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute;
-  '/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute;
-  '/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute;
-  '/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute;
-  '/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute;
-  '/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute;
-  '/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute;
-  '/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute;
-  '/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute;
-  '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute;
-  '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute;
-  '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute;
-  '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute;
-  '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute;
-  '/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute;
-  '/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute;
-  '/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute;
-  '/rxsoft/payment-transactions/': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute;
-  '/rxsoft/payments/': typeof AuthenticatedRxsoftPaymentsIndexRoute;
-  '/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute;
-  '/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute;
-  '/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute;
-  '/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute;
-  '/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute;
-  '/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute;
-  '/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute;
-  '/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute;
-  '/rxsoft/role-requests/': typeof AuthenticatedRxsoftRoleRequestsIndexRoute;
-  '/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute;
-  '/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute;
-  '/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute;
-  '/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute;
-  '/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute;
-  '/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute;
-  '/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute;
-  '/rxsoft/uoms/': typeof AuthenticatedRxsoftUomsIndexRoute;
-  '/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute;
-  '/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute;
-  '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute;
-  '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute;
-  '/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute;
-  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute;
-  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute;
-  '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute;
-  '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute;
-  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute;
-  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute;
-  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute;
-  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute;
-  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute;
-  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute;
-  '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute;
-  '/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute;
-  '/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute;
-  '/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute;
-  '/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute;
-  '/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute;
-  '/coding-concept/facilities/states/': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute;
-  '/coding-concept/facilities/types/': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute;
-  '/coding-concept/facilities/wards/': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute;
-  '/conversation/ai/config/': typeof AuthenticatedConversationAiConfigIndexRoute;
-  '/conversation/ai/costs/': typeof AuthenticatedConversationAiCostsIndexRoute;
-  '/conversation/ai/eval-logs/': typeof AuthenticatedConversationAiEvalLogsIndexRoute;
-  '/conversation/ai/instructions/': typeof AuthenticatedConversationAiInstructionsIndexRoute;
-  '/conversation/ai/models/': typeof AuthenticatedConversationAiModelsIndexRoute;
-  '/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute;
-  '/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute;
-  '/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute;
-  '/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute;
-  '/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute;
-  '/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute;
-  '/rxsoft/roles/$id/permissions/': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute;
+  '/': typeof IndexRoute
+  '/clerk': typeof ClerkauthRouteRoute
+  '/apm/admin': typeof ApmAdminRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/otp': typeof authOtpRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-in-2': typeof authSignIn2Route
+  '/sign-up': typeof authSignUpRoute
+  '/401': typeof errors401Route
+  '/403': typeof errors403Route
+  '/404': typeof errors404Route
+  '/500': typeof errors500Route
+  '/503': typeof errors503Route
+  '/service-unavailable': typeof errorsServiceUnavailableRoute
+  '/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren
+  '/apm/achievements': typeof ApmAchievementsRoute
+  '/apm/agenda': typeof ApmAgendaRoute
+  '/apm/contact': typeof ApmContactRoute
+  '/apm/events': typeof ApmEventsRouteWithChildren
+  '/apm/join': typeof ApmJoinRoute
+  '/apm/media': typeof ApmMediaRoute
+  '/apm/meet': typeof ApmMeetRoute
+  '/apm/news': typeof ApmNewsRouteWithChildren
+  '/apm/volunteer': typeof ApmVolunteerRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/blog': typeof ShopBlogRouteWithChildren
+  '/shop/branches': typeof ShopBranchesRouteWithChildren
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/categories': typeof ShopCategoriesRouteWithChildren
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute
+  '/shop/consultations': typeof ShopConsultationsRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/conversation': typeof ShopConversationRoute
+  '/shop/dashboard': typeof ShopDashboardRoute
+  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute
+  '/shop/facility-locator': typeof ShopFacilityLocatorRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/forgot-password': typeof ShopForgotPasswordRoute
+  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren
+  '/shop/login': typeof ShopLoginRoute
+  '/shop/medicines': typeof ShopMedicinesRouteWithChildren
+  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute
+  '/shop/orders': typeof ShopOrdersRoute
+  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute
+  '/shop/pos': typeof ShopPosRoute
+  '/shop/pos2': typeof ShopPos2Route
+  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/rewards': typeof ShopRewardsRoute
+  '/shop/search': typeof ShopSearchRoute
+  '/shop/shop': typeof ShopShopRoute
+  '/shop/supermarket': typeof ShopSupermarketRoute
+  '/shop/terms': typeof ShopTermsRoute
+  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/apm/': typeof ApmIndexRoute
+  '/questionnaire/': typeof QuestionnaireIndexRoute
+  '/shop/': typeof ShopIndexRoute
+  '/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute
+  '/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute
+  '/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute
+  '/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute
+  '/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute
+  '/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute
+  '/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute
+  '/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute
+  '/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute
+  '/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute
+  '/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren
+  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
+  '/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute
+  '/$page/$id': typeof AuthenticatedPageIdRouteWithChildren
+  '/$page/create': typeof AuthenticatedPageCreateRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute
+  '/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute
+  '/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute
+  '/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute
+  '/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute
+  '/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute
+  '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
+  '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
+  '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren
+  '/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute
+  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
+  '/emr/dashboard': typeof AuthenticatedEmrDashboardRoute
+  '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
+  '/lis/dashboard': typeof AuthenticatedLisDashboardRoute
+  '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
+  '/apm/admin/agents': typeof ApmAdminAgentsRoute
+  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
+  '/apm/admin/content': typeof ApmAdminContentRoute
+  '/apm/admin/conversion': typeof ApmAdminConversionRoute
+  '/apm/admin/gotv': typeof ApmAdminGotvRoute
+  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute
+  '/apm/admin/lgas': typeof ApmAdminLgasRoute
+  '/apm/admin/listening': typeof ApmAdminListeningRoute
+  '/apm/admin/results': typeof ApmAdminResultsRoute
+  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute
+  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute
+  '/apm/admin/tours': typeof ApmAdminToursRoute
+  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute
+  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute
+  '/apm/events/$id': typeof ApmEventsIdRoute
+  '/apm/news/$slug': typeof ApmNewsSlugRoute
+  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/shop/blog/$slug': typeof ShopBlogSlugRoute
+  '/shop/branches/$id': typeof ShopBranchesIdRoute
+  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
+  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
+  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/orders/$id': typeof ShopOrdersIdRoute
+  '/shop/pay/$token': typeof ShopPayTokenRoute
+  '/shop/pay/return': typeof ShopPayReturnRoute
+  '/shop/shop/$slug': typeof ShopShopSlugRoute
+  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute
+  '/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
+  '/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute
+  '/conversation/': typeof AuthenticatedConversationIndexRoute
+  '/emr/': typeof AuthenticatedEmrIndexRoute
+  '/identity/': typeof AuthenticatedIdentityIndexRoute
+  '/lis/': typeof AuthenticatedLisIndexRoute
+  '/shop/purchases/': typeof ShopPurchasesIndexRoute
+  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
+  '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
+  '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
+  '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
+  '/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute
+  '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute
+  '/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute
+  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
+  '/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute
+  '/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute
+  '/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute
+  '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
+  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
+  '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
+  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
+  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
+  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
+  '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
+  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
+  '/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
+  '/coding-concept/drug-classifications/': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
+  '/coding-concept/drug-components/': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
+  '/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
+  '/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute
+  '/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
+  '/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
+  '/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
+  '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
+  '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
+  '/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
+  '/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
+  '/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute
+  '/conversation/questions/': typeof AuthenticatedConversationQuestionsIndexRoute
+  '/conversation/workflow-configuration/': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute
+  '/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute
+  '/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
+  '/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
+  '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
+  '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
+  '/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute
+  '/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
+  '/emr/wards/': typeof AuthenticatedEmrWardsIndexRoute
+  '/identity/locations/': typeof AuthenticatedIdentityLocationsIndexRoute
+  '/identity/organizations/': typeof AuthenticatedIdentityOrganizationsIndexRoute
+  '/identity/permissions/': typeof AuthenticatedIdentityPermissionsIndexRoute
+  '/identity/roles/': typeof AuthenticatedIdentityRolesIndexRoute
+  '/identity/users/': typeof AuthenticatedIdentityUsersIndexRoute
+  '/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute
+  '/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute
+  '/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
+  '/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
+  '/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute
+  '/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute
+  '/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute
+  '/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
+  '/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute
+  '/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute
+  '/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute
+  '/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute
+  '/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute
+  '/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute
+  '/lis/reference-ranges/': typeof AuthenticatedLisReferenceRangesIndexRoute
+  '/lis/rejection-reasons/': typeof AuthenticatedLisRejectionReasonsIndexRoute
+  '/lis/result-signatures/': typeof AuthenticatedLisResultSignaturesIndexRoute
+  '/lis/results/': typeof AuthenticatedLisResultsIndexRoute
+  '/lis/sample-types/': typeof AuthenticatedLisSampleTypesIndexRoute
+  '/lis/samples/': typeof AuthenticatedLisSamplesIndexRoute
+  '/lis/statuses/': typeof AuthenticatedLisStatusesIndexRoute
+  '/lis/test-categories/': typeof AuthenticatedLisTestCategoriesIndexRoute
+  '/lis/test-definitions/': typeof AuthenticatedLisTestDefinitionsIndexRoute
+  '/lis/test-sections/': typeof AuthenticatedLisTestSectionsIndexRoute
+  '/lis/uoms/': typeof AuthenticatedLisUomsIndexRoute
+  '/lis/validation-dashboard/': typeof AuthenticatedLisValidationDashboardIndexRoute
+  '/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute
+  '/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
+  '/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
+  '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
+  '/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
+  '/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
+  '/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
+  '/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
+  '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
+  '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
+  '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
+  '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
+  '/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute
+  '/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
+  '/rxsoft/payment-transactions/': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute
+  '/rxsoft/payments/': typeof AuthenticatedRxsoftPaymentsIndexRoute
+  '/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
+  '/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
+  '/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
+  '/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
+  '/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
+  '/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute
+  '/rxsoft/role-requests/': typeof AuthenticatedRxsoftRoleRequestsIndexRoute
+  '/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
+  '/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
+  '/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
+  '/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
+  '/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute
+  '/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute
+  '/rxsoft/uoms/': typeof AuthenticatedRxsoftUomsIndexRoute
+  '/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute
+  '/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
+  '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
+  '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
+  '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
+  '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
+  '/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
+  '/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
+  '/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
+  '/coding-concept/facilities/states/': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute
+  '/coding-concept/facilities/types/': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute
+  '/coding-concept/facilities/wards/': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute
+  '/conversation/ai/config/': typeof AuthenticatedConversationAiConfigIndexRoute
+  '/conversation/ai/costs/': typeof AuthenticatedConversationAiCostsIndexRoute
+  '/conversation/ai/eval-logs/': typeof AuthenticatedConversationAiEvalLogsIndexRoute
+  '/conversation/ai/instructions/': typeof AuthenticatedConversationAiInstructionsIndexRoute
+  '/conversation/ai/models/': typeof AuthenticatedConversationAiModelsIndexRoute
+  '/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
+  '/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
+  '/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
+  '/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
+  '/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
+  '/rxsoft/roles/$id/permissions/': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/clerk': typeof ClerkauthRouteRoute;
-  '/apm/admin': typeof ApmAdminRouteRouteWithChildren;
-  '/forgot-password': typeof authForgotPasswordRoute;
-  '/otp': typeof authOtpRoute;
-  '/sign-in': typeof authSignInRoute;
-  '/sign-in-2': typeof authSignIn2Route;
-  '/sign-up': typeof authSignUpRoute;
-  '/401': typeof errors401Route;
-  '/403': typeof errors403Route;
-  '/404': typeof errors404Route;
-  '/500': typeof errors500Route;
-  '/503': typeof errors503Route;
-  '/service-unavailable': typeof errorsServiceUnavailableRoute;
-  '/apm/achievements': typeof ApmAchievementsRoute;
-  '/apm/agenda': typeof ApmAgendaRoute;
-  '/apm/contact': typeof ApmContactRoute;
-  '/apm/events': typeof ApmEventsRouteWithChildren;
-  '/apm/join': typeof ApmJoinRoute;
-  '/apm/media': typeof ApmMediaRoute;
-  '/apm/meet': typeof ApmMeetRoute;
-  '/apm/news': typeof ApmNewsRouteWithChildren;
-  '/apm/volunteer': typeof ApmVolunteerRoute;
-  '/shop/about': typeof ShopAboutRoute;
-  '/shop/blog': typeof ShopBlogRouteWithChildren;
-  '/shop/branches': typeof ShopBranchesRouteWithChildren;
-  '/shop/cart': typeof ShopCartRoute;
-  '/shop/categories': typeof ShopCategoriesRouteWithChildren;
-  '/shop/checkout': typeof ShopCheckoutRoute;
-  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute;
-  '/shop/consultations': typeof ShopConsultationsRoute;
-  '/shop/contact': typeof ShopContactRoute;
-  '/shop/conversation': typeof ShopConversationRoute;
-  '/shop/dashboard': typeof ShopDashboardRoute;
-  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute;
-  '/shop/facility-locator': typeof ShopFacilityLocatorRoute;
-  '/shop/faq': typeof ShopFaqRoute;
-  '/shop/forgot-password': typeof ShopForgotPasswordRoute;
-  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren;
-  '/shop/login': typeof ShopLoginRoute;
-  '/shop/medicines': typeof ShopMedicinesRouteWithChildren;
-  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute;
-  '/shop/orders': typeof ShopOrdersRoute;
-  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute;
-  '/shop/pos': typeof ShopPosRoute;
-  '/shop/pos2': typeof ShopPos2Route;
-  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute;
-  '/shop/rewards': typeof ShopRewardsRoute;
-  '/shop/search': typeof ShopSearchRoute;
-  '/shop/shop': typeof ShopShopRoute;
-  '/shop/supermarket': typeof ShopSupermarketRoute;
-  '/shop/terms': typeof ShopTermsRoute;
-  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute;
-  '/apm': typeof ApmIndexRoute;
-  '/questionnaire': typeof QuestionnaireIndexRoute;
-  '/shop': typeof ShopIndexRoute;
-  '/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute;
-  '/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute;
-  '/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute;
-  '/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute;
-  '/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute;
-  '/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute;
-  '/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute;
-  '/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute;
-  '/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute;
-  '/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute;
-  '/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren;
-  '/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute;
-  '/$page/$id': typeof AuthenticatedPageIdRouteWithChildren;
-  '/$page/create': typeof AuthenticatedPageCreateRoute;
-  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute;
-  '/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute;
-  '/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute;
-  '/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute;
-  '/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute;
-  '/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute;
-  '/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute;
-  '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute;
-  '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute;
-  '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute;
-  '/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren;
-  '/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute;
-  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute;
-  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute;
-  '/emr/dashboard': typeof AuthenticatedEmrDashboardRoute;
-  '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute;
-  '/lis/dashboard': typeof AuthenticatedLisDashboardRoute;
-  '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute;
-  '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute;
-  '/apm/admin/agents': typeof ApmAdminAgentsRoute;
-  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute;
-  '/apm/admin/content': typeof ApmAdminContentRoute;
-  '/apm/admin/conversion': typeof ApmAdminConversionRoute;
-  '/apm/admin/gotv': typeof ApmAdminGotvRoute;
-  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute;
-  '/apm/admin/lgas': typeof ApmAdminLgasRoute;
-  '/apm/admin/listening': typeof ApmAdminListeningRoute;
-  '/apm/admin/results': typeof ApmAdminResultsRoute;
-  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute;
-  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute;
-  '/apm/admin/tours': typeof ApmAdminToursRoute;
-  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute;
-  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute;
-  '/apm/events/$id': typeof ApmEventsIdRoute;
-  '/apm/news/$slug': typeof ApmNewsSlugRoute;
-  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute;
-  '/shop/blog/$slug': typeof ShopBlogSlugRoute;
-  '/shop/branches/$id': typeof ShopBranchesIdRoute;
-  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute;
-  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute;
-  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute;
-  '/shop/orders/$id': typeof ShopOrdersIdRoute;
-  '/shop/pay/$token': typeof ShopPayTokenRoute;
-  '/shop/pay/return': typeof ShopPayReturnRoute;
-  '/shop/shop/$slug': typeof ShopShopSlugRoute;
-  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute;
-  '/$moduleId': typeof AuthenticatedModuleIdIndexRoute;
-  '/coding-concept': typeof AuthenticatedCodingConceptIndexRoute;
-  '/conversation': typeof AuthenticatedConversationIndexRoute;
-  '/emr': typeof AuthenticatedEmrIndexRoute;
-  '/identity': typeof AuthenticatedIdentityIndexRoute;
-  '/lis': typeof AuthenticatedLisIndexRoute;
-  '/shop/purchases': typeof ShopPurchasesIndexRoute;
-  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren;
-  '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute;
-  '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute;
-  '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute;
-  '/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute;
-  '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute;
-  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute;
-  '/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute;
-  '/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute;
-  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute;
-  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute;
-  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute;
-  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute;
-  '/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute;
-  '/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute;
-  '/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute;
-  '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute;
-  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute;
-  '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute;
-  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute;
-  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute;
-  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute;
-  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute;
-  '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren;
-  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute;
-  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute;
-  '/coding-concept/dosage-forms': typeof AuthenticatedCodingConceptDosageFormsIndexRoute;
-  '/coding-concept/drug-classifications': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute;
-  '/coding-concept/drug-components': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute;
-  '/coding-concept/facilities': typeof AuthenticatedCodingConceptFacilitiesIndexRoute;
-  '/coding-concept/formulations': typeof AuthenticatedCodingConceptFormulationsIndexRoute;
-  '/coding-concept/generic-drugs': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute;
-  '/coding-concept/generic-products': typeof AuthenticatedCodingConceptGenericProductsIndexRoute;
-  '/coding-concept/manufacturers': typeof AuthenticatedCodingConceptManufacturersIndexRoute;
-  '/coding-concept/pharmaceutics': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute;
-  '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute;
-  '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute;
-  '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute;
-  '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute;
-  '/conversation/participants': typeof AuthenticatedConversationParticipantsIndexRoute;
-  '/conversation/projections': typeof AuthenticatedConversationProjectionsIndexRoute;
-  '/conversation/questionnaires': typeof AuthenticatedConversationQuestionnairesIndexRoute;
-  '/conversation/questions': typeof AuthenticatedConversationQuestionsIndexRoute;
-  '/conversation/workflow-configuration': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute;
-  '/conversation/workflow-events': typeof AuthenticatedConversationWorkflowEventsIndexRoute;
-  '/conversation/workflow-instances': typeof AuthenticatedConversationWorkflowInstancesIndexRoute;
-  '/conversation/workflows': typeof AuthenticatedConversationWorkflowsIndexRoute;
-  '/emr/appointments': typeof AuthenticatedEmrAppointmentsIndexRoute;
-  '/emr/departments': typeof AuthenticatedEmrDepartmentsIndexRoute;
-  '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute;
-  '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute;
-  '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute;
-  '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute;
-  '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute;
-  '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute;
-  '/emr/staff': typeof AuthenticatedEmrStaffIndexRoute;
-  '/emr/tags': typeof AuthenticatedEmrTagsIndexRoute;
-  '/emr/visits': typeof AuthenticatedEmrVisitsIndexRoute;
-  '/emr/wards': typeof AuthenticatedEmrWardsIndexRoute;
-  '/identity/locations': typeof AuthenticatedIdentityLocationsIndexRoute;
-  '/identity/organizations': typeof AuthenticatedIdentityOrganizationsIndexRoute;
-  '/identity/permissions': typeof AuthenticatedIdentityPermissionsIndexRoute;
-  '/identity/roles': typeof AuthenticatedIdentityRolesIndexRoute;
-  '/identity/users': typeof AuthenticatedIdentityUsersIndexRoute;
-  '/lis/attribute-definitions': typeof AuthenticatedLisAttributeDefinitionsIndexRoute;
-  '/lis/eqa-enrollments': typeof AuthenticatedLisEqaEnrollmentsIndexRoute;
-  '/lis/eqa-programs': typeof AuthenticatedLisEqaProgramsIndexRoute;
-  '/lis/eqa-results': typeof AuthenticatedLisEqaResultsIndexRoute;
-  '/lis/location-types': typeof AuthenticatedLisLocationTypesIndexRoute;
-  '/lis/locations': typeof AuthenticatedLisLocationsIndexRoute;
-  '/lis/loinc': typeof AuthenticatedLisLoincIndexRoute;
-  '/lis/methods': typeof AuthenticatedLisMethodsIndexRoute;
-  '/lis/orders': typeof AuthenticatedLisOrdersIndexRoute;
-  '/lis/panels': typeof AuthenticatedLisPanelsIndexRoute;
-  '/lis/patients': typeof AuthenticatedLisPatientsIndexRoute;
-  '/lis/priorities': typeof AuthenticatedLisPrioritiesIndexRoute;
-  '/lis/programs': typeof AuthenticatedLisProgramsIndexRoute;
-  '/lis/qa-checklist-items': typeof AuthenticatedLisQaChecklistItemsIndexRoute;
-  '/lis/qc-alerts': typeof AuthenticatedLisQcAlertsIndexRoute;
-  '/lis/qc-lots': typeof AuthenticatedLisQcLotsIndexRoute;
-  '/lis/qc-results': typeof AuthenticatedLisQcResultsIndexRoute;
-  '/lis/reference-ranges': typeof AuthenticatedLisReferenceRangesIndexRoute;
-  '/lis/rejection-reasons': typeof AuthenticatedLisRejectionReasonsIndexRoute;
-  '/lis/result-signatures': typeof AuthenticatedLisResultSignaturesIndexRoute;
-  '/lis/results': typeof AuthenticatedLisResultsIndexRoute;
-  '/lis/sample-types': typeof AuthenticatedLisSampleTypesIndexRoute;
-  '/lis/samples': typeof AuthenticatedLisSamplesIndexRoute;
-  '/lis/statuses': typeof AuthenticatedLisStatusesIndexRoute;
-  '/lis/test-categories': typeof AuthenticatedLisTestCategoriesIndexRoute;
-  '/lis/test-definitions': typeof AuthenticatedLisTestDefinitionsIndexRoute;
-  '/lis/test-sections': typeof AuthenticatedLisTestSectionsIndexRoute;
-  '/lis/uoms': typeof AuthenticatedLisUomsIndexRoute;
-  '/lis/validation-dashboard': typeof AuthenticatedLisValidationDashboardIndexRoute;
-  '/rxsoft/audit-logs': typeof AuthenticatedRxsoftAuditLogsIndexRoute;
-  '/rxsoft/branches': typeof AuthenticatedRxsoftBranchesIndexRoute;
-  '/rxsoft/categories': typeof AuthenticatedRxsoftCategoriesIndexRoute;
-  '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute;
-  '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute;
-  '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute;
-  '/rxsoft/ehealthwares-careers': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute;
-  '/rxsoft/ehealthwares-categories': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute;
-  '/rxsoft/ehealthwares-contact-submissions': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute;
-  '/rxsoft/ehealthwares-hero-slides': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute;
-  '/rxsoft/ehealthwares-investors': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute;
-  '/rxsoft/ehealthwares-partners': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute;
-  '/rxsoft/ehealthwares-products': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute;
-  '/rxsoft/ehealthwares-sections': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute;
-  '/rxsoft/ehealthwares-services': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute;
-  '/rxsoft/ehealthwares-settings': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute;
-  '/rxsoft/ehealthwares-team': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute;
-  '/rxsoft/ehealthwares-testimonials': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute;
-  '/rxsoft/gl-accounts': typeof AuthenticatedRxsoftGlAccountsIndexRoute;
-  '/rxsoft/insurance-providers': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute;
-  '/rxsoft/inventory': typeof AuthenticatedRxsoftInventoryIndexRoute;
-  '/rxsoft/items': typeof AuthenticatedRxsoftItemsIndexRoute;
-  '/rxsoft/journal-entries': typeof AuthenticatedRxsoftJournalEntriesIndexRoute;
-  '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute;
-  '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute;
-  '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute;
-  '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute;
-  '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute;
-  '/rxsoft/organizations': typeof AuthenticatedRxsoftOrganizationsIndexRoute;
-  '/rxsoft/payment-methods': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute;
-  '/rxsoft/payment-providers': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute;
-  '/rxsoft/payment-transactions': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute;
-  '/rxsoft/payments': typeof AuthenticatedRxsoftPaymentsIndexRoute;
-  '/rxsoft/pharmaceutics': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute;
-  '/rxsoft/pos-terminals': typeof AuthenticatedRxsoftPosTerminalsIndexRoute;
-  '/rxsoft/price-list-items': typeof AuthenticatedRxsoftPriceListItemsIndexRoute;
-  '/rxsoft/price-lists': typeof AuthenticatedRxsoftPriceListsIndexRoute;
-  '/rxsoft/purchases': typeof AuthenticatedRxsoftPurchasesIndexRoute;
-  '/rxsoft/receivables': typeof AuthenticatedRxsoftReceivablesIndexRoute;
-  '/rxsoft/receiving': typeof AuthenticatedRxsoftReceivingIndexRoute;
-  '/rxsoft/reports': typeof AuthenticatedRxsoftReportsIndexRoute;
-  '/rxsoft/role-requests': typeof AuthenticatedRxsoftRoleRequestsIndexRoute;
-  '/rxsoft/roles': typeof AuthenticatedRxsoftRolesIndexRoute;
-  '/rxsoft/sales-lines': typeof AuthenticatedRxsoftSalesLinesIndexRoute;
-  '/rxsoft/sales': typeof AuthenticatedRxsoftSalesIndexRoute;
-  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsIndexRoute;
-  '/rxsoft/stock-locations': typeof AuthenticatedRxsoftStockLocationsIndexRoute;
-  '/rxsoft/suppliers': typeof AuthenticatedRxsoftSuppliersIndexRoute;
-  '/rxsoft/uom-category': typeof AuthenticatedRxsoftUomCategoryIndexRoute;
-  '/rxsoft/uoms': typeof AuthenticatedRxsoftUomsIndexRoute;
-  '/rxsoft/user-config': typeof AuthenticatedRxsoftUserConfigIndexRoute;
-  '/rxsoft/users': typeof AuthenticatedRxsoftUsersIndexRoute;
-  '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute;
-  '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute;
-  '/rxsoft/website-prescriptions': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute;
-  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute;
-  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute;
-  '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute;
-  '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute;
-  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute;
-  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute;
-  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute;
-  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute;
-  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute;
-  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute;
-  '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute;
-  '/coding-concept/facilities/hospitals': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute;
-  '/coding-concept/facilities/laboratories': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute;
-  '/coding-concept/facilities/levels': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute;
-  '/coding-concept/facilities/lgas': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute;
-  '/coding-concept/facilities/pharmacies': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute;
-  '/coding-concept/facilities/states': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute;
-  '/coding-concept/facilities/types': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute;
-  '/coding-concept/facilities/wards': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute;
-  '/conversation/ai/config': typeof AuthenticatedConversationAiConfigIndexRoute;
-  '/conversation/ai/costs': typeof AuthenticatedConversationAiCostsIndexRoute;
-  '/conversation/ai/eval-logs': typeof AuthenticatedConversationAiEvalLogsIndexRoute;
-  '/conversation/ai/instructions': typeof AuthenticatedConversationAiInstructionsIndexRoute;
-  '/conversation/ai/models': typeof AuthenticatedConversationAiModelsIndexRoute;
-  '/conversation/ai/processors': typeof AuthenticatedConversationAiProcessorsIndexRoute;
-  '/conversation/ai/providers': typeof AuthenticatedConversationAiProvidersIndexRoute;
-  '/conversation/ai/request-logs': typeof AuthenticatedConversationAiRequestLogsIndexRoute;
-  '/rxsoft/reports/balance-sheet': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute;
-  '/rxsoft/reports/income-statement': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute;
-  '/rxsoft/reports/trial-balance': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute;
-  '/rxsoft/roles/$id/permissions': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute;
+  '/': typeof IndexRoute
+  '/clerk': typeof ClerkauthRouteRoute
+  '/apm/admin': typeof ApmAdminRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/otp': typeof authOtpRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-in-2': typeof authSignIn2Route
+  '/sign-up': typeof authSignUpRoute
+  '/401': typeof errors401Route
+  '/403': typeof errors403Route
+  '/404': typeof errors404Route
+  '/500': typeof errors500Route
+  '/503': typeof errors503Route
+  '/service-unavailable': typeof errorsServiceUnavailableRoute
+  '/apm/achievements': typeof ApmAchievementsRoute
+  '/apm/agenda': typeof ApmAgendaRoute
+  '/apm/contact': typeof ApmContactRoute
+  '/apm/events': typeof ApmEventsRouteWithChildren
+  '/apm/join': typeof ApmJoinRoute
+  '/apm/media': typeof ApmMediaRoute
+  '/apm/meet': typeof ApmMeetRoute
+  '/apm/news': typeof ApmNewsRouteWithChildren
+  '/apm/volunteer': typeof ApmVolunteerRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/blog': typeof ShopBlogRouteWithChildren
+  '/shop/branches': typeof ShopBranchesRouteWithChildren
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/categories': typeof ShopCategoriesRouteWithChildren
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute
+  '/shop/consultations': typeof ShopConsultationsRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/conversation': typeof ShopConversationRoute
+  '/shop/dashboard': typeof ShopDashboardRoute
+  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute
+  '/shop/facility-locator': typeof ShopFacilityLocatorRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/forgot-password': typeof ShopForgotPasswordRoute
+  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren
+  '/shop/login': typeof ShopLoginRoute
+  '/shop/medicines': typeof ShopMedicinesRouteWithChildren
+  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute
+  '/shop/orders': typeof ShopOrdersRoute
+  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute
+  '/shop/pos': typeof ShopPosRoute
+  '/shop/pos2': typeof ShopPos2Route
+  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/rewards': typeof ShopRewardsRoute
+  '/shop/search': typeof ShopSearchRoute
+  '/shop/shop': typeof ShopShopRoute
+  '/shop/supermarket': typeof ShopSupermarketRoute
+  '/shop/terms': typeof ShopTermsRoute
+  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/apm': typeof ApmIndexRoute
+  '/questionnaire': typeof QuestionnaireIndexRoute
+  '/shop': typeof ShopIndexRoute
+  '/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute
+  '/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute
+  '/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute
+  '/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute
+  '/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute
+  '/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute
+  '/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute
+  '/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute
+  '/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute
+  '/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute
+  '/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren
+  '/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute
+  '/$page/$id': typeof AuthenticatedPageIdRouteWithChildren
+  '/$page/create': typeof AuthenticatedPageCreateRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute
+  '/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute
+  '/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute
+  '/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute
+  '/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute
+  '/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute
+  '/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
+  '/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
+  '/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren
+  '/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute
+  '/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
+  '/emr/dashboard': typeof AuthenticatedEmrDashboardRoute
+  '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
+  '/lis/dashboard': typeof AuthenticatedLisDashboardRoute
+  '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
+  '/apm/admin/agents': typeof ApmAdminAgentsRoute
+  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
+  '/apm/admin/content': typeof ApmAdminContentRoute
+  '/apm/admin/conversion': typeof ApmAdminConversionRoute
+  '/apm/admin/gotv': typeof ApmAdminGotvRoute
+  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute
+  '/apm/admin/lgas': typeof ApmAdminLgasRoute
+  '/apm/admin/listening': typeof ApmAdminListeningRoute
+  '/apm/admin/results': typeof ApmAdminResultsRoute
+  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute
+  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute
+  '/apm/admin/tours': typeof ApmAdminToursRoute
+  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute
+  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute
+  '/apm/events/$id': typeof ApmEventsIdRoute
+  '/apm/news/$slug': typeof ApmNewsSlugRoute
+  '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/shop/blog/$slug': typeof ShopBlogSlugRoute
+  '/shop/branches/$id': typeof ShopBranchesIdRoute
+  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
+  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
+  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/orders/$id': typeof ShopOrdersIdRoute
+  '/shop/pay/$token': typeof ShopPayTokenRoute
+  '/shop/pay/return': typeof ShopPayReturnRoute
+  '/shop/shop/$slug': typeof ShopShopSlugRoute
+  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute
+  '/$moduleId': typeof AuthenticatedModuleIdIndexRoute
+  '/coding-concept': typeof AuthenticatedCodingConceptIndexRoute
+  '/conversation': typeof AuthenticatedConversationIndexRoute
+  '/emr': typeof AuthenticatedEmrIndexRoute
+  '/identity': typeof AuthenticatedIdentityIndexRoute
+  '/lis': typeof AuthenticatedLisIndexRoute
+  '/shop/purchases': typeof ShopPurchasesIndexRoute
+  '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
+  '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
+  '/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
+  '/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
+  '/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute
+  '/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute
+  '/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute
+  '/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
+  '/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute
+  '/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute
+  '/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute
+  '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
+  '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
+  '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
+  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
+  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
+  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
+  '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
+  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
+  '/coding-concept/dosage-forms': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
+  '/coding-concept/drug-classifications': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
+  '/coding-concept/drug-components': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
+  '/coding-concept/facilities': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
+  '/coding-concept/formulations': typeof AuthenticatedCodingConceptFormulationsIndexRoute
+  '/coding-concept/generic-drugs': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/coding-concept/generic-products': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
+  '/coding-concept/manufacturers': typeof AuthenticatedCodingConceptManufacturersIndexRoute
+  '/coding-concept/pharmaceutics': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
+  '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute
+  '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute
+  '/conversation/participants': typeof AuthenticatedConversationParticipantsIndexRoute
+  '/conversation/projections': typeof AuthenticatedConversationProjectionsIndexRoute
+  '/conversation/questionnaires': typeof AuthenticatedConversationQuestionnairesIndexRoute
+  '/conversation/questions': typeof AuthenticatedConversationQuestionsIndexRoute
+  '/conversation/workflow-configuration': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute
+  '/conversation/workflow-events': typeof AuthenticatedConversationWorkflowEventsIndexRoute
+  '/conversation/workflow-instances': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
+  '/conversation/workflows': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/emr/appointments': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/emr/departments': typeof AuthenticatedEmrDepartmentsIndexRoute
+  '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
+  '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
+  '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute
+  '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
+  '/emr/staff': typeof AuthenticatedEmrStaffIndexRoute
+  '/emr/tags': typeof AuthenticatedEmrTagsIndexRoute
+  '/emr/visits': typeof AuthenticatedEmrVisitsIndexRoute
+  '/emr/wards': typeof AuthenticatedEmrWardsIndexRoute
+  '/identity/locations': typeof AuthenticatedIdentityLocationsIndexRoute
+  '/identity/organizations': typeof AuthenticatedIdentityOrganizationsIndexRoute
+  '/identity/permissions': typeof AuthenticatedIdentityPermissionsIndexRoute
+  '/identity/roles': typeof AuthenticatedIdentityRolesIndexRoute
+  '/identity/users': typeof AuthenticatedIdentityUsersIndexRoute
+  '/lis/attribute-definitions': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/lis/eqa-enrollments': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/lis/eqa-programs': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/lis/eqa-results': typeof AuthenticatedLisEqaResultsIndexRoute
+  '/lis/location-types': typeof AuthenticatedLisLocationTypesIndexRoute
+  '/lis/locations': typeof AuthenticatedLisLocationsIndexRoute
+  '/lis/loinc': typeof AuthenticatedLisLoincIndexRoute
+  '/lis/methods': typeof AuthenticatedLisMethodsIndexRoute
+  '/lis/orders': typeof AuthenticatedLisOrdersIndexRoute
+  '/lis/panels': typeof AuthenticatedLisPanelsIndexRoute
+  '/lis/patients': typeof AuthenticatedLisPatientsIndexRoute
+  '/lis/priorities': typeof AuthenticatedLisPrioritiesIndexRoute
+  '/lis/programs': typeof AuthenticatedLisProgramsIndexRoute
+  '/lis/qa-checklist-items': typeof AuthenticatedLisQaChecklistItemsIndexRoute
+  '/lis/qc-alerts': typeof AuthenticatedLisQcAlertsIndexRoute
+  '/lis/qc-lots': typeof AuthenticatedLisQcLotsIndexRoute
+  '/lis/qc-results': typeof AuthenticatedLisQcResultsIndexRoute
+  '/lis/reference-ranges': typeof AuthenticatedLisReferenceRangesIndexRoute
+  '/lis/rejection-reasons': typeof AuthenticatedLisRejectionReasonsIndexRoute
+  '/lis/result-signatures': typeof AuthenticatedLisResultSignaturesIndexRoute
+  '/lis/results': typeof AuthenticatedLisResultsIndexRoute
+  '/lis/sample-types': typeof AuthenticatedLisSampleTypesIndexRoute
+  '/lis/samples': typeof AuthenticatedLisSamplesIndexRoute
+  '/lis/statuses': typeof AuthenticatedLisStatusesIndexRoute
+  '/lis/test-categories': typeof AuthenticatedLisTestCategoriesIndexRoute
+  '/lis/test-definitions': typeof AuthenticatedLisTestDefinitionsIndexRoute
+  '/lis/test-sections': typeof AuthenticatedLisTestSectionsIndexRoute
+  '/lis/uoms': typeof AuthenticatedLisUomsIndexRoute
+  '/lis/validation-dashboard': typeof AuthenticatedLisValidationDashboardIndexRoute
+  '/rxsoft/audit-logs': typeof AuthenticatedRxsoftAuditLogsIndexRoute
+  '/rxsoft/branches': typeof AuthenticatedRxsoftBranchesIndexRoute
+  '/rxsoft/categories': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
+  '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-careers': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/rxsoft/ehealthwares-categories': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/rxsoft/ehealthwares-contact-submissions': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/rxsoft/ehealthwares-hero-slides': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/rxsoft/ehealthwares-investors': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/rxsoft/ehealthwares-partners': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/rxsoft/ehealthwares-products': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/rxsoft/ehealthwares-sections': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/rxsoft/ehealthwares-services': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/rxsoft/ehealthwares-settings': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/rxsoft/ehealthwares-team': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/rxsoft/ehealthwares-testimonials': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
+  '/rxsoft/gl-accounts': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/rxsoft/insurance-providers': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
+  '/rxsoft/inventory': typeof AuthenticatedRxsoftInventoryIndexRoute
+  '/rxsoft/items': typeof AuthenticatedRxsoftItemsIndexRoute
+  '/rxsoft/journal-entries': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
+  '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
+  '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
+  '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
+  '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
+  '/rxsoft/organizations': typeof AuthenticatedRxsoftOrganizationsIndexRoute
+  '/rxsoft/payment-methods': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/rxsoft/payment-providers': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
+  '/rxsoft/payment-transactions': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute
+  '/rxsoft/payments': typeof AuthenticatedRxsoftPaymentsIndexRoute
+  '/rxsoft/pharmaceutics': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/rxsoft/pos-terminals': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
+  '/rxsoft/price-list-items': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
+  '/rxsoft/price-lists': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/purchases': typeof AuthenticatedRxsoftPurchasesIndexRoute
+  '/rxsoft/receivables': typeof AuthenticatedRxsoftReceivablesIndexRoute
+  '/rxsoft/receiving': typeof AuthenticatedRxsoftReceivingIndexRoute
+  '/rxsoft/reports': typeof AuthenticatedRxsoftReportsIndexRoute
+  '/rxsoft/role-requests': typeof AuthenticatedRxsoftRoleRequestsIndexRoute
+  '/rxsoft/roles': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/rxsoft/sales-lines': typeof AuthenticatedRxsoftSalesLinesIndexRoute
+  '/rxsoft/sales': typeof AuthenticatedRxsoftSalesIndexRoute
+  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsIndexRoute
+  '/rxsoft/stock-locations': typeof AuthenticatedRxsoftStockLocationsIndexRoute
+  '/rxsoft/suppliers': typeof AuthenticatedRxsoftSuppliersIndexRoute
+  '/rxsoft/uom-category': typeof AuthenticatedRxsoftUomCategoryIndexRoute
+  '/rxsoft/uoms': typeof AuthenticatedRxsoftUomsIndexRoute
+  '/rxsoft/user-config': typeof AuthenticatedRxsoftUserConfigIndexRoute
+  '/rxsoft/users': typeof AuthenticatedRxsoftUsersIndexRoute
+  '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/rxsoft/website-prescriptions': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
+  '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
+  '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
+  '/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/coding-concept/facilities/hospitals': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/coding-concept/facilities/laboratories': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
+  '/coding-concept/facilities/levels': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
+  '/coding-concept/facilities/lgas': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
+  '/coding-concept/facilities/pharmacies': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
+  '/coding-concept/facilities/states': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute
+  '/coding-concept/facilities/types': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute
+  '/coding-concept/facilities/wards': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute
+  '/conversation/ai/config': typeof AuthenticatedConversationAiConfigIndexRoute
+  '/conversation/ai/costs': typeof AuthenticatedConversationAiCostsIndexRoute
+  '/conversation/ai/eval-logs': typeof AuthenticatedConversationAiEvalLogsIndexRoute
+  '/conversation/ai/instructions': typeof AuthenticatedConversationAiInstructionsIndexRoute
+  '/conversation/ai/models': typeof AuthenticatedConversationAiModelsIndexRoute
+  '/conversation/ai/processors': typeof AuthenticatedConversationAiProcessorsIndexRoute
+  '/conversation/ai/providers': typeof AuthenticatedConversationAiProvidersIndexRoute
+  '/conversation/ai/request-logs': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/rxsoft/reports/balance-sheet': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
+  '/rxsoft/reports/income-statement': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
+  '/rxsoft/reports/trial-balance': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
+  '/rxsoft/roles/$id/permissions': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  '/': typeof IndexRoute;
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren;
-  '/clerk': typeof ClerkRouteRouteWithChildren;
-  '/apm/admin': typeof ApmAdminRouteRouteWithChildren;
-  '/clerk/(auth)': typeof ClerkauthRouteRoute;
-  '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren;
-  '/(auth)/forgot-password': typeof authForgotPasswordRoute;
-  '/(auth)/otp': typeof authOtpRoute;
-  '/(auth)/sign-in': typeof authSignInRoute;
-  '/(auth)/sign-in-2': typeof authSignIn2Route;
-  '/(auth)/sign-up': typeof authSignUpRoute;
-  '/(errors)/401': typeof errors401Route;
-  '/(errors)/403': typeof errors403Route;
-  '/(errors)/404': typeof errors404Route;
-  '/(errors)/500': typeof errors500Route;
-  '/(errors)/503': typeof errors503Route;
-  '/(errors)/service-unavailable': typeof errorsServiceUnavailableRoute;
-  '/_authenticated/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren;
-  '/apm/achievements': typeof ApmAchievementsRoute;
-  '/apm/agenda': typeof ApmAgendaRoute;
-  '/apm/contact': typeof ApmContactRoute;
-  '/apm/events': typeof ApmEventsRouteWithChildren;
-  '/apm/join': typeof ApmJoinRoute;
-  '/apm/media': typeof ApmMediaRoute;
-  '/apm/meet': typeof ApmMeetRoute;
-  '/apm/news': typeof ApmNewsRouteWithChildren;
-  '/apm/volunteer': typeof ApmVolunteerRoute;
-  '/shop/about': typeof ShopAboutRoute;
-  '/shop/blog': typeof ShopBlogRouteWithChildren;
-  '/shop/branches': typeof ShopBranchesRouteWithChildren;
-  '/shop/cart': typeof ShopCartRoute;
-  '/shop/categories': typeof ShopCategoriesRouteWithChildren;
-  '/shop/checkout': typeof ShopCheckoutRoute;
-  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute;
-  '/shop/consultations': typeof ShopConsultationsRoute;
-  '/shop/contact': typeof ShopContactRoute;
-  '/shop/conversation': typeof ShopConversationRoute;
-  '/shop/dashboard': typeof ShopDashboardRoute;
-  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute;
-  '/shop/facility-locator': typeof ShopFacilityLocatorRoute;
-  '/shop/faq': typeof ShopFaqRoute;
-  '/shop/forgot-password': typeof ShopForgotPasswordRoute;
-  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren;
-  '/shop/login': typeof ShopLoginRoute;
-  '/shop/medicines': typeof ShopMedicinesRouteWithChildren;
-  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute;
-  '/shop/orders': typeof ShopOrdersRoute;
-  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute;
-  '/shop/pos': typeof ShopPosRoute;
-  '/shop/pos2': typeof ShopPos2Route;
-  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute;
-  '/shop/rewards': typeof ShopRewardsRoute;
-  '/shop/search': typeof ShopSearchRoute;
-  '/shop/shop': typeof ShopShopRoute;
-  '/shop/supermarket': typeof ShopSupermarketRoute;
-  '/shop/terms': typeof ShopTermsRoute;
-  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute;
-  '/apm/': typeof ApmIndexRoute;
-  '/questionnaire/': typeof QuestionnaireIndexRoute;
-  '/shop/': typeof ShopIndexRoute;
-  '/_authenticated/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute;
-  '/_authenticated/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute;
-  '/_authenticated/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute;
-  '/_authenticated/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute;
-  '/_authenticated/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute;
-  '/_authenticated/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute;
-  '/_authenticated/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute;
-  '/_authenticated/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute;
-  '/_authenticated/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute;
-  '/_authenticated/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute;
-  '/_authenticated/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren;
-  '/_authenticated/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren;
-  '/_authenticated/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute;
-  '/_authenticated/$page/$id': typeof AuthenticatedPageIdRouteWithChildren;
-  '/_authenticated/$page/create': typeof AuthenticatedPageCreateRoute;
-  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute;
-  '/_authenticated/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute;
-  '/_authenticated/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute;
-  '/_authenticated/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute;
-  '/_authenticated/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute;
-  '/_authenticated/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute;
-  '/_authenticated/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute;
-  '/_authenticated/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute;
-  '/_authenticated/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute;
-  '/_authenticated/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute;
-  '/_authenticated/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren;
-  '/_authenticated/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute;
-  '/_authenticated/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute;
-  '/_authenticated/dashboard/sales': typeof AuthenticatedDashboardSalesRoute;
-  '/_authenticated/emr/dashboard': typeof AuthenticatedEmrDashboardRoute;
-  '/_authenticated/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute;
-  '/_authenticated/lis/dashboard': typeof AuthenticatedLisDashboardRoute;
-  '/_authenticated/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute;
-  '/_authenticated/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute;
-  '/apm/admin/agents': typeof ApmAdminAgentsRoute;
-  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute;
-  '/apm/admin/content': typeof ApmAdminContentRoute;
-  '/apm/admin/conversion': typeof ApmAdminConversionRoute;
-  '/apm/admin/gotv': typeof ApmAdminGotvRoute;
-  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute;
-  '/apm/admin/lgas': typeof ApmAdminLgasRoute;
-  '/apm/admin/listening': typeof ApmAdminListeningRoute;
-  '/apm/admin/results': typeof ApmAdminResultsRoute;
-  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute;
-  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute;
-  '/apm/admin/tours': typeof ApmAdminToursRoute;
-  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute;
-  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute;
-  '/apm/events/$id': typeof ApmEventsIdRoute;
-  '/apm/news/$slug': typeof ApmNewsSlugRoute;
-  '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute;
-  '/shop/blog/$slug': typeof ShopBlogSlugRoute;
-  '/shop/branches/$id': typeof ShopBranchesIdRoute;
-  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute;
-  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute;
-  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute;
-  '/shop/orders_/$id': typeof ShopOrdersIdRoute;
-  '/shop/pay/$token': typeof ShopPayTokenRoute;
-  '/shop/pay/return': typeof ShopPayReturnRoute;
-  '/shop/shop_/$slug': typeof ShopShopSlugRoute;
-  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute;
-  '/_authenticated/$moduleId/': typeof AuthenticatedModuleIdIndexRoute;
-  '/_authenticated/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute;
-  '/_authenticated/conversation/': typeof AuthenticatedConversationIndexRoute;
-  '/_authenticated/emr/': typeof AuthenticatedEmrIndexRoute;
-  '/_authenticated/identity/': typeof AuthenticatedIdentityIndexRoute;
-  '/_authenticated/lis/': typeof AuthenticatedLisIndexRoute;
-  '/shop/purchases/': typeof ShopPurchasesIndexRoute;
-  '/_authenticated/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren;
-  '/_authenticated/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute;
-  '/_authenticated/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute;
-  '/_authenticated/$page/$id/edit': typeof AuthenticatedPageIdEditRoute;
-  '/_authenticated/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute;
-  '/_authenticated/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute;
-  '/_authenticated/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute;
-  '/_authenticated/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute;
-  '/_authenticated/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute;
-  '/_authenticated/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute;
-  '/_authenticated/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute;
-  '/_authenticated/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute;
-  '/_authenticated/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute;
-  '/_authenticated/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute;
-  '/_authenticated/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute;
-  '/_authenticated/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute;
-  '/_authenticated/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute;
-  '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute;
-  '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute;
-  '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute;
-  '/_authenticated/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute;
-  '/_authenticated/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute;
-  '/_authenticated/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute;
-  '/_authenticated/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren;
-  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute;
-  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute;
-  '/_authenticated/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute;
-  '/_authenticated/coding-concept/drug-classifications/': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute;
-  '/_authenticated/coding-concept/drug-components/': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute;
-  '/_authenticated/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute;
-  '/_authenticated/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute;
-  '/_authenticated/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute;
-  '/_authenticated/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute;
-  '/_authenticated/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute;
-  '/_authenticated/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute;
-  '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute;
-  '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute;
-  '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute;
-  '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute;
-  '/_authenticated/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute;
-  '/_authenticated/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute;
-  '/_authenticated/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute;
-  '/_authenticated/conversation/questions/': typeof AuthenticatedConversationQuestionsIndexRoute;
-  '/_authenticated/conversation/workflow-configuration/': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute;
-  '/_authenticated/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute;
-  '/_authenticated/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute;
-  '/_authenticated/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute;
-  '/_authenticated/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute;
-  '/_authenticated/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute;
-  '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute;
-  '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute;
-  '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute;
-  '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute;
-  '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute;
-  '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute;
-  '/_authenticated/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute;
-  '/_authenticated/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute;
-  '/_authenticated/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute;
-  '/_authenticated/emr/wards/': typeof AuthenticatedEmrWardsIndexRoute;
-  '/_authenticated/identity/locations/': typeof AuthenticatedIdentityLocationsIndexRoute;
-  '/_authenticated/identity/organizations/': typeof AuthenticatedIdentityOrganizationsIndexRoute;
-  '/_authenticated/identity/permissions/': typeof AuthenticatedIdentityPermissionsIndexRoute;
-  '/_authenticated/identity/roles/': typeof AuthenticatedIdentityRolesIndexRoute;
-  '/_authenticated/identity/users/': typeof AuthenticatedIdentityUsersIndexRoute;
-  '/_authenticated/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute;
-  '/_authenticated/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute;
-  '/_authenticated/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute;
-  '/_authenticated/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute;
-  '/_authenticated/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute;
-  '/_authenticated/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute;
-  '/_authenticated/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute;
-  '/_authenticated/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute;
-  '/_authenticated/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute;
-  '/_authenticated/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute;
-  '/_authenticated/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute;
-  '/_authenticated/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute;
-  '/_authenticated/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute;
-  '/_authenticated/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute;
-  '/_authenticated/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute;
-  '/_authenticated/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute;
-  '/_authenticated/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute;
-  '/_authenticated/lis/reference-ranges/': typeof AuthenticatedLisReferenceRangesIndexRoute;
-  '/_authenticated/lis/rejection-reasons/': typeof AuthenticatedLisRejectionReasonsIndexRoute;
-  '/_authenticated/lis/result-signatures/': typeof AuthenticatedLisResultSignaturesIndexRoute;
-  '/_authenticated/lis/results/': typeof AuthenticatedLisResultsIndexRoute;
-  '/_authenticated/lis/sample-types/': typeof AuthenticatedLisSampleTypesIndexRoute;
-  '/_authenticated/lis/samples/': typeof AuthenticatedLisSamplesIndexRoute;
-  '/_authenticated/lis/statuses/': typeof AuthenticatedLisStatusesIndexRoute;
-  '/_authenticated/lis/test-categories/': typeof AuthenticatedLisTestCategoriesIndexRoute;
-  '/_authenticated/lis/test-definitions/': typeof AuthenticatedLisTestDefinitionsIndexRoute;
-  '/_authenticated/lis/test-sections/': typeof AuthenticatedLisTestSectionsIndexRoute;
-  '/_authenticated/lis/uoms/': typeof AuthenticatedLisUomsIndexRoute;
-  '/_authenticated/lis/validation-dashboard/': typeof AuthenticatedLisValidationDashboardIndexRoute;
-  '/_authenticated/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute;
-  '/_authenticated/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute;
-  '/_authenticated/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute;
-  '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute;
-  '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute;
-  '/_authenticated/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute;
-  '/_authenticated/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute;
-  '/_authenticated/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute;
-  '/_authenticated/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute;
-  '/_authenticated/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute;
-  '/_authenticated/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute;
-  '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute;
-  '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute;
-  '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute;
-  '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute;
-  '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute;
-  '/_authenticated/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute;
-  '/_authenticated/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute;
-  '/_authenticated/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute;
-  '/_authenticated/rxsoft/payment-transactions/': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute;
-  '/_authenticated/rxsoft/payments/': typeof AuthenticatedRxsoftPaymentsIndexRoute;
-  '/_authenticated/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute;
-  '/_authenticated/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute;
-  '/_authenticated/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute;
-  '/_authenticated/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute;
-  '/_authenticated/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute;
-  '/_authenticated/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute;
-  '/_authenticated/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute;
-  '/_authenticated/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute;
-  '/_authenticated/rxsoft/role-requests/': typeof AuthenticatedRxsoftRoleRequestsIndexRoute;
-  '/_authenticated/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute;
-  '/_authenticated/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute;
-  '/_authenticated/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute;
-  '/_authenticated/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute;
-  '/_authenticated/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute;
-  '/_authenticated/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute;
-  '/_authenticated/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute;
-  '/_authenticated/rxsoft/uoms/': typeof AuthenticatedRxsoftUomsIndexRoute;
-  '/_authenticated/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute;
-  '/_authenticated/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute;
-  '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute;
-  '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute;
-  '/_authenticated/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute;
-  '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute;
-  '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute;
-  '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute;
-  '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute;
-  '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute;
-  '/_authenticated/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute;
-  '/_authenticated/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute;
-  '/_authenticated/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute;
-  '/_authenticated/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute;
-  '/_authenticated/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute;
-  '/_authenticated/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute;
-  '/_authenticated/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute;
-  '/_authenticated/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute;
-  '/_authenticated/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute;
-  '/_authenticated/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute;
-  '/_authenticated/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute;
-  '/_authenticated/coding-concept/facilities/states/': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute;
-  '/_authenticated/coding-concept/facilities/types/': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute;
-  '/_authenticated/coding-concept/facilities/wards/': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute;
-  '/_authenticated/conversation/ai/config/': typeof AuthenticatedConversationAiConfigIndexRoute;
-  '/_authenticated/conversation/ai/costs/': typeof AuthenticatedConversationAiCostsIndexRoute;
-  '/_authenticated/conversation/ai/eval-logs/': typeof AuthenticatedConversationAiEvalLogsIndexRoute;
-  '/_authenticated/conversation/ai/instructions/': typeof AuthenticatedConversationAiInstructionsIndexRoute;
-  '/_authenticated/conversation/ai/models/': typeof AuthenticatedConversationAiModelsIndexRoute;
-  '/_authenticated/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute;
-  '/_authenticated/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute;
-  '/_authenticated/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute;
-  '/_authenticated/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute;
-  '/_authenticated/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute;
-  '/_authenticated/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute;
-  '/_authenticated/rxsoft/roles/$id/permissions/': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/clerk': typeof ClerkRouteRouteWithChildren
+  '/apm/admin': typeof ApmAdminRouteRouteWithChildren
+  '/clerk/(auth)': typeof ClerkauthRouteRoute
+  '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/otp': typeof authOtpRoute
+  '/(auth)/sign-in': typeof authSignInRoute
+  '/(auth)/sign-in-2': typeof authSignIn2Route
+  '/(auth)/sign-up': typeof authSignUpRoute
+  '/(errors)/401': typeof errors401Route
+  '/(errors)/403': typeof errors403Route
+  '/(errors)/404': typeof errors404Route
+  '/(errors)/500': typeof errors500Route
+  '/(errors)/503': typeof errors503Route
+  '/(errors)/service-unavailable': typeof errorsServiceUnavailableRoute
+  '/_authenticated/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren
+  '/apm/achievements': typeof ApmAchievementsRoute
+  '/apm/agenda': typeof ApmAgendaRoute
+  '/apm/contact': typeof ApmContactRoute
+  '/apm/events': typeof ApmEventsRouteWithChildren
+  '/apm/join': typeof ApmJoinRoute
+  '/apm/media': typeof ApmMediaRoute
+  '/apm/meet': typeof ApmMeetRoute
+  '/apm/news': typeof ApmNewsRouteWithChildren
+  '/apm/volunteer': typeof ApmVolunteerRoute
+  '/shop/about': typeof ShopAboutRoute
+  '/shop/blog': typeof ShopBlogRouteWithChildren
+  '/shop/branches': typeof ShopBranchesRouteWithChildren
+  '/shop/cart': typeof ShopCartRoute
+  '/shop/categories': typeof ShopCategoriesRouteWithChildren
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/consult-pharmacist': typeof ShopConsultPharmacistRoute
+  '/shop/consultations': typeof ShopConsultationsRoute
+  '/shop/contact': typeof ShopContactRoute
+  '/shop/conversation': typeof ShopConversationRoute
+  '/shop/dashboard': typeof ShopDashboardRoute
+  '/shop/delivery-areas': typeof ShopDeliveryAreasRoute
+  '/shop/facility-locator': typeof ShopFacilityLocatorRoute
+  '/shop/faq': typeof ShopFaqRoute
+  '/shop/forgot-password': typeof ShopForgotPasswordRoute
+  '/shop/health-concerns': typeof ShopHealthConcernsRouteWithChildren
+  '/shop/login': typeof ShopLoginRoute
+  '/shop/medicines': typeof ShopMedicinesRouteWithChildren
+  '/shop/my-prescriptions': typeof ShopMyPrescriptionsRoute
+  '/shop/orders': typeof ShopOrdersRoute
+  '/shop/pharmacy-locator': typeof ShopPharmacyLocatorRoute
+  '/shop/pos': typeof ShopPosRoute
+  '/shop/pos2': typeof ShopPos2Route
+  '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/rewards': typeof ShopRewardsRoute
+  '/shop/search': typeof ShopSearchRoute
+  '/shop/shop': typeof ShopShopRoute
+  '/shop/supermarket': typeof ShopSupermarketRoute
+  '/shop/terms': typeof ShopTermsRoute
+  '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/apm/': typeof ApmIndexRoute
+  '/questionnaire/': typeof QuestionnaireIndexRoute
+  '/shop/': typeof ShopIndexRoute
+  '/_authenticated/communication/aes': typeof AuthenticatedCommunicationAesRouteRoute
+  '/_authenticated/communication/communication-channels': typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute
+  '/_authenticated/communication/mapping': typeof AuthenticatedCommunicationMappingRouteRoute
+  '/_authenticated/communication/message-logs': typeof AuthenticatedCommunicationMessageLogsRouteRoute
+  '/_authenticated/communication/message-templates': typeof AuthenticatedCommunicationMessageTemplatesRouteRoute
+  '/_authenticated/communication/messages': typeof AuthenticatedCommunicationMessagesRouteRoute
+  '/_authenticated/communication/notification-templates': typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute
+  '/_authenticated/communication/notifications': typeof AuthenticatedCommunicationNotificationsRouteRoute
+  '/_authenticated/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute
+  '/_authenticated/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute
+  '/_authenticated/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren
+  '/_authenticated/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
+  '/_authenticated/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute
+  '/_authenticated/$page/$id': typeof AuthenticatedPageIdRouteWithChildren
+  '/_authenticated/$page/create': typeof AuthenticatedPageCreateRoute
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/coding-concept/dashboard': typeof AuthenticatedCodingConceptDashboardRoute
+  '/_authenticated/coding-concept/match': typeof AuthenticatedCodingConceptMatchRoute
+  '/_authenticated/coding-concept/search': typeof AuthenticatedCodingConceptSearchRoute
+  '/_authenticated/coding-concept/upload': typeof AuthenticatedCodingConceptUploadRoute
+  '/_authenticated/communication/audit-center': typeof AuthenticatedCommunicationAuditCenterRoute
+  '/_authenticated/communication/dashboard': typeof AuthenticatedCommunicationDashboardRoute
+  '/_authenticated/communication/flow-graph': typeof AuthenticatedCommunicationFlowGraphRoute
+  '/_authenticated/communication/message-tester': typeof AuthenticatedCommunicationMessageTesterRoute
+  '/_authenticated/communication/trace-explorer': typeof AuthenticatedCommunicationTraceExplorerRoute
+  '/_authenticated/conversation/$conversationId': typeof AuthenticatedConversationConversationIdRouteWithChildren
+  '/_authenticated/conversation/dashboard': typeof AuthenticatedConversationDashboardRoute
+  '/_authenticated/dashboard/purchases': typeof AuthenticatedDashboardPurchasesRoute
+  '/_authenticated/dashboard/sales': typeof AuthenticatedDashboardSalesRoute
+  '/_authenticated/emr/dashboard': typeof AuthenticatedEmrDashboardRoute
+  '/_authenticated/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
+  '/_authenticated/lis/dashboard': typeof AuthenticatedLisDashboardRoute
+  '/_authenticated/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/_authenticated/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
+  '/apm/admin/agents': typeof ApmAdminAgentsRoute
+  '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
+  '/apm/admin/content': typeof ApmAdminContentRoute
+  '/apm/admin/conversion': typeof ApmAdminConversionRoute
+  '/apm/admin/gotv': typeof ApmAdminGotvRoute
+  '/apm/admin/incidents': typeof ApmAdminIncidentsRoute
+  '/apm/admin/lgas': typeof ApmAdminLgasRoute
+  '/apm/admin/listening': typeof ApmAdminListeningRoute
+  '/apm/admin/results': typeof ApmAdminResultsRoute
+  '/apm/admin/sentiment': typeof ApmAdminSentimentRoute
+  '/apm/admin/stakeholders': typeof ApmAdminStakeholdersRoute
+  '/apm/admin/tours': typeof ApmAdminToursRoute
+  '/apm/admin/volunteers': typeof ApmAdminVolunteersRoute
+  '/apm/admin/whatsapp': typeof ApmAdminWhatsappRoute
+  '/apm/events/$id': typeof ApmEventsIdRoute
+  '/apm/news/$slug': typeof ApmNewsSlugRoute
+  '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/shop/blog/$slug': typeof ShopBlogSlugRoute
+  '/shop/branches/$id': typeof ShopBranchesIdRoute
+  '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
+  '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
+  '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/orders_/$id': typeof ShopOrdersIdRoute
+  '/shop/pay/$token': typeof ShopPayTokenRoute
+  '/shop/pay/return': typeof ShopPayReturnRoute
+  '/shop/shop_/$slug': typeof ShopShopSlugRoute
+  '/shop/track-order/$code': typeof ShopTrackOrderCodeRoute
+  '/_authenticated/$moduleId/': typeof AuthenticatedModuleIdIndexRoute
+  '/_authenticated/coding-concept/': typeof AuthenticatedCodingConceptIndexRoute
+  '/_authenticated/conversation/': typeof AuthenticatedConversationIndexRoute
+  '/_authenticated/emr/': typeof AuthenticatedEmrIndexRoute
+  '/_authenticated/identity/': typeof AuthenticatedIdentityIndexRoute
+  '/_authenticated/lis/': typeof AuthenticatedLisIndexRoute
+  '/shop/purchases/': typeof ShopPurchasesIndexRoute
+  '/_authenticated/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
+  '/_authenticated/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
+  '/_authenticated/$moduleId/$page/create': typeof AuthenticatedModuleIdPageCreateRoute
+  '/_authenticated/$page/$id/edit': typeof AuthenticatedPageIdEditRoute
+  '/_authenticated/coding-concept/drug-classifications/$classificationId': typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute
+  '/_authenticated/conversation/$conversationId/edit': typeof AuthenticatedConversationConversationIdEditRoute
+  '/_authenticated/conversation/exchanges/$exchangeId': typeof AuthenticatedConversationExchangesExchangeIdRoute
+  '/_authenticated/conversation/invites/$inviteId': typeof AuthenticatedConversationInvitesInviteIdRoute
+  '/_authenticated/conversation/projections/$projectionId': typeof AuthenticatedConversationProjectionsProjectionIdRoute
+  '/_authenticated/emr/encounters/$encounterId': typeof AuthenticatedEmrEncountersEncounterIdRoute
+  '/_authenticated/emr/patients/$patientId': typeof AuthenticatedEmrPatientsPatientIdRoute
+  '/_authenticated/emr/requests/$requestId': typeof AuthenticatedEmrRequestsRequestIdRoute
+  '/_authenticated/emr/visits/$visitId': typeof AuthenticatedEmrVisitsVisitIdRoute
+  '/_authenticated/emr/wards/admissions': typeof AuthenticatedEmrWardsAdmissionsRoute
+  '/_authenticated/emr/wards/beds': typeof AuthenticatedEmrWardsBedsRoute
+  '/_authenticated/emr/wards/board': typeof AuthenticatedEmrWardsBoardRoute
+  '/_authenticated/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
+  '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
+  '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
+  '/_authenticated/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
+  '/_authenticated/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
+  '/_authenticated/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
+  '/_authenticated/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
+  '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
+  '/_authenticated/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
+  '/_authenticated/coding-concept/drug-classifications/': typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
+  '/_authenticated/coding-concept/drug-components/': typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
+  '/_authenticated/coding-concept/facilities/': typeof AuthenticatedCodingConceptFacilitiesIndexRoute
+  '/_authenticated/coding-concept/formulations/': typeof AuthenticatedCodingConceptFormulationsIndexRoute
+  '/_authenticated/coding-concept/generic-drugs/': typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  '/_authenticated/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
+  '/_authenticated/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
+  '/_authenticated/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
+  '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
+  '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
+  '/_authenticated/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
+  '/_authenticated/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
+  '/_authenticated/conversation/questionnaires/': typeof AuthenticatedConversationQuestionnairesIndexRoute
+  '/_authenticated/conversation/questions/': typeof AuthenticatedConversationQuestionsIndexRoute
+  '/_authenticated/conversation/workflow-configuration/': typeof AuthenticatedConversationWorkflowConfigurationIndexRoute
+  '/_authenticated/conversation/workflow-events/': typeof AuthenticatedConversationWorkflowEventsIndexRoute
+  '/_authenticated/conversation/workflow-instances/': typeof AuthenticatedConversationWorkflowInstancesIndexRoute
+  '/_authenticated/conversation/workflows/': typeof AuthenticatedConversationWorkflowsIndexRoute
+  '/_authenticated/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
+  '/_authenticated/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
+  '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
+  '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
+  '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
+  '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
+  '/_authenticated/emr/staff/': typeof AuthenticatedEmrStaffIndexRoute
+  '/_authenticated/emr/tags/': typeof AuthenticatedEmrTagsIndexRoute
+  '/_authenticated/emr/visits/': typeof AuthenticatedEmrVisitsIndexRoute
+  '/_authenticated/emr/wards/': typeof AuthenticatedEmrWardsIndexRoute
+  '/_authenticated/identity/locations/': typeof AuthenticatedIdentityLocationsIndexRoute
+  '/_authenticated/identity/organizations/': typeof AuthenticatedIdentityOrganizationsIndexRoute
+  '/_authenticated/identity/permissions/': typeof AuthenticatedIdentityPermissionsIndexRoute
+  '/_authenticated/identity/roles/': typeof AuthenticatedIdentityRolesIndexRoute
+  '/_authenticated/identity/users/': typeof AuthenticatedIdentityUsersIndexRoute
+  '/_authenticated/lis/attribute-definitions/': typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  '/_authenticated/lis/eqa-enrollments/': typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  '/_authenticated/lis/eqa-programs/': typeof AuthenticatedLisEqaProgramsIndexRoute
+  '/_authenticated/lis/eqa-results/': typeof AuthenticatedLisEqaResultsIndexRoute
+  '/_authenticated/lis/location-types/': typeof AuthenticatedLisLocationTypesIndexRoute
+  '/_authenticated/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
+  '/_authenticated/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
+  '/_authenticated/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute
+  '/_authenticated/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute
+  '/_authenticated/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute
+  '/_authenticated/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
+  '/_authenticated/lis/priorities/': typeof AuthenticatedLisPrioritiesIndexRoute
+  '/_authenticated/lis/programs/': typeof AuthenticatedLisProgramsIndexRoute
+  '/_authenticated/lis/qa-checklist-items/': typeof AuthenticatedLisQaChecklistItemsIndexRoute
+  '/_authenticated/lis/qc-alerts/': typeof AuthenticatedLisQcAlertsIndexRoute
+  '/_authenticated/lis/qc-lots/': typeof AuthenticatedLisQcLotsIndexRoute
+  '/_authenticated/lis/qc-results/': typeof AuthenticatedLisQcResultsIndexRoute
+  '/_authenticated/lis/reference-ranges/': typeof AuthenticatedLisReferenceRangesIndexRoute
+  '/_authenticated/lis/rejection-reasons/': typeof AuthenticatedLisRejectionReasonsIndexRoute
+  '/_authenticated/lis/result-signatures/': typeof AuthenticatedLisResultSignaturesIndexRoute
+  '/_authenticated/lis/results/': typeof AuthenticatedLisResultsIndexRoute
+  '/_authenticated/lis/sample-types/': typeof AuthenticatedLisSampleTypesIndexRoute
+  '/_authenticated/lis/samples/': typeof AuthenticatedLisSamplesIndexRoute
+  '/_authenticated/lis/statuses/': typeof AuthenticatedLisStatusesIndexRoute
+  '/_authenticated/lis/test-categories/': typeof AuthenticatedLisTestCategoriesIndexRoute
+  '/_authenticated/lis/test-definitions/': typeof AuthenticatedLisTestDefinitionsIndexRoute
+  '/_authenticated/lis/test-sections/': typeof AuthenticatedLisTestSectionsIndexRoute
+  '/_authenticated/lis/uoms/': typeof AuthenticatedLisUomsIndexRoute
+  '/_authenticated/lis/validation-dashboard/': typeof AuthenticatedLisValidationDashboardIndexRoute
+  '/_authenticated/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute
+  '/_authenticated/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
+  '/_authenticated/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
+  '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-hero-slides/': typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-investors/': typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-partners/': typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-products/': typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-sections/': typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-services/': typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-settings/': typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-team/': typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-testimonials/': typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
+  '/_authenticated/rxsoft/gl-accounts/': typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  '/_authenticated/rxsoft/insurance-providers/': typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
+  '/_authenticated/rxsoft/inventory/': typeof AuthenticatedRxsoftInventoryIndexRoute
+  '/_authenticated/rxsoft/items/': typeof AuthenticatedRxsoftItemsIndexRoute
+  '/_authenticated/rxsoft/journal-entries/': typeof AuthenticatedRxsoftJournalEntriesIndexRoute
+  '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
+  '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
+  '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
+  '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
+  '/_authenticated/rxsoft/organizations/': typeof AuthenticatedRxsoftOrganizationsIndexRoute
+  '/_authenticated/rxsoft/payment-methods/': typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  '/_authenticated/rxsoft/payment-providers/': typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
+  '/_authenticated/rxsoft/payment-transactions/': typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute
+  '/_authenticated/rxsoft/payments/': typeof AuthenticatedRxsoftPaymentsIndexRoute
+  '/_authenticated/rxsoft/pharmaceutics/': typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  '/_authenticated/rxsoft/pos-terminals/': typeof AuthenticatedRxsoftPosTerminalsIndexRoute
+  '/_authenticated/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
+  '/_authenticated/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/_authenticated/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
+  '/_authenticated/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
+  '/_authenticated/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
+  '/_authenticated/rxsoft/reports/': typeof AuthenticatedRxsoftReportsIndexRoute
+  '/_authenticated/rxsoft/role-requests/': typeof AuthenticatedRxsoftRoleRequestsIndexRoute
+  '/_authenticated/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
+  '/_authenticated/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
+  '/_authenticated/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
+  '/_authenticated/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
+  '/_authenticated/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
+  '/_authenticated/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute
+  '/_authenticated/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute
+  '/_authenticated/rxsoft/uoms/': typeof AuthenticatedRxsoftUomsIndexRoute
+  '/_authenticated/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute
+  '/_authenticated/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
+  '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  '/_authenticated/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
+  '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
+  '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
+  '/_authenticated/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  '/_authenticated/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  '/_authenticated/lis/orders/workflow/label': typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  '/_authenticated/lis/orders/workflow/order': typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  '/_authenticated/lis/orders/workflow/qa': typeof AuthenticatedLisOrdersWorkflowQaRoute
+  '/_authenticated/rxsoft/uoms/$uomId/edit': typeof AuthenticatedRxsoftUomsUomIdEditRoute
+  '/_authenticated/coding-concept/facilities/hospitals/': typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  '/_authenticated/coding-concept/facilities/laboratories/': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
+  '/_authenticated/coding-concept/facilities/levels/': typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
+  '/_authenticated/coding-concept/facilities/lgas/': typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
+  '/_authenticated/coding-concept/facilities/pharmacies/': typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
+  '/_authenticated/coding-concept/facilities/states/': typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute
+  '/_authenticated/coding-concept/facilities/types/': typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute
+  '/_authenticated/coding-concept/facilities/wards/': typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute
+  '/_authenticated/conversation/ai/config/': typeof AuthenticatedConversationAiConfigIndexRoute
+  '/_authenticated/conversation/ai/costs/': typeof AuthenticatedConversationAiCostsIndexRoute
+  '/_authenticated/conversation/ai/eval-logs/': typeof AuthenticatedConversationAiEvalLogsIndexRoute
+  '/_authenticated/conversation/ai/instructions/': typeof AuthenticatedConversationAiInstructionsIndexRoute
+  '/_authenticated/conversation/ai/models/': typeof AuthenticatedConversationAiModelsIndexRoute
+  '/_authenticated/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
+  '/_authenticated/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
+  '/_authenticated/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/_authenticated/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
+  '/_authenticated/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
+  '/_authenticated/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
+  '/_authenticated/rxsoft/roles/$id/permissions/': typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/clerk'
@@ -3208,8 +3295,8 @@ export interface FileRouteTypes {
     | '/rxsoft/reports/balance-sheet/'
     | '/rxsoft/reports/income-statement/'
     | '/rxsoft/reports/trial-balance/'
-    | '/rxsoft/roles/$id/permissions/';
-  fileRoutesByTo: FileRoutesByTo;
+    | '/rxsoft/roles/$id/permissions/'
+  fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/clerk'
@@ -3512,7 +3599,7 @@ export interface FileRouteTypes {
     | '/rxsoft/reports/balance-sheet'
     | '/rxsoft/reports/income-statement'
     | '/rxsoft/reports/trial-balance'
-    | '/rxsoft/roles/$id/permissions';
+    | '/rxsoft/roles/$id/permissions'
   id:
     | '__root__'
     | '/'
@@ -3821,2234 +3908,2234 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/reports/balance-sheet/'
     | '/_authenticated/rxsoft/reports/income-statement/'
     | '/_authenticated/rxsoft/reports/trial-balance/'
-    | '/_authenticated/rxsoft/roles/$id/permissions/';
-  fileRoutesById: FileRoutesById;
+    | '/_authenticated/rxsoft/roles/$id/permissions/'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren;
-  ClerkRouteRoute: typeof ClerkRouteRouteWithChildren;
-  ApmAdminRouteRoute: typeof ApmAdminRouteRouteWithChildren;
-  authForgotPasswordRoute: typeof authForgotPasswordRoute;
-  authOtpRoute: typeof authOtpRoute;
-  authSignInRoute: typeof authSignInRoute;
-  authSignIn2Route: typeof authSignIn2Route;
-  authSignUpRoute: typeof authSignUpRoute;
-  errors401Route: typeof errors401Route;
-  errors403Route: typeof errors403Route;
-  errors404Route: typeof errors404Route;
-  errors500Route: typeof errors500Route;
-  errors503Route: typeof errors503Route;
-  errorsServiceUnavailableRoute: typeof errorsServiceUnavailableRoute;
-  ApmAchievementsRoute: typeof ApmAchievementsRoute;
-  ApmAgendaRoute: typeof ApmAgendaRoute;
-  ApmContactRoute: typeof ApmContactRoute;
-  ApmEventsRoute: typeof ApmEventsRouteWithChildren;
-  ApmJoinRoute: typeof ApmJoinRoute;
-  ApmMediaRoute: typeof ApmMediaRoute;
-  ApmMeetRoute: typeof ApmMeetRoute;
-  ApmNewsRoute: typeof ApmNewsRouteWithChildren;
-  ApmVolunteerRoute: typeof ApmVolunteerRoute;
-  ShopAboutRoute: typeof ShopAboutRoute;
-  ShopBlogRoute: typeof ShopBlogRouteWithChildren;
-  ShopBranchesRoute: typeof ShopBranchesRouteWithChildren;
-  ShopCartRoute: typeof ShopCartRoute;
-  ShopCategoriesRoute: typeof ShopCategoriesRouteWithChildren;
-  ShopCheckoutRoute: typeof ShopCheckoutRoute;
-  ShopConsultPharmacistRoute: typeof ShopConsultPharmacistRoute;
-  ShopConsultationsRoute: typeof ShopConsultationsRoute;
-  ShopContactRoute: typeof ShopContactRoute;
-  ShopConversationRoute: typeof ShopConversationRoute;
-  ShopDashboardRoute: typeof ShopDashboardRoute;
-  ShopDeliveryAreasRoute: typeof ShopDeliveryAreasRoute;
-  ShopFacilityLocatorRoute: typeof ShopFacilityLocatorRoute;
-  ShopFaqRoute: typeof ShopFaqRoute;
-  ShopForgotPasswordRoute: typeof ShopForgotPasswordRoute;
-  ShopHealthConcernsRoute: typeof ShopHealthConcernsRouteWithChildren;
-  ShopLoginRoute: typeof ShopLoginRoute;
-  ShopMedicinesRoute: typeof ShopMedicinesRouteWithChildren;
-  ShopMyPrescriptionsRoute: typeof ShopMyPrescriptionsRoute;
-  ShopOrdersRoute: typeof ShopOrdersRoute;
-  ShopPharmacyLocatorRoute: typeof ShopPharmacyLocatorRoute;
-  ShopPosRoute: typeof ShopPosRoute;
-  ShopPos2Route: typeof ShopPos2Route;
-  ShopPrivacyPolicyRoute: typeof ShopPrivacyPolicyRoute;
-  ShopRewardsRoute: typeof ShopRewardsRoute;
-  ShopSearchRoute: typeof ShopSearchRoute;
-  ShopShopRoute: typeof ShopShopRoute;
-  ShopSupermarketRoute: typeof ShopSupermarketRoute;
-  ShopTermsRoute: typeof ShopTermsRoute;
-  ShopUploadPrescriptionRoute: typeof ShopUploadPrescriptionRoute;
-  ApmIndexRoute: typeof ApmIndexRoute;
-  QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute;
-  ShopIndexRoute: typeof ShopIndexRoute;
-  ShopOrdersIdRoute: typeof ShopOrdersIdRoute;
-  ShopPayTokenRoute: typeof ShopPayTokenRoute;
-  ShopPayReturnRoute: typeof ShopPayReturnRoute;
-  ShopShopSlugRoute: typeof ShopShopSlugRoute;
-  ShopTrackOrderCodeRoute: typeof ShopTrackOrderCodeRoute;
-  ShopPurchasesIndexRoute: typeof ShopPurchasesIndexRoute;
+  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ClerkRouteRoute: typeof ClerkRouteRouteWithChildren
+  ApmAdminRouteRoute: typeof ApmAdminRouteRouteWithChildren
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authOtpRoute: typeof authOtpRoute
+  authSignInRoute: typeof authSignInRoute
+  authSignIn2Route: typeof authSignIn2Route
+  authSignUpRoute: typeof authSignUpRoute
+  errors401Route: typeof errors401Route
+  errors403Route: typeof errors403Route
+  errors404Route: typeof errors404Route
+  errors500Route: typeof errors500Route
+  errors503Route: typeof errors503Route
+  errorsServiceUnavailableRoute: typeof errorsServiceUnavailableRoute
+  ApmAchievementsRoute: typeof ApmAchievementsRoute
+  ApmAgendaRoute: typeof ApmAgendaRoute
+  ApmContactRoute: typeof ApmContactRoute
+  ApmEventsRoute: typeof ApmEventsRouteWithChildren
+  ApmJoinRoute: typeof ApmJoinRoute
+  ApmMediaRoute: typeof ApmMediaRoute
+  ApmMeetRoute: typeof ApmMeetRoute
+  ApmNewsRoute: typeof ApmNewsRouteWithChildren
+  ApmVolunteerRoute: typeof ApmVolunteerRoute
+  ShopAboutRoute: typeof ShopAboutRoute
+  ShopBlogRoute: typeof ShopBlogRouteWithChildren
+  ShopBranchesRoute: typeof ShopBranchesRouteWithChildren
+  ShopCartRoute: typeof ShopCartRoute
+  ShopCategoriesRoute: typeof ShopCategoriesRouteWithChildren
+  ShopCheckoutRoute: typeof ShopCheckoutRoute
+  ShopConsultPharmacistRoute: typeof ShopConsultPharmacistRoute
+  ShopConsultationsRoute: typeof ShopConsultationsRoute
+  ShopContactRoute: typeof ShopContactRoute
+  ShopConversationRoute: typeof ShopConversationRoute
+  ShopDashboardRoute: typeof ShopDashboardRoute
+  ShopDeliveryAreasRoute: typeof ShopDeliveryAreasRoute
+  ShopFacilityLocatorRoute: typeof ShopFacilityLocatorRoute
+  ShopFaqRoute: typeof ShopFaqRoute
+  ShopForgotPasswordRoute: typeof ShopForgotPasswordRoute
+  ShopHealthConcernsRoute: typeof ShopHealthConcernsRouteWithChildren
+  ShopLoginRoute: typeof ShopLoginRoute
+  ShopMedicinesRoute: typeof ShopMedicinesRouteWithChildren
+  ShopMyPrescriptionsRoute: typeof ShopMyPrescriptionsRoute
+  ShopOrdersRoute: typeof ShopOrdersRoute
+  ShopPharmacyLocatorRoute: typeof ShopPharmacyLocatorRoute
+  ShopPosRoute: typeof ShopPosRoute
+  ShopPos2Route: typeof ShopPos2Route
+  ShopPrivacyPolicyRoute: typeof ShopPrivacyPolicyRoute
+  ShopRewardsRoute: typeof ShopRewardsRoute
+  ShopSearchRoute: typeof ShopSearchRoute
+  ShopShopRoute: typeof ShopShopRoute
+  ShopSupermarketRoute: typeof ShopSupermarketRoute
+  ShopTermsRoute: typeof ShopTermsRoute
+  ShopUploadPrescriptionRoute: typeof ShopUploadPrescriptionRoute
+  ApmIndexRoute: typeof ApmIndexRoute
+  QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute
+  ShopIndexRoute: typeof ShopIndexRoute
+  ShopOrdersIdRoute: typeof ShopOrdersIdRoute
+  ShopPayTokenRoute: typeof ShopPayTokenRoute
+  ShopPayReturnRoute: typeof ShopPayReturnRoute
+  ShopShopSlugRoute: typeof ShopShopSlugRoute
+  ShopTrackOrderCodeRoute: typeof ShopTrackOrderCodeRoute
+  ShopPurchasesIndexRoute: typeof ShopPurchasesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
-      id: '/_authenticated';
-      path: '';
-      fullPath: '/';
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clerk': {
-      id: '/clerk';
-      path: '/clerk';
-      fullPath: '/clerk';
-      preLoaderRoute: typeof ClerkRouteRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/clerk'
+      path: '/clerk'
+      fullPath: '/clerk'
+      preLoaderRoute: typeof ClerkRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/forgot-password': {
-      id: '/(auth)/forgot-password';
-      path: '/forgot-password';
-      fullPath: '/forgot-password';
-      preLoaderRoute: typeof authForgotPasswordRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/otp': {
-      id: '/(auth)/otp';
-      path: '/otp';
-      fullPath: '/otp';
-      preLoaderRoute: typeof authOtpRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(auth)/otp'
+      path: '/otp'
+      fullPath: '/otp'
+      preLoaderRoute: typeof authOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/sign-in': {
-      id: '/(auth)/sign-in';
-      path: '/sign-in';
-      fullPath: '/sign-in';
-      preLoaderRoute: typeof authSignInRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(auth)/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof authSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/sign-in-2': {
-      id: '/(auth)/sign-in-2';
-      path: '/sign-in-2';
-      fullPath: '/sign-in-2';
-      preLoaderRoute: typeof authSignIn2RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(auth)/sign-in-2'
+      path: '/sign-in-2'
+      fullPath: '/sign-in-2'
+      preLoaderRoute: typeof authSignIn2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(auth)/sign-up': {
-      id: '/(auth)/sign-up';
-      path: '/sign-up';
-      fullPath: '/sign-up';
-      preLoaderRoute: typeof authSignUpRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(auth)/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/401': {
-      id: '/(errors)/401';
-      path: '/401';
-      fullPath: '/401';
-      preLoaderRoute: typeof errors401RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/401'
+      path: '/401'
+      fullPath: '/401'
+      preLoaderRoute: typeof errors401RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/403': {
-      id: '/(errors)/403';
-      path: '/403';
-      fullPath: '/403';
-      preLoaderRoute: typeof errors403RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/403'
+      path: '/403'
+      fullPath: '/403'
+      preLoaderRoute: typeof errors403RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/404': {
-      id: '/(errors)/404';
-      path: '/404';
-      fullPath: '/404';
-      preLoaderRoute: typeof errors404RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof errors404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/500': {
-      id: '/(errors)/500';
-      path: '/500';
-      fullPath: '/500';
-      preLoaderRoute: typeof errors500RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/500'
+      path: '/500'
+      fullPath: '/500'
+      preLoaderRoute: typeof errors500RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/503': {
-      id: '/(errors)/503';
-      path: '/503';
-      fullPath: '/503';
-      preLoaderRoute: typeof errors503RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/503'
+      path: '/503'
+      fullPath: '/503'
+      preLoaderRoute: typeof errors503RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(errors)/service-unavailable': {
-      id: '/(errors)/service-unavailable';
-      path: '/service-unavailable';
-      fullPath: '/service-unavailable';
-      preLoaderRoute: typeof errorsServiceUnavailableRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/(errors)/service-unavailable'
+      path: '/service-unavailable'
+      fullPath: '/service-unavailable'
+      preLoaderRoute: typeof errorsServiceUnavailableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/$moduleId': {
-      id: '/_authenticated/$moduleId';
-      path: '/$moduleId';
-      fullPath: '/$moduleId';
-      preLoaderRoute: typeof AuthenticatedModuleIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/$moduleId'
+      path: '/$moduleId'
+      fullPath: '/$moduleId'
+      preLoaderRoute: typeof AuthenticatedModuleIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/apm/': {
-      id: '/apm/';
-      path: '/apm';
-      fullPath: '/apm/';
-      preLoaderRoute: typeof ApmIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/'
+      path: '/apm'
+      fullPath: '/apm/'
+      preLoaderRoute: typeof ApmIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/achievements': {
-      id: '/apm/achievements';
-      path: '/apm/achievements';
-      fullPath: '/apm/achievements';
-      preLoaderRoute: typeof ApmAchievementsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/achievements'
+      path: '/apm/achievements'
+      fullPath: '/apm/achievements'
+      preLoaderRoute: typeof ApmAchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/admin': {
-      id: '/apm/admin';
-      path: '/apm/admin';
-      fullPath: '/apm/admin';
-      preLoaderRoute: typeof ApmAdminRouteRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/admin'
+      path: '/apm/admin'
+      fullPath: '/apm/admin'
+      preLoaderRoute: typeof ApmAdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/agenda': {
-      id: '/apm/agenda';
-      path: '/apm/agenda';
-      fullPath: '/apm/agenda';
-      preLoaderRoute: typeof ApmAgendaRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/agenda'
+      path: '/apm/agenda'
+      fullPath: '/apm/agenda'
+      preLoaderRoute: typeof ApmAgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/contact': {
-      id: '/apm/contact';
-      path: '/apm/contact';
-      fullPath: '/apm/contact';
-      preLoaderRoute: typeof ApmContactRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/contact'
+      path: '/apm/contact'
+      fullPath: '/apm/contact'
+      preLoaderRoute: typeof ApmContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/events': {
-      id: '/apm/events';
-      path: '/apm/events';
-      fullPath: '/apm/events';
-      preLoaderRoute: typeof ApmEventsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/events'
+      path: '/apm/events'
+      fullPath: '/apm/events'
+      preLoaderRoute: typeof ApmEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/join': {
-      id: '/apm/join';
-      path: '/apm/join';
-      fullPath: '/apm/join';
-      preLoaderRoute: typeof ApmJoinRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/join'
+      path: '/apm/join'
+      fullPath: '/apm/join'
+      preLoaderRoute: typeof ApmJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/media': {
-      id: '/apm/media';
-      path: '/apm/media';
-      fullPath: '/apm/media';
-      preLoaderRoute: typeof ApmMediaRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/media'
+      path: '/apm/media'
+      fullPath: '/apm/media'
+      preLoaderRoute: typeof ApmMediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/meet': {
-      id: '/apm/meet';
-      path: '/apm/meet';
-      fullPath: '/apm/meet';
-      preLoaderRoute: typeof ApmMeetRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/meet'
+      path: '/apm/meet'
+      fullPath: '/apm/meet'
+      preLoaderRoute: typeof ApmMeetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/news': {
-      id: '/apm/news';
-      path: '/apm/news';
-      fullPath: '/apm/news';
-      preLoaderRoute: typeof ApmNewsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/news'
+      path: '/apm/news'
+      fullPath: '/apm/news'
+      preLoaderRoute: typeof ApmNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apm/volunteer': {
-      id: '/apm/volunteer';
-      path: '/apm/volunteer';
-      fullPath: '/apm/volunteer';
-      preLoaderRoute: typeof ApmVolunteerRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/apm/volunteer'
+      path: '/apm/volunteer'
+      fullPath: '/apm/volunteer'
+      preLoaderRoute: typeof ApmVolunteerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clerk/(auth)': {
-      id: '/clerk/(auth)';
-      path: '';
-      fullPath: '/clerk';
-      preLoaderRoute: typeof ClerkauthRouteRouteImport;
-      parentRoute: typeof ClerkRouteRoute;
-    };
+      id: '/clerk/(auth)'
+      path: ''
+      fullPath: '/clerk'
+      preLoaderRoute: typeof ClerkauthRouteRouteImport
+      parentRoute: typeof ClerkRouteRoute
+    }
     '/clerk/_authenticated': {
-      id: '/clerk/_authenticated';
-      path: '';
-      fullPath: '/clerk';
-      preLoaderRoute: typeof ClerkAuthenticatedRouteRouteImport;
-      parentRoute: typeof ClerkRouteRoute;
-    };
+      id: '/clerk/_authenticated'
+      path: ''
+      fullPath: '/clerk'
+      preLoaderRoute: typeof ClerkAuthenticatedRouteRouteImport
+      parentRoute: typeof ClerkRouteRoute
+    }
     '/questionnaire/': {
-      id: '/questionnaire/';
-      path: '/questionnaire';
-      fullPath: '/questionnaire/';
-      preLoaderRoute: typeof QuestionnaireIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/questionnaire/'
+      path: '/questionnaire'
+      fullPath: '/questionnaire/'
+      preLoaderRoute: typeof QuestionnaireIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/': {
-      id: '/shop/';
-      path: '/shop';
-      fullPath: '/shop/';
-      preLoaderRoute: typeof ShopIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/'
+      path: '/shop'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/about': {
-      id: '/shop/about';
-      path: '/shop/about';
-      fullPath: '/shop/about';
-      preLoaderRoute: typeof ShopAboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/about'
+      path: '/shop/about'
+      fullPath: '/shop/about'
+      preLoaderRoute: typeof ShopAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/blog': {
-      id: '/shop/blog';
-      path: '/shop/blog';
-      fullPath: '/shop/blog';
-      preLoaderRoute: typeof ShopBlogRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/blog'
+      path: '/shop/blog'
+      fullPath: '/shop/blog'
+      preLoaderRoute: typeof ShopBlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/branches': {
-      id: '/shop/branches';
-      path: '/shop/branches';
-      fullPath: '/shop/branches';
-      preLoaderRoute: typeof ShopBranchesRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/branches'
+      path: '/shop/branches'
+      fullPath: '/shop/branches'
+      preLoaderRoute: typeof ShopBranchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/cart': {
-      id: '/shop/cart';
-      path: '/shop/cart';
-      fullPath: '/shop/cart';
-      preLoaderRoute: typeof ShopCartRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/cart'
+      path: '/shop/cart'
+      fullPath: '/shop/cart'
+      preLoaderRoute: typeof ShopCartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/categories': {
-      id: '/shop/categories';
-      path: '/shop/categories';
-      fullPath: '/shop/categories';
-      preLoaderRoute: typeof ShopCategoriesRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/categories'
+      path: '/shop/categories'
+      fullPath: '/shop/categories'
+      preLoaderRoute: typeof ShopCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/checkout': {
-      id: '/shop/checkout';
-      path: '/shop/checkout';
-      fullPath: '/shop/checkout';
-      preLoaderRoute: typeof ShopCheckoutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/checkout'
+      path: '/shop/checkout'
+      fullPath: '/shop/checkout'
+      preLoaderRoute: typeof ShopCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/consult-pharmacist': {
-      id: '/shop/consult-pharmacist';
-      path: '/shop/consult-pharmacist';
-      fullPath: '/shop/consult-pharmacist';
-      preLoaderRoute: typeof ShopConsultPharmacistRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/consult-pharmacist'
+      path: '/shop/consult-pharmacist'
+      fullPath: '/shop/consult-pharmacist'
+      preLoaderRoute: typeof ShopConsultPharmacistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/consultations': {
-      id: '/shop/consultations';
-      path: '/shop/consultations';
-      fullPath: '/shop/consultations';
-      preLoaderRoute: typeof ShopConsultationsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/consultations'
+      path: '/shop/consultations'
+      fullPath: '/shop/consultations'
+      preLoaderRoute: typeof ShopConsultationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/contact': {
-      id: '/shop/contact';
-      path: '/shop/contact';
-      fullPath: '/shop/contact';
-      preLoaderRoute: typeof ShopContactRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/contact'
+      path: '/shop/contact'
+      fullPath: '/shop/contact'
+      preLoaderRoute: typeof ShopContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/conversation': {
-      id: '/shop/conversation';
-      path: '/shop/conversation';
-      fullPath: '/shop/conversation';
-      preLoaderRoute: typeof ShopConversationRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/conversation'
+      path: '/shop/conversation'
+      fullPath: '/shop/conversation'
+      preLoaderRoute: typeof ShopConversationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/dashboard': {
-      id: '/shop/dashboard';
-      path: '/shop/dashboard';
-      fullPath: '/shop/dashboard';
-      preLoaderRoute: typeof ShopDashboardRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/dashboard'
+      path: '/shop/dashboard'
+      fullPath: '/shop/dashboard'
+      preLoaderRoute: typeof ShopDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/delivery-areas': {
-      id: '/shop/delivery-areas';
-      path: '/shop/delivery-areas';
-      fullPath: '/shop/delivery-areas';
-      preLoaderRoute: typeof ShopDeliveryAreasRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/delivery-areas'
+      path: '/shop/delivery-areas'
+      fullPath: '/shop/delivery-areas'
+      preLoaderRoute: typeof ShopDeliveryAreasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/facility-locator': {
-      id: '/shop/facility-locator';
-      path: '/shop/facility-locator';
-      fullPath: '/shop/facility-locator';
-      preLoaderRoute: typeof ShopFacilityLocatorRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/facility-locator'
+      path: '/shop/facility-locator'
+      fullPath: '/shop/facility-locator'
+      preLoaderRoute: typeof ShopFacilityLocatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/faq': {
-      id: '/shop/faq';
-      path: '/shop/faq';
-      fullPath: '/shop/faq';
-      preLoaderRoute: typeof ShopFaqRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/faq'
+      path: '/shop/faq'
+      fullPath: '/shop/faq'
+      preLoaderRoute: typeof ShopFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/forgot-password': {
-      id: '/shop/forgot-password';
-      path: '/shop/forgot-password';
-      fullPath: '/shop/forgot-password';
-      preLoaderRoute: typeof ShopForgotPasswordRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/forgot-password'
+      path: '/shop/forgot-password'
+      fullPath: '/shop/forgot-password'
+      preLoaderRoute: typeof ShopForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/health-concerns': {
-      id: '/shop/health-concerns';
-      path: '/shop/health-concerns';
-      fullPath: '/shop/health-concerns';
-      preLoaderRoute: typeof ShopHealthConcernsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/health-concerns'
+      path: '/shop/health-concerns'
+      fullPath: '/shop/health-concerns'
+      preLoaderRoute: typeof ShopHealthConcernsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/login': {
-      id: '/shop/login';
-      path: '/shop/login';
-      fullPath: '/shop/login';
-      preLoaderRoute: typeof ShopLoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/login'
+      path: '/shop/login'
+      fullPath: '/shop/login'
+      preLoaderRoute: typeof ShopLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/medicines': {
-      id: '/shop/medicines';
-      path: '/shop/medicines';
-      fullPath: '/shop/medicines';
-      preLoaderRoute: typeof ShopMedicinesRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/medicines'
+      path: '/shop/medicines'
+      fullPath: '/shop/medicines'
+      preLoaderRoute: typeof ShopMedicinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/my-prescriptions': {
-      id: '/shop/my-prescriptions';
-      path: '/shop/my-prescriptions';
-      fullPath: '/shop/my-prescriptions';
-      preLoaderRoute: typeof ShopMyPrescriptionsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/my-prescriptions'
+      path: '/shop/my-prescriptions'
+      fullPath: '/shop/my-prescriptions'
+      preLoaderRoute: typeof ShopMyPrescriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/orders': {
-      id: '/shop/orders';
-      path: '/shop/orders';
-      fullPath: '/shop/orders';
-      preLoaderRoute: typeof ShopOrdersRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/orders'
+      path: '/shop/orders'
+      fullPath: '/shop/orders'
+      preLoaderRoute: typeof ShopOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/pharmacy-locator': {
-      id: '/shop/pharmacy-locator';
-      path: '/shop/pharmacy-locator';
-      fullPath: '/shop/pharmacy-locator';
-      preLoaderRoute: typeof ShopPharmacyLocatorRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/pharmacy-locator'
+      path: '/shop/pharmacy-locator'
+      fullPath: '/shop/pharmacy-locator'
+      preLoaderRoute: typeof ShopPharmacyLocatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/pos': {
-      id: '/shop/pos';
-      path: '/shop/pos';
-      fullPath: '/shop/pos';
-      preLoaderRoute: typeof ShopPosRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/pos'
+      path: '/shop/pos'
+      fullPath: '/shop/pos'
+      preLoaderRoute: typeof ShopPosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/pos2': {
-      id: '/shop/pos2';
-      path: '/shop/pos2';
-      fullPath: '/shop/pos2';
-      preLoaderRoute: typeof ShopPos2RouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/pos2'
+      path: '/shop/pos2'
+      fullPath: '/shop/pos2'
+      preLoaderRoute: typeof ShopPos2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/privacy-policy': {
-      id: '/shop/privacy-policy';
-      path: '/shop/privacy-policy';
-      fullPath: '/shop/privacy-policy';
-      preLoaderRoute: typeof ShopPrivacyPolicyRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/privacy-policy'
+      path: '/shop/privacy-policy'
+      fullPath: '/shop/privacy-policy'
+      preLoaderRoute: typeof ShopPrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/rewards': {
-      id: '/shop/rewards';
-      path: '/shop/rewards';
-      fullPath: '/shop/rewards';
-      preLoaderRoute: typeof ShopRewardsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/rewards'
+      path: '/shop/rewards'
+      fullPath: '/shop/rewards'
+      preLoaderRoute: typeof ShopRewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/search': {
-      id: '/shop/search';
-      path: '/shop/search';
-      fullPath: '/shop/search';
-      preLoaderRoute: typeof ShopSearchRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/search'
+      path: '/shop/search'
+      fullPath: '/shop/search'
+      preLoaderRoute: typeof ShopSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/shop': {
-      id: '/shop/shop';
-      path: '/shop/shop';
-      fullPath: '/shop/shop';
-      preLoaderRoute: typeof ShopShopRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/shop'
+      path: '/shop/shop'
+      fullPath: '/shop/shop'
+      preLoaderRoute: typeof ShopShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/supermarket': {
-      id: '/shop/supermarket';
-      path: '/shop/supermarket';
-      fullPath: '/shop/supermarket';
-      preLoaderRoute: typeof ShopSupermarketRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/supermarket'
+      path: '/shop/supermarket'
+      fullPath: '/shop/supermarket'
+      preLoaderRoute: typeof ShopSupermarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/terms': {
-      id: '/shop/terms';
-      path: '/shop/terms';
-      fullPath: '/shop/terms';
-      preLoaderRoute: typeof ShopTermsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/terms'
+      path: '/shop/terms'
+      fullPath: '/shop/terms'
+      preLoaderRoute: typeof ShopTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/upload-prescription': {
-      id: '/shop/upload-prescription';
-      path: '/shop/upload-prescription';
-      fullPath: '/shop/upload-prescription';
-      preLoaderRoute: typeof ShopUploadPrescriptionRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/upload-prescription'
+      path: '/shop/upload-prescription'
+      fullPath: '/shop/upload-prescription'
+      preLoaderRoute: typeof ShopUploadPrescriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/$moduleId/': {
-      id: '/_authenticated/$moduleId/';
-      path: '/';
-      fullPath: '/$moduleId/';
-      preLoaderRoute: typeof AuthenticatedModuleIdIndexRouteImport;
-      parentRoute: typeof AuthenticatedModuleIdRoute;
-    };
+      id: '/_authenticated/$moduleId/'
+      path: '/'
+      fullPath: '/$moduleId/'
+      preLoaderRoute: typeof AuthenticatedModuleIdIndexRouteImport
+      parentRoute: typeof AuthenticatedModuleIdRoute
+    }
     '/_authenticated/$moduleId/dashboard': {
-      id: '/_authenticated/$moduleId/dashboard';
-      path: '/dashboard';
-      fullPath: '/$moduleId/dashboard';
-      preLoaderRoute: typeof AuthenticatedModuleIdDashboardRouteImport;
-      parentRoute: typeof AuthenticatedModuleIdRoute;
-    };
+      id: '/_authenticated/$moduleId/dashboard'
+      path: '/dashboard'
+      fullPath: '/$moduleId/dashboard'
+      preLoaderRoute: typeof AuthenticatedModuleIdDashboardRouteImport
+      parentRoute: typeof AuthenticatedModuleIdRoute
+    }
     '/_authenticated/$page/$id': {
-      id: '/_authenticated/$page/$id';
-      path: '/$page/$id';
-      fullPath: '/$page/$id';
-      preLoaderRoute: typeof AuthenticatedPageIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/$page/$id'
+      path: '/$page/$id'
+      fullPath: '/$page/$id'
+      preLoaderRoute: typeof AuthenticatedPageIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/$page/create': {
-      id: '/_authenticated/$page/create';
-      path: '/$page/create';
-      fullPath: '/$page/create';
-      preLoaderRoute: typeof AuthenticatedPageCreateRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/$page/create'
+      path: '/$page/create'
+      fullPath: '/$page/create'
+      preLoaderRoute: typeof AuthenticatedPageCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/dashboard': {
-      id: '/_authenticated/admin/dashboard';
-      path: '/admin/dashboard';
-      fullPath: '/admin/dashboard';
-      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/': {
-      id: '/_authenticated/coding-concept/';
-      path: '/coding-concept';
-      fullPath: '/coding-concept/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/'
+      path: '/coding-concept'
+      fullPath: '/coding-concept/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/dashboard': {
-      id: '/_authenticated/coding-concept/dashboard';
-      path: '/coding-concept/dashboard';
-      fullPath: '/coding-concept/dashboard';
-      preLoaderRoute: typeof AuthenticatedCodingConceptDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/dashboard'
+      path: '/coding-concept/dashboard'
+      fullPath: '/coding-concept/dashboard'
+      preLoaderRoute: typeof AuthenticatedCodingConceptDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/match': {
-      id: '/_authenticated/coding-concept/match';
-      path: '/coding-concept/match';
-      fullPath: '/coding-concept/match';
-      preLoaderRoute: typeof AuthenticatedCodingConceptMatchRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/match'
+      path: '/coding-concept/match'
+      fullPath: '/coding-concept/match'
+      preLoaderRoute: typeof AuthenticatedCodingConceptMatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/search': {
-      id: '/_authenticated/coding-concept/search';
-      path: '/coding-concept/search';
-      fullPath: '/coding-concept/search';
-      preLoaderRoute: typeof AuthenticatedCodingConceptSearchRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/search'
+      path: '/coding-concept/search'
+      fullPath: '/coding-concept/search'
+      preLoaderRoute: typeof AuthenticatedCodingConceptSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/upload': {
-      id: '/_authenticated/coding-concept/upload';
-      path: '/coding-concept/upload';
-      fullPath: '/coding-concept/upload';
-      preLoaderRoute: typeof AuthenticatedCodingConceptUploadRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/upload'
+      path: '/coding-concept/upload'
+      fullPath: '/coding-concept/upload'
+      preLoaderRoute: typeof AuthenticatedCodingConceptUploadRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/aes': {
-      id: '/_authenticated/communication/aes';
-      path: '/communication/aes';
-      fullPath: '/communication/aes';
-      preLoaderRoute: typeof AuthenticatedCommunicationAesRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/aes'
+      path: '/communication/aes'
+      fullPath: '/communication/aes'
+      preLoaderRoute: typeof AuthenticatedCommunicationAesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/audit-center': {
-      id: '/_authenticated/communication/audit-center';
-      path: '/communication/audit-center';
-      fullPath: '/communication/audit-center';
-      preLoaderRoute: typeof AuthenticatedCommunicationAuditCenterRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/audit-center'
+      path: '/communication/audit-center'
+      fullPath: '/communication/audit-center'
+      preLoaderRoute: typeof AuthenticatedCommunicationAuditCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/communication-channels': {
-      id: '/_authenticated/communication/communication-channels';
-      path: '/communication/communication-channels';
-      fullPath: '/communication/communication-channels';
-      preLoaderRoute: typeof AuthenticatedCommunicationCommunicationChannelsRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/communication-channels'
+      path: '/communication/communication-channels'
+      fullPath: '/communication/communication-channels'
+      preLoaderRoute: typeof AuthenticatedCommunicationCommunicationChannelsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/dashboard': {
-      id: '/_authenticated/communication/dashboard';
-      path: '/communication/dashboard';
-      fullPath: '/communication/dashboard';
-      preLoaderRoute: typeof AuthenticatedCommunicationDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/dashboard'
+      path: '/communication/dashboard'
+      fullPath: '/communication/dashboard'
+      preLoaderRoute: typeof AuthenticatedCommunicationDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/flow-graph': {
-      id: '/_authenticated/communication/flow-graph';
-      path: '/communication/flow-graph';
-      fullPath: '/communication/flow-graph';
-      preLoaderRoute: typeof AuthenticatedCommunicationFlowGraphRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/flow-graph'
+      path: '/communication/flow-graph'
+      fullPath: '/communication/flow-graph'
+      preLoaderRoute: typeof AuthenticatedCommunicationFlowGraphRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/mapping': {
-      id: '/_authenticated/communication/mapping';
-      path: '/communication/mapping';
-      fullPath: '/communication/mapping';
-      preLoaderRoute: typeof AuthenticatedCommunicationMappingRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/mapping'
+      path: '/communication/mapping'
+      fullPath: '/communication/mapping'
+      preLoaderRoute: typeof AuthenticatedCommunicationMappingRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/message-logs': {
-      id: '/_authenticated/communication/message-logs';
-      path: '/communication/message-logs';
-      fullPath: '/communication/message-logs';
-      preLoaderRoute: typeof AuthenticatedCommunicationMessageLogsRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/message-logs'
+      path: '/communication/message-logs'
+      fullPath: '/communication/message-logs'
+      preLoaderRoute: typeof AuthenticatedCommunicationMessageLogsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/message-templates': {
-      id: '/_authenticated/communication/message-templates';
-      path: '/communication/message-templates';
-      fullPath: '/communication/message-templates';
-      preLoaderRoute: typeof AuthenticatedCommunicationMessageTemplatesRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/message-templates'
+      path: '/communication/message-templates'
+      fullPath: '/communication/message-templates'
+      preLoaderRoute: typeof AuthenticatedCommunicationMessageTemplatesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/message-tester': {
-      id: '/_authenticated/communication/message-tester';
-      path: '/communication/message-tester';
-      fullPath: '/communication/message-tester';
-      preLoaderRoute: typeof AuthenticatedCommunicationMessageTesterRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/message-tester'
+      path: '/communication/message-tester'
+      fullPath: '/communication/message-tester'
+      preLoaderRoute: typeof AuthenticatedCommunicationMessageTesterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/messages': {
-      id: '/_authenticated/communication/messages';
-      path: '/communication/messages';
-      fullPath: '/communication/messages';
-      preLoaderRoute: typeof AuthenticatedCommunicationMessagesRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/messages'
+      path: '/communication/messages'
+      fullPath: '/communication/messages'
+      preLoaderRoute: typeof AuthenticatedCommunicationMessagesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/notification-templates': {
-      id: '/_authenticated/communication/notification-templates';
-      path: '/communication/notification-templates';
-      fullPath: '/communication/notification-templates';
-      preLoaderRoute: typeof AuthenticatedCommunicationNotificationTemplatesRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/notification-templates'
+      path: '/communication/notification-templates'
+      fullPath: '/communication/notification-templates'
+      preLoaderRoute: typeof AuthenticatedCommunicationNotificationTemplatesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/notifications': {
-      id: '/_authenticated/communication/notifications';
-      path: '/communication/notifications';
-      fullPath: '/communication/notifications';
-      preLoaderRoute: typeof AuthenticatedCommunicationNotificationsRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/notifications'
+      path: '/communication/notifications'
+      fullPath: '/communication/notifications'
+      preLoaderRoute: typeof AuthenticatedCommunicationNotificationsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/routing': {
-      id: '/_authenticated/communication/routing';
-      path: '/communication/routing';
-      fullPath: '/communication/routing';
-      preLoaderRoute: typeof AuthenticatedCommunicationRoutingRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/routing'
+      path: '/communication/routing'
+      fullPath: '/communication/routing'
+      preLoaderRoute: typeof AuthenticatedCommunicationRoutingRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/communication/trace-explorer': {
-      id: '/_authenticated/communication/trace-explorer';
-      path: '/communication/trace-explorer';
-      fullPath: '/communication/trace-explorer';
-      preLoaderRoute: typeof AuthenticatedCommunicationTraceExplorerRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/communication/trace-explorer'
+      path: '/communication/trace-explorer'
+      fullPath: '/communication/trace-explorer'
+      preLoaderRoute: typeof AuthenticatedCommunicationTraceExplorerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/': {
-      id: '/_authenticated/conversation/';
-      path: '/conversation';
-      fullPath: '/conversation/';
-      preLoaderRoute: typeof AuthenticatedConversationIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/'
+      path: '/conversation'
+      fullPath: '/conversation/'
+      preLoaderRoute: typeof AuthenticatedConversationIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/$conversationId': {
-      id: '/_authenticated/conversation/$conversationId';
-      path: '/conversation/$conversationId';
-      fullPath: '/conversation/$conversationId';
-      preLoaderRoute: typeof AuthenticatedConversationConversationIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/$conversationId'
+      path: '/conversation/$conversationId'
+      fullPath: '/conversation/$conversationId'
+      preLoaderRoute: typeof AuthenticatedConversationConversationIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/broadcasts': {
-      id: '/_authenticated/conversation/broadcasts';
-      path: '/conversation/broadcasts';
-      fullPath: '/conversation/broadcasts';
-      preLoaderRoute: typeof AuthenticatedConversationBroadcastsRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/broadcasts'
+      path: '/conversation/broadcasts'
+      fullPath: '/conversation/broadcasts'
+      preLoaderRoute: typeof AuthenticatedConversationBroadcastsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/dashboard': {
-      id: '/_authenticated/conversation/dashboard';
-      path: '/conversation/dashboard';
-      fullPath: '/conversation/dashboard';
-      preLoaderRoute: typeof AuthenticatedConversationDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/dashboard'
+      path: '/conversation/dashboard'
+      fullPath: '/conversation/dashboard'
+      preLoaderRoute: typeof AuthenticatedConversationDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/invites': {
-      id: '/_authenticated/conversation/invites';
-      path: '/conversation/invites';
-      fullPath: '/conversation/invites';
-      preLoaderRoute: typeof AuthenticatedConversationInvitesRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/invites'
+      path: '/conversation/invites'
+      fullPath: '/conversation/invites'
+      preLoaderRoute: typeof AuthenticatedConversationInvitesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/purchases': {
-      id: '/_authenticated/dashboard/purchases';
-      path: '/dashboard/purchases';
-      fullPath: '/dashboard/purchases';
-      preLoaderRoute: typeof AuthenticatedDashboardPurchasesRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/dashboard/purchases'
+      path: '/dashboard/purchases'
+      fullPath: '/dashboard/purchases'
+      preLoaderRoute: typeof AuthenticatedDashboardPurchasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/sales': {
-      id: '/_authenticated/dashboard/sales';
-      path: '/dashboard/sales';
-      fullPath: '/dashboard/sales';
-      preLoaderRoute: typeof AuthenticatedDashboardSalesRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/dashboard/sales'
+      path: '/dashboard/sales'
+      fullPath: '/dashboard/sales'
+      preLoaderRoute: typeof AuthenticatedDashboardSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/': {
-      id: '/_authenticated/emr/';
-      path: '/emr';
-      fullPath: '/emr/';
-      preLoaderRoute: typeof AuthenticatedEmrIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/'
+      path: '/emr'
+      fullPath: '/emr/'
+      preLoaderRoute: typeof AuthenticatedEmrIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/dashboard': {
-      id: '/_authenticated/emr/dashboard';
-      path: '/emr/dashboard';
-      fullPath: '/emr/dashboard';
-      preLoaderRoute: typeof AuthenticatedEmrDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/dashboard'
+      path: '/emr/dashboard'
+      fullPath: '/emr/dashboard'
+      preLoaderRoute: typeof AuthenticatedEmrDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/': {
-      id: '/_authenticated/identity/';
-      path: '/identity';
-      fullPath: '/identity/';
-      preLoaderRoute: typeof AuthenticatedIdentityIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/'
+      path: '/identity'
+      fullPath: '/identity/'
+      preLoaderRoute: typeof AuthenticatedIdentityIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/dashboard': {
-      id: '/_authenticated/identity/dashboard';
-      path: '/identity/dashboard';
-      fullPath: '/identity/dashboard';
-      preLoaderRoute: typeof AuthenticatedIdentityDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/dashboard'
+      path: '/identity/dashboard'
+      fullPath: '/identity/dashboard'
+      preLoaderRoute: typeof AuthenticatedIdentityDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/': {
-      id: '/_authenticated/lis/';
-      path: '/lis';
-      fullPath: '/lis/';
-      preLoaderRoute: typeof AuthenticatedLisIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/'
+      path: '/lis'
+      fullPath: '/lis/'
+      preLoaderRoute: typeof AuthenticatedLisIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/dashboard': {
-      id: '/_authenticated/lis/dashboard';
-      path: '/lis/dashboard';
-      fullPath: '/lis/dashboard';
-      preLoaderRoute: typeof AuthenticatedLisDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/dashboard'
+      path: '/lis/dashboard'
+      fullPath: '/lis/dashboard'
+      preLoaderRoute: typeof AuthenticatedLisDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/dashboard': {
-      id: '/_authenticated/rxsoft/dashboard';
-      path: '/rxsoft/dashboard';
-      fullPath: '/rxsoft/dashboard';
-      preLoaderRoute: typeof AuthenticatedRxsoftDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/dashboard'
+      path: '/rxsoft/dashboard'
+      fullPath: '/rxsoft/dashboard'
+      preLoaderRoute: typeof AuthenticatedRxsoftDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/settings': {
-      id: '/_authenticated/rxsoft/settings';
-      path: '/rxsoft/settings';
-      fullPath: '/rxsoft/settings';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings'
+      path: '/rxsoft/settings'
+      fullPath: '/rxsoft/settings'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/website/dashboard': {
-      id: '/_authenticated/website/dashboard';
-      path: '/website/dashboard';
-      fullPath: '/website/dashboard';
-      preLoaderRoute: typeof AuthenticatedWebsiteDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/website/dashboard'
+      path: '/website/dashboard'
+      fullPath: '/website/dashboard'
+      preLoaderRoute: typeof AuthenticatedWebsiteDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/apm/admin/agents': {
-      id: '/apm/admin/agents';
-      path: '/agents';
-      fullPath: '/apm/admin/agents';
-      preLoaderRoute: typeof ApmAdminAgentsRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/agents'
+      path: '/agents'
+      fullPath: '/apm/admin/agents'
+      preLoaderRoute: typeof ApmAdminAgentsRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/canvassing': {
-      id: '/apm/admin/canvassing';
-      path: '/canvassing';
-      fullPath: '/apm/admin/canvassing';
-      preLoaderRoute: typeof ApmAdminCanvassingRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/canvassing'
+      path: '/canvassing'
+      fullPath: '/apm/admin/canvassing'
+      preLoaderRoute: typeof ApmAdminCanvassingRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/content': {
-      id: '/apm/admin/content';
-      path: '/content';
-      fullPath: '/apm/admin/content';
-      preLoaderRoute: typeof ApmAdminContentRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/content'
+      path: '/content'
+      fullPath: '/apm/admin/content'
+      preLoaderRoute: typeof ApmAdminContentRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/conversion': {
-      id: '/apm/admin/conversion';
-      path: '/conversion';
-      fullPath: '/apm/admin/conversion';
-      preLoaderRoute: typeof ApmAdminConversionRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/conversion'
+      path: '/conversion'
+      fullPath: '/apm/admin/conversion'
+      preLoaderRoute: typeof ApmAdminConversionRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/gotv': {
-      id: '/apm/admin/gotv';
-      path: '/gotv';
-      fullPath: '/apm/admin/gotv';
-      preLoaderRoute: typeof ApmAdminGotvRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/gotv'
+      path: '/gotv'
+      fullPath: '/apm/admin/gotv'
+      preLoaderRoute: typeof ApmAdminGotvRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/incidents': {
-      id: '/apm/admin/incidents';
-      path: '/incidents';
-      fullPath: '/apm/admin/incidents';
-      preLoaderRoute: typeof ApmAdminIncidentsRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/incidents'
+      path: '/incidents'
+      fullPath: '/apm/admin/incidents'
+      preLoaderRoute: typeof ApmAdminIncidentsRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/lgas': {
-      id: '/apm/admin/lgas';
-      path: '/lgas';
-      fullPath: '/apm/admin/lgas';
-      preLoaderRoute: typeof ApmAdminLgasRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/lgas'
+      path: '/lgas'
+      fullPath: '/apm/admin/lgas'
+      preLoaderRoute: typeof ApmAdminLgasRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/listening': {
-      id: '/apm/admin/listening';
-      path: '/listening';
-      fullPath: '/apm/admin/listening';
-      preLoaderRoute: typeof ApmAdminListeningRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/listening'
+      path: '/listening'
+      fullPath: '/apm/admin/listening'
+      preLoaderRoute: typeof ApmAdminListeningRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/results': {
-      id: '/apm/admin/results';
-      path: '/results';
-      fullPath: '/apm/admin/results';
-      preLoaderRoute: typeof ApmAdminResultsRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/results'
+      path: '/results'
+      fullPath: '/apm/admin/results'
+      preLoaderRoute: typeof ApmAdminResultsRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/sentiment': {
-      id: '/apm/admin/sentiment';
-      path: '/sentiment';
-      fullPath: '/apm/admin/sentiment';
-      preLoaderRoute: typeof ApmAdminSentimentRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/sentiment'
+      path: '/sentiment'
+      fullPath: '/apm/admin/sentiment'
+      preLoaderRoute: typeof ApmAdminSentimentRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/stakeholders': {
-      id: '/apm/admin/stakeholders';
-      path: '/stakeholders';
-      fullPath: '/apm/admin/stakeholders';
-      preLoaderRoute: typeof ApmAdminStakeholdersRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/stakeholders'
+      path: '/stakeholders'
+      fullPath: '/apm/admin/stakeholders'
+      preLoaderRoute: typeof ApmAdminStakeholdersRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/tours': {
-      id: '/apm/admin/tours';
-      path: '/tours';
-      fullPath: '/apm/admin/tours';
-      preLoaderRoute: typeof ApmAdminToursRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/tours'
+      path: '/tours'
+      fullPath: '/apm/admin/tours'
+      preLoaderRoute: typeof ApmAdminToursRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/volunteers': {
-      id: '/apm/admin/volunteers';
-      path: '/volunteers';
-      fullPath: '/apm/admin/volunteers';
-      preLoaderRoute: typeof ApmAdminVolunteersRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/volunteers'
+      path: '/volunteers'
+      fullPath: '/apm/admin/volunteers'
+      preLoaderRoute: typeof ApmAdminVolunteersRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/whatsapp': {
-      id: '/apm/admin/whatsapp';
-      path: '/whatsapp';
-      fullPath: '/apm/admin/whatsapp';
-      preLoaderRoute: typeof ApmAdminWhatsappRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/apm/admin/whatsapp'
+      preLoaderRoute: typeof ApmAdminWhatsappRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/events/$id': {
-      id: '/apm/events/$id';
-      path: '/$id';
-      fullPath: '/apm/events/$id';
-      preLoaderRoute: typeof ApmEventsIdRouteImport;
-      parentRoute: typeof ApmEventsRoute;
-    };
+      id: '/apm/events/$id'
+      path: '/$id'
+      fullPath: '/apm/events/$id'
+      preLoaderRoute: typeof ApmEventsIdRouteImport
+      parentRoute: typeof ApmEventsRoute
+    }
     '/apm/news/$slug': {
-      id: '/apm/news/$slug';
-      path: '/$slug';
-      fullPath: '/apm/news/$slug';
-      preLoaderRoute: typeof ApmNewsSlugRouteImport;
-      parentRoute: typeof ApmNewsRoute;
-    };
+      id: '/apm/news/$slug'
+      path: '/$slug'
+      fullPath: '/apm/news/$slug'
+      preLoaderRoute: typeof ApmNewsSlugRouteImport
+      parentRoute: typeof ApmNewsRoute
+    }
     '/clerk/_authenticated/user-management': {
-      id: '/clerk/_authenticated/user-management';
-      path: '/user-management';
-      fullPath: '/clerk/user-management';
-      preLoaderRoute: typeof ClerkAuthenticatedUserManagementRouteImport;
-      parentRoute: typeof ClerkAuthenticatedRouteRoute;
-    };
+      id: '/clerk/_authenticated/user-management'
+      path: '/user-management'
+      fullPath: '/clerk/user-management'
+      preLoaderRoute: typeof ClerkAuthenticatedUserManagementRouteImport
+      parentRoute: typeof ClerkAuthenticatedRouteRoute
+    }
     '/shop/blog/$slug': {
-      id: '/shop/blog/$slug';
-      path: '/$slug';
-      fullPath: '/shop/blog/$slug';
-      preLoaderRoute: typeof ShopBlogSlugRouteImport;
-      parentRoute: typeof ShopBlogRoute;
-    };
+      id: '/shop/blog/$slug'
+      path: '/$slug'
+      fullPath: '/shop/blog/$slug'
+      preLoaderRoute: typeof ShopBlogSlugRouteImport
+      parentRoute: typeof ShopBlogRoute
+    }
     '/shop/branches/$id': {
-      id: '/shop/branches/$id';
-      path: '/$id';
-      fullPath: '/shop/branches/$id';
-      preLoaderRoute: typeof ShopBranchesIdRouteImport;
-      parentRoute: typeof ShopBranchesRoute;
-    };
+      id: '/shop/branches/$id'
+      path: '/$id'
+      fullPath: '/shop/branches/$id'
+      preLoaderRoute: typeof ShopBranchesIdRouteImport
+      parentRoute: typeof ShopBranchesRoute
+    }
     '/shop/categories/$slug': {
-      id: '/shop/categories/$slug';
-      path: '/$slug';
-      fullPath: '/shop/categories/$slug';
-      preLoaderRoute: typeof ShopCategoriesSlugRouteImport;
-      parentRoute: typeof ShopCategoriesRoute;
-    };
+      id: '/shop/categories/$slug'
+      path: '/$slug'
+      fullPath: '/shop/categories/$slug'
+      preLoaderRoute: typeof ShopCategoriesSlugRouteImport
+      parentRoute: typeof ShopCategoriesRoute
+    }
     '/shop/health-concerns/$slug': {
-      id: '/shop/health-concerns/$slug';
-      path: '/$slug';
-      fullPath: '/shop/health-concerns/$slug';
-      preLoaderRoute: typeof ShopHealthConcernsSlugRouteImport;
-      parentRoute: typeof ShopHealthConcernsRoute;
-    };
+      id: '/shop/health-concerns/$slug'
+      path: '/$slug'
+      fullPath: '/shop/health-concerns/$slug'
+      preLoaderRoute: typeof ShopHealthConcernsSlugRouteImport
+      parentRoute: typeof ShopHealthConcernsRoute
+    }
     '/shop/medicines/$code': {
-      id: '/shop/medicines/$code';
-      path: '/$code';
-      fullPath: '/shop/medicines/$code';
-      preLoaderRoute: typeof ShopMedicinesCodeRouteImport;
-      parentRoute: typeof ShopMedicinesRoute;
-    };
+      id: '/shop/medicines/$code'
+      path: '/$code'
+      fullPath: '/shop/medicines/$code'
+      preLoaderRoute: typeof ShopMedicinesCodeRouteImport
+      parentRoute: typeof ShopMedicinesRoute
+    }
     '/shop/orders_/$id': {
-      id: '/shop/orders_/$id';
-      path: '/shop/orders/$id';
-      fullPath: '/shop/orders/$id';
-      preLoaderRoute: typeof ShopOrdersIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/orders_/$id'
+      path: '/shop/orders/$id'
+      fullPath: '/shop/orders/$id'
+      preLoaderRoute: typeof ShopOrdersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/pay/$token': {
-      id: '/shop/pay/$token';
-      path: '/shop/pay/$token';
-      fullPath: '/shop/pay/$token';
-      preLoaderRoute: typeof ShopPayTokenRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/pay/$token'
+      path: '/shop/pay/$token'
+      fullPath: '/shop/pay/$token'
+      preLoaderRoute: typeof ShopPayTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/pay/return': {
-      id: '/shop/pay/return';
-      path: '/shop/pay/return';
-      fullPath: '/shop/pay/return';
-      preLoaderRoute: typeof ShopPayReturnRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/pay/return'
+      path: '/shop/pay/return'
+      fullPath: '/shop/pay/return'
+      preLoaderRoute: typeof ShopPayReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/purchases/': {
-      id: '/shop/purchases/';
-      path: '/shop/purchases';
-      fullPath: '/shop/purchases/';
-      preLoaderRoute: typeof ShopPurchasesIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/purchases/'
+      path: '/shop/purchases'
+      fullPath: '/shop/purchases/'
+      preLoaderRoute: typeof ShopPurchasesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/shop_/$slug': {
-      id: '/shop/shop_/$slug';
-      path: '/shop/shop/$slug';
-      fullPath: '/shop/shop/$slug';
-      preLoaderRoute: typeof ShopShopSlugRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/shop_/$slug'
+      path: '/shop/shop/$slug'
+      fullPath: '/shop/shop/$slug'
+      preLoaderRoute: typeof ShopShopSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/track-order/$code': {
-      id: '/shop/track-order/$code';
-      path: '/shop/track-order/$code';
-      fullPath: '/shop/track-order/$code';
-      preLoaderRoute: typeof ShopTrackOrderCodeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: '/shop/track-order/$code'
+      path: '/shop/track-order/$code'
+      fullPath: '/shop/track-order/$code'
+      preLoaderRoute: typeof ShopTrackOrderCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/$moduleId/$page/$id': {
-      id: '/_authenticated/$moduleId/$page/$id';
-      path: '/$page/$id';
-      fullPath: '/$moduleId/$page/$id';
-      preLoaderRoute: typeof AuthenticatedModuleIdPageIdRouteImport;
-      parentRoute: typeof AuthenticatedModuleIdRoute;
-    };
+      id: '/_authenticated/$moduleId/$page/$id'
+      path: '/$page/$id'
+      fullPath: '/$moduleId/$page/$id'
+      preLoaderRoute: typeof AuthenticatedModuleIdPageIdRouteImport
+      parentRoute: typeof AuthenticatedModuleIdRoute
+    }
     '/_authenticated/$moduleId/$page/create': {
-      id: '/_authenticated/$moduleId/$page/create';
-      path: '/$page/create';
-      fullPath: '/$moduleId/$page/create';
-      preLoaderRoute: typeof AuthenticatedModuleIdPageCreateRouteImport;
-      parentRoute: typeof AuthenticatedModuleIdRoute;
-    };
+      id: '/_authenticated/$moduleId/$page/create'
+      path: '/$page/create'
+      fullPath: '/$moduleId/$page/create'
+      preLoaderRoute: typeof AuthenticatedModuleIdPageCreateRouteImport
+      parentRoute: typeof AuthenticatedModuleIdRoute
+    }
     '/_authenticated/$page/$id/edit': {
-      id: '/_authenticated/$page/$id/edit';
-      path: '/edit';
-      fullPath: '/$page/$id/edit';
-      preLoaderRoute: typeof AuthenticatedPageIdEditRouteImport;
-      parentRoute: typeof AuthenticatedPageIdRoute;
-    };
+      id: '/_authenticated/$page/$id/edit'
+      path: '/edit'
+      fullPath: '/$page/$id/edit'
+      preLoaderRoute: typeof AuthenticatedPageIdEditRouteImport
+      parentRoute: typeof AuthenticatedPageIdRoute
+    }
     '/_authenticated/coding-concept/dosage-forms/': {
-      id: '/_authenticated/coding-concept/dosage-forms/';
-      path: '/coding-concept/dosage-forms';
-      fullPath: '/coding-concept/dosage-forms/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/dosage-forms/'
+      path: '/coding-concept/dosage-forms'
+      fullPath: '/coding-concept/dosage-forms/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/drug-classifications/': {
-      id: '/_authenticated/coding-concept/drug-classifications/';
-      path: '/coding-concept/drug-classifications';
-      fullPath: '/coding-concept/drug-classifications/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/drug-classifications/'
+      path: '/coding-concept/drug-classifications'
+      fullPath: '/coding-concept/drug-classifications/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/drug-classifications/$classificationId': {
-      id: '/_authenticated/coding-concept/drug-classifications/$classificationId';
-      path: '/coding-concept/drug-classifications/$classificationId';
-      fullPath: '/coding-concept/drug-classifications/$classificationId';
-      preLoaderRoute: typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/drug-classifications/$classificationId'
+      path: '/coding-concept/drug-classifications/$classificationId'
+      fullPath: '/coding-concept/drug-classifications/$classificationId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/drug-components/': {
-      id: '/_authenticated/coding-concept/drug-components/';
-      path: '/coding-concept/drug-components';
-      fullPath: '/coding-concept/drug-components/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/drug-components/'
+      path: '/coding-concept/drug-components'
+      fullPath: '/coding-concept/drug-components/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/': {
-      id: '/_authenticated/coding-concept/facilities/';
-      path: '/coding-concept/facilities';
-      fullPath: '/coding-concept/facilities/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/'
+      path: '/coding-concept/facilities'
+      fullPath: '/coding-concept/facilities/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/formulations/': {
-      id: '/_authenticated/coding-concept/formulations/';
-      path: '/coding-concept/formulations';
-      fullPath: '/coding-concept/formulations/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFormulationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/formulations/'
+      path: '/coding-concept/formulations'
+      fullPath: '/coding-concept/formulations/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFormulationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/generic-drugs/': {
-      id: '/_authenticated/coding-concept/generic-drugs/';
-      path: '/coding-concept/generic-drugs';
-      fullPath: '/coding-concept/generic-drugs/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/generic-drugs/'
+      path: '/coding-concept/generic-drugs'
+      fullPath: '/coding-concept/generic-drugs/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/generic-products/': {
-      id: '/_authenticated/coding-concept/generic-products/';
-      path: '/coding-concept/generic-products';
-      fullPath: '/coding-concept/generic-products/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/generic-products/'
+      path: '/coding-concept/generic-products'
+      fullPath: '/coding-concept/generic-products/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/manufacturers/': {
-      id: '/_authenticated/coding-concept/manufacturers/';
-      path: '/coding-concept/manufacturers';
-      fullPath: '/coding-concept/manufacturers/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptManufacturersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/manufacturers/'
+      path: '/coding-concept/manufacturers'
+      fullPath: '/coding-concept/manufacturers/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptManufacturersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/pharmaceutics/': {
-      id: '/_authenticated/coding-concept/pharmaceutics/';
-      path: '/coding-concept/pharmaceutics';
-      fullPath: '/coding-concept/pharmaceutics/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/pharmaceutics/'
+      path: '/coding-concept/pharmaceutics'
+      fullPath: '/coding-concept/pharmaceutics/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/$conversationId/edit': {
-      id: '/_authenticated/conversation/$conversationId/edit';
-      path: '/edit';
-      fullPath: '/conversation/$conversationId/edit';
-      preLoaderRoute: typeof AuthenticatedConversationConversationIdEditRouteImport;
-      parentRoute: typeof AuthenticatedConversationConversationIdRoute;
-    };
+      id: '/_authenticated/conversation/$conversationId/edit'
+      path: '/edit'
+      fullPath: '/conversation/$conversationId/edit'
+      preLoaderRoute: typeof AuthenticatedConversationConversationIdEditRouteImport
+      parentRoute: typeof AuthenticatedConversationConversationIdRoute
+    }
     '/_authenticated/conversation/channels/': {
-      id: '/_authenticated/conversation/channels/';
-      path: '/conversation/channels';
-      fullPath: '/conversation/channels/';
-      preLoaderRoute: typeof AuthenticatedConversationChannelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/channels/'
+      path: '/conversation/channels'
+      fullPath: '/conversation/channels/'
+      preLoaderRoute: typeof AuthenticatedConversationChannelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/chats/': {
-      id: '/_authenticated/conversation/chats/';
-      path: '/conversation/chats';
-      fullPath: '/conversation/chats/';
-      preLoaderRoute: typeof AuthenticatedConversationChatsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/chats/'
+      path: '/conversation/chats'
+      fullPath: '/conversation/chats/'
+      preLoaderRoute: typeof AuthenticatedConversationChatsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/exchanges/': {
-      id: '/_authenticated/conversation/exchanges/';
-      path: '/conversation/exchanges';
-      fullPath: '/conversation/exchanges/';
-      preLoaderRoute: typeof AuthenticatedConversationExchangesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/exchanges/'
+      path: '/conversation/exchanges'
+      fullPath: '/conversation/exchanges/'
+      preLoaderRoute: typeof AuthenticatedConversationExchangesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/exchanges/$exchangeId': {
-      id: '/_authenticated/conversation/exchanges/$exchangeId';
-      path: '/conversation/exchanges/$exchangeId';
-      fullPath: '/conversation/exchanges/$exchangeId';
-      preLoaderRoute: typeof AuthenticatedConversationExchangesExchangeIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/exchanges/$exchangeId'
+      path: '/conversation/exchanges/$exchangeId'
+      fullPath: '/conversation/exchanges/$exchangeId'
+      preLoaderRoute: typeof AuthenticatedConversationExchangesExchangeIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/invites/$inviteId': {
-      id: '/_authenticated/conversation/invites/$inviteId';
-      path: '/$inviteId';
-      fullPath: '/conversation/invites/$inviteId';
-      preLoaderRoute: typeof AuthenticatedConversationInvitesInviteIdRouteImport;
-      parentRoute: typeof AuthenticatedConversationInvitesRouteRoute;
-    };
+      id: '/_authenticated/conversation/invites/$inviteId'
+      path: '/$inviteId'
+      fullPath: '/conversation/invites/$inviteId'
+      preLoaderRoute: typeof AuthenticatedConversationInvitesInviteIdRouteImport
+      parentRoute: typeof AuthenticatedConversationInvitesRouteRoute
+    }
     '/_authenticated/conversation/option-lists/': {
-      id: '/_authenticated/conversation/option-lists/';
-      path: '/conversation/option-lists';
-      fullPath: '/conversation/option-lists/';
-      preLoaderRoute: typeof AuthenticatedConversationOptionListsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/option-lists/'
+      path: '/conversation/option-lists'
+      fullPath: '/conversation/option-lists/'
+      preLoaderRoute: typeof AuthenticatedConversationOptionListsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/participants/': {
-      id: '/_authenticated/conversation/participants/';
-      path: '/conversation/participants';
-      fullPath: '/conversation/participants/';
-      preLoaderRoute: typeof AuthenticatedConversationParticipantsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/participants/'
+      path: '/conversation/participants'
+      fullPath: '/conversation/participants/'
+      preLoaderRoute: typeof AuthenticatedConversationParticipantsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/projections/': {
-      id: '/_authenticated/conversation/projections/';
-      path: '/conversation/projections';
-      fullPath: '/conversation/projections/';
-      preLoaderRoute: typeof AuthenticatedConversationProjectionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/projections/'
+      path: '/conversation/projections'
+      fullPath: '/conversation/projections/'
+      preLoaderRoute: typeof AuthenticatedConversationProjectionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/projections/$projectionId': {
-      id: '/_authenticated/conversation/projections/$projectionId';
-      path: '/conversation/projections/$projectionId';
-      fullPath: '/conversation/projections/$projectionId';
-      preLoaderRoute: typeof AuthenticatedConversationProjectionsProjectionIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/projections/$projectionId'
+      path: '/conversation/projections/$projectionId'
+      fullPath: '/conversation/projections/$projectionId'
+      preLoaderRoute: typeof AuthenticatedConversationProjectionsProjectionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/questionnaires/': {
-      id: '/_authenticated/conversation/questionnaires/';
-      path: '/conversation/questionnaires';
-      fullPath: '/conversation/questionnaires/';
-      preLoaderRoute: typeof AuthenticatedConversationQuestionnairesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/questionnaires/'
+      path: '/conversation/questionnaires'
+      fullPath: '/conversation/questionnaires/'
+      preLoaderRoute: typeof AuthenticatedConversationQuestionnairesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/questions/': {
-      id: '/_authenticated/conversation/questions/';
-      path: '/conversation/questions';
-      fullPath: '/conversation/questions/';
-      preLoaderRoute: typeof AuthenticatedConversationQuestionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/questions/'
+      path: '/conversation/questions'
+      fullPath: '/conversation/questions/'
+      preLoaderRoute: typeof AuthenticatedConversationQuestionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/workflow-configuration/': {
-      id: '/_authenticated/conversation/workflow-configuration/';
-      path: '/conversation/workflow-configuration';
-      fullPath: '/conversation/workflow-configuration/';
-      preLoaderRoute: typeof AuthenticatedConversationWorkflowConfigurationIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/workflow-configuration/'
+      path: '/conversation/workflow-configuration'
+      fullPath: '/conversation/workflow-configuration/'
+      preLoaderRoute: typeof AuthenticatedConversationWorkflowConfigurationIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/workflow-events/': {
-      id: '/_authenticated/conversation/workflow-events/';
-      path: '/conversation/workflow-events';
-      fullPath: '/conversation/workflow-events/';
-      preLoaderRoute: typeof AuthenticatedConversationWorkflowEventsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/workflow-events/'
+      path: '/conversation/workflow-events'
+      fullPath: '/conversation/workflow-events/'
+      preLoaderRoute: typeof AuthenticatedConversationWorkflowEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/workflow-instances/': {
-      id: '/_authenticated/conversation/workflow-instances/';
-      path: '/conversation/workflow-instances';
-      fullPath: '/conversation/workflow-instances/';
-      preLoaderRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/workflow-instances/'
+      path: '/conversation/workflow-instances'
+      fullPath: '/conversation/workflow-instances/'
+      preLoaderRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/workflows/': {
-      id: '/_authenticated/conversation/workflows/';
-      path: '/conversation/workflows';
-      fullPath: '/conversation/workflows/';
-      preLoaderRoute: typeof AuthenticatedConversationWorkflowsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/workflows/'
+      path: '/conversation/workflows'
+      fullPath: '/conversation/workflows/'
+      preLoaderRoute: typeof AuthenticatedConversationWorkflowsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/appointments/': {
-      id: '/_authenticated/emr/appointments/';
-      path: '/emr/appointments';
-      fullPath: '/emr/appointments/';
-      preLoaderRoute: typeof AuthenticatedEmrAppointmentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/appointments/'
+      path: '/emr/appointments'
+      fullPath: '/emr/appointments/'
+      preLoaderRoute: typeof AuthenticatedEmrAppointmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/departments/': {
-      id: '/_authenticated/emr/departments/';
-      path: '/emr/departments';
-      fullPath: '/emr/departments/';
-      preLoaderRoute: typeof AuthenticatedEmrDepartmentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/departments/'
+      path: '/emr/departments'
+      fullPath: '/emr/departments/'
+      preLoaderRoute: typeof AuthenticatedEmrDepartmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/encounters/': {
-      id: '/_authenticated/emr/encounters/';
-      path: '/emr/encounters';
-      fullPath: '/emr/encounters/';
-      preLoaderRoute: typeof AuthenticatedEmrEncountersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/encounters/'
+      path: '/emr/encounters'
+      fullPath: '/emr/encounters/'
+      preLoaderRoute: typeof AuthenticatedEmrEncountersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/encounters/$encounterId': {
-      id: '/_authenticated/emr/encounters/$encounterId';
-      path: '/emr/encounters/$encounterId';
-      fullPath: '/emr/encounters/$encounterId';
-      preLoaderRoute: typeof AuthenticatedEmrEncountersEncounterIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/encounters/$encounterId'
+      path: '/emr/encounters/$encounterId'
+      fullPath: '/emr/encounters/$encounterId'
+      preLoaderRoute: typeof AuthenticatedEmrEncountersEncounterIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/forms/': {
-      id: '/_authenticated/emr/forms/';
-      path: '/emr/forms';
-      fullPath: '/emr/forms/';
-      preLoaderRoute: typeof AuthenticatedEmrFormsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/forms/'
+      path: '/emr/forms'
+      fullPath: '/emr/forms/'
+      preLoaderRoute: typeof AuthenticatedEmrFormsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/medications/': {
-      id: '/_authenticated/emr/medications/';
-      path: '/emr/medications';
-      fullPath: '/emr/medications/';
-      preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/medications/'
+      path: '/emr/medications'
+      fullPath: '/emr/medications/'
+      preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/patients/': {
-      id: '/_authenticated/emr/patients/';
-      path: '/emr/patients';
-      fullPath: '/emr/patients/';
-      preLoaderRoute: typeof AuthenticatedEmrPatientsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/patients/'
+      path: '/emr/patients'
+      fullPath: '/emr/patients/'
+      preLoaderRoute: typeof AuthenticatedEmrPatientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/patients/$patientId': {
-      id: '/_authenticated/emr/patients/$patientId';
-      path: '/emr/patients/$patientId';
-      fullPath: '/emr/patients/$patientId';
-      preLoaderRoute: typeof AuthenticatedEmrPatientsPatientIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/patients/$patientId'
+      path: '/emr/patients/$patientId'
+      fullPath: '/emr/patients/$patientId'
+      preLoaderRoute: typeof AuthenticatedEmrPatientsPatientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/referrals/': {
-      id: '/_authenticated/emr/referrals/';
-      path: '/emr/referrals';
-      fullPath: '/emr/referrals/';
-      preLoaderRoute: typeof AuthenticatedEmrReferralsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/referrals/'
+      path: '/emr/referrals'
+      fullPath: '/emr/referrals/'
+      preLoaderRoute: typeof AuthenticatedEmrReferralsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/requests/': {
-      id: '/_authenticated/emr/requests/';
-      path: '/emr/requests';
-      fullPath: '/emr/requests/';
-      preLoaderRoute: typeof AuthenticatedEmrRequestsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/requests/'
+      path: '/emr/requests'
+      fullPath: '/emr/requests/'
+      preLoaderRoute: typeof AuthenticatedEmrRequestsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/requests/$requestId': {
-      id: '/_authenticated/emr/requests/$requestId';
-      path: '/emr/requests/$requestId';
-      fullPath: '/emr/requests/$requestId';
-      preLoaderRoute: typeof AuthenticatedEmrRequestsRequestIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/requests/$requestId'
+      path: '/emr/requests/$requestId'
+      fullPath: '/emr/requests/$requestId'
+      preLoaderRoute: typeof AuthenticatedEmrRequestsRequestIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/staff/': {
-      id: '/_authenticated/emr/staff/';
-      path: '/emr/staff';
-      fullPath: '/emr/staff/';
-      preLoaderRoute: typeof AuthenticatedEmrStaffIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/staff/'
+      path: '/emr/staff'
+      fullPath: '/emr/staff/'
+      preLoaderRoute: typeof AuthenticatedEmrStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/tags/': {
-      id: '/_authenticated/emr/tags/';
-      path: '/emr/tags';
-      fullPath: '/emr/tags/';
-      preLoaderRoute: typeof AuthenticatedEmrTagsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/tags/'
+      path: '/emr/tags'
+      fullPath: '/emr/tags/'
+      preLoaderRoute: typeof AuthenticatedEmrTagsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/visits/': {
-      id: '/_authenticated/emr/visits/';
-      path: '/emr/visits';
-      fullPath: '/emr/visits/';
-      preLoaderRoute: typeof AuthenticatedEmrVisitsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/visits/'
+      path: '/emr/visits'
+      fullPath: '/emr/visits/'
+      preLoaderRoute: typeof AuthenticatedEmrVisitsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/visits/$visitId': {
-      id: '/_authenticated/emr/visits/$visitId';
-      path: '/emr/visits/$visitId';
-      fullPath: '/emr/visits/$visitId';
-      preLoaderRoute: typeof AuthenticatedEmrVisitsVisitIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/visits/$visitId'
+      path: '/emr/visits/$visitId'
+      fullPath: '/emr/visits/$visitId'
+      preLoaderRoute: typeof AuthenticatedEmrVisitsVisitIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/wards/': {
-      id: '/_authenticated/emr/wards/';
-      path: '/emr/wards';
-      fullPath: '/emr/wards/';
-      preLoaderRoute: typeof AuthenticatedEmrWardsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/wards/'
+      path: '/emr/wards'
+      fullPath: '/emr/wards/'
+      preLoaderRoute: typeof AuthenticatedEmrWardsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/wards/admissions': {
-      id: '/_authenticated/emr/wards/admissions';
-      path: '/emr/wards/admissions';
-      fullPath: '/emr/wards/admissions';
-      preLoaderRoute: typeof AuthenticatedEmrWardsAdmissionsRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/wards/admissions'
+      path: '/emr/wards/admissions'
+      fullPath: '/emr/wards/admissions'
+      preLoaderRoute: typeof AuthenticatedEmrWardsAdmissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/wards/beds': {
-      id: '/_authenticated/emr/wards/beds';
-      path: '/emr/wards/beds';
-      fullPath: '/emr/wards/beds';
-      preLoaderRoute: typeof AuthenticatedEmrWardsBedsRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/wards/beds'
+      path: '/emr/wards/beds'
+      fullPath: '/emr/wards/beds'
+      preLoaderRoute: typeof AuthenticatedEmrWardsBedsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/wards/board': {
-      id: '/_authenticated/emr/wards/board';
-      path: '/emr/wards/board';
-      fullPath: '/emr/wards/board';
-      preLoaderRoute: typeof AuthenticatedEmrWardsBoardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/wards/board'
+      path: '/emr/wards/board'
+      fullPath: '/emr/wards/board'
+      preLoaderRoute: typeof AuthenticatedEmrWardsBoardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/wards/discharges': {
-      id: '/_authenticated/emr/wards/discharges';
-      path: '/emr/wards/discharges';
-      fullPath: '/emr/wards/discharges';
-      preLoaderRoute: typeof AuthenticatedEmrWardsDischargesRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/emr/wards/discharges'
+      path: '/emr/wards/discharges'
+      fullPath: '/emr/wards/discharges'
+      preLoaderRoute: typeof AuthenticatedEmrWardsDischargesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/locations/': {
-      id: '/_authenticated/identity/locations/';
-      path: '/identity/locations';
-      fullPath: '/identity/locations/';
-      preLoaderRoute: typeof AuthenticatedIdentityLocationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/locations/'
+      path: '/identity/locations'
+      fullPath: '/identity/locations/'
+      preLoaderRoute: typeof AuthenticatedIdentityLocationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/organizations/': {
-      id: '/_authenticated/identity/organizations/';
-      path: '/identity/organizations';
-      fullPath: '/identity/organizations/';
-      preLoaderRoute: typeof AuthenticatedIdentityOrganizationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/organizations/'
+      path: '/identity/organizations'
+      fullPath: '/identity/organizations/'
+      preLoaderRoute: typeof AuthenticatedIdentityOrganizationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/permissions/': {
-      id: '/_authenticated/identity/permissions/';
-      path: '/identity/permissions';
-      fullPath: '/identity/permissions/';
-      preLoaderRoute: typeof AuthenticatedIdentityPermissionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/permissions/'
+      path: '/identity/permissions'
+      fullPath: '/identity/permissions/'
+      preLoaderRoute: typeof AuthenticatedIdentityPermissionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/roles/': {
-      id: '/_authenticated/identity/roles/';
-      path: '/identity/roles';
-      fullPath: '/identity/roles/';
-      preLoaderRoute: typeof AuthenticatedIdentityRolesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/roles/'
+      path: '/identity/roles'
+      fullPath: '/identity/roles/'
+      preLoaderRoute: typeof AuthenticatedIdentityRolesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/identity/users/': {
-      id: '/_authenticated/identity/users/';
-      path: '/identity/users';
-      fullPath: '/identity/users/';
-      preLoaderRoute: typeof AuthenticatedIdentityUsersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/identity/users/'
+      path: '/identity/users'
+      fullPath: '/identity/users/'
+      preLoaderRoute: typeof AuthenticatedIdentityUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/attribute-definitions/': {
-      id: '/_authenticated/lis/attribute-definitions/';
-      path: '/lis/attribute-definitions';
-      fullPath: '/lis/attribute-definitions/';
-      preLoaderRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/attribute-definitions/'
+      path: '/lis/attribute-definitions'
+      fullPath: '/lis/attribute-definitions/'
+      preLoaderRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/eqa-enrollments/': {
-      id: '/_authenticated/lis/eqa-enrollments/';
-      path: '/lis/eqa-enrollments';
-      fullPath: '/lis/eqa-enrollments/';
-      preLoaderRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/eqa-enrollments/'
+      path: '/lis/eqa-enrollments'
+      fullPath: '/lis/eqa-enrollments/'
+      preLoaderRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/eqa-programs/': {
-      id: '/_authenticated/lis/eqa-programs/';
-      path: '/lis/eqa-programs';
-      fullPath: '/lis/eqa-programs/';
-      preLoaderRoute: typeof AuthenticatedLisEqaProgramsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/eqa-programs/'
+      path: '/lis/eqa-programs'
+      fullPath: '/lis/eqa-programs/'
+      preLoaderRoute: typeof AuthenticatedLisEqaProgramsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/eqa-results/': {
-      id: '/_authenticated/lis/eqa-results/';
-      path: '/lis/eqa-results';
-      fullPath: '/lis/eqa-results/';
-      preLoaderRoute: typeof AuthenticatedLisEqaResultsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/eqa-results/'
+      path: '/lis/eqa-results'
+      fullPath: '/lis/eqa-results/'
+      preLoaderRoute: typeof AuthenticatedLisEqaResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/location-types/': {
-      id: '/_authenticated/lis/location-types/';
-      path: '/lis/location-types';
-      fullPath: '/lis/location-types/';
-      preLoaderRoute: typeof AuthenticatedLisLocationTypesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/location-types/'
+      path: '/lis/location-types'
+      fullPath: '/lis/location-types/'
+      preLoaderRoute: typeof AuthenticatedLisLocationTypesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/locations/': {
-      id: '/_authenticated/lis/locations/';
-      path: '/lis/locations';
-      fullPath: '/lis/locations/';
-      preLoaderRoute: typeof AuthenticatedLisLocationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/locations/'
+      path: '/lis/locations'
+      fullPath: '/lis/locations/'
+      preLoaderRoute: typeof AuthenticatedLisLocationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/loinc/': {
-      id: '/_authenticated/lis/loinc/';
-      path: '/lis/loinc';
-      fullPath: '/lis/loinc/';
-      preLoaderRoute: typeof AuthenticatedLisLoincIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/loinc/'
+      path: '/lis/loinc'
+      fullPath: '/lis/loinc/'
+      preLoaderRoute: typeof AuthenticatedLisLoincIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/methods/': {
-      id: '/_authenticated/lis/methods/';
-      path: '/lis/methods';
-      fullPath: '/lis/methods/';
-      preLoaderRoute: typeof AuthenticatedLisMethodsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/methods/'
+      path: '/lis/methods'
+      fullPath: '/lis/methods/'
+      preLoaderRoute: typeof AuthenticatedLisMethodsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/': {
-      id: '/_authenticated/lis/orders/';
-      path: '/lis/orders';
-      fullPath: '/lis/orders/';
-      preLoaderRoute: typeof AuthenticatedLisOrdersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/'
+      path: '/lis/orders'
+      fullPath: '/lis/orders/'
+      preLoaderRoute: typeof AuthenticatedLisOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/dashboard': {
-      id: '/_authenticated/lis/orders/dashboard';
-      path: '/lis/orders/dashboard';
-      fullPath: '/lis/orders/dashboard';
-      preLoaderRoute: typeof AuthenticatedLisOrdersDashboardRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/dashboard'
+      path: '/lis/orders/dashboard'
+      fullPath: '/lis/orders/dashboard'
+      preLoaderRoute: typeof AuthenticatedLisOrdersDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/workflow': {
-      id: '/_authenticated/lis/orders/workflow';
-      path: '/lis/orders/workflow';
-      fullPath: '/lis/orders/workflow';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow'
+      path: '/lis/orders/workflow'
+      fullPath: '/lis/orders/workflow'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/panels/': {
-      id: '/_authenticated/lis/panels/';
-      path: '/lis/panels';
-      fullPath: '/lis/panels/';
-      preLoaderRoute: typeof AuthenticatedLisPanelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/panels/'
+      path: '/lis/panels'
+      fullPath: '/lis/panels/'
+      preLoaderRoute: typeof AuthenticatedLisPanelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/patients/': {
-      id: '/_authenticated/lis/patients/';
-      path: '/lis/patients';
-      fullPath: '/lis/patients/';
-      preLoaderRoute: typeof AuthenticatedLisPatientsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/patients/'
+      path: '/lis/patients'
+      fullPath: '/lis/patients/'
+      preLoaderRoute: typeof AuthenticatedLisPatientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/priorities/': {
-      id: '/_authenticated/lis/priorities/';
-      path: '/lis/priorities';
-      fullPath: '/lis/priorities/';
-      preLoaderRoute: typeof AuthenticatedLisPrioritiesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/priorities/'
+      path: '/lis/priorities'
+      fullPath: '/lis/priorities/'
+      preLoaderRoute: typeof AuthenticatedLisPrioritiesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/programs/': {
-      id: '/_authenticated/lis/programs/';
-      path: '/lis/programs';
-      fullPath: '/lis/programs/';
-      preLoaderRoute: typeof AuthenticatedLisProgramsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/programs/'
+      path: '/lis/programs'
+      fullPath: '/lis/programs/'
+      preLoaderRoute: typeof AuthenticatedLisProgramsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/qa-checklist-items/': {
-      id: '/_authenticated/lis/qa-checklist-items/';
-      path: '/lis/qa-checklist-items';
-      fullPath: '/lis/qa-checklist-items/';
-      preLoaderRoute: typeof AuthenticatedLisQaChecklistItemsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/qa-checklist-items/'
+      path: '/lis/qa-checklist-items'
+      fullPath: '/lis/qa-checklist-items/'
+      preLoaderRoute: typeof AuthenticatedLisQaChecklistItemsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/qc-alerts/': {
-      id: '/_authenticated/lis/qc-alerts/';
-      path: '/lis/qc-alerts';
-      fullPath: '/lis/qc-alerts/';
-      preLoaderRoute: typeof AuthenticatedLisQcAlertsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/qc-alerts/'
+      path: '/lis/qc-alerts'
+      fullPath: '/lis/qc-alerts/'
+      preLoaderRoute: typeof AuthenticatedLisQcAlertsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/qc-lots/': {
-      id: '/_authenticated/lis/qc-lots/';
-      path: '/lis/qc-lots';
-      fullPath: '/lis/qc-lots/';
-      preLoaderRoute: typeof AuthenticatedLisQcLotsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/qc-lots/'
+      path: '/lis/qc-lots'
+      fullPath: '/lis/qc-lots/'
+      preLoaderRoute: typeof AuthenticatedLisQcLotsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/qc-results/': {
-      id: '/_authenticated/lis/qc-results/';
-      path: '/lis/qc-results';
-      fullPath: '/lis/qc-results/';
-      preLoaderRoute: typeof AuthenticatedLisQcResultsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/qc-results/'
+      path: '/lis/qc-results'
+      fullPath: '/lis/qc-results/'
+      preLoaderRoute: typeof AuthenticatedLisQcResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/reference-ranges/': {
-      id: '/_authenticated/lis/reference-ranges/';
-      path: '/lis/reference-ranges';
-      fullPath: '/lis/reference-ranges/';
-      preLoaderRoute: typeof AuthenticatedLisReferenceRangesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/reference-ranges/'
+      path: '/lis/reference-ranges'
+      fullPath: '/lis/reference-ranges/'
+      preLoaderRoute: typeof AuthenticatedLisReferenceRangesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/rejection-reasons/': {
-      id: '/_authenticated/lis/rejection-reasons/';
-      path: '/lis/rejection-reasons';
-      fullPath: '/lis/rejection-reasons/';
-      preLoaderRoute: typeof AuthenticatedLisRejectionReasonsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/rejection-reasons/'
+      path: '/lis/rejection-reasons'
+      fullPath: '/lis/rejection-reasons/'
+      preLoaderRoute: typeof AuthenticatedLisRejectionReasonsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/result-signatures/': {
-      id: '/_authenticated/lis/result-signatures/';
-      path: '/lis/result-signatures';
-      fullPath: '/lis/result-signatures/';
-      preLoaderRoute: typeof AuthenticatedLisResultSignaturesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/result-signatures/'
+      path: '/lis/result-signatures'
+      fullPath: '/lis/result-signatures/'
+      preLoaderRoute: typeof AuthenticatedLisResultSignaturesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/results/': {
-      id: '/_authenticated/lis/results/';
-      path: '/lis/results';
-      fullPath: '/lis/results/';
-      preLoaderRoute: typeof AuthenticatedLisResultsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/results/'
+      path: '/lis/results'
+      fullPath: '/lis/results/'
+      preLoaderRoute: typeof AuthenticatedLisResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/sample-types/': {
-      id: '/_authenticated/lis/sample-types/';
-      path: '/lis/sample-types';
-      fullPath: '/lis/sample-types/';
-      preLoaderRoute: typeof AuthenticatedLisSampleTypesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/sample-types/'
+      path: '/lis/sample-types'
+      fullPath: '/lis/sample-types/'
+      preLoaderRoute: typeof AuthenticatedLisSampleTypesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/samples/': {
-      id: '/_authenticated/lis/samples/';
-      path: '/lis/samples';
-      fullPath: '/lis/samples/';
-      preLoaderRoute: typeof AuthenticatedLisSamplesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/samples/'
+      path: '/lis/samples'
+      fullPath: '/lis/samples/'
+      preLoaderRoute: typeof AuthenticatedLisSamplesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/statuses/': {
-      id: '/_authenticated/lis/statuses/';
-      path: '/lis/statuses';
-      fullPath: '/lis/statuses/';
-      preLoaderRoute: typeof AuthenticatedLisStatusesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/statuses/'
+      path: '/lis/statuses'
+      fullPath: '/lis/statuses/'
+      preLoaderRoute: typeof AuthenticatedLisStatusesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/test-categories/': {
-      id: '/_authenticated/lis/test-categories/';
-      path: '/lis/test-categories';
-      fullPath: '/lis/test-categories/';
-      preLoaderRoute: typeof AuthenticatedLisTestCategoriesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/test-categories/'
+      path: '/lis/test-categories'
+      fullPath: '/lis/test-categories/'
+      preLoaderRoute: typeof AuthenticatedLisTestCategoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/test-definitions/': {
-      id: '/_authenticated/lis/test-definitions/';
-      path: '/lis/test-definitions';
-      fullPath: '/lis/test-definitions/';
-      preLoaderRoute: typeof AuthenticatedLisTestDefinitionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/test-definitions/'
+      path: '/lis/test-definitions'
+      fullPath: '/lis/test-definitions/'
+      preLoaderRoute: typeof AuthenticatedLisTestDefinitionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/test-sections/': {
-      id: '/_authenticated/lis/test-sections/';
-      path: '/lis/test-sections';
-      fullPath: '/lis/test-sections/';
-      preLoaderRoute: typeof AuthenticatedLisTestSectionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/test-sections/'
+      path: '/lis/test-sections'
+      fullPath: '/lis/test-sections/'
+      preLoaderRoute: typeof AuthenticatedLisTestSectionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/uoms/': {
-      id: '/_authenticated/lis/uoms/';
-      path: '/lis/uoms';
-      fullPath: '/lis/uoms/';
-      preLoaderRoute: typeof AuthenticatedLisUomsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/uoms/'
+      path: '/lis/uoms'
+      fullPath: '/lis/uoms/'
+      preLoaderRoute: typeof AuthenticatedLisUomsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/validation-dashboard/': {
-      id: '/_authenticated/lis/validation-dashboard/';
-      path: '/lis/validation-dashboard';
-      fullPath: '/lis/validation-dashboard/';
-      preLoaderRoute: typeof AuthenticatedLisValidationDashboardIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/validation-dashboard/'
+      path: '/lis/validation-dashboard'
+      fullPath: '/lis/validation-dashboard/'
+      preLoaderRoute: typeof AuthenticatedLisValidationDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/audit-logs/': {
-      id: '/_authenticated/rxsoft/audit-logs/';
-      path: '/rxsoft/audit-logs';
-      fullPath: '/rxsoft/audit-logs/';
-      preLoaderRoute: typeof AuthenticatedRxsoftAuditLogsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/audit-logs/'
+      path: '/rxsoft/audit-logs'
+      fullPath: '/rxsoft/audit-logs/'
+      preLoaderRoute: typeof AuthenticatedRxsoftAuditLogsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/branches/': {
-      id: '/_authenticated/rxsoft/branches/';
-      path: '/rxsoft/branches';
-      fullPath: '/rxsoft/branches/';
-      preLoaderRoute: typeof AuthenticatedRxsoftBranchesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/branches/'
+      path: '/rxsoft/branches'
+      fullPath: '/rxsoft/branches/'
+      preLoaderRoute: typeof AuthenticatedRxsoftBranchesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/categories/': {
-      id: '/_authenticated/rxsoft/categories/';
-      path: '/rxsoft/categories';
-      fullPath: '/rxsoft/categories/';
-      preLoaderRoute: typeof AuthenticatedRxsoftCategoriesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/categories/'
+      path: '/rxsoft/categories'
+      fullPath: '/rxsoft/categories/'
+      preLoaderRoute: typeof AuthenticatedRxsoftCategoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/customers/': {
-      id: '/_authenticated/rxsoft/customers/';
-      path: '/rxsoft/customers';
-      fullPath: '/rxsoft/customers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftCustomersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/customers/'
+      path: '/rxsoft/customers'
+      fullPath: '/rxsoft/customers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftCustomersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/drug-components/': {
-      id: '/_authenticated/rxsoft/drug-components/';
-      path: '/rxsoft/drug-components';
-      fullPath: '/rxsoft/drug-components/';
-      preLoaderRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/drug-components/'
+      path: '/rxsoft/drug-components'
+      fullPath: '/rxsoft/drug-components/'
+      preLoaderRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-articles/': {
-      id: '/_authenticated/rxsoft/ehealthwares-articles/';
-      path: '/rxsoft/ehealthwares-articles';
-      fullPath: '/rxsoft/ehealthwares-articles/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-articles/'
+      path: '/rxsoft/ehealthwares-articles'
+      fullPath: '/rxsoft/ehealthwares-articles/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-careers/': {
-      id: '/_authenticated/rxsoft/ehealthwares-careers/';
-      path: '/rxsoft/ehealthwares-careers';
-      fullPath: '/rxsoft/ehealthwares-careers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-careers/'
+      path: '/rxsoft/ehealthwares-careers'
+      fullPath: '/rxsoft/ehealthwares-careers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-categories/': {
-      id: '/_authenticated/rxsoft/ehealthwares-categories/';
-      path: '/rxsoft/ehealthwares-categories';
-      fullPath: '/rxsoft/ehealthwares-categories/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-categories/'
+      path: '/rxsoft/ehealthwares-categories'
+      fullPath: '/rxsoft/ehealthwares-categories/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-contact-submissions/': {
-      id: '/_authenticated/rxsoft/ehealthwares-contact-submissions/';
-      path: '/rxsoft/ehealthwares-contact-submissions';
-      fullPath: '/rxsoft/ehealthwares-contact-submissions/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-contact-submissions/'
+      path: '/rxsoft/ehealthwares-contact-submissions'
+      fullPath: '/rxsoft/ehealthwares-contact-submissions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-hero-slides/': {
-      id: '/_authenticated/rxsoft/ehealthwares-hero-slides/';
-      path: '/rxsoft/ehealthwares-hero-slides';
-      fullPath: '/rxsoft/ehealthwares-hero-slides/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-hero-slides/'
+      path: '/rxsoft/ehealthwares-hero-slides'
+      fullPath: '/rxsoft/ehealthwares-hero-slides/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-investors/': {
-      id: '/_authenticated/rxsoft/ehealthwares-investors/';
-      path: '/rxsoft/ehealthwares-investors';
-      fullPath: '/rxsoft/ehealthwares-investors/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-investors/'
+      path: '/rxsoft/ehealthwares-investors'
+      fullPath: '/rxsoft/ehealthwares-investors/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-partners/': {
-      id: '/_authenticated/rxsoft/ehealthwares-partners/';
-      path: '/rxsoft/ehealthwares-partners';
-      fullPath: '/rxsoft/ehealthwares-partners/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-partners/'
+      path: '/rxsoft/ehealthwares-partners'
+      fullPath: '/rxsoft/ehealthwares-partners/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-products/': {
-      id: '/_authenticated/rxsoft/ehealthwares-products/';
-      path: '/rxsoft/ehealthwares-products';
-      fullPath: '/rxsoft/ehealthwares-products/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-products/'
+      path: '/rxsoft/ehealthwares-products'
+      fullPath: '/rxsoft/ehealthwares-products/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-sections/': {
-      id: '/_authenticated/rxsoft/ehealthwares-sections/';
-      path: '/rxsoft/ehealthwares-sections';
-      fullPath: '/rxsoft/ehealthwares-sections/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-sections/'
+      path: '/rxsoft/ehealthwares-sections'
+      fullPath: '/rxsoft/ehealthwares-sections/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-services/': {
-      id: '/_authenticated/rxsoft/ehealthwares-services/';
-      path: '/rxsoft/ehealthwares-services';
-      fullPath: '/rxsoft/ehealthwares-services/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-services/'
+      path: '/rxsoft/ehealthwares-services'
+      fullPath: '/rxsoft/ehealthwares-services/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-settings/': {
-      id: '/_authenticated/rxsoft/ehealthwares-settings/';
-      path: '/rxsoft/ehealthwares-settings';
-      fullPath: '/rxsoft/ehealthwares-settings/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-settings/'
+      path: '/rxsoft/ehealthwares-settings'
+      fullPath: '/rxsoft/ehealthwares-settings/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-team/': {
-      id: '/_authenticated/rxsoft/ehealthwares-team/';
-      path: '/rxsoft/ehealthwares-team';
-      fullPath: '/rxsoft/ehealthwares-team/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-team/'
+      path: '/rxsoft/ehealthwares-team'
+      fullPath: '/rxsoft/ehealthwares-team/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-testimonials/': {
-      id: '/_authenticated/rxsoft/ehealthwares-testimonials/';
-      path: '/rxsoft/ehealthwares-testimonials';
-      fullPath: '/rxsoft/ehealthwares-testimonials/';
-      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/ehealthwares-testimonials/'
+      path: '/rxsoft/ehealthwares-testimonials'
+      fullPath: '/rxsoft/ehealthwares-testimonials/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/gl-accounts/': {
-      id: '/_authenticated/rxsoft/gl-accounts/';
-      path: '/rxsoft/gl-accounts';
-      fullPath: '/rxsoft/gl-accounts/';
-      preLoaderRoute: typeof AuthenticatedRxsoftGlAccountsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/gl-accounts/'
+      path: '/rxsoft/gl-accounts'
+      fullPath: '/rxsoft/gl-accounts/'
+      preLoaderRoute: typeof AuthenticatedRxsoftGlAccountsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/insurance-providers/': {
-      id: '/_authenticated/rxsoft/insurance-providers/';
-      path: '/rxsoft/insurance-providers';
-      fullPath: '/rxsoft/insurance-providers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/insurance-providers/'
+      path: '/rxsoft/insurance-providers'
+      fullPath: '/rxsoft/insurance-providers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/inventory/': {
-      id: '/_authenticated/rxsoft/inventory/';
-      path: '/rxsoft/inventory';
-      fullPath: '/rxsoft/inventory/';
-      preLoaderRoute: typeof AuthenticatedRxsoftInventoryIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/inventory/'
+      path: '/rxsoft/inventory'
+      fullPath: '/rxsoft/inventory/'
+      preLoaderRoute: typeof AuthenticatedRxsoftInventoryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/items/': {
-      id: '/_authenticated/rxsoft/items/';
-      path: '/rxsoft/items';
-      fullPath: '/rxsoft/items/';
-      preLoaderRoute: typeof AuthenticatedRxsoftItemsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/items/'
+      path: '/rxsoft/items'
+      fullPath: '/rxsoft/items/'
+      preLoaderRoute: typeof AuthenticatedRxsoftItemsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/items/create': {
-      id: '/_authenticated/rxsoft/items/create';
-      path: '/rxsoft/items/create';
-      fullPath: '/rxsoft/items/create';
-      preLoaderRoute: typeof AuthenticatedRxsoftItemsCreateRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/items/create'
+      path: '/rxsoft/items/create'
+      fullPath: '/rxsoft/items/create'
+      preLoaderRoute: typeof AuthenticatedRxsoftItemsCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/journal-entries/': {
-      id: '/_authenticated/rxsoft/journal-entries/';
-      path: '/rxsoft/journal-entries';
-      fullPath: '/rxsoft/journal-entries/';
-      preLoaderRoute: typeof AuthenticatedRxsoftJournalEntriesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/journal-entries/'
+      path: '/rxsoft/journal-entries'
+      fullPath: '/rxsoft/journal-entries/'
+      preLoaderRoute: typeof AuthenticatedRxsoftJournalEntriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/journal-entry-lines/': {
-      id: '/_authenticated/rxsoft/journal-entry-lines/';
-      path: '/rxsoft/journal-entry-lines';
-      fullPath: '/rxsoft/journal-entry-lines/';
-      preLoaderRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/journal-entry-lines/'
+      path: '/rxsoft/journal-entry-lines'
+      fullPath: '/rxsoft/journal-entry-lines/'
+      preLoaderRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/journals/': {
-      id: '/_authenticated/rxsoft/journals/';
-      path: '/rxsoft/journals';
-      fullPath: '/rxsoft/journals/';
-      preLoaderRoute: typeof AuthenticatedRxsoftJournalsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/journals/'
+      path: '/rxsoft/journals'
+      fullPath: '/rxsoft/journals/'
+      preLoaderRoute: typeof AuthenticatedRxsoftJournalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/manufacturers/': {
-      id: '/_authenticated/rxsoft/manufacturers/';
-      path: '/rxsoft/manufacturers';
-      fullPath: '/rxsoft/manufacturers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/manufacturers/'
+      path: '/rxsoft/manufacturers'
+      fullPath: '/rxsoft/manufacturers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/organisation-config/': {
-      id: '/_authenticated/rxsoft/organisation-config/';
-      path: '/rxsoft/organisation-config';
-      fullPath: '/rxsoft/organisation-config/';
-      preLoaderRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/organisation-config/'
+      path: '/rxsoft/organisation-config'
+      fullPath: '/rxsoft/organisation-config/'
+      preLoaderRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/organisation-payment-providers/': {
-      id: '/_authenticated/rxsoft/organisation-payment-providers/';
-      path: '/rxsoft/organisation-payment-providers';
-      fullPath: '/rxsoft/organisation-payment-providers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/organisation-payment-providers/'
+      path: '/rxsoft/organisation-payment-providers'
+      fullPath: '/rxsoft/organisation-payment-providers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/organizations/': {
-      id: '/_authenticated/rxsoft/organizations/';
-      path: '/rxsoft/organizations';
-      fullPath: '/rxsoft/organizations/';
-      preLoaderRoute: typeof AuthenticatedRxsoftOrganizationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/organizations/'
+      path: '/rxsoft/organizations'
+      fullPath: '/rxsoft/organizations/'
+      preLoaderRoute: typeof AuthenticatedRxsoftOrganizationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/payment-methods/': {
-      id: '/_authenticated/rxsoft/payment-methods/';
-      path: '/rxsoft/payment-methods';
-      fullPath: '/rxsoft/payment-methods/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPaymentMethodsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/payment-methods/'
+      path: '/rxsoft/payment-methods'
+      fullPath: '/rxsoft/payment-methods/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentMethodsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/payment-providers/': {
-      id: '/_authenticated/rxsoft/payment-providers/';
-      path: '/rxsoft/payment-providers';
-      fullPath: '/rxsoft/payment-providers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/payment-providers/'
+      path: '/rxsoft/payment-providers'
+      fullPath: '/rxsoft/payment-providers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/payment-transactions/': {
-      id: '/_authenticated/rxsoft/payment-transactions/';
-      path: '/rxsoft/payment-transactions';
-      fullPath: '/rxsoft/payment-transactions/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPaymentTransactionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/payment-transactions/'
+      path: '/rxsoft/payment-transactions'
+      fullPath: '/rxsoft/payment-transactions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentTransactionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/payments/': {
-      id: '/_authenticated/rxsoft/payments/';
-      path: '/rxsoft/payments';
-      fullPath: '/rxsoft/payments/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPaymentsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/payments/'
+      path: '/rxsoft/payments'
+      fullPath: '/rxsoft/payments/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/pharmaceutics/': {
-      id: '/_authenticated/rxsoft/pharmaceutics/';
-      path: '/rxsoft/pharmaceutics';
-      fullPath: '/rxsoft/pharmaceutics/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/pharmaceutics/'
+      path: '/rxsoft/pharmaceutics'
+      fullPath: '/rxsoft/pharmaceutics/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/pos-terminals/': {
-      id: '/_authenticated/rxsoft/pos-terminals/';
-      path: '/rxsoft/pos-terminals';
-      fullPath: '/rxsoft/pos-terminals/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/pos-terminals/'
+      path: '/rxsoft/pos-terminals'
+      fullPath: '/rxsoft/pos-terminals/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/price-list-items/': {
-      id: '/_authenticated/rxsoft/price-list-items/';
-      path: '/rxsoft/price-list-items';
-      fullPath: '/rxsoft/price-list-items/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/price-list-items/'
+      path: '/rxsoft/price-list-items'
+      fullPath: '/rxsoft/price-list-items/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/price-lists/': {
-      id: '/_authenticated/rxsoft/price-lists/';
-      path: '/rxsoft/price-lists';
-      fullPath: '/rxsoft/price-lists/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPriceListsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/price-lists/'
+      path: '/rxsoft/price-lists'
+      fullPath: '/rxsoft/price-lists/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPriceListsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/purchases/': {
-      id: '/_authenticated/rxsoft/purchases/';
-      path: '/rxsoft/purchases';
-      fullPath: '/rxsoft/purchases/';
-      preLoaderRoute: typeof AuthenticatedRxsoftPurchasesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/purchases/'
+      path: '/rxsoft/purchases'
+      fullPath: '/rxsoft/purchases/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPurchasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/receivables/': {
-      id: '/_authenticated/rxsoft/receivables/';
-      path: '/rxsoft/receivables';
-      fullPath: '/rxsoft/receivables/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReceivablesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/receivables/'
+      path: '/rxsoft/receivables'
+      fullPath: '/rxsoft/receivables/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReceivablesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/receiving/': {
-      id: '/_authenticated/rxsoft/receiving/';
-      path: '/rxsoft/receiving';
-      fullPath: '/rxsoft/receiving/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReceivingIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/receiving/'
+      path: '/rxsoft/receiving'
+      fullPath: '/rxsoft/receiving/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReceivingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/reports/': {
-      id: '/_authenticated/rxsoft/reports/';
-      path: '/rxsoft/reports';
-      fullPath: '/rxsoft/reports/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReportsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/reports/'
+      path: '/rxsoft/reports'
+      fullPath: '/rxsoft/reports/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/role-requests/': {
-      id: '/_authenticated/rxsoft/role-requests/';
-      path: '/rxsoft/role-requests';
-      fullPath: '/rxsoft/role-requests/';
-      preLoaderRoute: typeof AuthenticatedRxsoftRoleRequestsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/role-requests/'
+      path: '/rxsoft/role-requests'
+      fullPath: '/rxsoft/role-requests/'
+      preLoaderRoute: typeof AuthenticatedRxsoftRoleRequestsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/roles/': {
-      id: '/_authenticated/rxsoft/roles/';
-      path: '/rxsoft/roles';
-      fullPath: '/rxsoft/roles/';
-      preLoaderRoute: typeof AuthenticatedRxsoftRolesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/roles/'
+      path: '/rxsoft/roles'
+      fullPath: '/rxsoft/roles/'
+      preLoaderRoute: typeof AuthenticatedRxsoftRolesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/sales-lines/': {
-      id: '/_authenticated/rxsoft/sales-lines/';
-      path: '/rxsoft/sales-lines';
-      fullPath: '/rxsoft/sales-lines/';
-      preLoaderRoute: typeof AuthenticatedRxsoftSalesLinesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/sales-lines/'
+      path: '/rxsoft/sales-lines'
+      fullPath: '/rxsoft/sales-lines/'
+      preLoaderRoute: typeof AuthenticatedRxsoftSalesLinesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/sales/': {
-      id: '/_authenticated/rxsoft/sales/';
-      path: '/rxsoft/sales';
-      fullPath: '/rxsoft/sales/';
-      preLoaderRoute: typeof AuthenticatedRxsoftSalesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/sales/'
+      path: '/rxsoft/sales'
+      fullPath: '/rxsoft/sales/'
+      preLoaderRoute: typeof AuthenticatedRxsoftSalesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/settings/': {
-      id: '/_authenticated/rxsoft/settings/';
-      path: '/';
-      fullPath: '/rxsoft/settings/';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings/'
+      path: '/'
+      fullPath: '/rxsoft/settings/'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
+    }
     '/_authenticated/rxsoft/settings/account': {
-      id: '/_authenticated/rxsoft/settings/account';
-      path: '/account';
-      fullPath: '/rxsoft/settings/account';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAccountRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings/account'
+      path: '/account'
+      fullPath: '/rxsoft/settings/account'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
+    }
     '/_authenticated/rxsoft/settings/appearance': {
-      id: '/_authenticated/rxsoft/settings/appearance';
-      path: '/appearance';
-      fullPath: '/rxsoft/settings/appearance';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAppearanceRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings/appearance'
+      path: '/appearance'
+      fullPath: '/rxsoft/settings/appearance'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAppearanceRouteImport
+      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
+    }
     '/_authenticated/rxsoft/settings/display': {
-      id: '/_authenticated/rxsoft/settings/display';
-      path: '/display';
-      fullPath: '/rxsoft/settings/display';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsDisplayRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings/display'
+      path: '/display'
+      fullPath: '/rxsoft/settings/display'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsDisplayRouteImport
+      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
+    }
     '/_authenticated/rxsoft/settings/notifications': {
-      id: '/_authenticated/rxsoft/settings/notifications';
-      path: '/notifications';
-      fullPath: '/rxsoft/settings/notifications';
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsNotificationsRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/settings/notifications'
+      path: '/notifications'
+      fullPath: '/rxsoft/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
+    }
     '/_authenticated/rxsoft/stock-locations/': {
-      id: '/_authenticated/rxsoft/stock-locations/';
-      path: '/rxsoft/stock-locations';
-      fullPath: '/rxsoft/stock-locations/';
-      preLoaderRoute: typeof AuthenticatedRxsoftStockLocationsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/stock-locations/'
+      path: '/rxsoft/stock-locations'
+      fullPath: '/rxsoft/stock-locations/'
+      preLoaderRoute: typeof AuthenticatedRxsoftStockLocationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/suppliers/': {
-      id: '/_authenticated/rxsoft/suppliers/';
-      path: '/rxsoft/suppliers';
-      fullPath: '/rxsoft/suppliers/';
-      preLoaderRoute: typeof AuthenticatedRxsoftSuppliersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/suppliers/'
+      path: '/rxsoft/suppliers'
+      fullPath: '/rxsoft/suppliers/'
+      preLoaderRoute: typeof AuthenticatedRxsoftSuppliersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/uom-category/': {
-      id: '/_authenticated/rxsoft/uom-category/';
-      path: '/rxsoft/uom-category';
-      fullPath: '/rxsoft/uom-category/';
-      preLoaderRoute: typeof AuthenticatedRxsoftUomCategoryIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/uom-category/'
+      path: '/rxsoft/uom-category'
+      fullPath: '/rxsoft/uom-category/'
+      preLoaderRoute: typeof AuthenticatedRxsoftUomCategoryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/uoms/': {
-      id: '/_authenticated/rxsoft/uoms/';
-      path: '/rxsoft/uoms';
-      fullPath: '/rxsoft/uoms/';
-      preLoaderRoute: typeof AuthenticatedRxsoftUomsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/uoms/'
+      path: '/rxsoft/uoms'
+      fullPath: '/rxsoft/uoms/'
+      preLoaderRoute: typeof AuthenticatedRxsoftUomsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/uoms/$uomId': {
-      id: '/_authenticated/rxsoft/uoms/$uomId';
-      path: '/rxsoft/uoms/$uomId';
-      fullPath: '/rxsoft/uoms/$uomId';
-      preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/uoms/$uomId'
+      path: '/rxsoft/uoms/$uomId'
+      fullPath: '/rxsoft/uoms/$uomId'
+      preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/user-config/': {
-      id: '/_authenticated/rxsoft/user-config/';
-      path: '/rxsoft/user-config';
-      fullPath: '/rxsoft/user-config/';
-      preLoaderRoute: typeof AuthenticatedRxsoftUserConfigIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/user-config/'
+      path: '/rxsoft/user-config'
+      fullPath: '/rxsoft/user-config/'
+      preLoaderRoute: typeof AuthenticatedRxsoftUserConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/users/': {
-      id: '/_authenticated/rxsoft/users/';
-      path: '/rxsoft/users';
-      fullPath: '/rxsoft/users/';
-      preLoaderRoute: typeof AuthenticatedRxsoftUsersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/users/'
+      path: '/rxsoft/users'
+      fullPath: '/rxsoft/users/'
+      preLoaderRoute: typeof AuthenticatedRxsoftUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/warehouses/': {
-      id: '/_authenticated/rxsoft/warehouses/';
-      path: '/rxsoft/warehouses';
-      fullPath: '/rxsoft/warehouses/';
-      preLoaderRoute: typeof AuthenticatedRxsoftWarehousesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/warehouses/'
+      path: '/rxsoft/warehouses'
+      fullPath: '/rxsoft/warehouses/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWarehousesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/website-orders/': {
-      id: '/_authenticated/rxsoft/website-orders/';
-      path: '/rxsoft/website-orders';
-      fullPath: '/rxsoft/website-orders/';
-      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/website-orders/'
+      path: '/rxsoft/website-orders'
+      fullPath: '/rxsoft/website-orders/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/website-prescriptions/': {
-      id: '/_authenticated/rxsoft/website-prescriptions/';
-      path: '/rxsoft/website-prescriptions';
-      fullPath: '/rxsoft/website-prescriptions/';
-      preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/website-prescriptions/'
+      path: '/rxsoft/website-prescriptions'
+      fullPath: '/rxsoft/website-prescriptions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/apm/admin/polling-units/$wardId': {
-      id: '/apm/admin/polling-units/$wardId';
-      path: '/polling-units/$wardId';
-      fullPath: '/apm/admin/polling-units/$wardId';
-      preLoaderRoute: typeof ApmAdminPollingUnitsWardIdRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/polling-units/$wardId'
+      path: '/polling-units/$wardId'
+      fullPath: '/apm/admin/polling-units/$wardId'
+      preLoaderRoute: typeof ApmAdminPollingUnitsWardIdRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/apm/admin/wards/$lgaId': {
-      id: '/apm/admin/wards/$lgaId';
-      path: '/wards/$lgaId';
-      fullPath: '/apm/admin/wards/$lgaId';
-      preLoaderRoute: typeof ApmAdminWardsLgaIdRouteImport;
-      parentRoute: typeof ApmAdminRouteRoute;
-    };
+      id: '/apm/admin/wards/$lgaId'
+      path: '/wards/$lgaId'
+      fullPath: '/apm/admin/wards/$lgaId'
+      preLoaderRoute: typeof ApmAdminWardsLgaIdRouteImport
+      parentRoute: typeof ApmAdminRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/hospitals/': {
-      id: '/_authenticated/coding-concept/facilities/hospitals/';
-      path: '/coding-concept/facilities/hospitals';
-      fullPath: '/coding-concept/facilities/hospitals/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/hospitals/'
+      path: '/coding-concept/facilities/hospitals'
+      fullPath: '/coding-concept/facilities/hospitals/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': {
-      id: '/_authenticated/coding-concept/facilities/hospitals/$hospitalId';
-      path: '/coding-concept/facilities/hospitals/$hospitalId';
-      fullPath: '/coding-concept/facilities/hospitals/$hospitalId';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
+      path: '/coding-concept/facilities/hospitals/$hospitalId'
+      fullPath: '/coding-concept/facilities/hospitals/$hospitalId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/laboratories/': {
-      id: '/_authenticated/coding-concept/facilities/laboratories/';
-      path: '/coding-concept/facilities/laboratories';
-      fullPath: '/coding-concept/facilities/laboratories/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/laboratories/'
+      path: '/coding-concept/facilities/laboratories'
+      fullPath: '/coding-concept/facilities/laboratories/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': {
-      id: '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId';
-      path: '/coding-concept/facilities/laboratories/$laboratoryId';
-      fullPath: '/coding-concept/facilities/laboratories/$laboratoryId';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
+      path: '/coding-concept/facilities/laboratories/$laboratoryId'
+      fullPath: '/coding-concept/facilities/laboratories/$laboratoryId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/levels/': {
-      id: '/_authenticated/coding-concept/facilities/levels/';
-      path: '/coding-concept/facilities/levels';
-      fullPath: '/coding-concept/facilities/levels/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/levels/'
+      path: '/coding-concept/facilities/levels'
+      fullPath: '/coding-concept/facilities/levels/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/lgas/': {
-      id: '/_authenticated/coding-concept/facilities/lgas/';
-      path: '/coding-concept/facilities/lgas';
-      fullPath: '/coding-concept/facilities/lgas/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/lgas/'
+      path: '/coding-concept/facilities/lgas'
+      fullPath: '/coding-concept/facilities/lgas/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/pharmacies/': {
-      id: '/_authenticated/coding-concept/facilities/pharmacies/';
-      path: '/coding-concept/facilities/pharmacies';
-      fullPath: '/coding-concept/facilities/pharmacies/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/pharmacies/'
+      path: '/coding-concept/facilities/pharmacies'
+      fullPath: '/coding-concept/facilities/pharmacies/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': {
-      id: '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId';
-      path: '/coding-concept/facilities/pharmacies/$pharmacyId';
-      fullPath: '/coding-concept/facilities/pharmacies/$pharmacyId';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
+      path: '/coding-concept/facilities/pharmacies/$pharmacyId'
+      fullPath: '/coding-concept/facilities/pharmacies/$pharmacyId'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/states/': {
-      id: '/_authenticated/coding-concept/facilities/states/';
-      path: '/coding-concept/facilities/states';
-      fullPath: '/coding-concept/facilities/states/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/states/'
+      path: '/coding-concept/facilities/states'
+      fullPath: '/coding-concept/facilities/states/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesStatesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/types/': {
-      id: '/_authenticated/coding-concept/facilities/types/';
-      path: '/coding-concept/facilities/types';
-      fullPath: '/coding-concept/facilities/types/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesTypesIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/types/'
+      path: '/coding-concept/facilities/types'
+      fullPath: '/coding-concept/facilities/types/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesTypesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coding-concept/facilities/wards/': {
-      id: '/_authenticated/coding-concept/facilities/wards/';
-      path: '/coding-concept/facilities/wards';
-      fullPath: '/coding-concept/facilities/wards/';
-      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesWardsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/coding-concept/facilities/wards/'
+      path: '/coding-concept/facilities/wards'
+      fullPath: '/coding-concept/facilities/wards/'
+      preLoaderRoute: typeof AuthenticatedCodingConceptFacilitiesWardsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/$page/$id/edit': {
-      id: '/_authenticated/conversation/$page/$id/edit';
-      path: '/conversation/$page/$id/edit';
-      fullPath: '/conversation/$page/$id/edit';
-      preLoaderRoute: typeof AuthenticatedConversationPageIdEditRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/$page/$id/edit'
+      path: '/conversation/$page/$id/edit'
+      fullPath: '/conversation/$page/$id/edit'
+      preLoaderRoute: typeof AuthenticatedConversationPageIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/config/': {
-      id: '/_authenticated/conversation/ai/config/';
-      path: '/conversation/ai/config';
-      fullPath: '/conversation/ai/config/';
-      preLoaderRoute: typeof AuthenticatedConversationAiConfigIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/config/'
+      path: '/conversation/ai/config'
+      fullPath: '/conversation/ai/config/'
+      preLoaderRoute: typeof AuthenticatedConversationAiConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/costs/': {
-      id: '/_authenticated/conversation/ai/costs/';
-      path: '/conversation/ai/costs';
-      fullPath: '/conversation/ai/costs/';
-      preLoaderRoute: typeof AuthenticatedConversationAiCostsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/costs/'
+      path: '/conversation/ai/costs'
+      fullPath: '/conversation/ai/costs/'
+      preLoaderRoute: typeof AuthenticatedConversationAiCostsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/eval-logs/': {
-      id: '/_authenticated/conversation/ai/eval-logs/';
-      path: '/conversation/ai/eval-logs';
-      fullPath: '/conversation/ai/eval-logs/';
-      preLoaderRoute: typeof AuthenticatedConversationAiEvalLogsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/eval-logs/'
+      path: '/conversation/ai/eval-logs'
+      fullPath: '/conversation/ai/eval-logs/'
+      preLoaderRoute: typeof AuthenticatedConversationAiEvalLogsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/instructions/': {
-      id: '/_authenticated/conversation/ai/instructions/';
-      path: '/conversation/ai/instructions';
-      fullPath: '/conversation/ai/instructions/';
-      preLoaderRoute: typeof AuthenticatedConversationAiInstructionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/instructions/'
+      path: '/conversation/ai/instructions'
+      fullPath: '/conversation/ai/instructions/'
+      preLoaderRoute: typeof AuthenticatedConversationAiInstructionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/models/': {
-      id: '/_authenticated/conversation/ai/models/';
-      path: '/conversation/ai/models';
-      fullPath: '/conversation/ai/models/';
-      preLoaderRoute: typeof AuthenticatedConversationAiModelsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/models/'
+      path: '/conversation/ai/models'
+      fullPath: '/conversation/ai/models/'
+      preLoaderRoute: typeof AuthenticatedConversationAiModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/processors/': {
-      id: '/_authenticated/conversation/ai/processors/';
-      path: '/conversation/ai/processors';
-      fullPath: '/conversation/ai/processors/';
-      preLoaderRoute: typeof AuthenticatedConversationAiProcessorsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/processors/'
+      path: '/conversation/ai/processors'
+      fullPath: '/conversation/ai/processors/'
+      preLoaderRoute: typeof AuthenticatedConversationAiProcessorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/providers/': {
-      id: '/_authenticated/conversation/ai/providers/';
-      path: '/conversation/ai/providers';
-      fullPath: '/conversation/ai/providers/';
-      preLoaderRoute: typeof AuthenticatedConversationAiProvidersIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/providers/'
+      path: '/conversation/ai/providers'
+      fullPath: '/conversation/ai/providers/'
+      preLoaderRoute: typeof AuthenticatedConversationAiProvidersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/ai/request-logs/': {
-      id: '/_authenticated/conversation/ai/request-logs/';
-      path: '/conversation/ai/request-logs';
-      fullPath: '/conversation/ai/request-logs/';
-      preLoaderRoute: typeof AuthenticatedConversationAiRequestLogsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/conversation/ai/request-logs/'
+      path: '/conversation/ai/request-logs'
+      fullPath: '/conversation/ai/request-logs/'
+      preLoaderRoute: typeof AuthenticatedConversationAiRequestLogsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/$orderId/report': {
-      id: '/_authenticated/lis/orders/$orderId/report';
-      path: '/lis/orders/$orderId/report';
-      fullPath: '/lis/orders/$orderId/report';
-      preLoaderRoute: typeof AuthenticatedLisOrdersOrderIdReportRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/$orderId/report'
+      path: '/lis/orders/$orderId/report'
+      fullPath: '/lis/orders/$orderId/report'
+      preLoaderRoute: typeof AuthenticatedLisOrdersOrderIdReportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/workflow/collect': {
-      id: '/_authenticated/lis/orders/workflow/collect';
-      path: '/collect';
-      fullPath: '/lis/orders/workflow/collect';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowCollectRouteImport;
-      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow/collect'
+      path: '/collect'
+      fullPath: '/lis/orders/workflow/collect'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowCollectRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
+    }
     '/_authenticated/lis/orders/workflow/enter': {
-      id: '/_authenticated/lis/orders/workflow/enter';
-      path: '/enter';
-      fullPath: '/lis/orders/workflow/enter';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowEnterRouteImport;
-      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow/enter'
+      path: '/enter'
+      fullPath: '/lis/orders/workflow/enter'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowEnterRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
+    }
     '/_authenticated/lis/orders/workflow/label': {
-      id: '/_authenticated/lis/orders/workflow/label';
-      path: '/label';
-      fullPath: '/lis/orders/workflow/label';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowLabelRouteImport;
-      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow/label'
+      path: '/label'
+      fullPath: '/lis/orders/workflow/label'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowLabelRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
+    }
     '/_authenticated/lis/orders/workflow/order': {
-      id: '/_authenticated/lis/orders/workflow/order';
-      path: '/order';
-      fullPath: '/lis/orders/workflow/order';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRouteImport;
-      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow/order'
+      path: '/order'
+      fullPath: '/lis/orders/workflow/order'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
+    }
     '/_authenticated/lis/orders/workflow/qa': {
-      id: '/_authenticated/lis/orders/workflow/qa';
-      path: '/qa';
-      fullPath: '/lis/orders/workflow/qa';
-      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowQaRouteImport;
-      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute;
-    };
+      id: '/_authenticated/lis/orders/workflow/qa'
+      path: '/qa'
+      fullPath: '/lis/orders/workflow/qa'
+      preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowQaRouteImport
+      parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
+    }
     '/_authenticated/rxsoft/reports/balance-sheet/': {
-      id: '/_authenticated/rxsoft/reports/balance-sheet/';
-      path: '/rxsoft/reports/balance-sheet';
-      fullPath: '/rxsoft/reports/balance-sheet/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/reports/balance-sheet/'
+      path: '/rxsoft/reports/balance-sheet'
+      fullPath: '/rxsoft/reports/balance-sheet/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/reports/income-statement/': {
-      id: '/_authenticated/rxsoft/reports/income-statement/';
-      path: '/rxsoft/reports/income-statement';
-      fullPath: '/rxsoft/reports/income-statement/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/reports/income-statement/'
+      path: '/rxsoft/reports/income-statement'
+      fullPath: '/rxsoft/reports/income-statement/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/reports/trial-balance/': {
-      id: '/_authenticated/rxsoft/reports/trial-balance/';
-      path: '/rxsoft/reports/trial-balance';
-      fullPath: '/rxsoft/reports/trial-balance/';
-      preLoaderRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/reports/trial-balance/'
+      path: '/rxsoft/reports/trial-balance'
+      fullPath: '/rxsoft/reports/trial-balance/'
+      preLoaderRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/uoms/$uomId/edit': {
-      id: '/_authenticated/rxsoft/uoms/$uomId/edit';
-      path: '/edit';
-      fullPath: '/rxsoft/uoms/$uomId/edit';
-      preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdEditRouteImport;
-      parentRoute: typeof AuthenticatedRxsoftUomsUomIdRoute;
-    };
+      id: '/_authenticated/rxsoft/uoms/$uomId/edit'
+      path: '/edit'
+      fullPath: '/rxsoft/uoms/$uomId/edit'
+      preLoaderRoute: typeof AuthenticatedRxsoftUomsUomIdEditRouteImport
+      parentRoute: typeof AuthenticatedRxsoftUomsUomIdRoute
+    }
     '/_authenticated/rxsoft/roles/$id/permissions/': {
-      id: '/_authenticated/rxsoft/roles/$id/permissions/';
-      path: '/rxsoft/roles/$id/permissions';
-      fullPath: '/rxsoft/roles/$id/permissions/';
-      preLoaderRoute: typeof AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport;
-      parentRoute: typeof AuthenticatedRouteRoute;
-    };
+      id: '/_authenticated/rxsoft/roles/$id/permissions/'
+      path: '/rxsoft/roles/$id/permissions'
+      fullPath: '/rxsoft/roles/$id/permissions/'
+      preLoaderRoute: typeof AuthenticatedRxsoftRolesIdPermissionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedModuleIdRouteChildren {
-  AuthenticatedModuleIdDashboardRoute: typeof AuthenticatedModuleIdDashboardRoute;
-  AuthenticatedModuleIdIndexRoute: typeof AuthenticatedModuleIdIndexRoute;
-  AuthenticatedModuleIdPageIdRoute: typeof AuthenticatedModuleIdPageIdRoute;
-  AuthenticatedModuleIdPageCreateRoute: typeof AuthenticatedModuleIdPageCreateRoute;
+  AuthenticatedModuleIdDashboardRoute: typeof AuthenticatedModuleIdDashboardRoute
+  AuthenticatedModuleIdIndexRoute: typeof AuthenticatedModuleIdIndexRoute
+  AuthenticatedModuleIdPageIdRoute: typeof AuthenticatedModuleIdPageIdRoute
+  AuthenticatedModuleIdPageCreateRoute: typeof AuthenticatedModuleIdPageCreateRoute
 }
 
 const AuthenticatedModuleIdRouteChildren: AuthenticatedModuleIdRouteChildren = {
@@ -6056,345 +6143,374 @@ const AuthenticatedModuleIdRouteChildren: AuthenticatedModuleIdRouteChildren = {
   AuthenticatedModuleIdIndexRoute: AuthenticatedModuleIdIndexRoute,
   AuthenticatedModuleIdPageIdRoute: AuthenticatedModuleIdPageIdRoute,
   AuthenticatedModuleIdPageCreateRoute: AuthenticatedModuleIdPageCreateRoute,
-};
+}
 
-const AuthenticatedModuleIdRouteWithChildren = AuthenticatedModuleIdRoute._addFileChildren(
-  AuthenticatedModuleIdRouteChildren
-);
+const AuthenticatedModuleIdRouteWithChildren =
+  AuthenticatedModuleIdRoute._addFileChildren(
+    AuthenticatedModuleIdRouteChildren,
+  )
 
 interface AuthenticatedConversationInvitesRouteRouteChildren {
-  AuthenticatedConversationInvitesInviteIdRoute: typeof AuthenticatedConversationInvitesInviteIdRoute;
+  AuthenticatedConversationInvitesInviteIdRoute: typeof AuthenticatedConversationInvitesInviteIdRoute
 }
 
 const AuthenticatedConversationInvitesRouteRouteChildren: AuthenticatedConversationInvitesRouteRouteChildren =
   {
-    AuthenticatedConversationInvitesInviteIdRoute: AuthenticatedConversationInvitesInviteIdRoute,
-  };
+    AuthenticatedConversationInvitesInviteIdRoute:
+      AuthenticatedConversationInvitesInviteIdRoute,
+  }
 
 const AuthenticatedConversationInvitesRouteRouteWithChildren =
   AuthenticatedConversationInvitesRouteRoute._addFileChildren(
-    AuthenticatedConversationInvitesRouteRouteChildren
-  );
+    AuthenticatedConversationInvitesRouteRouteChildren,
+  )
 
 interface AuthenticatedRxsoftSettingsRouteRouteChildren {
-  AuthenticatedRxsoftSettingsAccountRoute: typeof AuthenticatedRxsoftSettingsAccountRoute;
-  AuthenticatedRxsoftSettingsAppearanceRoute: typeof AuthenticatedRxsoftSettingsAppearanceRoute;
-  AuthenticatedRxsoftSettingsDisplayRoute: typeof AuthenticatedRxsoftSettingsDisplayRoute;
-  AuthenticatedRxsoftSettingsNotificationsRoute: typeof AuthenticatedRxsoftSettingsNotificationsRoute;
-  AuthenticatedRxsoftSettingsIndexRoute: typeof AuthenticatedRxsoftSettingsIndexRoute;
+  AuthenticatedRxsoftSettingsAccountRoute: typeof AuthenticatedRxsoftSettingsAccountRoute
+  AuthenticatedRxsoftSettingsAppearanceRoute: typeof AuthenticatedRxsoftSettingsAppearanceRoute
+  AuthenticatedRxsoftSettingsDisplayRoute: typeof AuthenticatedRxsoftSettingsDisplayRoute
+  AuthenticatedRxsoftSettingsNotificationsRoute: typeof AuthenticatedRxsoftSettingsNotificationsRoute
+  AuthenticatedRxsoftSettingsIndexRoute: typeof AuthenticatedRxsoftSettingsIndexRoute
 }
 
 const AuthenticatedRxsoftSettingsRouteRouteChildren: AuthenticatedRxsoftSettingsRouteRouteChildren =
   {
-    AuthenticatedRxsoftSettingsAccountRoute: AuthenticatedRxsoftSettingsAccountRoute,
-    AuthenticatedRxsoftSettingsAppearanceRoute: AuthenticatedRxsoftSettingsAppearanceRoute,
-    AuthenticatedRxsoftSettingsDisplayRoute: AuthenticatedRxsoftSettingsDisplayRoute,
-    AuthenticatedRxsoftSettingsNotificationsRoute: AuthenticatedRxsoftSettingsNotificationsRoute,
-    AuthenticatedRxsoftSettingsIndexRoute: AuthenticatedRxsoftSettingsIndexRoute,
-  };
+    AuthenticatedRxsoftSettingsAccountRoute:
+      AuthenticatedRxsoftSettingsAccountRoute,
+    AuthenticatedRxsoftSettingsAppearanceRoute:
+      AuthenticatedRxsoftSettingsAppearanceRoute,
+    AuthenticatedRxsoftSettingsDisplayRoute:
+      AuthenticatedRxsoftSettingsDisplayRoute,
+    AuthenticatedRxsoftSettingsNotificationsRoute:
+      AuthenticatedRxsoftSettingsNotificationsRoute,
+    AuthenticatedRxsoftSettingsIndexRoute:
+      AuthenticatedRxsoftSettingsIndexRoute,
+  }
 
 const AuthenticatedRxsoftSettingsRouteRouteWithChildren =
   AuthenticatedRxsoftSettingsRouteRoute._addFileChildren(
-    AuthenticatedRxsoftSettingsRouteRouteChildren
-  );
+    AuthenticatedRxsoftSettingsRouteRouteChildren,
+  )
 
 interface AuthenticatedPageIdRouteChildren {
-  AuthenticatedPageIdEditRoute: typeof AuthenticatedPageIdEditRoute;
+  AuthenticatedPageIdEditRoute: typeof AuthenticatedPageIdEditRoute
 }
 
 const AuthenticatedPageIdRouteChildren: AuthenticatedPageIdRouteChildren = {
   AuthenticatedPageIdEditRoute: AuthenticatedPageIdEditRoute,
-};
+}
 
-const AuthenticatedPageIdRouteWithChildren = AuthenticatedPageIdRoute._addFileChildren(
-  AuthenticatedPageIdRouteChildren
-);
+const AuthenticatedPageIdRouteWithChildren =
+  AuthenticatedPageIdRoute._addFileChildren(AuthenticatedPageIdRouteChildren)
 
 interface AuthenticatedConversationConversationIdRouteChildren {
-  AuthenticatedConversationConversationIdEditRoute: typeof AuthenticatedConversationConversationIdEditRoute;
+  AuthenticatedConversationConversationIdEditRoute: typeof AuthenticatedConversationConversationIdEditRoute
 }
 
 const AuthenticatedConversationConversationIdRouteChildren: AuthenticatedConversationConversationIdRouteChildren =
   {
     AuthenticatedConversationConversationIdEditRoute:
       AuthenticatedConversationConversationIdEditRoute,
-  };
+  }
 
 const AuthenticatedConversationConversationIdRouteWithChildren =
   AuthenticatedConversationConversationIdRoute._addFileChildren(
-    AuthenticatedConversationConversationIdRouteChildren
-  );
+    AuthenticatedConversationConversationIdRouteChildren,
+  )
 
 interface AuthenticatedLisOrdersWorkflowRouteRouteChildren {
-  AuthenticatedLisOrdersWorkflowCollectRoute: typeof AuthenticatedLisOrdersWorkflowCollectRoute;
-  AuthenticatedLisOrdersWorkflowEnterRoute: typeof AuthenticatedLisOrdersWorkflowEnterRoute;
-  AuthenticatedLisOrdersWorkflowLabelRoute: typeof AuthenticatedLisOrdersWorkflowLabelRoute;
-  AuthenticatedLisOrdersWorkflowOrderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRoute;
-  AuthenticatedLisOrdersWorkflowQaRoute: typeof AuthenticatedLisOrdersWorkflowQaRoute;
+  AuthenticatedLisOrdersWorkflowCollectRoute: typeof AuthenticatedLisOrdersWorkflowCollectRoute
+  AuthenticatedLisOrdersWorkflowEnterRoute: typeof AuthenticatedLisOrdersWorkflowEnterRoute
+  AuthenticatedLisOrdersWorkflowLabelRoute: typeof AuthenticatedLisOrdersWorkflowLabelRoute
+  AuthenticatedLisOrdersWorkflowOrderRoute: typeof AuthenticatedLisOrdersWorkflowOrderRoute
+  AuthenticatedLisOrdersWorkflowQaRoute: typeof AuthenticatedLisOrdersWorkflowQaRoute
 }
 
 const AuthenticatedLisOrdersWorkflowRouteRouteChildren: AuthenticatedLisOrdersWorkflowRouteRouteChildren =
   {
-    AuthenticatedLisOrdersWorkflowCollectRoute: AuthenticatedLisOrdersWorkflowCollectRoute,
-    AuthenticatedLisOrdersWorkflowEnterRoute: AuthenticatedLisOrdersWorkflowEnterRoute,
-    AuthenticatedLisOrdersWorkflowLabelRoute: AuthenticatedLisOrdersWorkflowLabelRoute,
-    AuthenticatedLisOrdersWorkflowOrderRoute: AuthenticatedLisOrdersWorkflowOrderRoute,
-    AuthenticatedLisOrdersWorkflowQaRoute: AuthenticatedLisOrdersWorkflowQaRoute,
-  };
+    AuthenticatedLisOrdersWorkflowCollectRoute:
+      AuthenticatedLisOrdersWorkflowCollectRoute,
+    AuthenticatedLisOrdersWorkflowEnterRoute:
+      AuthenticatedLisOrdersWorkflowEnterRoute,
+    AuthenticatedLisOrdersWorkflowLabelRoute:
+      AuthenticatedLisOrdersWorkflowLabelRoute,
+    AuthenticatedLisOrdersWorkflowOrderRoute:
+      AuthenticatedLisOrdersWorkflowOrderRoute,
+    AuthenticatedLisOrdersWorkflowQaRoute:
+      AuthenticatedLisOrdersWorkflowQaRoute,
+  }
 
 const AuthenticatedLisOrdersWorkflowRouteRouteWithChildren =
   AuthenticatedLisOrdersWorkflowRouteRoute._addFileChildren(
-    AuthenticatedLisOrdersWorkflowRouteRouteChildren
-  );
+    AuthenticatedLisOrdersWorkflowRouteRouteChildren,
+  )
 
 interface AuthenticatedRxsoftUomsUomIdRouteChildren {
-  AuthenticatedRxsoftUomsUomIdEditRoute: typeof AuthenticatedRxsoftUomsUomIdEditRoute;
+  AuthenticatedRxsoftUomsUomIdEditRoute: typeof AuthenticatedRxsoftUomsUomIdEditRoute
 }
 
-const AuthenticatedRxsoftUomsUomIdRouteChildren: AuthenticatedRxsoftUomsUomIdRouteChildren = {
-  AuthenticatedRxsoftUomsUomIdEditRoute: AuthenticatedRxsoftUomsUomIdEditRoute,
-};
+const AuthenticatedRxsoftUomsUomIdRouteChildren: AuthenticatedRxsoftUomsUomIdRouteChildren =
+  {
+    AuthenticatedRxsoftUomsUomIdEditRoute:
+      AuthenticatedRxsoftUomsUomIdEditRoute,
+  }
 
 const AuthenticatedRxsoftUomsUomIdRouteWithChildren =
-  AuthenticatedRxsoftUomsUomIdRoute._addFileChildren(AuthenticatedRxsoftUomsUomIdRouteChildren);
+  AuthenticatedRxsoftUomsUomIdRoute._addFileChildren(
+    AuthenticatedRxsoftUomsUomIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedModuleIdRoute: typeof AuthenticatedModuleIdRouteWithChildren;
-  AuthenticatedCommunicationAesRouteRoute: typeof AuthenticatedCommunicationAesRouteRoute;
-  AuthenticatedCommunicationCommunicationChannelsRouteRoute: typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute;
-  AuthenticatedCommunicationMappingRouteRoute: typeof AuthenticatedCommunicationMappingRouteRoute;
-  AuthenticatedCommunicationMessageLogsRouteRoute: typeof AuthenticatedCommunicationMessageLogsRouteRoute;
-  AuthenticatedCommunicationMessageTemplatesRouteRoute: typeof AuthenticatedCommunicationMessageTemplatesRouteRoute;
-  AuthenticatedCommunicationMessagesRouteRoute: typeof AuthenticatedCommunicationMessagesRouteRoute;
-  AuthenticatedCommunicationNotificationTemplatesRouteRoute: typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute;
-  AuthenticatedCommunicationNotificationsRouteRoute: typeof AuthenticatedCommunicationNotificationsRouteRoute;
-  AuthenticatedCommunicationRoutingRouteRoute: typeof AuthenticatedCommunicationRoutingRouteRoute;
-  AuthenticatedConversationBroadcastsRouteRoute: typeof AuthenticatedConversationBroadcastsRouteRoute;
-  AuthenticatedConversationInvitesRouteRoute: typeof AuthenticatedConversationInvitesRouteRouteWithChildren;
-  AuthenticatedRxsoftSettingsRouteRoute: typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren;
-  AuthenticatedPageIdRoute: typeof AuthenticatedPageIdRouteWithChildren;
-  AuthenticatedPageCreateRoute: typeof AuthenticatedPageCreateRoute;
-  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute;
-  AuthenticatedCodingConceptDashboardRoute: typeof AuthenticatedCodingConceptDashboardRoute;
-  AuthenticatedCodingConceptMatchRoute: typeof AuthenticatedCodingConceptMatchRoute;
-  AuthenticatedCodingConceptSearchRoute: typeof AuthenticatedCodingConceptSearchRoute;
-  AuthenticatedCodingConceptUploadRoute: typeof AuthenticatedCodingConceptUploadRoute;
-  AuthenticatedCommunicationAuditCenterRoute: typeof AuthenticatedCommunicationAuditCenterRoute;
-  AuthenticatedCommunicationDashboardRoute: typeof AuthenticatedCommunicationDashboardRoute;
-  AuthenticatedCommunicationFlowGraphRoute: typeof AuthenticatedCommunicationFlowGraphRoute;
-  AuthenticatedCommunicationMessageTesterRoute: typeof AuthenticatedCommunicationMessageTesterRoute;
-  AuthenticatedCommunicationTraceExplorerRoute: typeof AuthenticatedCommunicationTraceExplorerRoute;
-  AuthenticatedConversationConversationIdRoute: typeof AuthenticatedConversationConversationIdRouteWithChildren;
-  AuthenticatedConversationDashboardRoute: typeof AuthenticatedConversationDashboardRoute;
-  AuthenticatedDashboardPurchasesRoute: typeof AuthenticatedDashboardPurchasesRoute;
-  AuthenticatedDashboardSalesRoute: typeof AuthenticatedDashboardSalesRoute;
-  AuthenticatedEmrDashboardRoute: typeof AuthenticatedEmrDashboardRoute;
-  AuthenticatedIdentityDashboardRoute: typeof AuthenticatedIdentityDashboardRoute;
-  AuthenticatedLisDashboardRoute: typeof AuthenticatedLisDashboardRoute;
-  AuthenticatedRxsoftDashboardRoute: typeof AuthenticatedRxsoftDashboardRoute;
-  AuthenticatedWebsiteDashboardRoute: typeof AuthenticatedWebsiteDashboardRoute;
-  AuthenticatedCodingConceptIndexRoute: typeof AuthenticatedCodingConceptIndexRoute;
-  AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute;
-  AuthenticatedEmrIndexRoute: typeof AuthenticatedEmrIndexRoute;
-  AuthenticatedIdentityIndexRoute: typeof AuthenticatedIdentityIndexRoute;
-  AuthenticatedLisIndexRoute: typeof AuthenticatedLisIndexRoute;
-  AuthenticatedLisOrdersWorkflowRouteRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren;
-  AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute: typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute;
-  AuthenticatedConversationExchangesExchangeIdRoute: typeof AuthenticatedConversationExchangesExchangeIdRoute;
-  AuthenticatedConversationProjectionsProjectionIdRoute: typeof AuthenticatedConversationProjectionsProjectionIdRoute;
-  AuthenticatedEmrEncountersEncounterIdRoute: typeof AuthenticatedEmrEncountersEncounterIdRoute;
-  AuthenticatedEmrPatientsPatientIdRoute: typeof AuthenticatedEmrPatientsPatientIdRoute;
-  AuthenticatedEmrRequestsRequestIdRoute: typeof AuthenticatedEmrRequestsRequestIdRoute;
-  AuthenticatedEmrVisitsVisitIdRoute: typeof AuthenticatedEmrVisitsVisitIdRoute;
-  AuthenticatedEmrWardsAdmissionsRoute: typeof AuthenticatedEmrWardsAdmissionsRoute;
-  AuthenticatedEmrWardsBedsRoute: typeof AuthenticatedEmrWardsBedsRoute;
-  AuthenticatedEmrWardsBoardRoute: typeof AuthenticatedEmrWardsBoardRoute;
-  AuthenticatedEmrWardsDischargesRoute: typeof AuthenticatedEmrWardsDischargesRoute;
-  AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute;
-  AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute;
-  AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren;
-  AuthenticatedCodingConceptDosageFormsIndexRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRoute;
-  AuthenticatedCodingConceptDrugClassificationsIndexRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute;
-  AuthenticatedCodingConceptDrugComponentsIndexRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRoute;
-  AuthenticatedCodingConceptFacilitiesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesIndexRoute;
-  AuthenticatedCodingConceptFormulationsIndexRoute: typeof AuthenticatedCodingConceptFormulationsIndexRoute;
-  AuthenticatedCodingConceptGenericDrugsIndexRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRoute;
-  AuthenticatedCodingConceptGenericProductsIndexRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRoute;
-  AuthenticatedCodingConceptManufacturersIndexRoute: typeof AuthenticatedCodingConceptManufacturersIndexRoute;
-  AuthenticatedCodingConceptPharmaceuticsIndexRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute;
-  AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute;
-  AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute;
-  AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute;
-  AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute;
-  AuthenticatedConversationParticipantsIndexRoute: typeof AuthenticatedConversationParticipantsIndexRoute;
-  AuthenticatedConversationProjectionsIndexRoute: typeof AuthenticatedConversationProjectionsIndexRoute;
-  AuthenticatedConversationQuestionnairesIndexRoute: typeof AuthenticatedConversationQuestionnairesIndexRoute;
-  AuthenticatedConversationQuestionsIndexRoute: typeof AuthenticatedConversationQuestionsIndexRoute;
-  AuthenticatedConversationWorkflowConfigurationIndexRoute: typeof AuthenticatedConversationWorkflowConfigurationIndexRoute;
-  AuthenticatedConversationWorkflowEventsIndexRoute: typeof AuthenticatedConversationWorkflowEventsIndexRoute;
-  AuthenticatedConversationWorkflowInstancesIndexRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRoute;
-  AuthenticatedConversationWorkflowsIndexRoute: typeof AuthenticatedConversationWorkflowsIndexRoute;
-  AuthenticatedEmrAppointmentsIndexRoute: typeof AuthenticatedEmrAppointmentsIndexRoute;
-  AuthenticatedEmrDepartmentsIndexRoute: typeof AuthenticatedEmrDepartmentsIndexRoute;
-  AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute;
-  AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute;
-  AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute;
-  AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute;
-  AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute;
-  AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute;
-  AuthenticatedEmrStaffIndexRoute: typeof AuthenticatedEmrStaffIndexRoute;
-  AuthenticatedEmrTagsIndexRoute: typeof AuthenticatedEmrTagsIndexRoute;
-  AuthenticatedEmrVisitsIndexRoute: typeof AuthenticatedEmrVisitsIndexRoute;
-  AuthenticatedEmrWardsIndexRoute: typeof AuthenticatedEmrWardsIndexRoute;
-  AuthenticatedIdentityLocationsIndexRoute: typeof AuthenticatedIdentityLocationsIndexRoute;
-  AuthenticatedIdentityOrganizationsIndexRoute: typeof AuthenticatedIdentityOrganizationsIndexRoute;
-  AuthenticatedIdentityPermissionsIndexRoute: typeof AuthenticatedIdentityPermissionsIndexRoute;
-  AuthenticatedIdentityRolesIndexRoute: typeof AuthenticatedIdentityRolesIndexRoute;
-  AuthenticatedIdentityUsersIndexRoute: typeof AuthenticatedIdentityUsersIndexRoute;
-  AuthenticatedLisAttributeDefinitionsIndexRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRoute;
-  AuthenticatedLisEqaEnrollmentsIndexRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRoute;
-  AuthenticatedLisEqaProgramsIndexRoute: typeof AuthenticatedLisEqaProgramsIndexRoute;
-  AuthenticatedLisEqaResultsIndexRoute: typeof AuthenticatedLisEqaResultsIndexRoute;
-  AuthenticatedLisLocationTypesIndexRoute: typeof AuthenticatedLisLocationTypesIndexRoute;
-  AuthenticatedLisLocationsIndexRoute: typeof AuthenticatedLisLocationsIndexRoute;
-  AuthenticatedLisLoincIndexRoute: typeof AuthenticatedLisLoincIndexRoute;
-  AuthenticatedLisMethodsIndexRoute: typeof AuthenticatedLisMethodsIndexRoute;
-  AuthenticatedLisOrdersIndexRoute: typeof AuthenticatedLisOrdersIndexRoute;
-  AuthenticatedLisPanelsIndexRoute: typeof AuthenticatedLisPanelsIndexRoute;
-  AuthenticatedLisPatientsIndexRoute: typeof AuthenticatedLisPatientsIndexRoute;
-  AuthenticatedLisPrioritiesIndexRoute: typeof AuthenticatedLisPrioritiesIndexRoute;
-  AuthenticatedLisProgramsIndexRoute: typeof AuthenticatedLisProgramsIndexRoute;
-  AuthenticatedLisQaChecklistItemsIndexRoute: typeof AuthenticatedLisQaChecklistItemsIndexRoute;
-  AuthenticatedLisQcAlertsIndexRoute: typeof AuthenticatedLisQcAlertsIndexRoute;
-  AuthenticatedLisQcLotsIndexRoute: typeof AuthenticatedLisQcLotsIndexRoute;
-  AuthenticatedLisQcResultsIndexRoute: typeof AuthenticatedLisQcResultsIndexRoute;
-  AuthenticatedLisReferenceRangesIndexRoute: typeof AuthenticatedLisReferenceRangesIndexRoute;
-  AuthenticatedLisRejectionReasonsIndexRoute: typeof AuthenticatedLisRejectionReasonsIndexRoute;
-  AuthenticatedLisResultSignaturesIndexRoute: typeof AuthenticatedLisResultSignaturesIndexRoute;
-  AuthenticatedLisResultsIndexRoute: typeof AuthenticatedLisResultsIndexRoute;
-  AuthenticatedLisSampleTypesIndexRoute: typeof AuthenticatedLisSampleTypesIndexRoute;
-  AuthenticatedLisSamplesIndexRoute: typeof AuthenticatedLisSamplesIndexRoute;
-  AuthenticatedLisStatusesIndexRoute: typeof AuthenticatedLisStatusesIndexRoute;
-  AuthenticatedLisTestCategoriesIndexRoute: typeof AuthenticatedLisTestCategoriesIndexRoute;
-  AuthenticatedLisTestDefinitionsIndexRoute: typeof AuthenticatedLisTestDefinitionsIndexRoute;
-  AuthenticatedLisTestSectionsIndexRoute: typeof AuthenticatedLisTestSectionsIndexRoute;
-  AuthenticatedLisUomsIndexRoute: typeof AuthenticatedLisUomsIndexRoute;
-  AuthenticatedLisValidationDashboardIndexRoute: typeof AuthenticatedLisValidationDashboardIndexRoute;
-  AuthenticatedRxsoftAuditLogsIndexRoute: typeof AuthenticatedRxsoftAuditLogsIndexRoute;
-  AuthenticatedRxsoftBranchesIndexRoute: typeof AuthenticatedRxsoftBranchesIndexRoute;
-  AuthenticatedRxsoftCategoriesIndexRoute: typeof AuthenticatedRxsoftCategoriesIndexRoute;
-  AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute;
-  AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute;
-  AuthenticatedRxsoftEhealthwaresCareersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute;
-  AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute;
-  AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute;
-  AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresPartnersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute;
-  AuthenticatedRxsoftEhealthwaresProductsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresSectionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresServicesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute;
-  AuthenticatedRxsoftEhealthwaresSettingsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute;
-  AuthenticatedRxsoftEhealthwaresTeamIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute;
-  AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute;
-  AuthenticatedRxsoftGlAccountsIndexRoute: typeof AuthenticatedRxsoftGlAccountsIndexRoute;
-  AuthenticatedRxsoftInsuranceProvidersIndexRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute;
-  AuthenticatedRxsoftInventoryIndexRoute: typeof AuthenticatedRxsoftInventoryIndexRoute;
-  AuthenticatedRxsoftItemsIndexRoute: typeof AuthenticatedRxsoftItemsIndexRoute;
-  AuthenticatedRxsoftJournalEntriesIndexRoute: typeof AuthenticatedRxsoftJournalEntriesIndexRoute;
-  AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute;
-  AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute;
-  AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute;
-  AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute;
-  AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute;
-  AuthenticatedRxsoftOrganizationsIndexRoute: typeof AuthenticatedRxsoftOrganizationsIndexRoute;
-  AuthenticatedRxsoftPaymentMethodsIndexRoute: typeof AuthenticatedRxsoftPaymentMethodsIndexRoute;
-  AuthenticatedRxsoftPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRoute;
-  AuthenticatedRxsoftPaymentTransactionsIndexRoute: typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute;
-  AuthenticatedRxsoftPaymentsIndexRoute: typeof AuthenticatedRxsoftPaymentsIndexRoute;
-  AuthenticatedRxsoftPharmaceuticsIndexRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRoute;
-  AuthenticatedRxsoftPosTerminalsIndexRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRoute;
-  AuthenticatedRxsoftPriceListItemsIndexRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRoute;
-  AuthenticatedRxsoftPriceListsIndexRoute: typeof AuthenticatedRxsoftPriceListsIndexRoute;
-  AuthenticatedRxsoftPurchasesIndexRoute: typeof AuthenticatedRxsoftPurchasesIndexRoute;
-  AuthenticatedRxsoftReceivablesIndexRoute: typeof AuthenticatedRxsoftReceivablesIndexRoute;
-  AuthenticatedRxsoftReceivingIndexRoute: typeof AuthenticatedRxsoftReceivingIndexRoute;
-  AuthenticatedRxsoftReportsIndexRoute: typeof AuthenticatedRxsoftReportsIndexRoute;
-  AuthenticatedRxsoftRoleRequestsIndexRoute: typeof AuthenticatedRxsoftRoleRequestsIndexRoute;
-  AuthenticatedRxsoftRolesIndexRoute: typeof AuthenticatedRxsoftRolesIndexRoute;
-  AuthenticatedRxsoftSalesLinesIndexRoute: typeof AuthenticatedRxsoftSalesLinesIndexRoute;
-  AuthenticatedRxsoftSalesIndexRoute: typeof AuthenticatedRxsoftSalesIndexRoute;
-  AuthenticatedRxsoftStockLocationsIndexRoute: typeof AuthenticatedRxsoftStockLocationsIndexRoute;
-  AuthenticatedRxsoftSuppliersIndexRoute: typeof AuthenticatedRxsoftSuppliersIndexRoute;
-  AuthenticatedRxsoftUomCategoryIndexRoute: typeof AuthenticatedRxsoftUomCategoryIndexRoute;
-  AuthenticatedRxsoftUomsIndexRoute: typeof AuthenticatedRxsoftUomsIndexRoute;
-  AuthenticatedRxsoftUserConfigIndexRoute: typeof AuthenticatedRxsoftUserConfigIndexRoute;
-  AuthenticatedRxsoftUsersIndexRoute: typeof AuthenticatedRxsoftUsersIndexRoute;
-  AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute;
-  AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute;
-  AuthenticatedRxsoftWebsitePrescriptionsIndexRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute;
-  AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute;
-  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute;
-  AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute;
-  AuthenticatedConversationPageIdEditRoute: typeof AuthenticatedConversationPageIdEditRoute;
-  AuthenticatedLisOrdersOrderIdReportRoute: typeof AuthenticatedLisOrdersOrderIdReportRoute;
-  AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute;
-  AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute;
-  AuthenticatedCodingConceptFacilitiesLevelsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute;
-  AuthenticatedCodingConceptFacilitiesLgasIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute;
-  AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute;
-  AuthenticatedCodingConceptFacilitiesStatesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute;
-  AuthenticatedCodingConceptFacilitiesTypesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute;
-  AuthenticatedCodingConceptFacilitiesWardsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute;
-  AuthenticatedConversationAiConfigIndexRoute: typeof AuthenticatedConversationAiConfigIndexRoute;
-  AuthenticatedConversationAiCostsIndexRoute: typeof AuthenticatedConversationAiCostsIndexRoute;
-  AuthenticatedConversationAiEvalLogsIndexRoute: typeof AuthenticatedConversationAiEvalLogsIndexRoute;
-  AuthenticatedConversationAiInstructionsIndexRoute: typeof AuthenticatedConversationAiInstructionsIndexRoute;
-  AuthenticatedConversationAiModelsIndexRoute: typeof AuthenticatedConversationAiModelsIndexRoute;
-  AuthenticatedConversationAiProcessorsIndexRoute: typeof AuthenticatedConversationAiProcessorsIndexRoute;
-  AuthenticatedConversationAiProvidersIndexRoute: typeof AuthenticatedConversationAiProvidersIndexRoute;
-  AuthenticatedConversationAiRequestLogsIndexRoute: typeof AuthenticatedConversationAiRequestLogsIndexRoute;
-  AuthenticatedRxsoftReportsBalanceSheetIndexRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute;
-  AuthenticatedRxsoftReportsIncomeStatementIndexRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute;
-  AuthenticatedRxsoftReportsTrialBalanceIndexRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute;
-  AuthenticatedRxsoftRolesIdPermissionsIndexRoute: typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute;
+  AuthenticatedModuleIdRoute: typeof AuthenticatedModuleIdRouteWithChildren
+  AuthenticatedCommunicationAesRouteRoute: typeof AuthenticatedCommunicationAesRouteRoute
+  AuthenticatedCommunicationCommunicationChannelsRouteRoute: typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute
+  AuthenticatedCommunicationMappingRouteRoute: typeof AuthenticatedCommunicationMappingRouteRoute
+  AuthenticatedCommunicationMessageLogsRouteRoute: typeof AuthenticatedCommunicationMessageLogsRouteRoute
+  AuthenticatedCommunicationMessageTemplatesRouteRoute: typeof AuthenticatedCommunicationMessageTemplatesRouteRoute
+  AuthenticatedCommunicationMessagesRouteRoute: typeof AuthenticatedCommunicationMessagesRouteRoute
+  AuthenticatedCommunicationNotificationTemplatesRouteRoute: typeof AuthenticatedCommunicationNotificationTemplatesRouteRoute
+  AuthenticatedCommunicationNotificationsRouteRoute: typeof AuthenticatedCommunicationNotificationsRouteRoute
+  AuthenticatedCommunicationRoutingRouteRoute: typeof AuthenticatedCommunicationRoutingRouteRoute
+  AuthenticatedConversationBroadcastsRouteRoute: typeof AuthenticatedConversationBroadcastsRouteRoute
+  AuthenticatedConversationInvitesRouteRoute: typeof AuthenticatedConversationInvitesRouteRouteWithChildren
+  AuthenticatedRxsoftSettingsRouteRoute: typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
+  AuthenticatedPageIdRoute: typeof AuthenticatedPageIdRouteWithChildren
+  AuthenticatedPageCreateRoute: typeof AuthenticatedPageCreateRoute
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedCodingConceptDashboardRoute: typeof AuthenticatedCodingConceptDashboardRoute
+  AuthenticatedCodingConceptMatchRoute: typeof AuthenticatedCodingConceptMatchRoute
+  AuthenticatedCodingConceptSearchRoute: typeof AuthenticatedCodingConceptSearchRoute
+  AuthenticatedCodingConceptUploadRoute: typeof AuthenticatedCodingConceptUploadRoute
+  AuthenticatedCommunicationAuditCenterRoute: typeof AuthenticatedCommunicationAuditCenterRoute
+  AuthenticatedCommunicationDashboardRoute: typeof AuthenticatedCommunicationDashboardRoute
+  AuthenticatedCommunicationFlowGraphRoute: typeof AuthenticatedCommunicationFlowGraphRoute
+  AuthenticatedCommunicationMessageTesterRoute: typeof AuthenticatedCommunicationMessageTesterRoute
+  AuthenticatedCommunicationTraceExplorerRoute: typeof AuthenticatedCommunicationTraceExplorerRoute
+  AuthenticatedConversationConversationIdRoute: typeof AuthenticatedConversationConversationIdRouteWithChildren
+  AuthenticatedConversationDashboardRoute: typeof AuthenticatedConversationDashboardRoute
+  AuthenticatedDashboardPurchasesRoute: typeof AuthenticatedDashboardPurchasesRoute
+  AuthenticatedDashboardSalesRoute: typeof AuthenticatedDashboardSalesRoute
+  AuthenticatedEmrDashboardRoute: typeof AuthenticatedEmrDashboardRoute
+  AuthenticatedIdentityDashboardRoute: typeof AuthenticatedIdentityDashboardRoute
+  AuthenticatedLisDashboardRoute: typeof AuthenticatedLisDashboardRoute
+  AuthenticatedRxsoftDashboardRoute: typeof AuthenticatedRxsoftDashboardRoute
+  AuthenticatedWebsiteDashboardRoute: typeof AuthenticatedWebsiteDashboardRoute
+  AuthenticatedCodingConceptIndexRoute: typeof AuthenticatedCodingConceptIndexRoute
+  AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute
+  AuthenticatedEmrIndexRoute: typeof AuthenticatedEmrIndexRoute
+  AuthenticatedIdentityIndexRoute: typeof AuthenticatedIdentityIndexRoute
+  AuthenticatedLisIndexRoute: typeof AuthenticatedLisIndexRoute
+  AuthenticatedLisOrdersWorkflowRouteRoute: typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
+  AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute: typeof AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute
+  AuthenticatedConversationExchangesExchangeIdRoute: typeof AuthenticatedConversationExchangesExchangeIdRoute
+  AuthenticatedConversationProjectionsProjectionIdRoute: typeof AuthenticatedConversationProjectionsProjectionIdRoute
+  AuthenticatedEmrEncountersEncounterIdRoute: typeof AuthenticatedEmrEncountersEncounterIdRoute
+  AuthenticatedEmrPatientsPatientIdRoute: typeof AuthenticatedEmrPatientsPatientIdRoute
+  AuthenticatedEmrRequestsRequestIdRoute: typeof AuthenticatedEmrRequestsRequestIdRoute
+  AuthenticatedEmrVisitsVisitIdRoute: typeof AuthenticatedEmrVisitsVisitIdRoute
+  AuthenticatedEmrWardsAdmissionsRoute: typeof AuthenticatedEmrWardsAdmissionsRoute
+  AuthenticatedEmrWardsBedsRoute: typeof AuthenticatedEmrWardsBedsRoute
+  AuthenticatedEmrWardsBoardRoute: typeof AuthenticatedEmrWardsBoardRoute
+  AuthenticatedEmrWardsDischargesRoute: typeof AuthenticatedEmrWardsDischargesRoute
+  AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
+  AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute
+  AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  AuthenticatedCodingConceptDosageFormsIndexRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRoute
+  AuthenticatedCodingConceptDrugClassificationsIndexRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
+  AuthenticatedCodingConceptDrugComponentsIndexRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
+  AuthenticatedCodingConceptFacilitiesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesIndexRoute
+  AuthenticatedCodingConceptFormulationsIndexRoute: typeof AuthenticatedCodingConceptFormulationsIndexRoute
+  AuthenticatedCodingConceptGenericDrugsIndexRoute: typeof AuthenticatedCodingConceptGenericDrugsIndexRoute
+  AuthenticatedCodingConceptGenericProductsIndexRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRoute
+  AuthenticatedCodingConceptManufacturersIndexRoute: typeof AuthenticatedCodingConceptManufacturersIndexRoute
+  AuthenticatedCodingConceptPharmaceuticsIndexRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
+  AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute
+  AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute
+  AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute
+  AuthenticatedConversationParticipantsIndexRoute: typeof AuthenticatedConversationParticipantsIndexRoute
+  AuthenticatedConversationProjectionsIndexRoute: typeof AuthenticatedConversationProjectionsIndexRoute
+  AuthenticatedConversationQuestionnairesIndexRoute: typeof AuthenticatedConversationQuestionnairesIndexRoute
+  AuthenticatedConversationQuestionsIndexRoute: typeof AuthenticatedConversationQuestionsIndexRoute
+  AuthenticatedConversationWorkflowConfigurationIndexRoute: typeof AuthenticatedConversationWorkflowConfigurationIndexRoute
+  AuthenticatedConversationWorkflowEventsIndexRoute: typeof AuthenticatedConversationWorkflowEventsIndexRoute
+  AuthenticatedConversationWorkflowInstancesIndexRoute: typeof AuthenticatedConversationWorkflowInstancesIndexRoute
+  AuthenticatedConversationWorkflowsIndexRoute: typeof AuthenticatedConversationWorkflowsIndexRoute
+  AuthenticatedEmrAppointmentsIndexRoute: typeof AuthenticatedEmrAppointmentsIndexRoute
+  AuthenticatedEmrDepartmentsIndexRoute: typeof AuthenticatedEmrDepartmentsIndexRoute
+  AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
+  AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
+  AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute
+  AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
+  AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute
+  AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
+  AuthenticatedEmrStaffIndexRoute: typeof AuthenticatedEmrStaffIndexRoute
+  AuthenticatedEmrTagsIndexRoute: typeof AuthenticatedEmrTagsIndexRoute
+  AuthenticatedEmrVisitsIndexRoute: typeof AuthenticatedEmrVisitsIndexRoute
+  AuthenticatedEmrWardsIndexRoute: typeof AuthenticatedEmrWardsIndexRoute
+  AuthenticatedIdentityLocationsIndexRoute: typeof AuthenticatedIdentityLocationsIndexRoute
+  AuthenticatedIdentityOrganizationsIndexRoute: typeof AuthenticatedIdentityOrganizationsIndexRoute
+  AuthenticatedIdentityPermissionsIndexRoute: typeof AuthenticatedIdentityPermissionsIndexRoute
+  AuthenticatedIdentityRolesIndexRoute: typeof AuthenticatedIdentityRolesIndexRoute
+  AuthenticatedIdentityUsersIndexRoute: typeof AuthenticatedIdentityUsersIndexRoute
+  AuthenticatedLisAttributeDefinitionsIndexRoute: typeof AuthenticatedLisAttributeDefinitionsIndexRoute
+  AuthenticatedLisEqaEnrollmentsIndexRoute: typeof AuthenticatedLisEqaEnrollmentsIndexRoute
+  AuthenticatedLisEqaProgramsIndexRoute: typeof AuthenticatedLisEqaProgramsIndexRoute
+  AuthenticatedLisEqaResultsIndexRoute: typeof AuthenticatedLisEqaResultsIndexRoute
+  AuthenticatedLisLocationTypesIndexRoute: typeof AuthenticatedLisLocationTypesIndexRoute
+  AuthenticatedLisLocationsIndexRoute: typeof AuthenticatedLisLocationsIndexRoute
+  AuthenticatedLisLoincIndexRoute: typeof AuthenticatedLisLoincIndexRoute
+  AuthenticatedLisMethodsIndexRoute: typeof AuthenticatedLisMethodsIndexRoute
+  AuthenticatedLisOrdersIndexRoute: typeof AuthenticatedLisOrdersIndexRoute
+  AuthenticatedLisPanelsIndexRoute: typeof AuthenticatedLisPanelsIndexRoute
+  AuthenticatedLisPatientsIndexRoute: typeof AuthenticatedLisPatientsIndexRoute
+  AuthenticatedLisPrioritiesIndexRoute: typeof AuthenticatedLisPrioritiesIndexRoute
+  AuthenticatedLisProgramsIndexRoute: typeof AuthenticatedLisProgramsIndexRoute
+  AuthenticatedLisQaChecklistItemsIndexRoute: typeof AuthenticatedLisQaChecklistItemsIndexRoute
+  AuthenticatedLisQcAlertsIndexRoute: typeof AuthenticatedLisQcAlertsIndexRoute
+  AuthenticatedLisQcLotsIndexRoute: typeof AuthenticatedLisQcLotsIndexRoute
+  AuthenticatedLisQcResultsIndexRoute: typeof AuthenticatedLisQcResultsIndexRoute
+  AuthenticatedLisReferenceRangesIndexRoute: typeof AuthenticatedLisReferenceRangesIndexRoute
+  AuthenticatedLisRejectionReasonsIndexRoute: typeof AuthenticatedLisRejectionReasonsIndexRoute
+  AuthenticatedLisResultSignaturesIndexRoute: typeof AuthenticatedLisResultSignaturesIndexRoute
+  AuthenticatedLisResultsIndexRoute: typeof AuthenticatedLisResultsIndexRoute
+  AuthenticatedLisSampleTypesIndexRoute: typeof AuthenticatedLisSampleTypesIndexRoute
+  AuthenticatedLisSamplesIndexRoute: typeof AuthenticatedLisSamplesIndexRoute
+  AuthenticatedLisStatusesIndexRoute: typeof AuthenticatedLisStatusesIndexRoute
+  AuthenticatedLisTestCategoriesIndexRoute: typeof AuthenticatedLisTestCategoriesIndexRoute
+  AuthenticatedLisTestDefinitionsIndexRoute: typeof AuthenticatedLisTestDefinitionsIndexRoute
+  AuthenticatedLisTestSectionsIndexRoute: typeof AuthenticatedLisTestSectionsIndexRoute
+  AuthenticatedLisUomsIndexRoute: typeof AuthenticatedLisUomsIndexRoute
+  AuthenticatedLisValidationDashboardIndexRoute: typeof AuthenticatedLisValidationDashboardIndexRoute
+  AuthenticatedRxsoftAuditLogsIndexRoute: typeof AuthenticatedRxsoftAuditLogsIndexRoute
+  AuthenticatedRxsoftBranchesIndexRoute: typeof AuthenticatedRxsoftBranchesIndexRoute
+  AuthenticatedRxsoftCategoriesIndexRoute: typeof AuthenticatedRxsoftCategoriesIndexRoute
+  AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
+  AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
+  AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  AuthenticatedRxsoftEhealthwaresCareersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
+  AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
+  AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
+  AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresHeroSlidesIndexRoute
+  AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresInvestorsIndexRoute
+  AuthenticatedRxsoftEhealthwaresPartnersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresPartnersIndexRoute
+  AuthenticatedRxsoftEhealthwaresProductsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresProductsIndexRoute
+  AuthenticatedRxsoftEhealthwaresSectionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSectionsIndexRoute
+  AuthenticatedRxsoftEhealthwaresServicesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresServicesIndexRoute
+  AuthenticatedRxsoftEhealthwaresSettingsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresSettingsIndexRoute
+  AuthenticatedRxsoftEhealthwaresTeamIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTeamIndexRoute
+  AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute
+  AuthenticatedRxsoftGlAccountsIndexRoute: typeof AuthenticatedRxsoftGlAccountsIndexRoute
+  AuthenticatedRxsoftInsuranceProvidersIndexRoute: typeof AuthenticatedRxsoftInsuranceProvidersIndexRoute
+  AuthenticatedRxsoftInventoryIndexRoute: typeof AuthenticatedRxsoftInventoryIndexRoute
+  AuthenticatedRxsoftItemsIndexRoute: typeof AuthenticatedRxsoftItemsIndexRoute
+  AuthenticatedRxsoftJournalEntriesIndexRoute: typeof AuthenticatedRxsoftJournalEntriesIndexRoute
+  AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
+  AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
+  AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
+  AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
+  AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
+  AuthenticatedRxsoftOrganizationsIndexRoute: typeof AuthenticatedRxsoftOrganizationsIndexRoute
+  AuthenticatedRxsoftPaymentMethodsIndexRoute: typeof AuthenticatedRxsoftPaymentMethodsIndexRoute
+  AuthenticatedRxsoftPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftPaymentProvidersIndexRoute
+  AuthenticatedRxsoftPaymentTransactionsIndexRoute: typeof AuthenticatedRxsoftPaymentTransactionsIndexRoute
+  AuthenticatedRxsoftPaymentsIndexRoute: typeof AuthenticatedRxsoftPaymentsIndexRoute
+  AuthenticatedRxsoftPharmaceuticsIndexRoute: typeof AuthenticatedRxsoftPharmaceuticsIndexRoute
+  AuthenticatedRxsoftPosTerminalsIndexRoute: typeof AuthenticatedRxsoftPosTerminalsIndexRoute
+  AuthenticatedRxsoftPriceListItemsIndexRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRoute
+  AuthenticatedRxsoftPriceListsIndexRoute: typeof AuthenticatedRxsoftPriceListsIndexRoute
+  AuthenticatedRxsoftPurchasesIndexRoute: typeof AuthenticatedRxsoftPurchasesIndexRoute
+  AuthenticatedRxsoftReceivablesIndexRoute: typeof AuthenticatedRxsoftReceivablesIndexRoute
+  AuthenticatedRxsoftReceivingIndexRoute: typeof AuthenticatedRxsoftReceivingIndexRoute
+  AuthenticatedRxsoftReportsIndexRoute: typeof AuthenticatedRxsoftReportsIndexRoute
+  AuthenticatedRxsoftRoleRequestsIndexRoute: typeof AuthenticatedRxsoftRoleRequestsIndexRoute
+  AuthenticatedRxsoftRolesIndexRoute: typeof AuthenticatedRxsoftRolesIndexRoute
+  AuthenticatedRxsoftSalesLinesIndexRoute: typeof AuthenticatedRxsoftSalesLinesIndexRoute
+  AuthenticatedRxsoftSalesIndexRoute: typeof AuthenticatedRxsoftSalesIndexRoute
+  AuthenticatedRxsoftStockLocationsIndexRoute: typeof AuthenticatedRxsoftStockLocationsIndexRoute
+  AuthenticatedRxsoftSuppliersIndexRoute: typeof AuthenticatedRxsoftSuppliersIndexRoute
+  AuthenticatedRxsoftUomCategoryIndexRoute: typeof AuthenticatedRxsoftUomCategoryIndexRoute
+  AuthenticatedRxsoftUomsIndexRoute: typeof AuthenticatedRxsoftUomsIndexRoute
+  AuthenticatedRxsoftUserConfigIndexRoute: typeof AuthenticatedRxsoftUserConfigIndexRoute
+  AuthenticatedRxsoftUsersIndexRoute: typeof AuthenticatedRxsoftUsersIndexRoute
+  AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute
+  AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
+  AuthenticatedRxsoftWebsitePrescriptionsIndexRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
+  AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
+  AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
+  AuthenticatedConversationPageIdEditRoute: typeof AuthenticatedConversationPageIdEditRoute
+  AuthenticatedLisOrdersOrderIdReportRoute: typeof AuthenticatedLisOrdersOrderIdReportRoute
+  AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
+  AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
+  AuthenticatedCodingConceptFacilitiesLevelsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLevelsIndexRoute
+  AuthenticatedCodingConceptFacilitiesLgasIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLgasIndexRoute
+  AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesIndexRoute
+  AuthenticatedCodingConceptFacilitiesStatesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesStatesIndexRoute
+  AuthenticatedCodingConceptFacilitiesTypesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesTypesIndexRoute
+  AuthenticatedCodingConceptFacilitiesWardsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesWardsIndexRoute
+  AuthenticatedConversationAiConfigIndexRoute: typeof AuthenticatedConversationAiConfigIndexRoute
+  AuthenticatedConversationAiCostsIndexRoute: typeof AuthenticatedConversationAiCostsIndexRoute
+  AuthenticatedConversationAiEvalLogsIndexRoute: typeof AuthenticatedConversationAiEvalLogsIndexRoute
+  AuthenticatedConversationAiInstructionsIndexRoute: typeof AuthenticatedConversationAiInstructionsIndexRoute
+  AuthenticatedConversationAiModelsIndexRoute: typeof AuthenticatedConversationAiModelsIndexRoute
+  AuthenticatedConversationAiProcessorsIndexRoute: typeof AuthenticatedConversationAiProcessorsIndexRoute
+  AuthenticatedConversationAiProvidersIndexRoute: typeof AuthenticatedConversationAiProvidersIndexRoute
+  AuthenticatedConversationAiRequestLogsIndexRoute: typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  AuthenticatedRxsoftReportsBalanceSheetIndexRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
+  AuthenticatedRxsoftReportsIncomeStatementIndexRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
+  AuthenticatedRxsoftReportsTrialBalanceIndexRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
+  AuthenticatedRxsoftRolesIdPermissionsIndexRoute: typeof AuthenticatedRxsoftRolesIdPermissionsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModuleIdRoute: AuthenticatedModuleIdRouteWithChildren,
-  AuthenticatedCommunicationAesRouteRoute: AuthenticatedCommunicationAesRouteRoute,
+  AuthenticatedCommunicationAesRouteRoute:
+    AuthenticatedCommunicationAesRouteRoute,
   AuthenticatedCommunicationCommunicationChannelsRouteRoute:
     AuthenticatedCommunicationCommunicationChannelsRouteRoute,
-  AuthenticatedCommunicationMappingRouteRoute: AuthenticatedCommunicationMappingRouteRoute,
-  AuthenticatedCommunicationMessageLogsRouteRoute: AuthenticatedCommunicationMessageLogsRouteRoute,
+  AuthenticatedCommunicationMappingRouteRoute:
+    AuthenticatedCommunicationMappingRouteRoute,
+  AuthenticatedCommunicationMessageLogsRouteRoute:
+    AuthenticatedCommunicationMessageLogsRouteRoute,
   AuthenticatedCommunicationMessageTemplatesRouteRoute:
     AuthenticatedCommunicationMessageTemplatesRouteRoute,
-  AuthenticatedCommunicationMessagesRouteRoute: AuthenticatedCommunicationMessagesRouteRoute,
+  AuthenticatedCommunicationMessagesRouteRoute:
+    AuthenticatedCommunicationMessagesRouteRoute,
   AuthenticatedCommunicationNotificationTemplatesRouteRoute:
     AuthenticatedCommunicationNotificationTemplatesRouteRoute,
   AuthenticatedCommunicationNotificationsRouteRoute:
     AuthenticatedCommunicationNotificationsRouteRoute,
-  AuthenticatedCommunicationRoutingRouteRoute: AuthenticatedCommunicationRoutingRouteRoute,
-  AuthenticatedConversationBroadcastsRouteRoute: AuthenticatedConversationBroadcastsRouteRoute,
+  AuthenticatedCommunicationRoutingRouteRoute:
+    AuthenticatedCommunicationRoutingRouteRoute,
+  AuthenticatedConversationBroadcastsRouteRoute:
+    AuthenticatedConversationBroadcastsRouteRoute,
   AuthenticatedConversationInvitesRouteRoute:
     AuthenticatedConversationInvitesRouteRouteWithChildren,
-  AuthenticatedRxsoftSettingsRouteRoute: AuthenticatedRxsoftSettingsRouteRouteWithChildren,
+  AuthenticatedRxsoftSettingsRouteRoute:
+    AuthenticatedRxsoftSettingsRouteRouteWithChildren,
   AuthenticatedPageIdRoute: AuthenticatedPageIdRouteWithChildren,
   AuthenticatedPageCreateRoute: AuthenticatedPageCreateRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
-  AuthenticatedCodingConceptDashboardRoute: AuthenticatedCodingConceptDashboardRoute,
+  AuthenticatedCodingConceptDashboardRoute:
+    AuthenticatedCodingConceptDashboardRoute,
   AuthenticatedCodingConceptMatchRoute: AuthenticatedCodingConceptMatchRoute,
   AuthenticatedCodingConceptSearchRoute: AuthenticatedCodingConceptSearchRoute,
   AuthenticatedCodingConceptUploadRoute: AuthenticatedCodingConceptUploadRoute,
-  AuthenticatedCommunicationAuditCenterRoute: AuthenticatedCommunicationAuditCenterRoute,
-  AuthenticatedCommunicationDashboardRoute: AuthenticatedCommunicationDashboardRoute,
-  AuthenticatedCommunicationFlowGraphRoute: AuthenticatedCommunicationFlowGraphRoute,
-  AuthenticatedCommunicationMessageTesterRoute: AuthenticatedCommunicationMessageTesterRoute,
-  AuthenticatedCommunicationTraceExplorerRoute: AuthenticatedCommunicationTraceExplorerRoute,
+  AuthenticatedCommunicationAuditCenterRoute:
+    AuthenticatedCommunicationAuditCenterRoute,
+  AuthenticatedCommunicationDashboardRoute:
+    AuthenticatedCommunicationDashboardRoute,
+  AuthenticatedCommunicationFlowGraphRoute:
+    AuthenticatedCommunicationFlowGraphRoute,
+  AuthenticatedCommunicationMessageTesterRoute:
+    AuthenticatedCommunicationMessageTesterRoute,
+  AuthenticatedCommunicationTraceExplorerRoute:
+    AuthenticatedCommunicationTraceExplorerRoute,
   AuthenticatedConversationConversationIdRoute:
     AuthenticatedConversationConversationIdRouteWithChildren,
-  AuthenticatedConversationDashboardRoute: AuthenticatedConversationDashboardRoute,
+  AuthenticatedConversationDashboardRoute:
+    AuthenticatedConversationDashboardRoute,
   AuthenticatedDashboardPurchasesRoute: AuthenticatedDashboardPurchasesRoute,
   AuthenticatedDashboardSalesRoute: AuthenticatedDashboardSalesRoute,
   AuthenticatedEmrDashboardRoute: AuthenticatedEmrDashboardRoute,
@@ -6407,16 +6523,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrIndexRoute: AuthenticatedEmrIndexRoute,
   AuthenticatedIdentityIndexRoute: AuthenticatedIdentityIndexRoute,
   AuthenticatedLisIndexRoute: AuthenticatedLisIndexRoute,
-  AuthenticatedLisOrdersWorkflowRouteRoute: AuthenticatedLisOrdersWorkflowRouteRouteWithChildren,
+  AuthenticatedLisOrdersWorkflowRouteRoute:
+    AuthenticatedLisOrdersWorkflowRouteRouteWithChildren,
   AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute:
     AuthenticatedCodingConceptDrugClassificationsClassificationIdRoute,
   AuthenticatedConversationExchangesExchangeIdRoute:
     AuthenticatedConversationExchangesExchangeIdRoute,
   AuthenticatedConversationProjectionsProjectionIdRoute:
     AuthenticatedConversationProjectionsProjectionIdRoute,
-  AuthenticatedEmrEncountersEncounterIdRoute: AuthenticatedEmrEncountersEncounterIdRoute,
-  AuthenticatedEmrPatientsPatientIdRoute: AuthenticatedEmrPatientsPatientIdRoute,
-  AuthenticatedEmrRequestsRequestIdRoute: AuthenticatedEmrRequestsRequestIdRoute,
+  AuthenticatedEmrEncountersEncounterIdRoute:
+    AuthenticatedEmrEncountersEncounterIdRoute,
+  AuthenticatedEmrPatientsPatientIdRoute:
+    AuthenticatedEmrPatientsPatientIdRoute,
+  AuthenticatedEmrRequestsRequestIdRoute:
+    AuthenticatedEmrRequestsRequestIdRoute,
   AuthenticatedEmrVisitsVisitIdRoute: AuthenticatedEmrVisitsVisitIdRoute,
   AuthenticatedEmrWardsAdmissionsRoute: AuthenticatedEmrWardsAdmissionsRoute,
   AuthenticatedEmrWardsBedsRoute: AuthenticatedEmrWardsBedsRoute,
@@ -6424,13 +6544,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrWardsDischargesRoute: AuthenticatedEmrWardsDischargesRoute,
   AuthenticatedLisOrdersDashboardRoute: AuthenticatedLisOrdersDashboardRoute,
   AuthenticatedRxsoftItemsCreateRoute: AuthenticatedRxsoftItemsCreateRoute,
-  AuthenticatedRxsoftUomsUomIdRoute: AuthenticatedRxsoftUomsUomIdRouteWithChildren,
-  AuthenticatedCodingConceptDosageFormsIndexRoute: AuthenticatedCodingConceptDosageFormsIndexRoute,
+  AuthenticatedRxsoftUomsUomIdRoute:
+    AuthenticatedRxsoftUomsUomIdRouteWithChildren,
+  AuthenticatedCodingConceptDosageFormsIndexRoute:
+    AuthenticatedCodingConceptDosageFormsIndexRoute,
   AuthenticatedCodingConceptDrugClassificationsIndexRoute:
     AuthenticatedCodingConceptDrugClassificationsIndexRoute,
   AuthenticatedCodingConceptDrugComponentsIndexRoute:
     AuthenticatedCodingConceptDrugComponentsIndexRoute,
-  AuthenticatedCodingConceptFacilitiesIndexRoute: AuthenticatedCodingConceptFacilitiesIndexRoute,
+  AuthenticatedCodingConceptFacilitiesIndexRoute:
+    AuthenticatedCodingConceptFacilitiesIndexRoute,
   AuthenticatedCodingConceptFormulationsIndexRoute:
     AuthenticatedCodingConceptFormulationsIndexRoute,
   AuthenticatedCodingConceptGenericDrugsIndexRoute:
@@ -6441,23 +6564,32 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptManufacturersIndexRoute,
   AuthenticatedCodingConceptPharmaceuticsIndexRoute:
     AuthenticatedCodingConceptPharmaceuticsIndexRoute,
-  AuthenticatedConversationChannelsIndexRoute: AuthenticatedConversationChannelsIndexRoute,
-  AuthenticatedConversationChatsIndexRoute: AuthenticatedConversationChatsIndexRoute,
-  AuthenticatedConversationExchangesIndexRoute: AuthenticatedConversationExchangesIndexRoute,
-  AuthenticatedConversationOptionListsIndexRoute: AuthenticatedConversationOptionListsIndexRoute,
-  AuthenticatedConversationParticipantsIndexRoute: AuthenticatedConversationParticipantsIndexRoute,
-  AuthenticatedConversationProjectionsIndexRoute: AuthenticatedConversationProjectionsIndexRoute,
+  AuthenticatedConversationChannelsIndexRoute:
+    AuthenticatedConversationChannelsIndexRoute,
+  AuthenticatedConversationChatsIndexRoute:
+    AuthenticatedConversationChatsIndexRoute,
+  AuthenticatedConversationExchangesIndexRoute:
+    AuthenticatedConversationExchangesIndexRoute,
+  AuthenticatedConversationOptionListsIndexRoute:
+    AuthenticatedConversationOptionListsIndexRoute,
+  AuthenticatedConversationParticipantsIndexRoute:
+    AuthenticatedConversationParticipantsIndexRoute,
+  AuthenticatedConversationProjectionsIndexRoute:
+    AuthenticatedConversationProjectionsIndexRoute,
   AuthenticatedConversationQuestionnairesIndexRoute:
     AuthenticatedConversationQuestionnairesIndexRoute,
-  AuthenticatedConversationQuestionsIndexRoute: AuthenticatedConversationQuestionsIndexRoute,
+  AuthenticatedConversationQuestionsIndexRoute:
+    AuthenticatedConversationQuestionsIndexRoute,
   AuthenticatedConversationWorkflowConfigurationIndexRoute:
     AuthenticatedConversationWorkflowConfigurationIndexRoute,
   AuthenticatedConversationWorkflowEventsIndexRoute:
     AuthenticatedConversationWorkflowEventsIndexRoute,
   AuthenticatedConversationWorkflowInstancesIndexRoute:
     AuthenticatedConversationWorkflowInstancesIndexRoute,
-  AuthenticatedConversationWorkflowsIndexRoute: AuthenticatedConversationWorkflowsIndexRoute,
-  AuthenticatedEmrAppointmentsIndexRoute: AuthenticatedEmrAppointmentsIndexRoute,
+  AuthenticatedConversationWorkflowsIndexRoute:
+    AuthenticatedConversationWorkflowsIndexRoute,
+  AuthenticatedEmrAppointmentsIndexRoute:
+    AuthenticatedEmrAppointmentsIndexRoute,
   AuthenticatedEmrDepartmentsIndexRoute: AuthenticatedEmrDepartmentsIndexRoute,
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
@@ -6469,16 +6601,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrTagsIndexRoute: AuthenticatedEmrTagsIndexRoute,
   AuthenticatedEmrVisitsIndexRoute: AuthenticatedEmrVisitsIndexRoute,
   AuthenticatedEmrWardsIndexRoute: AuthenticatedEmrWardsIndexRoute,
-  AuthenticatedIdentityLocationsIndexRoute: AuthenticatedIdentityLocationsIndexRoute,
-  AuthenticatedIdentityOrganizationsIndexRoute: AuthenticatedIdentityOrganizationsIndexRoute,
-  AuthenticatedIdentityPermissionsIndexRoute: AuthenticatedIdentityPermissionsIndexRoute,
+  AuthenticatedIdentityLocationsIndexRoute:
+    AuthenticatedIdentityLocationsIndexRoute,
+  AuthenticatedIdentityOrganizationsIndexRoute:
+    AuthenticatedIdentityOrganizationsIndexRoute,
+  AuthenticatedIdentityPermissionsIndexRoute:
+    AuthenticatedIdentityPermissionsIndexRoute,
   AuthenticatedIdentityRolesIndexRoute: AuthenticatedIdentityRolesIndexRoute,
   AuthenticatedIdentityUsersIndexRoute: AuthenticatedIdentityUsersIndexRoute,
-  AuthenticatedLisAttributeDefinitionsIndexRoute: AuthenticatedLisAttributeDefinitionsIndexRoute,
-  AuthenticatedLisEqaEnrollmentsIndexRoute: AuthenticatedLisEqaEnrollmentsIndexRoute,
+  AuthenticatedLisAttributeDefinitionsIndexRoute:
+    AuthenticatedLisAttributeDefinitionsIndexRoute,
+  AuthenticatedLisEqaEnrollmentsIndexRoute:
+    AuthenticatedLisEqaEnrollmentsIndexRoute,
   AuthenticatedLisEqaProgramsIndexRoute: AuthenticatedLisEqaProgramsIndexRoute,
   AuthenticatedLisEqaResultsIndexRoute: AuthenticatedLisEqaResultsIndexRoute,
-  AuthenticatedLisLocationTypesIndexRoute: AuthenticatedLisLocationTypesIndexRoute,
+  AuthenticatedLisLocationTypesIndexRoute:
+    AuthenticatedLisLocationTypesIndexRoute,
   AuthenticatedLisLocationsIndexRoute: AuthenticatedLisLocationsIndexRoute,
   AuthenticatedLisLoincIndexRoute: AuthenticatedLisLoincIndexRoute,
   AuthenticatedLisMethodsIndexRoute: AuthenticatedLisMethodsIndexRoute,
@@ -6487,27 +6625,39 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLisPatientsIndexRoute: AuthenticatedLisPatientsIndexRoute,
   AuthenticatedLisPrioritiesIndexRoute: AuthenticatedLisPrioritiesIndexRoute,
   AuthenticatedLisProgramsIndexRoute: AuthenticatedLisProgramsIndexRoute,
-  AuthenticatedLisQaChecklistItemsIndexRoute: AuthenticatedLisQaChecklistItemsIndexRoute,
+  AuthenticatedLisQaChecklistItemsIndexRoute:
+    AuthenticatedLisQaChecklistItemsIndexRoute,
   AuthenticatedLisQcAlertsIndexRoute: AuthenticatedLisQcAlertsIndexRoute,
   AuthenticatedLisQcLotsIndexRoute: AuthenticatedLisQcLotsIndexRoute,
   AuthenticatedLisQcResultsIndexRoute: AuthenticatedLisQcResultsIndexRoute,
-  AuthenticatedLisReferenceRangesIndexRoute: AuthenticatedLisReferenceRangesIndexRoute,
-  AuthenticatedLisRejectionReasonsIndexRoute: AuthenticatedLisRejectionReasonsIndexRoute,
-  AuthenticatedLisResultSignaturesIndexRoute: AuthenticatedLisResultSignaturesIndexRoute,
+  AuthenticatedLisReferenceRangesIndexRoute:
+    AuthenticatedLisReferenceRangesIndexRoute,
+  AuthenticatedLisRejectionReasonsIndexRoute:
+    AuthenticatedLisRejectionReasonsIndexRoute,
+  AuthenticatedLisResultSignaturesIndexRoute:
+    AuthenticatedLisResultSignaturesIndexRoute,
   AuthenticatedLisResultsIndexRoute: AuthenticatedLisResultsIndexRoute,
   AuthenticatedLisSampleTypesIndexRoute: AuthenticatedLisSampleTypesIndexRoute,
   AuthenticatedLisSamplesIndexRoute: AuthenticatedLisSamplesIndexRoute,
   AuthenticatedLisStatusesIndexRoute: AuthenticatedLisStatusesIndexRoute,
-  AuthenticatedLisTestCategoriesIndexRoute: AuthenticatedLisTestCategoriesIndexRoute,
-  AuthenticatedLisTestDefinitionsIndexRoute: AuthenticatedLisTestDefinitionsIndexRoute,
-  AuthenticatedLisTestSectionsIndexRoute: AuthenticatedLisTestSectionsIndexRoute,
+  AuthenticatedLisTestCategoriesIndexRoute:
+    AuthenticatedLisTestCategoriesIndexRoute,
+  AuthenticatedLisTestDefinitionsIndexRoute:
+    AuthenticatedLisTestDefinitionsIndexRoute,
+  AuthenticatedLisTestSectionsIndexRoute:
+    AuthenticatedLisTestSectionsIndexRoute,
   AuthenticatedLisUomsIndexRoute: AuthenticatedLisUomsIndexRoute,
-  AuthenticatedLisValidationDashboardIndexRoute: AuthenticatedLisValidationDashboardIndexRoute,
-  AuthenticatedRxsoftAuditLogsIndexRoute: AuthenticatedRxsoftAuditLogsIndexRoute,
+  AuthenticatedLisValidationDashboardIndexRoute:
+    AuthenticatedLisValidationDashboardIndexRoute,
+  AuthenticatedRxsoftAuditLogsIndexRoute:
+    AuthenticatedRxsoftAuditLogsIndexRoute,
   AuthenticatedRxsoftBranchesIndexRoute: AuthenticatedRxsoftBranchesIndexRoute,
-  AuthenticatedRxsoftCategoriesIndexRoute: AuthenticatedRxsoftCategoriesIndexRoute,
-  AuthenticatedRxsoftCustomersIndexRoute: AuthenticatedRxsoftCustomersIndexRoute,
-  AuthenticatedRxsoftDrugComponentsIndexRoute: AuthenticatedRxsoftDrugComponentsIndexRoute,
+  AuthenticatedRxsoftCategoriesIndexRoute:
+    AuthenticatedRxsoftCategoriesIndexRoute,
+  AuthenticatedRxsoftCustomersIndexRoute:
+    AuthenticatedRxsoftCustomersIndexRoute,
+  AuthenticatedRxsoftDrugComponentsIndexRoute:
+    AuthenticatedRxsoftDrugComponentsIndexRoute,
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute:
     AuthenticatedRxsoftEhealthwaresArticlesIndexRoute,
   AuthenticatedRxsoftEhealthwaresCareersIndexRoute:
@@ -6530,46 +6680,72 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftEhealthwaresServicesIndexRoute,
   AuthenticatedRxsoftEhealthwaresSettingsIndexRoute:
     AuthenticatedRxsoftEhealthwaresSettingsIndexRoute,
-  AuthenticatedRxsoftEhealthwaresTeamIndexRoute: AuthenticatedRxsoftEhealthwaresTeamIndexRoute,
+  AuthenticatedRxsoftEhealthwaresTeamIndexRoute:
+    AuthenticatedRxsoftEhealthwaresTeamIndexRoute,
   AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute:
     AuthenticatedRxsoftEhealthwaresTestimonialsIndexRoute,
-  AuthenticatedRxsoftGlAccountsIndexRoute: AuthenticatedRxsoftGlAccountsIndexRoute,
-  AuthenticatedRxsoftInsuranceProvidersIndexRoute: AuthenticatedRxsoftInsuranceProvidersIndexRoute,
-  AuthenticatedRxsoftInventoryIndexRoute: AuthenticatedRxsoftInventoryIndexRoute,
+  AuthenticatedRxsoftGlAccountsIndexRoute:
+    AuthenticatedRxsoftGlAccountsIndexRoute,
+  AuthenticatedRxsoftInsuranceProvidersIndexRoute:
+    AuthenticatedRxsoftInsuranceProvidersIndexRoute,
+  AuthenticatedRxsoftInventoryIndexRoute:
+    AuthenticatedRxsoftInventoryIndexRoute,
   AuthenticatedRxsoftItemsIndexRoute: AuthenticatedRxsoftItemsIndexRoute,
-  AuthenticatedRxsoftJournalEntriesIndexRoute: AuthenticatedRxsoftJournalEntriesIndexRoute,
-  AuthenticatedRxsoftJournalEntryLinesIndexRoute: AuthenticatedRxsoftJournalEntryLinesIndexRoute,
+  AuthenticatedRxsoftJournalEntriesIndexRoute:
+    AuthenticatedRxsoftJournalEntriesIndexRoute,
+  AuthenticatedRxsoftJournalEntryLinesIndexRoute:
+    AuthenticatedRxsoftJournalEntryLinesIndexRoute,
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
-  AuthenticatedRxsoftManufacturersIndexRoute: AuthenticatedRxsoftManufacturersIndexRoute,
-  AuthenticatedRxsoftOrganisationConfigIndexRoute: AuthenticatedRxsoftOrganisationConfigIndexRoute,
+  AuthenticatedRxsoftManufacturersIndexRoute:
+    AuthenticatedRxsoftManufacturersIndexRoute,
+  AuthenticatedRxsoftOrganisationConfigIndexRoute:
+    AuthenticatedRxsoftOrganisationConfigIndexRoute,
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute:
     AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute,
-  AuthenticatedRxsoftOrganizationsIndexRoute: AuthenticatedRxsoftOrganizationsIndexRoute,
-  AuthenticatedRxsoftPaymentMethodsIndexRoute: AuthenticatedRxsoftPaymentMethodsIndexRoute,
-  AuthenticatedRxsoftPaymentProvidersIndexRoute: AuthenticatedRxsoftPaymentProvidersIndexRoute,
+  AuthenticatedRxsoftOrganizationsIndexRoute:
+    AuthenticatedRxsoftOrganizationsIndexRoute,
+  AuthenticatedRxsoftPaymentMethodsIndexRoute:
+    AuthenticatedRxsoftPaymentMethodsIndexRoute,
+  AuthenticatedRxsoftPaymentProvidersIndexRoute:
+    AuthenticatedRxsoftPaymentProvidersIndexRoute,
   AuthenticatedRxsoftPaymentTransactionsIndexRoute:
     AuthenticatedRxsoftPaymentTransactionsIndexRoute,
   AuthenticatedRxsoftPaymentsIndexRoute: AuthenticatedRxsoftPaymentsIndexRoute,
-  AuthenticatedRxsoftPharmaceuticsIndexRoute: AuthenticatedRxsoftPharmaceuticsIndexRoute,
-  AuthenticatedRxsoftPosTerminalsIndexRoute: AuthenticatedRxsoftPosTerminalsIndexRoute,
-  AuthenticatedRxsoftPriceListItemsIndexRoute: AuthenticatedRxsoftPriceListItemsIndexRoute,
-  AuthenticatedRxsoftPriceListsIndexRoute: AuthenticatedRxsoftPriceListsIndexRoute,
-  AuthenticatedRxsoftPurchasesIndexRoute: AuthenticatedRxsoftPurchasesIndexRoute,
-  AuthenticatedRxsoftReceivablesIndexRoute: AuthenticatedRxsoftReceivablesIndexRoute,
-  AuthenticatedRxsoftReceivingIndexRoute: AuthenticatedRxsoftReceivingIndexRoute,
+  AuthenticatedRxsoftPharmaceuticsIndexRoute:
+    AuthenticatedRxsoftPharmaceuticsIndexRoute,
+  AuthenticatedRxsoftPosTerminalsIndexRoute:
+    AuthenticatedRxsoftPosTerminalsIndexRoute,
+  AuthenticatedRxsoftPriceListItemsIndexRoute:
+    AuthenticatedRxsoftPriceListItemsIndexRoute,
+  AuthenticatedRxsoftPriceListsIndexRoute:
+    AuthenticatedRxsoftPriceListsIndexRoute,
+  AuthenticatedRxsoftPurchasesIndexRoute:
+    AuthenticatedRxsoftPurchasesIndexRoute,
+  AuthenticatedRxsoftReceivablesIndexRoute:
+    AuthenticatedRxsoftReceivablesIndexRoute,
+  AuthenticatedRxsoftReceivingIndexRoute:
+    AuthenticatedRxsoftReceivingIndexRoute,
   AuthenticatedRxsoftReportsIndexRoute: AuthenticatedRxsoftReportsIndexRoute,
-  AuthenticatedRxsoftRoleRequestsIndexRoute: AuthenticatedRxsoftRoleRequestsIndexRoute,
+  AuthenticatedRxsoftRoleRequestsIndexRoute:
+    AuthenticatedRxsoftRoleRequestsIndexRoute,
   AuthenticatedRxsoftRolesIndexRoute: AuthenticatedRxsoftRolesIndexRoute,
-  AuthenticatedRxsoftSalesLinesIndexRoute: AuthenticatedRxsoftSalesLinesIndexRoute,
+  AuthenticatedRxsoftSalesLinesIndexRoute:
+    AuthenticatedRxsoftSalesLinesIndexRoute,
   AuthenticatedRxsoftSalesIndexRoute: AuthenticatedRxsoftSalesIndexRoute,
-  AuthenticatedRxsoftStockLocationsIndexRoute: AuthenticatedRxsoftStockLocationsIndexRoute,
-  AuthenticatedRxsoftSuppliersIndexRoute: AuthenticatedRxsoftSuppliersIndexRoute,
-  AuthenticatedRxsoftUomCategoryIndexRoute: AuthenticatedRxsoftUomCategoryIndexRoute,
+  AuthenticatedRxsoftStockLocationsIndexRoute:
+    AuthenticatedRxsoftStockLocationsIndexRoute,
+  AuthenticatedRxsoftSuppliersIndexRoute:
+    AuthenticatedRxsoftSuppliersIndexRoute,
+  AuthenticatedRxsoftUomCategoryIndexRoute:
+    AuthenticatedRxsoftUomCategoryIndexRoute,
   AuthenticatedRxsoftUomsIndexRoute: AuthenticatedRxsoftUomsIndexRoute,
-  AuthenticatedRxsoftUserConfigIndexRoute: AuthenticatedRxsoftUserConfigIndexRoute,
+  AuthenticatedRxsoftUserConfigIndexRoute:
+    AuthenticatedRxsoftUserConfigIndexRoute,
   AuthenticatedRxsoftUsersIndexRoute: AuthenticatedRxsoftUsersIndexRoute,
-  AuthenticatedRxsoftWarehousesIndexRoute: AuthenticatedRxsoftWarehousesIndexRoute,
-  AuthenticatedRxsoftWebsiteOrdersIndexRoute: AuthenticatedRxsoftWebsiteOrdersIndexRoute,
+  AuthenticatedRxsoftWarehousesIndexRoute:
+    AuthenticatedRxsoftWarehousesIndexRoute,
+  AuthenticatedRxsoftWebsiteOrdersIndexRoute:
+    AuthenticatedRxsoftWebsiteOrdersIndexRoute,
   AuthenticatedRxsoftWebsitePrescriptionsIndexRoute:
     AuthenticatedRxsoftWebsitePrescriptionsIndexRoute,
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute:
@@ -6578,8 +6754,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute,
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute:
     AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute,
-  AuthenticatedConversationPageIdEditRoute: AuthenticatedConversationPageIdEditRoute,
-  AuthenticatedLisOrdersOrderIdReportRoute: AuthenticatedLisOrdersOrderIdReportRoute,
+  AuthenticatedConversationPageIdEditRoute:
+    AuthenticatedConversationPageIdEditRoute,
+  AuthenticatedLisOrdersOrderIdReportRoute:
+    AuthenticatedLisOrdersOrderIdReportRoute,
   AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute:
     AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute,
   AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute:
@@ -6596,14 +6774,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptFacilitiesTypesIndexRoute,
   AuthenticatedCodingConceptFacilitiesWardsIndexRoute:
     AuthenticatedCodingConceptFacilitiesWardsIndexRoute,
-  AuthenticatedConversationAiConfigIndexRoute: AuthenticatedConversationAiConfigIndexRoute,
-  AuthenticatedConversationAiCostsIndexRoute: AuthenticatedConversationAiCostsIndexRoute,
-  AuthenticatedConversationAiEvalLogsIndexRoute: AuthenticatedConversationAiEvalLogsIndexRoute,
+  AuthenticatedConversationAiConfigIndexRoute:
+    AuthenticatedConversationAiConfigIndexRoute,
+  AuthenticatedConversationAiCostsIndexRoute:
+    AuthenticatedConversationAiCostsIndexRoute,
+  AuthenticatedConversationAiEvalLogsIndexRoute:
+    AuthenticatedConversationAiEvalLogsIndexRoute,
   AuthenticatedConversationAiInstructionsIndexRoute:
     AuthenticatedConversationAiInstructionsIndexRoute,
-  AuthenticatedConversationAiModelsIndexRoute: AuthenticatedConversationAiModelsIndexRoute,
-  AuthenticatedConversationAiProcessorsIndexRoute: AuthenticatedConversationAiProcessorsIndexRoute,
-  AuthenticatedConversationAiProvidersIndexRoute: AuthenticatedConversationAiProvidersIndexRoute,
+  AuthenticatedConversationAiModelsIndexRoute:
+    AuthenticatedConversationAiModelsIndexRoute,
+  AuthenticatedConversationAiProcessorsIndexRoute:
+    AuthenticatedConversationAiProcessorsIndexRoute,
+  AuthenticatedConversationAiProvidersIndexRoute:
+    AuthenticatedConversationAiProvidersIndexRoute,
   AuthenticatedConversationAiRequestLogsIndexRoute:
     AuthenticatedConversationAiRequestLogsIndexRoute,
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute:
@@ -6612,54 +6796,59 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftReportsIncomeStatementIndexRoute,
   AuthenticatedRxsoftReportsTrialBalanceIndexRoute:
     AuthenticatedRxsoftReportsTrialBalanceIndexRoute,
-  AuthenticatedRxsoftRolesIdPermissionsIndexRoute: AuthenticatedRxsoftRolesIdPermissionsIndexRoute,
-};
-
-const AuthenticatedRouteRouteWithChildren = AuthenticatedRouteRoute._addFileChildren(
-  AuthenticatedRouteRouteChildren
-);
-
-interface ClerkAuthenticatedRouteRouteChildren {
-  ClerkAuthenticatedUserManagementRoute: typeof ClerkAuthenticatedUserManagementRoute;
+  AuthenticatedRxsoftRolesIdPermissionsIndexRoute:
+    AuthenticatedRxsoftRolesIdPermissionsIndexRoute,
 }
 
-const ClerkAuthenticatedRouteRouteChildren: ClerkAuthenticatedRouteRouteChildren = {
-  ClerkAuthenticatedUserManagementRoute: ClerkAuthenticatedUserManagementRoute,
-};
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-const ClerkAuthenticatedRouteRouteWithChildren = ClerkAuthenticatedRouteRoute._addFileChildren(
-  ClerkAuthenticatedRouteRouteChildren
-);
+interface ClerkAuthenticatedRouteRouteChildren {
+  ClerkAuthenticatedUserManagementRoute: typeof ClerkAuthenticatedUserManagementRoute
+}
+
+const ClerkAuthenticatedRouteRouteChildren: ClerkAuthenticatedRouteRouteChildren =
+  {
+    ClerkAuthenticatedUserManagementRoute:
+      ClerkAuthenticatedUserManagementRoute,
+  }
+
+const ClerkAuthenticatedRouteRouteWithChildren =
+  ClerkAuthenticatedRouteRoute._addFileChildren(
+    ClerkAuthenticatedRouteRouteChildren,
+  )
 
 interface ClerkRouteRouteChildren {
-  ClerkauthRouteRoute: typeof ClerkauthRouteRoute;
-  ClerkAuthenticatedRouteRoute: typeof ClerkAuthenticatedRouteRouteWithChildren;
+  ClerkauthRouteRoute: typeof ClerkauthRouteRoute
+  ClerkAuthenticatedRouteRoute: typeof ClerkAuthenticatedRouteRouteWithChildren
 }
 
 const ClerkRouteRouteChildren: ClerkRouteRouteChildren = {
   ClerkauthRouteRoute: ClerkauthRouteRoute,
   ClerkAuthenticatedRouteRoute: ClerkAuthenticatedRouteRouteWithChildren,
-};
+}
 
-const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(ClerkRouteRouteChildren);
+const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(
+  ClerkRouteRouteChildren,
+)
 
 interface ApmAdminRouteRouteChildren {
-  ApmAdminAgentsRoute: typeof ApmAdminAgentsRoute;
-  ApmAdminCanvassingRoute: typeof ApmAdminCanvassingRoute;
-  ApmAdminContentRoute: typeof ApmAdminContentRoute;
-  ApmAdminConversionRoute: typeof ApmAdminConversionRoute;
-  ApmAdminGotvRoute: typeof ApmAdminGotvRoute;
-  ApmAdminIncidentsRoute: typeof ApmAdminIncidentsRoute;
-  ApmAdminLgasRoute: typeof ApmAdminLgasRoute;
-  ApmAdminListeningRoute: typeof ApmAdminListeningRoute;
-  ApmAdminResultsRoute: typeof ApmAdminResultsRoute;
-  ApmAdminSentimentRoute: typeof ApmAdminSentimentRoute;
-  ApmAdminStakeholdersRoute: typeof ApmAdminStakeholdersRoute;
-  ApmAdminToursRoute: typeof ApmAdminToursRoute;
-  ApmAdminVolunteersRoute: typeof ApmAdminVolunteersRoute;
-  ApmAdminWhatsappRoute: typeof ApmAdminWhatsappRoute;
-  ApmAdminPollingUnitsWardIdRoute: typeof ApmAdminPollingUnitsWardIdRoute;
-  ApmAdminWardsLgaIdRoute: typeof ApmAdminWardsLgaIdRoute;
+  ApmAdminAgentsRoute: typeof ApmAdminAgentsRoute
+  ApmAdminCanvassingRoute: typeof ApmAdminCanvassingRoute
+  ApmAdminContentRoute: typeof ApmAdminContentRoute
+  ApmAdminConversionRoute: typeof ApmAdminConversionRoute
+  ApmAdminGotvRoute: typeof ApmAdminGotvRoute
+  ApmAdminIncidentsRoute: typeof ApmAdminIncidentsRoute
+  ApmAdminLgasRoute: typeof ApmAdminLgasRoute
+  ApmAdminListeningRoute: typeof ApmAdminListeningRoute
+  ApmAdminResultsRoute: typeof ApmAdminResultsRoute
+  ApmAdminSentimentRoute: typeof ApmAdminSentimentRoute
+  ApmAdminStakeholdersRoute: typeof ApmAdminStakeholdersRoute
+  ApmAdminToursRoute: typeof ApmAdminToursRoute
+  ApmAdminVolunteersRoute: typeof ApmAdminVolunteersRoute
+  ApmAdminWhatsappRoute: typeof ApmAdminWhatsappRoute
+  ApmAdminPollingUnitsWardIdRoute: typeof ApmAdminPollingUnitsWardIdRoute
+  ApmAdminWardsLgaIdRoute: typeof ApmAdminWardsLgaIdRoute
 }
 
 const ApmAdminRouteRouteChildren: ApmAdminRouteRouteChildren = {
@@ -6679,87 +6868,93 @@ const ApmAdminRouteRouteChildren: ApmAdminRouteRouteChildren = {
   ApmAdminWhatsappRoute: ApmAdminWhatsappRoute,
   ApmAdminPollingUnitsWardIdRoute: ApmAdminPollingUnitsWardIdRoute,
   ApmAdminWardsLgaIdRoute: ApmAdminWardsLgaIdRoute,
-};
+}
 
 const ApmAdminRouteRouteWithChildren = ApmAdminRouteRoute._addFileChildren(
-  ApmAdminRouteRouteChildren
-);
+  ApmAdminRouteRouteChildren,
+)
 
 interface ApmEventsRouteChildren {
-  ApmEventsIdRoute: typeof ApmEventsIdRoute;
+  ApmEventsIdRoute: typeof ApmEventsIdRoute
 }
 
 const ApmEventsRouteChildren: ApmEventsRouteChildren = {
   ApmEventsIdRoute: ApmEventsIdRoute,
-};
+}
 
-const ApmEventsRouteWithChildren = ApmEventsRoute._addFileChildren(ApmEventsRouteChildren);
+const ApmEventsRouteWithChildren = ApmEventsRoute._addFileChildren(
+  ApmEventsRouteChildren,
+)
 
 interface ApmNewsRouteChildren {
-  ApmNewsSlugRoute: typeof ApmNewsSlugRoute;
+  ApmNewsSlugRoute: typeof ApmNewsSlugRoute
 }
 
 const ApmNewsRouteChildren: ApmNewsRouteChildren = {
   ApmNewsSlugRoute: ApmNewsSlugRoute,
-};
+}
 
-const ApmNewsRouteWithChildren = ApmNewsRoute._addFileChildren(ApmNewsRouteChildren);
+const ApmNewsRouteWithChildren =
+  ApmNewsRoute._addFileChildren(ApmNewsRouteChildren)
 
 interface ShopBlogRouteChildren {
-  ShopBlogSlugRoute: typeof ShopBlogSlugRoute;
+  ShopBlogSlugRoute: typeof ShopBlogSlugRoute
 }
 
 const ShopBlogRouteChildren: ShopBlogRouteChildren = {
   ShopBlogSlugRoute: ShopBlogSlugRoute,
-};
+}
 
-const ShopBlogRouteWithChildren = ShopBlogRoute._addFileChildren(ShopBlogRouteChildren);
+const ShopBlogRouteWithChildren = ShopBlogRoute._addFileChildren(
+  ShopBlogRouteChildren,
+)
 
 interface ShopBranchesRouteChildren {
-  ShopBranchesIdRoute: typeof ShopBranchesIdRoute;
+  ShopBranchesIdRoute: typeof ShopBranchesIdRoute
 }
 
 const ShopBranchesRouteChildren: ShopBranchesRouteChildren = {
   ShopBranchesIdRoute: ShopBranchesIdRoute,
-};
+}
 
-const ShopBranchesRouteWithChildren = ShopBranchesRoute._addFileChildren(ShopBranchesRouteChildren);
+const ShopBranchesRouteWithChildren = ShopBranchesRoute._addFileChildren(
+  ShopBranchesRouteChildren,
+)
 
 interface ShopCategoriesRouteChildren {
-  ShopCategoriesSlugRoute: typeof ShopCategoriesSlugRoute;
+  ShopCategoriesSlugRoute: typeof ShopCategoriesSlugRoute
 }
 
 const ShopCategoriesRouteChildren: ShopCategoriesRouteChildren = {
   ShopCategoriesSlugRoute: ShopCategoriesSlugRoute,
-};
+}
 
 const ShopCategoriesRouteWithChildren = ShopCategoriesRoute._addFileChildren(
-  ShopCategoriesRouteChildren
-);
+  ShopCategoriesRouteChildren,
+)
 
 interface ShopHealthConcernsRouteChildren {
-  ShopHealthConcernsSlugRoute: typeof ShopHealthConcernsSlugRoute;
+  ShopHealthConcernsSlugRoute: typeof ShopHealthConcernsSlugRoute
 }
 
 const ShopHealthConcernsRouteChildren: ShopHealthConcernsRouteChildren = {
   ShopHealthConcernsSlugRoute: ShopHealthConcernsSlugRoute,
-};
+}
 
-const ShopHealthConcernsRouteWithChildren = ShopHealthConcernsRoute._addFileChildren(
-  ShopHealthConcernsRouteChildren
-);
+const ShopHealthConcernsRouteWithChildren =
+  ShopHealthConcernsRoute._addFileChildren(ShopHealthConcernsRouteChildren)
 
 interface ShopMedicinesRouteChildren {
-  ShopMedicinesCodeRoute: typeof ShopMedicinesCodeRoute;
+  ShopMedicinesCodeRoute: typeof ShopMedicinesCodeRoute
 }
 
 const ShopMedicinesRouteChildren: ShopMedicinesRouteChildren = {
   ShopMedicinesCodeRoute: ShopMedicinesCodeRoute,
-};
+}
 
 const ShopMedicinesRouteWithChildren = ShopMedicinesRoute._addFileChildren(
-  ShopMedicinesRouteChildren
-);
+  ShopMedicinesRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -6825,7 +7020,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopShopSlugRoute: ShopShopSlugRoute,
   ShopTrackOrderCodeRoute: ShopTrackOrderCodeRoute,
   ShopPurchasesIndexRoute: ShopPurchasesIndexRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
