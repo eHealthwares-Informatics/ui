@@ -32,9 +32,7 @@ export type BuiltSchema = {
  * Business-rule cross-field validations come back as `.refine()` entries
  * so the caller can apply them to the combined schema.
  */
-export function buildZodSchema(
-  fields: Field[],
-): BuiltSchema {
+export function buildZodSchema(fields: Field[]): BuiltSchema {
   const shape: Record<string, z.ZodTypeAny> = {};
   const fieldRules: BuiltSchema['fieldRules'] = [];
 
@@ -83,7 +81,7 @@ export function buildZodSchema(
       if (field.type === 'switch' || field.type === 'checkbox') {
         typeSchema = (typeSchema as z.ZodBoolean).refine(
           (v) => v === true,
-          `${field.label} is required`,
+          `${field.label} is required`
         );
       } else if (
         field.type === 'async-select' ||
@@ -93,13 +91,21 @@ export function buildZodSchema(
         typeSchema = z
           .any()
           .refine(
-            (v) => v !== null && v !== undefined && v !== '' && !(typeof v === 'object' && v !== null && (!('value' in v) || v.value === '' || v.value === undefined)),
-            `${field.label} is required`,
+            (v) =>
+              v !== null &&
+              v !== undefined &&
+              v !== '' &&
+              !(
+                typeof v === 'object' &&
+                v !== null &&
+                (!('value' in v) || v.value === '' || v.value === undefined)
+              ),
+            `${field.label} is required`
           );
       } else if (field.type === 'number') {
         typeSchema = (typeSchema as z.ZodNumber).refine(
           (v) => v !== undefined && v !== null && !isNaN(Number(v)),
-          `${field.label} is required`,
+          `${field.label} is required`
         );
       } else {
         typeSchema = (typeSchema as z.ZodString).min(1, `${field.label} is required`);
@@ -208,17 +214,13 @@ export function useValidatedSubmit({
 
       // Render per-field errors
       for (const [name, message] of Object.entries(errors)) {
-        const errorEl = document.querySelector(
-          `[data-testid="field-error-${name}"]`,
-        );
+        const errorEl = document.querySelector(`[data-testid="field-error-${name}"]`);
         if (errorEl) {
           errorEl.textContent = message;
           (errorEl as HTMLElement).style.display = 'block';
         }
         // Set aria-invalid on the field input
-        const fieldEl = document.querySelector(
-          `[data-testid="field-${name}"]`,
-        );
+        const fieldEl = document.querySelector(`[data-testid="field-${name}"]`);
         if (fieldEl) {
           fieldEl.setAttribute('aria-invalid', 'true');
         }
@@ -232,7 +234,9 @@ export function useValidatedSubmit({
         summary.setAttribute('role', 'alert');
         summary.style.cssText =
           'color: var(--mantine-color-red-6); background: var(--mantine-color-red-0); padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px;';
-        summary.innerHTML = `<strong>${Object.keys(errors).length} field(s) need attention</strong><ul style="margin:8px 0 0 16px;padding:0">${Object.entries(errors)
+        summary.innerHTML = `<strong>${Object.keys(errors).length} field(s) need attention</strong><ul style="margin:8px 0 0 16px;padding:0">${Object.entries(
+          errors
+        )
           .slice(0, 5)
           .map(([name, msg]) => `<li>${msg}</li>`)
           .join('')}</ul>`;
@@ -243,7 +247,7 @@ export function useValidatedSubmit({
       const firstErrorField = Object.keys(errors)[0];
       if (firstErrorField) {
         const firstField = document.querySelector(
-          `[data-testid="field-${firstErrorField}"]`,
+          `[data-testid="field-${firstErrorField}"]`
         ) as HTMLElement | null;
         if (firstField) {
           firstField.focus();

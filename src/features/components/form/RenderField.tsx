@@ -105,7 +105,11 @@ function RenderFieldComponent({
           error={fieldError}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -129,7 +133,11 @@ function RenderFieldComponent({
           formState={formState}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -182,7 +190,11 @@ function RenderFieldComponent({
           ))}
         </Group>
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -211,7 +223,11 @@ function RenderFieldComponent({
           error={fieldError}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -232,7 +248,11 @@ function RenderFieldComponent({
           error={fieldError}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -282,7 +302,11 @@ function RenderFieldComponent({
           ))}
         </Group>
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -320,7 +344,11 @@ function RenderFieldComponent({
 
   if (field.type === 'color') {
     return (
-      <LabelField label={inTable ? '' : field.label} required={field.required} data-testid={`field-${field.name}`}>
+      <LabelField
+        label={inTable ? '' : field.label}
+        required={field.required}
+        data-testid={`field-${field.name}`}
+      >
         <ColorInput
           data-testid={`field-${field.name}`}
           value={(fieldValue as string) ?? '#228be6'}
@@ -342,7 +370,11 @@ function RenderFieldComponent({
           error={fieldError}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -352,7 +384,11 @@ function RenderFieldComponent({
 
   if (field.type === 'textarea') {
     return (
-      <LabelField label={inTable ? '' : field.label} required={field.required} data-testid={`field-${field.name}`}>
+      <LabelField
+        label={inTable ? '' : field.label}
+        required={field.required}
+        data-testid={`field-${field.name}`}
+      >
         <DebouncedTextInput
           data-testid={`field-${field.name}`}
           isTextarea
@@ -366,7 +402,11 @@ function RenderFieldComponent({
           error={fieldError}
         />
         {fieldError && (
-          <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+          <span
+            data-testid={`field-error-${field.name}`}
+            role="alert"
+            style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+          >
             {fieldError}
           </span>
         )}
@@ -424,7 +464,14 @@ function RenderFieldComponent({
 
   if (field.type === 'json-accordion-array') {
     const items: any[] = (fieldValue as any[]) || [];
-    return <JsonAccordionArrayField data-testid={`field-${field.name}`} field={field} items={items} onChange={handleChange} />;
+    return (
+      <JsonAccordionArrayField
+        data-testid={`field-${field.name}`}
+        field={field}
+        items={items}
+        onChange={handleChange}
+      />
+    );
   }
 
   if (field.type === 'accordion') {
@@ -439,7 +486,11 @@ function RenderFieldComponent({
   }
 
   return (
-    <LabelField label={inTable ? '' : field.label} required={!inTable && field.required} data-testid={`field-${field.name}`}>
+    <LabelField
+      label={inTable ? '' : field.label}
+      required={!inTable && field.required}
+      data-testid={`field-${field.name}`}
+    >
       <Group align="flex-end" gap={4} wrap="nowrap">
         <DebouncedTextInput
           data-testid={`field-${field.name}`}
@@ -476,7 +527,11 @@ function RenderFieldComponent({
         ) : null}
       </Group>
       {fieldError && (
-        <span data-testid={`field-error-${field.name}`} role="alert" style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}>
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
           {fieldError}
         </span>
       )}

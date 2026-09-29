@@ -10,8 +10,8 @@ import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields, normalizeMultiSelectIds } from '@/features/shared/payload-utils';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { FieldGroup } from '../form/FieldGroup';
-import { TabGroups } from '../form/tab-groups';
 import { useValidatedSubmit, buildZodSchema } from '../form/submit';
+import { TabGroups } from '../form/tab-groups';
 import { RxPage } from './rx-page';
 
 type DataPageFormProps = {

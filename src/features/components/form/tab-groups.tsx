@@ -98,7 +98,11 @@ function TabGroupsComponent({
         </Button>
         {activeStep < tabGroups.length - 1 ? (
           <Button
-            data-testid={hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit ? 'form-create-continue' : 'form-next'}
+            data-testid={
+              hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit
+                ? 'form-create-continue'
+                : 'form-next'
+            }
             onClick={handleNext}
             disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit}
             loading={loading}
@@ -107,7 +111,12 @@ function TabGroupsComponent({
           </Button>
         ) : (
           onSubmit && (
-            <Button data-testid="form-submit" onClick={onSubmit} disabled={loading} loading={loading}>
+            <Button
+              data-testid="form-submit"
+              onClick={onSubmit}
+              disabled={loading}
+              loading={loading}
+            >
               {loading ? 'Submitting...' : 'Submit'}
             </Button>
           )

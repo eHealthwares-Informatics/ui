@@ -3,8 +3,8 @@ import { Loader } from 'lucide-react';
 import { collectFields } from '@/features/shared/payload-utils';
 import { FieldGroup as FieldGroupType, TabGroup } from '../../rxsoft/types';
 import { FieldGroup } from './FieldGroup';
-import { TabGroups } from './tab-groups';
 import { useValidatedSubmit, buildZodSchema } from './submit';
+import { TabGroups } from './tab-groups';
 
 type FormProps = {
   editingRow: Record<string, unknown> | null;
