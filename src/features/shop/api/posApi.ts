@@ -469,9 +469,11 @@ export function useDispenseOrders(search?: string) {
   return useQuery({
     queryKey: ['dispense-orders', search ?? ''],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/orders/admin/orders/dispense', {
-        params: { search, limit: 25 },
-      });
+      const params: Record<string, any> = { limit: 25 };
+      if (search) {
+        params.search = search;
+      }
+      const { data } = await rxsoftApi.get('/orders/admin/orders/dispense', { params });
       return data?.data ?? data ?? [];
     },
     staleTime: 30_000,

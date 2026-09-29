@@ -100,7 +100,7 @@ export default function PosSalesPage() {
     return calculateTotals(activeSession);
   }, [activeSession]);
 
-  const heldSalesCount = useMemo(() => sessions.filter((s) => s.held).length, [sessions]);
+  const salesCount = useMemo(() => sessions.length, [sessions]);
 
   useKeyboardShortcuts({
     createSale: createSession,
@@ -323,7 +323,7 @@ export default function PosSalesPage() {
             onLoadSale={handleLoadSale}
             onLoadOrder={handleLoadOrder}
             onHeldSalesOpen={() => setHeldSalesOpened(true)}
-            heldSalesCount={heldSalesCount}
+            salesCount={salesCount}
           />
 
           {/* PRODUCT ENTRY (dispense mode shows order lines as editable rows) */}

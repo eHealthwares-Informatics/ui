@@ -16,7 +16,7 @@ interface Props {
   onLoadSale: (saleId: string) => void;
   onLoadOrder: (orderId: string) => void;
   onHeldSalesOpen: () => void;
-  heldSalesCount: number;
+  salesCount: number;
 }
 
 const ORDER_OPTION_PREFIX = 'order:';
@@ -31,7 +31,7 @@ export function PosToolbar({
   onLoadSale,
   onLoadOrder,
   onHeldSalesOpen,
-  heldSalesCount,
+  salesCount,
 }: Props) {
   const [customerModal, setCustomerModal] = useState(false);
   const [customerSearch, setCustomerSearch] = useState('');
@@ -123,10 +123,10 @@ export function PosToolbar({
         />
 
         <Button size="xs" leftSection={<Search size={14} />} onClick={onHeldSalesOpen}>
-          Held Sales{' '}
-          {heldSalesCount > 0 && (
+          Sales{' '}
+          {salesCount > 0 && (
             <Badge ml={4} size="xs">
-              {heldSalesCount}
+              {salesCount}
             </Badge>
           )}
         </Button>
