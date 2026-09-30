@@ -132,6 +132,7 @@ function DispenseRowEditor({
   stockLocationId,
   onAdd,
   onRemove,
+  hideRemove,
 }: {
   row: DispenseRow;
   priceListId?: string;
@@ -139,6 +140,7 @@ function DispenseRowEditor({
   stockLocationId?: string | null;
   onAdd: (item: CartItem) => void;
   onRemove: () => void;
+  hideRemove?: boolean;
 }) {
   const initialSelected: SelectedProduct | null = row.initialItem
     ? {
@@ -341,15 +343,17 @@ function DispenseRowEditor({
           >
             Add
           </Button>
-          <ActionIcon
-            size="sm"
-            color="red"
-            variant="subtle"
-            onClick={onRemove}
-            aria-label="Remove dispense row"
-          >
-            <Trash2 size={14} />
-          </ActionIcon>
+          {!hideRemove && (
+            <ActionIcon
+              size="sm"
+              color="red"
+              variant="subtle"
+              onClick={onRemove}
+              aria-label="Remove dispense row"
+            >
+              <Trash2 size={14} />
+            </ActionIcon>
+          )}
         </ActionIcon.Group>
       </Table.Td>
 
@@ -554,21 +558,41 @@ export function ProductEntryTable({
         </Table.Thead>
         <Table.Tbody>
           {isDispense ? (
-            dispenseRowState.map((row) => (
+            <>
+              {dispenseRowState.map((row) => (
+                <DispenseRowEditor
+                  key={row.orderItemId}
+                  row={row}
+                  priceListId={session.priceListId}
+                  pricingMode={session.pricingMode}
+                  stockLocationId={stockLocationId}
+                  onAdd={(item) => onDispenseAdd?.(item)}
+                  onRemove={() =>
+                    setDispenseRowState((prev) =>
+                      prev.filter((r) => r.orderItemId !== row.orderItemId)
+                    )
+                  }
+                />
+              ))}
+              {/* Always show one empty row for adding new items */}
               <DispenseRowEditor
-                key={row.orderItemId}
-                row={row}
+                key="__new_empty"
+                row={{
+                  orderItemId: `__new_${Date.now()}`,
+                  orderedLabel: '',
+                  orderedCode: '',
+                  quantity: 1,
+                  initialItemId: null,
+                  initialItem: null,
+                }}
                 priceListId={session.priceListId}
                 pricingMode={session.pricingMode}
                 stockLocationId={stockLocationId}
                 onAdd={(item) => onDispenseAdd?.(item)}
-                onRemove={() =>
-                  setDispenseRowState((prev) =>
-                    prev.filter((r) => r.orderItemId !== row.orderItemId)
-                  )
-                }
+                onRemove={() => {}}
+                hideRemove
               />
-            ))
+            </>
           ) : (
             <Table.Tr>
               <Table.Td>
