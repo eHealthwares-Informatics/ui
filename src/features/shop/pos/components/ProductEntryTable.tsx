@@ -68,6 +68,7 @@ function PosProductPicker({
 }) {
   const combobox = useCombobox();
   const [search, setSearch] = useState('');
+  const [focused, setFocused] = useState(false);
   const [debounced] = useDebouncedValue(search, 250);
   const { data: items = [], isLoading } = usePosItems(debounced);
 
@@ -97,14 +98,21 @@ function PosProductPicker({
           placeholder="Search product..."
           w={350}
           data-testid="pos-product-select"
-          value={search || selectedLabel || ''}
+          value={search || (!focused ? selectedLabel : '') || ''}
           onChange={(e) => {
             setSearch(e.currentTarget.value);
             combobox.openDropdown();
           }}
           onClick={() => combobox.openDropdown()}
-          onFocus={() => combobox.openDropdown()}
-          onBlur={() => setSearch('')}
+          onFocus={() => {
+            setSearch(selectedLabel ?? '');
+            setFocused(true);
+            combobox.openDropdown();
+          }}
+          onBlur={() => {
+            setSearch('');
+            setFocused(false);
+          }}
           rightSection={isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
         />
       </Combobox.Target>
