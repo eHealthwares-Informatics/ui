@@ -149,3 +149,6 @@ if (!rootElement.innerHTML) {
     </StrictMode>
   );
 }
+// Signal loading screen that React is ready
+window.__REACT_READY__ = true;
+window.dispatchEvent(new Event('react-ready'));
