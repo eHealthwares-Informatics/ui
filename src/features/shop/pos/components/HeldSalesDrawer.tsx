@@ -30,9 +30,8 @@ export function HeldSalesDrawer({ opened, onClose, onResume, onPrintInvoice }: P
                   onClose();
                 }}
               >
-                {sale.saleCode} - {sale.customerName || 'Walk-in'} · {itemCount}{' '}
-                item{itemCount !== 1 ? 's' : ''} · ₦
-                {total.toFixed(2)}
+                {sale.saleCode} - {sale.customerName || 'Walk-in'} · {itemCount} item
+                {itemCount !== 1 ? 's' : ''} · ₦{total.toFixed(2)}
               </Button>
               <Button
                 size="xs"
