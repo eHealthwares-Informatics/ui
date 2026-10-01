@@ -634,10 +634,7 @@ export function ProductEntryTable({
               <Table.Td>{itemCode || '-'}</Table.Td>
               <Table.Td>
                 <Group gap={4} wrap="nowrap">
-                  <PosProductPicker
-                    selectedLabel={selectedLabel}
-                    onSelect={handleProductSelect}
-                  />
+                  <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
                   <Button
                     size="xs"
                     variant="light"

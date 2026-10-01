@@ -45,7 +45,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
         value: c.id,
         label: c.name,
       })),
-    [categories],
+    [categories]
   );
 
   const uomOptions = useMemo(
@@ -54,14 +54,12 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
         value: u.id,
         label: u.name,
       })),
-    [uoms],
+    [uoms]
   );
 
-  const selectedCategoryName =
-    categoryOptions.find((o) => o.value === categoryId)?.label ?? '';
+  const selectedCategoryName = categoryOptions.find((o) => o.value === categoryId)?.label ?? '';
 
-  const selectedUomName =
-    uomOptions.find((o) => o.value === baseUomId)?.label ?? '';
+  const selectedUomName = uomOptions.find((o) => o.value === baseUomId)?.label ?? '';
 
   function reset() {
     setName('');
@@ -127,9 +125,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
               }}
               onClick={() => categoryCombobox.openDropdown()}
               onFocus={() => categoryCombobox.openDropdown()}
-              rightSection={
-                categoriesLoading ? <Loader size={14} /> : <ChevronDown size={14} />
-              }
+              rightSection={categoriesLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
               data-testid="quick-add-product-category"
             />
           </Combobox.Target>
@@ -170,18 +166,14 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
               }}
               onClick={() => uomCombobox.openDropdown()}
               onFocus={() => uomCombobox.openDropdown()}
-              rightSection={
-                uomsLoading ? <Loader size={14} /> : <ChevronDown size={14} />
-              }
+              rightSection={uomsLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
               data-testid="quick-add-product-uom"
             />
           </Combobox.Target>
           <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 30 }}>
             <Combobox.Options style={{ maxHeight: 220, overflowY: 'auto' }}>
               {uomOptions.length === 0 ? (
-                <Combobox.Empty>
-                  {uomsLoading ? 'Loading…' : 'No UOMs found'}
-                </Combobox.Empty>
+                <Combobox.Empty>{uomsLoading ? 'Loading…' : 'No UOMs found'}</Combobox.Empty>
               ) : (
                 uomOptions.map((o) => (
                   <Combobox.Option key={o.value} value={o.value}>
