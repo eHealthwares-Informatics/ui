@@ -26,10 +26,18 @@ export default defineConfig({
     // Playwright e2e specs are NOT vitest tests — without this exclude vitest
     // picks up e2e/**/*.spec.ts and errors on test.describe() outside its runner.
     exclude: ['**/node_modules/**', 'e2e/**', 'playwright/**', 'dist/**'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
 
   resolve: {
     tsconfigPaths: true,
+  },
+  define: {
+    __IDENTITY_API_URL__: JSON.stringify(process.env.VITE_IDENTITY_API_URL || 'http://localhost:8092'),
+    __EMR_API_URL__: JSON.stringify(process.env.VITE_EMR_API_URL || 'http://localhost:8093/api'),
+    __COMMUNICATION_API_URL__: JSON.stringify(process.env.VITE_COMMUNICATION_API_URL || 'http://localhost:8003/api/v1'),
+    __LIS_API_URL__: JSON.stringify(process.env.VITE_LIS_API_URL || 'http://localhost:8002'),
+    __RXSOFT_API_URL__: JSON.stringify(process.env.VITE_RXSOFT_API_URL || 'https://rxsoft-backend.onrender.com/api'),
   },
   build: {
     minify: false,
