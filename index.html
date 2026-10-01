@@ -13,93 +13,95 @@
   --bg:#f5f8fc; --muted:#718096; --line:#e4ebf3;
 }
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%}
-body{
+/* Loading screen: every rule scoped under #rxsoft-loader so nothing leaks into
+   the React app once the loader node is removed. @keyframes stay global. */
+#rxsoft-loader{
+  position:fixed;inset:0;z-index:9999;margin:0;
+  display:grid;place-items:center;overflow:auto;
   font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   color:var(--navy);
   background:
     radial-gradient(circle at 10% 15%,#2879e812,transparent 27%),
     radial-gradient(circle at 90% 80%,#16a6a012,transparent 30%),var(--bg);
-  display:grid;place-items:center;overflow:auto;
 }
-.shell{width:min(94vw,720px);padding:22px}
-.card{
+#rxsoft-loader .card{
+  width:min(94vw,720px);
   background:#fffffff7;border:1px solid #e5ebf3;border-radius:28px;
   box-shadow:0 25px 80px #173b6318;padding:34px 36px 28px;
   backdrop-filter:blur(18px);
 }
-.brand{display:flex;align-items:center;justify-content:center;gap:12px}
-.brand-mark{width:54px;height:54px;position:relative}
-.brand-mark img{position:absolute;width:31px;height:31px;object-fit:contain}
-.brand-mark .a{left:0;top:12px}.brand-mark .b{left:18px;top:0}
-.brand-mark .c{left:30px;top:14px}.brand-mark .d{left:17px;top:27px}
-.brand-name{font-size:25px;font-weight:780;letter-spacing:-.8px}
-.brand-name span{color:var(--teal)}
-.tagline{text-align:center;color:#718096;font-size:13px;margin-top:4px}
-h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
-.subtitle{text-align:center;color:var(--muted);font-size:13px;margin:0 0 24px}
-.checks{display:flex;flex-direction:column;gap:8px}
-.check{
+#rxsoft-loader .brand{display:flex;align-items:center;justify-content:center;gap:12px}
+#rxsoft-loader .brand-mark{width:54px;height:54px;position:relative}
+#rxsoft-loader .brand-mark img{position:absolute;width:31px;height:31px;object-fit:contain}
+#rxsoft-loader .brand-mark .a{left:0;top:12px}#rxsoft-loader .brand-mark .b{left:18px;top:0}
+#rxsoft-loader .brand-mark .c{left:30px;top:14px}#rxsoft-loader .brand-mark .d{left:17px;top:27px}
+#rxsoft-loader .brand-name{font-size:25px;font-weight:780;letter-spacing:-.8px}
+#rxsoft-loader .brand-name span{color:var(--teal)}
+#rxsoft-loader .tagline{text-align:center;color:#718096;font-size:13px;margin-top:4px}
+#rxsoft-loader h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
+#rxsoft-loader .subtitle{text-align:center;color:var(--muted);font-size:13px;margin:0 0 24px}
+#rxsoft-loader .checks{display:flex;flex-direction:column;gap:8px}
+#rxsoft-loader .check{
   min-height:56px;display:grid;grid-template-columns:38px 1fr 30px;
   align-items:center;gap:11px;padding:9px 12px;border:1px solid var(--line);
   border-radius:14px;background:#fff;transition:.25s;
 }
-.check.active{background:#f7fbff;border-color:#2879e83b}
-.check.done{background:#f7fcf9;border-color:#28b4633d}
-.icon{
+#rxsoft-loader .check.active{background:#f7fbff;border-color:#2879e83b}
+#rxsoft-loader .check.done{background:#f7fcf9;border-color:#28b4633d}
+#rxsoft-loader .icon{
   width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
   color:white;font-weight:800;font-size:15px;
 }
-.i-blue{background:var(--blue)}.i-teal{background:var(--teal)}
-.i-purple{background:var(--purple)}.i-amber{background:var(--amber)}
-.i-green{background:var(--green)}
-.label{font-size:13.5px;font-weight:680}.status{font-size:11.5px;color:var(--muted);margin-top:2px}
-.indicator{display:grid;place-items:center}
-.spinner{width:18px;height:18px;border:2px solid #dce7f5;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
-.tick{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;font-size:12px;font-weight:800}
-.wait{width:7px;height:7px;border-radius:50%;background:#c8d1de}
-.modules{margin-top:17px;border-top:1px solid var(--line);padding-top:17px}
-.modules-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
-.modules-title{font-size:14px;font-weight:750}
-.modules-status{font-size:12px;color:var(--green);font-weight:700}
-.module-grid{
+#rxsoft-loader .i-blue{background:var(--blue)}#rxsoft-loader .i-teal{background:var(--teal)}
+#rxsoft-loader .i-purple{background:var(--purple)}#rxsoft-loader .i-amber{background:var(--amber)}
+#rxsoft-loader .i-green{background:var(--green)}
+#rxsoft-loader .label{font-size:13.5px;font-weight:680}#rxsoft-loader .status{font-size:11.5px;color:var(--muted);margin-top:2px}
+#rxsoft-loader .indicator{display:grid;place-items:center}
+#rxsoft-loader .spinner{width:18px;height:18px;border:2px solid #dce7f5;border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+#rxsoft-loader .tick{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;font-size:12px;font-weight:800}
+#rxsoft-loader .wait{width:7px;height:7px;border-radius:50%;background:#c8d1de}
+#rxsoft-loader .modules{margin-top:17px;border-top:1px solid var(--line);padding-top:17px}
+#rxsoft-loader .modules-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+#rxsoft-loader .modules-title{font-size:14px;font-weight:750}
+#rxsoft-loader .modules-status{font-size:12px;color:var(--green);font-weight:700}
+#rxsoft-loader .module-grid{
   display:grid;grid-template-columns:repeat(7,1fr);gap:8px;
   overflow:hidden;
 }
-.module{min-width:0;text-align:center;opacity:.18;transform:translateY(10px) scale(.88);transition:opacity .45s,transform .45s}
-.module.visible{opacity:1;transform:none}
-.module-icon{
+#rxsoft-loader .module{min-width:0;text-align:center;opacity:.18;transform:translateY(10px) scale(.88);transition:opacity .45s,transform .45s}
+#rxsoft-loader .module.visible{opacity:1;transform:none}
+#rxsoft-loader .module-icon{
   position:relative;width:68px;height:68px;margin:auto;border-radius:17px;
   background:#fff;border:1px solid #edf1f6;box-shadow:0 6px 18px #16395e10;
   display:grid;place-items:center;
 }
-.module-icon img{width:62px;height:62px;object-fit:contain}
-.online-dot{
+#rxsoft-loader .module-icon img{width:62px;height:62px;object-fit:contain}
+#rxsoft-loader .online-dot{
   position:absolute;right:-2px;top:-2px;width:12px;height:12px;border-radius:50%;
   background:var(--green);border:2px solid #fff;opacity:0;transform:scale(.5);
 }
-.module.visible .online-dot{opacity:1;transform:scale(1);animation:pulse 1.5s infinite}
-.module-name{font-size:10.5px;font-weight:700;color:#334b67;margin-top:7px;white-space:nowrap}
-.module-online{font-size:9.5px;color:var(--green);margin-top:2px}
-.progress{height:5px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:22px}
-.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));transition:width .35s}
-.footer{text-align:center;color:#8291a5;font-size:12px;margin-top:15px}
+#rxsoft-loader .module.visible .online-dot{opacity:1;transform:scale(1);animation:pulse 1.5s infinite}
+#rxsoft-loader .module-name{font-size:10.5px;font-weight:700;color:#334b67;margin-top:7px;white-space:nowrap}
+#rxsoft-loader .module-online{font-size:9.5px;color:var(--green);margin-top:2px}
+#rxsoft-loader .progress{height:5px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:22px}
+#rxsoft-loader .bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));transition:width .35s}
+#rxsoft-loader .footer{text-align:center;color:#8291a5;font-size:12px;margin-top:15px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 #28b46355}50%{box-shadow:0 0 0 5px #28b46300}}
 @media(max-width:650px){
-  .card{padding:28px 18px 24px}.module-grid{grid-template-columns:repeat(4,1fr);row-gap:15px}
-  .module-icon{width:62px;height:62px}.module-icon img{width:57px;height:57px}
+  #rxsoft-loader .card{padding:28px 18px 24px}#rxsoft-loader .module-grid{grid-template-columns:repeat(4,1fr);row-gap:15px}
+  #rxsoft-loader .module-icon{width:62px;height:62px}#rxsoft-loader .module-icon img{width:57px;height:57px}
 }
 @media(max-width:420px){
-  .shell{width:100%;padding:10px}.card{border-radius:20px}
-  .module-grid{grid-template-columns:repeat(3,1fr)}
+  #rxsoft-loader .card{width:calc(100vw - 20px);border-radius:20px}
+  #rxsoft-loader .module-grid{grid-template-columns:repeat(3,1fr)}
 }
 
-.skip-link{color:#2879e8;font-size:11px;cursor:pointer;text-decoration:none;font-weight:600;display:none;margin-left:8px;white-space:nowrap}
-.skip-link:hover{text-decoration:underline}
-.check.active .skip-link{display:inline}
-.skip-all{color:#2879e8;font-size:12px;cursor:pointer;text-decoration:none;font-weight:600}
-.skip-all:hover{text-decoration:underline}
+#rxsoft-loader .skip-link{color:#2879e8;font-size:11px;cursor:pointer;text-decoration:none;font-weight:600;display:none;margin-left:8px;white-space:nowrap}
+#rxsoft-loader .skip-link:hover{text-decoration:underline}
+#rxsoft-loader .check.active .skip-link{display:inline}
+#rxsoft-loader .skip-all{color:#2879e8;font-size:12px;cursor:pointer;text-decoration:none;font-weight:600}
+#rxsoft-loader .skip-all:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -144,6 +146,7 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
 (function(){
   var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
   var $=function(id){return document.getElementById(id)};
+  var setText=function(id,txt){var e=$(id);if(e)e.textContent=txt;};
 
   function setBar(n){var b=$('bar');if(b)b.style.width=n+'%';}
 
@@ -197,7 +200,7 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
   /* ═══ STEP 1: Internet ═══ */
   async function checkNetwork(){
     checkState('network',true,'Verifying internet connection\u2026');
-    $('footer').textContent='Checking network connection\u2026';
+    setText('footer','Checking network connection\u2026');
     try{
       await Promise.race([
         fetch('https://www.google.com/generate_204',{method:'HEAD',mode:'no-cors',cache:'no-store'}),
@@ -209,7 +212,7 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
         checkState('network',false,'Connected');
       }else{
         checkState('network',true,'Network unavailable');
-        $('footer').textContent='Waiting for network\u2026';
+        setText('footer','Waiting for network\u2026');
         try{
           await new Promise(function(resolve){
             window.addEventListener('online',resolve,{once:true});
@@ -224,7 +227,7 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
   /* ═══ STEP 2: Application ═══ */
   async function checkApp(){
     checkState('app',true,'Pinging application host\u2026');
-    $('footer').textContent='Checking application online status\u2026';
+    setText('footer','Checking application online status\u2026');
     try{
       await Promise.race([
         fetch(window.location.origin,{method:'HEAD',cache:'no-store'}),
@@ -240,7 +243,7 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
   /* ═══ STEP 3: Auth ═══ */
   function checkAuth(){
     checkState('auth',true,'Checking signed-in roles\u2026');
-    $('footer').textContent='Checking authentication status\u2026';
+    setText('footer','Checking authentication status\u2026');
     try{
       var hasTokens=!!(localStorage.getItem('access_token')||localStorage.getItem('refresh_token'));
       checkState('auth',false,hasTokens?'Authenticated':'No active session');
@@ -274,49 +277,55 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
   }
 
   async function runModules(){
-    $('footer').textContent='Checking healthcare modules\u2026';
-    $('moduleStatus').textContent='Connecting\u2026';
+    setText('footer','Checking healthcare modules\u2026');
+    setText('moduleStatus','Connecting\u2026');
     var MODULE_URLS=getModuleUrls();
-    var mods=Array.from(document.querySelectorAll('.module'));
-    var onlineCount=0;
-    for(var i=0;i<mods.length;i++){
-      if(skipAllModules){
-        for(var j=i;j<mods.length;j++){
-          mods[j].classList.add('visible');
-          mods[j].querySelector('.module-online').textContent='Offline';
-          mods[j].querySelector('.module-online').style.color='#ef5265';
-          mods[j].querySelector('.online-dot').style.background='#ef5265';
-          mods[j].querySelector('.online-dot').style.opacity='1';
-          mods[j].querySelector('.online-dot').style.transform='scale(1)';
-        }
-        break;
-      }
-      var name=mods[i].querySelector('.module-name').textContent;
+    var mods=Array.from(document.querySelectorAll('#rxsoft-loader .module'));
+    var total=mods.length;
+    if(!total){return;}
+    var onlineCount=0,checkedCount=0;
+
+    function markOffline(m){
+      m.classList.add('visible');
+      var s=m.querySelector('.module-online');
+      if(s){s.textContent='Offline';s.style.color='#ef5265';}
+      var d=m.querySelector('.online-dot');
+      if(d){d.style.background='#ef5265';d.style.opacity='1';d.style.transform='scale(1)';}
+    }
+
+    if(skipAllModules){
+      mods.forEach(markOffline);
+      setText('moduleStatus','0/'+total+' online');
+      setBar(95);
+      return;
+    }
+
+    async function checkModule(m){
+      var nameEl=m.querySelector('.module-name');
+      var name=nameEl?nameEl.textContent:'';
       var url=MODULE_URLS[name];
-      mods[i].classList.add('visible');
-      mods[i].querySelector('.module-online').textContent='Checking\u2026';
-      mods[i].querySelector('.module-online').style.color='#f3a51a';
+      var s=m.querySelector('.module-online');
+      var d=m.querySelector('.online-dot');
+      m.classList.add('visible');
+      if(s){s.textContent='Checking\u2026';s.style.color='#f3a51a';}
       try{
         await Promise.race([
           fetch(url,{method:'HEAD',mode:'no-cors',cache:'no-store'}),
           new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},5000)})
         ]);
-        mods[i].querySelector('.module-online').textContent='Online';
-        mods[i].querySelector('.module-online').style.color='#28b463';
-        mods[i].querySelector('.online-dot').style.background='#28b463';
+        if(s){s.textContent='Online';s.style.color='#28b463';}
+        if(d){d.style.background='#28b463';}
         onlineCount++;
       }catch(err){
-        mods[i].querySelector('.module-online').textContent='Offline';
-        mods[i].querySelector('.module-online').style.color='#ef5265';
-        mods[i].querySelector('.online-dot').style.background='#ef5265';
-        mods[i].querySelector('.online-dot').style.opacity='1';
-        mods[i].querySelector('.online-dot').style.transform='scale(1)';
+        markOffline(m);
       }
-      $('moduleStatus').textContent=(i+1)+' of '+mods.length+' checked';
-      setBar(55+Math.round((i+1)/mods.length*40));
-      await sleep(150);
+      checkedCount++;
+      setText('moduleStatus',checkedCount+' of '+total+' checked');
+      setBar(55+Math.round(checkedCount/total*40));
     }
-    $('moduleStatus').textContent=onlineCount+'/'+mods.length+' online';
+
+    await Promise.all(mods.map(checkModule));
+    setText('moduleStatus',onlineCount+'/'+total+' online');
   }
 
   /* ═══ Wait for both checks AND React ═══ */
@@ -332,51 +341,59 @@ h1{text-align:center;font-size:24px;letter-spacing:-.5px;margin:25px 0 6px}
     });
   }
 
+  var loaderFaded=false;
   function fadeOutLoader(){
+    if(loaderFaded) return;
+    loaderFaded=true;
     var loader=$('rxsoft-loader');
     if(loader){
       loader.style.transition='opacity 0.4s';
       loader.style.opacity='0';
-      setTimeout(function(){loader.remove()},400);
+      setTimeout(function(){if(loader.parentNode)loader.remove();},400);
     }
   }
 
-  /* ═══ MAIN STARTUP ═══ */
+  /* Fail-safes: never let the loader trap the app behind it */
+  window.addEventListener('error',function(){fadeOutLoader();});
+  setTimeout(fadeOutLoader,8000);
+
+  /* ============ MAIN STARTUP ============ */
+  var START_TS=Date.now();
   async function startup(){
-    try{
-      activateStep(0);
-      await checkNetwork();
-      currentStep++;
+    var work=(async function(){
+      try{
+        activateStep(0);
+        await checkNetwork();
+        currentStep++;
 
-      activateStep(1);
-      await checkApp();
-      currentStep++;
+        activateStep(1);
+        await checkApp();
+        currentStep++;
 
-      activateStep(2);
-      checkAuth();
-      currentStep++;
+        activateStep(2);
+        checkAuth();
+        currentStep++;
 
-      await runModules();
-    }catch(e){
-      console.error('Loading screen error:',e);
-    }
+        await runModules();
+        /* Wait for React to finish loading before fading out */
+        await waitForReact();
+      }catch(e){
+        console.error('Loading screen error:',e);
+      }
 
-    checksDone=true;
-    allDone=true;
-    try{
-      $('moduleStatus').textContent='All modules checked';
-      $('footer').textContent='Waiting for application\u2026';
+      checksDone=true;
+      allDone=true;
+      setText('moduleStatus','All modules checked');
+      setText('footer','Waiting for application\u2026');
       setBar(100);
-    }catch(x){}
+    })();
 
-    /* Wait for React to finish loading before fading out */
-    await waitForReact();
+    /* Hard cap: loader never outlives 6s; enforce ~1.2s minimum on screen */
+    await Promise.race([work,sleep(6000)]);
+    var elapsed=Date.now()-START_TS;
+    if(elapsed<1200){await sleep(1200-elapsed);}
 
-    try{
-      $('footer').textContent='Ready \u2014 launching eHealthWares\u2026';
-    }catch(x){}
-
-    await sleep(300);
+    setText('footer','Ready \u2014 launching eHealthWares\u2026');
     fadeOutLoader();
   }
   startup();
