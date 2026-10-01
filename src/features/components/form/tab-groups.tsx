@@ -120,18 +120,34 @@ function TabGroupsComponent({
           Previous
         </Button>
         {activeStep < tabGroups.length - 1 ? (
-          <Button
-            data-testid={
-              hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit
-                ? 'form-create-continue'
-                : 'form-next'
-            }
-            onClick={handleNext}
-            disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit}
-            loading={loading}
-          >
-            {hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit ? 'Create & Continue' : 'Next'}
-          </Button>
+          <>
+            <Button
+              data-testid={
+                hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit
+                  ? 'form-create-continue'
+                  : 'form-next'
+              }
+              onClick={handleNext}
+              disabled={hasUnsatisfiedWaitFor(activeStep + 1) && !onStepSubmit}
+              loading={loading}
+            >
+              {hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit ? 'Create & Continue' : 'Next'}
+            </Button>
+            {/* Full-form submit must be reachable from ANY step, not only the
+                last one (VAL-01/02/03 drive it from step 1): when the page
+                form wires onSubmit, expose it beside the step navigation. */}
+            {onSubmit && (
+              <Button
+                variant="outline"
+                data-testid="form-submit"
+                onClick={onSubmit}
+                disabled={loading}
+                loading={loading}
+              >
+                {loading ? 'Submitting...' : 'Submit'}
+              </Button>
+            )}
+          </>
         ) : (
           onSubmit && (
             <Button

@@ -156,9 +156,17 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     // it must never fail silently.
     const docsRes = await request.get(`${API_BASE_URL}/docs-json`);
     test.skip(!docsRes.ok(), 'OpenAPI document unavailable — DTO parity check skipped');
-    const dtoRequired: string[] =
-      docsRes.json().paths?.['/items']?.post?.requestBody?.content?.['application/json']?.schema
-        ?.required ?? [];
+    // APIResponse.json() returns a Promise — without await, .paths is undefined
+    // and the parity check silently compares against [].
+    const docs = await docsRes.json();
+    // rxsoft prefixes paths with the global /api prefix and the requestBody is
+    // a $ref into components.schemas — resolve it before reading `required`.
+    const postOp = docs.paths?.['/api/items']?.post ?? docs.paths?.['/items']?.post;
+    const bodySchema = postOp?.requestBody?.content?.['application/json']?.schema ?? {};
+    const dtoRequired: string[] = bodySchema.required ??
+      (bodySchema.$ref
+        ? (docs.components?.schemas?.[bodySchema.$ref.split('/').pop()]?.required ?? [])
+        : []);
 
     // DTO truth (CreateItemDto): name + categoryId + baseUomId required;
     // genericProductCode / purchaseUomId / saleUomId are @IsOptional.
