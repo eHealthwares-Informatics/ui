@@ -556,7 +556,7 @@ export function ProductEntryTable({
   }
 
   function openAdjustModal() {
-    if (!selectedProductId || !stockLocationId) {
+    if (!selectedProductId) {
       return;
     }
     setAdjustItemId(selectedProductId);
@@ -652,7 +652,7 @@ export function ProductEntryTable({
                 </Group>
               </Table.Td>
               <Table.Td>
-                {stockLocationId && selectedProductId ? (
+                {selectedProductId ? (
                   adjustedStockQty === null ? (
                     <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
                       Set Stock
