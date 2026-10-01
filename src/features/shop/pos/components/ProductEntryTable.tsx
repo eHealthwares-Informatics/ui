@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Button,
   Combobox,
+  Group,
   Image,
   InputBase,
   Loader,
@@ -23,6 +24,7 @@ import { getUomEffectiveFactor } from '@/lib/uom-utils';
 import { UomOption, usePosItemPrice, usePosItemUoms, usePosItems } from '../../api/posApi';
 import { SaleSession, CartItem, DispenseRow } from '../types';
 import { PosSetPriceModal } from './PosSetPriceModal';
+import { QuickAddProductModal } from './QuickAddProductModal';
 import { StockAdjustModal } from './StockAdjustModal';
 
 type PosItemOption = {
@@ -407,6 +409,7 @@ export function ProductEntryTable({
   const [adjustCurrentQty, setAdjustCurrentQty] = useState(0);
 
   const [setPriceOpen, setSetPriceOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
 
   const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
   const { data: unitPrice = null } = usePosItemPrice(session.priceListId, selectedProductId);
@@ -491,6 +494,22 @@ export function ProductEntryTable({
     setSelected(prod);
     setSelectedProductId(item.id);
     setUomId(null);
+  }
+
+  function handleQuickAddCreated(product: { id: string; name: string; code: string }) {
+    const prod: SelectedProduct = {
+      id: product.id,
+      code: product.code,
+      name: product.name,
+      saleUomId: null,
+      imageUrl: '',
+    };
+    setSelected(prod);
+    setSelectedProductId(product.id);
+    setUomId(null);
+    setQuickAddOpen(false);
+    // Set a default quantity of 1
+    setQuantity(1);
   }
 
   function handleAdd() {
@@ -614,7 +633,21 @@ export function ProductEntryTable({
               </Table.Td>
               <Table.Td>{itemCode || '-'}</Table.Td>
               <Table.Td>
-                <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
+                <Group gap={4} wrap="nowrap">
+                  <PosProductPicker
+                    selectedLabel={selectedLabel}
+                    onSelect={handleProductSelect}
+                  />
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="yellow"
+                    onClick={() => setQuickAddOpen(true)}
+                    data-testid="pos-quick-add-product"
+                  >
+                    Quick+
+                  </Button>
+                </Group>
               </Table.Td>
               <Table.Td>
                 {stockLocationId && selectedProductId ? (
@@ -716,6 +749,12 @@ export function ProductEntryTable({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? itemCode}
         priceListId={session.priceListId}
+      />
+
+      <QuickAddProductModal
+        opened={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onProductCreated={handleQuickAddCreated}
       />
     </Paper>
   );
