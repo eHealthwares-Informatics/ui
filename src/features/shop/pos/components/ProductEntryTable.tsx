@@ -318,7 +318,12 @@ function DispenseRowEditor({
             SetPrice
           </Button>
         ) : (
-          unitPriceDisplay.toFixed(2)
+          <UnstyledButton
+            onClick={() => setSetPriceOpen(true)}
+            style={{ textDecoration: 'underline', cursor: 'pointer' }}
+          >
+            {unitPriceDisplay.toFixed(2)}
+          </UnstyledButton>
         )}
       </Table.Td>
       <Table.Td>
@@ -682,7 +687,12 @@ export function ProductEntryTable({
                     SetPrice
                   </Button>
                 ) : (
-                  unitPriceDisplay.toFixed(2)
+                  <UnstyledButton
+                    onClick={() => setSetPriceOpen(true)}
+                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {unitPriceDisplay.toFixed(2)}
+                  </UnstyledButton>
                 )}
               </Table.Td>
               <Table.Td>
