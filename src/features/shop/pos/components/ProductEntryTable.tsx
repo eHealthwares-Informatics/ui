@@ -379,6 +379,8 @@ function DispenseRowEditor({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? row.orderedLabel}
         priceListId={priceListId}
+        uomName={currentUom?.name}
+        uomFactor={uomFactor}
       />
     </Table.Tr>
   );
@@ -756,6 +758,8 @@ export function ProductEntryTable({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? itemCode}
         priceListId={session.priceListId}
+        uomName={currentUom?.name}
+        uomFactor={uomFactor}
       />
 
       <QuickAddProductModal

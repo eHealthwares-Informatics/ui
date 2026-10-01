@@ -1,4 +1,4 @@
-import { Button, Group, Modal, NumberInput, Stack, Table, Text } from '@mantine/core';
+import { Button, Group, Modal, NumberInput, Stack, Table, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -13,7 +13,13 @@ interface Props {
   itemId: string;
   itemName: string;
   priceListId?: string;
+  /** UOM selected in the POS row — the price entered is FOR this unit. */
+  uomName?: string;
+  /** Effective factor of the selected UOM (1 = base unit). */
+  uomFactor?: number;
 }
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
 interface PriceListItem {
   id: string;
@@ -30,8 +36,11 @@ export function PosSetPriceModal({
   itemId,
   itemName,
   priceListId,
+  uomName,
+  uomFactor,
 }: Props) {
   const qc = useQueryClient();
+  const factor = uomFactor && uomFactor > 0 ? uomFactor : 1;
   const [price, setPrice] = useState<number>(0);
   const [saving, setSaving] = useState(false);
 
@@ -54,9 +63,9 @@ export function PosSetPriceModal({
 
   function open() {
     if (existing) {
-      setPrice(Number(existing.unitPrice));
+      setPrice(round2(Number(existing.unitPrice) / factor));
     } else if (entries.length > 0) {
-      setPrice(Number(entries[0].unitPrice));
+      setPrice(round2(Number(entries[0].unitPrice) / factor));
     } else {
       setPrice(0);
     }
@@ -74,17 +83,20 @@ export function PosSetPriceModal({
       return;
     }
     setSaving(true);
+    // The cashier enters the price FOR the selected UOM; the price list stores
+    // the base-unit price, so convert on save (POS display multiplies back by factor).
+    const storedUnitPrice = round2(Number(price) / factor);
     try {
       if (existing) {
         await rxsoftApi.patch(`/price-lists/${existing.priceListId}/items/${existing.id}`, {
-          unitPrice: Number(price),
+          unitPrice: storedUnitPrice,
         });
       } else if (priceListId) {
         await rxsoftApi.post('/price-lists/items', {
           priceListId,
           itemId,
           currencyCode: entries[0]?.currencyCode ?? 'NGN',
-          unitPrice: Number(price),
+          unitPrice: storedUnitPrice,
         });
       } else {
         notifications.show({
@@ -93,7 +105,10 @@ export function PosSetPriceModal({
         });
         return;
       }
-      notifications.show({ message: `Price set to ${Number(price).toFixed(2)}`, color: 'green' });
+      notifications.show({
+        message: `Price set to ${storedUnitPrice.toFixed(2)}${uomName ? ` per ${uomName}` : ''}`,
+        color: 'green',
+      });
       qc.invalidateQueries({ queryKey: ['price-list-items'] });
       onSaved();
       onClose();
@@ -135,20 +150,38 @@ export function PosSetPriceModal({
                 <Table.Tr
                   key={e.id}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => setPrice(Number(e.unitPrice))}
+                  onClick={() => setPrice(round2(Number(e.unitPrice) / factor))}
                 >
                   <Table.Td>{e.priceList?.name ?? e.priceListId}</Table.Td>
                   <Table.Td>
-                    {e.currencyCode} {Number(e.unitPrice).toFixed(2)}
+                    {e.currencyCode} {round2(Number(e.unitPrice) / factor).toFixed(2)}
                   </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
           </Table>
         )}
+        {entries.length > 0 && (
+          <Text size="xs" c="dimmed">
+            Prices shown{uomName ? ` per ${uomName}` : ''} (base-unit list price
+            {uomName ? ` ÷ ${factor}` : ''}).
+          </Text>
+        )}
+
+        {uomName && (
+          <TextInput
+            label="Price for"
+            value={`${uomName} (×${factor})`}
+            disabled
+            styles={{ input: { color: '#495057' } }}
+          />
+        )}
 
         <NumberInput
-          label="Unit Price"
+          label={`Unit Price${uomName ? ` (per ${uomName})` : ''}`}
+          description={
+            uomName ? 'Entered for the selected UOM; stored as base-unit price.' : undefined
+          }
           value={price}
           onChange={(v) => setPrice(Number(v) || 0)}
           min={0}
