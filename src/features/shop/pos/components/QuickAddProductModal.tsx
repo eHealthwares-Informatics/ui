@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { ChevronDown } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCategoriesSearch, useQuickCreateItem, useUomsSearch } from '../../api/posApi';
 
 interface Props {
@@ -32,6 +32,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
 
   const categoryCombobox = useCombobox();
   const uomCombobox = useCombobox();
+  const userPickedUom = useRef(false);
 
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategoriesSearch(debouncedCategorySearch);
@@ -61,12 +62,23 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
 
   const selectedUomName = uomOptions.find((o) => o.value === baseUomId)?.label ?? '';
 
+  // Auto-default to the base (factor === 1) UOM once options load, unless the
+  // cashier has explicitly picked one.
+  useEffect(() => {
+    if (uoms.length === 0 || baseUomId || userPickedUom.current) {
+      return;
+    }
+    const pick = uoms.find((u) => u.factor === 1) ?? uoms[0];
+    setBaseUomId(pick.id);
+  }, [uoms, baseUomId]);
+
   function reset() {
     setName('');
     setCategoryId(null);
     setCategorySearch('');
     setBaseUomId(null);
     setUomSearch('');
+    userPickedUom.current = false;
   }
 
   async function handleSubmit() {
@@ -109,6 +121,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
           store={categoryCombobox}
           onOptionSubmit={(val) => {
             setCategoryId(val);
+            setCategorySearch('');
             categoryCombobox.closeDropdown();
           }}
         >
@@ -150,6 +163,8 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
           store={uomCombobox}
           onOptionSubmit={(val) => {
             setBaseUomId(val);
+            setUomSearch('');
+            userPickedUom.current = true;
             uomCombobox.closeDropdown();
           }}
         >
