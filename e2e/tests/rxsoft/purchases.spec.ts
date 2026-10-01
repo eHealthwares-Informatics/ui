@@ -142,10 +142,6 @@ test.describe.serial('RxSoft purchases', () => {
   test('creates a purchase order through the create modal', async ({ page }) => {
     await page.goto('/rxsoft/purchases');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     // Open create modal
     await page.getByTestId('header-new').click();
     const dialog = page.getByRole('dialog', { name: /Create Purchase/ });
@@ -262,10 +258,6 @@ test.describe.serial('RxSoft purchases', () => {
   test('views purchase detail via the Eye icon', async ({ page }) => {
     await page.goto('/rxsoft/purchases');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     // Search for our purchase
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
     const row = page
@@ -294,10 +286,6 @@ test.describe.serial('RxSoft purchases', () => {
   test('purchase shows correct status in list', async ({ page }) => {
     await page.goto('/rxsoft/purchases');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
     const row = page
       .getByTestId('data-table-body')
@@ -318,10 +306,6 @@ test.describe.serial('RxSoft purchases', () => {
 
   test('deletes the purchase order via row action', async ({ page }) => {
     await page.goto('/rxsoft/purchases');
-
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     await page.getByTestId('header-search').fill(`PO-E2E-${TS}`);
     const row = page

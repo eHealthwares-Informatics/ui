@@ -1,6 +1,8 @@
 import { Button, Group, Stepper } from '@mantine/core';
 import { memo, useCallback, useState } from 'react';
 import { TabGroup } from '@/features/rxsoft/types';
+import { collectFields } from '@/features/shared/payload-utils';
+import { clearValidationErrors, renderValidationErrors, validateFields } from './submit';
 import { TabPanel } from './tab-panel';
 
 type Props = {
@@ -44,10 +46,27 @@ function TabGroupsComponent({
   );
 
   const handleNext = async () => {
-    if (hasUnsatisfiedWaitFor(activeStep + 1) && onStepSubmit) {
+    const targetStep = activeStep + 1;
+    const stepSubmit = onStepSubmit;
+    const isDraftTransition = hasUnsatisfiedWaitFor(targetStep) && Boolean(stepSubmit);
+
+    // Draft-creating transitions POST the active tab's state to the server —
+    // validate that tab's fields visibly before allowing the request through.
+    // Non-draft steps (gated tabs already satisfied, no submit hook) are pure
+    // navigation and stay ungated.
+    if (isDraftTransition && stepSubmit) {
+      const currentFields = collectFields({
+        createFieldGroups: tabGroups[activeStep]?.fieldGroups ?? [],
+      });
+      const errors = validateFields(currentFields, formState);
+      if (Object.keys(errors).length > 0) {
+        renderValidationErrors(errors);
+        return;
+      }
+      clearValidationErrors();
       setStepSubmitting(true);
       try {
-        const result = await onStepSubmit(activeStep);
+        const result = await stepSubmit(activeStep);
         if (result && typeof result === 'object' && 'id' in result) {
           updateField('id', result.id);
         }
@@ -82,7 +101,11 @@ function TabGroupsComponent({
               }
             }}
           >
-            <TabPanel tab={tab} formState={formState} updateField={updateField} />
+            {/* Gated tabs (waitFor unsatisfied, e.g. no itemId yet) stay unmounted:
+                their matrix field groups would fire doomed loads on every open. */}
+            {!isStepDisabled(i) || i === activeStep ? (
+              <TabPanel tab={tab} formState={formState} updateField={updateField} />
+            ) : null}
           </Stepper.Step>
         ))}
       </Stepper>

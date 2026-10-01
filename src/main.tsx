@@ -49,21 +49,18 @@ Sentry.init({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (failureCount, error) => {
-        // eslint-disable-next-line no-console
-        if (import.meta.env.DEV) {
-          console.log({ failureCount, error });
-        }
-
-        if (failureCount >= 0 && import.meta.env.DEV) {
-          return false;
-        }
-        if (failureCount > 3 && import.meta.env.PROD) {
-          return false;
-        }
-
-        return !(error instanceof AxiosError && [401, 403].includes(error.response?.status ?? 0));
-      },
+      // No query retries in dev/e2e: failures surface immediately instead of
+      // tests waiting through retry backoff before an error state is visible.
+      retry: import.meta.env.DEV
+        ? false
+        : (failureCount, error) => {
+            if (failureCount > 3) {
+              return false;
+            }
+            return !(
+              error instanceof AxiosError && [401, 403].includes(error.response?.status ?? 0)
+            );
+          },
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 10 * 1000, // 10s
     },

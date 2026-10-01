@@ -1,6 +1,16 @@
 # Task: UI must visibly enforce schema + business rules before submission
 
-**Status**: Spec ready for implementation
+**Status**: Partially landed 2026-09-30 — see §8 "Landed implementation"; remaining: live green run + board entries
+
+## 8. Landed implementation (2026-09-30)
+
+- `form/submit.ts`: shared `validateFields` + `renderValidationErrors` + `clearValidationErrors` exported alongside `useValidatedSubmit`.
+- `form/RenderField.tsx`: `field-error-<name>` spans now render **unconditionally** (previously `{fieldError && …}` — the gate's DOM-poked errors could never appear on first failure). 9 branches.
+- `page/data-page-form.tsx`: outer Stack carries `className="rx-page-form"` so page-form summaries (not just modals) have an anchor.
+- `form/tab-groups.tsx`: **step gate** — draft-creating transitions (tab-1 → `waitFor: 'id'` tabs via Create & Continue) now validate the active tab's fields and block the POST visibly on failure. Scoped to draft transitions only, so price/stock tabs' own required fields never block plain navigation.
+- `e2e/tests/rxsoft/items-validation.spec.ts`: VAL-01 (empty submit → per-field errors + aria-invalid + focus + zero POSTs), VAL-02 (fix → errors clear + exactly one POST), VAL-03 (summary lists all three offending fields), VAL-04 (UI required set == CreateItemDto via `/api/docs-json`, skip-gated on the docs endpoint).
+- Found + fixed en route: the wizard's "Next" (Create & Continue) previously bypassed the zod gate entirely — that hole is closed by the step gate.
+- Pending: live green run (identity/seed down), then VAL TC board entries via board_updates.md.
 **Priority**: Critical — root cause of phase-2 challenge C2 ("quiet validation")
 **Owner**: frontend (primary) + rxsoft (DTO alignment) + e2e
 **Requested by**: John — *"investigate and generate detailed task on how to make sure UI enforces validations (schema and biz rules) before submission including updates needed in tests and playwright e2e"*

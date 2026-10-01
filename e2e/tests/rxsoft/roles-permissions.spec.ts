@@ -34,10 +34,6 @@ test.describe('RxSoft role permissions', () => {
     try {
       await page.goto(`/rxsoft/roles/${id}/permissions`);
 
-      await page.addStyleTag({
-        content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-      });
-
       await expect(page.getByRole('heading', { name: 'Role Permissions' })).toBeVisible({
         timeout: 15_000,
       });

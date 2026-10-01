@@ -169,7 +169,7 @@ export function DataPageForm({
 
   return (
     <RxPage title={pageTitle} description={description}>
-      <Stack gap="lg">
+      <Stack gap="lg" className="rx-page-form">
         <Text size="sm" c="dimmed">
           {mode === 'edit'
             ? `Editing the ${title.toLowerCase()} record.`

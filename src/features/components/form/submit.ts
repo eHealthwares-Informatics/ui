@@ -147,6 +147,99 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
 }
 
 /**
+ * Validate a formState against a field list. Returns a map of
+ * field name -> error message (empty object when valid).
+ */
+export function validateFields(
+  fields: Field[],
+  data: Record<string, unknown>
+): Record<string, string> {
+  const { schema, fieldRules } = buildZodSchema(fields);
+  const errors: Record<string, string> = {};
+
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const path = issue.path.join('.');
+      if (!errors[path]) {
+        errors[path] = issue.message;
+      }
+    }
+  }
+
+  for (const rule of fieldRules) {
+    const ruleResult = rule.refine(data);
+    if (ruleResult !== true && !errors[rule.name]) {
+      errors[rule.name] = typeof ruleResult === 'string' ? ruleResult : 'Invalid value';
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Clear all rendered validation error markers (per-field + summary + aria-invalid).
+ */
+export function clearValidationErrors(): void {
+  const existingSummary = document.querySelector('[data-testid="form-error-summary"]');
+  if (existingSummary) existingSummary.remove();
+  document.querySelectorAll('[data-testid^="field-error-"]').forEach((el) => {
+    el.textContent = '';
+    (el as HTMLElement).style.display = 'none';
+  });
+  document.querySelectorAll('[data-testid^="field-"]').forEach((el) => {
+    el.removeAttribute('aria-invalid');
+  });
+}
+
+/**
+ * Render a field->message error map into the DOM:
+ * per-field `field-error-<name>` spans, a `form-error-summary` alert,
+ * aria-invalid on fields, focus on the first invalid field.
+ */
+export function renderValidationErrors(errors: Record<string, string>): void {
+  clearValidationErrors();
+
+  for (const [name, message] of Object.entries(errors)) {
+    const errorEl = document.querySelector(`[data-testid="field-error-${name}"]`);
+    if (errorEl) {
+      errorEl.textContent = message;
+      (errorEl as HTMLElement).style.display = 'block';
+    }
+    const fieldEl = document.querySelector(`[data-testid="field-${name}"]`);
+    if (fieldEl) {
+      fieldEl.setAttribute('aria-invalid', 'true');
+    }
+  }
+
+  const formEl = document.querySelector('[data-testid="modal-form"], .rx-page-form');
+  if (formEl) {
+    const summary = document.createElement('div');
+    summary.setAttribute('data-testid', 'form-error-summary');
+    summary.setAttribute('role', 'alert');
+    summary.style.cssText =
+      'color: var(--mantine-color-red-6); background: var(--mantine-color-red-0); padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px;';
+    summary.innerHTML = `<strong>${Object.keys(errors).length} field(s) need attention</strong><ul style="margin:8px 0 0 16px;padding:0">${Object.entries(
+      errors
+    )
+      .slice(0, 5)
+      .map(([name, msg]) => `<li>${msg}</li>`)
+      .join('')}</ul>`;
+    formEl.prepend(summary);
+  }
+
+  const firstErrorField = Object.keys(errors)[0];
+  if (firstErrorField) {
+    const firstField = document.querySelector(
+      `[data-testid="field-${firstErrorField}"]`
+    ) as HTMLElement | null;
+    if (firstField) {
+      firstField.focus();
+    }
+  }
+}
+
+/**
  * Hook that returns a validated submit function.
  *
  * Usage:
@@ -211,61 +304,13 @@ export function useValidatedSubmit({
           errors[path] = issue.message;
         }
       }
-
-      // Render per-field errors
-      for (const [name, message] of Object.entries(errors)) {
-        const errorEl = document.querySelector(`[data-testid="field-error-${name}"]`);
-        if (errorEl) {
-          errorEl.textContent = message;
-          (errorEl as HTMLElement).style.display = 'block';
-        }
-        // Set aria-invalid on the field input
-        const fieldEl = document.querySelector(`[data-testid="field-${name}"]`);
-        if (fieldEl) {
-          fieldEl.setAttribute('aria-invalid', 'true');
-        }
-      }
-
-      // Render form-level error summary
-      const formEl = document.querySelector('[data-testid="modal-form"], .rx-page-form');
-      if (formEl) {
-        const summary = document.createElement('div');
-        summary.setAttribute('data-testid', 'form-error-summary');
-        summary.setAttribute('role', 'alert');
-        summary.style.cssText =
-          'color: var(--mantine-color-red-6); background: var(--mantine-color-red-0); padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px;';
-        summary.innerHTML = `<strong>${Object.keys(errors).length} field(s) need attention</strong><ul style="margin:8px 0 0 16px;padding:0">${Object.entries(
-          errors
-        )
-          .slice(0, 5)
-          .map(([name, msg]) => `<li>${msg}</li>`)
-          .join('')}</ul>`;
-        formEl.prepend(summary);
-      }
-
-      // Focus first invalid field
-      const firstErrorField = Object.keys(errors)[0];
-      if (firstErrorField) {
-        const firstField = document.querySelector(
-          `[data-testid="field-${firstErrorField}"]`
-        ) as HTMLElement | null;
-        if (firstField) {
-          firstField.focus();
-        }
-      }
-
+      renderValidationErrors(errors);
       onError?.(errors);
       return;
     }
 
     // Valid — clear any existing error markers
-    document.querySelectorAll('[data-testid^="field-error-"]').forEach((el) => {
-      el.textContent = '';
-      (el as HTMLElement).style.display = 'none';
-    });
-    document.querySelectorAll('[data-testid^="field-"]').forEach((el) => {
-      el.removeAttribute('aria-invalid');
-    });
+    clearValidationErrors();
 
     // Fire mutation
     mutation.mutate(formState);

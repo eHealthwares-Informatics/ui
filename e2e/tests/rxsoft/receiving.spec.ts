@@ -153,10 +153,6 @@ test.describe.serial('RxSoft goods receiving', () => {
   test('receipt appears in the receiving list with correct detail', async ({ page }) => {
     await page.goto('/rxsoft/receiving');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     // The receipt should appear in the list
     const receiptRow = page
       .getByTestId('data-table-body')
@@ -201,10 +197,6 @@ test.describe.serial('RxSoft goods receiving', () => {
 
   test('opens a receipt detail and unposts a line', async ({ page }) => {
     await page.goto('/rxsoft/receiving');
-
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     const receiptRow = page
       .getByTestId('data-table-body')

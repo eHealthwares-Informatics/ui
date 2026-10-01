@@ -36,11 +36,7 @@ test.describe('RxSoft items create (wizard)', () => {
   test('creates an item without a generic product and finalises via PATCH', async ({ page }) => {
     await page.goto('/rxsoft/items/create');
 
-    // The dev "ToastStack" widget injects a full-screen debug overlay that
     // intercepts pointer events on centered buttons; hide it so clicks land.
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     const categoryInput = page.getByTestId('async-select-category');
     await expect(categoryInput).toBeEnabled({ timeout: 20_000 });

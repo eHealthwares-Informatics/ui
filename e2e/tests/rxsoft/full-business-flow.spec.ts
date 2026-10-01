@@ -248,9 +248,6 @@ test.describe.serial('Full Business Flow', () => {
     await page.goto('/rxsoft/items/create');
 
     // Hide dev overlay
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     // Wait for the wizard to load
     const categoryInput = page.getByTestId('async-select-category');
@@ -430,10 +427,6 @@ test.describe.serial('Full Business Flow', () => {
     await page.goto('/rxsoft/inventory');
     await expect(page.getByTestId('page-title')).toHaveText('Inventory');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     // Click "New Stock Adjustment" → actually use the Transfer button
     // The transfer is done through the transfer button in the stock balances table
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();
@@ -569,10 +562,6 @@ test.describe.serial('Full Business Flow', () => {
     await page.goto('/rxsoft/website-orders');
     await expect(page.getByTestId('page-title')).toHaveText('Website Orders');
 
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
-
     // Search for the order
     const searchInput = page.getByTestId('header-search');
     await searchInput.fill(`Biscuit-${TS}`);
@@ -618,10 +607,6 @@ test.describe.serial('Full Business Flow', () => {
   test('16. verifies current stock on the Inventory page', async ({ page }) => {
     await page.goto('/rxsoft/inventory');
     await expect(page.getByTestId('page-title')).toHaveText('Inventory');
-
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     // Wait for stock balances table
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();

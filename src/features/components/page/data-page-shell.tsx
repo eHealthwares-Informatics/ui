@@ -146,7 +146,8 @@ export function DataPageShell(props: DataPageShellProps) {
   const [showModal, setShowModal] = useState(false);
   const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
   const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  // 25 rows/page: fewer page turns per assertion in e2e, same per-request cost.
+  const [pageSize, setPageSize] = useState(25);
   const [totalItems, setTotalItems] = useState(0);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [jsonToPreview, setJsonToPreview] = useState<Record<string, unknown> | null>(null);

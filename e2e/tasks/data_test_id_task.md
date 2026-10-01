@@ -75,6 +75,7 @@ Rules:
 | ModalDataForm wrapper | `src/features/components/form/ModalDataForm.tsx` | `modal-title` on the modal title, `modal-form` on the form element |
 | Field error messages | all branches in RenderField | `field-error-<name>` (see companion task [schema_validation_task.md](schema_validation_task.md)) |
 | Remaining LabelField-embedded inputs | any custom field renderers outside RenderField | sweep with the lint rule in §5 |
+| Inventory adjust/transfer surfaces | `src/features/rxsoft/pages/inventory/index.tsx` | ✅ **Landed 2026-09-30**: `transfer-modal/-destination/-uom/-quantity/-submit`, `adjust-modal/-quantity/-reason/-submit`, `adjust-inline-form/-quantity/-reason/-submit`, `row-view-movements/-transfer/-adjust`; both specs migrated off `getByLabel`/`getByTitle` |
 
 ## 4. Implementation steps
 

@@ -15,11 +15,10 @@ export const Route = createRootRouteWithContext<{
         <NavigationProgress />
         <Outlet />
         <Notifications />
-        {import.meta.env.MODE === 'development' && (
-          <>
-            <ReactQueryDevtools buttonPosition="bottom-right" />
-            {/* <TanStackRouterDevtools position='bottom-right' /> */}
-          </>
+        {/* React Query devtools: hidden for automated browsers (navigator.webdriver)
+            so the floating panel can never intercept pointer events in e2e runs. */}
+        {import.meta.env.MODE === 'development' && !navigator.webdriver && (
+          <ReactQueryDevtools buttonPosition="bottom-right" />
         )}
       </>
     );

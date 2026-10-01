@@ -116,7 +116,13 @@ function TransferModal({
   });
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Transfer Stock" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title="Transfer Stock"
+      centered
+      data-testid="transfer-modal"
+    >
       <Stack>
         <Text size="sm">
           From:{' '}
@@ -131,6 +137,7 @@ function TransferModal({
         </Text>
 
         <Select
+          data-testid="transfer-destination"
           label="Destination Location"
           value={toLocationId}
           onChange={setToLocationId}
@@ -142,6 +149,7 @@ function TransferModal({
         />
 
         <Select
+          data-testid="transfer-uom"
           label="UOM"
           value={selectedUom?.id ?? null}
           onChange={(v) => setUomId(v)}
@@ -153,6 +161,7 @@ function TransferModal({
         />
 
         <NumberInput
+          data-testid="transfer-quantity"
           label="Quantity"
           value={quantity}
           onChange={(v) => setQuantity(Number(v) || 0)}
@@ -170,6 +179,7 @@ function TransferModal({
             Cancel
           </Button>
           <Button
+            data-testid="transfer-submit"
             onClick={() => transferMutation.mutate()}
             loading={transferMutation.isPending}
             disabled={!toLocationId || quantity <= 0 || baseQuantity > availableBase}
@@ -217,7 +227,13 @@ function AdjustModal({
   });
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Stock Adjustment" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title="Stock Adjustment"
+      centered
+      data-testid="adjust-modal"
+    >
       <Stack>
         <Text size="sm">
           Item: <Badge>{(balance?.item?.name as string) ?? (balance?.itemId as string)}</Badge>
@@ -231,6 +247,7 @@ function AdjustModal({
         </Text>
 
         <NumberInput
+          data-testid="adjust-quantity"
           label="Delta Quantity"
           value={deltaQuantity}
           onChange={(v) => setDeltaQuantity(Number(v) || 0)}
@@ -239,6 +256,7 @@ function AdjustModal({
         />
 
         <TextInput
+          data-testid="adjust-reason"
           label="Reason"
           value={reason}
           onChange={(e) => setReason(e.currentTarget.value)}
@@ -250,6 +268,7 @@ function AdjustModal({
             Cancel
           </Button>
           <Button
+            data-testid="adjust-submit"
             onClick={() => adjustmentMutation.mutate()}
             loading={adjustmentMutation.isPending}
             disabled={deltaQuantity === 0 || !reason}
@@ -291,6 +310,7 @@ export function RxInventoryPage() {
               <ActionIcon
                 variant="light"
                 title="View Movements"
+                data-testid="row-view-movements"
                 onClick={() => {
                   setMovementItemId(row.itemId ?? row.item?.id ?? null);
                   setMovementLocationId(row.locationId ?? row.location?.id ?? null);
@@ -301,6 +321,7 @@ export function RxInventoryPage() {
               <ActionIcon
                 variant="light"
                 title="Transfer"
+                data-testid="row-transfer"
                 onClick={() => {
                   setSelectedBalance(row);
                   setTransferModalOpen(true);
@@ -311,6 +332,7 @@ export function RxInventoryPage() {
               <ActionIcon
                 variant="light"
                 title="Adjust"
+                data-testid="row-adjust"
                 onClick={() => {
                   setSelectedAdjustBalance(row);
                   setAdjustModalOpen(true);
@@ -672,6 +694,7 @@ export function RxInventoryPage() {
             <Text fw={600}>New Stock Adjustment</Text>
 
             <form
+              data-testid="adjust-inline-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 adjustmentMutation.mutate();
@@ -728,6 +751,7 @@ export function RxInventoryPage() {
 
                 <Grid.Col span={{ base: 12, md: 4 }}>
                   <TextInput
+                    data-testid="adjust-inline-quantity"
                     label="Delta Quantity"
                     type="number"
                     value={deltaQuantity}
@@ -738,6 +762,7 @@ export function RxInventoryPage() {
 
                 <Grid.Col span={{ base: 12, md: 4 }}>
                   <TextInput
+                    data-testid="adjust-inline-reason"
                     label="Reason"
                     value={reason}
                     onChange={(e) => setReason(e.currentTarget.value)}
@@ -748,6 +773,7 @@ export function RxInventoryPage() {
                 <Grid.Col span={12}>
                   <Group justify="flex-end">
                     <Button
+                      data-testid="adjust-inline-submit"
                       type="submit"
                       loading={adjustmentMutation.isPending}
                       disabled={!selectedBalanceId}
