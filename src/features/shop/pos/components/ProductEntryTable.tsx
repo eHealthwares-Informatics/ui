@@ -572,7 +572,7 @@ export function ProductEntryTable({
   }
 
   function openAdjustModal() {
-    if (!selectedProductId || !stockLocationId) {
+    if (!selectedProductId) {
       return;
     }
     setAdjustItemId(selectedProductId);
