@@ -169,8 +169,11 @@ function DispenseRowEditor({
   const [uomId, setUomId] = useState<string | null>(null);
   const [setPriceOpen, setSetPriceOpen] = useState(false);
 
-  const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
-  const { data: unitPrice = null } = usePosItemPrice(priceListId, selectedProductId);
+  const { data: itemUoms = [], isLoading: uomsLoading } = usePosItemUoms(selectedProductId);
+  const { data: unitPrice = null, isLoading: priceLoading } = usePosItemPrice(
+    priceListId,
+    selectedProductId
+  );
 
   const itemUomMap = useMemo(
     () => new Map(itemUoms.map((u) => [u.id, u as UomOption])),
@@ -205,7 +208,7 @@ function DispenseRowEditor({
   const unitPriceDisplay = effectivePrice !== null ? effectivePrice * uomFactor : null;
   const total = effectivePrice !== null ? quantity * effectivePrice * uomFactor : 0;
 
-  const { data: stockQty = null } = useQuery({
+  const { data: stockQty = null, isLoading: stockLoading } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
     queryFn: async () => {
       if (!selectedProductId || !stockLocationId) {
@@ -295,7 +298,9 @@ function DispenseRowEditor({
       </Table.Td>
       <Table.Td>
         {stockLocationId && selectedProductId ? (
-          adjustedStockQty === null ? (
+          stockLoading ? (
+            <Loader size={14} />
+          ) : adjustedStockQty === null ? (
             <Text size="xs" c="dimmed">
               -
             </Text>
@@ -313,6 +318,8 @@ function DispenseRowEditor({
           <Text size="xs" c="dimmed">
             -
           </Text>
+        ) : priceLoading ? (
+          <Loader size={14} />
         ) : unitPriceDisplay === null ? (
           <Button size="xs" variant="light" color="cyan" onClick={() => setSetPriceOpen(true)}>
             SetPrice
@@ -327,16 +334,20 @@ function DispenseRowEditor({
         )}
       </Table.Td>
       <Table.Td>
-        <Select
-          size="xs"
-          w={180}
-          data={itemUoms.map((u) => ({ value: u.id, label: u.name }))}
-          value={uomId}
-          onChange={(v) => setUomId(v)}
-          placeholder="Pick UOM"
-          disabled={itemUoms.length === 0}
-          maxDropdownHeight={300}
-        />
+        {selectedProductId && uomsLoading ? (
+          <Loader size={14} />
+        ) : (
+          <Select
+            size="xs"
+            w={180}
+            data={itemUoms.map((u) => ({ value: u.id, label: u.name }))}
+            value={uomId}
+            onChange={(v) => setUomId(v)}
+            placeholder="Pick UOM"
+            disabled={itemUoms.length === 0}
+            maxDropdownHeight={300}
+          />
+        )}
       </Table.Td>
       <Table.Td>
         <NumberInput
@@ -379,6 +390,8 @@ function DispenseRowEditor({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? row.orderedLabel}
         priceListId={priceListId}
+        uomName={currentUom?.name}
+        uomFactor={uomFactor}
       />
     </Table.Tr>
   );
@@ -416,8 +429,11 @@ export function ProductEntryTable({
   const [setPriceOpen, setSetPriceOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
 
-  const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
-  const { data: unitPrice = null } = usePosItemPrice(session.priceListId, selectedProductId);
+  const { data: itemUoms = [], isLoading: uomsLoading } = usePosItemUoms(selectedProductId);
+  const { data: unitPrice = null, isLoading: priceLoading } = usePosItemPrice(
+    session.priceListId,
+    selectedProductId
+  );
 
   const itemUomMap = useMemo(() => {
     const map = new Map<string, UomOption>();
@@ -463,7 +479,7 @@ export function ProductEntryTable({
 
   const unitPriceDisplay = effectivePrice !== null ? effectivePrice * uomFactor : null;
 
-  const { data: stockQty = null, refetch: refetchStock } = useQuery({
+  const { data: stockQty = null, refetch: refetchStock, isLoading: stockLoading } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
     queryFn: async () => {
       if (!selectedProductId || !stockLocationId) {
@@ -652,8 +668,10 @@ export function ProductEntryTable({
                 </Group>
               </Table.Td>
               <Table.Td>
-                {selectedProductId ? (
-                  adjustedStockQty === null ? (
+                {stockLocationId && selectedProductId ? (
+                  stockLoading ? (
+                    <Loader size={14} />
+                  ) : adjustedStockQty === null ? (
                     <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
                       Set Stock
                     </Button>
@@ -676,6 +694,8 @@ export function ProductEntryTable({
                   <Text size="xs" c="dimmed">
                     -
                   </Text>
+                ) : priceLoading ? (
+                  <Loader size={14} />
                 ) : unitPriceDisplay === null ? (
                   <Button
                     size="xs"
@@ -696,20 +716,24 @@ export function ProductEntryTable({
                 )}
               </Table.Td>
               <Table.Td>
-                <Select
-                  size="xs"
-                  w={200}
-                  data-testid="pos-entry-uom"
-                  data={itemUoms.map((u) => ({
-                    value: u.id,
-                    label: u.name,
-                  }))}
-                  value={uomId}
-                  onChange={(v) => setUomId(v)}
-                  placeholder="Pick UOM"
-                  disabled={itemUoms.length === 0}
-                  maxDropdownHeight={300}
-                />
+                {selectedProductId && uomsLoading ? (
+                  <Loader size={14} />
+                ) : (
+                  <Select
+                    size="xs"
+                    w={200}
+                    data-testid="pos-entry-uom"
+                    data={itemUoms.map((u) => ({
+                      value: u.id,
+                      label: u.name,
+                    }))}
+                    value={uomId}
+                    onChange={(v) => setUomId(v)}
+                    placeholder="Pick UOM"
+                    disabled={itemUoms.length === 0}
+                    maxDropdownHeight={300}
+                  />
+                )}
               </Table.Td>
               <Table.Td>
                 <NumberInput
@@ -756,6 +780,8 @@ export function ProductEntryTable({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? itemCode}
         priceListId={session.priceListId}
+        uomName={currentUom?.name}
+        uomFactor={uomFactor}
       />
 
       <QuickAddProductModal
