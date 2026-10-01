@@ -129,7 +129,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
               data-testid="quick-add-product-category"
             />
           </Combobox.Target>
-          <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 30 }}>
+          <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 200 }}>
             <Combobox.Options style={{ maxHeight: 220, overflowY: 'auto' }}>
               {categoryOptions.length === 0 ? (
                 <Combobox.Empty>
@@ -170,7 +170,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
               data-testid="quick-add-product-uom"
             />
           </Combobox.Target>
-          <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 30 }}>
+          <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 200 }}>
             <Combobox.Options style={{ maxHeight: 220, overflowY: 'auto' }}>
               {uomOptions.length === 0 ? (
                 <Combobox.Empty>{uomsLoading ? 'Loading…' : 'No UOMs found'}</Combobox.Empty>

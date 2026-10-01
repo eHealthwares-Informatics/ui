@@ -118,7 +118,7 @@ function PosProductPicker({
           rightSection={isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
         />
       </Combobox.Target>
-      <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 20 }}>
+      <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 200 }}>
         <Combobox.Options style={{ maxHeight: 280, overflowY: 'auto' }}>
           {options.length === 0 ? (
             <Combobox.Empty>{isLoading ? 'Loading…' : 'No products found'}</Combobox.Empty>
