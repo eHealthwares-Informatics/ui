@@ -51,9 +51,13 @@ export const HeaderBar = ({
 
   useEffect(() => {
     if (debouncedSearch.length === 0 || debouncedSearch.length >= minSearchLength) {
-      onSearchChange(debouncedSearch);
+      // Skip when the applied search is unchanged — every state change
+      // refetches the page, so no-op commits cost a request each.
+      if (debouncedSearch !== search) {
+        onSearchChange(debouncedSearch);
+      }
     }
-  }, [debouncedSearch, minSearchLength, onSearchChange]);
+  }, [debouncedSearch, minSearchLength, onSearchChange, search]);
 
   useEffect(() => {
     setSearchValue(search);

@@ -1,4 +1,28 @@
-export function printPosReceipt(sale: {
+export async function printPosReceiptRemote(data: {
+  saleNumber: string;
+  header?: string;
+  footer?: string;
+  items: Array<{ name: string; qty: number; price: number; total: number }>;
+  subtotal: number;
+  discount: number;
+  vat: number;
+  total: number;
+  paidAmount: number;
+  changeAmount: number;
+}): Promise<boolean> {
+  try {
+    const res = await fetch('http://localhost:8094/print/receipt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, footer: data.footer || 'Thank you!' }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function printPosReceipt(sale: {
   saleNumber: string;
   customerName?: string;
   items: Array<{ code: string; name: string; qty: number; price: number; total: number }>;
@@ -22,6 +46,19 @@ export function printPosReceipt(sale: {
     .join('');
 
   const headerText = sale.header || 'DAMOREX PHARMACY';
+
+  const remoteOk = await printPosReceiptRemote({
+    saleNumber: sale.saleNumber,
+    header: headerText,
+    items: sale.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, total: i.total })),
+    subtotal: sale.subtotal,
+    discount: sale.discount,
+    vat: sale.vat,
+    total: sale.total,
+    paidAmount: sale.paidAmount,
+    changeAmount: sale.changeAmount,
+  });
+  if (remoteOk) return;
 
   const win = window.open('', '_blank');
   if (!win) {

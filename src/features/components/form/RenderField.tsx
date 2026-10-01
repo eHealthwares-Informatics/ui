@@ -92,8 +92,9 @@ function RenderFieldComponent({
 
   if (field.type === 'switch') {
     return (
-      <LabelField label={field.label} required>
+      <LabelField label={field.label} required data-testid={`field-${field.name}`}>
         <Switch
+          data-testid={`field-${field.name}`}
           checked={Boolean(fieldValue)}
           disabled={disabled}
           onChange={(event) => {
@@ -103,13 +104,20 @@ function RenderFieldComponent({
           onFocus={onFocus}
           error={fieldError}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
 
   if (field.type === 'async-select') {
     return (
-      <LabelField label={field.label} required>
+      <LabelField label={field.label} required data-testid={`field-${field.name}`}>
         <AsyncSelectField
           field={field}
           value={fieldValue as Option}
@@ -122,6 +130,13 @@ function RenderFieldComponent({
           error={fieldError}
           formState={formState}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
@@ -137,7 +152,7 @@ function RenderFieldComponent({
       handleChange(updated);
     };
     return (
-      <LabelField label={field.label} required>
+      <LabelField label={field.label} required data-testid={`field-${field.name}`}>
         <AsyncSelectField
           field={field}
           value={'' as any}
@@ -153,6 +168,7 @@ function RenderFieldComponent({
           {current.map((item: string | Option) => (
             <Badge
               key={typeof item === 'string' ? item : item.value}
+              data-testid={`field-${field.name}-badge`}
               rightSection={
                 <ActionIcon
                   size="xs"
@@ -169,14 +185,22 @@ function RenderFieldComponent({
             </Badge>
           ))}
         </Group>
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
 
   if (field.type === 'select') {
     return (
-      <LabelField label={field.label} required={field.required}>
+      <LabelField label={field.label} required={field.required} data-testid={`field-${field.name}`}>
         <SelectField
+          data-testid={`field-${field.name}`}
           value={
             typeof fieldValue === 'string'
               ? { label: fieldValue, value: fieldValue }
@@ -192,14 +216,22 @@ function RenderFieldComponent({
           options={field.options ?? []}
           error={fieldError}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
 
   if (field.type === 'remote-select') {
     return (
-      <LabelField label={field.label} required={field.required}>
+      <LabelField label={field.label} required={field.required} data-testid={`field-${field.name}`}>
         <RemoteSelectField
+          data-testid={`field-${field.name}`}
           value={String(fieldValue)}
           field={field}
           onChange={(v) => handleChange(v)}
@@ -207,6 +239,13 @@ function RenderFieldComponent({
           onFocus={onFocus}
           error={fieldError}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
@@ -221,6 +260,7 @@ function RenderFieldComponent({
     return (
       <>
         <SelectField
+          data-testid={`field-${field.name}`}
           value={fieldValue as Option}
           disabled={disabled}
           onChange={(option) => option && toggle(option)}
@@ -234,6 +274,7 @@ function RenderFieldComponent({
           {(current || []).map((item: Option) => (
             <Badge
               key={item.value}
+              data-testid={`field-${field.name}-badge`}
               rightSection={
                 <ActionIcon
                   size="xs"
@@ -250,6 +291,13 @@ function RenderFieldComponent({
             </Badge>
           ))}
         </Group>
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </>
     );
   }
@@ -272,6 +320,7 @@ function RenderFieldComponent({
   if (field.type === 'json') {
     return (
       <JsonEditorField
+        data-testid={`field-${field.name}`}
         label={field.label}
         placeholder={field.placeholder}
         error={fieldError}
@@ -283,8 +332,13 @@ function RenderFieldComponent({
 
   if (field.type === 'color') {
     return (
-      <LabelField label={inTable ? '' : field.label} required={field.required}>
+      <LabelField
+        label={inTable ? '' : field.label}
+        required={field.required}
+        data-testid={`field-${field.name}`}
+      >
         <ColorInput
+          data-testid={`field-${field.name}`}
           value={(fieldValue as string) ?? '#228be6'}
           format="hex"
           swatches={[
@@ -303,14 +357,26 @@ function RenderFieldComponent({
           onFocus={onFocus}
           error={fieldError}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
 
   if (field.type === 'textarea') {
     return (
-      <LabelField label={inTable ? '' : field.label} required={field.required}>
+      <LabelField
+        label={inTable ? '' : field.label}
+        required={field.required}
+        data-testid={`field-${field.name}`}
+      >
         <DebouncedTextInput
+          data-testid={`field-${field.name}`}
           isTextarea
           value={(fieldValue as string) ?? ''}
           onChange={(v) => handleChange(v)}
@@ -321,6 +387,13 @@ function RenderFieldComponent({
           minRows={3}
           error={fieldError}
         />
+        <span
+          data-testid={`field-error-${field.name}`}
+          role="alert"
+          style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+        >
+          {fieldError}
+        </span>
       </LabelField>
     );
   }
@@ -329,6 +402,7 @@ function RenderFieldComponent({
     return (
       <Grid.Col span={{ base: 12, md: field.col ?? 6 }}>
         <ImageUploader
+          data-testid={`field-${field.name}`}
           label={field.label}
           description={field.placeholder}
           value={(fieldValue as string) ?? ''}
@@ -350,6 +424,7 @@ function RenderFieldComponent({
   if (field.type === 'permission-picker') {
     return (
       <PermissionPicker
+        data-testid={`field-${field.name}`}
         value={Array.isArray(fieldValue) ? fieldValue.map(String) : []}
         onChange={(codes) => handleChange(codes)}
         disabled={disabled}
@@ -362,6 +437,7 @@ function RenderFieldComponent({
     const items: any[] = (fieldValue as any[]) || [];
     return (
       <AccordionArrayField
+        data-testid={`field-${field.name}`}
         field={field}
         items={items}
         parentFormState={formState}
@@ -372,12 +448,20 @@ function RenderFieldComponent({
 
   if (field.type === 'json-accordion-array') {
     const items: any[] = (fieldValue as any[]) || [];
-    return <JsonAccordionArrayField field={field} items={items} onChange={handleChange} />;
+    return (
+      <JsonAccordionArrayField
+        data-testid={`field-${field.name}`}
+        field={field}
+        items={items}
+        onChange={handleChange}
+      />
+    );
   }
 
   if (field.type === 'accordion') {
     return (
       <AccordionSingleField
+        data-testid={`field-${field.name}`}
         field={field}
         value={fieldValue as string | null | undefined}
         onChange={(v) => handleChange(v)}
@@ -386,9 +470,14 @@ function RenderFieldComponent({
   }
 
   return (
-    <LabelField label={inTable ? '' : field.label} required={!inTable && field.required}>
+    <LabelField
+      label={inTable ? '' : field.label}
+      required={!inTable && field.required}
+      data-testid={`field-${field.name}`}
+    >
       <Group align="flex-end" gap={4} wrap="nowrap">
         <DebouncedTextInput
+          data-testid={`field-${field.name}`}
           value={(fieldValue as string) ?? ''}
           readOnly={disabled}
           onChange={(v) => handleChange(v)}
@@ -421,6 +510,13 @@ function RenderFieldComponent({
           />
         ) : null}
       </Group>
+      <span
+        data-testid={`field-error-${field.name}`}
+        role="alert"
+        style={{ color: 'var(--mantine-color-red-6)', fontSize: 'var(--mantine-font-size-xs)' }}
+      >
+        {fieldError}
+      </span>
     </LabelField>
   );
 }

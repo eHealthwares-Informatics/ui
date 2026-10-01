@@ -26,7 +26,10 @@ export class CrudShellPage {
   }
 
   get searchInput(): Locator {
-    return this.page.getByTestId('header-search');
+    // Strict-mode-safe: some nested route layouts (e.g. /rxsoft/settings
+    // renders its layout's Outlet twice for desktop/mobile breakpoints) mount
+    // two DataPageShells, hence two header-search inputs. Use the first.
+    return this.page.getByTestId('header-search').first();
   }
 
   get newButton(): Locator {
@@ -38,16 +41,30 @@ export class CrudShellPage {
   }
 
   get recordsTotal(): Locator {
-    return this.page.getByTestId('pagination-records-total');
+    return this.page.getByTestId('pagination-records-total').first();
   }
 
   get pagination(): Locator {
-    return this.page.getByTestId('pagination-controls');
+    return this.page.getByTestId('pagination-controls').first();
   }
 
   /** The currently open modal (create/update). */
   get dialog(): Locator {
     return this.page.locator('[role="dialog"]').last();
+  }
+
+  /**
+   * Strict-mode-safe page title: some routes (e.g. /rxsoft/sales-lines opened
+   * with a tab query, /rxsoft/website-orders) render two page-title headings,
+   * sometimes with overlapping text ('Orders' vs 'Website Orders'), so match
+   * the exact heading text instead of a substring.
+   */
+  pageTitle(expected: string): Locator {
+    const escaped = expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.page
+      .getByTestId('page-title')
+      .filter({ hasText: new RegExp(`^\\s*${escaped}\\s*$`) })
+      .first();
   }
 
   async goto(route: string): Promise<void> {
@@ -66,24 +83,46 @@ export class CrudShellPage {
   rowAction(text: string, iconClass: 'lucide-pencil' | 'lucide-trash-2'): Locator {
     return this.getRow(text)
       .locator('button')
-      .filter({ has: this.page.locator(`svg.${iconClass}`) });
+      .filter({ has: this.page.locator(`svg.${iconClass}`) })
+      .first();
   }
 
-  /** The label Text is the first child of a LabelField Stack; the field control is its next sibling. */
-  private fieldRoot(label: string): Locator {
-    const labelEl = this.dialog.getByText(label, { exact: false }).first();
+  /**
+   * Field control root. Scope 'dialog' (default) targets the open modal;
+   * scope 'page' targets full-page DataPageForm wizards (e.g. items create
+   * at /rxsoft/items/create) where the same LabelField structure is used.
+   */
+  private fieldRoot(label: string, scope: 'dialog' | 'page' = 'dialog'): Locator {
+    const root = scope === 'dialog' ? this.dialog : this.page;
+    const labelEl = root.getByText(label, { exact: false }).first();
     return labelEl.locator('xpath=following-sibling::*[1]');
   }
 
-  async fillField(label: string, value: string): Promise<void> {
-    const control = this.fieldRoot(label);
+  async fillField(
+    label: string,
+    value: string,
+    scope: 'dialog' | 'page' = 'dialog'
+  ): Promise<void> {
+    const control = this.fieldRoot(label, scope);
     const input = control.locator('input, textarea').first();
     await input.fill(value);
   }
 
-  async chooseOption(label: string, option: string): Promise<void> {
-    const control = this.fieldRoot(label);
-    await control.locator('input[role="combobox"]').click();
+  async chooseOption(
+    label: string,
+    option: string,
+    scope: 'dialog' | 'page' = 'dialog'
+  ): Promise<void> {
+    const control = this.fieldRoot(label, scope);
+    const combobox = control.locator('input[role="combobox"]');
+    // Mantine Select renders a readonly input; if there is no combobox inside
+    // the field root the control may BE the input (native select fallback).
+    if ((await combobox.count()) === 0) {
+      const native = control.locator('select').first();
+      await native.selectOption({ label: option });
+      return;
+    }
+    await combobox.click();
     await this.page.getByRole('option', { name: option }).click();
   }
 
@@ -114,8 +153,38 @@ export class CrudShellPage {
   async confirmDelete(): Promise<void> {
     const dialog = this.page.getByRole('dialog', { name: 'Delete Item' });
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'Delete' }).click();
-    await expect(dialog).toBeHidden();
+    const confirm = dialog.getByRole('button', { name: 'Delete' });
+    // The confirm button can stay disabled while a list refetch holds the
+    // dialog in a loading state — wait for it to become enabled (observed
+    // up to ~25s on slow list endpoints) instead of click-timing-out.
+    await expect(confirm).toBeEnabled({ timeout: 45_000 });
+    // Mantine re-render churn can swallow the first force-click (the button
+    // detaches mid-action). Click, briefly wait for close, and retry.
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await confirm.click({ force: true });
+      try {
+        await expect(dialog).toBeHidden({ timeout: 8_000 });
+        return;
+      } catch {
+        // fall through to a retry
+      }
+    }
+    await expect(dialog).toBeHidden({ timeout: 10_000 });
+  }
+
+  /**
+   * Triggers CSV export through the header Export menu and waits for the
+   * success toast. The Export button opens a Mantine dropdown with CSV/PDF
+   * items — clicking the button alone downloads nothing.
+   */
+  async exportCsv(title: string): Promise<void> {
+    await this.exportButton.click();
+    await this.page.getByRole('menuitem', { name: 'CSV' }).click();
+    // Large tables (Items ~39k rows) stream the CSV before the toast — 10s
+    // was not enough on a cold backend cache.
+    await expect(this.page.getByText(`${title} export downloaded`)).toBeVisible({
+      timeout: 30_000,
+    });
   }
 
   private async setField(field: CrudFieldSpec, token: string): Promise<void> {

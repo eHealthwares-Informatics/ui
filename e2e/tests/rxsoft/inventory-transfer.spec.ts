@@ -6,14 +6,13 @@ import { expect, test } from '../../fixtures/test';
  * Finds a Stock Balances row with available quantity > 0, opens its Transfer
  * modal, picks a destination location and quantity 1, transfers, and asserts
  * the success toast (POST /inventory/transfers).
+ *
+ * Selectors are testid-first per the e2e convention (AGENTS.md rule 1);
+ * the transfer modal fields carry transfer-* testids on the inventory page.
  */
 test.describe('RxSoft inventory transfers', () => {
   test('transfers stock to another location', async ({ page }) => {
     await page.goto('/rxsoft/inventory');
-
-    await page.addStyleTag({
-      content: '.tsqd-parent-container, [class*="tsqd-"]{display:none !important}',
-    });
 
     // Scope to the Stock Balances table (header cell "On Hand").
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();
@@ -43,22 +42,22 @@ test.describe('RxSoft inventory transfers', () => {
     }
     const targetRow = rows.nth(targetIndex);
 
-    const transferIcon = targetRow.getByTitle('Transfer');
+    const transferIcon = targetRow.getByTestId('row-transfer');
     await expect(transferIcon).toBeVisible();
     await transferIcon.click();
 
-    const dialog = page.getByRole('dialog', { name: 'Transfer Stock' });
+    const dialog = page.getByTestId('transfer-modal');
     await expect(dialog).toBeVisible({ timeout: 15_000 });
 
     // Destination location (source is excluded from the options).
-    const destSelect = dialog.getByLabel('Destination Location');
+    const destSelect = dialog.getByTestId('transfer-destination').locator('input');
     await destSelect.click();
     const destOption = page.getByRole('option').first();
     await expect(destOption).toBeVisible({ timeout: 12_000 });
     await destOption.click();
 
-    await dialog.getByLabel('Quantity').fill('1');
-    await dialog.getByRole('button', { name: 'Transfer', exact: true }).click();
+    await dialog.getByTestId('transfer-quantity').locator('input').fill('1');
+    await dialog.getByTestId('transfer-submit').click();
 
     await expect(page.getByText('Stock transferred successfully.')).toBeVisible({
       timeout: 15_000,

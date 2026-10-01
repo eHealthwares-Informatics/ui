@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Button,
   Combobox,
+  Group,
   Image,
   InputBase,
   Loader,
@@ -23,6 +24,7 @@ import { getUomEffectiveFactor } from '@/lib/uom-utils';
 import { UomOption, usePosItemPrice, usePosItemUoms, usePosItems } from '../../api/posApi';
 import { SaleSession, CartItem, DispenseRow } from '../types';
 import { PosSetPriceModal } from './PosSetPriceModal';
+import { QuickAddProductModal } from './QuickAddProductModal';
 import { StockAdjustModal } from './StockAdjustModal';
 
 type PosItemOption = {
@@ -68,6 +70,7 @@ function PosProductPicker({
 }) {
   const combobox = useCombobox();
   const [search, setSearch] = useState('');
+  const [focused, setFocused] = useState(false);
   const [debounced] = useDebouncedValue(search, 250);
   const { data: items = [], isLoading } = usePosItems(debounced);
 
@@ -97,14 +100,21 @@ function PosProductPicker({
           placeholder="Search product..."
           w={350}
           data-testid="pos-product-select"
-          value={search || selectedLabel || ''}
+          value={search || (!focused ? selectedLabel : '') || ''}
           onChange={(e) => {
             setSearch(e.currentTarget.value);
             combobox.openDropdown();
           }}
           onClick={() => combobox.openDropdown()}
-          onFocus={() => combobox.openDropdown()}
-          onBlur={() => setSearch('')}
+          onFocus={() => {
+            setSearch(selectedLabel ?? '');
+            setFocused(true);
+            combobox.openDropdown();
+          }}
+          onBlur={() => {
+            setSearch('');
+            setFocused(false);
+          }}
           rightSection={isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
         />
       </Combobox.Target>
@@ -132,6 +142,7 @@ function DispenseRowEditor({
   stockLocationId,
   onAdd,
   onRemove,
+  hideRemove,
 }: {
   row: DispenseRow;
   priceListId?: string;
@@ -139,6 +150,7 @@ function DispenseRowEditor({
   stockLocationId?: string | null;
   onAdd: (item: CartItem) => void;
   onRemove: () => void;
+  hideRemove?: boolean;
 }) {
   const initialSelected: SelectedProduct | null = row.initialItem
     ? {
@@ -341,15 +353,17 @@ function DispenseRowEditor({
           >
             Add
           </Button>
-          <ActionIcon
-            size="sm"
-            color="red"
-            variant="subtle"
-            onClick={onRemove}
-            aria-label="Remove dispense row"
-          >
-            <Trash2 size={14} />
-          </ActionIcon>
+          {!hideRemove && (
+            <ActionIcon
+              size="sm"
+              color="red"
+              variant="subtle"
+              onClick={onRemove}
+              aria-label="Remove dispense row"
+            >
+              <Trash2 size={14} />
+            </ActionIcon>
+          )}
         </ActionIcon.Group>
       </Table.Td>
 
@@ -395,6 +409,7 @@ export function ProductEntryTable({
   const [adjustCurrentQty, setAdjustCurrentQty] = useState(0);
 
   const [setPriceOpen, setSetPriceOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
 
   const { data: itemUoms = [] } = usePosItemUoms(selectedProductId);
   const { data: unitPrice = null } = usePosItemPrice(session.priceListId, selectedProductId);
@@ -481,6 +496,22 @@ export function ProductEntryTable({
     setUomId(null);
   }
 
+  function handleQuickAddCreated(product: { id: string; name: string; code: string }) {
+    const prod: SelectedProduct = {
+      id: product.id,
+      code: product.code,
+      name: product.name,
+      saleUomId: null,
+      imageUrl: '',
+    };
+    setSelected(prod);
+    setSelectedProductId(product.id);
+    setUomId(null);
+    setQuickAddOpen(false);
+    // Set a default quantity of 1
+    setQuantity(1);
+  }
+
   function handleAdd() {
     if (!selectedProductId || !quantity) {
       notifications.show({ color: 'red', message: 'Select a product and quantity first' });
@@ -554,21 +585,41 @@ export function ProductEntryTable({
         </Table.Thead>
         <Table.Tbody>
           {isDispense ? (
-            dispenseRowState.map((row) => (
+            <>
+              {dispenseRowState.map((row) => (
+                <DispenseRowEditor
+                  key={row.orderItemId}
+                  row={row}
+                  priceListId={session.priceListId}
+                  pricingMode={session.pricingMode}
+                  stockLocationId={stockLocationId}
+                  onAdd={(item) => onDispenseAdd?.(item)}
+                  onRemove={() =>
+                    setDispenseRowState((prev) =>
+                      prev.filter((r) => r.orderItemId !== row.orderItemId)
+                    )
+                  }
+                />
+              ))}
+              {/* Always show one empty row for adding new items */}
               <DispenseRowEditor
-                key={row.orderItemId}
-                row={row}
+                key="__new_empty"
+                row={{
+                  orderItemId: `__new_${Date.now()}`,
+                  orderedLabel: '',
+                  orderedCode: '',
+                  quantity: 1,
+                  initialItemId: null,
+                  initialItem: null,
+                }}
                 priceListId={session.priceListId}
                 pricingMode={session.pricingMode}
                 stockLocationId={stockLocationId}
                 onAdd={(item) => onDispenseAdd?.(item)}
-                onRemove={() =>
-                  setDispenseRowState((prev) =>
-                    prev.filter((r) => r.orderItemId !== row.orderItemId)
-                  )
-                }
+                onRemove={() => {}}
+                hideRemove
               />
-            ))
+            </>
           ) : (
             <Table.Tr>
               <Table.Td>
@@ -582,7 +633,21 @@ export function ProductEntryTable({
               </Table.Td>
               <Table.Td>{itemCode || '-'}</Table.Td>
               <Table.Td>
-                <PosProductPicker selectedLabel={selectedLabel} onSelect={handleProductSelect} />
+                <Group gap={4} wrap="nowrap">
+                  <PosProductPicker
+                    selectedLabel={selectedLabel}
+                    onSelect={handleProductSelect}
+                  />
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="yellow"
+                    onClick={() => setQuickAddOpen(true)}
+                    data-testid="pos-quick-add-product"
+                  >
+                    Quick+
+                  </Button>
+                </Group>
               </Table.Td>
               <Table.Td>
                 {stockLocationId && selectedProductId ? (
@@ -684,6 +749,12 @@ export function ProductEntryTable({
         itemId={selectedProductId ?? ''}
         itemName={selected?.name ?? itemCode}
         priceListId={session.priceListId}
+      />
+
+      <QuickAddProductModal
+        opened={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onProductCreated={handleQuickAddCreated}
       />
     </Paper>
   );

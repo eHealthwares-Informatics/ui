@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import {
+  useCreateCustomer,
   useCreateSale,
   useDebitWallet,
   useInitiatePosPayment,
@@ -48,6 +49,8 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [providerId, setProviderId] = useState<string | null>(null);
   const [paymentLink, setPaymentLink] = useState<{ token: string; url: string } | null>(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
 
   useEffect(() => {
     if (opened) {
@@ -59,8 +62,11 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       setProviderId(null);
       setPaymentLink(null);
       setIsGeneratingLink(false);
+      // Pre-fill customer fields from session
+      setCustomerName(session?.customerName || '');
+      setCustomerPhone(session?.customer?.phone || '');
     }
-  }, [opened, totals.total]);
+  }, [opened, totals.total, session?.customerName, session?.customer?.phone]);
 
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -93,6 +99,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     staleTime: 60_000,
   });
 
+  const createCustomer = useCreateCustomer();
   const mutation = useCreateSale({
     onSuccess: (data) => {
       onComplete(data);
@@ -237,6 +244,24 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   }
 
   async function handleComplete() {
+    // Create customer first if name is provided but no customer is set
+    let customerId = session.customerId || null;
+    if (customerName && !customerId) {
+      try {
+        const newCustomer = await createCustomer.mutateAsync({
+          name: customerName,
+          phone: customerPhone || undefined,
+        });
+        customerId = newCustomer.id;
+      } catch (e: any) {
+        notifications.show({
+          color: 'red',
+          message: 'Failed to create customer: ' + getApiErrorMessage(e),
+        });
+        return;
+      }
+    }
+
     const lines = (session.cart || []).map((item: any) => ({
       itemId: item.id,
       orderItemId: item.orderItemId ?? undefined,
@@ -269,7 +294,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       saleNumber: session.saleCode,
       saleChannel: 'pos',
       storeId: posConfig?.storeId ?? 'default',
-      customerId: session.customerId || null,
+      customerId,
       stockLocationId: posConfig?.stockLocationId ?? null,
       lines,
       payments: methodId
@@ -317,6 +342,21 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           placeholder="Select method"
           clearable
           data-testid="pos-payment-method"
+        />
+
+        <TextInput
+          label="Customer Name"
+          placeholder="Enter customer name (leave blank for walk-in)"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.currentTarget.value)}
+          data-testid="pos-customer-name"
+        />
+        <TextInput
+          label="Customer Phone"
+          placeholder="Enter phone number"
+          value={customerPhone}
+          onChange={(e) => setCustomerPhone(e.currentTarget.value)}
+          data-testid="pos-customer-phone"
         />
 
         <NumberInput

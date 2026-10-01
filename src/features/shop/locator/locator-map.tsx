@@ -1,6 +1,6 @@
 /**
  * Leaflet map used by both locator pages, themed to the site: a dark
- * CARTO basemap tinted green via CSS filter, custom SVG teardrop pins
+ * Stadia Maps basemap tinted green via CSS filter, custom SVG teardrop pins
  * (hospital cross for facilities, capsule for pharmacies), themed cluster
  * bubbles and dark popups. Renders clustered precise pins for records that
  * carry coordinates and optional "bubble" CircleMarkers for area-level
@@ -43,8 +43,9 @@ const THEME = {
 export type MapVariant = 'dark' | 'light';
 
 const TILE_URLS: Record<MapVariant, string> = {
-  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-  light: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+  dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=dfa6bc43-0d5d-4d53-9724-65b6d2c9919b',
+  light:
+    'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=dfa6bc43-0d5d-4d53-9724-65b6d2c9919b',
 };
 
 /** Green-tinted dark basemap styles + themed Leaflet chrome, injected once. */
@@ -522,7 +523,7 @@ function LocatorMapInner({
       >
         <TileLayer
           key={activeVariant}
-          attribution='&copy; <a href="https://stadiamaps.com/attributions/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URLS[activeVariant]}
         />
         <VariantClass variant={activeVariant} />

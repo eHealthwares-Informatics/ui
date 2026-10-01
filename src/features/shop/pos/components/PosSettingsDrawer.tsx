@@ -1,10 +1,12 @@
 import {
+  Anchor,
   Drawer,
   Loader,
   NumberInput,
   Select,
   Stack,
   Switch,
+  Text,
   TextInput,
   useMantineColorScheme,
 } from '@mantine/core';
@@ -154,6 +156,16 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
         />
 
         <Switch label="Toggle Theme" onClick={() => toggleColorScheme()} />
+
+        <Text fw={600} mt="md">Print Server</Text>
+        <Anchor
+          href="https://drive.google.com/file/d/1xNb5oHOPX7JGA12z5OwlL_HzPo4inIsJ/view"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Download Print Server
+        </Anchor>
+        <Text size="sm" c="dimmed">Print Server URL: http://localhost:8094</Text>
       </Stack>
     </Drawer>
   );

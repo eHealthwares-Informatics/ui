@@ -180,6 +180,7 @@ export function useCreateSale(options?: { onSuccess?: (data: any) => void }) {
     mutationFn: (payload: CreateSaleDto) => createSale(payload),
     onSuccess: (data) => {
       qc.invalidateQueries(salesKeys.list);
+      qc.invalidateQueries({ queryKey: ['rxsoft-sales-analytics'] });
       options?.onSuccess?.(data);
     },
   });
@@ -465,13 +466,72 @@ export function useOrganisationConfig() {
   });
 }
 
+// ── Quick Add Product ─────────────────────────────────────────────
+
+export function useCategoriesSearch(search?: string) {
+  return useQuery({
+    queryKey: ['pos-categories', search ?? ''],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/categories', {
+        params: { search, limit: 20 },
+      });
+      return (data?.data ?? data ?? []) as Array<{
+        id: string;
+        name: string;
+        code?: string;
+      }>;
+    },
+    staleTime: 60_000,
+  });
+}
+
+export function useUomsSearch(search?: string) {
+  return useQuery({
+    queryKey: ['pos-uoms', search ?? ''],
+    queryFn: async () => {
+      const { data } = await rxsoftApi.get('/uoms', {
+        params: { search, limit: 20 },
+      });
+      return (data?.data ?? data ?? []) as Array<{
+        id: string;
+        name: string;
+        code: string | null;
+        factor: number;
+      }>;
+    },
+    staleTime: 300_000,
+  });
+}
+
+export function useQuickCreateItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      name: string;
+      categoryId: string;
+      baseUomId: string;
+      saleUomId?: string;
+      isActive?: boolean;
+    }) => {
+      const { data } = await rxsoftApi.post('/items', payload);
+      return data as { id: string; name: string; code?: string; itemCode?: string };
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pos-items'] });
+      qc.invalidateQueries({ queryKey: ['whitelisted-items'] });
+    },
+  });
+}
+
 export function useDispenseOrders(search?: string) {
   return useQuery({
     queryKey: ['dispense-orders', search ?? ''],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/orders/admin/orders/dispense', {
-        params: { search, limit: 25 },
-      });
+      const params: Record<string, any> = { limit: 25 };
+      if (search) {
+        params.search = search;
+      }
+      const { data } = await rxsoftApi.get('/orders/admin/orders/dispense', { params });
       return data?.data ?? data ?? [];
     },
     staleTime: 30_000,

@@ -44,7 +44,7 @@ for (const resource of rxsoftResources) {
 
     test('renders the list page', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
-      await expect(page.getByTestId('page-title')).toHaveText(resource.title);
+      await expect(crud.pageTitle(resource.title)).toHaveText(resource.title);
       await expect(crud.searchInput).toBeVisible();
       await expect(crud.recordsTotal).toBeVisible();
     });
@@ -90,6 +90,9 @@ for (const resource of rxsoftResources) {
     test('deletes the created record via the row action', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
       test.skip(!(resource.canCreate && resource.canDelete), 'record not created by this suite');
+      // Slow list endpoints can keep the confirm dialog disabled ~45s, which
+      // alone exhausts the default 60s per-test budget.
+      test.setTimeout(120_000);
       const searchKey = updatedToken ?? createdToken;
       await crud.search(searchKey);
       await expect(crud.rowAction(searchKey, 'lucide-trash-2')).toBeVisible();
@@ -101,11 +104,8 @@ for (const resource of rxsoftResources) {
     test('exposes CSV export', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
       test.skip(!resource.hasExport, 'resource has no csv endpoint');
-      await expect(crud.exportButton).toBeVisible();
-      await crud.exportButton.click();
-      await expect(page.getByText(`${resource.title} export downloaded`)).toBeVisible({
-        timeout: 5_000,
-      });
+      void page;
+      await crud.exportCsv(resource.title);
     });
 
     test.afterAll(async ({ request }) => {
@@ -124,6 +124,14 @@ for (const resource of rxsoftResources) {
         const body = (await listRes.json()) as unknown;
         for (const row of getRows(body)) {
           if (!row.id) {
+            continue;
+          }
+          // SAFEGUARD: only delete rows that actually contain the token created
+          // by this suite. Some list endpoints (e.g. the /roles proxy) IGNORE
+          // the `search` query param and return every row — blindly deleting
+          // the first `limit` rows would wipe the org's system roles and 403
+          // every role-guarded endpoint for the rest of the run.
+          if (!JSON.stringify(row).includes(searchKey)) {
             continue;
           }
           await request.delete(`${API_BASE_URL}${resource.endpoint}/${String(row.id)}`, {
