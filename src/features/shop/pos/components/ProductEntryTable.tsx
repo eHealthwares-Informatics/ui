@@ -17,7 +17,7 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getUomEffectiveFactor } from '@/lib/uom-utils';
@@ -115,7 +115,25 @@ function PosProductPicker({
             setSearch('');
             setFocused(false);
           }}
-          rightSection={isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
+          rightSection={
+            <Group gap={4} style={{ paddingRight: 4 }}>
+              {selectedLabel && !focused && (
+                <ActionIcon
+                  size="sm"
+                  variant="subtle"
+                  color="gray"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(null);
+                  }}
+                  aria-label="Clear product"
+                >
+                  <X size={14} />
+                </ActionIcon>
+              )}
+              {isLoading ? <Loader size={14} /> : <ChevronDown size={14} />}
+            </Group>
+          }
         />
       </Combobox.Target>
       <Combobox.Dropdown style={{ backgroundColor: 'white', zIndex: 200 }}>
