@@ -5,6 +5,7 @@ import {
   useOrganisationConfig,
   useOrderDetail,
   useUserPosConfig,
+  useUpdateUserPosConfig,
   useStockLocations,
 } from '../api/posApi';
 import { CartTable } from './components/CartTable';
@@ -51,6 +52,7 @@ export default function PosSalesPage() {
   const defaultsAppliedForSessions = useRef(new Set<string>());
   const { data: orgConfig } = useOrganisationConfig();
   const { data: userPosConfig } = useUserPosConfig();
+  const updatePosConfig = useUpdateUserPosConfig();
   const { data: stockLocations = [] } = useStockLocations();
   const stockLocationId = userPosConfig?.stockLocationId as string | undefined;
 
@@ -137,6 +139,25 @@ export default function PosSalesPage() {
       setCustomer(activeSession.id, { id: userPosConfig.defaultCustomerId, name: '' });
     }
   }, [userPosConfig, activeSession.id]);
+
+  // Auto-assign the first visible stock location when the cashier has none set
+  // (and hasn't opted out of location auto-selection). Runs once per load.
+  const locationAutoAssigned = useRef(false);
+  useEffect(() => {
+    if (locationAutoAssigned.current) {
+      return;
+    }
+    if (!userPosConfig || !stockLocations || stockLocations.length === 0) {
+      return;
+    }
+    if (userPosConfig.autoSelectLocation === false || userPosConfig.stockLocationId) {
+      locationAutoAssigned.current = true;
+      return;
+    }
+    locationAutoAssigned.current = true;
+    updatePosConfig.mutate({ stockLocationId: stockLocations[0].id });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPosConfig, stockLocations]);
 
   if (!activeSession) {
     return null;
