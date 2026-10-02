@@ -486,11 +486,14 @@ export function useCategoriesSearch(search?: string) {
 }
 
 export function useUomsSearch(search?: string) {
+  const term = search?.trim();
   return useQuery({
-    queryKey: ['pos-uoms', search ?? ''],
+    queryKey: ['pos-uoms', term ?? ''],
     queryFn: async () => {
+      // Unfiltered → fetch the full UOM list (backend caps at 1000);
+      // filtered → pass the search term through for server-side ranking.
       const { data } = await rxsoftApi.get('/uoms', {
-        params: { search, limit: 20 },
+        params: term ? { search: term, limit: 100 } : { limit: 1000 },
       });
       return (data?.data ?? data ?? []) as Array<{
         id: string;

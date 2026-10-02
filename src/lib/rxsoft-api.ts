@@ -2,8 +2,7 @@ import type { AxiosRequestConfig } from 'axios';
 import { createAuthApiClient } from '@/lib/create-api-client';
 
 export const RXSOFT_API_BASE_URL =
-  (import.meta.env.VITE_RXSOFT_API_URL as string | undefined) ??
-  '/api';
+  (import.meta.env.VITE_RXSOFT_API_URL as string | undefined) ?? '/api';
 
 export const rxsoftApi = createAuthApiClient({
   baseURL: RXSOFT_API_BASE_URL,
