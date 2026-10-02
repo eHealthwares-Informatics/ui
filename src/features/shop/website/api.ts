@@ -33,7 +33,7 @@ export interface WebPaymentProvider {
 }
 
 const api = createAuthApiClient({
-  baseURL: import.meta.env.VITE_RXSOFT_API_URL || 'https://rxsoft-backend.onrender.com/api',
+  baseURL: import.meta.env.VITE_RXSOFT_API_URL || '/api',
   onSessionExpired: 'ignore',
   onForbidden: 'ignore',
 });

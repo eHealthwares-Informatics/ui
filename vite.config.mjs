@@ -33,11 +33,14 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   define: {
-    __IDENTITY_API_URL__: JSON.stringify(process.env.VITE_IDENTITY_API_URL || 'http://localhost:8092'),
-    __EMR_API_URL__: JSON.stringify(process.env.VITE_EMR_API_URL || 'http://localhost:8093/api'),
-    __COMMUNICATION_API_URL__: JSON.stringify(process.env.VITE_COMMUNICATION_API_URL || 'http://localhost:8003/api/v1'),
-    __LIS_API_URL__: JSON.stringify(process.env.VITE_LIS_API_URL || 'http://localhost:8002'),
-    __RXSOFT_API_URL__: JSON.stringify(process.env.VITE_RXSOFT_API_URL || 'https://rxsoft-backend.onrender.com/api'),
+    // Fallbacks are relative paths — same-origin via nginx proxy. Never localhost
+    // or absolute hosts: a production build missing env vars must not ping the
+    // cashier's own machine or trip mixed-content blocking.
+    __IDENTITY_API_URL__: JSON.stringify(process.env.VITE_IDENTITY_API_URL || '/api/identity'),
+    __EMR_API_URL__: JSON.stringify(process.env.VITE_EMR_API_URL || '/api/emr'),
+    __COMMUNICATION_API_URL__: JSON.stringify(process.env.VITE_COMMUNICATION_API_URL || '/api/communication'),
+    __LIS_API_URL__: JSON.stringify(process.env.VITE_LIS_API_URL || '/api/lis'),
+    __RXSOFT_API_URL__: JSON.stringify(process.env.VITE_RXSOFT_API_URL || '/api'),
   },
   build: {
     minify: false,

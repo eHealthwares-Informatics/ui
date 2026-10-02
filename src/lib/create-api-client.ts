@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig 
 import { clearTokens, getAccessToken, getRefreshToken, persistTokens } from '@/lib/auth-tokens';
 
 export const IDENTITY_API_BASE_URL =
-  (import.meta.env.VITE_IDENTITY_API_URL as string | undefined) ?? 'http://localhost:8092';
+  (import.meta.env.VITE_IDENTITY_API_URL as string | undefined) ?? '/api/identity';
 
 export type SessionExpiredHandler = 'redirect' | 'ignore';
 
