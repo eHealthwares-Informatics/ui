@@ -497,7 +497,11 @@ export function ProductEntryTable({
 
   const unitPriceDisplay = effectivePrice !== null ? effectivePrice * uomFactor : null;
 
-  const { data: stockQty = null, refetch: refetchStock, isLoading: stockLoading } = useQuery({
+  const {
+    data: stockQty = null,
+    refetch: refetchStock,
+    isLoading: stockLoading,
+  } = useQuery({
     queryKey: ['pos-stock-qty', selectedProductId, stockLocationId],
     queryFn: async () => {
       if (!selectedProductId || !stockLocationId) {
