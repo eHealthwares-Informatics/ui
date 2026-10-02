@@ -2,7 +2,7 @@ import { createAuthApiClient } from '@/lib/create-api-client';
 
 export const CODING_CONCEPT_API_BASE_URL =
   (import.meta.env.VITE_CODING_CONCEPT_API_URL as string | undefined) ??
-  'https://api.ehealthwares.com/concepts/v1';
+  '/api/coding';
 
 export const codingConceptApi = createAuthApiClient({
   baseURL: CODING_CONCEPT_API_BASE_URL,

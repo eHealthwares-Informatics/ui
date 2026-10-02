@@ -3,7 +3,7 @@ import { createAuthApiClient } from '@/lib/create-api-client';
 
 export const RXSOFT_API_BASE_URL =
   (import.meta.env.VITE_RXSOFT_API_URL as string | undefined) ??
-  'https://rxsoft-backend.onrender.com/api';
+  '/api';
 
 export const rxsoftApi = createAuthApiClient({
   baseURL: RXSOFT_API_BASE_URL,

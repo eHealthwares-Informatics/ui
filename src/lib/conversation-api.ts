@@ -2,7 +2,7 @@ import type { AxiosRequestConfig } from 'axios';
 import { createAuthApiClient } from '@/lib/create-api-client';
 
 export const CONVERSATION_API_BASE_URL =
-  (import.meta.env.VITE_CONVERSATION_API_URL as string | undefined) ?? 'http://localhost:8001/api';
+  (import.meta.env.VITE_CONVERSATION_API_URL as string | undefined) ?? '/api/conversation';
 
 /** @deprecated Use CONVERSATION_API_BASE_URL instead */
 export const API_BASE_URL = CONVERSATION_API_BASE_URL;

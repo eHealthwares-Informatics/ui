@@ -255,23 +255,25 @@
 
   /* ═══ MODULES ═══ */
   function getModuleUrls(){
+    // Fallbacks are relative paths (nginx-proxied, same-origin) — never localhost
+    // or absolute hosts, so a build without defines can't false-report Offline.
     try{
       return {
-        'Security':        (typeof __IDENTITY_API_URL__ !== 'undefined') ? __IDENTITY_API_URL__ : 'http://localhost:8092',
-        'Clinical':        (typeof __EMR_API_URL__ !== 'undefined') ? __EMR_API_URL__ : 'http://localhost:8093/api',
-        'Patients':        (typeof __EMR_API_URL__ !== 'undefined') ? __EMR_API_URL__ : 'http://localhost:8093/api',
-        'Communication':   (typeof __COMMUNICATION_API_URL__ !== 'undefined') ? __COMMUNICATION_API_URL__ : 'http://localhost:8003/api/v1',
-        'Laboratory':      (typeof __LIS_API_URL__ !== 'undefined') ? __LIS_API_URL__ : 'http://localhost:8002',
-        'Billing':         (typeof __RXSOFT_API_URL__ !== 'undefined') ? __RXSOFT_API_URL__ : 'https://rxsoft-backend.onrender.com/api'
+        'Security':        (typeof __IDENTITY_API_URL__ !== 'undefined') ? __IDENTITY_API_URL__ : '/api/identity',
+        'Clinical':        (typeof __EMR_API_URL__ !== 'undefined') ? __EMR_API_URL__ : '/api/emr',
+        'Patients':        (typeof __EMR_API_URL__ !== 'undefined') ? __EMR_API_URL__ : '/api/emr',
+        'Communication':   (typeof __COMMUNICATION_API_URL__ !== 'undefined') ? __COMMUNICATION_API_URL__ : '/api/communication',
+        'Laboratory':      (typeof __LIS_API_URL__ !== 'undefined') ? __LIS_API_URL__ : '/api/lis',
+        'Billing':         (typeof __RXSOFT_API_URL__ !== 'undefined') ? __RXSOFT_API_URL__ : '/api'
       };
     }catch(e){
       return {
-        'Security':'http://localhost:8092',
-        'Clinical':'http://localhost:8093/api',
-        'Patients':'http://localhost:8093/api',
-        'Communication':'http://localhost:8003/api/v1',
-        'Laboratory':'http://localhost:8002',
-        'Billing':'https://rxsoft-backend.onrender.com/api'
+        'Security':'/api/identity',
+        'Clinical':'/api/emr',
+        'Patients':'/api/emr',
+        'Communication':'/api/communication',
+        'Laboratory':'/api/lis',
+        'Billing':'/api'
       };
     }
   }
