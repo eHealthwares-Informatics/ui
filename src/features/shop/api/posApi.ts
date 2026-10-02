@@ -510,6 +510,7 @@ export function useQuickCreateItem() {
       name: string;
       categoryId: string;
       baseUomId: string;
+      purchaseUomId?: string;
       saleUomId?: string;
       isActive?: boolean;
     }) => {

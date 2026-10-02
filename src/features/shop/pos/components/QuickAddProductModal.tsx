@@ -89,6 +89,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
       name: name.trim(),
       categoryId,
       baseUomId,
+      purchaseUomId: baseUomId,
       saleUomId: baseUomId,
       isActive: true,
     });
