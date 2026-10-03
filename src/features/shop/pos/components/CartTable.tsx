@@ -33,7 +33,7 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
   const { data: allUoms = [] } = useQuery({
     queryKey: ['uoms', 'all'],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/uoms', { params: { limit: 100 } });
+      const { data } = await rxsoftApi.get('/uoms', { params: { limit: 1000 } });
       return (data?.data ?? data ?? []) as UomOption[];
     },
     staleTime: 300_000,
@@ -84,27 +84,33 @@ export function CartTable({ session, onUpdateQty, onRemoveItem }: Props) {
                   <Table.Td c="lime">{item.name}</Table.Td>
                   <Table.Td c="lime">{price.toFixed(2)}</Table.Td>
                   <Table.Td c="lime">
-                    <Select
-                      size="xs"
-                      data={(() => {
-                        const current = uomMap.get(item.uomId);
-                        if (!current?.categoryId) {
-                          return Array.from(uomMap.values()).map((u) => ({
-                            value: u.id,
-                            label: u.name,
-                          }));
-                        }
-                        return Array.from(uomMap.values())
-                          .filter((u) => u.categoryId === current.categoryId)
-                          .map((u) => ({ value: u.id, label: u.name }));
-                      })()}
-                      value={item.uomId}
-                      disabled
-                      w={90}
-                      styles={{
-                        input: { color: 'lime', background: '#00185f', borderColor: '#2f8a53' },
-                      }}
-                    />
+                    {item.uomName ? (
+                      <Text size="xs" c="lime">
+                        {item.uomName}
+                      </Text>
+                    ) : (
+                      <Select
+                        size="xs"
+                        data={(() => {
+                          const current = uomMap.get(item.uomId);
+                          if (!current?.categoryId) {
+                            return Array.from(uomMap.values()).map((u) => ({
+                              value: u.id,
+                              label: u.name,
+                            }));
+                          }
+                          return Array.from(uomMap.values())
+                            .filter((u) => u.categoryId === current.categoryId)
+                            .map((u) => ({ value: u.id, label: u.name }));
+                        })()}
+                        value={item.uomId}
+                        disabled
+                        w={90}
+                        styles={{
+                          input: { color: 'lime', background: '#00185f', borderColor: '#2f8a53' },
+                        }}
+                      />
+                    )}
                   </Table.Td>
                   <Table.Td c="lime">
                     <NumberInput

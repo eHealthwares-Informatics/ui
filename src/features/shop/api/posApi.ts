@@ -423,12 +423,17 @@ export function usePosItemUoms(itemId?: string | null) {
       if (!itemId) {
         return [];
       }
-      const { data } = await rxsoftApi.get(`/items/${itemId}/uoms`);
-      const uoms = (data?.data ?? data ?? []) as UomOption[];
-      if (uoms.length > 0) {
-        return uoms;
+      let itemUoms: UomOption[] = [];
+      try {
+        const { data } = await rxsoftApi.get(`/items/${itemId}/uoms`);
+        itemUoms = (data?.data ?? data ?? []) as UomOption[];
+      } catch {
+        itemUoms = [];
       }
-      const all = await rxsoftApi.get('/uoms', { params: { limit: 200 } });
+      if (itemUoms.length > 0) {
+        return itemUoms;
+      }
+      const all = await rxsoftApi.get('/uoms', { params: { limit: 1000 } });
       return (all.data?.data ?? all.data ?? []) as UomOption[];
     },
     enabled: !!itemId,
