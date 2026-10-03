@@ -1,5 +1,7 @@
 import { Box, Grid, Paper, Stack } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { getUomEffectiveFactor } from '@/lib/uom-utils';
 import {
   useCompleteDispense,
   useOrganisationConfig,
@@ -8,7 +10,7 @@ import {
   useUpdateUserPosConfig,
   useStockLocations,
 } from '../api/posApi';
-import { CartTable } from './components/CartTable';
+import { CartStockAdjustContext, CartTable } from './components/CartTable';
 import { HeldSalesDrawer } from './components/HeldSalesDrawer';
 import { InvoicePreviewModal } from './components/InvoicePreviewModal';
 import { PaymentModal } from './components/PaymentModal';
@@ -17,6 +19,7 @@ import { PosToolbar } from './components/PosToolbar';
 import { ProductEntryTable } from './components/ProductEntryTable';
 import { SalesSummary } from './components/SalesSummary';
 import { SaleTabs } from './components/SaleTabs';
+import { StockAdjustModal } from './components/StockAdjustModal';
 import { usePosStore } from './store/usePosStore';
 import type { Customer, DispenseRow } from './types';
 import { calculateTotals } from './utils/calculation';
@@ -48,6 +51,8 @@ export default function PosSalesPage() {
   const [settingsOpened, setSettingsOpened] = useState(false);
   const [invoicePreviewOpened, setInvoicePreviewOpened] = useState(false);
   const [dispenseOrderId, setDispenseOrderId] = useState<string | null>(null);
+  const [adjustCartCtx, setAdjustCartCtx] = useState<CartStockAdjustContext | null>(null);
+  const queryClient = useQueryClient();
   const saleResultRef = useRef<any>(null);
   const defaultsAppliedForSessions = useRef(new Set<string>());
   const { data: orgConfig } = useOrganisationConfig();
@@ -330,6 +335,22 @@ export default function PosSalesPage() {
     });
   }
 
+  function handleCartUomChange(itemId: string, uom: { id: string; name: string; factor: number }) {
+    updateItem(activeSession.id, itemId, {
+      uomId: uom.id,
+      uomName: uom.name || 'Unit',
+      uomFactor: getUomEffectiveFactor(uom),
+    });
+  }
+
+  function handleStockAdjusted() {
+    if (adjustCartCtx) {
+      queryClient.invalidateQueries({
+        queryKey: ['pos-stock-qty', adjustCartCtx.itemId, stockLocationId],
+      });
+    }
+  }
+
   return (
     <>
       <Box bg="#b7dce9" h="100vh">
@@ -380,10 +401,13 @@ export default function PosSalesPage() {
             <Grid.Col span={{ base: 12, md: 9 }}>
               <CartTable
                 session={activeSession}
+                stockLocationId={stockLocationId}
                 onUpdateQty={(itemId, qty) =>
                   updateItem(activeSession.id, itemId, { quantity: qty })
                 }
                 onRemoveItem={(itemId) => removeItem(activeSession.id, itemId)}
+                onUomChange={handleCartUomChange}
+                onAdjustStock={setAdjustCartCtx}
               />
             </Grid.Col>
 
@@ -441,6 +465,20 @@ export default function PosSalesPage() {
 
       {/* SETTINGS */}
       <PosSettingsDrawer opened={settingsOpened} onClose={() => setSettingsOpened(false)} />
+
+      {/* CART STOCK ADJUST */}
+      <StockAdjustModal
+        opened={!!adjustCartCtx}
+        onClose={() => setAdjustCartCtx(null)}
+        itemId={adjustCartCtx?.itemId ?? ''}
+        itemName={adjustCartCtx?.itemName ?? ''}
+        stockLocationId={stockLocationId ?? ''}
+        currentQty={adjustCartCtx?.currentQty ?? 0}
+        baseQty={adjustCartCtx?.baseQty ?? 0}
+        onAdjusted={handleStockAdjusted}
+        uomId={adjustCartCtx?.uomId}
+        uomName={adjustCartCtx?.uomName}
+      />
     </>
   );
 }
