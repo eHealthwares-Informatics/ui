@@ -63,12 +63,14 @@ import { Route as ShopPharmacyLocatorRouteImport } from './routes/shop/pharmacy-
 import { Route as ShopPosRouteImport } from './routes/shop/pos'
 import { Route as ShopPos2RouteImport } from './routes/shop/pos2'
 import { Route as ShopPrivacyPolicyRouteImport } from './routes/shop/privacy-policy'
+import { Route as ShopResetPasswordRouteImport } from './routes/shop/reset-password'
 import { Route as ShopRewardsRouteImport } from './routes/shop/rewards'
 import { Route as ShopSearchRouteImport } from './routes/shop/search'
 import { Route as ShopShopRouteImport } from './routes/shop/shop'
 import { Route as ShopSupermarketRouteImport } from './routes/shop/supermarket'
 import { Route as ShopTermsRouteImport } from './routes/shop/terms'
 import { Route as ShopUploadPrescriptionRouteImport } from './routes/shop/upload-prescription'
+import { Route as ShopVerifyEmailRouteImport } from './routes/shop/verify-email'
 import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index'
 import { Route as AuthenticatedModuleIdDashboardRouteImport } from './routes/_authenticated/$moduleId/dashboard'
 import { Route as AuthenticatedPageIdRouteImport } from './routes/_authenticated/$page/$id'
@@ -225,6 +227,7 @@ import { Route as AuthenticatedLisValidationDashboardIndexRouteImport } from './
 import { Route as AuthenticatedRxsoftAuditLogsIndexRouteImport } from './routes/_authenticated/rxsoft/audit-logs/index'
 import { Route as AuthenticatedRxsoftBranchesIndexRouteImport } from './routes/_authenticated/rxsoft/branches/index'
 import { Route as AuthenticatedRxsoftCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/categories/index'
+import { Route as AuthenticatedRxsoftCouponsIndexRouteImport } from './routes/_authenticated/rxsoft/coupons/index'
 import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
 import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
 import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
@@ -281,8 +284,11 @@ import { Route as AuthenticatedRxsoftUomsUomIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedRxsoftUserConfigIndexRouteImport } from './routes/_authenticated/rxsoft/user-config/index'
 import { Route as AuthenticatedRxsoftUsersIndexRouteImport } from './routes/_authenticated/rxsoft/users/index'
 import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes/_authenticated/rxsoft/warehouses/index'
+import { Route as AuthenticatedRxsoftWebsiteConsultationsIndexRouteImport } from './routes/_authenticated/rxsoft/website-consultations/index'
+import { Route as AuthenticatedRxsoftWebsiteDeliveryAreasIndexRouteImport } from './routes/_authenticated/rxsoft/website-delivery-areas/index'
 import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
 import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index'
+import { Route as AuthenticatedRxsoftWebsiteRewardProgramsIndexRouteImport } from './routes/_authenticated/rxsoft/website-reward-programs/index'
 import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
 import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId'
 import { Route as AuthenticatedCodingConceptFacilitiesHospitalsIndexRouteImport } from './routes/_authenticated/coding-concept/facilities/hospitals/index'
@@ -585,6 +591,11 @@ const ShopPrivacyPolicyRoute = ShopPrivacyPolicyRouteImport.update({
   path: '/shop/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopResetPasswordRoute = ShopResetPasswordRouteImport.update({
+  id: '/shop/reset-password',
+  path: '/shop/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRewardsRoute = ShopRewardsRouteImport.update({
   id: '/shop/rewards',
   path: '/shop/rewards',
@@ -613,6 +624,11 @@ const ShopTermsRoute = ShopTermsRouteImport.update({
 const ShopUploadPrescriptionRoute = ShopUploadPrescriptionRouteImport.update({
   id: '/shop/upload-prescription',
   path: '/shop/upload-prescription',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopVerifyEmailRoute = ShopVerifyEmailRouteImport.update({
+  id: '/shop/verify-email',
+  path: '/shop/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedModuleIdIndexRoute =
@@ -1521,6 +1537,12 @@ const AuthenticatedRxsoftCategoriesIndexRoute =
     path: '/rxsoft/categories/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftCouponsIndexRoute =
+  AuthenticatedRxsoftCouponsIndexRouteImport.update({
+    id: '/rxsoft/coupons/',
+    path: '/rxsoft/coupons/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftCustomersIndexRoute =
   AuthenticatedRxsoftCustomersIndexRouteImport.update({
     id: '/rxsoft/customers/',
@@ -1857,6 +1879,18 @@ const AuthenticatedRxsoftWarehousesIndexRoute =
     path: '/rxsoft/warehouses/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftWebsiteConsultationsIndexRoute =
+  AuthenticatedRxsoftWebsiteConsultationsIndexRouteImport.update({
+    id: '/rxsoft/website-consultations/',
+    path: '/rxsoft/website-consultations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute =
+  AuthenticatedRxsoftWebsiteDeliveryAreasIndexRouteImport.update({
+    id: '/rxsoft/website-delivery-areas/',
+    path: '/rxsoft/website-delivery-areas/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftWebsiteOrdersIndexRoute =
   AuthenticatedRxsoftWebsiteOrdersIndexRouteImport.update({
     id: '/rxsoft/website-orders/',
@@ -1867,6 +1901,12 @@ const AuthenticatedRxsoftWebsitePrescriptionsIndexRoute =
   AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport.update({
     id: '/rxsoft/website-prescriptions/',
     path: '/rxsoft/website-prescriptions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute =
+  AuthenticatedRxsoftWebsiteRewardProgramsIndexRouteImport.update({
+    id: '/rxsoft/website-reward-programs/',
+    path: '/rxsoft/website-reward-programs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApmAdminPollingUnitsWardIdRoute =
@@ -2118,12 +2158,14 @@ export interface FileRoutesByFullPath {
   '/shop/pos': typeof ShopPosRoute
   '/shop/pos2': typeof ShopPos2Route
   '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/reset-password': typeof ShopResetPasswordRoute
   '/shop/rewards': typeof ShopRewardsRoute
   '/shop/search': typeof ShopSearchRoute
   '/shop/shop': typeof ShopShopRoute
   '/shop/supermarket': typeof ShopSupermarketRoute
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/shop/verify-email': typeof ShopVerifyEmailRoute
   '/apm/': typeof ApmIndexRoute
   '/questionnaire/': typeof QuestionnaireIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -2291,6 +2333,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute
   '/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/rxsoft/coupons/': typeof AuthenticatedRxsoftCouponsIndexRoute
   '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -2341,8 +2384,11 @@ export interface FileRoutesByFullPath {
   '/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute
   '/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/rxsoft/website-consultations/': typeof AuthenticatedRxsoftWebsiteConsultationsIndexRoute
+  '/rxsoft/website-delivery-areas/': typeof AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute
   '/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/rxsoft/website-reward-programs/': typeof AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute
   '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -2423,12 +2469,14 @@ export interface FileRoutesByTo {
   '/shop/pos': typeof ShopPosRoute
   '/shop/pos2': typeof ShopPos2Route
   '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/reset-password': typeof ShopResetPasswordRoute
   '/shop/rewards': typeof ShopRewardsRoute
   '/shop/search': typeof ShopSearchRoute
   '/shop/shop': typeof ShopShopRoute
   '/shop/supermarket': typeof ShopSupermarketRoute
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/shop/verify-email': typeof ShopVerifyEmailRoute
   '/apm': typeof ApmIndexRoute
   '/questionnaire': typeof QuestionnaireIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -2595,6 +2643,7 @@ export interface FileRoutesByTo {
   '/rxsoft/audit-logs': typeof AuthenticatedRxsoftAuditLogsIndexRoute
   '/rxsoft/branches': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/rxsoft/coupons': typeof AuthenticatedRxsoftCouponsIndexRoute
   '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -2645,8 +2694,11 @@ export interface FileRoutesByTo {
   '/rxsoft/user-config': typeof AuthenticatedRxsoftUserConfigIndexRoute
   '/rxsoft/users': typeof AuthenticatedRxsoftUsersIndexRoute
   '/rxsoft/warehouses': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/rxsoft/website-consultations': typeof AuthenticatedRxsoftWebsiteConsultationsIndexRoute
+  '/rxsoft/website-delivery-areas': typeof AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute
   '/rxsoft/website-orders': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/rxsoft/website-prescriptions': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/rxsoft/website-reward-programs': typeof AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute
   '/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -2732,12 +2784,14 @@ export interface FileRoutesById {
   '/shop/pos': typeof ShopPosRoute
   '/shop/pos2': typeof ShopPos2Route
   '/shop/privacy-policy': typeof ShopPrivacyPolicyRoute
+  '/shop/reset-password': typeof ShopResetPasswordRoute
   '/shop/rewards': typeof ShopRewardsRoute
   '/shop/search': typeof ShopSearchRoute
   '/shop/shop': typeof ShopShopRoute
   '/shop/supermarket': typeof ShopSupermarketRoute
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
+  '/shop/verify-email': typeof ShopVerifyEmailRoute
   '/apm/': typeof ApmIndexRoute
   '/questionnaire/': typeof QuestionnaireIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -2905,6 +2959,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/audit-logs/': typeof AuthenticatedRxsoftAuditLogsIndexRoute
   '/_authenticated/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/_authenticated/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
+  '/_authenticated/rxsoft/coupons/': typeof AuthenticatedRxsoftCouponsIndexRoute
   '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -2955,8 +3010,11 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/user-config/': typeof AuthenticatedRxsoftUserConfigIndexRoute
   '/_authenticated/rxsoft/users/': typeof AuthenticatedRxsoftUsersIndexRoute
   '/_authenticated/rxsoft/warehouses/': typeof AuthenticatedRxsoftWarehousesIndexRoute
+  '/_authenticated/rxsoft/website-consultations/': typeof AuthenticatedRxsoftWebsiteConsultationsIndexRoute
+  '/_authenticated/rxsoft/website-delivery-areas/': typeof AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute
   '/_authenticated/rxsoft/website-orders/': typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   '/_authenticated/rxsoft/website-prescriptions/': typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  '/_authenticated/rxsoft/website-reward-programs/': typeof AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute
   '/_authenticated/coding-concept/facilities/hospitals/$hospitalId': typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -3040,12 +3098,14 @@ export interface FileRouteTypes {
     | '/shop/pos'
     | '/shop/pos2'
     | '/shop/privacy-policy'
+    | '/shop/reset-password'
     | '/shop/rewards'
     | '/shop/search'
     | '/shop/shop'
     | '/shop/supermarket'
     | '/shop/terms'
     | '/shop/upload-prescription'
+    | '/shop/verify-email'
     | '/apm/'
     | '/questionnaire/'
     | '/shop/'
@@ -3213,6 +3273,7 @@ export interface FileRouteTypes {
     | '/rxsoft/audit-logs/'
     | '/rxsoft/branches/'
     | '/rxsoft/categories/'
+    | '/rxsoft/coupons/'
     | '/rxsoft/customers/'
     | '/rxsoft/drug-components/'
     | '/rxsoft/ehealthwares-articles/'
@@ -3263,8 +3324,11 @@ export interface FileRouteTypes {
     | '/rxsoft/user-config/'
     | '/rxsoft/users/'
     | '/rxsoft/warehouses/'
+    | '/rxsoft/website-consultations/'
+    | '/rxsoft/website-delivery-areas/'
     | '/rxsoft/website-orders/'
     | '/rxsoft/website-prescriptions/'
+    | '/rxsoft/website-reward-programs/'
     | '/coding-concept/facilities/hospitals/$hospitalId'
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -3345,12 +3409,14 @@ export interface FileRouteTypes {
     | '/shop/pos'
     | '/shop/pos2'
     | '/shop/privacy-policy'
+    | '/shop/reset-password'
     | '/shop/rewards'
     | '/shop/search'
     | '/shop/shop'
     | '/shop/supermarket'
     | '/shop/terms'
     | '/shop/upload-prescription'
+    | '/shop/verify-email'
     | '/apm'
     | '/questionnaire'
     | '/shop'
@@ -3517,6 +3583,7 @@ export interface FileRouteTypes {
     | '/rxsoft/audit-logs'
     | '/rxsoft/branches'
     | '/rxsoft/categories'
+    | '/rxsoft/coupons'
     | '/rxsoft/customers'
     | '/rxsoft/drug-components'
     | '/rxsoft/ehealthwares-articles'
@@ -3567,8 +3634,11 @@ export interface FileRouteTypes {
     | '/rxsoft/user-config'
     | '/rxsoft/users'
     | '/rxsoft/warehouses'
+    | '/rxsoft/website-consultations'
+    | '/rxsoft/website-delivery-areas'
     | '/rxsoft/website-orders'
     | '/rxsoft/website-prescriptions'
+    | '/rxsoft/website-reward-programs'
     | '/coding-concept/facilities/hospitals/$hospitalId'
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -3653,12 +3723,14 @@ export interface FileRouteTypes {
     | '/shop/pos'
     | '/shop/pos2'
     | '/shop/privacy-policy'
+    | '/shop/reset-password'
     | '/shop/rewards'
     | '/shop/search'
     | '/shop/shop'
     | '/shop/supermarket'
     | '/shop/terms'
     | '/shop/upload-prescription'
+    | '/shop/verify-email'
     | '/apm/'
     | '/questionnaire/'
     | '/shop/'
@@ -3826,6 +3898,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/audit-logs/'
     | '/_authenticated/rxsoft/branches/'
     | '/_authenticated/rxsoft/categories/'
+    | '/_authenticated/rxsoft/coupons/'
     | '/_authenticated/rxsoft/customers/'
     | '/_authenticated/rxsoft/drug-components/'
     | '/_authenticated/rxsoft/ehealthwares-articles/'
@@ -3876,8 +3949,11 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/user-config/'
     | '/_authenticated/rxsoft/users/'
     | '/_authenticated/rxsoft/warehouses/'
+    | '/_authenticated/rxsoft/website-consultations/'
+    | '/_authenticated/rxsoft/website-delivery-areas/'
     | '/_authenticated/rxsoft/website-orders/'
     | '/_authenticated/rxsoft/website-prescriptions/'
+    | '/_authenticated/rxsoft/website-reward-programs/'
     | '/_authenticated/coding-concept/facilities/hospitals/$hospitalId'
     | '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
     | '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
@@ -3960,12 +4036,14 @@ export interface RootRouteChildren {
   ShopPosRoute: typeof ShopPosRoute
   ShopPos2Route: typeof ShopPos2Route
   ShopPrivacyPolicyRoute: typeof ShopPrivacyPolicyRoute
+  ShopResetPasswordRoute: typeof ShopResetPasswordRoute
   ShopRewardsRoute: typeof ShopRewardsRoute
   ShopSearchRoute: typeof ShopSearchRoute
   ShopShopRoute: typeof ShopShopRoute
   ShopSupermarketRoute: typeof ShopSupermarketRoute
   ShopTermsRoute: typeof ShopTermsRoute
   ShopUploadPrescriptionRoute: typeof ShopUploadPrescriptionRoute
+  ShopVerifyEmailRoute: typeof ShopVerifyEmailRoute
   ApmIndexRoute: typeof ApmIndexRoute
   QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -4357,6 +4435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopPrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/reset-password': {
+      id: '/shop/reset-password'
+      path: '/shop/reset-password'
+      fullPath: '/shop/reset-password'
+      preLoaderRoute: typeof ShopResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/rewards': {
       id: '/shop/rewards'
       path: '/shop/rewards'
@@ -4397,6 +4482,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/upload-prescription'
       fullPath: '/shop/upload-prescription'
       preLoaderRoute: typeof ShopUploadPrescriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/verify-email': {
+      id: '/shop/verify-email'
+      path: '/shop/verify-email'
+      fullPath: '/shop/verify-email'
+      preLoaderRoute: typeof ShopVerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/$moduleId/': {
@@ -5491,6 +5583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftCategoriesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/coupons/': {
+      id: '/_authenticated/rxsoft/coupons/'
+      path: '/rxsoft/coupons'
+      fullPath: '/rxsoft/coupons/'
+      preLoaderRoute: typeof AuthenticatedRxsoftCouponsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/customers/': {
       id: '/_authenticated/rxsoft/customers/'
       path: '/rxsoft/customers'
@@ -5883,6 +5982,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftWarehousesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/website-consultations/': {
+      id: '/_authenticated/rxsoft/website-consultations/'
+      path: '/rxsoft/website-consultations'
+      fullPath: '/rxsoft/website-consultations/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteConsultationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/website-delivery-areas/': {
+      id: '/_authenticated/rxsoft/website-delivery-areas/'
+      path: '/rxsoft/website-delivery-areas'
+      fullPath: '/rxsoft/website-delivery-areas/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteDeliveryAreasIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/website-orders/': {
       id: '/_authenticated/rxsoft/website-orders/'
       path: '/rxsoft/website-orders'
@@ -5895,6 +6008,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/website-prescriptions'
       fullPath: '/rxsoft/website-prescriptions/'
       preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/website-reward-programs/': {
+      id: '/_authenticated/rxsoft/website-reward-programs/'
+      path: '/rxsoft/website-reward-programs'
+      fullPath: '/rxsoft/website-reward-programs/'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteRewardProgramsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/apm/admin/polling-units/$wardId': {
@@ -6385,6 +6505,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftAuditLogsIndexRoute: typeof AuthenticatedRxsoftAuditLogsIndexRoute
   AuthenticatedRxsoftBranchesIndexRoute: typeof AuthenticatedRxsoftBranchesIndexRoute
   AuthenticatedRxsoftCategoriesIndexRoute: typeof AuthenticatedRxsoftCategoriesIndexRoute
+  AuthenticatedRxsoftCouponsIndexRoute: typeof AuthenticatedRxsoftCouponsIndexRoute
   AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
   AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -6434,8 +6555,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftUserConfigIndexRoute: typeof AuthenticatedRxsoftUserConfigIndexRoute
   AuthenticatedRxsoftUsersIndexRoute: typeof AuthenticatedRxsoftUsersIndexRoute
   AuthenticatedRxsoftWarehousesIndexRoute: typeof AuthenticatedRxsoftWarehousesIndexRoute
+  AuthenticatedRxsoftWebsiteConsultationsIndexRoute: typeof AuthenticatedRxsoftWebsiteConsultationsIndexRoute
+  AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute: typeof AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute
   AuthenticatedRxsoftWebsiteOrdersIndexRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRoute
   AuthenticatedRxsoftWebsitePrescriptionsIndexRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRoute
+  AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute: typeof AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute
   AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
@@ -6654,6 +6778,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftBranchesIndexRoute: AuthenticatedRxsoftBranchesIndexRoute,
   AuthenticatedRxsoftCategoriesIndexRoute:
     AuthenticatedRxsoftCategoriesIndexRoute,
+  AuthenticatedRxsoftCouponsIndexRoute: AuthenticatedRxsoftCouponsIndexRoute,
   AuthenticatedRxsoftCustomersIndexRoute:
     AuthenticatedRxsoftCustomersIndexRoute,
   AuthenticatedRxsoftDrugComponentsIndexRoute:
@@ -6744,10 +6869,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftUsersIndexRoute: AuthenticatedRxsoftUsersIndexRoute,
   AuthenticatedRxsoftWarehousesIndexRoute:
     AuthenticatedRxsoftWarehousesIndexRoute,
+  AuthenticatedRxsoftWebsiteConsultationsIndexRoute:
+    AuthenticatedRxsoftWebsiteConsultationsIndexRoute,
+  AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute:
+    AuthenticatedRxsoftWebsiteDeliveryAreasIndexRoute,
   AuthenticatedRxsoftWebsiteOrdersIndexRoute:
     AuthenticatedRxsoftWebsiteOrdersIndexRoute,
   AuthenticatedRxsoftWebsitePrescriptionsIndexRoute:
     AuthenticatedRxsoftWebsitePrescriptionsIndexRoute,
+  AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute:
+    AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute,
   AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute:
     AuthenticatedCodingConceptFacilitiesHospitalsHospitalIdRoute,
   AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute:
@@ -7005,12 +7136,14 @@ const rootRouteChildren: RootRouteChildren = {
   ShopPosRoute: ShopPosRoute,
   ShopPos2Route: ShopPos2Route,
   ShopPrivacyPolicyRoute: ShopPrivacyPolicyRoute,
+  ShopResetPasswordRoute: ShopResetPasswordRoute,
   ShopRewardsRoute: ShopRewardsRoute,
   ShopSearchRoute: ShopSearchRoute,
   ShopShopRoute: ShopShopRoute,
   ShopSupermarketRoute: ShopSupermarketRoute,
   ShopTermsRoute: ShopTermsRoute,
   ShopUploadPrescriptionRoute: ShopUploadPrescriptionRoute,
+  ShopVerifyEmailRoute: ShopVerifyEmailRoute,
   ApmIndexRoute: ApmIndexRoute,
   QuestionnaireIndexRoute: QuestionnaireIndexRoute,
   ShopIndexRoute: ShopIndexRoute,

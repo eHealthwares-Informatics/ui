@@ -140,6 +140,22 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
     import('@/features/rxsoft/pages/website-prescriptions/schema').then((m) => ({
       default: m.prescriptionsConfig as unknown as ModelConfig,
     })),
+  'website-consultations': () =>
+    import('@/features/rxsoft/pages/website-consultations/schema').then((m) => ({
+      default: m.consultationsConfig as unknown as ModelConfig,
+    })),
+  'website-delivery-areas': () =>
+    import('@/features/rxsoft/pages/website-delivery-areas/schema').then((m) => ({
+      default: m.deliveryAreasConfig as unknown as ModelConfig,
+    })),
+  'website-reward-programs': () =>
+    import('@/features/rxsoft/pages/website-reward-programs/schema').then((m) => ({
+      default: m.rewardProgramsConfig as unknown as ModelConfig,
+    })),
+  coupons: () =>
+    import('@/features/rxsoft/pages/coupons/schema').then((m) => ({
+      default: m.couponsConfig as unknown as ModelConfig,
+    })),
 
   // Coding Concept
   'coding-concepts': () =>

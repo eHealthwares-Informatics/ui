@@ -47,3 +47,7 @@ export * from './users';
 export * from './user-config';
 export * from './website-orders';
 export * from './website-prescriptions';
+export * from './website-consultations';
+export * from './website-delivery-areas';
+export * from './website-reward-programs';
+export * from './coupons';
