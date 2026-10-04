@@ -43,11 +43,23 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
 
     // 1. Pick base type
     switch (field.type) {
-      case 'number':
-        typeSchema = z.coerce.number();
-        if (field.min !== undefined) typeSchema = (typeSchema as z.ZodNumber).min(field.min);
-        if (field.max !== undefined) typeSchema = (typeSchema as z.ZodNumber).max(field.max);
+      case 'number': {
+        let numberSchema = z.coerce.number();
+        if (field.min !== undefined) numberSchema = numberSchema.min(field.min);
+        if (field.max !== undefined) numberSchema = numberSchema.max(field.max);
+        // Missing required numbers must surface the field label, not zod's
+        // "expected number, received NaN" (z.coerce.number(undefined) → NaN).
+        typeSchema = field.required
+          ? z
+              .any()
+              .refine(
+                (v) => v !== undefined && v !== null && v !== '' && !Number.isNaN(Number(v)),
+                `${field.label} is required`
+              )
+              .pipe(numberSchema)
+          : numberSchema;
         break;
+      }
       case 'switch':
       case 'checkbox':
         typeSchema = z.boolean();
@@ -62,21 +74,44 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       case 'json':
         typeSchema = z.any();
         break;
+      case 'email': {
+        const emailSchema = z.string().email('Invalid email address');
+        // Missing required emails must surface the field label, not zod's
+        // "expected string, received undefined".
+        typeSchema = field.required
+          ? z
+              .any()
+              .refine(
+                (v) => typeof v === 'string' && v.trim().length > 0,
+                `${field.label} is required`
+              )
+              .pipe(emailSchema)
+          : emailSchema;
+        break;
+      }
       case 'textarea':
       case 'password':
-      case 'email':
       case 'color':
       case 'date':
       case 'text':
-      default:
-        typeSchema = z.string();
-        if (field.type === 'email') {
-          typeSchema = z.string().email('Invalid email address');
-        }
+      default: {
+        // Missing required strings must surface the field label, not zod's
+        // "expected string, received undefined".
+        typeSchema = field.required
+          ? z
+              .any()
+              .refine(
+                (v) => typeof v === 'string' && v.trim().length > 0,
+                `${field.label} is required`
+              )
+              .pipe(z.string())
+          : z.string();
         break;
+      }
     }
 
-    // 2. Required check
+    // 2. Required / optional wrapping for types whose required rule is not
+    //    folded into the base schema above (selects, switches, json).
     if (field.required) {
       if (field.type === 'switch' || field.type === 'checkbox') {
         typeSchema = (typeSchema as z.ZodBoolean).refine(
@@ -86,7 +121,10 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       } else if (
         field.type === 'async-select' ||
         field.type === 'select' ||
-        field.type === 'remote-select'
+        field.type === 'remote-select' ||
+        field.type === 'multi-async-select' ||
+        field.type === 'multi-pick' ||
+        field.type === 'json'
       ) {
         typeSchema = z
           .any()
@@ -102,20 +140,17 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
               ),
             `${field.label} is required`
           );
-      } else if (field.type === 'number') {
-        typeSchema = (typeSchema as z.ZodNumber).refine(
-          (v) => v !== undefined && v !== null && !isNaN(Number(v)),
-          `${field.label} is required`
-        );
-      } else {
-        typeSchema = (typeSchema as z.ZodString).min(1, `${field.label} is required`);
       }
+      // number / string / email already carry a friendly required refine.
     } else {
       // Optional fields can be null/undefined
       if (
         field.type === 'async-select' ||
         field.type === 'select' ||
-        field.type === 'remote-select'
+        field.type === 'remote-select' ||
+        field.type === 'multi-async-select' ||
+        field.type === 'multi-pick' ||
+        field.type === 'json'
       ) {
         typeSchema = z.any().nullable().optional();
       } else if (field.type === 'number') {

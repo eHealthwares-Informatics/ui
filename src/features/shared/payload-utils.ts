@@ -24,18 +24,35 @@ export function unwrapSelectValue(v: unknown): unknown {
   return v;
 }
 
-/** Flattens all fields defined across a ModelConfig (create fields, field groups, tabs) */
+/**
+ * True when a field group owns its own local/nested row state instead of
+ * binding fields to the page-level formState.
+ *
+ * Matrix renderers (pricing matrix, stock matrix, etc.) keep field values in
+ * component state and write results into nested arrays (priceListItems,
+ * stockEntries, …). Those field defs are row-entry inputs — they must never
+ * be validated against the top-level wizard formState.
+ */
+function isNestedStateGroup(group: { renderer?: string; formStateField?: string }): boolean {
+  return group.renderer === 'matrix';
+}
+
+/** Flattens all fields defined across a ModelConfig (create fields, field groups, tabs).
+ *  Nested-state groups (matrix renderers) are excluded — their fields are not
+ *  top-level form fields. */
 export function collectFields(config: ConfigFields): Field[] {
   const out: Field[] = [];
   for (const f of config.createFields ?? []) {
     out.push(f);
   }
   for (const g of config.createFieldGroups ?? []) {
+    if (isNestedStateGroup(g)) continue;
     out.push(...(g.fields ?? []));
   }
   for (const t of config.tabGroups ?? []) {
     out.push(...(t.fields ?? []));
     for (const g of t.fieldGroups ?? []) {
+      if (isNestedStateGroup(g)) continue;
       out.push(...(g.fields ?? []));
     }
   }
