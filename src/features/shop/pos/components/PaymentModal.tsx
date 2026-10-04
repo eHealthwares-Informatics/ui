@@ -311,6 +311,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       uomId: item.uomId || '',
       quantity: item.quantity,
       unitPrice: session.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice,
+      priceListId: session.priceListId || undefined,
     }));
 
     let paymentReference: string | undefined;

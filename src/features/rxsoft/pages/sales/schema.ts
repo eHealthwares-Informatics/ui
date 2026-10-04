@@ -33,7 +33,8 @@ const createFields: Field[] = [
     label: 'Lines JSON',
     required: true,
     type: 'textarea',
-    placeholder: '[{"productId":"...","uomId":"...","quantity":1,"unitPrice":10}]',
+    placeholder:
+      '[{"productId":"...","uomId":"...","quantity":1,"unitPrice":10,"priceListId":"..."}]',
   },
   {
     name: 'paymentsJson',
