@@ -228,11 +228,13 @@ export default function PosSalesPage() {
   }
 
   function handlePaymentModalComplete(saleResult?: any) {
+    const isOffline = saleResult?.offline === true;
     const printMode = saleResultRef.current;
     saleResultRef.current = null;
 
     // If this POS sale was dispensed from an order, link + dispatch the order.
-    if (dispenseOrderId && saleResult?.id) {
+    // Offline sales have no server id yet, so they cannot link until synced.
+    if (!isOffline && dispenseOrderId && saleResult?.id) {
       completeDispense.mutate({
         orderId: dispenseOrderId,
         saleId: saleResult.id,
@@ -243,18 +245,39 @@ export default function PosSalesPage() {
 
     handlePaymentComplete();
 
-    if (printMode === 'print') {
-      const items = activeSession.cart.map((item) => {
-        const price =
-          activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
-        return {
-          code: item.code,
-          name: item.name,
-          qty: item.quantity,
-          price,
-          total: price * item.quantity * item.uomFactor,
-        };
+    const items = activeSession.cart.map((item) => {
+      const price =
+        activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
+      return {
+        code: item.code,
+        name: item.name,
+        qty: item.quantity,
+        price,
+        total: price * item.quantity * item.uomFactor,
+      };
+    });
+
+    if (isOffline) {
+      // Offline sale: hand the customer a receipt marked pending sync.
+      const offlineHeader = orgConfig?.posHeader
+        ? `${orgConfig.posHeader} — OFFLINE — PENDING SYNC`
+        : 'OFFLINE — PENDING SYNC';
+      printPosReceipt({
+        saleNumber: activeSession.saleCode,
+        customerName: activeSession.customerName,
+        items,
+        subtotal: totals.subtotal,
+        discount: totals.discount,
+        vat: totals.vat,
+        total: totals.total,
+        paidAmount: totals.total,
+        changeAmount: 0,
+        header: offlineHeader,
       });
+      return;
+    }
+
+    if (printMode === 'print') {
       printPosReceipt({
         saleNumber: activeSession.saleCode,
         customerName: activeSession.customerName,
@@ -268,17 +291,6 @@ export default function PosSalesPage() {
         header: orgConfig?.posHeader ?? undefined,
       });
     } else if (printMode === 'print_wholesale') {
-      const items = activeSession.cart.map((item) => {
-        const price =
-          activeSession.pricingMode === 'wholesale' ? item.wholesalePrice : item.retailPrice;
-        return {
-          code: item.code,
-          name: item.name,
-          qty: item.quantity,
-          price,
-          total: price * item.quantity * item.uomFactor,
-        };
-      });
       printA4Receipt({
         saleNumber: activeSession.saleCode,
         customerName: activeSession.customerName,
