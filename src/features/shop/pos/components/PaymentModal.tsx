@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
   Group,
@@ -26,6 +27,8 @@ import {
   usePosTerminals,
   useQueryPosPayment,
 } from '../../api/posApi';
+import { usePosStore } from '../store/usePosStore';
+import { isNetworkError } from '../utils/offline-sales';
 
 interface Props {
   opened: boolean;
@@ -51,6 +54,20 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [walletPaymentRef, setWalletPaymentRef] = useState<string | null>(null);
+  const [walletDebited, setWalletDebited] = useState(false);
+  const [offlinePrompt, setOfflinePrompt] = useState(false);
+  const lastPayloadRef = useRef<any>(null);
+  const walletDebitedRef = useRef(false);
+  const enqueueOfflineSale = usePosStore((s) => s.enqueueOfflineSale);
+
+  function resetAttemptState() {
+    setWalletPaymentRef(null);
+    setWalletDebited(false);
+    setOfflinePrompt(false);
+    lastPayloadRef.current = null;
+    walletDebitedRef.current = false;
+  }
 
   useEffect(() => {
     if (opened) {
@@ -62,10 +79,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       setProviderId(null);
       setPaymentLink(null);
       setIsGeneratingLink(false);
+      resetAttemptState();
       // Pre-fill customer fields from session
       setCustomerName(session?.customerName || '');
       setCustomerPhone(session?.customer?.phone || '');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, totals.total, session?.customerName, session?.customer?.phone]);
 
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,8 +121,32 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const createCustomer = useCreateCustomer();
   const mutation = useCreateSale({
     onSuccess: (data) => {
+      resetAttemptState();
       onComplete(data);
       onClose();
+    },
+    onError: (error) => {
+      // Transport failure → offer an offline completion. Business errors (4xx
+      // e.g. insufficient stock) must never be completed offline.
+      if (isNetworkError(error)) {
+        setOfflinePrompt(true);
+        notifications.show({
+          color: 'orange',
+          title: 'Backend unreachable',
+          message: 'Complete this sale offline? It will be queued and synced automatically.',
+          autoClose: false,
+        });
+        return;
+      }
+      notifications.show({ color: 'red', message: getApiErrorMessage(error) });
+      if (walletDebitedRef.current) {
+        notifications.show({
+          color: 'orange',
+          title: 'Wallet debited, sale not recorded',
+          message: 'Retry will reuse the payment reference — do not debit again.',
+          autoClose: false,
+        });
+      }
     },
   });
 
@@ -274,11 +317,25 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     const payAmount = paid;
 
     if (usesWallet) {
-      const res = await debitWallet.mutateAsync({
-        amount: payAmount,
-        note: 'Sale paid from wallet',
-      });
-      paymentReference = res.reference;
+      if (walletPaymentRef) {
+        // A previous debit succeeded but the sale did not. Reuse the same
+        // reference on retry instead of debiting the wallet a second time.
+        paymentReference = walletPaymentRef;
+      } else {
+        try {
+          const res = await debitWallet.mutateAsync({
+            amount: payAmount,
+            note: 'Sale paid from wallet',
+          });
+          paymentReference = res.reference;
+          setWalletPaymentRef(res.reference ?? null);
+          setWalletDebited(true);
+          walletDebitedRef.current = true;
+        } catch (e: any) {
+          notifications.show({ color: 'red', message: getApiErrorMessage(e) });
+          return;
+        }
+      }
     } else if (usesTerminal) {
       if (posStatus !== 'success' || !posRef) {
         notifications.show({
@@ -308,13 +365,26 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
         : [],
     };
 
+    lastPayloadRef.current = payload;
     mutation.mutate(payload);
+  }
+
+  function handleCompleteOffline() {
+    const payload = lastPayloadRef.current;
+    if (!payload) {
+      setOfflinePrompt(false);
+      return;
+    }
+    enqueueOfflineSale({ payload, saleCode: session.saleCode });
+    resetAttemptState();
+    onComplete({ offline: true, saleNumber: session.saleCode, id: undefined });
+    onClose();
   }
 
   const canComplete = usesTerminal
     ? posStatus === 'success'
     : usesWallet
-      ? debitWallet.isPending
+      ? !debitWallet.isPending
       : usesTransfer
         ? !!paymentLink
         : true && !!methodId;
@@ -324,6 +394,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       opened={opened}
       onClose={() => {
         clearPosState();
+        resetAttemptState();
         onClose();
       }}
       title="Payment"
@@ -476,6 +547,35 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
         <Text data-testid="pos-payment-balance">Balance: ₦{Math.max(0, balance).toFixed(2)}</Text>
         {change > 0 && <Text c="green">Change: ₦{change.toFixed(2)}</Text>}
 
+        {walletDebited && !offlinePrompt && (
+          <Alert color="yellow" data-testid="pos-wallet-outstanding">
+            Wallet was debited but the sale was not recorded. Retrying reuses the payment reference
+            — do not debit again.
+          </Alert>
+        )}
+
+        {offlinePrompt && (
+          <Alert color="orange" title="Backend unreachable" data-testid="pos-offline-prompt">
+            <Text size="sm">
+              The sale could not reach the server. Complete it offline? It will be queued and synced
+              automatically when the connection returns.
+            </Text>
+            <Group mt="sm">
+              <Button
+                color="orange"
+                size="xs"
+                onClick={handleCompleteOffline}
+                data-testid="pos-complete-offline-btn"
+              >
+                Complete sale offline
+              </Button>
+              <Button variant="subtle" size="xs" onClick={() => setOfflinePrompt(false)}>
+                Cancel
+              </Button>
+            </Group>
+          </Alert>
+        )}
+
         <Group grow>
           <Button
             loading={mutation.isPending}
@@ -485,7 +585,14 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           >
             Complete Sale
           </Button>
-          <Button variant="light" onClick={onClose} data-testid="pos-cancel-payment-btn">
+          <Button
+            variant="light"
+            onClick={() => {
+              resetAttemptState();
+              onClose();
+            }}
+            data-testid="pos-cancel-payment-btn"
+          >
             Cancel
           </Button>
         </Group>

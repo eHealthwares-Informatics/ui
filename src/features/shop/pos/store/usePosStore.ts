@@ -2,6 +2,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SaleSession, CartItem, Customer } from '../types';
 
+export type OfflineSaleStatus = 'pending_sync' | 'synced' | 'failed';
+
+export interface OfflineSaleRecord {
+  id: string;
+  /** The exact `POST /sales` payload captured when the backend was unreachable. */
+  payload: Record<string, unknown>;
+  saleCode: string;
+  createdAt: string;
+  status: OfflineSaleStatus;
+  lastError?: string;
+}
+
 function generateSaleCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = 'WEBPOS-';
@@ -31,6 +43,19 @@ interface PosStore {
   setPricingMode: (sessionId: string, mode: 'retail' | 'wholesale') => void;
   holdSale: (id: string) => void;
   completeSale: (id: string, paidAmount: number, changeAmount: number) => void;
+
+  /**
+   * Offline complete-sale queue. Sales that failed on a NETWORK error (backend
+   * unreachable) are captured here so the cashier can still hand over a receipt.
+   * Entries are synced with their ORIGINAL saleNumber to guard against dupes.
+   */
+  offlineSaleQueue: OfflineSaleRecord[];
+  enqueueOfflineSale: (entry: { payload: Record<string, unknown>; saleCode: string }) => string;
+  markOfflineSaleSynced: (id: string) => void;
+  markOfflineSaleFailed: (id: string, lastError: string) => void;
+  removeOfflineSale: (id: string) => void;
+  /** Reset failed entries back to pending_sync so a cashier can manually retry. */
+  retryFailedOfflineSales: () => number;
 }
 
 const createEmptySession = (): SaleSession => ({
@@ -52,6 +77,7 @@ export const usePosStore = create<PosStore>()(
     (set) => ({
       sessions: [createEmptySession()],
       activeSessionId: null,
+      offlineSaleQueue: [],
 
       createSession: (oldSessionId?: string) =>
         set((state) => {
@@ -210,6 +236,57 @@ export const usePosStore = create<PosStore>()(
               : session
           ),
         })),
+
+      enqueueOfflineSale: ({ payload, saleCode }) => {
+        const id = crypto.randomUUID();
+        set((state) => ({
+          offlineSaleQueue: [
+            ...state.offlineSaleQueue,
+            {
+              id,
+              payload,
+              saleCode,
+              createdAt: new Date().toISOString(),
+              status: 'pending_sync' as const,
+            },
+          ],
+        }));
+        return id;
+      },
+
+      markOfflineSaleSynced: (id) =>
+        set((state) => ({
+          offlineSaleQueue: state.offlineSaleQueue.map((entry) =>
+            entry.id === id ? { ...entry, status: 'synced' as const, lastError: undefined } : entry
+          ),
+        })),
+
+      markOfflineSaleFailed: (id, lastError) =>
+        set((state) => ({
+          offlineSaleQueue: state.offlineSaleQueue.map((entry) =>
+            entry.id === id ? { ...entry, status: 'failed' as const, lastError } : entry
+          ),
+        })),
+
+      removeOfflineSale: (id) =>
+        set((state) => ({
+          offlineSaleQueue: state.offlineSaleQueue.filter((entry) => entry.id !== id),
+        })),
+
+      retryFailedOfflineSales: () => {
+        let count = 0;
+        set((state) => {
+          const queue = state.offlineSaleQueue.map((entry) => {
+            if (entry.status !== 'failed') {
+              return entry;
+            }
+            count += 1;
+            return { ...entry, status: 'pending_sync' as const, lastError: undefined };
+          });
+          return { offlineSaleQueue: queue };
+        });
+        return count;
+      },
     }),
     { name: 'pos-store' }
   )

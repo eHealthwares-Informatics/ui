@@ -1,9 +1,10 @@
 import { ActionIcon, Badge, Button, Group, Select, Text } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { Plus, RefreshCcw, Search, Settings } from 'lucide-react';
+import { CloudOff, Plus, RefreshCcw, Search, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { useCustomers, useDispenseOrders, usePriceLists, useSearchSales } from '../../api/posApi';
 import { SaleSession } from '../types';
+import { useOfflineSalesSync } from '../utils/offline-sales';
 import { CustomerQuickAddModal } from './CustomerQuickAddModal';
 
 interface Props {
@@ -43,6 +44,7 @@ export function PosToolbar({
   const { data: priceLists = [] } = usePriceLists(priceListSearch);
   const { data: sales = [] } = useSearchSales(saleSearch);
   const { data: dispenseOrders = [] } = useDispenseOrders(saleSearch);
+  const { pendingCount, failedCount, syncing, syncNow, retryFailed } = useOfflineSalesSync();
 
   const customerData = (Array.isArray(customers) ? customers : []).map((c: any) => ({
     value: c.id,
@@ -159,6 +161,38 @@ export function PosToolbar({
         >
           Refresh
         </Button>
+
+        {(pendingCount > 0 || failedCount > 0) && (
+          <>
+            <Badge
+              size="sm"
+              variant="filled"
+              color={failedCount > 0 ? 'red' : 'orange'}
+              leftSection={<CloudOff size={12} />}
+              data-testid="pos-offline-queue-badge"
+            >
+              {pendingCount} offline sale{pendingCount === 1 ? '' : 's'}
+              {failedCount > 0 ? ` · ${failedCount} failed` : ''}
+            </Badge>
+            <Button
+              size="xs"
+              variant="light"
+              color={failedCount > 0 ? 'red' : 'orange'}
+              loading={syncing}
+              leftSection={<RefreshCcw size={14} />}
+              onClick={() => {
+                if (failedCount > 0) {
+                  void retryFailed();
+                } else {
+                  void syncNow();
+                }
+              }}
+              data-testid="pos-offline-sync-btn"
+            >
+              Sync now
+            </Button>
+          </>
+        )}
 
         <Button
           size="xs"

@@ -98,6 +98,9 @@ export function useDebitWallet() {
       const { data } = await rxsoftApi.post('/customer/wallet/debit', payload);
       return data as { id: string; balance: number; reference?: string };
     },
+    // 'always' so a debit attempted while offline fails fast instead of hanging
+    // the checkout in a paused mutation.
+    networkMode: 'always',
     onSuccess: () => {
       qc.invalidateQueries(walletKeys.me);
     },
@@ -174,14 +177,29 @@ export async function fetchSales() {
   return data;
 }
 
-export function useCreateSale(options?: { onSuccess?: (data: any) => void }) {
+export function useCreateSale(options?: {
+  onSuccess?: (data: any) => void;
+  onError?: (error: unknown) => void;
+}) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateSaleDto) => createSale(payload),
+    // 'always' so an offline POST actually fails and surfaces an onError (and
+    // the offline-complete prompt) instead of being paused until reconnect.
+    networkMode: 'always',
     onSuccess: (data) => {
       qc.invalidateQueries(salesKeys.list);
       qc.invalidateQueries({ queryKey: ['rxsoft-sales-analytics'] });
       options?.onSuccess?.(data);
+    },
+    // A hook-level onError replaces the QueryClient's default mutation onError
+    // (TanStack Query merges defaults as `{ ...defaults, ...options }`), so the
+    // backend message is surfaced exactly once here instead of toast-twice.
+    onError: (error) => {
+      options?.onError?.(error);
+      if (!options?.onError) {
+        notifications.show({ color: 'red', message: getApiErrorMessage(error) });
+      }
     },
   });
 }
