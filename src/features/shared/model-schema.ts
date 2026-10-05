@@ -42,6 +42,12 @@ export type ModelConfig<T = any> = {
    */
   renderCreateModal?: (args: { onClose: () => void; refresh: () => void }) => React.ReactNode;
   transformRows?: (rows: Record<string, unknown>[]) => Record<string, unknown>[];
+  /**
+   * Gates the header New/create entry point. Defaults to true when any create
+   * config exists (createFields/createFieldGroups/tabGroups/renderCreateModal);
+   * set false to retire create while keeping list/view/edit behavior.
+   */
+  canCreate?: boolean;
   canDelete?: boolean;
   canArchive?: boolean;
   canExport?: boolean;
