@@ -306,7 +306,10 @@ test.describe('RxSoft Items wizard', () => {
     await pickSuggestion('purchaseUom', ['bo', 'pi', 'ea']);
     await pickSuggestion('saleUom', ['ea', 'pi', 'bo']);
     await crud.page.getByRole('button', { name: 'Create & Continue' }).click();
-    await expect(page.locator('.mantine-Notification-root, [role="alert"]').first()).toBeVisible({
+    // Narrow to Mantine's notification root: the validation gate renders
+    // unconditional field-error-<name> spans with role="alert", which a broad
+    // [role="alert"] selector matches first (hidden, empty spans).
+    await expect(page.locator('.mantine-Notification-root').first()).toBeVisible({
       timeout: 15_000,
     });
     await page.unroute('**/api/items');
