@@ -106,10 +106,7 @@ test.describe.serial('RxSoft goods receiving', () => {
     // CreateItemDto: categoryId + all three UOM ids required by
     // CreateItemUseCase; item DTO has no overrideCodeValidation (rejected by
     // whitelist + forbidNonWhitelisted).
-    const categories = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/categories?limit=1'
-    );
+    const categories = await apiFetch<{ data: Array<{ id: string }> }>(page, '/categories?limit=1');
     const categoryId = categories.data?.[0]?.id;
     expect(categoryId, 'seeded category required for item create').toBeTruthy();
     const item = await apiCreate<{ id: string }>(page, '/items', {

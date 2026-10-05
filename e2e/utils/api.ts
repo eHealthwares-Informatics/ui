@@ -43,9 +43,9 @@ export async function readAccessToken(page: {
   evaluate: (fn: () => unknown) => unknown;
 }): Promise<string | null> {
   try {
-    return (await page.evaluate(
-      () => window.localStorage.getItem('rxsoft_admin_access_token')
-    )) as string | null;
+    return (await page.evaluate(() => window.localStorage.getItem('rxsoft_admin_access_token'))) as
+      | string
+      | null;
   } catch {
     return tokenFromStorageState();
   }

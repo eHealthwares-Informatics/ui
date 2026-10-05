@@ -113,10 +113,7 @@ test.describe.serial('RxSoft purchases', () => {
     // Create an item (CreateItemDto: categoryId + all three UOM ids required
     // by CreateItemUseCase; no overrideCodeValidation field on the item DTO —
     // whitelist+forbidNonWhitelisted rejects unknown keys)
-    const categories = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/categories?limit=1'
-    );
+    const categories = await apiFetch<{ data: Array<{ id: string }> }>(page, '/categories?limit=1');
     const categoryId = categories.data?.[0]?.id;
     expect(categoryId, 'seeded category required for item create').toBeTruthy();
     const item = await apiCreate<{ id: string }>(page, '/items', {

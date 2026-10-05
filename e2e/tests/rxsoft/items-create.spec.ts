@@ -29,11 +29,7 @@ const token = `E2E Create ${Date.now().toString(36)}`;
  * Advice", not the old hardcoded "Medical") so we must not pin a label: select
  * the first rendered `async-option-*` (testid-prefix, no label-proximity).
  */
-async function pickOption(
-  page: import('@playwright/test').Page,
-  fieldName: string,
-  query: string
-) {
+async function pickOption(page: import('@playwright/test').Page, fieldName: string, query: string) {
   const input = page.getByTestId(`async-select-${fieldName}`);
   await expect(input).toBeEnabled({ timeout: 20_000 });
   await input.click();
