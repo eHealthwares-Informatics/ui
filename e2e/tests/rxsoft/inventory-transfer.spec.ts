@@ -1,17 +1,46 @@
 import { expect, test } from '../../fixtures/test';
+import { apiFetch } from '../../utils/api';
 
 /**
  * RxSoft inventory — stock transfer between locations.
  *
- * Finds a Stock Balances row with available quantity > 0, opens its Transfer
- * modal, picks a destination location and quantity 1, transfers, and asserts
- * the success toast (POST /inventory/transfers).
+ * Self-setup: fresh provisioned orgs have stock locations (HQ + STORE) but
+ * no balances, so this spec seeds one via POST /inventory/adjust-quantity
+ * (creates balance if needed) before driving the UI. Finds a Stock Balances
+ * row with available quantity > 0, opens its Transfer modal, picks a
+ * destination location and quantity 1, transfers, and asserts the success
+ * toast (POST /inventory/transfers).
  *
  * Selectors are testid-first per the e2e convention (AGENTS.md rule 1);
  * the transfer modal fields carry transfer-* testids on the inventory page.
  */
+const TS = Date.now().toString(36);
+
 test.describe('RxSoft inventory transfers', () => {
   test('transfers stock to another location', async ({ page }) => {
+    // Self-setup: seed a stock balance at the first location; transfer needs
+    // a second location as destination (seed template provisions HQ + STORE).
+    const items = await apiFetch<{ data: Array<{ id: string }> }>(page, '/items?limit=1');
+    const locations = await apiFetch<{ data: Array<{ id: string }> }>(
+      page,
+      '/stock-locations?limit=5'
+    );
+    const itemId = items.data?.[0]?.id;
+    const locs = locations.data ?? [];
+    test.skip(
+      !itemId || locs.length < 2,
+      'need a seeded item and >=2 stock locations for a transfer'
+    );
+    await apiFetch(page, '/inventory/adjust-quantity', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemId,
+        locationId: locs[0].id,
+        deltaQuantity: 5,
+        reason: `E2E seed stock ${TS}`,
+      }),
+    });
+
     await page.goto('/rxsoft/inventory');
 
     // Scope to the Stock Balances table (header cell "On Hand").
@@ -37,8 +66,9 @@ test.describe('RxSoft inventory transfers', () => {
         break;
       }
     }
+    // Safety net: self-setup should have created a balance with qty 5.
     if (targetIndex < 0) {
-      test.skip(true, 'no stock balances with available quantity to transfer');
+      test.skip(true, 'no stock balances with available quantity after self-setup');
     }
     const targetRow = rows.nth(targetIndex);
 
