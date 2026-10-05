@@ -7,7 +7,7 @@ const columns: Column[] = [
     key: 'supplier.name',
     label: 'Supplier',
     filters: RELATION_FILTER({
-      endpoint: '/customers',
+      endpoint: '/suppliers',
       queryParam: 'search',
       valueKey: 'id',
       labelKey: 'name',
@@ -42,7 +42,7 @@ const createFields: Field[] = [
     type: 'async-select',
     required: true,
     searchParam: {
-      endpoint: '/customers',
+      endpoint: '/suppliers',
       queryParam: 'search',
       valueKey: 'id',
       labelKey: 'name',
@@ -162,8 +162,10 @@ function buildCreatePayload(values: Record<string, unknown>) {
     warehouseId: values.warehouse
       ? (values.warehouse as { value: string }).value
       : values.warehouseId,
-    productId: values.productId,
-    purchaseUomId: values.purchaseUom ? (values.purchaseUom as { value: string }).value : undefined,
+    // Backend CreatePurchaseDto flat path (normalizeLines): itemId + quantity +
+    // unitCost → one line (uomId defaults server-side). productId/purchaseUomId
+    // are NOT DTO fields — whitelist + forbidNonWhitelisted rejects them (400).
+    itemId: values.productId,
     quantity: Number(values.quantity || 0),
     unitCost: Number(values.unitCost || 0),
     invoiceNumber: values.invoiceNumber || undefined,
@@ -201,6 +203,10 @@ export const purchasesConfig: ModelConfig = {
   buildFormState,
   view: purchasesView,
   detailPathBuilder: (row) => `/rxsoft/purchases/${String(row.id)}`,
+  // Create retired: PO creation lives at /shop/purchases (ui#70). List, view,
+  // line-edit, status, delete and export stay wired. createFields/
+  // buildCreatePayload kept for reference until the shop flow fully owns POs.
+  canCreate: false,
   canDelete: true,
   canExport: true,
   csvEndpoint: '/purchases/export',

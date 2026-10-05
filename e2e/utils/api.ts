@@ -68,7 +68,10 @@ export async function apiFetch<T>(
   };
   const res = await fetch(`${API_BASE_URL}${path}`, { ...init, headers });
   if (!res.ok) {
-    throw new Error(`apiFetch ${path} failed: ${res.status} ${res.statusText}`);
+    const body = await res.text().catch(() => '');
+    throw new Error(
+      `apiFetch ${path} failed: ${res.status} ${res.statusText}${body ? ` — ${body.slice(0, 300)}` : ''}`
+    );
   }
   return (await res.json()) as T;
 }

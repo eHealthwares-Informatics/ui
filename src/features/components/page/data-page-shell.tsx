@@ -84,6 +84,7 @@ export function DataPageShell(props: DataPageShellProps) {
     queryKeyBase,
     defaultSort,
     renderCreateModal,
+    canCreate,
   } = config;
   const moduleContext = useModuleContext();
   const listKeyBase = queryKeyBase ?? ['rxsoft-data-page', endpoint];
@@ -215,8 +216,14 @@ export function DataPageShell(props: DataPageShellProps) {
     staleTime: 120_000,
   });
 
-  const hasCreate = Boolean(tabGroups || createFields || createFieldGroups || renderCreateModal);
-  const hasInlineEdit = hasCreate && !editPathBuilder;
+  // Create config presence (form/modal/paths) vs. the create entry point:
+  // canCreate=false retires the header New button (e.g. admin purchases —
+  // creation lives at /shop/purchases) without touching edit/detail wiring.
+  const hasCreateConfig = Boolean(
+    tabGroups || createFields || createFieldGroups || renderCreateModal
+  );
+  const hasCreate = canCreate !== false && hasCreateConfig;
+  const hasInlineEdit = hasCreateConfig && !editPathBuilder;
   const hasFilterableColumns = columns.some((c) => c.filters && c.filters.length > 0);
 
   const fieldGroups = createFieldGroups ?? (createFields ? [{ fields: createFields }] : []);
