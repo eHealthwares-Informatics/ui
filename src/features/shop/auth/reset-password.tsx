@@ -76,7 +76,10 @@ export default function ResetPasswordPage({ token }: { token: string }) {
               Enter a new password for your account.
             </Text>
 
-            <Input.Wrapper label="New password" error={tooShort ? 'At least 8 characters' : undefined}>
+            <Input.Wrapper
+              label="New password"
+              error={tooShort ? 'At least 8 characters' : undefined}
+            >
               <Input
                 type="password"
                 placeholder="New password"
@@ -89,7 +92,10 @@ export default function ResetPasswordPage({ token }: { token: string }) {
               />
             </Input.Wrapper>
 
-            <Input.Wrapper label="Confirm password" error={mismatch ? 'Passwords do not match' : undefined}>
+            <Input.Wrapper
+              label="Confirm password"
+              error={mismatch ? 'Passwords do not match' : undefined}
+            >
               <Input
                 type="password"
                 placeholder="Repeat password"

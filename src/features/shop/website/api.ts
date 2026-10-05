@@ -314,10 +314,7 @@ export const websiteApi = {
 
   requestEmailVerification: (data: { email: string }) =>
     api
-      .post<{ sent: boolean; alreadyVerified?: boolean }>(
-        '/website/auth/resend-verification',
-        data,
-      )
+      .post<{ sent: boolean; alreadyVerified?: boolean }>('/website/auth/resend-verification', data)
       .then((r) => r.data),
 
   verifyEmail: (data: { token: string }) =>

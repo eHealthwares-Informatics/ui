@@ -48,16 +48,19 @@ export default function VerifyEmailPage({ token }: { token: string }) {
             </>
           ) : (
             <>
-              <ThemeIcon radius="xl" size={64} color={state === 'verified' ? 'green' : 'red'} mx="auto">
+              <ThemeIcon
+                radius="xl"
+                size={64}
+                color={state === 'verified' ? 'green' : 'red'}
+                mx="auto"
+              >
                 {state === 'verified' ? <Check size={32} /> : <AlertCircle size={32} />}
               </ThemeIcon>
               <Title order={2} className="damorex-heading" mt="md">
                 {state === 'verified' ? 'Email Verified' : 'Verification Failed'}
               </Title>
               <Text c={muted} lh={1.7} mt="sm">
-                {state === 'verified'
-                  ? 'Thanks! Your email address is now confirmed.'
-                  : message}
+                {state === 'verified' ? 'Thanks! Your email address is now confirmed.' : message}
               </Text>
               <Button
                 radius="xl"

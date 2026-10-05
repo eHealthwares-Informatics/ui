@@ -61,7 +61,7 @@ async function completeSaleWithPriceList(priceListId?: string) {
       onComplete={vi.fn()}
       totals={{ total: 100 }}
       session={session(priceListId)}
-    />,
+    />
   );
 
   const methodInput = screen.getByTestId('pos-payment-method');
