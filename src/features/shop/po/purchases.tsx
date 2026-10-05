@@ -267,10 +267,14 @@ export default function PurchasesPage() {
     }
   }
 
-  function handleReceiveAll() {
+  async function handleReceiveAll() {
     const receivable = lines.filter((l) => l.serverLineId && !l.isPosted && l.receivedQty > 0);
+    // Sequential receives: the backend computes PO status (received vs
+    // partially_received) from all lines inside each request's transaction.
+    // Parallel fire-and-forget POSTs race on that read — each sees the other
+    // line unreceived and the PO stays partially_received after both commit.
     for (const line of receivable) {
-      handleReceiveLine(line);
+      await handleReceiveLine(line);
     }
   }
 

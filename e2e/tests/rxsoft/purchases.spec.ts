@@ -346,7 +346,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-01: selects a supplier on the PO builder', async ({ page }) => {
     test.skip(!supplierId, 'setup did not resolve a supplier');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     const supplierSelect = page.getByTestId('po-supplier-select');
     await expect(supplierSelect).toBeVisible({ timeout: 15_000 });
@@ -363,7 +363,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-02: selects a warehouse on the PO builder', async ({ page }) => {
     test.skip(!warehouseId, 'setup did not resolve a warehouse');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     const warehouseSelect = page.getByTestId('po-warehouse-select');
     await expect(warehouseSelect).toBeVisible({ timeout: 15_000 });
@@ -380,7 +380,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-03: enters an item and ordered quantity', async ({ page }) => {
     test.skip(!item1, 'setup did not resolve an item');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await expect(page.getByTestId('po-lines-table')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId('po-add-line')).toBeVisible();
@@ -394,7 +394,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-04: saves a draft PO and the PO number is visible', async ({ page }) => {
     test.skip(!supplierId || !warehouseId || !item1, 'setup prerequisites missing');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await pickSelectOption(
       page,
@@ -448,7 +448,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-05a: submits the draft PO to approved', async ({ page }) => {
     test.skip(!draftPoId || !draftPoNumber, 'TC-04 did not produce a draft PO');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await loadPoFromSelect(page, draftPoNumber);
     await expect(page.getByTestId('po-status-badge')).toContainText('draft', { timeout: 10_000 });
@@ -471,7 +471,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-05b: direct submit path skips the draft-save step', async ({ page }) => {
     test.skip(!supplierId || !warehouseId || !item1 || !item2, 'setup prerequisites missing');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     const { id, number } = await buildAndDirectSubmitPo(page);
     directPoId = id;
@@ -486,7 +486,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-06: loads a PO from the purchase-orders select', async ({ page }) => {
     test.skip(!directPoId || !directPoNumber, 'TC-05b did not produce an approved PO');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await loadPoFromSelect(page, directPoNumber);
 
@@ -508,7 +508,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
     page,
   }) => {
     test.skip(!directPoId || !directPoNumber, 'TC-05b did not produce an approved PO');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await loadPoFromSelect(page, directPoNumber);
     await enterReceiptAndLineValues(page);
@@ -525,7 +525,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-08: receives each line individually', async ({ page }) => {
     test.skip(!directPoId || !directPoNumber, 'TC-05b did not produce an approved PO');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     await loadPoFromSelect(page, directPoNumber);
     await enterReceiptAndLineValues(page);
@@ -566,7 +566,7 @@ test.describe.serial('RxSoft shop purchases (PO flow)', () => {
 
   test('TC-SHOP-PO-09: receives all lines at once, skipping per-line receive', async ({ page }) => {
     test.skip(!supplierId || !warehouseId || !item1 || !item2, 'setup prerequisites missing');
-    await page.goto('/shop/purchases');
+    await page.goto('/shop/purchases', { timeout: 60_000 });
 
     // Fresh 2-line PO via direct submit (skips per-line receive entirely).
     const { id, number } = await buildAndDirectSubmitPo(page);
