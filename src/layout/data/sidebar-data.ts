@@ -434,6 +434,30 @@ export const sidebarData: SidebarData = {
           icon: FileText,
           modules: ['rxsoft'],
         },
+        {
+          title: 'Consultations',
+          url: '/rxsoft/website-consultations',
+          icon: Stethoscope,
+          modules: ['rxsoft'],
+        },
+        {
+          title: 'Delivery Areas',
+          url: '/rxsoft/website-delivery-areas',
+          icon: Truck,
+          modules: ['rxsoft'],
+        },
+        {
+          title: 'Reward Programs',
+          url: '/rxsoft/website-reward-programs',
+          icon: HandCoins,
+          modules: ['rxsoft'],
+        },
+        {
+          title: 'Coupons',
+          url: '/rxsoft/coupons',
+          icon: Receipt,
+          modules: ['rxsoft'],
+        },
       ],
     },
     {

@@ -306,6 +306,20 @@ export const websiteApi = {
       .post<{ accessToken: string; refreshToken: string }>('/website/auth/login', data)
       .then((r) => r.data),
 
+  forgotPassword: (data: { email: string }) =>
+    api.post<{ sent: boolean }>('/website/auth/forgot-password', data).then((r) => r.data),
+
+  resetPassword: (data: { token: string; password: string }) =>
+    api.post<{ reset: boolean }>('/website/auth/reset-password', data).then((r) => r.data),
+
+  requestEmailVerification: (data: { email: string }) =>
+    api
+      .post<{ sent: boolean; alreadyVerified?: boolean }>('/website/auth/resend-verification', data)
+      .then((r) => r.data),
+
+  verifyEmail: (data: { token: string }) =>
+    api.post<{ verified: boolean }>('/website/auth/verify-email', data).then((r) => r.data),
+
   // Search
   search: (q: string, type?: string) =>
     api.get<SearchResults>('/website/search', { params: { q, type } }).then((r) => r.data),

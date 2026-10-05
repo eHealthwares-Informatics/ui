@@ -253,6 +253,13 @@ export function AuthPanel({ variant, initialTab = 'signin', onSuccess }: AuthPan
         phone: regPhone || undefined,
         password: regPassword,
       });
+      if (regEmail) {
+        notifications.show({
+          title: 'Verify your email',
+          message: `We sent a verification link to ${regEmail}.`,
+          color: 'green',
+        });
+      }
       finish();
     } catch (error: unknown) {
       notifications.show({
