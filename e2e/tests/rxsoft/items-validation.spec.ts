@@ -6,15 +6,15 @@ import { API_BASE_URL, readAccessToken } from '../../utils/api';
  * VAL-01..04 — visible schema/business-rule validation on the items wizard
  * (tasks/schema_validation_task.md §4.2).
  *
- * The submit gate (form/submit.ts useValidatedSubmit) + step gate
- * (form/tab-groups.tsx draft transitions) must:
- *   - block invalid submits WITHOUT any network call (VAL-01)
- *   - let valid submits fire exactly one POST (VAL-02)
+ * The items create flow is a full-page MULTI-STEP wizard (DataPageForm +
+ * TabGroups stepper). Step 1's footer button is "Create & Continue"
+ * (data-testid="form-create-continue") — "form-submit" only renders on the
+ * LAST tab. The step gate (form/tab-groups.tsx handleNext draft transition)
+ * must:
+ *   - block invalid step-1 submits WITHOUT any network call (VAL-01)
+ *   - let valid step-1 submits fire exactly one POST (VAL-02)
  *   - render a form-level error summary (VAL-03)
  *   - keep UI required flags aligned with the backend CreateItemDto (VAL-04)
- *
- * The items wizard is a full-page form (createPathBuilder → /rxsoft/items/create),
- * so these run against DataPageForm's rx-page-form anchor.
  *
  * Required step-1 fields (UI): Category, Item Name, Base UOM.
  * Async-selects need >= 2 chars before suggestions load (minChars: 2).
@@ -52,6 +52,16 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
   }
 
   /**
+   * Triggers the step-1 gate. On a multi-step wizard the step-1 footer button
+   * is "Create & Continue" (form-create-continue); form-submit only exists on
+   * the last tab. The draft transition in tab-groups.tsx validates step-1
+   * fields and blocks the POST when any required field is empty.
+   */
+  async function clickStepGate(): Promise<void> {
+    await crud.page.getByTestId('form-create-continue').click();
+  }
+
+  /**
    * Fills an async-select by testid with the first query that yields options.
    * Options detach mid-click under debounce re-renders — 3× retry (C9).
    */
@@ -82,11 +92,11 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     );
   }
 
-  test('VAL-01 — empty submit is blocked: per-field errors visible, zero POSTs', async () => {
+  test('VAL-01 — empty step-1 submit is blocked: per-field errors visible, zero POSTs', async () => {
     const posts = await watchItemPosts();
     await openCreatePage();
 
-    await crud.page.getByTestId('form-submit').click();
+    await clickStepGate();
 
     const summary = crud.page.getByTestId('form-error-summary');
     await expect(summary).toBeVisible({ timeout: 10_000 });
@@ -114,7 +124,7 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     await openCreatePage();
 
     // First submit invalid to render the errors we then watch disappear
-    await crud.page.getByTestId('form-submit').click();
+    await clickStepGate();
     await expect(crud.page.getByTestId('form-error-summary')).toBeVisible({ timeout: 10_000 });
     expect(posts.count()).toBe(0);
 
@@ -123,8 +133,8 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     await nameField.fill(`${token} v1`);
     await pickSuggestion('baseUom', ['pi', 'bo', 'ea', 'ta']);
 
-    // Filled fields' errors clear as the valid submit goes through
-    await crud.page.getByTestId('form-submit').click();
+    // Filled fields' errors clear as the valid step-1 submit goes through
+    await clickStepGate();
     await expect(crud.page.getByTestId('form-error-summary')).toBeHidden({ timeout: 10_000 });
 
     await expect(crud.page.getByText(/record created|Item .* created/i).first()).toBeVisible({
@@ -138,7 +148,7 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     await watchItemPosts();
     await openCreatePage();
 
-    await crud.page.getByTestId('form-submit').click();
+    await clickStepGate();
 
     const summary = crud.page.getByTestId('form-error-summary');
     await expect(summary).toBeVisible({ timeout: 10_000 });
@@ -152,13 +162,22 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     request,
   }) => {
     // Source of truth: the served OpenAPI document (kept in sync with the
-    // DTOs by @nestjs/swagger). If this endpoint 404s the check is skipped —
-    // it must never fail silently.
+    // DTOs by @nestjs/swagger). NestJS emits the request-body schema as a
+    // { $ref: '#/components/schemas/CreateItemDto' } pointer — required[]
+    // lives on the component, not inline. If the document 404s the check is
+    // skipped — it must never fail silently.
     const docsRes = await request.get(`${API_BASE_URL}/docs-json`);
     test.skip(!docsRes.ok(), 'OpenAPI document unavailable — DTO parity check skipped');
-    const dtoRequired: string[] =
-      docsRes.json().paths?.['/items']?.post?.requestBody?.content?.['application/json']?.schema
-        ?.required ?? [];
+    const doc = (await docsRes.json()) as {
+      paths?: Record<string, any>;
+      components?: { schemas?: Record<string, any> };
+    };
+    const schema = doc.paths?.['/items']?.post?.requestBody?.content?.['application/json']
+      ?.schema as { $ref?: string } | undefined;
+    const resolved = schema?.$ref
+      ? doc.components?.schemas?.[schema.$ref.split('/').pop() ?? '']
+      : schema;
+    const dtoRequired: string[] = resolved?.required ?? [];
 
     // DTO truth (CreateItemDto): name + categoryId + baseUomId required;
     // genericProductCode / purchaseUomId / saleUomId are @IsOptional.
