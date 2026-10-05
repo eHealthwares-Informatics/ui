@@ -43,8 +43,8 @@ export default defineConfig({
     __RXSOFT_API_URL__: JSON.stringify(process.env.VITE_RXSOFT_API_URL || '/api'),
   },
   build: {
-    minify: false,
-    sourcemap: true
+    minify: true,
+    sourcemap: false
   },
   server: {
     allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev']
