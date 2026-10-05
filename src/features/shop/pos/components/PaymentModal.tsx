@@ -297,11 +297,25 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
         });
         customerId = newCustomer.id;
       } catch (e: any) {
-        notifications.show({
-          color: 'red',
-          message: 'Failed to create customer: ' + getApiErrorMessage(e),
-        });
-        return;
+        if (isNetworkError(e)) {
+          // Backend unreachable — do not block the sale. Continue as a walk-in
+          // and let the sale mutation surface the offline prompt so the sale
+          // can be queued offline.
+          notifications.show({
+            color: 'orange',
+            title: 'Customer not created (offline)',
+            message:
+              'The customer could not be created because the backend is unreachable — continuing as a walk-in. The sale will be queued offline.',
+            autoClose: false,
+          });
+          customerId = null;
+        } else {
+          notifications.show({
+            color: 'red',
+            message: 'Failed to create customer: ' + getApiErrorMessage(e),
+          });
+          return;
+        }
       }
     }
 
