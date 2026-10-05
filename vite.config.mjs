@@ -44,7 +44,7 @@ export default defineConfig({
   },
   build: {
     minify: false,
-    sourcemap: true
+    sourcemap: false
   },
   server: {
     allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev']
