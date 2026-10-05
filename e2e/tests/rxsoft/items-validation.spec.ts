@@ -106,14 +106,23 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     await expect(crud.page.getByTestId('field-error-name')).toBeVisible();
     await expect(crud.page.getByTestId('field-error-baseUom')).toBeVisible();
 
-    // Inputs flagged aria-invalid for a11y
-    await expect(crud.page.getByTestId('field-category').locator('input')).toHaveAttribute(
+    // Controls flagged aria-invalid for a11y. Testid map (testid-first):
+    //   category / baseUom → async-select-<name> (LabelField drops data-testid;
+    //   the Mantine InputBase input carries async-select-<name>)
+    //   name              → field-name (DebouncedTextInput puts the testid on
+    //   the <input> itself)
+    await expect(crud.page.getByTestId('async-select-category')).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    await expect(crud.page.getByTestId('field-name')).toHaveAttribute('aria-invalid', 'true');
+    await expect(crud.page.getByTestId('async-select-baseUom')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
 
     // The first invalid field receives focus
-    await expect(crud.page.getByTestId('field-category').locator('input')).toBeFocused();
+    await expect(crud.page.getByTestId('async-select-category')).toBeFocused();
 
     // Validation worked exactly because no request fired
     expect(posts.count(), 'invalid submit must not POST /items').toBe(0);
@@ -129,15 +138,18 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     expect(posts.count()).toBe(0);
 
     await pickSuggestion('category', ['ca', 'ta', 'su']);
-    const nameField = crud.page.getByTestId('field-name').locator('input');
-    await nameField.fill(`${token} v1`);
+    // field-name sits on the <input> itself (DebouncedTextInput → Mantine
+    // TextInput) — no nested input locator needed.
+    await crud.page.getByTestId('field-name').fill(`${token} v1`);
     await pickSuggestion('baseUom', ['pi', 'bo', 'ea', 'ta']);
 
-    // Filled fields' errors clear as the valid step-1 submit goes through
+    // Filled fields' errors clear as the valid step-1 submit goes through.
+    // Step-submit success signal: the wizard advances (Price List tab unlocks
+    // once the draft has an id) — the step gate does not fire the mutation
+    // toast, which belongs to the final-form submit path.
     await clickStepGate();
     await expect(crud.page.getByTestId('form-error-summary')).toBeHidden({ timeout: 10_000 });
-
-    await expect(crud.page.getByText(/record created|Item .* created/i).first()).toBeVisible({
+    await expect(crud.page.getByRole('button', { name: 'Price List' })).toBeEnabled({
       timeout: 30_000,
     });
 
@@ -162,7 +174,8 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
     request,
   }) => {
     // Source of truth: the served OpenAPI document (kept in sync with the
-    // DTOs by @nestjs/swagger). NestJS emits the request-body schema as a
+    // DTOs by @nestjs/swagger). The backend sets global prefix 'api', so paths
+    // are /api/items (not /items); the request-body schema is a
     // { $ref: '#/components/schemas/CreateItemDto' } pointer — required[]
     // lives on the component, not inline. If the document 404s the check is
     // skipped — it must never fail silently.
@@ -172,7 +185,7 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
       paths?: Record<string, any>;
       components?: { schemas?: Record<string, any> };
     };
-    const schema = doc.paths?.['/items']?.post?.requestBody?.content?.['application/json']
+    const schema = doc.paths?.['/api/items']?.post?.requestBody?.content?.['application/json']
       ?.schema as { $ref?: string } | undefined;
     const resolved = schema?.$ref
       ? doc.components?.schemas?.[schema.$ref.split('/').pop() ?? '']
@@ -197,7 +210,15 @@ test.describe('RxSoft Items wizard — validation gate (VAL)', () => {
   });
 
   test.afterAll(async ({ request }) => {
-    const accessToken = await readAccessToken(crud.page);
+    // The page fixture is torn down before afterAll runs — reading localStorage
+    // from crud.page throws "Target page closed". Cleanup is best-effort: the
+    // provisioned org is deprovisioned at global-teardown anyway.
+    let accessToken: string | null = null;
+    try {
+      accessToken = await readAccessToken(crud.page);
+    } catch {
+      return;
+    }
     if (!accessToken) return; // public runs have no session to clean with
     const list = await request.get(`${API_BASE_URL}/items`, {
       headers: { Authorization: `Bearer ${accessToken}` },

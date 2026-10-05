@@ -222,9 +222,13 @@ export function clearValidationErrors(): void {
     el.textContent = '';
     (el as HTMLElement).style.display = 'none';
   });
-  document.querySelectorAll('[data-testid^="field-"]').forEach((el) => {
-    el.removeAttribute('aria-invalid');
-  });
+  // aria-invalid may sit on field-<name> (text inputs) or async-select-<name>
+  // (async-selects carry their testid on the Mantine InputBase input itself).
+  document
+    .querySelectorAll('[data-testid^="field-"], [data-testid^="async-select-"]')
+    .forEach((el) => {
+      el.removeAttribute('aria-invalid');
+    });
 }
 
 /**
@@ -241,7 +245,12 @@ export function renderValidationErrors(errors: Record<string, string>): void {
       errorEl.textContent = message;
       (errorEl as HTMLElement).style.display = 'block';
     }
-    const fieldEl = document.querySelector(`[data-testid="field-${name}"]`);
+    // Text inputs: testid field-<name> sits on the <input> itself.
+    // Async-selects: LabelField drops data-testid, so the control's testid
+    // is async-select-<name> (Mantine InputBase → the <input> element).
+    const fieldEl =
+      document.querySelector(`[data-testid="field-${name}"]`) ??
+      document.querySelector(`[data-testid="async-select-${name}"]`);
     if (fieldEl) {
       fieldEl.setAttribute('aria-invalid', 'true');
     }
@@ -266,7 +275,7 @@ export function renderValidationErrors(errors: Record<string, string>): void {
   const firstErrorField = Object.keys(errors)[0];
   if (firstErrorField) {
     const firstField = document.querySelector(
-      `[data-testid="field-${firstErrorField}"]`
+      `[data-testid="field-${firstErrorField}"], [data-testid="async-select-${firstErrorField}"]`
     ) as HTMLElement | null;
     if (firstField) {
       firstField.focus();

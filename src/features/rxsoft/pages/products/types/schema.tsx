@@ -922,14 +922,22 @@ export function buildItemPayload(values: Record<string, any>) {
       reason: 'Initial stock setup from item creation',
     }));
 
+  // Base UOM is always required by the step gate. CreateItemDto marks
+  // purchase/sale UOM @IsOptional, but CreateItemUseCase hard-requires all
+  // three ids (400 otherwise) — when the wizard's step gate submits without
+  // them, default purchase/sale to the base UOM. Never emit undefined/null.
+  const baseUomId = (values.baseUom as any)?.value as string | undefined;
+  const purchaseUomId = (values as any).purchaseUom?.value as string | undefined;
+  const saleUomId = (values as any).saleUom?.value as string | undefined;
+
   return {
     code: values.code || undefined,
     name: values.name,
     categoryId: (values.category as any).value,
     genericProductCode: (values?.genericProductCode as any)?.value,
-    baseUomId: (values.baseUom as any).value,
-    purchaseUomId: (values as any).purchaseUom.value,
-    saleUomId: (values as any).saleUom.value || undefined,
+    baseUomId,
+    purchaseUomId: purchaseUomId || baseUomId,
+    saleUomId: saleUomId || baseUomId,
     barcode: values.barcode || undefined,
     alias: values.alias || undefined,
     isActive: values.isActive,
