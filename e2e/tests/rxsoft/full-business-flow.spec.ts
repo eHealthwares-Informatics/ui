@@ -369,7 +369,10 @@ test.describe.serial('Full Business Flow', () => {
 
     // Double-click the price cell. Currency column also shows "NGN" — anchor
     // to the cell with an amount (Price column renders "NGN 10.00").
-    const priceCell = row.locator('td').filter({ hasText: /NGN\s*\d/ }).first();
+    const priceCell = row
+      .locator('td')
+      .filter({ hasText: /NGN\s*\d/ })
+      .first();
     await priceCell.dblclick();
 
     // Inline editor: NumberInput + green Check ActionIcon inside the row.
@@ -390,10 +393,7 @@ test.describe.serial('Full Business Flow', () => {
     while (Date.now() < deadline) {
       const list = await apiFetch<{
         data: Array<{ id?: string; unitPrice?: number; item?: { id?: string; name?: string } }>;
-      }>(
-        page,
-        `/price-lists/items?search=${encodeURIComponent(`Biscuit-${runId}`)}&limit=10`
-      );
+      }>(page, `/price-lists/items?search=${encodeURIComponent(`Biscuit-${runId}`)}&limit=10`);
       const hit = (list.data ?? []).find(
         (r) => r.id === priceListItemId || r.item?.id === biscuitItemId
       );
@@ -492,9 +492,7 @@ test.describe.serial('Full Business Flow', () => {
         page,
         '/stock-locations?limit=10'
       );
-      const mainLocationId = (locations.data ?? []).find((l) =>
-        /main/i.test(l.name ?? '')
-      )?.id;
+      const mainLocationId = (locations.data ?? []).find((l) => /main/i.test(l.name ?? ''))?.id;
       if (!mainLocationId || !junksSalesLocationId) {
         test.skip(true, 'Main/JunksSales location missing for transfer fallback');
       }
@@ -555,16 +553,10 @@ test.describe.serial('Full Business Flow', () => {
 
     // Real uuids — placeholder codes like 'pm-seed' crash uuid casts (22P02).
     // Pattern proven in pos-flow.spec.ts step 0.
-    const pmRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/payment-methods?limit=5'
-    );
+    const pmRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/payment-methods?limit=5');
     const paymentMethodId = (pmRes.data ?? []).map((p) => p.id).find(Boolean) ?? '';
     test.skip(!paymentMethodId, 'no payment method available for the POS sale');
-    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/customers?limit=5'
-    );
+    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/customers?limit=5');
     const customerId = (custRes.data ?? []).map((c) => c.id).find(Boolean);
 
     const saleRes = await apiFetch<{ id: string; status: string }>(page, '/sales', {
@@ -599,10 +591,7 @@ test.describe.serial('Full Business Flow', () => {
   test('14. creates website order for 5 Biscuits', async ({ page }) => {
     // CreateOrderDto: flat deliveryAddress/city/phone are rejected — delivery
     // is a nested CreateDeliveryDto; customerId must be a real UUID or omitted.
-    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/customers?limit=5'
-    );
+    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/customers?limit=5');
     const customerId = (custRes.data ?? []).map((c) => c.id).find(Boolean);
 
     const orderRes = await apiFetch<{ id: string; orderStatus: string }>(page, '/website/orders', {

@@ -92,10 +92,7 @@ test.describe('RxSoft inventory adjustments', () => {
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();
     await expect(onHandHeader).toBeVisible({ timeout: 15_000 });
     const balancesTable = onHandHeader.locator('xpath=ancestor::table[1]');
-    const targetRow = balancesTable
-      .locator('tbody tr')
-      .filter({ hasText: setup.itemName })
-      .first();
+    const targetRow = balancesTable.locator('tbody tr').filter({ hasText: setup.itemName }).first();
     await expect(targetRow).toBeVisible({ timeout: 30_000 });
     await targetRow.getByTestId('row-adjust').click();
 
@@ -121,10 +118,7 @@ test.describe('RxSoft inventory adjustments', () => {
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();
     await expect(onHandHeader).toBeVisible({ timeout: 15_000 });
     const balancesTable = onHandHeader.locator('xpath=ancestor::table[1]');
-    const targetRow = balancesTable
-      .locator('tbody tr')
-      .filter({ hasText: setup.itemName })
-      .first();
+    const targetRow = balancesTable.locator('tbody tr').filter({ hasText: setup.itemName }).first();
     await expect(targetRow).toBeVisible({ timeout: 30_000 });
     await targetRow.getByTestId('row-adjust').click();
 
@@ -178,7 +172,10 @@ test.describe('RxSoft inventory adjustments', () => {
       .getByTestId('stock-balance-option')
       .filter({ hasText: setup.itemName })
       .first();
-    const target = (await namedOption.count()) > 0 ? namedOption : page.getByTestId('stock-balance-option').first();
+    const target =
+      (await namedOption.count()) > 0
+        ? namedOption
+        : page.getByTestId('stock-balance-option').first();
     // Retry the pick — combobox options can detach mid-click under re-render (C9).
     let picked = false;
     for (let attempt = 0; attempt < 3 && !picked; attempt += 1) {

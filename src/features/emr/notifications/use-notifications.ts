@@ -81,10 +81,7 @@ export function useNotifications() {
       const previousCount = queryClient.getQueryData<number>(NOTIFICATIONS_UNREAD_KEY);
       setItems((prev) => prev.map((item) => (item.id === id ? { ...item, read: true } : item)));
       if (typeof previousCount === 'number') {
-        queryClient.setQueryData(
-          NOTIFICATIONS_UNREAD_KEY,
-          Math.max(0, previousCount - 1)
-        );
+        queryClient.setQueryData(NOTIFICATIONS_UNREAD_KEY, Math.max(0, previousCount - 1));
       }
       return { previousItems, previousCount };
     },

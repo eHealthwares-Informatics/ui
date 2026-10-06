@@ -81,7 +81,9 @@ test.describe('RxSoft stock locations', () => {
     await dialog.getByTestId('form-create').click();
     const res = await postRes;
     const resBody = await res.text().catch(() => '');
-    expect(res.status(), `POST /stock-locations failed: ${resBody.slice(0, 300)}`).toBeLessThan(400);
+    expect(res.status(), `POST /stock-locations failed: ${resBody.slice(0, 300)}`).toBeLessThan(
+      400
+    );
     await expect(dialog).toBeHidden({ timeout: 20_000 });
 
     // Server-side: the location exists.
@@ -89,7 +91,9 @@ test.describe('RxSoft stock locations', () => {
       page,
       `/stock-locations?search=${encodeURIComponent(locationName)}&limit=10`
     );
-    const created = (list.data ?? []).find((r) => r.name === locationName || r.code === locationCode);
+    const created = (list.data ?? []).find(
+      (r) => r.name === locationName || r.code === locationCode
+    );
     expect(created, 'created stock location present via API').toBeTruthy();
   });
 });

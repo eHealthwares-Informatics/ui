@@ -312,7 +312,8 @@ test.describe.serial('POS Flow through Sales UI', () => {
     expect(sale.lines).toHaveLength(1);
     // Sale-detail lines carry a nested item object (SaleDetailLineDto.item),
     // not a flat itemId.
-    const lineItemId = sale.lines[0].itemId ?? (sale.lines[0] as { item?: { id?: string } }).item?.id;
+    const lineItemId =
+      sale.lines[0].itemId ?? (sale.lines[0] as { item?: { id?: string } }).item?.id;
     expect(lineItemId).toBe(itemId);
     expect(sale.lines[0].quantity).toBe(3);
     expect(sale.lines[0].unitPrice).toBe(25);

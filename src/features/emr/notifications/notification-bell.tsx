@@ -15,9 +15,9 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from '@tanstack/react-router';
 import { Bell, CheckCheck } from 'lucide-react';
-import { useNotifications } from './use-notifications';
 import { formatRelativeTime } from './relative-time';
 import { NOTIFICATION_TYPE_COLORS, type NotificationItem } from './types';
+import { useNotifications } from './use-notifications';
 
 function NotificationRow({
   item,

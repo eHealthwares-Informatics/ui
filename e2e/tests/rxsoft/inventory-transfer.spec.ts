@@ -16,7 +16,12 @@ import { apiFetch } from '../../utils/api';
  */
 const TS = Date.now().toString(36);
 
-type BalanceSetup = { itemId: string; locationId: string; otherLocationId: string; itemName: string };
+type BalanceSetup = {
+  itemId: string;
+  locationId: string;
+  otherLocationId: string;
+  itemName: string;
+};
 
 /**
  * Mantine 9 controls put data-testid on the wrapper in some versions and on
@@ -127,7 +132,7 @@ test.describe('RxSoft inventory transfers', () => {
       .filter({ hasText: /STORE|HQ|E2E/i })
       .first();
     await expect(destOption.or(page.getByRole('option').first())).toBeVisible({ timeout: 12_000 });
-    await (await destOption.count() ? destOption : page.getByRole('option').first()).click();
+    await ((await destOption.count()) ? destOption : page.getByRole('option').first()).click();
 
     const qtyInput = dialog.getByTestId('transfer-quantity');
     // Balance has qty 5 — request far more than available.
