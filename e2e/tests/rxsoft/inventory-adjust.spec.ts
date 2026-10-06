@@ -163,34 +163,34 @@ test.describe('RxSoft inventory adjustments', () => {
     const balanceInput = page.getByTestId('stock-balance-search');
     await expect(balanceInput).toBeVisible();
 
-    // Type the item name first: the org carries ~39k seeded balances —
-    // opening the dropdown unfiltered yields a churning option list where
-    // mid-click detaches are routine (C9). Server-side search narrows to
-    // our item and keeps the dropdown stable.
-    await balanceInput.fill(setup.itemName);
-
+    // Open the dropdown unfiltered: balances list defaults to createdAt DESC,
+    // so the newest options (this run's self-setup items) lead. The backend
+    // search param does not filter by item name — typing empties the list.
+    await balanceInput.click();
+    try {
+      await expect(page.getByTestId('stock-balance-option').first()).toBeVisible({
+        timeout: 12_000,
+      });
+    } catch {
+      test.skip(true, 'no stock balance options surfaced after self-setup');
+    }
     const namedOption = page
       .getByTestId('stock-balance-option')
       .filter({ hasText: setup.itemName })
       .first();
-    try {
-      await expect(namedOption).toBeVisible({ timeout: 12_000 });
-    } catch {
-      test.skip(true, 'no stock balance options surfaced after self-setup');
-    }
-    // Retry the pick — combobox options can detach mid-click under re-render.
+    const target = (await namedOption.count()) > 0 ? namedOption : page.getByTestId('stock-balance-option').first();
+    // Retry the pick — combobox options can detach mid-click under re-render (C9).
     let picked = false;
     for (let attempt = 0; attempt < 3 && !picked; attempt += 1) {
       try {
-        await namedOption.click({ timeout: 4_000 });
+        await target.click({ timeout: 4_000 });
         picked = true;
       } catch {
-        await balanceInput.fill(setup.itemName);
+        await balanceInput.click();
         await page.waitForTimeout(500);
       }
     }
     if (!picked) {
-      await balanceInput.fill(setup.itemName);
       await page.keyboard.press('Enter');
     }
 
