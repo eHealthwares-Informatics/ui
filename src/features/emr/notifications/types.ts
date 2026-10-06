@@ -1,5 +1,8 @@
 export type NotificationType = 'info' | 'warning' | 'error' | 'success';
 
+/** react-query key prefix for message-template list + channel options. */
+export const MESSAGE_TEMPLATES_KEY = ['emr', 'message-templates'] as const;
+
 export type NotificationItem = {
   id: string;
   title: string;
