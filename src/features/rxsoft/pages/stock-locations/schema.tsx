@@ -3,6 +3,15 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { ColumnDataType } from '../../types';
 
+/** Async-select formState value → id string (or undefined when empty). */
+function flattenOptionId(v: unknown): string | undefined {
+  if (v && typeof v === 'object' && 'value' in (v as Record<string, unknown>)) {
+    const val = (v as Record<string, unknown>).value;
+    return val === undefined || val === null || val === '' ? undefined : String(val);
+  }
+  return typeof v === 'string' && v ? v : undefined;
+}
+
 export const stockLocationsConfig: ModelConfig = {
   id: 'stock-locations',
   title: 'Stock Locations',
@@ -155,9 +164,11 @@ export const stockLocationsConfig: ModelConfig = {
     isActive: true,
   },
 
+  // Async-selects store {value,label} option objects in formState — flatten
+  // to the id string or the backend rejects with "must be a string".
   buildCreatePayload: (values) => ({
-    warehouseId: values.warehouseId || undefined,
-    parentId: values.parentId || undefined,
+    warehouseId: flattenOptionId(values.warehouseId),
+    parentId: flattenOptionId(values.parentId),
     code: values.code || undefined,
     name: values.name,
     locationType: values.locationType,
@@ -165,8 +176,8 @@ export const stockLocationsConfig: ModelConfig = {
   }),
 
   buildUpdatePayload: (values) => ({
-    warehouseId: values.warehouseId || undefined,
-    parentId: values.parentId || undefined,
+    warehouseId: flattenOptionId(values.warehouseId),
+    parentId: flattenOptionId(values.parentId),
     code: values.code || undefined,
     name: values.name,
     locationType: values.locationType,
