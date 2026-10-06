@@ -37,7 +37,9 @@ async function identityFetch(
 }
 
 test.describe('RxSoft role requests', () => {
-  test('TC-RX-ROLE-REQUESTS-01 + approve/reject flows', async ({ page }) => {
+  test('TC-RX-ROLE-REQUESTS-01 + TC-RX-ROLE-REQUESTS-14 + TC-RX-ROLE-REQUESTS-15: list renders; approve and reject flows', async ({
+    page,
+  }) => {
     await page.goto('/rxsoft/role-requests', { timeout: 60_000 });
 
     // List renders — actual page heading is "Roles Request".

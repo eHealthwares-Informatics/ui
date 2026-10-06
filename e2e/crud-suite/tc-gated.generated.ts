@@ -7,7 +7,7 @@
  * unimplemented test types stay missing until later phases.
  */
 
-// 84 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
+// 91 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
 // Board-sync scans this file (TC id per comment line) as coverage evidence.
 //   TC-RX-BRANCHES-14
 //   TC-RX-BRANCHES-16
@@ -20,6 +20,7 @@
 //   TC-RX-GL-ACCOUNTS-16
 //   TC-RX-INSURANCE-PROVIDERS-14
 //   TC-RX-INSURANCE-PROVIDERS-16
+//   TC-RX-JOURNAL-ENTRIES-09
 //   TC-RX-JOURNAL-ENTRIES-11
 //   TC-RX-JOURNAL-ENTRIES-12
 //   TC-RX-JOURNAL-ENTRIES-14
@@ -37,6 +38,7 @@
 //   TC-RX-PAYMENT-METHODS-16
 //   TC-RX-PAYMENT-PROVIDERS-14
 //   TC-RX-PAYMENT-PROVIDERS-16
+//   TC-RX-PAYMENTS-09
 //   TC-RX-PAYMENTS-11
 //   TC-RX-PAYMENTS-12
 //   TC-RX-PAYMENTS-14
@@ -46,6 +48,7 @@
 //   TC-RX-PAYMENTS-19
 //   TC-RX-POS-TERMINALS-14
 //   TC-RX-POS-TERMINALS-16
+//   TC-RX-PRICE-LIST-ITEMS-09
 //   TC-RX-PRICE-LIST-ITEMS-11
 //   TC-RX-PRICE-LIST-ITEMS-12
 //   TC-RX-PRICE-LIST-ITEMS-14
@@ -55,6 +58,7 @@
 //   TC-RX-PRICE-LIST-ITEMS-19
 //   TC-RX-ROLES-14
 //   TC-RX-ROLES-16
+//   TC-RX-SALES-09
 //   TC-RX-SALES-11
 //   TC-RX-SALES-12
 //   TC-RX-SALES-14
@@ -62,6 +66,7 @@
 //   TC-RX-SALES-17
 //   TC-RX-SALES-18
 //   TC-RX-SALES-19
+//   TC-RX-STOCK-LOCATIONS-09
 //   TC-RX-STOCK-LOCATIONS-11
 //   TC-RX-STOCK-LOCATIONS-12
 //   TC-RX-STOCK-LOCATIONS-14
@@ -74,6 +79,7 @@
 //   TC-RX-SUPPLIERS-17
 //   TC-RX-SUPPLIERS-18
 //   TC-RX-SUPPLIERS-19
+//   TC-RX-UOM-CATEGORY-09
 //   TC-RX-UOM-CATEGORY-11
 //   TC-RX-UOM-CATEGORY-12
 //   TC-RX-UOM-CATEGORY-14
@@ -86,6 +92,7 @@
 //   TC-RX-UOMS-17
 //   TC-RX-UOMS-18
 //   TC-RX-UOMS-19
+//   TC-RX-USERS-09
 //   TC-RX-USERS-11
 //   TC-RX-USERS-12
 //   TC-RX-USERS-14
