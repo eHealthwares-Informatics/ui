@@ -311,6 +311,7 @@ import { Route as AuthenticatedConversationAiModelsIndexRouteImport } from './ro
 import { Route as AuthenticatedConversationAiProcessorsIndexRouteImport } from './routes/_authenticated/conversation/ai/processors/index'
 import { Route as AuthenticatedConversationAiProvidersIndexRouteImport } from './routes/_authenticated/conversation/ai/providers/index'
 import { Route as AuthenticatedConversationAiRequestLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/request-logs/index'
+import { Route as AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport } from './routes/_authenticated/emr/settings/message-templates/index'
 import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
 import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect'
 import { Route as AuthenticatedLisOrdersWorkflowEnterRouteImport } from './routes/_authenticated/lis/orders/workflow/enter'
@@ -2042,6 +2043,12 @@ const AuthenticatedConversationAiRequestLogsIndexRoute =
     path: '/conversation/ai/request-logs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrSettingsMessageTemplatesIndexRoute =
+  AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport.update({
+    id: '/emr/settings/message-templates/',
+    path: '/emr/settings/message-templates/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisOrdersOrderIdReportRoute =
   AuthenticatedLisOrdersOrderIdReportRouteImport.update({
     id: '/lis/orders/$orderId/report',
@@ -2416,6 +2423,7 @@ export interface FileRoutesByFullPath {
   '/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -2726,6 +2734,7 @@ export interface FileRoutesByTo {
   '/conversation/ai/processors': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/conversation/ai/providers': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/emr/settings/message-templates': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/rxsoft/reports/balance-sheet': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/rxsoft/reports/income-statement': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/rxsoft/reports/trial-balance': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -3042,6 +3051,7 @@ export interface FileRoutesById {
   '/_authenticated/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/_authenticated/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/_authenticated/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/_authenticated/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/_authenticated/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/_authenticated/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/_authenticated/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -3356,6 +3366,7 @@ export interface FileRouteTypes {
     | '/conversation/ai/processors/'
     | '/conversation/ai/providers/'
     | '/conversation/ai/request-logs/'
+    | '/emr/settings/message-templates/'
     | '/rxsoft/reports/balance-sheet/'
     | '/rxsoft/reports/income-statement/'
     | '/rxsoft/reports/trial-balance/'
@@ -3666,6 +3677,7 @@ export interface FileRouteTypes {
     | '/conversation/ai/processors'
     | '/conversation/ai/providers'
     | '/conversation/ai/request-logs'
+    | '/emr/settings/message-templates'
     | '/rxsoft/reports/balance-sheet'
     | '/rxsoft/reports/income-statement'
     | '/rxsoft/reports/trial-balance'
@@ -3981,6 +3993,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/ai/processors/'
     | '/_authenticated/conversation/ai/providers/'
     | '/_authenticated/conversation/ai/request-logs/'
+    | '/_authenticated/emr/settings/message-templates/'
     | '/_authenticated/rxsoft/reports/balance-sheet/'
     | '/_authenticated/rxsoft/reports/income-statement/'
     | '/_authenticated/rxsoft/reports/trial-balance/'
@@ -6171,6 +6184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationAiRequestLogsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/settings/message-templates/': {
+      id: '/_authenticated/emr/settings/message-templates/'
+      path: '/emr/settings/message-templates'
+      fullPath: '/emr/settings/message-templates/'
+      preLoaderRoute: typeof AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/$orderId/report': {
       id: '/_authenticated/lis/orders/$orderId/report'
       path: '/lis/orders/$orderId/report'
@@ -6581,6 +6601,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationAiProcessorsIndexRoute: typeof AuthenticatedConversationAiProcessorsIndexRoute
   AuthenticatedConversationAiProvidersIndexRoute: typeof AuthenticatedConversationAiProvidersIndexRoute
   AuthenticatedConversationAiRequestLogsIndexRoute: typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  AuthenticatedEmrSettingsMessageTemplatesIndexRoute: typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   AuthenticatedRxsoftReportsIncomeStatementIndexRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   AuthenticatedRxsoftReportsTrialBalanceIndexRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -6921,6 +6942,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationAiProvidersIndexRoute,
   AuthenticatedConversationAiRequestLogsIndexRoute:
     AuthenticatedConversationAiRequestLogsIndexRoute,
+  AuthenticatedEmrSettingsMessageTemplatesIndexRoute:
+    AuthenticatedEmrSettingsMessageTemplatesIndexRoute,
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute:
     AuthenticatedRxsoftReportsBalanceSheetIndexRoute,
   AuthenticatedRxsoftReportsIncomeStatementIndexRoute:
