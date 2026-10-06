@@ -48,7 +48,7 @@ function TransferModal({
   const { data: locations = [] } = useQuery({
     queryKey: ['stock-locations', 'all'],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 200 } });
+      const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 100 } });
       return data?.data ?? data ?? [];
     },
   });
@@ -362,7 +362,7 @@ export function RxInventoryPage() {
   const { data: locations = [] } = useQuery({
     queryKey: ['stock-locations', 'all'],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 200 } });
+      const { data } = await rxsoftApi.get('/stock-locations', { params: { limit: 100 } });
       return data?.data ?? data ?? [];
     },
   });
@@ -370,7 +370,7 @@ export function RxInventoryPage() {
   const { data: movementItems = [] } = useQuery({
     queryKey: ['stock-movement-items', 'all'],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/items', { params: { limit: 200 } });
+      const { data } = await rxsoftApi.get('/items', { params: { limit: 100 } });
       return (data?.data ?? data ?? []).map((i: any) => ({ value: i.id, label: i.name }));
     },
   });
