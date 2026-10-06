@@ -159,9 +159,17 @@ export class CrudShellPage {
     // up to ~25s on slow list endpoints) instead of click-timing-out.
     await expect(confirm).toBeEnabled({ timeout: 45_000 });
     // Mantine re-render churn can swallow the first force-click (the button
-    // detaches mid-action). Click, briefly wait for close, and retry.
+    // detaches mid-action — observed on Payment Providers / POS Terminals
+    // lists). Click; on detach race, dispatch a JS click on the testid node,
+    // then wait for close. Retry the loop.
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      await confirm.click({ force: true });
+      try {
+        await confirm.click({ force: true, timeout: 5_000 });
+      } catch {
+        await this.page
+          .getByTestId('confirm-dialog-confirm')
+          .evaluate((el: HTMLElement) => el.click());
+      }
       try {
         await expect(dialog).toBeHidden({ timeout: 8_000 });
         return;

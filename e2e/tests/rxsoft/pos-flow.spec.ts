@@ -171,11 +171,12 @@ test.describe.serial('POS Flow through Sales UI', () => {
       .first();
     await expect(row).toBeVisible({ timeout: 15_000 });
 
-    // Verify the channel column shows "pos"
-    await expect(row.locator('td').filter({ hasText: 'pos' })).toBeVisible();
+    // Verify the channel column shows "pos" — anchored match: "posted"
+    // (status) and sale numbers containing "POS-" also contain "pos".
+    await expect(row.locator('td').filter({ hasText: /^pos$/ })).toBeVisible();
 
     // Verify status column shows "posted"
-    await expect(row.locator('td').filter({ hasText: 'posted' })).toBeVisible();
+    await expect(row.locator('td').filter({ hasText: /^posted$/ })).toBeVisible();
 
     // Verify total amount is 75 (3 × 25)
     await expect(row.locator('td').filter({ hasText: '75' })).toBeVisible();
@@ -207,7 +208,8 @@ test.describe.serial('POS Flow through Sales UI', () => {
       timeout: 10_000,
     });
 
-    await expect(page.getByTestId('page-title')).toHaveText('Sales Lines');
+    // Sales-lines page can render duplicate page-title nodes (RxPage + shell).
+    await expect(page.getByTestId('page-title').first()).toHaveText('Sales Lines');
   });
 
   /* ── 4. Verify the line details match the submitted data ──────── */
@@ -215,7 +217,8 @@ test.describe.serial('POS Flow through Sales UI', () => {
   test('4. verifies sales line shows correct item, qty, and price', async ({ page }) => {
     await page.goto(`/rxsoft/sales-lines?saleId=${saleId}`);
 
-    await expect(page.getByTestId('page-title')).toHaveText('Sales Lines');
+    // Duplicate page-title nodes on sales-lines — scope to the first.
+    await expect(page.getByTestId('page-title').first()).toHaveText('Sales Lines');
 
     // Wait for the table to load
     await expect(page.getByTestId('data-table-body').locator('tr').first()).toBeVisible({
@@ -224,14 +227,15 @@ test.describe.serial('POS Flow through Sales UI', () => {
 
     const row = page.getByTestId('data-table-body').locator('tr').first();
 
-    // The line should show quantity = 3
-    await expect(row.locator('td').filter({ hasText: '3' })).toBeVisible();
+    // The line should show quantity = 3 — anchored: timestamps/item names
+    // in sibling cells also contain "3"/"25".
+    await expect(row.locator('td').filter({ hasText: /^3$/ })).toBeVisible();
 
     // The line should show unit price = 25
-    await expect(row.locator('td').filter({ hasText: '25' })).toBeVisible();
+    await expect(row.locator('td').filter({ hasText: /^25$/ })).toBeVisible();
 
-    // The line should show total = 75 (3 × 25)
-    await expect(row.locator('td').filter({ hasText: '75' })).toBeVisible();
+    // The line should show total = 75 (3 × 25) — anchored: two cells render 75.
+    await expect(row.locator('td').filter({ hasText: /^75$/ }).first()).toBeVisible();
   });
 
   /* ── 5. Print receipt — verify the PDF endpoint is reachable ──── */
@@ -306,7 +310,11 @@ test.describe.serial('POS Flow through Sales UI', () => {
     expect(sale.saleChannel).toBe('pos');
     expect(sale.status).toBe('posted');
     expect(sale.lines).toHaveLength(1);
-    expect(sale.lines[0].itemId).toBe(itemId);
+    // Sale-detail lines carry a nested item object (SaleDetailLineDto.item),
+    // not a flat itemId.
+    const lineItemId =
+      sale.lines[0].itemId ?? (sale.lines[0] as { item?: { id?: string } }).item?.id;
+    expect(lineItemId).toBe(itemId);
     expect(sale.lines[0].quantity).toBe(3);
     expect(sale.lines[0].unitPrice).toBe(25);
     expect(sale.lines[0].lineTotal).toBe(75);

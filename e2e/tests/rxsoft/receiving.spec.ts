@@ -279,9 +279,8 @@ test.describe.serial('RxSoft goods receiving', () => {
     }>(page, `/receipts?search=${encodeURIComponent(receiptNumber!)}&limit=5`);
     const receipt = (receipts.data ?? []).find((r) => r.receiptNumber === receiptNumber);
     expect(receipt, 'receipt still listed after unpost').toBeTruthy();
-    expect(
-      receipt?.lines?.[0]?.isUnposted,
-      'receipt line marked unposted after confirm'
-    ).toBe(true);
+    expect(receipt?.lines?.[0]?.isUnposted, 'receipt line marked unposted after confirm').toBe(
+      true
+    );
   });
 });

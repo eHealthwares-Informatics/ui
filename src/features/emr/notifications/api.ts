@@ -1,6 +1,6 @@
+import { getArrayPayload } from '@/features/components/utils';
 import { communicationApi } from '@/lib/communication-api';
 import { emrApi } from '@/lib/emr-api';
-import { getArrayPayload } from '@/features/components/utils';
 import {
   normalizeMessageTemplate,
   type MessageTemplate,
