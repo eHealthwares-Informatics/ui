@@ -70,10 +70,13 @@ for (const it of items) {
     const name = m[2].trim();
     // tcId form: TC-RX-<ENTITY>-<NN>; entity may contain hyphens → strip NN
     const withoutPrefix = tcId.replace(/^TC-RX-/, '');
-    const nn = Number(withoutPrefix.split('-').pop());
-    const entity = withoutPrefix.slice(0, withoutPrefix.length - String(nn).length - 1).toLowerCase();
+    // Keep the raw suffix (e.g. '01') — Number('01') drops the leading zero
+    // and the entity slice then retains a trailing hyphen ('sales-'), which
+    // misses every fixture resource and silently drops list/pagination TCs.
+    const nnStr = withoutPrefix.match(/(\d+)$/)?.[1] ?? '';
+    const entity = withoutPrefix.slice(0, withoutPrefix.length - nnStr.length - 1).toLowerCase();
     if (!RXSOFT_ENTITIES.has(entity)) RXSOFT_ENTITIES.set(entity, { ucs: [] });
-    RXSOFT_ENTITIES.get(entity).ucs.push({ tcId, name, nn, body });
+    RXSOFT_ENTITIES.get(entity).ucs.push({ tcId, name, nn: nnStr, body });
   }
 }
 

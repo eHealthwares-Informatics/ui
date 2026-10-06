@@ -13,7 +13,7 @@ import { readOrgState } from '../../utils/provision';
 const TS = Date.now().toString(36);
 
 test.describe('RxSoft stock locations', () => {
-  test('TC-RX-STOCK-LOCATIONS-03: creates a location through the create modal', async ({
+  test('TC-RX-STOCK-LOCATIONS-09 + TC-RX-STOCK-LOCATIONS-11: opens create modal and creates a location', async ({
     page,
   }) => {
     // Parent location name from org-state (seeded main/sale stock location).
