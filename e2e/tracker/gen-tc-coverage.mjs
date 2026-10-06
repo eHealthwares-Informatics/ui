@@ -33,10 +33,15 @@ const CAPABILITY_BY_NAME = [
   [/list renders|renders/i, 'render'],
   [/column sort/i, 'sort'],
   [/search/i, 'search'],
+  // NOTE: empty-state TCs are intentionally NOT mapped — several list
+  // endpoints ignore the search param (e.g. /roles proxy), so the suite's
+  // empty-state test honestly skips for those resources. TC-*-04 stays
+  // `missing` on the tracker until list endpoints honor search everywhere.
   [/paginat/i, 'pagination'],
   [/create/i, 'create'],
   [/edit|update/i, 'edit'],
   [/delete|archive/i, 'delete'],
+  [/cleanup/i, 'cleanup'],
   [/export csv/i, 'export'],
 ];
 
@@ -139,16 +144,23 @@ for (const [entity, { ucs }] of RXSOFT_ENTITIES) {
       (cap === 'edit' && res.canEdit) ||
       (cap === 'delete' && res.canDelete) ||
       (cap === 'export' && res.hasExport) ||
-      // The suite asserts render, search and the pagination shell for every
-      // resource; column sort is NOT asserted (no header click) → missing.
-      cap === 'render' || cap === 'search' || cap === 'pagination';
+      // The suite asserts render, search (+clear/debounce), pagination and
+      // API cleanup (afterAll deletes token rows) for every resource.
+      // NOT auto-covered (honest gaps until the UI/backends support them):
+      //   - sort: Column.sortable is unset across schemas → no sort ActionIcon
+      //     renders; the suite's sort test honestly skips.
+      //   - empty-state: several list endpoints ignore the search param; the
+      //     suite skips where search is not honored.
+      cap === 'render' ||
+      cap === 'search' ||
+      cap === 'pagination' ||
+      cap === 'cleanup';
     if (capable) {
       covered.add(tcId);
     } else if (SKIPPABLE_CAPS.has(cap)) {
       // Resource flag is false → run-crud.spec.ts test.skip — honest gate.
       gated.add(tcId);
     }
-    // incapable non-skippable caps (sort) fall through → missing
   }
 }
 
