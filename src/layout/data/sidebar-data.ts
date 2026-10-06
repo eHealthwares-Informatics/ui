@@ -1224,6 +1224,12 @@ export const sidebarData: SidebarData = {
         },
         { title: 'Forms', url: '/emr/forms', icon: FileSpreadsheet, modules: ['emr'] },
         { title: 'Tags', url: '/emr/tags', icon: Tags, modules: ['emr'] },
+        {
+          title: 'Message Templates',
+          url: '/emr/settings/message-templates',
+          icon: MessageSquare,
+          modules: ['emr'],
+        },
       ],
     },
   ],

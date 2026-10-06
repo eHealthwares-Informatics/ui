@@ -1,9 +1,11 @@
-import { AppShell } from '@mantine/core';
+import { AppShell, Group } from '@mantine/core';
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { LayoutProvider } from '@/context/layout-provider';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
 import { AutoLogout } from '@/features/auth/auto-logout';
+import { NotificationBell } from '@/features/emr/notifications/notification-bell';
+import { NotificationSubscriptionRegistrar } from '@/features/emr/notifications/notification-subscription';
 import { useModuleFavicon } from '@/features/shared/use-module-favicon';
 import { useModuleTitle } from '@/features/shared/use-module-title';
 import { getCookie } from '@/lib/cookies';
@@ -51,8 +53,20 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
     <AutoLogout>
       <LayoutProvider>
-        <AppShell navbar={{ width: 260, breakpoint: 'sm' }} padding="md">
+        <NotificationSubscriptionRegistrar />
+        <AppShell
+          navbar={{ width: 260, breakpoint: 'sm' }}
+          header={moduleId === 'emr' ? { height: 56 } : undefined}
+          padding="md"
+        >
           <AppSidebar />
+          {moduleId === 'emr' && (
+            <AppShell.Header>
+              <Group h="100%" px="md" justify="flex-end">
+                <NotificationBell />
+              </Group>
+            </AppShell.Header>
+          )}
           <AppShell.Main>{children ?? <Outlet />}</AppShell.Main>
         </AppShell>
       </LayoutProvider>
