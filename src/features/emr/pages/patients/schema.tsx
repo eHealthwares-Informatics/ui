@@ -7,6 +7,7 @@ import {
   type Option,
 } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { unwrapSelectValue } from '@/features/shared/payload-utils';
 import { emrApi } from '@/lib/emr-api';
 import { PaymentProvidersCell } from '../../components/shared/payment-providers-cell';
 import { TagChips } from '../../components/shared/tag-chips';
@@ -67,6 +68,25 @@ function toIdArray(value: unknown): string[] {
     .filter(Boolean);
 }
 
+/** Schema select fields store Option {value,label} in form state; DTO wants strings. */
+const SELECT_FIELDS = [
+  'gender',
+  'maritalStatus',
+  'bloodGroup',
+  'genotype',
+  'nextOfKinRelationship',
+] as const;
+
+function unwrapSelectFields(values: Record<string, unknown>): Record<string, unknown> {
+  const next = { ...values };
+  for (const key of SELECT_FIELDS) {
+    if (next[key] !== undefined) {
+      next[key] = unwrapSelectValue(next[key]) ?? '';
+    }
+  }
+  return next;
+}
+
 function compact(values: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(values).filter(([, value]) => value !== '' && value != null)
@@ -75,7 +95,7 @@ function compact(values: Record<string, unknown>): Record<string, unknown> {
 
 function buildCreatePayload(values: Record<string, unknown>): Record<string, unknown> {
   const payload = compact({
-    ...values,
+    ...unwrapSelectFields(values),
     paymentProviderIds: toIdArray(values.paymentProviderIds),
   });
   // tags are assigned via PUT /patients/:id/tags after create (onCreateSuccess)
@@ -85,7 +105,7 @@ function buildCreatePayload(values: Record<string, unknown>): Record<string, unk
 
 function buildUpdatePayload(values: Record<string, unknown>): Record<string, unknown> {
   return compact({
-    ...values,
+    ...unwrapSelectFields(values),
     paymentProviderIds:
       values.paymentProviderIds !== undefined ? toIdArray(values.paymentProviderIds) : undefined,
   });
