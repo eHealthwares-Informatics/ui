@@ -4,10 +4,8 @@ import { useNotificationSubscription } from './use-notifications';
 export function NotificationSubscriptionRegistrar() {
   const user = useAuthStore((state) => state.user);
 
-  useNotificationSubscription(
-    user ? { organizationId: user.organizationId, locationId: user.locationId } : null,
-    Boolean(user)
-  );
+  // Tenant (org/location) is resolved from the JWT on EMR — send an empty body.
+  useNotificationSubscription(user ? {} : null, Boolean(user));
 
   return null;
 }
