@@ -1,45 +1,55 @@
-import { Button, Group, Modal } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { Plus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { DataPageShell } from '@/features/components/page/data-page-shell';
-import { PatientForm } from '../../components/patients/patient-form';
+import type { Option } from '@/features/rxsoft/types';
+import { emrApi } from '@/lib/emr-api';
 import { PatientRowActions } from '../../components/patients/patient-row-actions';
-import { patientsConfig } from './schema';
+import type { PaymentProvider } from '../../lib/emr-types';
+import { buildPatientsConfig } from './schema';
 
+/**
+ * EMR Patients — schema-forms admin page.
+ *
+ * Register Patient is the DataPageShell New button → ModalDataForm driven by
+ * createFieldGroups in schema.tsx (no bespoke PatientForm modal).
+ */
 export function PatientsPage() {
-  const [opened, { open, close }] = useDisclosure(false);
+  const { data: paymentProviders = [] } = useQuery({
+    queryKey: ['emr', 'payment-providers'],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: PaymentProvider[] }>('/payment-providers', {
+        params: { limit: 100 },
+      });
+      return res.data?.data ?? [];
+    },
+    staleTime: 60_000,
+  });
 
-  const config = useMemo(
-    () => ({
-      ...patientsConfig,
-      renderHeaderActions: () => (
-        <Button leftSection={<Plus size={16} />} onClick={open}>
-          Register Patient
-        </Button>
-      ),
+  const paymentProviderOptions = useMemo<Option[]>(
+    () =>
+      paymentProviders
+        .filter((p) => p.isActive)
+        .map((p) => ({
+          value: String(p.id),
+          label: `${p.name} (${p.type})`,
+        })),
+    [paymentProviders]
+  );
+
+  const config = useMemo(() => {
+    const base = buildPatientsConfig(paymentProviderOptions);
+    return {
+      ...base,
       columns: [
-        ...patientsConfig.columns,
+        ...base.columns,
         {
           key: 'actions',
           label: '',
-          render: (row: Record<string, unknown>) => (
-            <Group gap={4} wrap="nowrap">
-              <PatientRowActions row={row} />
-            </Group>
-          ),
+          render: (row: Record<string, unknown>) => <PatientRowActions row={row} />,
         },
       ],
-    }),
-    [open]
-  );
+    };
+  }, [paymentProviderOptions]);
 
-  return (
-    <>
-      <DataPageShell config={config as typeof patientsConfig} />
-      <Modal opened={opened} onClose={close} title="Register Patient" size="lg" centered>
-        <PatientForm onClose={close} />
-      </Modal>
-    </>
-  );
+  return <DataPageShell config={config} />;
 }
