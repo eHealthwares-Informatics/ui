@@ -98,16 +98,11 @@ for (const resource of rxsoftResources) {
       const rowCount = await rows.count();
       if (rowCount > 0) {
         const rowText = (await rows.first().innerText()).toLowerCase();
-        const isPlaceholder = /no results|no data|empty|nothing|no records|not found/.test(
-          rowText
-        );
+        const isPlaceholder = /no results|no data|empty|nothing|no records|not found/.test(rowText);
         if (!isPlaceholder) {
           // Search left real rows (partial match / count drift) — empty-state
           // cannot be asserted for this resource; skip honestly.
-          test.skip(
-            true,
-            `no-match search left non-empty rows (first: ${rowText.slice(0, 80)})`
-          );
+          test.skip(true, `no-match search left non-empty rows (first: ${rowText.slice(0, 80)})`);
         }
       }
     });
@@ -143,14 +138,14 @@ for (const resource of rxsoftResources) {
       });
       const sortable = page
         .locator('th')
-        .filter({ has: page.locator('button, [role="button"], svg.lucide-arrow-up, svg.lucide-arrow-down') })
+        .filter({
+          has: page.locator('button, [role="button"], svg.lucide-arrow-up, svg.lucide-arrow-down'),
+        })
         .first();
       const count = await sortable.count();
       test.skip(count === 0, 'no sortable headers on this list');
       await sortable.click();
-      await expect
-        .poll(() => sortRequests.length, { timeout: 10_000 })
-        .toBeGreaterThan(0);
+      await expect.poll(() => sortRequests.length, { timeout: 10_000 }).toBeGreaterThan(0);
     });
 
     test('empty create submit is blocked with no POST', async ({ page }, testInfo) => {

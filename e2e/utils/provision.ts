@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 export const ORG_STATE_PATH = join(E2E_DIR, '..', '.runtime', 'org-state.json');
 
-export const SEED_BASE_URL = (process.env.SEED_BASE_URL ?? 'http://localhost:8093').replace(
+// Seed lives on :8094 — local EMR owns :8093 (VITE_EMR_API_URL).
+export const SEED_BASE_URL = (process.env.SEED_BASE_URL ?? 'http://localhost:8094').replace(
   /\/$/,
   ''
 );

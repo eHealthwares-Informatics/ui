@@ -89,7 +89,7 @@ Verified: typecheck, lint, vitest 75/75, format (except §2.3 files).
 
 ## 5. Environment & machine quirks (this Mac)
 
-**Servers** (user starts them — rule 4): quick-start block lives in [server_restart_command.md](server_restart_command.md). Ports: rxsoft :8080 (`/api` prefix) · identity :8092 · seed :8093 · vite :5173 (via dev-daemon). e2e provisions a fresh org per run via seed `POST /api/provision` (x-api-key from `seed/.env`); fallback DEFAULT org `admin`/`password` still needs identity up.
+**Servers** (user starts them — rule 4): quick-start block lives in [server_restart_command.md](server_restart_command.md). Ports: rxsoft :8080 (`/api` prefix) · identity :8092 · seed :8094 (`SEED_PORT`; EMR owns :8093) · vite :5173 (via dev-daemon). e2e provisions a fresh org per run via seed `POST /api/provision` (x-api-key from `seed/.env`); fallback DEFAULT org `admin`/`password` still needs identity up.
 
 ```bash
 # the one Playwright invocation that works here (provisioned org):
