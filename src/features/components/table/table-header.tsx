@@ -33,7 +33,10 @@ export const TableHeader = ({
   sortOrder?: SortOrder;
   onSortChange?: (key: string, order: SortOrder) => void;
 }) => {
-  const { label, dataType, filters, sortable } = column;
+  // Columns are sortable by default — schemas opt OUT with `sortable: false`.
+  // Unlocking sort by default activates the TC-*-02 column-sort coverage
+  // across every list (tracked in ehealthwares/rxsoft#774).
+  const { label, dataType, filters, sortable = true } = column;
   const [open, setOpen] = useState(false);
   const [menuOpened, setMenuOpened] = useState(false);
   const [tempFilter, setTempFilter] = useState<FilterValue | null>(filterValue || null);

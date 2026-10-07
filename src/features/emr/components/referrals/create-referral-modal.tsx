@@ -29,6 +29,13 @@ type StaffRow = {
   department?: string | null;
 };
 
+/** `Name (Department)` when a department is set; otherwise just the name. */
+function specialistLabel(staff: StaffRow): string {
+  const name = `${staff.firstName} ${staff.lastName}`.trim();
+  const dept = staff.department?.trim();
+  return dept ? `${name} (${dept})` : name;
+}
+
 export function CreateReferralModal({
   opened,
   onClose,
@@ -115,7 +122,7 @@ export function CreateReferralModal({
             },
             ...(specialistsQuery.data ?? []).map((s) => ({
               value: s.id,
-              label: `${s.firstName} ${s.lastName}`.trim(),
+              label: specialistLabel(s),
             })),
           ]}
           value={specialistId}

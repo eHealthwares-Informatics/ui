@@ -15,9 +15,13 @@ export type NotificationItem = {
   createdAt: string;
 };
 
+/**
+ * POST /api/notification-subscriptions — body is optional.
+ * Org/location always come from the JWT on the EMR; clients must not send them
+ * (EMR also accepts echoed ids for compatibility, but ignores them).
+ */
 export type NotificationSubscriptionPayload = {
-  organizationId: string | null;
-  locationId: string | null;
+  expiresAt?: string | null;
 };
 
 export type MessageTemplateStatus = 'draft' | 'active' | 'inactive';

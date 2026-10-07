@@ -152,6 +152,21 @@ test.describe.serial('RxSoft goods receiving', () => {
     });
     expect(recv.receiptNumber).toBe(receiptNumber);
 
+    // API evidence before any UI assertion (C12 / #775): the receipt must be
+    // listable for the SAME token/org the browser will use. Distinguishes
+    // "seed never landed" from "UI list empty despite backend row".
+    const listed = await apiFetch<{
+      data: Array<{ receiptNumber?: string }>;
+      meta?: { total?: number };
+    }>(page, `/receipts?search=${encodeURIComponent(receiptNumber!)}&limit=5`);
+    const found = (listed.data ?? []).some((r) => r.receiptNumber === receiptNumber);
+    // eslint-disable-next-line no-console
+    console.log(
+      'SEED-LIST',
+      JSON.stringify({ receiptNumber, total: listed.meta?.total, rows: listed.data?.length, found })
+    );
+    expect(found, `receipt ${receiptNumber} must be listable via API after receive`).toBe(true);
+
     accessToken = await readAccessToken(page);
   });
 
@@ -211,15 +226,22 @@ test.describe.serial('RxSoft goods receiving', () => {
   //   TC-02 confirmation UI appears (password + Confirm Unpost)
   //   TC-03 stock reversed after unpost (balance decreased + line unposted)
 
-  test('TC-RX-PURCHASES-UNPOST-01 + TC-RX-PURCHASES-UNPOST-02: receipt detail unpost — action available, confirmation UI, stock reversal', async ({ page }) => {
-    await page.goto('/rxsoft/receiving');
+  test('TC-RX-PURCHASES-UNPOST-01 + TC-RX-PURCHASES-UNPOST-02: receipt detail unpost — action available, confirmation UI, stock reversal', async ({
+    page,
+  }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
 
+    // Search-filtered lookup keeps the unpost path deterministic even when
+    // the unfiltered list is large. #775 empty-list was seed/provision
+    // (seed port conflict), not a UI render bug — SEED-LIST above is the
+    // C12 gate that the receipt exists for this org before UI asserts.
+    await page.getByTestId('header-search').first().fill(receiptNumber!);
     const receiptRow = page
       .getByTestId('data-table-body')
       .locator('tr')
-      .filter({ hasText: receiptNumber })
+      .filter({ hasText: receiptNumber! })
       .first();
-    await expect(receiptRow).toBeVisible({ timeout: 15_000 });
+    await expect(receiptRow).toBeVisible({ timeout: 30_000 });
 
     const receiptLink = receiptRow.locator('button').first();
     await receiptLink.click();
@@ -271,12 +293,17 @@ test.describe.serial('RxSoft goods receiving', () => {
 
     // TC-03 continued: stock reversed — balance for the item decreased.
     // Diagnostic: movements + balances after unpost (inventory path).
+    // stock-movements is uncached; stock-balances list is cached 30s under
+    // inventory:list:<org>: — poll both, and bust the balance cache by
+    // varying limit so a stale read cannot mask a real DB reversal.
     const movesDiag = await apiFetch<{
-      data: Array<{ movementType?: string; quantity?: number; toLocationId?: string }>;
+      data: Array<{
+        movementType?: string;
+        quantity?: number;
+        toLocationId?: string;
+        fromLocationId?: string;
+      }>;
     }>(page, `/inventory/stock-movements?itemId=${itemId}&limit=10`);
-    const balsDiag = await apiFetch<{
-      data: Array<{ locationId?: string; quantityOnHand?: number }>;
-    }>(page, `/inventory/stock-balances?itemId=${itemId}&limit=20`);
     // eslint-disable-next-line no-console
     console.log(
       'UNPOST-REQ',
@@ -288,33 +315,35 @@ test.describe.serial('RxSoft goods receiving', () => {
         (movesDiag.data ?? []).map((m) => ({
           t: m.movementType,
           q: m.quantity,
-          loc: String(m.toLocationId ?? '').slice(0, 8),
-        }))
-      ),
-      'BALS',
-      JSON.stringify(
-        (balsDiag.data ?? []).map((b) => ({
-          loc: String(b.locationId ?? '').slice(0, 8),
-          q: b.quantityOnHand,
+          from: String(m.fromLocationId ?? '').slice(0, 8),
+          to: String(m.toLocationId ?? '').slice(0, 8),
         }))
       )
     );
 
-    // Poll: the balances API can briefly serve a stale read right after the
-    // unpost transaction commits (observed 2026-10-07: DB showed 0 immediately
-    // but the API returned the pre-unpost value once).
-    const deadline = Date.now() + 10_000;
+    // Primary TC-03 evidence: an 'out' movement exists (uncached endpoint).
+    const outMove = (movesDiag.data ?? []).find(
+      (m) => m.movementType === 'out' && Number(m.quantity ?? 0) > 0
+    );
+    expect(outMove, 'unpost must write a stock movement of type out').toBeTruthy();
+
+    // Poll balances with a rotating limit (cache-bust) + short sleeps.
+    const deadline = Date.now() + 15_000;
     let totalAfter = totalBefore;
+    let bust = 20;
     while (Date.now() < deadline && totalAfter >= totalBefore) {
+      bust = bust === 20 ? 21 : 20;
       const balancesAfter = await apiFetch<{
         data: Array<{ itemId: string; quantityOnHand: number }>;
-      }>(page, `/inventory/stock-balances?itemId=${itemId}&limit=20`);
+      }>(page, `/inventory/stock-balances?itemId=${itemId}&limit=${bust}`);
       totalAfter = (balancesAfter.data ?? []).reduce(
         (sum, b) => sum + Number(b.quantityOnHand ?? 0),
         0
       );
       if (totalAfter >= totalBefore) await page.waitForTimeout(500);
     }
+    // eslint-disable-next-line no-console
+    console.log('BAL-POLL', JSON.stringify({ totalBefore, totalAfter, bust }));
     expect(totalAfter, 'stock decremented after unpost').toBeLessThan(totalBefore);
 
     // TC-03 continued: receipt line marked unposted.

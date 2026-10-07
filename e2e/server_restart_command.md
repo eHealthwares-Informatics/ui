@@ -16,8 +16,8 @@ cd rxsoft && PORT=8080 yarn start:dev
 # 2. identity API — :8092
 cd identity && npm run start:dev
 
-# 3. seed service — :8093 (SEED_API_KEY lives in seed/.env; e2e global-setup needs it)
-cd seed && PORT=8093 npm run start:dev
+# 3. seed service — :8094 (EMR owns :8093; SEED_API_KEY lives in seed/.env)
+cd seed && npm run start:dev
 
 # 4. frontend Vite — :5173 (always via dev-daemon so Playwright can reuse it)
 cd frontend && node e2e/tracker/dev-daemon.mjs --name vite-5173 --cwd "$PWD" --log /tmp/vite-5173.log -- yarn dev --host
@@ -32,7 +32,7 @@ cd rxsoft && node ../frontend/e2e/tracker/dev-daemon.mjs --name rxsoft-8080 --cw
 ### Readiness probes
 
 ```bash
-lsof -i :8080 -i :8092 -i :8093 -i :5173        # processes listening
+lsof -i :8080 -i :8092 -i :8093 -i :8094 -i :5173   # EMR :8093, seed :8094
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080/api/health   # any HTTP code = alive; 404 counts
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:5173/
 ```
@@ -61,7 +61,7 @@ node e2e/tracker/dev-daemon.mjs --name pw-X --cwd "$PWD" --log /tmp/pw-X.log -- 
 ```
 
 ### Missing SEED_API_KEY → provision failures
-e2e `global-setup.ts` provisions a fresh org via seed `POST /api/provision` (x-api-key). If the key env is missing or seed (:8093) is down, setup fails and the run falls back to DEFAULT org `admin`/`password`. Always export `SEED_PROVISION_API_KEY` from `seed/.env` (see command above).
+e2e `global-setup.ts` provisions a fresh org via seed `POST /api/provision` (x-api-key). If the key env is missing or seed (:8094) is down, setup fails and the run falls back to DEFAULT org `admin`/`password`. Always export `SEED_PROVISION_API_KEY` from `seed/.env` (see command above).
 
 ### Login / token notes (do NOT debug login in the preview browser)
 - Login returns `{accessToken, refreshToken}`; localStorage keys: `rxsoft_admin_access_token`, `rxsoft_admin_refresh_token`; auth-store `bootstrap()` needs **both**.
@@ -80,14 +80,15 @@ Freebuff restarts kill daemons and orphan /tmp logs. `rm -f /tmp/pw-*.log /tmp/v
 
 ### Other stacks (only when needed)
 - conversation: needs the Mongo **replica set** for change streams — `cd conversation && docker compose up -d`, then `npm run start:dev` (:8090)
-- concepts :3011 (`npm run start:dev`), interop :3000 (`npm run dev`), emr :8093-slot is seed — emr is `:8093` only when seed is off; check `lsof -i :8093` first.
+- concepts :3011 (`npm run start:dev`), interop :3000 (`npm run dev`), emr :8093. Seed is :8094 (SEED_PORT); do not put seed back on :8093.
 
 ### Baseline expectations when healthy
 | Service | Port | Healthy signal |
 |---|---|---|
 | rxsoft | 8080 | any HTTP on `/api/*` (404 fine) |
 | identity | 8092 | any HTTP |
-| seed | 8093 | any HTTP; `/api/provision` needs x-api-key |
+| seed | 8094 | any HTTP; `/api/provision` needs x-api-key |
+| emr | 8093 | any HTTP (frontend VITE_EMR_API_URL) |
 | vite | 5173 | 200 on `/` |
 | Postgres (rxsoft+identity DBs) | 5432 | `docker ps` shows both containers up |
 | Mongo replica set | 27017+ | only for conversation module work |

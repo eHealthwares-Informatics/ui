@@ -34,10 +34,18 @@ export function AppointmentViewModal({
   const visitId = row.visitId ? String(row.visitId) : null;
 
   const visitQuery = useQuery({
-    queryKey: ['emr', 'visit', visitId],
-    queryFn: async () => {
-      const res = await emrApi.get<{ data: Record<string, unknown> }>(`/visits/${visitId}`);
-      return res.data.data;
+    // Align with visit-detail-page / encounter-detail-page keys.
+    queryKey: ['emr', 'visits', visitId],
+    queryFn: async (): Promise<Record<string, unknown>> => {
+      // GET /visits/:id returns the visit object directly (not { data }).
+      const { data } = await emrApi.get<unknown>(`/visits/${visitId}`);
+      if (data && typeof data === 'object' && 'data' in (data as object)) {
+        const wrapped = (data as { data?: unknown }).data;
+        if (wrapped && typeof wrapped === 'object') {
+          return wrapped as Record<string, unknown>;
+        }
+      }
+      return (data ?? {}) as Record<string, unknown>;
     },
     enabled: Boolean(visitId),
   });

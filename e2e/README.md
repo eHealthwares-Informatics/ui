@@ -65,6 +65,7 @@ saves `e2e/.auth/admin.json` as the storageState. The `admin` and `admin-modules
 | PostgreSQL | localhost:5432 | yes (rxsoft) |
 | Conversation | :8090 | module suite only |
 | EMR | :8093 | module suite only |
+| seed | :8094 | provisioning (`SEED_PORT`; not :8093) |
 | Communication | :8003 | module suite only |
 | Coding-Concept | :8004 | module suite only |
 | LIS | :8002 | module suite only |

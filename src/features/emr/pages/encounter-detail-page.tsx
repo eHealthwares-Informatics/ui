@@ -150,9 +150,23 @@ export function EncounterDetailPage() {
       const res = await emrApi.get<{ data: FormSubmission[] }>('/form-submissions', {
         params: { encounterId, limit: 100 },
       });
-      return res.data.data;
+      return res.data.data ?? [];
     },
     enabled: Boolean(encounterId),
+  });
+
+  // Vitals recorded outside this encounter (nurse mobile flow) — keyed by MRN.
+  const patientVitalsQuery = useQuery({
+    queryKey: ['emr', 'form-submissions', 'patient-vitals', encounter?.patientId],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: FormSubmission[] }>('/form-submissions', {
+        params: { patientId: encounter!.patientId, limit: 50 },
+      });
+      return (res.data.data ?? []).filter((s) =>
+        String(s.formName ?? '').toLowerCase().includes('vital'),
+      );
+    },
+    enabled: Boolean(encounter?.patientId),
   });
 
   const requestsQuery = useQuery({
@@ -297,7 +311,9 @@ export function EncounterDetailPage() {
         <Tabs.List mb="md">
           <Tabs.Tab value="details">Details</Tabs.Tab>
           <Tabs.Tab value="documentation">
-            Documentation ({submissionsQuery.data?.length ?? 0})
+            Documentation (
+            {(submissionsQuery.data?.length ?? 0) + (patientVitalsQuery.data?.length ?? 0)})
+
           </Tabs.Tab>
           <Tabs.Tab value="requests">Requests ({requestsQuery.data?.length ?? 0})</Tabs.Tab>
         </Tabs.List>
@@ -375,8 +391,14 @@ export function EncounterDetailPage() {
         <Tabs.Panel value="documentation">
           <Card withBorder radius="md" padding="lg">
             <DocumentsAccordion
-              submissions={submissionsQuery.data ?? []}
-              isLoading={submissionsQuery.isLoading}
+              submissions={[
+                ...(submissionsQuery.data ?? []),
+                ...(patientVitalsQuery.data ?? []),
+              ].filter(
+                (row, index, all) =>
+                  all.findIndex((r) => String(r.id) === String(row.id)) === index,
+              )}
+              isLoading={submissionsQuery.isLoading || patientVitalsQuery.isLoading}
               onView={setViewSubmission}
               onAmend={setAmendSubmission}
             />

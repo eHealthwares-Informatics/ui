@@ -144,18 +144,17 @@ export function useNotificationSubscription(
     onError: () => undefined,
   });
 
-  const organizationId = payload?.organizationId ?? null;
-  const locationId = payload?.locationId ?? null;
+  // Debounce on user presence only — body no longer carries tenant ids.
+  const registerKey = payload ? 'register' : '';
 
   useEffect(() => {
     if (!enabled) {
       return;
     }
-    const key = `${organizationId ?? ''}|${locationId ?? ''}`;
-    if (lastKeyRef.current === key) {
+    if (lastKeyRef.current === registerKey) {
       return;
     }
-    lastKeyRef.current = key;
-    mutation.mutate({ organizationId, locationId });
-  }, [enabled, organizationId, locationId, mutation]);
+    lastKeyRef.current = registerKey;
+    mutation.mutate(payload ?? {});
+  }, [enabled, registerKey, payload, mutation]);
 }
