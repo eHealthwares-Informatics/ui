@@ -247,9 +247,15 @@ test.describe.serial('RxSoft goods receiving', () => {
     );
     expect(totalBefore, 'goods receive posted stock for the item').toBeGreaterThan(0);
 
-    // Fill the unpost password and confirm — capture the POST response so a
-    // backend rejection surfaces with its body instead of a bare toast timeout.
+    // Fill the unpost password and confirm — capture the POST request/response
+    // so a backend rejection or silent no-reversal surfaces with evidence.
     await dialog.getByLabel('Unpost Password').fill('password12');
+    let unpostBody = '';
+    page.on('request', (req) => {
+      if (req.url().includes('/unpost') && req.method() === 'POST') {
+        unpostBody = req.postData() ?? '';
+      }
+    });
     const unpostRes = page.waitForResponse(
       (res) => res.url().includes('/unpost') && res.request().method() === 'POST',
       { timeout: 20_000 }
@@ -264,13 +270,51 @@ test.describe.serial('RxSoft goods receiving', () => {
     });
 
     // TC-03 continued: stock reversed — balance for the item decreased.
-    const balancesAfter = await apiFetch<{
-      data: Array<{ itemId: string; quantityOnHand: number }>;
+    // Diagnostic: movements + balances after unpost (inventory path).
+    const movesDiag = await apiFetch<{
+      data: Array<{ movementType?: string; quantity?: number; toLocationId?: string }>;
+    }>(page, `/inventory/stock-movements?itemId=${itemId}&limit=10`);
+    const balsDiag = await apiFetch<{
+      data: Array<{ locationId?: string; quantityOnHand?: number }>;
     }>(page, `/inventory/stock-balances?itemId=${itemId}&limit=20`);
-    const totalAfter = (balancesAfter.data ?? []).reduce(
-      (sum, b) => sum + Number(b.quantityOnHand ?? 0),
-      0
+    // eslint-disable-next-line no-console
+    console.log(
+      'UNPOST-REQ',
+      unpostBody,
+      'RESP',
+      resBody.slice(0, 150),
+      'MOVES',
+      JSON.stringify(
+        (movesDiag.data ?? []).map((m) => ({
+          t: m.movementType,
+          q: m.quantity,
+          loc: String(m.toLocationId ?? '').slice(0, 8),
+        }))
+      ),
+      'BALS',
+      JSON.stringify(
+        (balsDiag.data ?? []).map((b) => ({
+          loc: String(b.locationId ?? '').slice(0, 8),
+          q: b.quantityOnHand,
+        }))
+      )
     );
+
+    // Poll: the balances API can briefly serve a stale read right after the
+    // unpost transaction commits (observed 2026-10-07: DB showed 0 immediately
+    // but the API returned the pre-unpost value once).
+    const deadline = Date.now() + 10_000;
+    let totalAfter = totalBefore;
+    while (Date.now() < deadline && totalAfter >= totalBefore) {
+      const balancesAfter = await apiFetch<{
+        data: Array<{ itemId: string; quantityOnHand: number }>;
+      }>(page, `/inventory/stock-balances?itemId=${itemId}&limit=20`);
+      totalAfter = (balancesAfter.data ?? []).reduce(
+        (sum, b) => sum + Number(b.quantityOnHand ?? 0),
+        0
+      );
+      if (totalAfter >= totalBefore) await page.waitForTimeout(500);
+    }
     expect(totalAfter, 'stock decremented after unpost').toBeLessThan(totalBefore);
 
     // TC-03 continued: receipt line marked unposted.
