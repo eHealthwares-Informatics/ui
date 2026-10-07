@@ -361,6 +361,7 @@ export function DataPageShell(props: DataPageShellProps) {
     apiProvider,
     fields,
     queryKeyBase: listKeyBase,
+    onCreateSuccess: config.onCreateSuccess,
   });
 
   const updateMutation = useUpdateMutation({

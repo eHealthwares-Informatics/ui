@@ -27,6 +27,15 @@ export type ModelConfig<T = any> = {
   buildCreatePayload?: (values: Record<string, unknown>) => unknown;
   buildUpdatePayload?: (values: Record<string, unknown>, row?: Record<string, unknown>) => unknown;
   buildFormState?: (row: Record<string, unknown>) => Record<string, unknown>;
+  /**
+   * Runs after a successful create POST, with the API response and the form
+   * values. Use for side-channel writes the create DTO does not accept
+   * (e.g. assigning patient tags after POST /patients).
+   */
+  onCreateSuccess?: (
+    created: Record<string, unknown>,
+    values: Record<string, unknown>
+  ) => Promise<void> | void;
   renderCreateExtras?: (args: {
     formState: Record<string, unknown>;
     updateField: (name: string, value: unknown) => void;

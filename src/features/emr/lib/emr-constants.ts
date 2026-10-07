@@ -94,9 +94,9 @@ export const GENDERS = ['MALE', 'FEMALE', 'OTHER'] as const;
 
 export const MARITAL_STATUSES = ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'OTHER'] as const;
 
-export const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as const;
+export const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'UNKNOWN'] as const;
 
-export const GENOTYPES = ['AA', 'AS', 'SS', 'AC', 'CC', 'SC'] as const;
+export const GENOTYPES = ['AA', 'AS', 'SS', 'AC', 'CC', 'SC', 'UNKNOWN'] as const;
 
 export const NEXT_OF_KIN_RELATIONSHIPS = ['SPOUSE', 'PARENT', 'SIBLING', 'CHILD', 'OTHER'] as const;
 
