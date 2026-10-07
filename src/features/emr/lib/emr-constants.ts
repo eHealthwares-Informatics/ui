@@ -43,6 +43,8 @@ export const STAFF_ROLE_TYPES = [
   'Therapist',
   'Admin',
   'Support',
+  'Specialist',
+  'Finance',
 ] as const;
 export const DEPARTMENT_TYPES = [
   'OPD',
