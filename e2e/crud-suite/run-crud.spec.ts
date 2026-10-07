@@ -136,15 +136,12 @@ for (const resource of rxsoftResources) {
       page.on('request', (req) => {
         if (req.url().includes('sortBy=')) sortRequests.push(req.url());
       });
-      const sortable = page
-        .locator('th')
-        .filter({
-          has: page.locator('button, [role="button"], svg.lucide-arrow-up, svg.lucide-arrow-down'),
-        })
-        .first();
-      const count = await sortable.count();
+      // TableHeader renders sort as ActionIcon aria-label="Sort by <label>".
+      // Do not match generic th>button — filter ActionIcons live in the same th.
+      const sortBtn = page.getByRole('button', { name: /^Sort by / }).first();
+      const count = await sortBtn.count();
       test.skip(count === 0, 'no sortable headers on this list');
-      await sortable.click();
+      await sortBtn.click();
       await expect.poll(() => sortRequests.length, { timeout: 10_000 }).toBeGreaterThan(0);
     });
 
