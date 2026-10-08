@@ -163,7 +163,9 @@ export function EncounterDetailPage() {
         params: { patientId: encounter!.patientId, limit: 50 },
       });
       return (res.data.data ?? []).filter((s) =>
-        String(s.formName ?? '').toLowerCase().includes('vital'),
+        String(s.formName ?? '')
+          .toLowerCase()
+          .includes('vital')
       );
     },
     enabled: Boolean(encounter?.patientId),
@@ -313,7 +315,6 @@ export function EncounterDetailPage() {
           <Tabs.Tab value="documentation">
             Documentation (
             {(submissionsQuery.data?.length ?? 0) + (patientVitalsQuery.data?.length ?? 0)})
-
           </Tabs.Tab>
           <Tabs.Tab value="requests">Requests ({requestsQuery.data?.length ?? 0})</Tabs.Tab>
         </Tabs.List>
@@ -395,8 +396,7 @@ export function EncounterDetailPage() {
                 ...(submissionsQuery.data ?? []),
                 ...(patientVitalsQuery.data ?? []),
               ].filter(
-                (row, index, all) =>
-                  all.findIndex((r) => String(r.id) === String(row.id)) === index,
+                (row, index, all) => all.findIndex((r) => String(r.id) === String(row.id)) === index
               )}
               isLoading={submissionsQuery.isLoading || patientVitalsQuery.isLoading}
               onView={setViewSubmission}

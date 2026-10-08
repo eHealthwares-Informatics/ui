@@ -38,10 +38,7 @@ export function StaffPage() {
     <>
       <DataPageShell config={config as typeof staffConfig} />
       <Modal opened={opened} onClose={close} title="Register Staff" size="lg" centered>
-        <StaffForm
-          onClose={close}
-          onCreated={close}
-        />
+        <StaffForm onClose={close} onCreated={close} />
       </Modal>
     </>
   );
