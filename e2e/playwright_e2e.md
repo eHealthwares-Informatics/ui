@@ -2,7 +2,7 @@
 
 **Purpose**: Canonical onboarding for a fresh Freebuff session continuing the RxSoft alpha-test-coverage effort. Read top-to-bottom; everything linked is in-repo.
 **Board**: ehealthwares/rxsoft → "RxSoft Alpha Test Plan" (22 epics / 116 entity tasks / 593 UCs / ~2,039 TCs)
-**Last updated**: 2026-10-01 ~00:45 (validation gate + VAL family + efficiency fixes landed, uncommitted)
+**Last updated**: 2026-10-08 ~20:30 (§5.1 common-issues playbook added; earlier: 2026-10-01 validation gate + VAL family + efficiency fixes)
 
 ---
 
@@ -107,6 +107,27 @@ node e2e/tracker/dev-daemon.mjs --name pw-X --cwd "$PWD" --log /tmp/pw-X.log -- 
 - `gh pr create` breaks on heredoc bodies → `--body-file`. Repeat write-backs need `board-sync.mjs --no-cache` (stale `.board-cache.json`).
 - Don't debug UI login in the preview browser (dead end — see phase-1/2 challenges); auth.setup-provisioned storageState is the way.
 - Mantine gotchas: options detach mid-click (3× retry pattern in `pickSuggestion`); async-selects have no `input[role=combobox]` (use `async-select-<field>` testid).
+
+### 5.1 Common issues & how to resolve — **check this table before debugging any red run**
+
+Most failures in this repo are environmental, not app defects. Symptom → cause → fix. Canon: [challenges_blockers_resolutions/INDEX.md](challenges_blockers_resolutions/INDEX.md) (C1–C13); AIOS-side copy: `~/.config`-independent playbook at `AIOS/core/skills/qa/playwright/SKILL.md` (also embedded in the `ehealthwares/qa` + `ehealthwares/rxsoft/qa` agent definitions).
+
+| # | Symptom | Cause | Resolution |
+|---|---|---|---|
+| 1 | Rotating per-test timeouts that look like app bugs | **Load trap**: load-avg > ~10 freezes Chromium + Node together (incident: 216) | `uptime` before every run (healthy <10); wait or recycle services, then re-run. Never diagnose app behaviour under load. |
+| 2 | `node: command not found`, all daemons dead, `/tmp/*.log` wiped | Freebuff/host restart drops the nvm PATH and kills watch processes | Re-export nvm PATH, then use the quick-start block in [server_restart_command.md](server_restart_command.md); output it and **wait for the user** (rule 4). |
+| 3 | Provisioning 500, or seed health/provision 404 | Seed is on **:8094** (EMR owns :8093); provision requires `x-api-key` | `export SEED_PROVISION_API_KEY=$(grep '^SEED_API_KEY=' ../seed/.env \| cut -d= -f2)`; confirm `SEED_BASE_URL=http://localhost:8094`. |
+| 4 | Stuck on `/sign-in`, 401→403 loop, whole app remounts, every control "element was detached from the DOM" | Hollow org: identity `roles`/`user_roles` empty → user gets `roles: []`, authenticated router 403-loops (remounts the app) | Verify role rows for the org, reprovision a fresh org (or DEFAULT `admin`/`password`), file the defect against seed/identity — **never patch the spec to pass**. |
+| 5 | Route subtree remounts; Mantine ids change mid-interaction | `AppBootstrap` declared inline in `ModuleProvider` (**ui#84**, fixed in master) | Pull master; regression test `src/context/module-provider.test.tsx` (hoist + memoize `AppBootstrap`, dedupe `bootstrap()`). |
+| 6 | Mantine option detaches mid-click; async-select has no `input[role=combobox]` | Mantine portal re-render | 3x retry in `pickSuggestion`; use the `async-select-<field>` testid (testid-first rule). |
+| 7 | `page.goto: Cannot navigate to invalid URL` for every test | Playwright ran **without** `--config e2e/playwright.config.ts` → no baseURL | Always pass `--config e2e/playwright.config.ts --project=setup --project=admin`. |
+| 8 | Run never finishes after green tests (4c11: killed after 28 min) | seed#12: `DELETE /api/provision/:code` hangs | **Fixed** — `deprovisionOrganization` aborts after 30s (`SEED_DEPROVISION_TIMEOUT_MS`), throws, and teardown logs `deprovision NOT confirmed` then exits (regression test: `e2e/utils/provision.test.ts`). Results are already in the reporter — never wait on teardown. |
+| 9 | Fresh org list endpoints return `[]` while DEFAULT org has rows | Seed on the wrong port / FK-CASCADE deletes removed the run's rows (**#775**) | Check seed :8094 + probe the org's rows in Postgres before filing a UI/backend defect. |
+| 10 | `auth.setup` fails after an env change | `.env.local` flipped to production/stale → provisioned storageState no longer matches | Force `.env.local` back to localhost and **restart Vite**. |
+| 11 | A pass takes 8–12 min; failures migrate between tests | Serial mode + `--retries=1` re-runs whole describe groups | Self-contained tests, 120s beforeEach budgets, no shared mutable state. |
+| 12 | File tools report `[BLOCKED]` / "file does not exist" on a real file | Local-change snapshots write mode **600** | `chmod 644 <file>`; if `read_files` blocks everything, work through bash with exact-match asserts. |
+| 13 | `gh pr create` fails; board write-back silently no-ops | Heredoc bodies break `gh`; stale `.board-cache.json` | `gh ... --body-file <file>`; `board-sync.mjs --no-cache`. |
+| 14 | A test passes but the box stays unticked | Honesty rule **C12** + Alpha QA workflow rules 1–4 | Never tick an unverified TC; board mutations go through [board_updates.md](board_updates.md); testid-first; visible errors **and** zero POSTs. |
 
 ## 6. Reference map
 
