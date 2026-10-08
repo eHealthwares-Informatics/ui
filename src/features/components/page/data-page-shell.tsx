@@ -1,4 +1,4 @@
-import { ActionIcon, Select, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Select, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -477,42 +477,46 @@ export function DataPageShell(props: DataPageShellProps) {
           })()}
         />
       )}
-      <HeaderBar
-        open={filtersModalOpened}
-        setOpen={setFiltersModalOpened}
-        appliedFilters={appliedFilters}
-        updateFilters={handleApplyFilter}
-        columns={columns}
-        pageIndex={pageIndex}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        refresh={() => {
-          query.refetch();
-        }}
-        search={search}
-        onSearchChange={setSearch}
-        customActions={renderHeaderActions?.({
-          rows,
-          refresh: () => {
+      {/* Stable toolbar container so e2e can scope search/sort queries to one
+          node and detect remounts (ehealthwares/ui#84). */}
+      <Box data-testid={config.id ? `${config.id}-toolbar` : 'page-toolbar'}>
+        <HeaderBar
+          open={filtersModalOpened}
+          setOpen={setFiltersModalOpened}
+          appliedFilters={appliedFilters}
+          updateFilters={handleApplyFilter}
+          columns={columns}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          refresh={() => {
             query.refetch();
-          },
-        })}
-        onExportCsv={
-          canExport && csvEndpoint ? () => exportMutation.mutate(exportParams) : undefined
-        }
-        onExportPdf={canExport && pdfEndpoint ? () => void downloadPdf() : undefined}
-        onDelete={canDelete || deletePathBuilder ? () => setIsDeleteOpen(true) : undefined}
-        hasFilterableColumns={hasFilterableColumns}
-        minSearchLength={minSearchLength}
-        debounceMs={debounceMs}
-        onCreate={
-          hasCreate
-            ? () => {
-                createPathBuilder ? navigate({ to: createPathBuilder() }) : openModal();
-              }
-            : undefined
-        }
-      />
+          }}
+          search={search}
+          onSearchChange={setSearch}
+          customActions={renderHeaderActions?.({
+            rows,
+            refresh: () => {
+              query.refetch();
+            },
+          })}
+          onExportCsv={
+            canExport && csvEndpoint ? () => exportMutation.mutate(exportParams) : undefined
+          }
+          onExportPdf={canExport && pdfEndpoint ? () => void downloadPdf() : undefined}
+          onDelete={canDelete || deletePathBuilder ? () => setIsDeleteOpen(true) : undefined}
+          hasFilterableColumns={hasFilterableColumns}
+          minSearchLength={minSearchLength}
+          debounceMs={debounceMs}
+          onCreate={
+            hasCreate
+              ? () => {
+                  createPathBuilder ? navigate({ to: createPathBuilder() }) : openModal();
+                }
+              : undefined
+          }
+        />
+      </Box>
 
       <DataTable
         columns={columns}

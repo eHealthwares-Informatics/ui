@@ -1,6 +1,5 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ModuleContext, type ModuleContextType } from '@/context/module-context';
-import { useAttributeDefinitionsBootstrap } from '@/features/queries/bootstrap';
 import { modules, type ModuleId, moduleMap } from '@/features/shared/module-data';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -29,26 +28,23 @@ const getInitialModule = (userModules: { id: string }[]): ModuleId => {
   return 'rxsoft';
 };
 
+/**
+ * Bootstrap wrapper. Defined at module scope on purpose: declaring it inside
+ * `ModuleProvider` gives it a new component identity on every provider render,
+ * which makes React unmount and remount the entire subtree (see
+ * ehealthwares/ui#84).
+ */
+function AppBootstrap({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    console.log('React app is fully loaded and mounted!');
+  }, []);
+
+  return children;
+}
+
 export interface ModuleProviderProps {
   children: ReactNode;
   defaultModule?: ModuleId;
-}
-
-function FullScreenLoader() {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-      }}
-    >
-      <div className="spinner" />
-      <p>Loading application...</p>
-    </div>
-  );
 }
 
 export function ModuleProvider({ children, defaultModule }: ModuleProviderProps) {
@@ -73,51 +69,35 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
         window.localStorage.setItem(MODULE_STORAGE_KEY, firstAvailable);
       }
     }
-  }, [storeModules]);
+  }, [storeModules, selectedModule]);
 
-  const currentModuleDefinition = moduleMap[selectedModule];
-
-  // Fallback to first module if somehow we don't have a definition
-  const fallbackModule = currentModuleDefinition || modules[0];
-
-  const setSelectedModule = (moduleId: ModuleId) => {
+  const setSelectedModule = useCallback((moduleId: ModuleId) => {
     setSelectedModuleState(moduleId);
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(MODULE_STORAGE_KEY, moduleId);
     }
-  };
+  }, []);
 
-  const contextValue: ModuleContextType = {
-    selectedModule,
-    setSelectedModule,
-    currentModuleDefinition: fallbackModule,
-    moduleId: selectedModule,
-    apiProvider: fallbackModule.apiProvider,
-    moduleName: fallbackModule.title,
-    moduleDescription: fallbackModule.description,
-    moduleRoot: fallbackModule.root,
-    modules,
-  };
+  // Fallback to first module if somehow we don't have a definition.
+  const currentModuleDefinition = moduleMap[selectedModule];
+  const fallbackModule = currentModuleDefinition || modules[0];
 
-  function AppBootstrap({ children }: { children: React.ReactNode }) {
-    const pathname = typeof window === 'undefined' ? '' : window.location.pathname;
-    const isPublicWebsiteRoute = pathname === '/' || pathname.startsWith('/shop');
-    const [isReady, setIsReady] = useState(false);
-    // const attributeDefs = useAttributeDefinitionsBootstrap('LOINC');
-    useEffect(() => {
-      // This runs AFTER the initial DOM render is complete
-      setIsReady(true);
-      console.log('React app is fully loaded and mounted!');
-    }, []);
-
-    // const isReady = isPublicWebsiteRoute //|| //attributeDefs.isSuccess;
-
-    // if (!isReady) {
-    //   return <FullScreenLoader />;
-    // }
-
-    return children;
-  }
+  // Memoize the context value so consumers only re-render when the selected
+  // module actually changes, not on every provider render.
+  const contextValue: ModuleContextType = useMemo(
+    () => ({
+      selectedModule,
+      setSelectedModule,
+      currentModuleDefinition: fallbackModule,
+      moduleId: selectedModule,
+      apiProvider: fallbackModule.apiProvider,
+      moduleName: fallbackModule.title,
+      moduleDescription: fallbackModule.description,
+      moduleRoot: fallbackModule.root,
+      modules,
+    }),
+    [selectedModule, setSelectedModule, fallbackModule]
+  );
 
   return (
     <ModuleContext.Provider value={contextValue}>
