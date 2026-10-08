@@ -1,8 +1,16 @@
+import {
+  getPrintServerUrl,
+  sendReceipt,
+  type AgentReceiptPayload,
+} from './printServer';
+
 export async function printPosReceiptRemote(data: {
   saleNumber: string;
+  customerName?: string;
   header?: string;
   footer?: string;
-  items: Array<{ name: string; qty: number; price: number; total: number }>;
+  currency?: string;
+  items: Array<{ code?: string; name: string; qty: number; price: number; total: number }>;
   subtotal: number;
   discount: number;
   vat: number;
@@ -11,12 +19,11 @@ export async function printPosReceiptRemote(data: {
   changeAmount: number;
 }): Promise<boolean> {
   try {
-    const res = await fetch('http://localhost:8094/print/receipt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, footer: data.footer || 'Thank you!' }),
-    });
-    return res.ok;
+    const payload: AgentReceiptPayload = {
+      ...data,
+      footer: data.footer || 'Thank you for your patronage!',
+    };
+    return await sendReceipt(getPrintServerUrl(), payload);
   } catch {
     return false;
   }
@@ -49,8 +56,15 @@ export async function printPosReceipt(sale: {
 
   const remoteOk = await printPosReceiptRemote({
     saleNumber: sale.saleNumber,
+    customerName: sale.customerName,
     header: headerText,
-    items: sale.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, total: i.total })),
+    items: sale.items.map((i) => ({
+      code: i.code,
+      name: i.name,
+      qty: i.qty,
+      price: i.price,
+      total: i.total,
+    })),
     subtotal: sale.subtotal,
     discount: sale.discount,
     vat: sale.vat,
