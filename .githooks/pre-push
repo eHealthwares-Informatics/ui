@@ -1,0 +1,77 @@
+#!/bin/sh
+# pre-push hook: block pushes containing files that fail the repo-pinned oxfmt check.
+#
+# Problem this solves: the CI format gate (test_pull_request) runs
+# `oxfmt --check` and re-breaks for every subsequent PR when a merge
+# sneaks unformatted files past review. This hook catches violations
+# locally BEFORE the push, using the repo-pinned oxfmt (devDependencies)
+# — never `npx oxfmt`, which pulls a different version that formats
+# differently than CI.
+#
+# Coverage: per pushed ref, files changed vs that ref's upstream.
+# New branches (no upstream yet) are diffed against origin/master.
+# Only *.ts / *.tsx / *.css files are checked; deleted files are skipped.
+#
+# Activate per clone with:  git config core.hooksPath .githooks
+
+set -u
+
+repo_root=$(git rev-parse --show-toplevel) || exit 1
+oxfmt="$repo_root/node_modules/.bin/oxfmt"
+
+# The all-zero sha marks ref creation / deletion in pre-push input.
+zero="0000000000000000000000000000000000000000"
+
+# Collect changed files across all pushed refs (deduped, existence-checked).
+changed_list=$(
+  while read -r local_ref local_sha remote_ref remote_sha; do
+    # Skip deletion pushes.
+    [ "$local_sha" = "$zero" ] && continue
+
+    if [ "$remote_sha" = "$zero" ]; then
+      # First push of this ref: no upstream yet — diff against the default base.
+      base="refs/remotes/origin/master"
+      if ! git rev-parse --verify -q "$base" >/dev/null; then
+        echo "pre-push: no origin/master to compare $remote_ref against; skipping check." >&2
+        continue
+      fi
+      range="$base...$local_sha"
+    else
+      # Commits new vs the ref's current upstream.
+      range="$remote_sha...$local_sha"
+    fi
+
+    git diff --name-only "$range" -- '*.ts' '*.tsx' '*.css' 2>/dev/null
+  done | sort -u
+)
+
+# Keep only files that exist in the worktree (skip deletions/renames-away).
+files=""
+for f in ${changed_list:-}; do
+  [ -f "$repo_root/$f" ] && files="$files $f"
+done
+
+# Nothing relevant to check.
+[ -z "${files# }" ] && exit 0
+
+if [ ! -x "$oxfmt" ]; then
+  echo "pre-push: repo-pinned oxfmt not found at $oxfmt" >&2
+  echo "pre-push: run 'npm install' first, then retry the push." >&2
+  exit 1
+fi
+
+echo "pre-push: checking $(echo $files | wc -w | tr -d ' ') changed file(s) with oxfmt $("$oxfmt" --version 2>/dev/null) ..."
+
+# Run from repo root so .oxfmtrc.json is picked up.
+# shellcheck disable=SC2086
+if (cd "$repo_root" && "$oxfmt" --check $files); then
+  echo "pre-push: format check passed."
+  exit 0
+else
+  echo ""
+  echo "pre-push: FORMAT CHECK FAILED — the files below have unformatted code."
+  echo "pre-push: Run 'npm run format:write' on the listed files (or 'npm run format:changed'),"
+  echo "pre-push: commit the result, and push again."
+  for f in $files; do echo "  - $f"; done
+  exit 1
+fi
