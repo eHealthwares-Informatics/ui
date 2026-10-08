@@ -1,8 +1,4 @@
-import {
-  getPrintServerUrl,
-  sendReceipt,
-  type AgentReceiptPayload,
-} from './printServer';
+import { getPrintServerUrl, sendReceipt, type AgentReceiptPayload } from './printServer';
 
 export async function printPosReceiptRemote(data: {
   saleNumber: string;

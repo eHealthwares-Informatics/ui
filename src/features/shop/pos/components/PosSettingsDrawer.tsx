@@ -110,9 +110,7 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
   }, [printServerUrl]);
 
   const handleFind = useCallback(async () => {
-    const targets = candidates.trim()
-      ? parseCandidates(candidates)
-      : [printServerUrl];
+    const targets = candidates.trim() ? parseCandidates(candidates) : [printServerUrl];
     if (targets.length === 0) {
       setFindState({ status: 'error', message: 'Enter at least one IP address to search.' });
       return;
@@ -321,10 +319,7 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
         </Button>
 
         {testPrint.status === 'success' && (
-          <Alert
-            color="green"
-            data-testid="pos-settings-print-test-success"
-          >
+          <Alert color="green" data-testid="pos-settings-print-test-success">
             {testPrint.message}
           </Alert>
         )}

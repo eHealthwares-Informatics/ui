@@ -97,10 +97,7 @@ export function parseCandidates(input: string, port = PRINT_SERVER_PORT): string
 }
 
 /** Probe a single host's `GET /discover`; resolves to null when not an agent. */
-export async function probeAgent(
-  base: string,
-  timeoutMs = 1500,
-): Promise<AgentInfo | null> {
+export async function probeAgent(base: string, timeoutMs = 1500): Promise<AgentInfo | null> {
   const baseUrl = normalizeBaseUrl(base);
   try {
     const controller = new AbortController();
@@ -117,14 +114,12 @@ export async function probeAgent(
 }
 
 /** Probe every candidate concurrently, returning the agents that responded. */
-export async function discoverPrintServers(
-  candidates: string[],
-): Promise<DiscoveredAgent[]> {
+export async function discoverPrintServers(candidates: string[]): Promise<DiscoveredAgent[]> {
   const results = await Promise.all(
     candidates.map(async (base) => {
       const info = await probeAgent(base);
       return info ? { url: normalizeBaseUrl(base), info } : null;
-    }),
+    })
   );
   return results.filter((r): r is DiscoveredAgent => r !== null);
 }
@@ -151,7 +146,7 @@ export interface AgentReceiptPayload {
 export function printOverWebSocket(
   base: string,
   payload: AgentReceiptPayload,
-  timeoutMs = 3000,
+  timeoutMs = 3000
 ): Promise<boolean> {
   return new Promise((resolve) => {
     let settled = false;
@@ -202,7 +197,7 @@ export function printOverWebSocket(
 export async function printOverHttp(
   base: string,
   payload: AgentReceiptPayload,
-  timeoutMs = 3000,
+  timeoutMs = 3000
 ): Promise<boolean> {
   const baseUrl = normalizeBaseUrl(base);
   try {
@@ -222,10 +217,7 @@ export async function printOverHttp(
 }
 
 /** Websocket first, then HTTP. Resolves true if either path succeeds. */
-export async function sendReceipt(
-  base: string,
-  payload: AgentReceiptPayload,
-): Promise<boolean> {
+export async function sendReceipt(base: string, payload: AgentReceiptPayload): Promise<boolean> {
   if (await printOverWebSocket(base, payload)) return true;
   return printOverHttp(base, payload);
 }
