@@ -110,13 +110,14 @@ export function renderCell(row: Record<string, any>, column: Column) {
   if (column.editable && column.field?.updateField) {
     const update = column.field.updateField;
     const updateField = (name: string, value: string) => update(row, name, value);
+    const error = column.error?.(row);
 
     return (
       <>
         <RenderField inTable field={column.field} value={value} updateField={updateField} />
-        {column.error?.(row) && (
-          <Text c="red" size="xs">
-            {column.error(row)}
+        {error && (
+          <Text c="red" size="xs" data-testid="field-error">
+            {error}
           </Text>
         )}
       </>

@@ -1,7 +1,7 @@
 import { Alert, Button, Grid, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { AlertCircle, Plus } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   mergeRowToSaved,
   PricingMatrixRow,
@@ -24,15 +24,25 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
     [fieldGroup.parentId || '']: parentId,
   });
 
-  const syncRows = useCallback(
+  const updateFieldRef = useRef(updateField);
+  const rowsRef = useRef(rows);
+  const originalRowsRef = useRef(originalRows);
+
+  useEffect(() => {
+    updateFieldRef.current = updateField;
+    rowsRef.current = rows;
+    originalRowsRef.current = originalRows;
+  });
+
+  const commitRows = useCallback(
     (nextRows: Record<string, unknown>[], nextOriginalRows?: Record<string, unknown>[]) => {
       setRows(nextRows);
       if (nextOriginalRows) {
         setOriginalRows(nextOriginalRows);
       }
-      updateField(rowsField, nextRows, index);
+      updateFieldRef.current(rowsField, nextRows, index);
     },
-    [index, rowsField, updateField]
+    [index, rowsField]
   );
 
   const updateLocalFormState = (name: string, value: string, _: any) => {
@@ -44,7 +54,7 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
 
   const loadMatrix = useCallback(async () => {
     if (!parentId) {
-      syncRows([], []);
+      commitRows([], []);
       return;
     }
 
@@ -52,37 +62,14 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
     setError(null);
     try {
       const matrixRows = await fieldGroup.matrix.load({ [fieldGroup.parentId || '']: parentId });
-      syncRows(matrixRows, matrixRows);
+      commitRows(matrixRows, matrixRows);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load pricing matrix';
       setError(message);
     } finally {
       setIsLoading(false);
     }
-  }, [parentId, syncRows]);
-
-  const matrixColumns = useMemo(() => {
-    return (fieldGroup.columns || []).map((column) => {
-      if (!column.editable || !column.field) {
-        return column;
-      }
-
-      return {
-        ...column,
-        editable: true,
-        field: {
-          ...column.field,
-          updateField: (row: PricingMatrixRow, name: string, value: unknown) => {
-            updateMatrixRow(
-              row.id,
-              name as keyof PricingMatrixRow, //rows as any,
-              value
-            );
-          },
-        },
-      };
-    });
-  }, [rows, setRows, updateField, index, rowsField, fieldGroup.columns]);
+  }, [parentId, commitRows]);
 
   useEffect(() => {
     setLocalFormState((current) => ({ ...current, [fieldGroup.parentId || '']: parentId }));
@@ -93,44 +80,70 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
     } else if (parentId) {
       loadMatrix();
     } else {
-      syncRows([], []);
+      commitRows([], []);
     }
   }, [parentId]);
 
-  const updateMatrixRow = (rowId: string, field: keyof PricingMatrixRow, value: unknown) => {
-    const nextRows = rows.map((row) =>
-      row.id === rowId
-        ? {
-            ...row,
-            [field]: field === 'unitPrice' && value !== '' ? Number(value) : value,
-            dirty: true,
-            error: undefined,
-          }
-        : row
-    );
-    setRows(nextRows);
-    updateField(rowsField, nextRows, index);
-  };
+  const updateMatrixRow = useCallback(
+    (rowId: string, field: keyof PricingMatrixRow, value: unknown) => {
+      commitRows(
+        rowsRef.current.map((row) =>
+          row.id === rowId
+            ? {
+                ...row,
+                [field]: field === 'unitPrice' && value !== '' ? Number(value) : value,
+                dirty: true,
+                error: undefined,
+              }
+            : row
+        )
+      );
+    },
+    [commitRows]
+  );
+
+  const matrixColumns = useMemo(() => {
+    return (fieldGroup.columns || []).map((column) => {
+      if (!column.editable || !column.field) {
+        return column;
+      }
+
+      return {
+        ...column,
+        editable: true,
+        error: (row: Record<string, unknown>) => row.error as string | undefined,
+        field: {
+          ...column.field,
+          updateField: (row: PricingMatrixRow, name: string, value: unknown) => {
+            updateMatrixRow(row.id, name as keyof PricingMatrixRow, value);
+          },
+        },
+      };
+    });
+  }, [fieldGroup.columns, updateMatrixRow]);
 
   const resetRow = (rowId: string) => {
-    const original = originalRows.find((row) => row.id === rowId);
+    const original = originalRowsRef.current.find((row) => row.id === rowId);
     if (!original) {
       return;
     }
 
-    const nextRows = rows.map((row) => (row.id === rowId ? original : row));
-    setRows(nextRows);
-    updateField(rowsField, nextRows, index);
+    commitRows(rowsRef.current.map((row) => (row.id === rowId ? original : row)));
   };
 
   const saveRow = async (row: PricingMatrixRow) => {
     const validation = fieldGroup.matrix.validate(row);
     if (!validation.valid) {
-      const nextRows = rows.map((item) =>
-        item.id === row.id ? { ...item, error: validation.error } : item
+      const message = validation.error ?? 'Invalid row';
+      const nextRows = rowsRef.current.map((item) =>
+        item.id === row.id ? { ...item, error: message } : item
       );
-      setRows(nextRows);
-      updateField(rowsField, nextRows, index);
+      commitRows(nextRows);
+      notifications.show({
+        title: `${fieldGroup.title} save failed`,
+        message,
+        color: 'red',
+      });
       return;
     }
 
@@ -148,9 +161,11 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
         error: undefined,
       };
 
-      const nextRows = rows.map((item) => (item.id === row.id ? savedRow : item));
-      const nextOriginalRows = originalRows.map((item) => (item.id === row.id ? savedRow : item));
-      syncRows(nextRows, nextOriginalRows);
+      const nextRows = rowsRef.current.map((item) => (item.id === row.id ? savedRow : item));
+      const nextOriginalRows = originalRowsRef.current.map((item) =>
+        item.id === row.id ? savedRow : item
+      );
+      commitRows(nextRows, nextOriginalRows);
       notifications.show({
         title: `${fieldGroup.title} saved`,
         message: `${row.priceListName}  updated`,
@@ -158,11 +173,10 @@ export function FieldGroupAdd({ title, fieldGroup, formState, updateField, index
       });
     } catch (err: any) {
       const message = getApiErrorMessage(err);
-      const nextRows = rows.map((item) =>
+      const nextRows = rowsRef.current.map((item) =>
         item.id === row.id ? { ...item, error: String(message) } : item
       );
-      setRows(nextRows);
-      updateField(rowsField, nextRows, index);
+      commitRows(nextRows);
       notifications.show({
         title: `${fieldGroup.title} save failed`,
         message: String(message),
