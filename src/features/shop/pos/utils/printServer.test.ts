@@ -68,7 +68,7 @@ describe('discovery', () => {
   it('returns null when the host is not an agent', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ service: 'other' }) }),
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ service: 'other' }) })
     );
     expect(await probeAgent('http://localhost:8094')).toBeNull();
   });
@@ -81,9 +81,9 @@ describe('discovery', () => {
         Promise.resolve(
           url.includes('192.168.1.10')
             ? { ok: true, json: async () => agentInfo }
-            : { ok: false, json: async () => ({}) },
-        ),
-      ),
+            : { ok: false, json: async () => ({}) }
+        )
+      )
     );
 
     const found = await discoverPrintServers([
