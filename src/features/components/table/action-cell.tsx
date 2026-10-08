@@ -102,6 +102,8 @@ export const ActionCell = ({
         <ActionIcon
           variant="light"
           color="green"
+          aria-label="Save row"
+          data-testid="row-save"
           loading={savingRowIndex === row.id}
           disabled={!row.dirty || savingRowIndex !== null}
           onClick={() => {
@@ -114,6 +116,8 @@ export const ActionCell = ({
       {resetRow && (
         <ActionIcon
           variant="light"
+          aria-label="Reset row"
+          data-testid="row-reset"
           disabled={!row.dirty || savingRowIndex !== null}
           onClick={() => resetRow(row.id as string)}
         >

@@ -267,7 +267,6 @@ const itemPriceListFieldGroups: FieldGroup[] = [
           type: 'number',
           col: 3,
           required: true,
-          updateField: (row, name, value) => {}, //updateMatrixRow(row, name, value)
         },
       },
       {
@@ -279,10 +278,6 @@ const itemPriceListFieldGroups: FieldGroup[] = [
           </Text>
         ),
       },
-    ],
-    rowActions: [
-      { label: 'Save', action: 'save-price' },
-      { label: 'Reset', action: 'reset-price' },
     ],
     fields: [
       {
