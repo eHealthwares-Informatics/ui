@@ -12,6 +12,19 @@ export const SEED_BASE_URL = (process.env.SEED_BASE_URL ?? 'http://localhost:809
 );
 export const SEED_API_KEY = process.env.SEED_PROVISION_API_KEY ?? process.env.SEED_API_KEY ?? '';
 
+/**
+ * Upper bound for the teardown DELETE. seed#12 lets `DELETE /api/provision/:code`
+ * hang forever, which stalled global-teardown for 28 minutes after run 4c11 had
+ * already finished. Teardown is best-effort (orgs are unique per run), so give
+ * up quickly and say so instead of blocking the process.
+ */
+export const DEPROVISION_TIMEOUT_MS = Number(process.env.SEED_DEPROVISION_TIMEOUT_MS ?? 30_000);
+
+const isAbort = (err: unknown): boolean => {
+  const name = (err as Error | undefined)?.name;
+  return name === 'TimeoutError' || name === 'AbortError';
+};
+
 export type OrgState = {
   organizationId: string;
   organizationCode: string;
@@ -73,17 +86,37 @@ export async function provisionOrganization(input: ProvisionOrgInput): Promise<O
 /**
  * Tears down the provisioned organisation (DELETE /api/provision/:code).
  * Idempotent — safe to call more than once.
+ *
+ * Bounded by DEPROVISION_TIMEOUT_MS: a hung seed DELETE throws instead of
+ * stalling global-teardown (seed#12), so the run always exits promptly.
  */
 export async function deprovisionOrganization(code: string): Promise<boolean> {
-  const res = await fetch(`${SEED_BASE_URL}/api/provision/${encodeURIComponent(code)}`, {
-    method: 'DELETE',
-    headers: SEED_API_KEY ? { 'x-api-key': SEED_API_KEY } : {},
-  });
-  if (!res.ok) {
-    return false;
+  try {
+    const res = await fetch(`${SEED_BASE_URL}/api/provision/${encodeURIComponent(code)}`, {
+      method: 'DELETE',
+      headers: SEED_API_KEY ? { 'x-api-key': SEED_API_KEY } : {},
+      signal: AbortSignal.timeout(DEPROVISION_TIMEOUT_MS),
+    });
+    if (!res.ok) {
+      return false;
+    }
+    const body = (await res.json().catch((err) => {
+      // A mid-body abort is the same hang as one before the response — report it.
+      if (isAbort(err)) {
+        throw err;
+      }
+      return {};
+    })) as { deprovisioned?: boolean };
+    return body.deprovisioned ?? false;
+  } catch (err) {
+    if (isAbort(err)) {
+      throw new Error(
+        `deprovision of ${code} aborted after ${DEPROVISION_TIMEOUT_MS}ms (seed DELETE hung, ` +
+          'seed#12) — org left provisioned for manual cleanup'
+      );
+    }
+    throw err;
   }
-  const body = (await res.json().catch(() => ({}))) as { deprovisioned?: boolean };
-  return body.deprovisioned ?? false;
 }
 
 /** Reads the current run's org state, or null when it wasn't provisioned. */

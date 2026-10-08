@@ -25,8 +25,9 @@ export default defineConfig({
     setupFiles: './vitest.setup.mjs',
     // Playwright e2e specs are NOT vitest tests — without this exclude vitest
     // picks up e2e/**/*.spec.ts and errors on test.describe() outside its runner.
-    exclude: ['**/node_modules/**', 'e2e/**', 'playwright/**', 'dist/**'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // e2e/**/*.test.ts IS a vitest test (harness unit tests, e.g. provision.test.ts).
+    exclude: ['**/node_modules/**', 'e2e/**/*.spec.ts', 'playwright/**', 'dist/**'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'e2e/**/*.test.ts'],
   },
 
   resolve: {
