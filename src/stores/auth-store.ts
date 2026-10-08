@@ -148,9 +148,11 @@ export const useAuthStore = create<AuthState>()(
 
         // Refresh modules in the background, but only if they haven't been loaded
         // yet. Force-fetching on every navigation caused unnecessary re-renders
-        // that collapsed sidebar submenus.
+        // that collapsed sidebar submenus. The non-force call also dedupes
+        // concurrent fetches via `pendingModulesFetch`, which prevents a
+        // fetch/remount feedback loop (see ehealthwares/ui#84).
         if (user && get().modules.length === 0) {
-          get().fetchModules(true);
+          get().fetchModules();
         }
       },
 
