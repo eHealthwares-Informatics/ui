@@ -15,7 +15,8 @@ import type { CrudFieldSpec, RxsoftCrudResource } from '../fixtures/rxsoft-resou
  *    lucide svgs expose `lucide-pencil` / `lucide-trash-2` classes.
  *  - ModalDataForm: Mantine Modal -> `[role="dialog"]`; form fields are
  *    wrapped in `LabelField` (a `<Text>` label, NOT a real <label>), so the
- *    input is located as the label Text's following sibling.
+ *    control is located by anchoring on the exact label text and querying the
+ *    wrapper that contains it (see fieldRoot).
  *  - Row delete confirmations use ConfirmDialog (title "Delete Item",
  *    confirm Button "Delete") rendered inside the ActionCell.
  */
@@ -68,7 +69,7 @@ export class CrudShellPage {
   }
 
   async goto(route: string): Promise<void> {
-    await this.page.goto(route);
+    await this.page.goto(route, { waitUntil: 'domcontentloaded' });
   }
 
   async search(query: string): Promise<void> {
@@ -91,11 +92,20 @@ export class CrudShellPage {
    * Field control root. Scope 'dialog' (default) targets the open modal;
    * scope 'page' targets full-page DataPageForm wizards (e.g. items create
    * at /rxsoft/items/create) where the same LabelField structure is used.
+   *
+   * LabelField renders the label as a bare <Text> node beside the control
+   * (no <label htmlFor>/id binding), so `getByLabel` resolves nothing. Anchor
+   * on the EXACT label text (anchored regex, tolerating the required '*'),
+   * then walk UP to the nearest wrapper that also contains the control and
+   * query inside it. Unlike the old `following-sibling::*[1]` chain, this
+   * survives a re-render that inserts/removes a node between the label and
+   * the control (e.g. TC-WIZARD-06 after the mocked 500 + unroute).
    */
   private fieldRoot(label: string, scope: 'dialog' | 'page' = 'dialog'): Locator {
     const root = scope === 'dialog' ? this.dialog : this.page;
-    const labelEl = root.getByText(label, { exact: false }).first();
-    return labelEl.locator('xpath=following-sibling::*[1]');
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const labelEl = root.getByText(new RegExp(`^\\s*${escaped}\\s*\\*?\\s*$`)).first();
+    return labelEl.locator('xpath=ancestor-or-self::*[.//input or .//textarea or .//select][1]');
   }
 
   async fillField(
