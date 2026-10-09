@@ -48,6 +48,27 @@ export default defineConfig({
     sourcemap: false
   },
   server: {
-    allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev']
+    allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev'],
+    watch: {
+      // Playwright writes its artifacts *while the dev server is running*
+      // (`webServer.command: 'yarn dev --host'` shares the vite process with the
+      // run). Every artifact write fired a full HMR page reload on connected
+      // clients, killing in-flight navigations — see ui#94. The html reporter
+      // `outputFolder` (e2e/reports) is the loud one: it streams report data
+      // during the run and `removeFolders()` + rebuilds the whole tree in
+      // `onEnd`, which is a burst of add/unlink events mid-suite.
+      //
+      // Patterns are chokidar globs matched against absolute paths. Vite 8 also
+      // ignores **/.git/**, **/node_modules/**, **/test-results/**, cacheDir and
+      // build.outDir by default; they are listed here so the whole exclusion set
+      // is explicit and survives a config merge / downgrade.
+      ignored: [
+        '**/node_modules/**',
+        '**/.git/**',
+        '**/e2e/reports/**',
+        '**/test-results/**',
+        '**/playwright-report/**',
+      ],
+    },
   }
 });

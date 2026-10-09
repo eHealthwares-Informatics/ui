@@ -39,9 +39,28 @@ npx playwright test --grep "LGA"
 npx playwright test --headed
 npx playwright test --debug
 
-# report
-npx playwright show-report
+# report (path is config-relative — not playwright's default, see below)
+npx playwright show-report e2e/reports
 ```
+
+## Artifacts & the Vite dev server (ui#94)
+
+The suite runs against the Vite dev server (`webServer.command: 'yarn dev --host'`),
+i.e. the same process that serves the app under test. **Any artifact Playwright
+writes into a directory Vite watches fires a full HMR page reload on the page
+being tested**, which kills in-flight navigations and shows up as random
+`page.goto` timeouts late in a run.
+
+| Artifact | Location | Notes |
+|---|---|---|
+| HTML report | `e2e/reports/` | Durable — read back by hand and by `tracker/make-phase1-report.mjs`. Excluded from Vite's watcher via `server.watch.ignored` in [../vite.config.mjs](../vite.config.mjs). |
+| Traces, screenshots, `.last-run.json` | `os.tmpdir()/rxsoft-e2e-artifacts` | Ephemeral failure artifacts. Deliberately **outside** the repo root so the watcher never sees them. Override with `PLAYWRIGHT_OUTPUT_DIR`. |
+
+Open the report with `npx playwright show-report e2e/reports` (from `frontend/`).
+
+To confirm a path is actually excluded, write to it while the dev server is
+running and grep its log for `page reload <path>` — assume nothing about the
+ignore list (details: [challenges_blockers_resolutions/phase-2.md](./challenges_blockers_resolutions/phase-2.md), C7).
 
 ## Auth setup
 
