@@ -634,8 +634,12 @@ test.describe('RxSoft Items wizard', () => {
     });
     await page.unroute('**/api/items');
 
-    // Clear the mock and test another error scenario
-    await page.unroute('**/api/items');
+    // Wait for the red toast to auto-dismiss. It renders in Mantine's portal
+    // and physically covers the footer button, so clicking straight away is
+    // intercepted for the toast's whole 20s autoClose and times out.
+    await expect(page.locator('.mantine-Notification-root').first()).toHaveCount(0, {
+      timeout: 15_000,
+    });
 
     // Test validation error path - submit with missing required field
     await crud.fillField('Item Name (Brand/Variety)', '', 'page'); // Clear required field
