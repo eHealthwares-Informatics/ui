@@ -24,7 +24,7 @@ type TimelineData = {
 };
 
 export function LisResultAmendmentsPage() {
-  const { id } = useParams({ from: '/_authenticated/lis/result-amendments/$id' });
+  const { id } = useParams({ from: '/_authenticated/lis/result-amendments/$id/' });
   const [data, setData] = useState<TimelineData | null>(null);
   const [loading, setLoading] = useState(true);
 
