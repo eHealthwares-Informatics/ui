@@ -318,6 +318,7 @@ import { Route as AuthenticatedLisOrdersWorkflowEnterRouteImport } from './route
 import { Route as AuthenticatedLisOrdersWorkflowLabelRouteImport } from './routes/_authenticated/lis/orders/workflow/label'
 import { Route as AuthenticatedLisOrdersWorkflowOrderRouteImport } from './routes/_authenticated/lis/orders/workflow/order'
 import { Route as AuthenticatedLisOrdersWorkflowQaRouteImport } from './routes/_authenticated/lis/orders/workflow/qa'
+import { Route as AuthenticatedLisResultAmendmentsIdIndexRouteImport } from './routes/_authenticated/lis/result-amendments/$id/index'
 import { Route as AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport } from './routes/_authenticated/rxsoft/reports/balance-sheet/index'
 import { Route as AuthenticatedRxsoftReportsIncomeStatementIndexRouteImport } from './routes/_authenticated/rxsoft/reports/income-statement/index'
 import { Route as AuthenticatedRxsoftReportsTrialBalanceIndexRouteImport } from './routes/_authenticated/rxsoft/reports/trial-balance/index'
@@ -2085,6 +2086,12 @@ const AuthenticatedLisOrdersWorkflowQaRoute =
     path: '/qa',
     getParentRoute: () => AuthenticatedLisOrdersWorkflowRouteRoute,
   } as any)
+const AuthenticatedLisResultAmendmentsIdIndexRoute =
+  AuthenticatedLisResultAmendmentsIdIndexRouteImport.update({
+    id: '/lis/result-amendments/$id/',
+    path: '/lis/result-amendments/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftReportsBalanceSheetIndexRoute =
   AuthenticatedRxsoftReportsBalanceSheetIndexRouteImport.update({
     id: '/rxsoft/reports/balance-sheet/',
@@ -2424,6 +2431,7 @@ export interface FileRoutesByFullPath {
   '/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
   '/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
+  '/lis/result-amendments/$id/': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -2735,6 +2743,7 @@ export interface FileRoutesByTo {
   '/conversation/ai/providers': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs': typeof AuthenticatedConversationAiRequestLogsIndexRoute
   '/emr/settings/message-templates': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
+  '/lis/result-amendments/$id': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/rxsoft/reports/balance-sheet': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/rxsoft/reports/income-statement': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/rxsoft/reports/trial-balance': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -3052,6 +3061,7 @@ export interface FileRoutesById {
   '/_authenticated/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/_authenticated/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
   '/_authenticated/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
+  '/_authenticated/lis/result-amendments/$id/': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/_authenticated/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   '/_authenticated/rxsoft/reports/income-statement/': typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   '/_authenticated/rxsoft/reports/trial-balance/': typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -3367,6 +3377,7 @@ export interface FileRouteTypes {
     | '/conversation/ai/providers/'
     | '/conversation/ai/request-logs/'
     | '/emr/settings/message-templates/'
+    | '/lis/result-amendments/$id/'
     | '/rxsoft/reports/balance-sheet/'
     | '/rxsoft/reports/income-statement/'
     | '/rxsoft/reports/trial-balance/'
@@ -3678,6 +3689,7 @@ export interface FileRouteTypes {
     | '/conversation/ai/providers'
     | '/conversation/ai/request-logs'
     | '/emr/settings/message-templates'
+    | '/lis/result-amendments/$id'
     | '/rxsoft/reports/balance-sheet'
     | '/rxsoft/reports/income-statement'
     | '/rxsoft/reports/trial-balance'
@@ -3994,6 +4006,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/ai/providers/'
     | '/_authenticated/conversation/ai/request-logs/'
     | '/_authenticated/emr/settings/message-templates/'
+    | '/_authenticated/lis/result-amendments/$id/'
     | '/_authenticated/rxsoft/reports/balance-sheet/'
     | '/_authenticated/rxsoft/reports/income-statement/'
     | '/_authenticated/rxsoft/reports/trial-balance/'
@@ -6233,6 +6246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLisOrdersWorkflowQaRouteImport
       parentRoute: typeof AuthenticatedLisOrdersWorkflowRouteRoute
     }
+    '/_authenticated/lis/result-amendments/$id/': {
+      id: '/_authenticated/lis/result-amendments/$id/'
+      path: '/lis/result-amendments/$id'
+      fullPath: '/lis/result-amendments/$id/'
+      preLoaderRoute: typeof AuthenticatedLisResultAmendmentsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/reports/balance-sheet/': {
       id: '/_authenticated/rxsoft/reports/balance-sheet/'
       path: '/rxsoft/reports/balance-sheet'
@@ -6602,6 +6622,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationAiProvidersIndexRoute: typeof AuthenticatedConversationAiProvidersIndexRoute
   AuthenticatedConversationAiRequestLogsIndexRoute: typeof AuthenticatedConversationAiRequestLogsIndexRoute
   AuthenticatedEmrSettingsMessageTemplatesIndexRoute: typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
+  AuthenticatedLisResultAmendmentsIdIndexRoute: typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
   AuthenticatedRxsoftReportsIncomeStatementIndexRoute: typeof AuthenticatedRxsoftReportsIncomeStatementIndexRoute
   AuthenticatedRxsoftReportsTrialBalanceIndexRoute: typeof AuthenticatedRxsoftReportsTrialBalanceIndexRoute
@@ -6944,6 +6965,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationAiRequestLogsIndexRoute,
   AuthenticatedEmrSettingsMessageTemplatesIndexRoute:
     AuthenticatedEmrSettingsMessageTemplatesIndexRoute,
+  AuthenticatedLisResultAmendmentsIdIndexRoute:
+    AuthenticatedLisResultAmendmentsIdIndexRoute,
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute:
     AuthenticatedRxsoftReportsBalanceSheetIndexRoute,
   AuthenticatedRxsoftReportsIncomeStatementIndexRoute:

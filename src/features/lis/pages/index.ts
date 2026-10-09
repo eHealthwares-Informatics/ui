@@ -34,3 +34,4 @@ export { LisQcAlertsPage } from './qc-alerts';
 export { LisEqaProgramsPage } from './eqa-programs';
 export { LisEqaEnrollmentsPage } from './eqa-enrollments';
 export { LisEqaResultsPage } from './eqa-results';
+export { LisResultAmendmentsPage } from './result-amendments';
