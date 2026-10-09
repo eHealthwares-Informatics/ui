@@ -638,7 +638,7 @@ test.describe('RxSoft Items wizard', () => {
     await page.unroute('**/api/items');
 
     // Test validation error path - submit with missing required field
-    await crud.fillField('Item Name (Brand/Variety)', ''); // Clear required field
+    await crud.fillField('Item Name (Brand/Variety)', '', 'page'); // Clear required field
     await stepButton('Create & Continue').click();
 
     // Should remain on the same step (quiet validation)
