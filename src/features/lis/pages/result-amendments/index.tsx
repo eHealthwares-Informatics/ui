@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useParams } from '@tanstack/react-router';
 import { Badge, Card, Group, Stack, Table, Text, Timeline, Title } from '@mantine/core';
+import { useParams } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 
@@ -31,11 +31,15 @@ export function LisResultAmendmentsPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    lisApi.get(`/lis/results/${id}/amendment-timeline`).then((res) => {
-      setData(res.data);
-    }).catch(() => {
-      setData(null);
-    }).finally(() => setLoading(false));
+    lisApi
+      .get(`/lis/results/${id}/amendment-timeline`)
+      .then((res) => {
+        setData(res.data);
+      })
+      .catch(() => {
+        setData(null);
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
@@ -71,13 +75,22 @@ export function LisResultAmendmentsPage() {
                 {original.isLatest ? 'Current' : 'Superseded'}
               </Badge>
             </Group>
-            <Text size="sm"><strong>Value:</strong> {original.value ?? '-'}</Text>
-            <Text size="sm"><strong>Status:</strong> {original.status}</Text>
-            <Text size="sm"><strong>Amendment #:</strong> {original.amendmentNumber ?? 0}</Text>
-            <Text size="sm"><strong>Entered:</strong> {original.enteredDate ?? '-'}</Text>
+            <Text size="sm">
+              <strong>Value:</strong> {original.value ?? '-'}
+            </Text>
+            <Text size="sm">
+              <strong>Status:</strong> {original.status}
+            </Text>
+            <Text size="sm">
+              <strong>Amendment #:</strong> {original.amendmentNumber ?? 0}
+            </Text>
+            <Text size="sm">
+              <strong>Entered:</strong> {original.enteredDate ?? '-'}
+            </Text>
             {supersededBy && (
               <Text size="sm" c="blue">
-                <strong>Superseded by:</strong> {supersededBy.id?.slice(0, 8)}… (value: {supersededBy.value ?? '-'})
+                <strong>Superseded by:</strong> {supersededBy.id?.slice(0, 8)}… (value:{' '}
+                {supersededBy.value ?? '-'})
               </Text>
             )}
           </Stack>
@@ -106,11 +119,21 @@ export function LisResultAmendmentsPage() {
                     <Table.Td>{a.amendmentNumber}</Table.Td>
                     <Table.Td>{a.reason}</Table.Td>
                     <Table.Td>{a.previousValue ?? '-'}</Table.Td>
-                    <Table.Td><Text fw={600}>{a.correctedValue ?? '-'}</Text></Table.Td>
-                    <Table.Td><Badge size="sm">{a.previousStatus}</Badge></Table.Td>
-                    <Table.Td><Badge size="sm" color="blue">{a.newStatus}</Badge></Table.Td>
+                    <Table.Td>
+                      <Text fw={600}>{a.correctedValue ?? '-'}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge size="sm">{a.previousStatus}</Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge size="sm" color="blue">
+                        {a.newStatus}
+                      </Badge>
+                    </Table.Td>
                     <Table.Td>{a.correctedById?.slice(0, 8) ?? '-'}</Table.Td>
-                    <Table.Td>{a.correctedAt ? new Date(a.correctedAt).toLocaleDateString() : '-'}</Table.Td>
+                    <Table.Td>
+                      {a.correctedAt ? new Date(a.correctedAt).toLocaleDateString() : '-'}
+                    </Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -118,9 +141,7 @@ export function LisResultAmendmentsPage() {
           </>
         )}
 
-        {amendments.length === 0 && (
-          <Text c="dimmed">No amendments recorded for this result.</Text>
-        )}
+        {amendments.length === 0 && <Text c="dimmed">No amendments recorded for this result.</Text>}
       </Stack>
     </RxPage>
   );

@@ -1,4 +1,17 @@
-import { Badge, Button, Group, Modal, Paper, Select, SimpleGrid, Stack, Table, Text, TextInput, Title } from '@mantine/core';
+import {
+  Badge,
+  Button,
+  Group,
+  Modal,
+  Paper,
+  Select,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
@@ -102,24 +115,43 @@ export function LisValidationDashboardPage() {
   };
 
   return (
-    <RxPage title="Result Validation" description="Review, validate and manage QA holds on test results.">
+    <RxPage
+      title="Result Validation"
+      description="Review, validate and manage QA holds on test results."
+    >
       <Stack gap="md">
         <SimpleGrid cols={4}>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Pending</Text>
-            <Title order={2} c="yellow">{counts.PENDING}</Title>
+            <Text size="xs" c="dimmed">
+              Pending
+            </Text>
+            <Title order={2} c="yellow">
+              {counts.PENDING}
+            </Title>
           </Paper>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Technical Review</Text>
-            <Title order={2} c="blue">{counts.TECHNICAL_REVIEW}</Title>
+            <Text size="xs" c="dimmed">
+              Technical Review
+            </Text>
+            <Title order={2} c="blue">
+              {counts.TECHNICAL_REVIEW}
+            </Title>
           </Paper>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">Finalized</Text>
-            <Title order={2} c="green">{counts.FINALIZED}</Title>
+            <Text size="xs" c="dimmed">
+              Finalized
+            </Text>
+            <Title order={2} c="green">
+              {counts.FINALIZED}
+            </Title>
           </Paper>
           <Paper withBorder p="md" ta="center">
-            <Text size="xs" c="dimmed">QA Hold</Text>
-            <Title order={2} c="violet">{counts.QA_HOLD}</Title>
+            <Text size="xs" c="dimmed">
+              QA Hold
+            </Text>
+            <Title order={2} c="violet">
+              {counts.QA_HOLD}
+            </Title>
           </Paper>
         </SimpleGrid>
 
@@ -165,12 +197,22 @@ export function LisValidationDashboardPage() {
                   <Table.Td>
                     <Group gap="xs">
                       {(r.status === 'PENDING' || r.status === 'TECHNICAL_REVIEW') && (
-                        <Button size="xs" color="violet" variant="light" onClick={() => openHoldModal(r)}>
+                        <Button
+                          size="xs"
+                          color="violet"
+                          variant="light"
+                          onClick={() => openHoldModal(r)}
+                        >
                           Hold
                         </Button>
                       )}
                       {r.status === 'QA_HOLD' && (
-                        <Button size="xs" color="green" variant="light" onClick={() => submitRelease(r)}>
+                        <Button
+                          size="xs"
+                          color="green"
+                          variant="light"
+                          onClick={() => submitRelease(r)}
+                        >
                           Release
                         </Button>
                       )}
@@ -185,7 +227,8 @@ export function LisValidationDashboardPage() {
         <Modal opened={opened} onClose={close} title="Place Result on QA Hold" centered>
           <Stack gap="md">
             <Text size="sm" c="dimmed">
-              Result: {selectedResult?.orderItemId?.slice(0, 8)}… | Current Value: {selectedResult?.value ?? '-'}
+              Result: {selectedResult?.orderItemId?.slice(0, 8)}… | Current Value:{' '}
+              {selectedResult?.value ?? '-'}
             </Text>
             <TextInput
               label="Reason for Hold"
@@ -196,7 +239,9 @@ export function LisValidationDashboardPage() {
               data-testid="qa-hold-reason"
             />
             <Group justify="flex-end">
-              <Button variant="default" onClick={close}>Cancel</Button>
+              <Button variant="default" onClick={close}>
+                Cancel
+              </Button>
               <Button color="violet" onClick={submitHold} disabled={!holdReason.trim()}>
                 Submit Hold
               </Button>
