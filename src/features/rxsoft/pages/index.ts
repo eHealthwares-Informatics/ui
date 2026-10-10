@@ -13,6 +13,7 @@ export * from './journals';
 export * from './manufacturers';
 export * from './organizations';
 export * from './organisation-config';
+export * from './orders';
 export * from './payment-methods';
 export * from './payments';
 export * from './payment-transactions';

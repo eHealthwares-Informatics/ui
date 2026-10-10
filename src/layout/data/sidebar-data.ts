@@ -261,6 +261,12 @@ export const sidebarData: SidebarData = {
       icon: Workflow,
       items: [
         {
+          title: 'Orders',
+          url: '/rxsoft/orders',
+          icon: ShoppingCart,
+          modules: ['rxsoft'],
+        },
+        {
           title: 'Sales',
           url: '/rxsoft/sales',
           icon: ShoppingCart,
