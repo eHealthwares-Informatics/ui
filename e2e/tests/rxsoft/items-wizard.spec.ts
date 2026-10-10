@@ -638,7 +638,7 @@ test.describe('RxSoft Items wizard', () => {
     // and physically covers the footer button, so clicking straight away is
     // intercepted for the toast's whole 20s autoClose and times out.
     await expect(page.locator('.mantine-Notification-root').first()).toHaveCount(0, {
-      timeout: 15_000,
+      timeout: 60_000,
     });
 
     // Test validation error path - submit with missing required field
