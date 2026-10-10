@@ -46,16 +46,36 @@ function pickedDateStr(day: number): string {
 
 /**
  * Opens the Mantine DatePickerInput anchored on its label and picks a day
- * of the visible month. Mantine renders a real <label for=…> so getByLabel
- * resolves the input; the calendar mounts in a portal with one button per
- * day whose accessible name is the day number. The popover auto-closes on
- * pick.
+ * of the visible month. The control renders as a <button> targeted by the
+ * real <label for=…> ("As of date" / "From" / "To"), so getByLabel resolves
+ * it. The calendar mounts in a portal and — verified against the live DOM
+ * (2026-10-10 QA run, error-context snapshot) — every day button's
+ * accessible name is the FULL date: "1 October 2026" (day, month, year),
+ * with the bare number only as text content. Outside-month days are also
+ * rendered, so the name must pin the month/year, not the bare day number.
  */
+const EN_MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
 async function pickDatePickerDay(page: Page, label: string, day: number): Promise<void> {
-  const input = page.getByLabel(label, { exact: true });
-  await expect(input).toBeVisible({ timeout: 15_000 });
-  await input.click();
-  const dayBtn = page.getByRole('button', { name: String(day), exact: true }).last();
+  const control = page.getByLabel(label, { exact: true }).first();
+  await expect(control).toBeVisible({ timeout: 15_000 });
+  await control.click();
+  const now = new Date();
+  const dayName = `${day} ${EN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  const dayBtn = page.getByRole('button', { name: dayName, exact: true });
   await expect(dayBtn).toBeVisible({ timeout: 10_000 });
   await dayBtn.click();
 }
