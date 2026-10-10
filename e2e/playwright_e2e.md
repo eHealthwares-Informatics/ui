@@ -104,6 +104,7 @@ node e2e/tracker/dev-daemon.mjs --name pw-X --cwd "$PWD" --log /tmp/pw-X.log -- 
 - "Local changes snapshot" writes files with mode **600** → the app's file tools may report `[BLOCKED]`/"file does not exist" on real files. Fix: `chmod 644 <file>` (bash can always read/write as owner). If `read_files` blocks *everything*, work through bash (`sed -n`, `cat`) + python edits with exact-match assertions.
 - **Load trap**: check `uptime` before Playwright runs. Incident: load-avg 216 vs 9 normal produced rotating per-test timeouts that looked like app bugs. Healthy ≈ <10.
 - Serial mode + retries re-runs whole describe groups (~8–12 min/pass); keep tests self-contained; 120s budgets in beforeEach.
+- **Watch storm (ui#94, fixed)**: the Vite dev server shares the process the suite drives, so any Playwright artifact written into a watched directory fires a full HMR reload and kills the in-flight navigation — systematic `page.goto` timeouts 12–15 min into a run. `e2e/reports/` was the hole; `test-results/`, `node_modules/`, `.git/` and `dist/` were already excluded. Fixed via `server.watch.ignored` in [../vite.config.mjs](../vite.config.mjs) plus a Playwright `outputDir` outside the repo root. If a red run ever looks like this again, confirm the hypothesis by writing to the suspect path with the dev server up and grepping its log for `page reload`.
 - `gh pr create` breaks on heredoc bodies → `--body-file`. Repeat write-backs need `board-sync.mjs --no-cache` (stale `.board-cache.json`).
 - Don't debug UI login in the preview browser (dead end — see phase-1/2 challenges); auth.setup-provisioned storageState is the way.
 - Mantine gotchas: options detach mid-click (3× retry pattern in `pickSuggestion`); async-selects have no `input[role=combobox]` (use `async-select-<field>` testid).
@@ -128,6 +129,7 @@ Most failures in this repo are environmental, not app defects. Symptom → cause
 | 12 | File tools report `[BLOCKED]` / "file does not exist" on a real file | Local-change snapshots write mode **600** | `chmod 644 <file>`; if `read_files` blocks everything, work through bash with exact-match asserts. |
 | 13 | `gh pr create` fails; board write-back silently no-ops | Heredoc bodies break `gh`; stale `.board-cache.json` | `gh ... --body-file <file>`; `board-sync.mjs --no-cache`. |
 | 14 | A test passes but the box stays unticked | Honesty rule **C12** + Alpha QA workflow rules 1–4 | Never tick an unverified TC; board mutations go through [board_updates.md](board_updates.md); testid-first; visible errors **and** zero POSTs. |
+| 15 | `page.goto` timeout / "element detached" ~12–15 min into a run; retry then passes in ~20 s | Vite's watcher sees a Playwright artifact written mid-run and fires a full HMR reload at the page under test | **Fixed (ui#94)** — `server.watch.ignored` now excludes `**/e2e/reports/**` etc. and Playwright's `outputDir` sits outside the repo. Pull master. If it recurs, reproduce by writing to the suspect path with Vite up and grepping its log for `page reload \<path>`. |
 
 ## 6. Reference map
 

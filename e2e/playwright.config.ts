@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,6 +7,19 @@ const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 /** Playwright resolves `use.storageState` relative to the process CWD, so use an absolute path. */
 const ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'admin.json');
 const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
+
+/**
+ * Failure artifacts (traces, screenshots, .last-run.json) land OUTSIDE the repo
+ * so the Vite dev server started by `webServer` never watches them — ui#94.
+ * Playwright writes a trace/screenshot per failing test as the suite runs, and
+ * any write inside a watched directory fires a full HMR page reload that kills
+ * the in-flight navigation that was about to be asserted.
+ *
+ * Still overridable: PLAYWRIGHT_OUTPUT_DIR=./test-results npx playwright test ...
+ * (note that `pathResolve` is config-dir-relative, so resolve absolute paths
+ * yourself if you point it back inside the repo).
+ */
+const OUTPUT_DIR = process.env.PLAYWRIGHT_OUTPUT_DIR ?? join(tmpdir(), 'rxsoft-e2e-artifacts');
 
 /**
  * Playwright config.
@@ -23,9 +37,14 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   retries: 1,
   workers: 2,
+  // Outside the repo root — see OUTPUT_DIR above (ui#94).
+  outputDir: OUTPUT_DIR,
   reporter: [
     ['list'],
-    // open: 'never' keeps CI/scripted runs from blocking on the report server
+    // open: 'never' keeps CI/scripted runs from blocking on the report server.
+    // The HTML report is a durable artifact developers/tracker tooling read back
+    // from disk, so it stays in the repo; vite's `server.watch.ignored` excludes
+    // it from the dev-server watcher instead.
     ['html', { outputFolder: 'reports', open: 'never' }],
   ],
   projects: [

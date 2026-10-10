@@ -81,3 +81,27 @@ passed-flaky under momentary load.
   unverified TCs (C12 honesty rule from phase 1 still applies).
 - **Learning**: pick the *unit of progress visible to stakeholders* and
   drive the suite toward completing whole units, not scattered checks.
+
+## C7 — Vite dev-server watch storm: Playwright artifacts reload the page mid-run
+- **Challenge**: the `webServer.command: 'yarn dev --host'` vite dev server is
+  the same process the suite drives, and it watched the whole frontend tree
+  including `e2e/reports/` (the html reporter `outputFolder`). Every artifact
+  write fired a full HMR page reload on connected clients, killing in-flight
+  navigations — systematic `page.goto` timeouts at 12–15 min of a run (runs
+  4c14/4c15), with retries passing in ~20 s once the writes paused. In serial
+  mode each failure cascaded into skips (21 of 26 tests "did not run" in 4c15).
+  Reproduced by writing to `e2e/reports/index.html` while the dev server ran and
+  observing `[vite] page reload e2e/reports/index.html`.
+- **Resolution**: (1) `vite.config.mjs` → `server.watch.ignored` excludes
+  `**/e2e/reports/**`, `**/test-results/**`, `**/playwright-report/**` (plus the
+  `**/node_modules/**` / `**/.git/**` Vite already defaults, made explicit).
+  Re-probed: identical writes now produce no event, while `index.html` /
+  `src/main.tsx` still reload (watcher not disabled). (2) Playwright's
+  `outputDir` (traces / screenshots / `.last-run.json`) moved outside the repo
+  root to `os.tmpdir()/rxsoft-e2e-artifacts`, overridable via
+  `PLAYWRIGHT_OUTPUT_DIR`. Vite 8's own `resolveChokidarOptions` already ignored
+  `**/test-results/**` and `<outDir>/**` — `e2e/reports` was the only hole.
+- **Learning**: any directory the harness writes into during a run is a
+  hot-reload trigger for the server it started. Verify by touching the path with
+  the dev server up and grepping its log for `page reload`, rather than assuming
+  the ignore list covers it.
