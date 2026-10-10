@@ -35,3 +35,4 @@ export { LisEqaProgramsPage } from './eqa-programs';
 export { LisEqaEnrollmentsPage } from './eqa-enrollments';
 export { LisEqaResultsPage } from './eqa-results';
 export { LisResultAmendmentsPage } from './result-amendments';
+export { LisNotificationsPage } from './notifications';
