@@ -201,6 +201,7 @@ import { Route as AuthenticatedLisLocationTypesIndexRouteImport } from './routes
 import { Route as AuthenticatedLisLocationsIndexRouteImport } from './routes/_authenticated/lis/locations/index'
 import { Route as AuthenticatedLisLoincIndexRouteImport } from './routes/_authenticated/lis/loinc/index'
 import { Route as AuthenticatedLisMethodsIndexRouteImport } from './routes/_authenticated/lis/methods/index'
+import { Route as AuthenticatedLisNotificationsIndexRouteImport } from './routes/_authenticated/lis/notifications/index'
 import { Route as AuthenticatedLisOrdersIndexRouteImport } from './routes/_authenticated/lis/orders/index'
 import { Route as AuthenticatedLisOrdersDashboardRouteImport } from './routes/_authenticated/lis/orders/dashboard'
 import { Route as AuthenticatedLisOrdersWorkflowRouteRouteImport } from './routes/_authenticated/lis/orders/workflow/route'
@@ -1383,6 +1384,12 @@ const AuthenticatedLisMethodsIndexRoute =
     path: '/lis/methods/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLisNotificationsIndexRoute =
+  AuthenticatedLisNotificationsIndexRouteImport.update({
+    id: '/lis/notifications/',
+    path: '/lis/notifications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLisOrdersIndexRoute =
   AuthenticatedLisOrdersIndexRouteImport.update({
     id: '/lis/orders/',
@@ -2323,6 +2330,7 @@ export interface FileRoutesByFullPath {
   '/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
   '/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
   '/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute
+  '/lis/notifications/': typeof AuthenticatedLisNotificationsIndexRoute
   '/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute
   '/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute
   '/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
@@ -2635,6 +2643,7 @@ export interface FileRoutesByTo {
   '/lis/locations': typeof AuthenticatedLisLocationsIndexRoute
   '/lis/loinc': typeof AuthenticatedLisLoincIndexRoute
   '/lis/methods': typeof AuthenticatedLisMethodsIndexRoute
+  '/lis/notifications': typeof AuthenticatedLisNotificationsIndexRoute
   '/lis/orders': typeof AuthenticatedLisOrdersIndexRoute
   '/lis/panels': typeof AuthenticatedLisPanelsIndexRoute
   '/lis/patients': typeof AuthenticatedLisPatientsIndexRoute
@@ -2953,6 +2962,7 @@ export interface FileRoutesById {
   '/_authenticated/lis/locations/': typeof AuthenticatedLisLocationsIndexRoute
   '/_authenticated/lis/loinc/': typeof AuthenticatedLisLoincIndexRoute
   '/_authenticated/lis/methods/': typeof AuthenticatedLisMethodsIndexRoute
+  '/_authenticated/lis/notifications/': typeof AuthenticatedLisNotificationsIndexRoute
   '/_authenticated/lis/orders/': typeof AuthenticatedLisOrdersIndexRoute
   '/_authenticated/lis/panels/': typeof AuthenticatedLisPanelsIndexRoute
   '/_authenticated/lis/patients/': typeof AuthenticatedLisPatientsIndexRoute
@@ -3269,6 +3279,7 @@ export interface FileRouteTypes {
     | '/lis/locations/'
     | '/lis/loinc/'
     | '/lis/methods/'
+    | '/lis/notifications/'
     | '/lis/orders/'
     | '/lis/panels/'
     | '/lis/patients/'
@@ -3581,6 +3592,7 @@ export interface FileRouteTypes {
     | '/lis/locations'
     | '/lis/loinc'
     | '/lis/methods'
+    | '/lis/notifications'
     | '/lis/orders'
     | '/lis/panels'
     | '/lis/patients'
@@ -3898,6 +3910,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lis/locations/'
     | '/_authenticated/lis/loinc/'
     | '/_authenticated/lis/methods/'
+    | '/_authenticated/lis/notifications/'
     | '/_authenticated/lis/orders/'
     | '/_authenticated/lis/panels/'
     | '/_authenticated/lis/patients/'
@@ -5427,6 +5440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLisMethodsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lis/notifications/': {
+      id: '/_authenticated/lis/notifications/'
+      path: '/lis/notifications'
+      fullPath: '/lis/notifications/'
+      preLoaderRoute: typeof AuthenticatedLisNotificationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lis/orders/': {
       id: '/_authenticated/lis/orders/'
       path: '/lis/orders'
@@ -6521,6 +6541,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLisLocationsIndexRoute: typeof AuthenticatedLisLocationsIndexRoute
   AuthenticatedLisLoincIndexRoute: typeof AuthenticatedLisLoincIndexRoute
   AuthenticatedLisMethodsIndexRoute: typeof AuthenticatedLisMethodsIndexRoute
+  AuthenticatedLisNotificationsIndexRoute: typeof AuthenticatedLisNotificationsIndexRoute
   AuthenticatedLisOrdersIndexRoute: typeof AuthenticatedLisOrdersIndexRoute
   AuthenticatedLisPanelsIndexRoute: typeof AuthenticatedLisPanelsIndexRoute
   AuthenticatedLisPatientsIndexRoute: typeof AuthenticatedLisPatientsIndexRoute
@@ -6786,6 +6807,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLisLocationsIndexRoute: AuthenticatedLisLocationsIndexRoute,
   AuthenticatedLisLoincIndexRoute: AuthenticatedLisLoincIndexRoute,
   AuthenticatedLisMethodsIndexRoute: AuthenticatedLisMethodsIndexRoute,
+  AuthenticatedLisNotificationsIndexRoute:
+    AuthenticatedLisNotificationsIndexRoute,
   AuthenticatedLisOrdersIndexRoute: AuthenticatedLisOrdersIndexRoute,
   AuthenticatedLisPanelsIndexRoute: AuthenticatedLisPanelsIndexRoute,
   AuthenticatedLisPatientsIndexRoute: AuthenticatedLisPatientsIndexRoute,

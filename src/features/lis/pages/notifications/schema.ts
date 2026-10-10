@@ -29,7 +29,9 @@ const columns: Column[] = [
     key: 'relatedEntity',
     label: 'Related Entity',
     render: (row: any) =>
-      row.relatedEntityId ? `${row.relatedEntityType ?? 'Entity'}: ${row.relatedEntityId.slice(0, 8)}…` : '-',
+      row.relatedEntityId
+        ? `${row.relatedEntityType ?? 'Entity'}: ${row.relatedEntityId.slice(0, 8)}…`
+        : '-',
   },
   {
     key: 'retry',

@@ -3,6 +3,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Debug: print environment variables
+console.error(`[global-setup] SEED_API_KEY: ${process.env.SEED_API_KEY ?? 'undefined'}`);
+console.error(
+  `[global-setup] SEED_PROVISION_API_KEY: ${process.env.SEED_PROVISION_API_KEY ?? 'undefined'}`
+);
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const BACKEND_HEALTH_URL = 'http://localhost:8080/api/health';
@@ -197,6 +203,8 @@ async function verifySeedArtifacts(token: string): Promise<void> {
 }
 
 export default async function globalSetup(): Promise<void> {
+  console.error(`[global-setup] About to probe health URLs`);
+  console.error(`[global-setup] SEED_HEALTH_URL: ${SEED_HEALTH_URL}`);
   const [backendUp, conversationUp, lisUp, communicationUp, seedUp] = await Promise.all([
     probe(BACKEND_HEALTH_URL),
     probe(CONVERSATION_HEALTH_URL),
@@ -204,6 +212,9 @@ export default async function globalSetup(): Promise<void> {
     probe(COMMUNICATION_HEALTH_URL),
     probe(SEED_HEALTH_URL),
   ]);
+  console.error(
+    `[global-setup] Probe results: backendUp=${backendUp}, conversationUp=${conversationUp}, lisUp=${lisUp}, communicationUp=${communicationUp}, seedUp=${seedUp}`
+  );
 
   // Fresh organisation per run: request it from the seed provisioning module so
   // every suite (auth, rxsoft, crud, shop) executes against an isolated
@@ -229,6 +240,7 @@ export default async function globalSetup(): Promise<void> {
       console.warn(
         `[global-setup] provisioning ${orgCode} failed — using DEFAULT org admin: ${(err as Error).message}`
       );
+      console.error(`[global-setup] Caught error: ${err}`);
       orgCode = null;
     }
   }
