@@ -1,5 +1,5 @@
-import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import type { Page } from '@playwright/test';
+import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 
 /**
  * RxSoft financial statements — #195 / #197 / #199
@@ -77,7 +77,9 @@ test.describe('RxSoft financial statements', () => {
     const tableHeaders = page.locator('th').filter({ hasText: 'Account' });
     const emptyState = page.getByText('No data found for the selected date.');
     await expect
-      .poll(async () => (await tableHeaders.count()) + (await emptyState.count()), { timeout: 30_000 })
+      .poll(async () => (await tableHeaders.count()) + (await emptyState.count()), {
+        timeout: 30_000,
+      })
       .toBeGreaterThan(0);
   });
 
@@ -105,7 +107,9 @@ test.describe('RxSoft financial statements', () => {
       { timeout: 30_000 }
     );
     await pickDatePickerDay(page, 'As of date', day);
-    expect((await refetch).status(), 'trial-balance refetch after date change failed').toBeLessThan(400);
+    expect((await refetch).status(), 'trial-balance refetch after date change failed').toBeLessThan(
+      400
+    );
 
     // Page survives the period change.
     await expect(page.getByTestId('page-title')).toHaveText('Trial Balance');
@@ -138,9 +142,9 @@ test.describe('RxSoft financial statements', () => {
     // sectionTable always renders the three sections + totals footer,
     // regardless of whether accounts exist.
     for (const section of ['Assets', 'Liabilities', 'Equity']) {
-      await expect(
-        page.getByRole('heading', { name: section, exact: true }).first()
-      ).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByRole('heading', { name: section, exact: true }).first()).toBeVisible({
+        timeout: 30_000,
+      });
     }
     await expect(page.getByText('Total Liabilities & Equity').first()).toBeVisible();
   });
@@ -165,7 +169,9 @@ test.describe('RxSoft financial statements', () => {
       { timeout: 30_000 }
     );
     await pickDatePickerDay(page, 'As of date', day);
-    expect((await refetch).status(), 'balance-sheet refetch after date change failed').toBeLessThan(400);
+    expect((await refetch).status(), 'balance-sheet refetch after date change failed').toBeLessThan(
+      400
+    );
 
     await expect(page.getByTestId('page-title')).toHaveText('Balance Sheet');
   });
@@ -196,12 +202,16 @@ test.describe('RxSoft financial statements', () => {
     await expect(page.getByText('To', { exact: true })).toBeVisible();
 
     for (const section of ['Revenue', 'Cost of Goods Sold', 'Gross Profit', 'Net Income']) {
-      await expect(page.getByText(section, { exact: true }).first()).toBeVisible({ timeout: 30_000 });
+      await expect(page.getByText(section, { exact: true }).first()).toBeVisible({
+        timeout: 30_000,
+      });
     }
     await expect(page.getByText('Operating Expenses', { exact: true }).first()).toBeVisible();
   });
 
-  test('TC-RX-INCOME-STATEMENT-02: From/To period filter reaches the API', async ({ page }, testInfo) => {
+  test('TC-RX-INCOME-STATEMENT-02: From/To period filter reaches the API', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     const year = new Date().getFullYear();
 
@@ -227,7 +237,10 @@ test.describe('RxSoft financial statements', () => {
       { timeout: 30_000 }
     );
     await pickDatePickerDay(page, 'To', day);
-    expect((await refetch).status(), 'income-statement refetch after date change failed').toBeLessThan(400);
+    expect(
+      (await refetch).status(),
+      'income-statement refetch after date change failed'
+    ).toBeLessThan(400);
 
     await expect(page.getByTestId('page-title')).toHaveText('Income Statement');
   });

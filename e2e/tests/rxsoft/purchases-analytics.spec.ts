@@ -1,5 +1,5 @@
-import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import type { Page } from '@playwright/test';
+import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import { readFileSync } from 'node:fs';
 
 /**
@@ -98,15 +98,20 @@ async function tabToFilterControl(page: Page): Promise<boolean> {
 }
 
 test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
-  test('TC-RX-PURCHASES-ANALYTICS-01: analytics dashboard renders KPI cards, filters and charts', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-01: analytics dashboard renders KPI cards, filters and charts', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
 
     const initial = page.waitForResponse(
-      (res) => res.url().includes('/api/reports/purchases-analytics') && res.url().includes('from='),
+      (res) =>
+        res.url().includes('/api/reports/purchases-analytics') && res.url().includes('from='),
       { timeout: 45_000 }
     );
     await page.goto('/dashboard/purchases');
-    expect((await initial).status(), 'default purchases-analytics request failed').toBeLessThan(400);
+    expect((await initial).status(), 'default purchases-analytics request failed').toBeLessThan(
+      400
+    );
 
     await expect(page.getByTestId('page-title')).toHaveText('Purchases Dashboard');
 
@@ -150,7 +155,9 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
     test.skip(true, 'no pagination control on the purchases analytics dashboard');
   });
 
-  test('TC-RX-PURCHASES-ANALYTICS-04: empty analytics payload renders the empty-chart state', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-04: empty analytics payload renders the empty-chart state', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.route(ANALYTICS_ROUTE, (route) =>
       route.fulfill({
@@ -165,13 +172,18 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
 
     const emptyCharts = page.getByText('No data for the selected period');
     await expect(emptyCharts.first()).toBeVisible({ timeout: 30_000 });
-    expect(await emptyCharts.count(), 'chart cards must show the empty state').toBeGreaterThanOrEqual(3);
+    expect(
+      await emptyCharts.count(),
+      'chart cards must show the empty state'
+    ).toBeGreaterThanOrEqual(3);
 
     // KPI cards still render with zeroed values.
     await expect(page.getByText('Total Purchase Value', { exact: true }).first()).toBeVisible();
   });
 
-  test('TC-RX-PURCHASES-ANALYTICS-05: loading state shows the Loader until data arrives', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-05: loading state shows the Loader until data arrives', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.route(ANALYTICS_ROUTE, async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 2_500));
@@ -212,7 +224,9 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
     );
   });
 
-  test('filter control: category selection reaches the API as categoryCode', async ({ page }, testInfo) => {
+  test('filter control: category selection reaches the API as categoryCode', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/dashboard/purchases');
 
@@ -233,10 +247,14 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
       { timeout: 30_000 }
     );
     await option.click();
-    expect((await refetch).status(), 'filtered purchases-analytics request failed').toBeLessThan(400);
+    expect((await refetch).status(), 'filtered purchases-analytics request failed').toBeLessThan(
+      400
+    );
   });
 
-  test('TC-RX-PURCHASES-ANALYTICS-20: Export Report triggers the purchases_report.csv download', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-20: Export Report triggers the purchases_report.csv download', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/dashboard/purchases');
 
@@ -265,7 +283,9 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
     expect(csv, 'exported file must be CSV-shaped (comma or newline)').toMatch(/[,;\n]/);
   });
 
-  test('TC-RX-PURCHASES-ANALYTICS-22: API error surfaces the failure card', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-22: API error surfaces the failure card', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.route(ANALYTICS_ROUTE, (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
@@ -280,7 +300,9 @@ test.describe('RxSoft Purchases Analytics (/dashboard/purchases)', () => {
     await expect(page.getByRole('button', { name: 'Export Report' })).toBeVisible();
   });
 
-  test('TC-RX-PURCHASES-ANALYTICS-23: filter controls are keyboard reachable', async ({ page }, testInfo) => {
+  test('TC-RX-PURCHASES-ANALYTICS-23: filter controls are keyboard reachable', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/dashboard/purchases');
     await expect(page.getByTestId('page-title')).toHaveText('Purchases Dashboard');

@@ -48,7 +48,9 @@ test.describe('RxSoft dashboard', () => {
 
   // ── TC-RX-DASH-01 ────────────────────────────────────────────
 
-  test('TC-RX-DASH-01: module dashboard renders the account panel and quick links', async ({ page }, testInfo) => {
+  test('TC-RX-DASH-01: module dashboard renders the account panel and quick links', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/rxsoft/dashboard');
 
@@ -76,7 +78,9 @@ test.describe('RxSoft dashboard', () => {
 
   // ── TC-RX-DASH-02 ────────────────────────────────────────────
 
-  test('TC-RX-DASH-02: widget 500s degrade to fallbacks and the page survives', async ({ page }, testInfo) => {
+  test('TC-RX-DASH-02: widget 500s degrade to fallbacks and the page survives', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     // Mock the panel's data sources to fail: identity activity + rxsoft
     // audit trail return 500. The board TC's "mock a report 500 → widget

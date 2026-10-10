@@ -26,11 +26,17 @@ import { expect, skipIfBackendDown, test } from '../../fixtures/test';
  */
 
 test.describe('RxSoft reports', () => {
-  test('TC-RX-REPORTS-01: reports page renders widgets from the three report endpoints', async ({ page }, testInfo) => {
+  test('TC-RX-REPORTS-01: reports page renders widgets from the three report endpoints', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
 
     // Track the three report requests the page fires on mount.
-    const endpoints = ['/reports/daily-sales', '/reports/inventory-valuation', '/reports/top-selling-items'];
+    const endpoints = [
+      '/reports/daily-sales',
+      '/reports/inventory-valuation',
+      '/reports/top-selling-items',
+    ];
     const seen = new Set<string>();
     page.on('response', (res) => {
       for (const ep of endpoints) {
@@ -61,12 +67,12 @@ test.describe('RxSoft reports', () => {
     // All three report endpoints answered successfully (the widgets'
     // values come from them; the API error branch would suppress the
     // tables and show "Failed to load reports.").
-    await expect
-      .poll(() => seen.size, { timeout: 30_000 })
-      .toBeGreaterThanOrEqual(3);
+    await expect.poll(() => seen.size, { timeout: 30_000 }).toBeGreaterThanOrEqual(3);
   });
 
-  test('TC-RX-REPORTS-02: Export Summary downloads reports_summary.csv', async ({ page }, testInfo) => {
+  test('TC-RX-REPORTS-02: Export Summary downloads reports_summary.csv', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/rxsoft/reports');
 

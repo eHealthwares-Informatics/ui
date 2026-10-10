@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 
 // Debug: print environment variables
 console.error(`[global-setup] SEED_API_KEY: ${process.env.SEED_API_KEY ?? 'undefined'}`);
-console.error(`[global-setup] SEED_PROVISION_API_KEY: ${process.env.SEED_PROVISION_API_KEY ?? 'undefined'}`);
+console.error(
+  `[global-setup] SEED_PROVISION_API_KEY: ${process.env.SEED_PROVISION_API_KEY ?? 'undefined'}`
+);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -210,7 +212,9 @@ export default async function globalSetup(): Promise<void> {
     probe(COMMUNICATION_HEALTH_URL),
     probe(SEED_HEALTH_URL),
   ]);
-  console.error(`[global-setup] Probe results: backendUp=${backendUp}, conversationUp=${conversationUp}, lisUp=${lisUp}, communicationUp=${communicationUp}, seedUp=${seedUp}`);
+  console.error(
+    `[global-setup] Probe results: backendUp=${backendUp}, conversationUp=${conversationUp}, lisUp=${lisUp}, communicationUp=${communicationUp}, seedUp=${seedUp}`
+  );
 
   // Fresh organisation per run: request it from the seed provisioning module so
   // every suite (auth, rxsoft, crud, shop) executes against an isolated

@@ -1,5 +1,5 @@
-import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import type { Page } from '@playwright/test';
+import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 import { readFileSync } from 'node:fs';
 
 /**
@@ -89,7 +89,9 @@ async function tabToFilterControl(page: Page): Promise<boolean> {
 }
 
 test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
-  test('TC-RX-SALES-ANALYTICS-01: analytics dashboard renders KPI cards, filters and charts', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-01: analytics dashboard renders KPI cards, filters and charts', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
 
     // The default month-to-date range reaches the API as from/to params.
@@ -141,7 +143,9 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
     test.skip(true, 'no pagination control on the sales analytics dashboard');
   });
 
-  test('TC-RX-SALES-ANALYTICS-04: empty analytics payload renders the empty-chart state', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-04: empty analytics payload renders the empty-chart state', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     // Deterministic empty state: fulfill the analytics GET with an empty
     // payload (shape from features/rxsoft/types.ts) — the chart cards must
@@ -159,14 +163,19 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
 
     const emptyCharts = page.getByText('No data for the selected period');
     await expect(emptyCharts.first()).toBeVisible({ timeout: 30_000 });
-    expect(await emptyCharts.count(), 'all chart cards must show the empty state').toBeGreaterThanOrEqual(3);
+    expect(
+      await emptyCharts.count(),
+      'all chart cards must show the empty state'
+    ).toBeGreaterThanOrEqual(3);
 
     // KPI cards still render with zeroed values — the page degrades
     // gracefully instead of erroring.
     await expect(page.getByText('Total Sales', { exact: true }).first()).toBeVisible();
   });
 
-  test('TC-RX-SALES-ANALYTICS-05: loading state shows the Loader until data arrives', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-05: loading state shows the Loader until data arrives', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     // Hold the analytics GET for 2.5s so the mounted page observably sits
     // in its loading state (Loader + no KPI cards), then let it resolve.
@@ -212,7 +221,9 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
     );
   });
 
-  test('filter control: category selection reaches the API as categoryCode', async ({ page }, testInfo) => {
+  test('filter control: category selection reaches the API as categoryCode', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     // Extra real coverage for the "Search and filter" UC intent: picking a
     // category changes the query key → refetch with categoryCode param.
@@ -229,14 +240,17 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
     await expect(option).toBeVisible({ timeout: 15_000 });
 
     const refetch = page.waitForResponse(
-      (res) => res.url().includes('/api/reports/sales-analytics') && res.url().includes('categoryCode='),
+      (res) =>
+        res.url().includes('/api/reports/sales-analytics') && res.url().includes('categoryCode='),
       { timeout: 30_000 }
     );
     await option.click();
     expect((await refetch).status(), 'filtered sales-analytics request failed').toBeLessThan(400);
   });
 
-  test('TC-RX-SALES-ANALYTICS-20: Export Report triggers the sales_report.csv download', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-20: Export Report triggers the sales_report.csv download', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/dashboard/sales');
 
@@ -265,7 +279,9 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
     expect(csv, 'exported file must be CSV-shaped (comma or newline)').toMatch(/[,;\n]/);
   });
 
-  test('TC-RX-SALES-ANALYTICS-22: API error surfaces the failure card', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-22: API error surfaces the failure card', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.route(ANALYTICS_ROUTE, (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
@@ -282,7 +298,9 @@ test.describe('RxSoft Sales Analytics (/dashboard/sales)', () => {
     await expect(page.getByRole('button', { name: 'Export Report' })).toBeVisible();
   });
 
-  test('TC-RX-SALES-ANALYTICS-23: filter controls are keyboard reachable', async ({ page }, testInfo) => {
+  test('TC-RX-SALES-ANALYTICS-23: filter controls are keyboard reachable', async ({
+    page,
+  }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/dashboard/sales');
     await expect(page.getByTestId('page-title')).toHaveText('Sales Analytics');
