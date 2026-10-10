@@ -32,9 +32,9 @@ export class SignInPage {
 
   async goto(redirectTo?: string): Promise<void> {
     if (redirectTo) {
-      await this.page.goto(`/sign-in?redirect=${encodeURIComponent(redirectTo)}`);
+      await this.page.goto(`/sign-in?redirect=${encodeURIComponent(redirectTo)}`, { waitUntil: 'domcontentloaded' });
     } else {
-      await this.page.goto('/sign-in');
+      await this.page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
     }
   }
 
