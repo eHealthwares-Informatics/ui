@@ -634,12 +634,17 @@ test.describe('RxSoft Items wizard', () => {
     });
     await page.unroute('**/api/items');
 
-    // Wait for the red toast to auto-dismiss. It renders in Mantine's portal
-    // and physically covers the footer button, so clicking straight away is
-    // intercepted for the toast's whole 20s autoClose and times out.
-    await expect(page.locator('.mantine-Notification-root').first()).toHaveCount(0, {
-      timeout: 60_000,
-    });
+    // The error toast renders in Mantine's portal and physically covers the
+    // footer button, so clicking straight away is intercepted. It has no
+    // autoClose (it stayed open 53×/60s across runs), so dismiss it explicitly
+    // via its close button rather than waiting for it to vanish.
+    const errorToast = page.locator('.mantine-Notification-root').first();
+    await expect(errorToast).toBeVisible({ timeout: 15_000 });
+    const toastClose = errorToast.getByRole('button');
+    if (await toastClose.count()) {
+      await toastClose.click({ timeout: 10_000 });
+    }
+    await expect(errorToast).toHaveCount(0, { timeout: 10_000 });
 
     // Test validation error path - submit with missing required field
     await crud.fillField('Item Name (Brand/Variety)', '', 'page'); // Clear required field
