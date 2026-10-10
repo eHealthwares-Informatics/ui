@@ -41,9 +41,18 @@ from the finance cluster remains open. Your queue is only the items in
    in `board_updates.md`, never applied. The green-run evidence lived in local
    `/tmp` which the 2026-10-10 reboot wiped. Re-verify with a fresh
    `--grep "column sort"` run on the QA box before ticking (C12).
+   - *Scrum-master 2026-10-10: re-verification run launched on the QA box
+   (log `/tmp/pw-qa-sort-20261010b.log`); ticks will be applied on green
+   evidence.*
 2. **Leftover E2E orgs on the QA system** — `E2E-20261010-PU5E3C`,
    `E2E-20261010-T4HYQU`, `E2E-20261010-VZ6ITQ` (all seed#12 teardown
    timeouts). Cleanup runbook: `e2e/orphaned-org-cleanup.md`.
+   - *Scrum-master 2026-10-10: ✅ DONE. All 3 cleaned per runbook §4 (the
+   three `lot_id` indexes already existed from the 2026-10-10 manual fix, so
+   none were recreated). Scoped deletes: `stock_lots` 29,448 + 14,448 rows
+   (batched 5,000/statement), `gl_accounts` 27 rows, identity `organizations`
+   3 rows; no `audit_logs` rows present. All 3 verified `exists:false` on
+   seed :8094 after cleanup.*
 3. **#774 gap work continues** (the issue stays open as the standing
    coverage follow-up). Biggest remaining buckets, in rough value order:
    - Phase-4 missing 105 TCs (website orders/prescriptions partials, org
@@ -96,3 +105,15 @@ from the finance cluster remains open. Your queue is only the items in
 - **Known repo quirk**: an external automation occasionally auto-commits the
   frontend working tree (it did during this batch) and `src/routeTree.gen.ts`
   is perpetually dirtied by the running vite — stash it before pulls.
+
+## §4 · Scrum-master close-out (2026-10-10)
+
+- **§2.2 orphaned orgs: ✅ cleaned** — see annotation under §2 item 2.
+- **§2.1 sort-tick rows: re-verification in flight** — fresh
+  `--grep "column sort"` run launched on the QA box; the ~25 queued TC-02
+  ticks will be applied on green evidence, then `board-sync.mjs --no-cache`
+  regen captures the coverage delta in one pass (§2.5).
+- **§2.3 #774: no action** — standing coverage follow-up; stays open.
+- **§2.4 ui#102: no action** — verify on the next long multi-spec run.
+- Handover doc itself: updated this session (this §4 + §2 annotations);
+  changes are uncommitted in the frontend tree.

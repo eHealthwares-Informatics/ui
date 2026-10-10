@@ -54,7 +54,12 @@ export default defineConfig({
     },
     {
       name: 'public',
-      testMatch: ['tests/auth/sign-in.spec.ts', 'tests/errors/**', 'tests/root/**'],
+      testMatch: [
+        'tests/auth/sign-in.spec.ts',
+        'tests/auth/reset-password.spec.ts',
+        'tests/errors/**',
+        'tests/root/**',
+      ],
       testIgnore: ['**/auth.setup.ts'],
     },
     {
@@ -65,6 +70,7 @@ export default defineConfig({
         '**/auth.setup.ts',
         'tests/emr/**',
         'tests/auth/sign-in.spec.ts',
+        'tests/auth/reset-password.spec.ts',
         'tests/root/**',
       ],
       use: {

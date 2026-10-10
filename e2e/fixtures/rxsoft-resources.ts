@@ -571,4 +571,37 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     canDelete: false,
     hasExport: false,
   },
+
+  // ── Phase-4 registry extension (2026-10-10 batch, #104/#149) ─────────────
+  {
+    id: 'purchases',
+    title: 'Purchases',
+    route: '/rxsoft/purchases',
+    endpoint: '/purchases',
+    nameLabel: 'PO/Invoice',
+    uniquePrefix: 'E2E Purchase',
+    createFields: [],
+    // Admin create retired (ui#70 — the shop PO builder owns creation);
+    // edit is status-conditional via the modal; POs are financial records
+    // the suite must never delete.
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    hasExport: false,
+  },
+  {
+    id: 'organisation-payment-providers',
+    title: 'Organisation Payment Providers',
+    route: '/rxsoft/organisation-payment-providers',
+    endpoint: '/organisation-payment-providers',
+    nameLabel: 'Provider Name',
+    uniquePrefix: 'E2E OrgPayProvider',
+    createFields: [],
+    // Create requires a paymentProviderId async-select, and org payment
+    // providers are org-critical wiring — the suite stays view-only.
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    hasExport: false,
+  },
 ];

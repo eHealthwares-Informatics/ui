@@ -5,7 +5,7 @@
  * each resource's capabilities in fixtures/rxsoft-resources.ts.
  */
 
-// 227 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
+// 237 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
 // Board-sync scans this file (TC id per comment line) as coverage evidence.
 //   TC-RX-AUDIT-LOGS-01
 //   TC-RX-AUDIT-LOGS-03
@@ -84,6 +84,11 @@
 //   TC-RX-MANUFACTURERS-17
 //   TC-RX-MANUFACTURERS-18
 //   TC-RX-MANUFACTURERS-19
+//   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-01
+//   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-03
+//   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-06
+//   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-07
+//   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-13
 //   TC-RX-ORGANIZATIONS-01
 //   TC-RX-ORGANIZATIONS-03
 //   TC-RX-ORGANIZATIONS-06
@@ -159,6 +164,11 @@
 //   TC-RX-PRICE-LISTS-17
 //   TC-RX-PRICE-LISTS-18
 //   TC-RX-PRICE-LISTS-19
+//   TC-RX-PURCHASES-01
+//   TC-RX-PURCHASES-03
+//   TC-RX-PURCHASES-06
+//   TC-RX-PURCHASES-07
+//   TC-RX-PURCHASES-13
 //   TC-RX-RECEIVABLES-01
 //   TC-RX-RECEIVABLES-03
 //   TC-RX-RECEIVABLES-06
