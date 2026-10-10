@@ -31,3 +31,5 @@ Append-only. One entry per tracker run.
 | 2026-10-06T18:50:30.336Z | read-only | 240 | 112 | 1749 | 0 | report only |
 | 2026-10-06T18:51:35.372Z | read-only | 240 | 112 | 1749 | 0 | report only |
 | 2026-10-06T23:16:21.990Z | WRITE | 261 | 112 | 1728 | 0 | issue write-back |
+| 2026-10-10T18:18:49.057Z | read-only | 261 | 149 | 1691 | 0 | report only |
+| 2026-10-10T18:49:37.361Z | read-only | 262 | 149 | 1690 | 0 | report only |

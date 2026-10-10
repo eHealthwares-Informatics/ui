@@ -226,7 +226,7 @@ test.describe.serial('RxSoft goods receiving', () => {
   //   TC-02 confirmation UI appears (password + Confirm Unpost)
   //   TC-03 stock reversed after unpost (balance decreased + line unposted)
 
-  test('TC-RX-PURCHASES-UNPOST-01 + TC-RX-PURCHASES-UNPOST-02: receipt detail unpost — action available, confirmation UI, stock reversal', async ({
+  test('TC-RX-PURCHASES-UNPOST-01 + TC-RX-PURCHASES-UNPOST-02 + TC-RX-PURCHASES-UNPOST-03: receipt detail unpost — action available, confirmation UI, stock reversal', async ({
     page,
   }) => {
     await page.goto('/rxsoft/receiving', { timeout: 60_000 });

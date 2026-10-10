@@ -1,8 +1,8 @@
 # Tracker Status — RxSoft Alpha Test Plan
 
-> Generated 2026-10-06T23:16:21.941Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 123 entity tasks / 596 use cases
+> Generated 2026-10-10T18:49:37.338Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 125 entity tasks / 596 use cases
 
-**Storage state:** ✅ admin storageState is fresh (0.5h old).
+**Storage state:** ⚠️ `e2e/.auth/admin.json` is **stale** (25h old) — rerun `--project=setup` if admin suites 401/403.
 
 | State | Meaning |
 |---|---|
@@ -15,7 +15,7 @@
 
 | Covered | Gated | Missing | Missing-path | TCs mapped | Coverage (of mappable) |
 |---|---|---|---|---|---|
-| 261 | 112 | 1728 | 0 | 2101 | 17.8% |
+| 262 | 149 | 1690 | 0 | 2101 | 19.6% |
 
 ## Per-phase matrix
 
@@ -24,8 +24,8 @@
 | 0-baseline | 1 | 1 | 12 | 4 | 0 | 0 |
 | 1-rxsoft-crud | 87 | 8 | 93 | 31 | 166 | 0 |
 | 2-catalog | 50 | 11 | 46 | 44 | 77 | 0 |
-| 3-operations | 48 | 6 | 62 | 13 | 92 | 0 |
-| 4-commerce | 65 | 4 | 48 | 20 | 142 | 0 |
+| 3-operations | 48 | 7 | 63 | 13 | 91 | 0 |
+| 4-commerce | 65 | 17 | 48 | 57 | 105 | 0 |
 | 5-modules | 360 | 0 | 0 | 0 | 1251 | 0 |
 
 ## Entity rollup
@@ -99,14 +99,14 @@
 | lis | [lis] Validation Dashboard — E2E | 5-modules | 0/1 | — | [#732](ehealthwares/rxsoft/issues/732) |
 | notifications | [QA] EMR In-App Notifications + Message Templates — Test Suite (Backend) | unphased | 0/0 | — | [#4](eHealthwares-Informatics/emr/issues/4) |
 | rxsoft | [rxsoft] Audit Logs — E2E | 1-rxsoft-crud | 4/12 | — | [#273](ehealthwares/rxsoft/issues/273) |
-| rxsoft | [rxsoft] Balance Sheet — E2E | 4-commerce | 0/3 | — | [#195](ehealthwares/rxsoft/issues/195) |
+| rxsoft | [rxsoft] Balance Sheet — E2E | 4-commerce | 3/3 | ✅ | [#195](ehealthwares/rxsoft/issues/195) |
 | rxsoft | [rxsoft] Branches — E2E | 1-rxsoft-crud | 9/16 | — | [#245](ehealthwares/rxsoft/issues/245) |
 | rxsoft | [rxsoft] Customers — E2E | 1-rxsoft-crud | 8/17 | — | [#251](ehealthwares/rxsoft/issues/251) |
-| rxsoft | [rxsoft] Dashboard — E2E | 4-commerce | 0/2 | — | [#191](ehealthwares/rxsoft/issues/191) |
+| rxsoft | [rxsoft] Dashboard — E2E | 4-commerce | 2/2 | ✅ | [#191](ehealthwares/rxsoft/issues/191) |
 | rxsoft | [rxsoft] Drug Components — E2E | 1-rxsoft-crud | 4/12 | — | [#268](ehealthwares/rxsoft/issues/268) |
 | rxsoft | [rxsoft] Full Business Flow (end-to-end) — E2E | 4-commerce | 0/6 | — | [#211](ehealthwares/rxsoft/issues/211) |
 | rxsoft | [rxsoft] GL Accounts — E2E | 1-rxsoft-crud | 13/21 | — | [#278](ehealthwares/rxsoft/issues/278) |
-| rxsoft | [rxsoft] Income Statement — E2E | 4-commerce | 0/3 | — | [#197](ehealthwares/rxsoft/issues/197) |
+| rxsoft | [rxsoft] Income Statement — E2E | 4-commerce | 3/3 | ✅ | [#197](ehealthwares/rxsoft/issues/197) |
 | rxsoft | [rxsoft] Insurance Providers — E2E | 1-rxsoft-crud | 13/21 | — | [#309](ehealthwares/rxsoft/issues/309) |
 | rxsoft | [rxsoft] Inventory — E2E | 3-operations | 10/16 | — | [#86](ehealthwares/rxsoft/issues/86) |
 | rxsoft | [rxsoft] Items — E2E | 2-catalog | 18/24 | — | [#28](ehealthwares/rxsoft/issues/28) |
@@ -127,20 +127,20 @@
 | rxsoft | [rxsoft] Price Lists — E2E | 2-catalog | 13/21 | — | [#41](ehealthwares/rxsoft/issues/41) |
 | rxsoft | [rxsoft] Products — E2E | 2-catalog | 0/21 | — | [#72](ehealthwares/rxsoft/issues/72) |
 | rxsoft | [rxsoft] Purchases — E2E | 3-operations | 0/21 | — | [#104](ehealthwares/rxsoft/issues/104) |
-| rxsoft | [rxsoft] Purchases Analytics — E2E | 4-commerce | 0/12 | — | [#206](ehealthwares/rxsoft/issues/206) |
+| rxsoft | [rxsoft] Purchases Analytics — E2E | 4-commerce | 12/12 | ✅ | [#206](ehealthwares/rxsoft/issues/206) |
 | rxsoft | [rxsoft] Receivables — E2E | 1-rxsoft-crud | 4/12 | — | [#304](ehealthwares/rxsoft/issues/304) |
-| rxsoft | [rxsoft] Receiving — E2E | 3-operations | 6/13 | — | [#111](ehealthwares/rxsoft/issues/111) |
-| rxsoft | [rxsoft] Reports — E2E | 4-commerce | 0/2 | — | [#193](ehealthwares/rxsoft/issues/193) |
+| rxsoft | [rxsoft] Receiving — E2E | 3-operations | 7/13 | — | [#111](ehealthwares/rxsoft/issues/111) |
+| rxsoft | [rxsoft] Reports — E2E | 4-commerce | 2/2 | ✅ | [#193](ehealthwares/rxsoft/issues/193) |
 | rxsoft | [rxsoft] Reset Password — E2E | 1-rxsoft-crud | 0/2 | — | [#318](ehealthwares/rxsoft/issues/318) |
 | rxsoft | [rxsoft] Role Requests — E2E | 3-operations | 3/21 | — | [#184](ehealthwares/rxsoft/issues/184) |
 | rxsoft | [rxsoft] Roles — E2E | 3-operations | 13/24 | — | [#176](ehealthwares/rxsoft/issues/176) |
 | rxsoft | [rxsoft] Sales — E2E | 4-commerce | 13/21 | — | [#123](ehealthwares/rxsoft/issues/123) |
-| rxsoft | [rxsoft] Sales Analytics — E2E | 4-commerce | 0/12 | — | [#201](ehealthwares/rxsoft/issues/201) |
+| rxsoft | [rxsoft] Sales Analytics — E2E | 4-commerce | 12/12 | ✅ | [#201](ehealthwares/rxsoft/issues/201) |
 | rxsoft | [rxsoft] Sales Lines — E2E | 4-commerce | 4/12 | — | [#130](ehealthwares/rxsoft/issues/130) |
 | rxsoft | [rxsoft] Settings (account/appearance/display/notifications) — E2E | 1-rxsoft-crud | 0/4 | — | [#316](ehealthwares/rxsoft/issues/316) |
 | rxsoft | [rxsoft] Stock Locations — E2E | 3-operations | 13/21 | — | [#92](ehealthwares/rxsoft/issues/92) |
 | rxsoft | [rxsoft] Suppliers — E2E | 3-operations | 13/21 | — | [#116](ehealthwares/rxsoft/issues/116) |
-| rxsoft | [rxsoft] Trial Balance — E2E | 4-commerce | 0/3 | — | [#199](ehealthwares/rxsoft/issues/199) |
+| rxsoft | [rxsoft] Trial Balance — E2E | 4-commerce | 3/3 | ✅ | [#199](ehealthwares/rxsoft/issues/199) |
 | rxsoft | [rxsoft] UOM Categories — E2E | 2-catalog | 13/21 | — | [#65](ehealthwares/rxsoft/issues/65) |
 | rxsoft | [rxsoft] UOMs — E2E | 2-catalog | 13/21 | — | [#55](ehealthwares/rxsoft/issues/55) |
 | rxsoft | [rxsoft] User Config — E2E | 1-rxsoft-crud | 0/21 | — | [#221](ehealthwares/rxsoft/issues/221) |
@@ -149,8 +149,10 @@
 | rxsoft | [rxsoft] Warehouses — E2E | 3-operations | 8/15 | — | [#99](ehealthwares/rxsoft/issues/99) |
 | rxsoft | [rxsoft] Website Orders — E2E | 4-commerce | 4/10 | — | [#168](ehealthwares/rxsoft/issues/168) |
 | rxsoft | [rxsoft] Website Prescriptions — E2E | 4-commerce | 4/10 | — | [#172](ehealthwares/rxsoft/issues/172) |
+| shop | [QA] Test: POS batch #2 — PRs #33-#38 + backend PR eHealthwares-Informatics/rxsoft#12 | unphased | 0/0 | — | [#39](eHealthwares-Informatics/ui/issues/39) |
 | shop | QA: POS Quick Add UOM fix (PR #42) — create-from-POS regression | unphased | 0/0 | — | [#43](eHealthwares-Informatics/ui/issues/43) |
 | shop | QA: print-agent service + POS/mobile remote printing test suite | unphased | 0/0 | — | [#8](eHealthwares-Informatics/ui/issues/8) |
+| unknown | [QA] data-testid on all UI elements + testid-first e2e selectors | unphased | 0/0 | — | [#68](eHealthwares-Informatics/ui/issues/68) |
 | unknown | [QA] Test: PR #34 batch — website auth endpoints, admin CRUD (coupons, reward-programs, consultations, delivery-areas) | unphased | 0/0 | — | [#35](eHealthwares-Informatics/rxsoft/issues/35) |
 | unknown | [QA] Test: PR #60 batch — website auth flows, admin pages, form validation fix, priceListId regression tests | unphased | 0/0 | — | [#61](eHealthwares-Informatics/ui/issues/61) |
 | unknown | [QA] Test: PR #62 — POS offline sale completes when new customer is typed (#59) | unphased | 0/0 | — | [#63](eHealthwares-Informatics/ui/issues/63) |
@@ -164,6 +166,11 @@
 - tests/communication/module.spec.ts
 - tests/conversation/module.spec.ts
 - tests/lis/module.spec.ts
+- tests/rxsoft/dashboard.spec.ts
+- tests/rxsoft/financial-statements.spec.ts
 - tests/rxsoft/items-create.spec.ts
 - tests/rxsoft/items-validation.spec.ts
 - tests/rxsoft/items-wizard.spec.ts
+- tests/rxsoft/purchases-analytics.spec.ts
+- tests/rxsoft/reports.spec.ts
+- tests/rxsoft/sales-analytics.spec.ts
