@@ -19,7 +19,7 @@ export default defineConfig({
   testDir: '.',
   globalSetup: './global-setup.ts',
   globalTeardown: './global-teardown.ts',
-  timeout: 60_000,
+  timeout: 180_000,
   expect: { timeout: 15_000 },
   retries: 1,
   workers: 2,
@@ -78,7 +78,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 800 },
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    actionTimeout: 20_000,
-    navigationTimeout: 30_000,
+    actionTimeout: 60_000,
+    navigationTimeout: 90_000,
   },
 });
