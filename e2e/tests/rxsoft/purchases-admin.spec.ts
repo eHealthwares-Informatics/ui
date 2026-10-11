@@ -34,7 +34,7 @@ async function apiCreate<T>(
 test.describe('RxSoft Admin Purchases — List Page (UC-RX-PURCHASES-01/02/04/05)', () => {
   test.setTimeout(120_000);
 
-  let accessToken: string | null = null;
+  const accessToken: string | null = null;
   let supplierId: string;
   let warehouseId: string;
   let itemId: string;
