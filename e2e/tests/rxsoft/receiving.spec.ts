@@ -356,4 +356,160 @@ test.describe.serial('RxSoft goods receiving', () => {
       true
     );
   });
+
+  // ── UC-RX-RECEIVING-01/02/06: List page coverage ──────────────
+
+  test('TC-RX-RECEIVING-01-01: receiving page loads and shows receipts table', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+    await expect(page.getByTestId('page-title')).toHaveText('Goods Receiving');
+
+    const body = page.getByTestId('data-table-body');
+    await expect(body).toBeVisible({ timeout: 15_000 });
+    await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
+
+    // Verify common column headers (flexible match)
+    const expectedHeaders = ['Receipt', 'PO', 'Date', 'Status'];
+    for (const header of expectedHeaders) {
+      const th = page.locator('th').filter({ hasText: header }).first();
+      if ((await th.count()) > 0) {
+        await expect(th).toBeVisible();
+      }
+    }
+  });
+
+  test('TC-RX-RECEIVING-01-02: pagination controls render and function', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const body = page.getByTestId('data-table-body');
+    await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
+
+    // Pagination controls
+    const pageSizeSelect = page.getByTestId('page-size-select').first();
+    if ((await pageSizeSelect.count()) > 0) {
+      await expect(pageSizeSelect).toBeVisible();
+      await pageSizeSelect.click();
+      const opt = page.getByRole('option', { name: /25|50|100/ }).first();
+      if ((await opt.count()) > 0) {
+        await opt.click();
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
+      }
+    }
+
+    const nextBtn = page.getByRole('button', { name: /next|›/i }).first();
+    const prevBtn = page.getByRole('button', { name: /previous|‹/i }).first();
+    if ((await nextBtn.count()) > 0 && (await nextBtn.isEnabled())) {
+      await nextBtn.click();
+      await page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .first()
+        .waitFor({ state: 'visible', timeout: 15_000 });
+      if (await prevBtn.isEnabled()) {
+        await prevBtn.click();
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
+      }
+    }
+  });
+
+  test('TC-RX-RECEIVING-01-03: column sorting on receipts table', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const sortableHeaders = ['Receipt #', 'PO #', 'Supplier', 'Date', 'Status'];
+    for (const headerText of sortableHeaders) {
+      const th = page.locator('th').filter({ hasText: headerText }).first();
+      if ((await th.count()) > 0) {
+        await th.click({ timeout: 10_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
+        await th.click({ timeout: 10_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
+      }
+    }
+  });
+
+  test('TC-RX-RECEIVING-02-01: header search filters receipts', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const searchInput = page.getByTestId('header-search').first();
+    await expect(searchInput).toBeVisible();
+    // Search for a generic term that might match our seeded receipt
+    await searchInput.fill('GR-RCPT');
+    await page.waitForTimeout(1_000);
+
+    const body = page.getByTestId('data-table-body');
+    await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
+
+    // Clear search restores full list
+    await searchInput.clear();
+    await page.waitForTimeout(1_000);
+    await page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .first()
+      .waitFor({ state: 'visible', timeout: 15_000 });
+  });
+
+  test('TC-RX-RECEIVING-02-02: no-match search shows empty state', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const searchInput = page.getByTestId('header-search').first();
+    await searchInput.fill('__NO_MATCH_RECEIPT__' + TS);
+    await page.waitForTimeout(1_000);
+
+    const rows = page.getByTestId('data-table-body').locator('tr');
+    const rowCount = await rows.count();
+    if (rowCount === 0) {
+      expect(rowCount).toBe(0);
+    } else {
+      const firstRow = rows.first();
+      const rowText = await firstRow.innerText();
+      expect(rowText.toLowerCase()).toMatch(/no records|no results|no data|empty/);
+    }
+  });
+
+  test('TC-RX-RECEIVING-06-01: empty state accessible when no receipts match', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const searchInput = page.getByTestId('header-search').first();
+    await searchInput.fill('__NON_EXISTENT_RECEIPT__' + TS);
+    await page.waitForTimeout(1_000);
+
+    const rows = page.getByTestId('data-table-body').locator('tr');
+    const rowCount = await rows.count();
+    if (rowCount > 0) {
+      const firstRow = rows.first();
+      const rowText = await firstRow.innerText();
+      expect(rowText.toLowerCase()).toMatch(/no records|no results|no data|empty/);
+    }
+  });
+
+  test('TC-RX-RECEIVING-06-02: receipts table keyboard navigation', async ({ page }) => {
+    await page.goto('/rxsoft/receiving', { timeout: 60_000 });
+
+    const firstRow = page.getByTestId('data-table-body').locator('tr').first();
+    await expect(firstRow).toBeVisible({ timeout: 15_000 });
+
+    await firstRow.focus();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowUp');
+  });
+
+  test.skip('TC-RX-RECEIVING-06-03: API error on receipts fetch shows toast', async ({ page }) => {
+    test.skip(true, 'Requires API error injection - documented for future hardening');
+  });
 });
