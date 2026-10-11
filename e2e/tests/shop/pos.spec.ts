@@ -25,6 +25,61 @@ async function addFirstProduct(page: import('@playwright/test').Page) {
   return label;
 }
 
+/**
+ * Seed a single-priced cart directly into the persisted POS store, then reload.
+ *
+ * The offline new-customer regression (#59 / ui#63) exercises PaymentModal's
+ * checkout logic, not product search. Seeding the cart here keeps the test
+ * deterministic and independent of seed-data pricing (the live product picker
+ * currently offers receipt-only items with "no price set").
+ */
+async function seedCartViaStorage(page: import('@playwright/test').Page) {
+  await page.goto('/shop/pos');
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(() => {
+    const session = {
+      id: crypto.randomUUID(),
+      saleCode: `QA-OFFLINE-${Date.now().toString(36).toUpperCase()}`,
+      createdAt: new Date().toISOString(),
+      discount: 0,
+      vatPercent: 0,
+      pricingMode: 'retail',
+      held: false,
+      status: 'active',
+      paidAmount: 0,
+      changeAmount: 0,
+      customerId: null,
+      customerName: '',
+      cart: [
+        {
+          id: crypto.randomUUID(),
+          orderItemId: crypto.randomUUID(),
+          uomId: crypto.randomUUID(),
+          quantity: 1,
+          retailPrice: 50,
+          wholesalePrice: 40,
+        },
+      ],
+    };
+    const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+    localStorage.setItem(
+      'pos-store',
+      JSON.stringify({
+        ...raw,
+        state: {
+          ...(raw.state ?? {}),
+          sessions: [session],
+          activeSessionId: session.id,
+          offlineSaleQueue: [],
+        },
+      })
+    );
+  });
+  await page.reload();
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByTestId('pos-sell-only-btn')).toBeEnabled({ timeout: waits.visible });
+}
+
 /* ------------------------------------------------------------------ */
 /*  POS — happy-path and edge-case tests                              */
 /* ------------------------------------------------------------------ */
@@ -179,5 +234,109 @@ test.describe('Damorex POS', () => {
     await expect(page.getByTestId('pos-payment-balance')).toBeVisible({ timeout: waits.visible });
 
     await page.getByTestId('pos-cancel-payment-btn').click();
+  });
+
+  /* ---- Offline new-customer regression (#59 / ui#63, PR #62) ---- */
+
+  test('offline sale with a NEW customer continues as walk-in and queues the sale', async ({
+    page,
+  }) => {
+    await seedCartViaStorage(page);
+
+    await page.getByTestId('pos-sell-only-btn').click();
+    const dialog = page.getByRole('dialog', { name: 'Payment' });
+    await expect(dialog).toBeVisible({ timeout: waits.pos.paymentModal });
+
+    // Cash method so completion needs no terminal/wallet side effects.
+    await page.getByTestId('pos-payment-method').click();
+    await page.getByRole('option').first().click();
+
+    // Type a NEW customer (no session customer) — this is the #59 path.
+    const newCustomerName = `Offline QA ${Date.now().toString(36)}`;
+    await page.getByTestId('pos-customer-name').fill(newCustomerName);
+
+    // Simulate the backend being unreachable at the transport level while the
+    // browser stays "online" (navigator.onLine === true). We deliberately do
+    // NOT use context.setOffline(): TanStack Query v5 defaults to
+    // networkMode 'online' and PAUSES mutations when navigator.onLine is false,
+    // so mutateAsync never rejects and the #59 path is never reached. That
+    // true-offline gap is reported on ui#63; this regression pins the
+    // "backend unreachable" path the merged fix actually targets.
+    await page.route('**/api/customers', (route) => route.abort('failed'));
+    await page.route('**/api/sales', (route) =>
+      route.request().method() === 'POST' ? route.abort('failed') : route.continue()
+    );
+
+    await page.getByTestId('pos-complete-sale-btn').click();
+
+    // Network failure on createCustomer must NOT block the sale — the offline
+    // prompt offers queueing instead.
+    const offlinePrompt = page.getByTestId('pos-offline-prompt');
+    await expect(offlinePrompt).toBeVisible({ timeout: 20_000 });
+
+    // Queue the sale offline (walk-in).
+    await page.getByTestId('pos-complete-offline-btn').click();
+
+    // The persisted queue entry must carry the original saleCode and a null
+    // customerId (walk-in), proving the sale continued without the customer.
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(() => {
+            const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+            return (raw?.state?.offlineSaleQueue ?? []).length;
+          }),
+        { timeout: 10_000 }
+      )
+      .toBeGreaterThan(0);
+
+    const queued = await page.evaluate(() => {
+      const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+      const queue: Array<{ saleCode?: string; payload?: { customerId?: unknown } }> =
+        raw?.state?.offlineSaleQueue ?? [];
+      const last = queue[queue.length - 1];
+      return {
+        payloadExists: Boolean(last?.payload),
+        saleCode: last?.saleCode as string | undefined,
+        customerId: last?.payload?.customerId,
+      };
+    });
+    expect(queued.payloadExists).toBe(true);
+    expect(queued.customerId).toBeNull();
+    expect(queued.saleCode).toBeTruthy();
+  });
+
+  test('customer business error still blocks the sale (no offline prompt)', async ({ page }) => {
+    await seedCartViaStorage(page);
+
+    // Simulate a 4xx business rejection from createCustomer (e.g. duplicate phone).
+    await page.route('**/api/customers', (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Customer phone already exists' }),
+      })
+    );
+
+    await page.getByTestId('pos-sell-only-btn').click();
+    const dialog = page.getByRole('dialog', { name: 'Payment' });
+    await expect(dialog).toBeVisible({ timeout: waits.pos.paymentModal });
+
+    await page.getByTestId('pos-payment-method').click();
+    await page.getByRole('option').first().click();
+    await page.getByTestId('pos-customer-name').fill('Duplicate Customer');
+
+    // Sale POST must never fire for a business error.
+    let salePosts = 0;
+    await page.route('**/api/sales', (route) => {
+      if (route.request().method() === 'POST') salePosts += 1;
+      return route.continue();
+    });
+
+    await page.getByTestId('pos-complete-sale-btn').click();
+
+    // No offline prompt — the sale is blocked, not queued.
+    await expect(page.getByTestId('pos-offline-prompt')).toHaveCount(0, { timeout: 5_000 });
+    expect(salePosts, 'business error must not POST a sale').toBe(0);
   });
 });
