@@ -7,8 +7,20 @@ const columns: Column[] = [
   {
     key: 'roles',
     label: 'Roles',
-    render: (row) =>
-      (((row.roles as any).map((row: any) => row.name) as string[] | undefined) ?? []).join(', '),
+    // identity /users returns role CODES as plain strings (roles:
+    // user.roleCodes) — full role objects never reach the client. Map both
+    // shapes so a provisioned owner's admin role actually shows in the list.
+    render: (row) => {
+      const roles = Array.isArray(row.roles) ? (row.roles as unknown[]) : [];
+      return roles
+        .map((role) => {
+          if (typeof role === 'string') return role;
+          const obj = role as { name?: string; code?: string } | null;
+          return obj?.name ?? obj?.code ?? '';
+        })
+        .filter(Boolean)
+        .join(', ');
+    },
   },
 ];
 
