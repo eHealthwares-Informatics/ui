@@ -464,7 +464,16 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   test('9. offline sale with a NEW customer continues as walk-in and queues the sale', async ({ page }) => {
     await gotoPosReady(page);
-    await pickAndAddFirstProduct(page);
+
+    // Add our seeded item (which has a price) to the cart
+    const productSelect = page.getByTestId('pos-product-select');
+    await productSelect.click();
+    await productSelect.fill(`POS-Item-${runId}`);
+    await page.waitForTimeout(500);
+    const option = page.getByRole('option', { name: `POS-Item-${runId}`, exact: false }).first();
+    await expect(option).toBeVisible({ timeout: waits.pos.productSelect });
+    await option.click();
+    await page.getByTestId('pos-add-to-cart-btn').click();
 
     // Open payment modal
     await page.getByTestId('pos-sell-only-btn').click();
@@ -493,6 +502,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
     // Queue the sale offline (walk-in)
     await page.getByTestId('pos-complete-offline-btn').click();
+
+    // Clear cart for next test: use Hold Sale to reset cart
+    await page.getByTestId('pos-hold-sale-btn').click();
 
     // Verify the persisted queue entry has original saleCode and null customerId
     await expect
