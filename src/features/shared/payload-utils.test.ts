@@ -138,3 +138,63 @@ describe('items wizard form validation (final submit)', () => {
     );
   });
 });
+
+describe('required multi-async-select validation (users Roles field)', () => {
+  // Mirrors the roles field on /rxsoft/users (features/rxsoft/pages/users).
+  const rolesField: Field = {
+    name: 'roles',
+    label: 'Roles',
+    type: 'multi-async-select',
+    required: true,
+  };
+  const fields: Field[] = [{ name: 'username', label: 'Username', required: true }, rolesField];
+
+  it('accepts a selected array of options and no longer reports "Roles is required"', () => {
+    const errors = validateFields(fields, {
+      username: 'jane',
+      roles: [{ value: 'admin', label: 'Administrator' }],
+    });
+
+    // Regression guard: arrays have no top-level `value` property, so the old
+    // single-object refine rejected every selection with "Roles is required".
+    expect(errors.roles).toBeUndefined();
+    expect(errors).toEqual({});
+  });
+
+  it('accepts a plain array of role codes (edit state hydrated from the identity API)', () => {
+    const errors = validateFields(fields, {
+      username: 'jane',
+      roles: ['admin'],
+    });
+
+    expect(errors.roles).toBeUndefined();
+  });
+
+  it('rejects an empty selection with the field label', () => {
+    const errors = validateFields(fields, { username: 'jane', roles: [] });
+
+    expect(errors.roles).toBe('Roles is required');
+  });
+
+  it('rejects missing roles and entries without a usable value', () => {
+    expect(validateFields(fields, { username: 'jane' }).roles).toBe('Roles is required');
+    expect(validateFields(fields, { username: 'jane', roles: [{ label: 'Empty' }] }).roles).toBe(
+      'Roles is required'
+    );
+    expect(validateFields(fields, { username: 'jane', roles: ['  '] }).roles).toBe(
+      'Roles is required'
+    );
+  });
+
+  it('does not flag optional multi-async-select fields when empty', () => {
+    const optional: Field[] = [
+      { name: 'username', label: 'Username', required: true },
+      { name: 'roles', label: 'Roles', type: 'multi-async-select' },
+    ];
+
+    const errors = validateFields(optional, { username: 'jane', roles: [] });
+
+    expect(errors.roles).toBeUndefined();
+    expect(errors).toEqual({});
+  });
+});

@@ -170,6 +170,25 @@ export function useItems(search?: string) {
   });
 }
 
+// Whitelists a catalog item for the current organisation — PUT /items/me/:id
+// creates (or restores) an active organisation_items row. Purchase orders
+// require that row: the backend's assertItemsOrgAdded rejects lines for items
+// that are not added ("Item(s) not added to this organisation: …").
+export function useAddItemToOrganisation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (itemId: string) => {
+      const { data } = await rxsoftApi.put(`/items/me/${itemId}`, { isActive: true });
+      return data;
+    },
+    onSuccess: () => {
+      // The PO item picker (useItems) and the catalog pages must reflect the
+      // new whitelisted state.
+      qc.invalidateQueries({ queryKey: ['catalog-items'] });
+    },
+  });
+}
+
 export function useItemUoms(itemId: string | null) {
   return useQuery({
     queryKey: ['item-uoms', itemId],

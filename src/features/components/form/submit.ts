@@ -21,6 +21,24 @@ export type BuiltSchema = {
   }>;
 };
 
+/** Field types whose value is an ARRAY of options (multi-selects). */
+const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick']);
+
+/**
+ * A selected multi-select entry is usable when it is a non-empty string
+ * (role/category code) or an option object carrying a value/id/code —
+ * mirroring extractOptionId in payload-utils.
+ */
+function hasUsableOptionValue(entry: unknown): boolean {
+  if (typeof entry === 'string') return entry.trim().length > 0;
+  if (entry && typeof entry === 'object') {
+    const value =
+      (entry as Record<string, unknown>).value ?? (entry as any).id ?? (entry as any).code;
+    return value !== undefined && value !== null && String(value).length > 0;
+  }
+  return false;
+}
+
 /**
  * Build a zod schema from one or more FieldGroup configs.
  *
@@ -118,12 +136,23 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
           (v) => v === true,
           `${field.label} is required`
         );
+      } else if (field.type && MULTI_SELECT_TYPES.has(field.type)) {
+        // Multi-selects hold an ARRAY of options (RenderField toggles entries
+        // in/out), so the single-object check below can never pass — arrays
+        // don't carry a top-level `value` property. Required = at least one
+        // selected entry, every entry carrying a usable value.
+        typeSchema = z.any().refine((v) => {
+          const entries = Array.isArray(v)
+            ? v
+            : v === null || v === undefined || v === ''
+              ? []
+              : [v];
+          return entries.length > 0 && entries.every(hasUsableOptionValue);
+        }, `${field.label} is required`);
       } else if (
         field.type === 'async-select' ||
         field.type === 'select' ||
         field.type === 'remote-select' ||
-        field.type === 'multi-async-select' ||
-        field.type === 'multi-pick' ||
         field.type === 'json'
       ) {
         typeSchema = z
