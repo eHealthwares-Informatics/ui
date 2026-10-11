@@ -1,6 +1,6 @@
 import { expect, test } from '../../fixtures/test';
-import { apiFetch, readAccessToken } from '../../utils/api';
 import { waits, recordTiming } from '../../utils/adaptive-wait';
+import { apiFetch, readAccessToken } from '../../utils/api';
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -58,7 +58,11 @@ async function createCategory(page: import('@playwright/test').Page, code: strin
 /**
  * Creates a stock location via API.
  */
-async function createStockLocation(page: import('@playwright/test').Page, code: string, name: string) {
+async function createStockLocation(
+  page: import('@playwright/test').Page,
+  code: string,
+  name: string
+) {
   const res = await apiFetch<{ id: string }>(page, '/stock-locations', {
     method: 'POST',
     body: JSON.stringify({ code, name, locationType: 'internal', isActive: true }),
@@ -130,7 +134,11 @@ async function ensurePosConfig(
   await fetch('http://localhost:8080/api/user-pos-config/me', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ defaultPriceListId: priceListId, stockLocationId, autoSelectLocation: true }),
+    body: JSON.stringify({
+      defaultPriceListId: priceListId,
+      stockLocationId,
+      autoSelectLocation: true,
+    }),
   });
 }
 
@@ -194,7 +202,14 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     expect(stockLocationId).toBeTruthy();
 
     // Create item with UOMs so it appears in the POS picker with price
-    itemId = await createItem(page, `POS-Item-${runId}`, categoryId, unitUomId, packUomId, unitUomId);
+    itemId = await createItem(
+      page,
+      `POS-Item-${runId}`,
+      categoryId,
+      unitUomId,
+      packUomId,
+      unitUomId
+    );
     expect(itemId).toBeTruthy();
 
     priceListId = await createPriceList(page, `POS_PRICE_${runId}`, `POS-Pricelist-${runId}`);
@@ -213,7 +228,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 1. PR #33: Set Stock / Adjust Stock modal opens with location picker when needed ── */
 
-  test('1. Adjust Stock from cart opens modal; session location hidden when set', async ({ page }) => {
+  test('1. Adjust Stock from cart opens modal; session location hidden when set', async ({
+    page,
+  }) => {
     await gotoPosReady(page);
     await pickAndAddFirstProduct(page);
 
@@ -237,7 +254,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 2. PR #34: Loading placeholders — SKIP (cannot deterministically catch in E2E) ── */
 
-  test.skip('2. Loading placeholders in UOM / RtPrice / StockQty cells while fetching', async ({ page }) => {
+  test.skip('2. Loading placeholders in UOM / RtPrice / StockQty cells while fetching', async ({
+    page,
+  }) => {
     // The loader states are fleeting (sub-second) and race with React Query cache.
     // Final rendered values are asserted in test 3 (SetPrice) and test 11 (cart add).
     // This test is documented as an honest skip per C12.
@@ -262,7 +281,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     // Select Pack UOM (factor 10) → display should show 1000 (100 × 10)
     const uomSelect = page.getByTestId('pos-entry-uom');
     await uomSelect.click();
-    const packOption = page.getByRole('option', { name: `Pack-e2e-${runId}`, exact: false }).first();
+    const packOption = page
+      .getByRole('option', { name: `Pack-e2e-${runId}`, exact: false })
+      .first();
     await expect(packOption).toBeVisible({ timeout: waits.visible });
     await packOption.click();
 
@@ -292,7 +313,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
     // Switch back to Unit UOM → display should show 150
     await uomSelect.click();
-    const unitOption = page.getByRole('option', { name: `Unit-e2e-${runId}`, exact: false }).first();
+    const unitOption = page
+      .getByRole('option', { name: `Unit-e2e-${runId}`, exact: false })
+      .first();
     await expect(unitOption).toBeVisible({ timeout: waits.visible });
     await unitOption.click();
 
@@ -319,7 +342,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 5. PR #37: QuickAdd UOM single-result + auto-default ── */
 
-  test('5. Quick Add UOM: single-result select works; UOM auto-defaults to a factor=1 unit', async ({ page }) => {
+  test('5. Quick Add UOM: single-result select works; UOM auto-defaults to a factor=1 unit', async ({
+    page,
+  }) => {
     await gotoPosReady(page);
 
     // Click Quick+ button
@@ -335,7 +360,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     const catInput = page.getByTestId('quick-add-product-category');
     await catInput.click();
     await catInput.fill(`POS-Category-${runId}`);
-    const catOption = page.getByRole('option', { name: `POS-Category-${runId}`, exact: false }).first();
+    const catOption = page
+      .getByRole('option', { name: `POS-Category-${runId}`, exact: false })
+      .first();
     await expect(catOption).toBeVisible({ timeout: waits.visible });
     await catOption.click();
 
@@ -360,7 +387,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
     // Verify the item was created and appears in the picker
     await page.getByTestId('pos-product-select').click();
-    const newOption = page.getByRole('option', { name: `QuickItem-${runId}`, exact: false }).first();
+    const newOption = page
+      .getByRole('option', { name: `QuickItem-${runId}`, exact: false })
+      .first();
     await expect(newOption).toBeVisible({ timeout: waits.pos.productSelect });
     await newOption.click();
 
@@ -411,12 +440,14 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 8. ui#43 / PR #42: Quick Add sends all three UOMs + item sellable ── */
 
-  test('8. Quick Add payload includes baseUomId + purchaseUomId + saleUomId; created item sellable at POS', async ({ page }) => {
+  test('8. Quick Add payload includes baseUomId + purchaseUomId + saleUomId; created item sellable at POS', async ({
+    page,
+  }) => {
     await gotoPosReady(page);
 
     // Intercept the create item POST
-    const createItemPromise = page.waitForRequest((req) =>
-      req.url().includes('/api/items') && req.method() === 'POST'
+    const createItemPromise = page.waitForRequest(
+      (req) => req.url().includes('/api/items') && req.method() === 'POST'
     );
 
     await page.getByTestId('pos-quick-add-product').click();
@@ -428,7 +459,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     const catInput = page.getByTestId('quick-add-product-category');
     await catInput.click();
     await catInput.fill(`POS-Category-${runId}`);
-    const catOption = page.getByRole('option', { name: `POS-Category-${runId}`, exact: false }).first();
+    const catOption = page
+      .getByRole('option', { name: `POS-Category-${runId}`, exact: false })
+      .first();
     await expect(catOption).toBeVisible({ timeout: waits.visible });
     await catOption.click();
 
@@ -452,7 +485,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
     // Now the item should appear in the picker
     await page.getByTestId('pos-product-select').click();
-    const newOption = page.getByRole('option', { name: `QuickFull-${runId}`, exact: false }).first();
+    const newOption = page
+      .getByRole('option', { name: `QuickFull-${runId}`, exact: false })
+      .first();
     await expect(newOption).toBeVisible({ timeout: waits.pos.productSelect });
     await newOption.click();
 
@@ -462,7 +497,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 9. ui#63 (restored): Offline new-customer walk-in regression ── */
 
-  test('9. offline sale with a NEW customer continues as walk-in and queues the sale', async ({ page }) => {
+  test('9. offline sale with a NEW customer continues as walk-in and queues the sale', async ({
+    page,
+  }) => {
     await gotoPosReady(page);
 
     // Add our seeded item (which has a price) to the cart
@@ -536,7 +573,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
   /* ── 10. ui#63: Business error (4xx) still blocks sale, no offline prompt ── */
 
-  test('10. customer business error still blocks the sale (no offline prompt)', async ({ page }) => {
+  test('10. customer business error still blocks the sale (no offline prompt)', async ({
+    page,
+  }) => {
     await gotoPosReady(page);
     await pickAndAddFirstProduct(page);
 
@@ -632,7 +671,9 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
 
     await expect(page.getByTestId('pos-payment-method')).toBeVisible({ timeout: waits.visible });
     await expect(page.getByTestId('pos-complete-sale-btn')).toBeVisible({ timeout: waits.visible });
-    await expect(page.getByTestId('pos-cancel-payment-btn')).toBeVisible({ timeout: waits.visible });
+    await expect(page.getByTestId('pos-cancel-payment-btn')).toBeVisible({
+      timeout: waits.visible,
+    });
 
     await page.getByTestId('pos-cancel-payment-btn').click();
   });
@@ -685,39 +726,53 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     // Clean up seeded data via API
     if (!accessToken) return;
     if (priceListId) {
-      await request.delete(`http://localhost:8080/api/price-lists/${priceListId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/price-lists/${priceListId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (itemId) {
-      await request.delete(`http://localhost:8080/api/items/${itemId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/items/${itemId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (stockLocationId) {
-      await request.delete(`http://localhost:8080/api/stock-locations/${stockLocationId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/stock-locations/${stockLocationId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (categoryId) {
-      await request.delete(`http://localhost:8080/api/categories/${categoryId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/categories/${categoryId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (packUomId) {
-      await request.delete(`http://localhost:8080/api/uoms/${packUomId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/uoms/${packUomId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (unitUomId) {
-      await request.delete(`http://localhost:8080/api/uoms/${unitUomId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/uoms/${unitUomId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
     if (uomCategoryId) {
-      await request.delete(`http://localhost:8080/api/uom-categories/${uomCategoryId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }).catch(() => {});
+      await request
+        .delete(`http://localhost:8080/api/uom-categories/${uomCategoryId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .catch(() => {});
     }
   });
 });

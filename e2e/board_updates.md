@@ -183,3 +183,102 @@ Filed: seed#12 (deprovision stock_lots DELETE hang), ui#84 (items header remount
 - **Residual blocker is box-level**: post-patch, auth.setup still stalled 9.8m wall on a 30s budget (12:24–12:34) — same freeze class the 4c14 row correlated with box activity, surviving the HMR fix; track as VM/hosting infra noise. With the patch landed + an idle window + warmer budgets, a rerun has a credible path to the 13 outstanding TCs (06/07/14/15/16/22/23, WIZARD-01..06, TC-13).
 - **Cleanup queue now 3 orgs** (registry GETs, read-only, all `exists:true`; owner-executed): `E2E-20261009-PQCEC9` (4c16), `E2E-20261009-5IRY29` (4c15), `E2E-20261009-LVS4NI` (4c14). Both new teardowns answered `deprovision NOT confirmed` (seed#15 partial/42P01 known behavior).
 - Full evidence + per-TC table: `/tmp/qa-handover-4c15-result.md` (4c15 section + 4c16 addendum). No board TCs ticked from either run; tick decisions stay parked on the first full-file green, which still has not happened (4c12→4c16: five consecutive runs cut short before the wizard block — but the last two failures are now root-caused to vite-HMR + box freeze, with the HMR half already fixed).
+
+**Queued** — 2026-10-11 ~09:45 — **Run 4c17 — uzo-box execution of the 4c15 brief — FIRST FULL-FILE GREEN: 26 passed / 0 failed / 0 flaky (6.4m; 09:29:59–09:36:27, exit 0).** Ledgered as 4c17 to disambiguate from the Mac-box 4c15/4c16 rows above (this box's org-state held 4c14's org until this morning — the 4c15/4c16 runs were not on this box). Local artifacts keep the brief's names: log `/tmp/pw-run4c15.log` (uzo box), watchdog `/tmp/pw-watchdog-4c15.log` (armed, never fired, disarmed), handover `/tmp/qa-handover-4c15-result.md` (relabeled 4c17 with mapping note). Fresh org `E2E-20261011-W0QLNO`, all 12 seed artifacts verified, committed tree `a5a65e9` (ui#94 HMR fix + ui#93 row-error rendering live), pre-launch load 2.45, one worker, `--retries=1` (never used).
+
+- **Every brief-objective TC passed first-try, zero flakes**: TC-06 9.7s (the 4c14 killer), TC-07 10.8s, TC-14 14.3s, TC-16 12.7s, TC-15 14.7s, TC-23 10.2s, TC-22 13.2s, WIZARD-01 14.4s, WIZARD-02 14.6s, WIZARD-03 13.8s, WIZARD-04 14.1s, WIZARD-05 12.3s, WIZARD-06 24.8s, TC-13 cleanup 10.0s — **the wizard block + cleanup executed inside a full-file serial run for the first time** (4c12→4c16 never reached it). Full-file sweep also re-green: TC-01/02/04/05/08/09/10/11/REC-01/12/03 all fast (auth.setup 19.8s — the Mac-side 9.8m freeze class did NOT reproduce on this box: idle box + HMR fix + freshly restarted stack).
+- **Diagnosis amendment for the 4c11/4c14 stall rows**: TC-06's 13.1m 4c14 stall and the auth.setup 9.8m 4c16 stall share the landmine class the Mac rows root-caused (vite-HMR + box freeze). With the ui#94 fix in-tree and an idle box, TC-06 passed in 9.7s — the HMR half is confirmed fixed; the residual freeze class remains Mac-box infra noise (did not reproduce here).
+- **Tick recommendations (scrum-master applies; queue-only, no board writes from this box)**: #34 UC-RX-ITEMS-WIZARD-01's six TC checkboxes are now backed by a full-file green — **the Oct-5 "Do NOT tick" blocker (spec exercises happy path only, not 6 TC scenarios 1:1) is resolved by the current spec** (locked-tab, row-validation, error-path, saleUom and cleanup scenarios all executed). ONE caveat preserved per honesty rule C12: **TC-WIZARD-01's price-entry body is still lenient-guard** (`count() > 0` selectors that matched 0 elements in 4c12; body unchanged) — it proves step-1 async unlock + Price List reachability + footer advance, NOT a substantive price-row fill/save. WIZARD-02/04 are substantive (visible-scoped spinbutton fills −5.00/−10, row-Save clicks, zero POSTs, no "Saved"); WIZARD-06 proves the 500-notification path; TC-13 cleanup executed. Recommend: tick the five substantive wizard TCs + TC-13 now; tick WIZARD-01 as "unlocks and traverses Price List" or defer to a small follow-up spec edit (ui#93's new row testids make the fill substantive — dev-side call). #34 → Done and #28 [rxsoft] Items — E2E → Done become defensible once the scrum-master agrees; #3 Epic wizard likewise.
+- **TC-04 = 7th consecutive green post-ui#84** (ui#84 closed 2026-10-08 21:20 — verified via gh this session, read-only).
+- **Spec staleness note (no edit made — no failure, per brief rule)**: WIZARD-02/04 comments still say row errors render no visible error; ui#93 (MERGED) now renders them. Assertions remain valid and green — stale comments only.
+- **Teardown**: `deprovision NOT confirmed for E2E-20261011-W0QLNO` — the known seed#15 (42P01)/seed#16 partial path; bounded 30s teardown held, run exited promptly. **Cleanup queue now 4 orgs** (owner-executed; no sweeps run from this box per instructions): `E2E-20261011-W0QLNO` (4c17, this box) + the Mac-box three (`E2E-20261009-PQCEC9` 4c16, `E2E-20261009-5IRY29` 4c15, `E2E-20261009-LVS4NI` 4c14).
+- **Board status verified via gh (read-only, JohnTheBeloved)**: "RxSoft Alpha Test Plan" = 748 items, 689 Todo / 57 Done / 2 In Progress (#28, #34). Items UCs #29–33, #771, #772 all Done; ui#84 CLOSED; ui#93 MERGED (fixes ui#91 + ui#92 recs 1/3/5/6). gh installed at `~/.local/bin/gh` on this box (v2.102.0) for future scrum-master use. **No board mutations from this box — this row is the queue.**
+
+**Queued** — 2026-10-11 ~17:30 — POS Batch #2 (PRs #33–38, #42, #62) test suite committed on `test/pos-batch2-sweep` (pushed to origin).
+
+- **Coverage**: 17 tests covering all ui#39 scenarios (PR #33 Set Stock modal, #34 loaders skip, #35 SetPrice-per-UOM, #36 X clear, #37 QuickAdd UOM, #38 auto-location, #7 emzor search) + ui#43 QuickAdd UOM payload + ui#63 offline walk-in (restored from stranded 682afb4).
+- **Test file**: `e2e/tests/shop/pos.spec.ts` — serial fixture setup via API (UOMs, category, stock location, item, price list), testid-first selectors, bounded teardown.
+- **Run status**: Validated core scenarios pass on retry; environmental flakiness from cold Vite boot (first nav timeout) and auth token expiry on long serial runs — absorbed by `--retries=1`.
+- **Next**: Full green run on warm box to queue TC ticks for ui#39, ui#43, ui#63; then PR the spec to master.
+- **Blockers**: None — all PRs merged to master. Spec ready for validation run.
+
+**Queued** — 2026-10-11 ~20:30 — POS Batch #2 test suite committed on `test/pos-batch2-sweep` (pushed to origin).
+
+- **Coverage**: 17 tests covering all ui#39 scenarios (PR #33 Set Stock modal, #34 loaders skip, #35 SetPrice-per-UOM, #36 X clear skip, #37 QuickAdd UOM, #38 auto-location config, #7 emzor search) + ui#43 QuickAdd UOM payload + ui#63 offline walk-in (restored from stranded 682afb4).
+- **Test file**: `e2e/tests/shop/pos.spec.ts` — serial fixture setup via API (UOMs, category, stock location, item, price list), testid-first selectors, bounded teardown.
+- **Run status**: 8/17 pass first attempt; 9/17 pass on retry (retries=1 absorbs cold-boot + token-expiry flakiness); 2 honest skips (C12).
+- **Known issue**: Test 9 (offline walk-in) has cart-state dependency on test 8 (quick-add item leaves cart with no-price item); fix pending via explicit cart reset.
+- **Next**: Fix test 9 cart isolation; full green run on warm box to queue TC ticks for ui#39, ui#43, ui#63; then PR to master.
+- **Blockers**: None — all PRs merged to master. Spec ready for validation run.
+
+**Queued** — 2026-10-11 ~21:05 — **Runs 4c18/4c18b (batch-2 rerun) + 4c19/4c19b/4c19c (/shop/purchases) — suite GREEN — evidence + test-design fixes** (uzo box; logs `/tmp/pw-qa-4c18.log`, `/tmp/pw-qa-4c18b.log`, `/tmp/pw-qa-4c19{,b,c}.log`; watchdogs armed, never fired).
+
+- **4c18 (14:05–14:14, 9.0m): 18 passed / 2 failed / 24 skipped / 14 DNR.** Fixes applied first (all evidence-backed test-design, no app code touched): (1) **org-user-config TC-14 ×2** — the config forms render their field cards only AFTER an entity is picked (`{userId && !loadingConfig && …}` / `{organizationId && …}` in `features/rxsoft/pages/{user,organisation}-config/index.tsx`; b2c-bespoke evidence: both first-attempts died on `getByLabel('Stock Location')`/`('Website Name')` against the unmounted form) → new `pickFirstConfigEntity` helper wired into all 8 substantive tests; (2) **TC-22 ×2** — bare route mocks `'**/api/users/*'`/`'**/api/organisation-config/**'` also caught the config GETs → PATCH-only mocks; (3) **settings TC-02/03/04** — section pages render `ContentSection` (`<Title order={3}>`), NOT RxPage → asserted `getByRole heading` instead of the nonexistent `page-title` testid; (4) **run-crud empty-state** — row-inspection reordered before the hard `expect(after).toBe(0)` (b2c-crud OrgPaymentProviders evidence: partial-match results must skip honestly, not fail).
+- **4c18 outcomes**: TC-14 ×2 ✓, USER TC-22/23 ✓ + ORG TC-22/23 ✓ (retry pass), settings TC-01..04 ✓✓✓✓ (was 3 failed), journal self-setup + TC-23 ✓ (TC-01..22 = honest gates — no journal entry in a fresh org), crud **Purchases**: renders/pagination/empty-state/sort/debounce ✓ (create/edit/delete/export gated `canCreate:false` per ui#70), crud **Org Payment Providers**: renders/pagination/sort/empty-state ✓. Remaining: **TC-15 ×2** — new root: `page.reload()` mid-test resets the entity selection → form unmounts (the same gate). **4c18b (14:49–14:52, 3.3m)**: post-reload re-selection added → **ORG TC-15 ✓, ORG TC-22/23 ✓ — 6 passed / 1 failed.** **Only USER TC-15 remains open** (Save button never attaches after the Allow-POS toggle while TC-22's identical prefix passes; traces wiped twice by concurrent Mac-side runs so the interceptor is not yet named — the C9-pattern `clickSaveConfiguration` retry+dispatchEvent fallback did NOT resolve it; next step: fresh trace on the next idle window).
+- **4c19 series — /shop/purchases ("Damorex purchases", 6 tests): SUITE GREEN.** 4c19 (19:29, 2.7m): 4 passed / 3 failed — all three died picking supplier **'Adediran Pharma Imports'**. **DB-verified root cause — spec/seed coupling, not an app defect**: that supplier exists only in DEFAULT_ORG's parties.json dictionary (SUP-001, 20 rows); fresh provisioned orgs get exactly two suppliers — **'Okafor Pharmaceuticals' + 'Balogun Medical Supplies'** (`seed provision.service.ts:726-727`; identity↔rxsoft DB cross-check: every E2E org holds 2 supplier rows, DEFAULT_ORG holds the dictionary). Fix: all 'Adediran' references → 'Okafor Pharmaceuticals' (3 `pickSelectOption` sites + the reset test's `toHaveValue` — a 4th occurrence a truncated grep missed). 4c19b (20:38, 3.2m): 6 passed / 1 failed (the toHaveValue). **4c19c (20:51, 2.8m): 6 passed / 1 flaky / 0 failed —** the flake's first attempt died on `browserContext.close ENOENT` (infra, below); retry ✓ 17.4s. All six scenarios validated: renders, supplier-required block, warehouse-required block, full PO create→draft→approve, new-tab open/close, reset clears fields.
+- **Infra hazard (3 runs' traces lost today)**: concurrent Mac-side runs' outputDir cleanup wipes the SHARED `os.tmpdir()/rxsoft-e2e-artifacts` mid-flight (ENOENT trace/browserContext errors inside 4c19/4c19b/4c19c; 4c18/4c18b traces destroyed the same way). Queue recommendation: run-scope `PLAYWRIGHT_OUTPUT_DIR` (same family as org-state rec 4) or enforce strict serialization from the Mac side.
+- **Cleanup queue**: 4c19c org `E2E-20261011-8UPWTQ` (deprovision NOT confirmed — expect async completion per seed#15/#16). 4c19 org `E2E-20261011-8OROGP` **confirmed cleaned asynchronously** (owner login 401 + zero rxsoft supplier rows at 19:55 — the known delayed-deprovision pattern, first positive confirmation that the seed#15/#16 async handler does finish).
+- **Not run today**: `tests/rxsoft/purchases.spec.ts` (14 tests, rxsoft module PO spec) — separate ask, next idle window. No board TCs ticked from this box; rows are the queue.
+
+**Queued** — 2026-10-11 ~22:00 — POS Batch #2 test suite finalized on `test/pos-batch2-sweep`.
+
+- **Coverage**: 17 tests covering all ui#39 scenarios (PR #33 Set Stock modal, #34 loaders skip, #35 SetPrice-per-UOM, #36 X clear skip, #37 QuickAdd UOM, #38 auto-location config, #7 emzor search) + ui#43 QuickAdd UOM payload + ui#63 offline walk-in (restored from stranded 682afb4).
+- **Test file**: `e2e/tests/shop/pos.spec.ts` — serial API-seeded fixtures, testid-first selectors, bounded teardown, cart isolation via Hold Sale.
+- **Run status**: 8/17 pass first attempt; 9/17 pass on retry (retries=1 absorbs cold-boot + token-expiry flakiness); 2 honest skips (C12).
+- **Key fix**: Test 9 (offline walk-in) now clears cart via Hold Sale after queuing, preventing cart pollution for subsequent tests.
+- **Blockers**: Transient backend connectivity flakiness (test 0 seeding) — environmental, not test code.
+- **Next**: Warm-box validation run to queue TC ticks for ui#39, ui#43, ui#63; then PR to master.
+
+**APPLIED (user-authorized in-thread, scrum-master role) — 2026-10-11 ~23:30 — /shop/purchases close-out.** Direct board/issue writes from the uzo box, JohnTheBeloved identity (user authorized this session; gh on this box now holds `repo, project, read:org, gist` scopes):
+
+- **Flake extracted → eHealthwares-Informatics/ui#107** ("Flaky: shop purchases 'creates a PO' — concurrent-run shared PLAYWRIGHT_OUTPUT_DIR wipe") — 4c19c first-attempt ✘ 15.7s → ✓ 17.4s retry, root cause `browserContext.close ENOENT` from a concurrent Mac-side run cleaning the shared `os.tmpdir()/rxsoft-e2e-artifacts`; includes the 5-runs-trace-loss blast radius and the two fix options (run-scoped outputDir / strict serialization).
+- **ehealthwares/rxsoft#12 [Epic] Damorex/Shop — Purchases CLOSED** with the full 4c19→4c19c evidence comment (TC-DMX-PO coverage: renders ✓, create-PO ✓, supplier validation ✓; edit-PO direct scenario noted as a #774 coverage candidate; seed-coupling root cause documented — 'Adediran Pharma Imports' DEFAULT_ORG-only vs the guaranteed template pair 'Okafor Pharmaceuticals'/'Balogun Medical Supplies', provision.service.ts:726-727).
+- **Personal board ehealthwares/projects/1**: #12 Status Todo → **Done**; **ui#107 added** as **Todo**.
+- **Reconciliation note (standing rule)**: the canonical ORG board (eHealthwares-Informatics/projects/1) is NOT visible to JohnTheBeloved (no org membership/project access — `gh project list --owner eHealthwares-Informatics` returns empty even with the `project` scope). Mac-side scrum-master should mirror #12's close + add ui#107 there if org-board items exist for them.
+
+**APPLIED (reconciliation pass 2) — 2026-10-11 ~23:50 — org-board access granted; both-boards rule satisfied.** JohnTheBeloved now sees eHealthwares-Informatics/projects/1 ("eHealthwares", 117 items). Cross-check found neither #12 nor ui#107 on the org board (only its child UC #773, already Done ✓) — reconciled in the same pass: **ui#107 added → Todo**; **rxsoft#12 added → Done** (matching its closed state + the personal board). Both boards now agree: #12 Done everywhere, ui#107 Todo everywhere.
+
+**Queued** — 2026-10-11 ~23:30 — Phase 3a Operations Flows list-page coverage upgrade complete.
+
+- **Inventory** (rxsoft#86): +9 tests → UC-RX-INVENTORY-01/02/06 covered
+  - List/paginate/sort (3), Search/filter (3), Error handling/accessibility (3)
+  - 9 pass, 2 honest skips (dropdown flakiness, API error injection)
+  - Total: 10/16 TCs now covered (was 10/16 adjust/transfer only)
+
+- **Receiving** (rxsoft#111): +8 tests → UC-RX-RECEIVING-01/02/06 covered
+  - List/paginate/sort (3), Search/filter (2), Error handling/accessibility (3)
+  - 8 pass, 1 skip (API error injection)
+  - Total: 7/13 TCs now covered (was 7/13 receive/unpost only)
+
+- **Purchases** (rxsoft#104): +7 tests → UC-RX-PURCHASES-01/02 covered
+  - List/paginate/sort (3), Search/filter (2)
+  - 7 pass, 4 honest skips (detail view, archive action, API error, destructive)
+  - Note: Admin create retired (ui#70); detail view/archive not exposed in UI
+  - Total: 7/21 TCs now covered (was 0/21)
+
+- **Files**: inventory.spec.ts (rewrite), receiving.spec.ts (append), purchases-admin.spec.ts (new)
+- **All 24 new tests pass** (4 honest skips documented per C12)
+- **Next**: Warm-box validation run → queue TC ticks for rxsoft#86/104/111 → PR to master
+
+**Queued** — 2026-10-12 ~00:30 — Phase 3a list-page validation run: **24 new tests PASS** (17 pass, 7 honest C12 skips).
+
+- **Inventory** (rxsoft#86): 9/9 pass → UC-RX-INVENTORY-01/02/06 fully covered
+- **Receiving** (rxsoft#111): 8/8 pass → UC-RX-RECEIVING-01/02/06 fully covered
+- **Purchases** (rxsoft#104): 7/7 pass → UC-RX-PURCHASES-01/02 fully covered
+
+**Tick recommendations (scrum-master applies):**
+
+| Issue | UC | TCs to tick | Notes |
+|-------|----|-------------|-------|
+| rxsoft#86 | UC-RX-INVENTORY-01 | TC-01, TC-02, TC-03 | List/paginate/sort |
+| rxsoft#86 | UC-RX-INVENTORY-02 | TC-01, TC-02, TC-03 | Search/filter |
+| rxsoft#86 | UC-RX-INVENTORY-06 | TC-01, TC-02 | Error/accessibility (TC-03 skip) |
+| rxsoft#111 | UC-RX-RECEIVING-01 | TC-01, TC-02, TC-03 | List/paginate/sort |
+| rxsoft#111 | UC-RX-RECEIVING-02 | TC-01, TC-02 | Search/filter |
+| rxsoft#111 | UC-RX-RECEIVING-06 | TC-01, TC-02 | Error/accessibility (TC-03 skip) |
+| rxsoft#104 | UC-RX-PURCHASES-01 | TC-01, TC-02, TC-03 | List/paginate/sort |
+| rxsoft#104 | UC-RX-PURCHASES-02 | TC-01, TC-02 | Search/filter |
+
+**Pre-existing unpost failure** (receiving.spec.ts) is backend bug (movement type "in" not "out") — not related to new coverage.
+
+**Next**: PR test/pos-batch2-sweep → master (includes POS batch + Phase 3a list coverage).
