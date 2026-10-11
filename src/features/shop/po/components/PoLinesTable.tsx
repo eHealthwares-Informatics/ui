@@ -13,12 +13,14 @@ import {
   Tooltip,
   useCombobox,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronDown, DollarSign, Save, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { convertPriceBetweenUoms } from '@/lib/uom-utils';
-import { useItems, useItemUoms } from '../api/poApi';
+import { useAddItemToOrganisation, useItems, useItemUoms } from '../api/poApi';
 import { PoLineItem, PurchaseOrderStatus } from '../types';
 
 interface Props {
@@ -145,12 +147,14 @@ function ItemSearchSelect({
   excludeIds,
   onSelect,
   w = 350,
+  'data-testid': dataTestId,
 }: {
   value: string;
   selectedLabel?: string;
   excludeIds?: Set<string>;
   onSelect: (item: any) => void;
   w?: number;
+  'data-testid'?: string;
 }) {
   const combobox = useCombobox();
   const [search, setSearch] = useState('');
@@ -187,6 +191,7 @@ function ItemSearchSelect({
         <InputBase
           size="xs"
           placeholder="Select item"
+          data-testid={dataTestId}
           value={search || selected?.label || selectedLabel || ''}
           onChange={(e) => {
             setSearch(e.currentTarget.value);
@@ -302,6 +307,46 @@ export function PoLinesTable({
     newUomId: string;
   } | null>(null);
 
+  // Item picked on a line that is not yet added to the current organisation —
+  // parked until the user confirms adding it (or cancels) in the dialog below.
+  const [pendingItem, setPendingItem] = useState<{ lineId: string; item: any } | null>(null);
+  const addItemToOrg = useAddItemToOrganisation();
+
+  // The /items list (no includeAll) surfaces BOTH whitelisted items and
+  // "default"-visibility ones (no organisation_items row). Purchases only
+  // accept items the organisation explicitly added, so a default/blacklisted
+  // pick would 400 on save with "Item(s) not added to this organisation: …".
+  const itemNeedsOrgAdd = (item: any): boolean =>
+    item?.visibility === 'default' || item?.visibility === 'blacklisted';
+
+  const applyItemToLine = (lineId: string, item: any) => {
+    onUpdateLine(lineId, {
+      itemId: item.id,
+      itemCode: item.code,
+      itemName: item.name,
+      uomId: item.purchaseUom?.id || item.purchaseUomId || '',
+    });
+  };
+
+  const handleConfirmAddItemToOrg = async () => {
+    if (!pendingItem) {
+      return;
+    }
+    const { lineId, item } = pendingItem;
+    try {
+      await addItemToOrg.mutateAsync(item.id);
+      notifications.show({
+        message: `${item.name || item.code || 'Item'} added to your organisation`,
+        color: 'green',
+      });
+      applyItemToLine(lineId, item);
+      setPendingItem(null);
+    } catch {
+      // The global mutation onError surfaces the failure ("Server Error: …").
+      // Keep the dialog open so the user can retry or cancel.
+    }
+  };
+
   const { data: allUoms = [] } = useQuery({
     queryKey: ['uoms', 'all'],
     queryFn: async () => {
@@ -382,14 +427,13 @@ export function PoLinesTable({
                       selectedLabel={selectedItemLabel || undefined}
                       excludeIds={usedItemIds}
                       data-testid="po-line-item-select"
-                      onSelect={(item) =>
-                        onUpdateLine(line.id, {
-                          itemId: item.id,
-                          itemCode: item.code,
-                          itemName: item.name,
-                          uomId: item.purchaseUom?.id || item.purchaseUomId || '',
-                        })
-                      }
+                      onSelect={(item) => {
+                        if (itemNeedsOrgAdd(item)) {
+                          setPendingItem({ lineId: line.id, item });
+                        } else {
+                          applyItemToLine(line.id, item);
+                        }
+                      }}
                     />
                   ) : (
                     <Text size="xs">{line.itemName || line.itemCode || line.itemId}</Text>
@@ -547,6 +591,20 @@ export function PoLinesTable({
         uomMap={uomMap}
         oldUomId={pendingUom?.oldUomId ?? ''}
         newUomId={pendingUom?.newUomId ?? ''}
+      />
+
+      <ConfirmDialog
+        open={!!pendingItem}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingItem(null);
+          }
+        }}
+        title="Add item to your organisation?"
+        description={`"${pendingItem ? pendingItem.item.name || pendingItem.item.code || pendingItem.item.id : ''}" is not added to your organisation's catalogue. Purchase orders can only include items your organisation has added.`}
+        confirmText="Add & Continue"
+        onConfirm={handleConfirmAddItemToOrg}
+        isLoading={addItemToOrg.isPending}
       />
     </>
   );
