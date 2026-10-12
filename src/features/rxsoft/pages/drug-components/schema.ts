@@ -1,16 +1,21 @@
 import type { ModelConfig } from '../../../shared/model-schema';
-import type { Column, Field } from '../../types';
+import type { Column, FieldGroup } from '../../types';
 
-const columns: Column[] = [
+export const columns: Column[] = [
   { key: 'name', label: 'Name' },
   { key: 'updatedAt', label: 'Updated' },
 ];
 
-const createFields: Field[] = [{ name: 'name', label: 'Name', required: true }];
+export const createFieldGroups: FieldGroup[] = [
+  {
+    title: 'Drug Component',
+    fields: [{ name: 'name', label: 'Name', required: true }],
+  },
+];
 
-function buildCreatePayload(values: Record<string, unknown>) {
-  return { name: values.name };
-}
+export const buildPayload = (values: Record<string, unknown>) => ({
+  name: values.name,
+});
 
 export const drugComponentsConfig: ModelConfig = {
   id: 'drug-components',
@@ -18,8 +23,8 @@ export const drugComponentsConfig: ModelConfig = {
   description: 'Manage active ingredients and component lookup values.',
   endpoint: '/drug-components',
   columns,
-  createFields,
-  buildCreatePayload,
+  createFieldGroups,
+  buildCreatePayload: buildPayload,
   canExport: true,
   csvEndpoint: '/drug-components/export',
 };

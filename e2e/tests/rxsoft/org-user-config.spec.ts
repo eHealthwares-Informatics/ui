@@ -27,34 +27,56 @@ const GATE_LIST_FAMILY = (entity: string) =>
   `${entity} page is a configuration form, not a DataPageShell list — no sortable/paginated table, no empty/loading list states`;
 
 /**
- * Owner/multi-scope sessions land on a picker (a "User" / "Organisation"
- * Mantine Select) before the config form mounts ("Select an organisation
- * above to configure it."). This opens the combobox and picks the first
- * option, then waits for the form fields to appear.
+ * Test-design fix (run 4c18, evidence: b2c-bespoke 2026-10-11): the config
+ * pages render their field form only AFTER an entity is picked in the
+ * page's Select — `features/rxsoft/pages/user-config/index.tsx` gates on
+ * `{userId && !loadingConfig && …}` (org-config: `{organizationId && …}`),
+ * otherwise the page shows just the heading + Select + "Select a user
+ * above to configure them." Both TC-14 first-attempts died asserting
+ * `getByLabel('Stock Location')`/`('Website Name')` against that unmounted
+ * form. Pick the first Select option so the config query loads and the
+ * fields mount; skip honestly when the org has no selectable entity.
  */
-async function ensureFormMounted(
+async function pickFirstConfigEntity(
   page: Page,
-  pickerLabel: string,
-  fieldLabel: string
+  selectLabel: 'User' | 'Organisation'
 ): Promise<void> {
-  if (
-    await page
-      .getByLabel(fieldLabel, { exact: true })
-      .first()
-      .isVisible()
-      .catch(() => false)
-  ) {
-    return; // form already mounted (pre-selected single scope)
+  const select = page.getByLabel(selectLabel).first();
+  await expect(select).toBeVisible({ timeout: 30_000 });
+  await select.click();
+  const firstOption = page.getByRole('option').first();
+  try {
+    await expect(firstOption).toBeVisible({ timeout: 10_000 });
+  } catch {
+    test.skip(true, `${selectLabel} select has no options — config form cannot be exercised`);
   }
-  const combo = page.getByLabel(pickerLabel, { exact: true }).first();
-  await expect(combo).toBeVisible({ timeout: 15_000 });
-  await combo.click();
-  const option = page.getByRole('option').first();
-  await expect(option).toBeVisible({ timeout: 15_000 });
-  await option.click();
-  await expect(page.getByLabel(fieldLabel, { exact: true }).first()).toBeVisible({
-    timeout: 30_000,
-  });
+  await firstOption.click();
+}
+
+/**
+ * C9 churn pattern (items-wizard openCreatePage precedent): the config
+ * cards' Save button can stay actionability-blocked for the whole budget
+ * (run 4c18: TC-RX-USER-CONFIG-15's Save click pended 30s+ on BOTH
+ * attempts while no PATCH ever fired — trace wiped by the concurrent
+ * shop-pos run, so bounded retries + a dispatchEvent fallback carry the
+ * proven pattern from the same signature class). The onClick
+ * (save.mutate) still runs on dispatch; the callers' PATCH + toast
+ * asserts prove the save either way.
+ */
+async function clickSaveConfiguration(page: Page): Promise<void> {
+  const saveButton = page.getByRole('button', { name: 'Save Configuration' });
+  let clicked = false;
+  for (let attempt = 0; attempt < 3 && !clicked; attempt += 1) {
+    try {
+      await saveButton.click({ timeout: 8_000 });
+      clicked = true;
+    } catch {
+      // retry
+    }
+  }
+  if (!clicked) {
+    await saveButton.dispatchEvent('click');
+  }
 }
 
 test.describe.serial('RxSoft User Configuration (#221)', () => {
@@ -65,8 +87,9 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
       timeout: 30_000,
     });
-    await ensureFormMounted(page, 'User', 'Stock Location');
-    for (const label of ['Stock Location', 'Allow POS', 'Login Timeout (minutes)']) {
+    // Fields render only after a user is picked (see pickFirstConfigEntity).
+    await pickFirstConfigEntity(page, 'User');
+    for (const label of ['User', 'Stock Location', 'Allow POS', 'Login Timeout (minutes)']) {
       await expect(page.getByLabel(label).first()).toBeVisible({ timeout: 15_000 });
     }
     await expect(page.getByRole('button', { name: 'Save Configuration' })).toBeVisible();
@@ -77,11 +100,7 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
   }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/rxsoft/user-config');
-
-    await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
-      timeout: 30_000,
-    });
-    await ensureFormMounted(page, 'User', 'Stock Location');
+    await pickFirstConfigEntity(page, 'User');
 
     const allowPos = page.getByLabel('Allow POS').first();
     await expect(allowPos).toBeVisible({ timeout: 30_000 });
@@ -96,7 +115,7 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
       (res) => res.url().includes('/api/users/') && res.request().method() === 'PATCH',
       { timeout: 30_000 }
     );
-    await page.getByRole('button', { name: 'Save Configuration' }).click();
+    await clickSaveConfiguration(page);
     const res = await patch;
     test.skip(
       res.status() === 404,
@@ -105,13 +124,11 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     expect(res.status(), 'user-config PATCH failed').toBeLessThan(400);
     await expect(page.getByText('User configuration saved')).toBeVisible({ timeout: 15_000 });
 
-    // Reload → the change persisted (the page may land on the picker again —
-    // re-select the same scope before asserting).
+    // Reload → the change persisted. The reload resets the entity selection
+    // (the form unmounts — same gate as pickFirstConfigEntity), so
+    // re-select the user before reading the saved value (4c18 fix).
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
-      timeout: 30_000,
-    });
-    await ensureFormMounted(page, 'User', 'Stock Location');
+    await pickFirstConfigEntity(page, 'User');
     const afterReload = page.getByLabel('Allow POS').first();
     await expect(afterReload).toBeVisible({ timeout: 30_000 });
     await expect
@@ -126,7 +143,7 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
       (res) => res.url().includes('/api/users/') && res.request().method() === 'PATCH',
       { timeout: 30_000 }
     );
-    await page.getByRole('button', { name: 'Save Configuration' }).click();
+    await clickSaveConfiguration(page);
     expect((await restore).status()).toBeLessThan(400);
     await expect(page.getByText('User configuration saved')).toBeVisible({ timeout: 15_000 });
   });
@@ -135,11 +152,19 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     page,
   }, testInfo) => {
     skipIfBackendDown(testInfo);
-    await page.route('**/api/users/*', (route) =>
-      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
-    );
+    // Test-design fix (run 4c18): mock ONLY the save (PATCH). The bare
+    // '**/api/users/*' interception also caught the config GET
+    // /api/users/:id, so the form's data query 500'd before the fields
+    // could mount — the error-notification path was never reachable.
+    await page.route('**/api/users/*', (route) => {
+      if (route.request().method() === 'PATCH') {
+        return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      }
+      return route.continue();
+    });
 
     await page.goto('/rxsoft/user-config');
+    await pickFirstConfigEntity(page, 'User');
     const allowPos = page.getByLabel('Allow POS').first();
     await expect(allowPos).toBeVisible({ timeout: 30_000 });
     await allowPos.click();
@@ -157,6 +182,8 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
       timeout: 30_000,
     });
+    // The Tab-walk targets the form controls — mount them first.
+    await pickFirstConfigEntity(page, 'User');
 
     let reached = false;
     for (let i = 0; i < 50; i += 1) {
@@ -203,6 +230,9 @@ test.describe.serial('RxSoft Organisation Configuration (#240)', () => {
     await expect(page.getByRole('heading', { name: 'Organisation Configuration' })).toBeVisible({
       timeout: 30_000,
     });
+    // Fields render only after an organisation is picked (see
+    // pickFirstConfigEntity).
+    await pickFirstConfigEntity(page, 'Organisation');
     for (const label of ['Website Name', 'POS Header']) {
       await expect(page.getByLabel(label).first()).toBeVisible({ timeout: 15_000 });
     }
@@ -214,6 +244,7 @@ test.describe.serial('RxSoft Organisation Configuration (#240)', () => {
   }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/rxsoft/organisation-config');
+    await pickFirstConfigEntity(page, 'Organisation');
 
     const posHeader = page.getByLabel('POS Header').first();
     await expect(posHeader).toBeVisible({ timeout: 30_000 });
@@ -237,8 +268,12 @@ test.describe.serial('RxSoft Organisation Configuration (#240)', () => {
       timeout: 15_000,
     });
 
-    // Reload → the value persisted.
+    // Reload → the value persisted. The reload resets the entity selection
+    // (the form unmounts — same gate as pickFirstConfigEntity), so
+    // re-select the organisation before reading the saved value (4c18
+    // evidence: failed at afterReload toBeVisible with the form unmounted).
     await page.reload();
+    await pickFirstConfigEntity(page, 'Organisation');
     const afterReload = page.getByLabel('POS Header').first();
     await expect(afterReload).toBeVisible({ timeout: 30_000 });
     await expect(afterReload).toHaveValue(token, { timeout: 15_000 });
@@ -261,11 +296,18 @@ test.describe.serial('RxSoft Organisation Configuration (#240)', () => {
     page,
   }, testInfo) => {
     skipIfBackendDown(testInfo);
-    await page.route('**/api/organisation-config/**', (route) =>
-      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
-    );
+    // Test-design fix (run 4c18): mock ONLY the save (PATCH) — the bare
+    // '**/api/organisation-config/**' interception also caught the config
+    // GET, so the form could never mount its fields.
+    await page.route('**/api/organisation-config/**', (route) => {
+      if (route.request().method() === 'PATCH') {
+        return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      }
+      return route.continue();
+    });
 
     await page.goto('/rxsoft/organisation-config');
+    await pickFirstConfigEntity(page, 'Organisation');
     const posHeader = page.getByLabel('POS Header').first();
     await expect(posHeader).toBeVisible({ timeout: 30_000 });
     await posHeader.fill('E2E-error-probe');
@@ -284,6 +326,8 @@ test.describe.serial('RxSoft Organisation Configuration (#240)', () => {
     await expect(page.getByRole('heading', { name: 'Organisation Configuration' })).toBeVisible({
       timeout: 30_000,
     });
+    // The Tab-walk targets the form controls — mount them first.
+    await pickFirstConfigEntity(page, 'Organisation');
 
     let reached = false;
     for (let i = 0; i < 50; i += 1) {

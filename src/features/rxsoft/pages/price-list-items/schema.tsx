@@ -88,11 +88,9 @@ export const fieldGroups: FieldGroup[] = [
 export const buildFormState = (row: Record<string, any>) => {
   const formState = { ...row };
   for (const key in row) {
-    // check for fields like categoryId, baseUomId, etc.
     if (key.endsWith('Id')) {
       const fieldName = key.replace('Id', '');
       const relation = row[fieldName];
-      // if related object exists
       if (relation?.id && relation?.name) {
         formState[fieldName] = {
           label: relation.name,
@@ -101,7 +99,6 @@ export const buildFormState = (row: Record<string, any>) => {
       }
     }
   }
-
   return formState;
 };
 

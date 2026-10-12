@@ -145,7 +145,22 @@
 <script>
 (function(){
   var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+  /* Full startup checks UI only for authenticated sessions (tokens present):
+     dashboards, modules, "/" redirect flow. Unauthenticated links — public
+     storefront /shop, sign-in, marketing, error pages — get the simple loader. */
+  var hasToken = false;
+  try { hasToken = !!(localStorage.getItem('access_token')||localStorage.getItem('refresh_token')); } catch(e){}
+  var simpleMode = !hasToken;
   var $=function(id){return document.getElementById(id)};
+  function initSimpleMode(){
+    if(!simpleMode){return;}
+    var card=document.querySelector('#rxsoft-loader .card');
+    var h1=document.querySelector('#rxsoft-loader h1');
+    var blocks=document.querySelectorAll('#rxsoft-loader .checks, #rxsoft-loader .modules');
+    if(h1){h1.textContent='Loading…';}
+    if(blocks){blocks.forEach(function(b){b.style.display='none';});}
+    /* progress + footer still animate briefly then loader fades via existing fail-safes */
+  }
   var setText=function(id,txt){var e=$(id);if(e)e.textContent=txt;};
 
   function setBar(n){var b=$('bar');if(b)b.style.width=n+'%';}
@@ -362,7 +377,12 @@
   /* ============ MAIN STARTUP ============ */
   var START_TS=Date.now();
   async function startup(){
-    var work=(async function(){
+    var work;
+    if(simpleMode){
+      initSimpleMode();
+      work=(async function(){ await waitForReact(); })();
+    }else{
+    var work2=(async function(){
       try{
         activateStep(0);
         await checkNetwork();
@@ -390,6 +410,8 @@
       setBar(100);
     })();
 
+      work=work2;
+    }
     /* Hard cap: loader never outlives 6s; enforce ~1.2s minimum on screen */
     await Promise.race([work,sleep(6000)]);
     var elapsed=Date.now()-START_TS;

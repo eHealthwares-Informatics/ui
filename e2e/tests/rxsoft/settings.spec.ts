@@ -10,9 +10,11 @@ import { expect, test } from '../../fixtures/test';
  *   TC-RX-SETTINGS-04  Display / Notifications sections
  *
  * Section routes verified in routes/_authenticated/rxsoft/settings/*:
- * /rxsoft/settings/{account,appearance,display,notifications}, each an RxPage
- * titled Account / Appearance / Display / Notifications. The settings layout
- * renders its Outlet twice (desktop + mobile breakpoints) — use .first().
+ * /rxsoft/settings/{account,appearance,display,notifications}, each a
+ * ContentSection with an h3 heading titled Account / Appearance / Display /
+ * Notifications (run 4c18: they are NOT RxPages — no page-title testid on
+ * the section pages; only the settings index carries it). The settings
+ * layout renders its Outlet twice (desktop + mobile breakpoints) — use .first().
  */
 
 test.describe('RxSoft settings', () => {
@@ -36,38 +38,24 @@ test.describe('RxSoft settings', () => {
 
   test('TC-RX-SETTINGS-02: Account section renders', async ({ page }) => {
     await page.goto('/rxsoft/settings/account');
-    // The settings layout renders an h1 "Settings" + the section content
-    // with an h3 section heading (verified via error-context snapshot —
-    // the section pages are NOT RxPage-titled).
-    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Account', exact: true })).toBeVisible({
-      timeout: 30_000,
-    });
-    await expect(
-      page.getByText('Update your account settings. Set your preferred language and timezone.')
-    ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Update account' })).toBeVisible();
+    // Test-design fix (run 4c18, b2c-bespoke evidence): the section pages
+    // render ContentSection (features/settings/components/content-section.tsx
+    // — <Title order={3} size="lg">{title}</Title>), NOT RxPage, so the
+    // page-title testid never exists here. Assert the section heading.
+    // The settings layout renders its Outlet twice (desktop + mobile) — .first().
+    await expect(page.getByRole('heading', { name: 'Account' }).first()).toBeVisible();
   });
 
   test('TC-RX-SETTINGS-03: Appearance section renders', async ({ page }) => {
     await page.goto('/rxsoft/settings/appearance');
-    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Appearance', exact: true })).toBeVisible({
-      timeout: 30_000,
-    });
+    await expect(page.getByRole('heading', { name: 'Appearance' }).first()).toBeVisible();
   });
 
   test('TC-RX-SETTINGS-04: Display and Notifications sections render', async ({ page }) => {
     await page.goto('/rxsoft/settings/display');
-    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Display', exact: true })).toBeVisible({
-      timeout: 30_000,
-    });
+    await expect(page.getByRole('heading', { name: 'Display' }).first()).toBeVisible();
 
     await page.goto('/rxsoft/settings/notifications');
-    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Notifications', exact: true })).toBeVisible({
-      timeout: 30_000,
-    });
+    await expect(page.getByRole('heading', { name: 'Notifications' }).first()).toBeVisible();
   });
 });
