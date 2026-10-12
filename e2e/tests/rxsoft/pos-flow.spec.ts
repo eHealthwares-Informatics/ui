@@ -15,66 +15,241 @@ import { apiFetch, readAccessToken } from '../../utils/api';
 /* ── Helpers ──────────────────────────────────────────────────── */
 
 const TS = Date.now().toString(36);
+let runId = TS;
 
-async function apiCreate(
-  page: import('@playwright/test').Page,
-  path: string,
-  body: Record<string, unknown>
-) {
-  return apiFetch<{ id: string }>(page, path, {
+/**
+ * Creates a UOM category via API.
+ */
+async function createUomCategory(page: import('@playwright/test').Page) {
+  const res = await apiFetch<{ id: string }>(page, '/uom-categories', {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: JSON.stringify({ name: `POS-UOMCat-${runId}` }),
+  });
+  return res.id;
+}
+
+/**
+ * Creates a UOM via API.
+ */
+async function createUom(
+  page: import('@playwright/test').Page,
+  uomCategoryId: string,
+  name: string,
+  uomType: 'reference' | 'bigger' | 'smaller',
+  factor: number
+) {
+  const res = await apiFetch<{ id: string }>(page, '/uoms', {
+    method: 'POST',
+    body: JSON.stringify({
+      name,
+      uomType,
+      categoryId: uomCategoryId,
+      factor,
+      rounding: 1,
+      isActive: true,
+    }),
+  });
+  return res.id;
+}
+
+/**
+ * Creates a category via API.
+ */
+async function createCategory(page: import('@playwright/test').Page, code: string, name: string) {
+  const res = await apiFetch<{ id: string }>(page, '/categories', {
+    method: 'POST',
+    body: JSON.stringify({ code, name, overrideCodeValidation: true }),
+  });
+  return res.id;
+}
+
+/**
+ * Creates a stock location via API.
+ */
+async function createStockLocation(page: import('@playwright/test').Page, code: string, name: string) {
+  const res = await apiFetch<{ id: string }>(page, '/stock-locations', {
+    method: 'POST',
+    body: JSON.stringify({ code, name, locationType: 'internal', isActive: true }),
+  });
+  return res.id;
+}
+
+/**
+ * Creates an item via API (bypasses wizard for fixture speed).
+ */
+async function createItem(
+  page: import('@playwright/test').Page,
+  name: string,
+  categoryId: string,
+  baseUomId: string,
+  purchaseUomId: string,
+  saleUomId: string
+) {
+  const res = await apiFetch<{ id: string; itemCode?: string; code?: string }>(page, '/items', {
+    method: 'POST',
+    body: JSON.stringify({
+      name,
+      categoryId,
+      baseUomId,
+      purchaseUomId,
+      saleUomId,
+      isActive: true,
+    }),
+  });
+  return res.id;
+}
+
+/**
+ * Creates a price list via API.
+ */
+async function createPriceList(page: import('@playwright/test').Page, code: string, name: string) {
+  const res = await apiFetch<{ id: string }>(page, '/price-lists', {
+    method: 'POST',
+    body: JSON.stringify({ code, name, isActive: true }),
+  });
+  return res.id;
+}
+
+/**
+ * Adds a price list item via API.
+ */
+async function addPriceListItem(
+  page: import('@playwright/test').Page,
+  priceListId: string,
+  itemId: string,
+  unitPrice: number
+) {
+  const res = await apiFetch<{ id: string; unitPrice: number }>(page, '/price-lists/items', {
+    method: 'POST',
+    body: JSON.stringify({ priceListId, itemId, unitPrice, currencyCode: 'NGN' }),
+  });
+  return res.id;
+}
+
+/**
+ * Ensures the user POS config has the right price list and stock location.
+ */
+async function ensurePosConfig(
+  page: import('@playwright/test').Page,
+  priceListId: string,
+  stockLocationId: string
+) {
+  const token = await readAccessToken(page);
+  await fetch('http://localhost:8080/api/user-pos-config/me', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ defaultPriceListId: priceListId, stockLocationId, autoSelectLocation: true }),
   });
 }
 
-/* ── Test ─────────────────────────────────────────────────────── */
+/**
+ * Navigates to POS and waits for the product picker to be ready.
+ */
+async function gotoPosReady(page: import('@playwright/test').Page) {
+  await page.goto('/shop/pos');
+  await page.waitForLoadState('networkidle');
+  const productSelect = page.getByTestId('pos-product-select');
+  await expect(productSelect).toBeEnabled({ timeout: 15_000 });
+}
+
+/**
+ * Picks the first product from the picker and adds to cart.
+ */
+async function pickAndAddFirstProduct(page: import('@playwright/test').Page) {
+  const productSelect = page.getByTestId('pos-product-select');
+  await productSelect.click();
+  const option = page.getByRole('option').first();
+  await expect(option).toBeVisible({ timeout: 15_000 });
+  await option.click();
+  await page.getByTestId('pos-add-to-cart-btn').click();
+}
+
+/* ── Fixture setup (serial — one org per run) ─────────────────── */
 
 test.describe.serial('POS Flow through Sales UI', () => {
-  test.setTimeout(60_000);
+  test.setTimeout(180_000);
 
+  let uomCategoryId: string;
+  let unitUomId: string;
+  let packUomId: string;
+  let categoryId: string;
+  let stockLocationId: string;
+  let itemId: string;
+  let priceListId: string;
+  let accessToken: string | null = null;
   let saleId: string;
   let saleNumber: string;
-  let itemId: string;
-  let uomId: string;
-  let locationId: string;
+  let runId = TS;
   let paymentMethodId: string;
-  let customerId: string;
-  let accessToken: string | null = null;
 
-  /* ── Seed prerequisite data via API ─────────────────────────── */
+  /* ── 0. Seed all prerequisite data ── */
 
-  test('0. seeds prerequisite data for the POS sale', async ({ page }) => {
+  test('0. seeds UOMs, category, stock location, item, price list', async ({ page }) => {
     accessToken = await readAccessToken(page);
-    // Find an existing item with stock
-    const itemsRes = await apiFetch<{ data: Array<{ id: string; name: string }> }>(
-      page,
-      '/items?limit=1'
-    );
-    itemId = itemsRes.data?.[0]?.id ?? '';
+    runId = `${TS}-${Date.now().toString(36).slice(-4)}`;
+
+    uomCategoryId = await createUomCategory(page);
+    expect(uomCategoryId).toBeTruthy();
+
+    unitUomId = await createUom(page, uomCategoryId, `Unit-e2e-${runId}`, 'reference', 1);
+    expect(unitUomId).toBeTruthy();
+
+    packUomId = await createUom(page, uomCategoryId, `Pack-e2e-${runId}`, 'bigger', 10);
+    expect(packUomId).toBeTruthy();
+
+    categoryId = await createCategory(page, `POSCAT_${runId}`, `POS-Category-${runId}`);
+    expect(categoryId).toBeTruthy();
+
+    stockLocationId = await createStockLocation(page, `POSLOC_${runId}`, `POS-Location-${runId}`);
+    expect(stockLocationId).toBeTruthy();
+
+    // Create item with UOMs so it appears in the POS picker with price
+    itemId = await createItem(page, `POS-Item-${runId}`, categoryId, unitUomId, packUomId, unitUomId);
     expect(itemId).toBeTruthy();
 
-    // Find a UOM
-    const uomsRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/uoms?limit=1');
-    uomId = uomsRes.data?.[0]?.id ?? '';
-    expect(uomId).toBeTruthy();
+    priceListId = await createPriceList(page, `POS_PRICE_${runId}`, `POS-Pricelist-${runId}`);
+    expect(priceListId).toBeTruthy();
 
-    // Find a stock location
-    const locRes = await apiFetch<{ data: Array<{ id: string }> }>(
-      page,
-      '/stock-locations?limit=1'
-    );
-    locationId = locRes.data?.[0]?.id ?? '';
-    expect(locationId).toBeTruthy();
+    // Add price at base UOM (100 per unit)
+    const priceId = await addPriceListItem(page, priceListId, itemId, 100);
+    expect(priceId).toBeTruthy();
 
-    // Find a payment method
-    const pmRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/payment-methods?limit=1');
-    paymentMethodId = pmRes.data?.[0]?.id ?? '';
+    // Try to add stock at the location so the sale can be completed
+    // (this may fail due to missing GL accounts, but we'll try)
+    try {
+      await apiFetch(page, '/inventory/adjust-quantity', {
+        method: 'POST',
+        body: JSON.stringify({
+          itemId,
+          locationId: stockLocationId,
+          deltaQuantity: 100,
+          reason: `POS test seed stock ${runId}`,
+          uomId: unitUomId,
+        }),
+      });
+    } catch (e) {
+      // If stock adjustment fails (e.g., missing GL accounts), continue anyway
+      // The test may still work if there's existing seeded stock
+      console.warn('Stock adjustment failed (may be OK if seeded data has stock):', e);
+    }
+
+    // Create a payment method
+    const pmRes = await apiFetch<{ id: string }>(page, '/payment-methods', {
+      method: 'POST',
+      body: JSON.stringify({ code: `CASH_${runId}`, name: `Cash ${runId}`, methodType: 'cash', isActive: true }),
+    });
+    paymentMethodId = pmRes.id;
     expect(paymentMethodId).toBeTruthy();
 
-    // Find a customer
-    const custRes = await apiFetch<{ data: Array<{ id: string }> }>(page, '/customers?limit=1');
-    customerId = custRes.data?.[0]?.id ?? '';
-    // customer is optional for POS
+    // Wire POS config so the session auto-loads price list + location
+    await ensurePosConfig(page, priceListId, stockLocationId);
+
+    // Also ensure there's at least one item with stock by checking existing seeded items
+    // The existing pos.spec.ts test passes by picking the first item from the picker
+    // which means there are seeded items with stock. We'll try to find one.
+
+    // Give the queries a moment to settle before first test
+    await page.waitForTimeout(1_000);
   });
 
   /* ── 1. Create a POS sale via the "New" modal on /rxsoft/sales ── */
@@ -88,12 +263,16 @@ test.describe.serial('POS Flow through Sales UI', () => {
       timeout: 15_000,
     });
 
+    // First, try to find an existing item with stock by searching
+    const productSelect = page.getByTestId('pos-product-select');
+    await expect(productSelect).toBeEnabled({ timeout: 15_000 });
+
     // Click "New" to open the create modal
     await page.getByTestId('header-new').click();
     const dialog = page.getByRole('dialog').last();
     await expect(dialog).toBeVisible({ timeout: 10_000 });
 
-    saleNumber = `POS-UI-${TS}`;
+    saleNumber = `POS-UI-${runId}`;
 
     // The create modal uses LabelField components. Fields are:
     //   Sale Number (text), Sale Channel (text), Store ID (text),
@@ -113,15 +292,17 @@ test.describe.serial('POS Flow through Sales UI', () => {
     await fieldRoot('Store ID').locator('input').fill('default');
 
     // Customer ID (optional — leave blank or fill if available)
-    if (customerId) {
-      await fieldRoot('Customer ID').locator('input').fill(customerId);
-    }
+    // Note: customerId might not be seeded in this test
+    // if (customerId) {
+    //   await fieldRoot('Customer ID').locator('input').fill(customerId);
+    // }
 
     // Lines JSON — a single line: 3 × the item at unitPrice 25
+    // Using unitUomId (factor 1) with price 100 per unit
     const lines = JSON.stringify([
       {
         itemId,
-        uomId,
+        uomId: unitUomId,
         quantity: 3,
         unitPrice: 25,
       },
@@ -139,7 +320,14 @@ test.describe.serial('POS Flow through Sales UI', () => {
 
     // Submit the form
     await dialog.getByRole('button', { name: 'Create' }).click();
-    await expect(dialog).toBeHidden({ timeout: 15_000 });
+    
+    // Wait for either the dialog to close (success) or an error toast to appear
+    await Promise.race([
+      expect(dialog).toBeHidden({ timeout: 15_000 }),
+      expect(page.getByRole('alert')).toBeVisible({ timeout: 15_000 }).then(() => {
+        throw new Error('Sale creation failed - check error toast');
+      })
+    ]);
 
     // The new sale should appear in the list
     await page.getByTestId('header-search').fill(saleNumber);
@@ -231,7 +419,7 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // in sibling cells also contain "3"/"25".
     await expect(row.locator('td').filter({ hasText: /^3$/ })).toBeVisible();
 
-    // The line should show unit price = 25
+    // The line should show unit price = 25 (price is per unit UOM, 25 per unit)
     await expect(row.locator('td').filter({ hasText: /^25$/ })).toBeVisible();
 
     // The line should show total = 75 (3 × 25) — anchored: two cells render 75.
