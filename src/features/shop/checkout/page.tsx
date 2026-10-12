@@ -344,8 +344,13 @@ export default function CheckoutPage() {
           // readable before reconciliation: the item name as freetextName, plus
           // the generic product/drug codes when the hydrated product knows them.
           const displayName = i.name ?? i.product?.name;
+          // GP business code only — a concepts UUID is not resolvable
+          // as a generic reference (legacy carts may still store it).
+          const gpCode = i.genericProductCode;
           const genericProductCode =
-            i.genericProductCode ?? i.product?.genericProduct?.id ?? undefined;
+            gpCode && gpCode.startsWith('GP-')
+              ? gpCode
+              : (i.product?.genericProduct?.code ?? undefined);
           const genericDrugCode = i.genericDrugCode ?? i.product?.genericDrugCode ?? undefined;
           if (i.productId) {
             return {

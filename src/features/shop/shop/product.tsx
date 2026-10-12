@@ -62,6 +62,7 @@ export default function ProductDetailPage() {
   const product = data?.product;
   const gp = (data?.genericProduct ?? product?.genericProduct ?? null) as {
     id?: string | null;
+    code?: string | null;
     name?: string | null;
     strength?: string | null;
     dosageForm?: string | null;
@@ -339,9 +340,12 @@ export default function ProductDetailPage() {
                           leftSection={<Pill size={18} />}
                           styles={buttonStyles}
                           onClick={() => {
+                            // The checkout contract wants the GP business
+                            // code (GP-xxxxx) — the concepts UUID is not
+                            // resolvable server-side (rxsoft#54/ui#114).
                             addGenericItem({
                               name: gp.name || product.name,
-                              genericProductCode: gp.id ?? '',
+                              genericProductCode: gp.code ?? '',
                               unitPrice: product.unitPrice ?? 0,
                             });
                             notifications.show({
