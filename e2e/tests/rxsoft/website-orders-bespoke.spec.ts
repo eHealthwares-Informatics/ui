@@ -95,6 +95,12 @@ test.describe.serial('RxSoft Website Orders — Bespoke Status Transitions', () 
 
   // ── 0. Seed prerequisites ────────────────────────────────────
   test('0. seeds supplier, warehouse, item, stock location for fulfilment', async ({ page }) => {
+    // Serial suite: capture the admin token here so the afterAll teardown
+    // can authenticate its DELETEs (previously never assigned — teardown
+    // silently ran unauthenticated AND tripped oxlint prefer-const, the
+    // single error keeping the npm test gate red, ui#66).
+    accessToken = await readAccessToken(page);
+
     const supplier = await apiCreate<{ id: string }>(page, '/suppliers', {
       name: `WebOrd Sup ${TS}`,
       phone: '08000000003',
