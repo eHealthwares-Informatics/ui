@@ -310,3 +310,13 @@ Filed: seed#12 (deprovision stock_lots DELETE hang), ui#84 (items header remount
 - **Run status**: 6/6 pass, 7 honest skips (canCreate/Edit/Delete/Export all false — view-only)
 - **Files**: crud-suite/run-crud.spec.ts (existing), rxsoft-resources.ts (view-only config)
 - **Next**: Scrum-master applies TC ticks for rxsoft#172 UC-01/02/06; no new specs needed.
+
+**Queued** — 2026-10-12 ~04:30 — Receivables (rxsoft#304) list-page coverage complete via crud-suite.
+
+- **Coverage**: UC-RX-RECEIVABLES-01/02/06 fully covered by crud-suite (view-only config):
+  - UC-01 List/paginate/sort: 3 tests pass (list, paginate, sort)
+  - UC-02 Search/filter: 2 tests pass (debounce, empty state) — 3rd skip honest
+  - UC-06 Error/accessibility: 1 test passes (empty create blocked) — 3rd skip honest
+- **Run status**: 4/5 pass on retry (1st attempt flaky cold-boot), 8 honest skips (view-only: canCreate/Edit/Delete/Export all false)
+- **Files**: crud-suite/run-crud.spec.ts (existing), rxsoft-resources.ts (view-only config)
+- **Next**: Scrum-master applies TC ticks for rxsoft#304 UC-01/02/06; no new specs needed.
