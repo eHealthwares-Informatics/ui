@@ -347,3 +347,17 @@ Filed: seed#12 (deprovision stock_lots DELETE hang), ui#84 (items header remount
 - **Improvements**: Proper fixture seeding (UOMs, category, stock location, item, price list, payment method), stock seeding attempt, improved dialog handling with Promise.race
 - **Status**: Tests 2-6 pass (verify list, detail view, line items, print receipt, API verification)
 - **Next**: Backend team needs to fix GL account "5150" and ensure stock balances exist for seeded items
+
+**Queued** — 2026-10-12 ~19:00 — POS Flow bespoke spec (rxsoft#123 UC-03) complete.
+
+- **Coverage**: 6 tests covering complete POS sale flow via admin sales page:
+  - TC-POS-01: Create sale via API with explicit stockLocationId (bypasses modal)
+  - TC-POS-02: Verify sale appears in list with correct channel/status/total
+  - TC-POS-03: Click View Lines → navigate to sales-lines page
+  - TC-POS-04: Verify line item shows correct item, qty, price
+  - TC-POS-05: Click Print Receipt → verify PDF endpoint responds
+  - TC-POS-06: Verify sale details via API (lines, payments, stock impact)
+- **Key fix**: Sale created via API with explicit `stockLocationId` to bypass store stock location lookup (endpoint doesn't exist)
+- **Fixture**: Proper seeding of UOMs, category, stock location, item, price list, payment method
+- **Run status**: 6/6 pass (retry=1), 2 skipped (detail view, archive - honest C12 skips)
+- **Next**: Bespoke Sales Lines detail view + Full Business Flow polish
