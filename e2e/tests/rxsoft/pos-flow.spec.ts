@@ -15,7 +15,7 @@ import { apiFetch, readAccessToken } from '../../utils/api';
 /* ── Helpers ──────────────────────────────────────────────────── */
 
 const TS = Date.now().toString(36);
-let runId = TS;
+const runId = TS;
 
 /**
  * Creates a UOM category via API.
