@@ -64,7 +64,13 @@ test.describe('Damorex purchases', () => {
     await page.goto('/shop/purchases');
     await page.waitForLoadState('networkidle');
 
-    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
+    // Seed-data fix (run 4c19 evidence): 'Adediran Pharma Imports' exists only
+    // in DEFAULT_ORG's dictionary (parties.json SUP-001). Fresh provisioned
+    // orgs get exactly two suppliers — 'Okafor Pharmaceuticals' +
+    // 'Balogun Medical Supplies' (seed provision.service.ts:726-727) — so
+    // pick the guaranteed name. DB-verified: E2E orgs carry 2 supplier rows;
+    // DEFAULT_ORG carries the 20-row dictionary.
+    await pickSelectOption(page, 'po-supplier-select', 'Okafor', 'Okafor Pharmaceuticals');
 
     await page.getByTestId('po-save-draft-btn').click();
     await expect(page.getByText('Please select a warehouse')).toBeVisible({
@@ -81,7 +87,13 @@ test.describe('Damorex purchases', () => {
     await page.waitForLoadState('networkidle');
 
     // 1. Select supplier from seed data.
-    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
+    // Seed-data fix (run 4c19 evidence): 'Adediran Pharma Imports' exists only
+    // in DEFAULT_ORG's dictionary (parties.json SUP-001). Fresh provisioned
+    // orgs get exactly two suppliers — 'Okafor Pharmaceuticals' +
+    // 'Balogun Medical Supplies' (seed provision.service.ts:726-727) — so
+    // pick the guaranteed name. DB-verified: E2E orgs carry 2 supplier rows;
+    // DEFAULT_ORG carries the 20-row dictionary.
+    await pickSelectOption(page, 'po-supplier-select', 'Okafor', 'Okafor Pharmaceuticals');
 
     // 2. Select warehouse from seed data.
     await pickSelectOption(page, 'po-warehouse-select', 'Main', 'Main Warehouse');
@@ -173,11 +185,17 @@ test.describe('Damorex purchases', () => {
     await page.waitForLoadState('networkidle');
 
     // Select a supplier.
-    await pickSelectOption(page, 'po-supplier-select', 'Adediran', 'Adediran Pharma Imports');
+    // Seed-data fix (run 4c19 evidence): 'Adediran Pharma Imports' exists only
+    // in DEFAULT_ORG's dictionary (parties.json SUP-001). Fresh provisioned
+    // orgs get exactly two suppliers — 'Okafor Pharmaceuticals' +
+    // 'Balogun Medical Supplies' (seed provision.service.ts:726-727) — so
+    // pick the guaranteed name. DB-verified: E2E orgs carry 2 supplier rows;
+    // DEFAULT_ORG carries the 20-row dictionary.
+    await pickSelectOption(page, 'po-supplier-select', 'Okafor', 'Okafor Pharmaceuticals');
 
     // Verify it was set.
     const supplierInput = page.getByPlaceholder('Supplier');
-    await expect(supplierInput).toHaveValue('Adediran Pharma Imports', {
+    await expect(supplierInput).toHaveValue('Okafor Pharmaceuticals', {
       timeout: waits.visible,
     });
 
