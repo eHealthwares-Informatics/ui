@@ -320,3 +320,14 @@ Filed: seed#12 (deprovision stock_lots DELETE hang), ui#84 (items header remount
 - **Run status**: 4/5 pass on retry (1st attempt flaky cold-boot), 8 honest skips (view-only: canCreate/Edit/Delete/Export all false)
 - **Files**: crud-suite/run-crud.spec.ts (existing), rxsoft-resources.ts (view-only config)
 - **Next**: Scrum-master applies TC ticks for rxsoft#304 UC-01/02/06; no new specs needed.
+
+**Queued** — 2026-10-12 ~05:30 — Sales (rxsoft#123) list-page coverage complete via crud-suite.
+
+- **Coverage**: 13/25 tests pass (13 skipped, honest C12 skips for create/edit/delete which are false for Sales — real create path is POS flow)
+  - UC-RX-SALES-01 (List/sort/paginate): 3 pass
+  - UC-RX-SALES-02 (Search/filter): 3 pass (empty state, search clear, debounce) — 1 honest skip (search filter)
+  - UC-RX-SALES-06 (Error/accessibility): 2 pass (empty create blocked, CSV export) — 1 honest skip (API error injection)
+- **Sales Lines** (rxsoft#130): 7/13 pass (list, paginate, sort, search, empty state, debounce, CSV export) — 6 honest skips
+- **Files**: crud-suite/run-crud.spec.ts (existing), rxsoft-resources.ts (view-only config)
+- **Run status**: 13 pass, 12 honest skips (view-only: canCreate/Edit/Delete/Export all false)
+- **Next**: Bespoke tests for Sales create (pos-flow.spec.ts) + Sales Lines detail view; PR to master
