@@ -66,7 +66,11 @@ async function createCategory(page: import('@playwright/test').Page, code: strin
 /**
  * Creates a stock location via API.
  */
-async function createStockLocation(page: import('@playwright/test').Page, code: string, name: string) {
+async function createStockLocation(
+  page: import('@playwright/test').Page,
+  code: string,
+  name: string
+) {
   const res = await apiFetch<{ id: string }>(page, '/stock-locations', {
     method: 'POST',
     body: JSON.stringify({ code, name, locationType: 'internal', isActive: true }),
@@ -138,7 +142,11 @@ async function ensurePosConfig(
   await fetch('http://localhost:8080/api/user-pos-config/me', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ defaultPriceListId: priceListId, stockLocationId, autoSelectLocation: true }),
+    body: JSON.stringify({
+      defaultPriceListId: priceListId,
+      stockLocationId,
+      autoSelectLocation: true,
+    }),
   });
 }
 
@@ -204,7 +212,14 @@ test.describe.serial('POS Flow through Sales UI', () => {
     expect(stockLocationId).toBeTruthy();
 
     // Create item with UOMs so it appears in the POS picker with price
-    itemId = await createItem(page, `POS-Item-${runId}`, categoryId, unitUomId, packUomId, unitUomId);
+    itemId = await createItem(
+      page,
+      `POS-Item-${runId}`,
+      categoryId,
+      unitUomId,
+      packUomId,
+      unitUomId
+    );
     expect(itemId).toBeTruthy();
 
     priceListId = await createPriceList(page, `POS_PRICE_${runId}`, `POS-Pricelist-${runId}`);
@@ -236,7 +251,12 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // Create a payment method
     const pmRes = await apiFetch<{ id: string }>(page, '/payment-methods', {
       method: 'POST',
-      body: JSON.stringify({ code: `CASH_${runId}`, name: `Cash ${runId}`, methodType: 'cash', isActive: true }),
+      body: JSON.stringify({
+        code: `CASH_${runId}`,
+        name: `Cash ${runId}`,
+        methodType: 'cash',
+        isActive: true,
+      }),
     });
     paymentMethodId = pmRes.id;
     expect(paymentMethodId).toBeTruthy();
@@ -320,13 +340,15 @@ test.describe.serial('POS Flow through Sales UI', () => {
 
     // Submit the form
     await dialog.getByRole('button', { name: 'Create' }).click();
-    
+
     // Wait for either the dialog to close (success) or an error toast to appear
     await Promise.race([
       expect(dialog).toBeHidden({ timeout: 15_000 }),
-      expect(page.getByRole('alert')).toBeVisible({ timeout: 15_000 }).then(() => {
-        throw new Error('Sale creation failed - check error toast');
-      })
+      expect(page.getByRole('alert'))
+        .toBeVisible({ timeout: 15_000 })
+        .then(() => {
+          throw new Error('Sale creation failed - check error toast');
+        }),
     ]);
 
     // The new sale should appear in the list
