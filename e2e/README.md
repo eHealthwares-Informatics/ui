@@ -54,7 +54,7 @@ being tested**, which kills in-flight navigations and shows up as random
 | Artifact | Location | Notes |
 |---|---|---|
 | HTML report | `e2e/reports/` | Durable — read back by hand and by `tracker/make-phase1-report.mjs`. Excluded from Vite's watcher via `server.watch.ignored` in [../vite.config.mjs](../vite.config.mjs). |
-| Traces, screenshots, `.last-run.json` | `os.tmpdir()/rxsoft-e2e-artifacts` | Ephemeral failure artifacts. Deliberately **outside** the repo root so the watcher never sees them. Override with `PLAYWRIGHT_OUTPUT_DIR`. |
+| Traces, screenshots, `.last-run.json` | `os.tmpdir()/rxsoft-e2e-artifacts/run-<pid>` | Ephemeral failure artifacts. Deliberately **outside** the repo root so the watcher never sees them. Run-scoped per PID so concurrent runs can't wipe each other (ui#107). Override with `PLAYWRIGHT_OUTPUT_DIR` (respected verbatim — no PID suffix). |
 
 Open the report with `npx playwright show-report e2e/reports` (from `frontend/`).
 
