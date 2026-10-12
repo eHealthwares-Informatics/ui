@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import { tmpdir } from 'node:os';
+import { resolveOutputDir } from './output-dir';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,11 +15,13 @@ const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
  * any write inside a watched directory fires a full HMR page reload that kills
  * the in-flight navigation that was about to be asserted.
  *
- * Still overridable: PLAYWRIGHT_OUTPUT_DIR=./test-results npx playwright test ...
+ * The default dir is run-scoped (run-<pid>) so concurrent configured runs on
+ * one box can never clean each other's in-flight artifacts — ui#107. Still
+ * overridable: PLAYWRIGHT_OUTPUT_DIR=./test-results npx playwright test ...
  * (note that `pathResolve` is config-dir-relative, so resolve absolute paths
  * yourself if you point it back inside the repo).
  */
-const OUTPUT_DIR = process.env.PLAYWRIGHT_OUTPUT_DIR ?? join(tmpdir(), 'rxsoft-e2e-artifacts');
+const OUTPUT_DIR = resolveOutputDir();
 
 /**
  * Playwright config.
