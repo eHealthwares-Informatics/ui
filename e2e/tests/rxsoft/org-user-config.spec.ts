@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 
 /**
@@ -25,6 +26,37 @@ import { expect, skipIfBackendDown, test } from '../../fixtures/test';
 const GATE_LIST_FAMILY = (entity: string) =>
   `${entity} page is a configuration form, not a DataPageShell list — no sortable/paginated table, no empty/loading list states`;
 
+/**
+ * Owner/multi-scope sessions land on a picker (a "User" / "Organisation"
+ * Mantine Select) before the config form mounts ("Select an organisation
+ * above to configure it."). This opens the combobox and picks the first
+ * option, then waits for the form fields to appear.
+ */
+async function ensureFormMounted(
+  page: Page,
+  pickerLabel: string,
+  fieldLabel: string
+): Promise<void> {
+  if (
+    await page
+      .getByLabel(fieldLabel, { exact: true })
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    return; // form already mounted (pre-selected single scope)
+  }
+  const combo = page.getByLabel(pickerLabel, { exact: true }).first();
+  await expect(combo).toBeVisible({ timeout: 15_000 });
+  await combo.click();
+  const option = page.getByRole('option').first();
+  await expect(option).toBeVisible({ timeout: 15_000 });
+  await option.click();
+  await expect(page.getByLabel(fieldLabel, { exact: true }).first()).toBeVisible({
+    timeout: 30_000,
+  });
+}
+
 test.describe.serial('RxSoft User Configuration (#221)', () => {
   test('TC-RX-USER-CONFIG-14: config form renders as the edit view', async ({ page }, testInfo) => {
     skipIfBackendDown(testInfo);
@@ -33,7 +65,8 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
       timeout: 30_000,
     });
-    for (const label of ['User', 'Stock Location', 'Allow POS', 'Login Timeout (minutes)']) {
+    await ensureFormMounted(page, 'User', 'Stock Location');
+    for (const label of ['Stock Location', 'Allow POS', 'Login Timeout (minutes)']) {
       await expect(page.getByLabel(label).first()).toBeVisible({ timeout: 15_000 });
     }
     await expect(page.getByRole('button', { name: 'Save Configuration' })).toBeVisible();
@@ -44,6 +77,11 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
   }, testInfo) => {
     skipIfBackendDown(testInfo);
     await page.goto('/rxsoft/user-config');
+
+    await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
+      timeout: 30_000,
+    });
+    await ensureFormMounted(page, 'User', 'Stock Location');
 
     const allowPos = page.getByLabel('Allow POS').first();
     await expect(allowPos).toBeVisible({ timeout: 30_000 });
@@ -67,8 +105,13 @@ test.describe.serial('RxSoft User Configuration (#221)', () => {
     expect(res.status(), 'user-config PATCH failed').toBeLessThan(400);
     await expect(page.getByText('User configuration saved')).toBeVisible({ timeout: 15_000 });
 
-    // Reload → the change persisted.
+    // Reload → the change persisted (the page may land on the picker again —
+    // re-select the same scope before asserting).
     await page.reload();
+    await expect(page.getByRole('heading', { name: 'User Configuration' })).toBeVisible({
+      timeout: 30_000,
+    });
+    await ensureFormMounted(page, 'User', 'Stock Location');
     const afterReload = page.getByLabel('Allow POS').first();
     await expect(afterReload).toBeVisible({ timeout: 30_000 });
     await expect

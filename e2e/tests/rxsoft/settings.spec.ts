@@ -36,39 +36,38 @@ test.describe('RxSoft settings', () => {
 
   test('TC-RX-SETTINGS-02: Account section renders', async ({ page }) => {
     await page.goto('/rxsoft/settings/account');
+    // The settings layout renders an h1 "Settings" + the section content
+    // with an h3 section heading (verified via error-context snapshot —
+    // the section pages are NOT RxPage-titled).
+    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Account', exact: true })).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(
-      page
-        .getByTestId('page-title')
-        .filter({ hasText: /^\s*Account\s*$/ })
-        .first()
-    ).toHaveText('Account');
+      page.getByText('Update your account settings. Set your preferred language and timezone.')
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Update account' })).toBeVisible();
   });
 
   test('TC-RX-SETTINGS-03: Appearance section renders', async ({ page }) => {
     await page.goto('/rxsoft/settings/appearance');
-    await expect(
-      page
-        .getByTestId('page-title')
-        .filter({ hasText: /^\s*Appearance\s*$/ })
-        .first()
-    ).toHaveText('Appearance');
+    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Appearance', exact: true })).toBeVisible({
+      timeout: 30_000,
+    });
   });
 
   test('TC-RX-SETTINGS-04: Display and Notifications sections render', async ({ page }) => {
     await page.goto('/rxsoft/settings/display');
-    await expect(
-      page
-        .getByTestId('page-title')
-        .filter({ hasText: /^\s*Display\s*$/ })
-        .first()
-    ).toHaveText('Display');
+    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Display', exact: true })).toBeVisible({
+      timeout: 30_000,
+    });
 
     await page.goto('/rxsoft/settings/notifications');
-    await expect(
-      page
-        .getByTestId('page-title')
-        .filter({ hasText: /^\s*Notifications\s*$/ })
-        .first()
-    ).toHaveText('Notifications');
+    await expect(page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Notifications', exact: true })).toBeVisible({
+      timeout: 30_000,
+    });
   });
 });
