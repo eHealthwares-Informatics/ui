@@ -24,7 +24,7 @@ export const ARTIFACTS_ROOT = join(tmpdir(), 'rxsoft-e2e-artifacts');
  */
 export function resolveOutputDir(
   env: Pick<NodeJS.ProcessEnv, 'PLAYWRIGHT_OUTPUT_DIR'> = process.env,
-  pid: number = process.pid,
+  pid: number = process.pid
 ): string {
   const override = env.PLAYWRIGHT_OUTPUT_DIR;
   if (override) {

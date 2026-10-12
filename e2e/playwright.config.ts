@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
+import { resolveOutputDir } from './output-dir';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveOutputDir } from './output-dir';
 
 const E2E_DIR = dirname(fileURLToPath(import.meta.url));
 /** Playwright resolves `use.storageState` relative to the process CWD, so use an absolute path. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { ARTIFACTS_ROOT, resolveOutputDir } from './output-dir';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { ARTIFACTS_ROOT, resolveOutputDir } from './output-dir';
 
 /**
  * ui#107 — concurrent configured Playwright runs shared one outputDir, and
@@ -28,7 +28,7 @@ describe('resolveOutputDir — run-scoped Playwright artifacts (ui#107)', () => 
 
   it('respects an explicit PLAYWRIGHT_OUTPUT_DIR override verbatim (no pid suffix)', () => {
     expect(resolveOutputDir({ PLAYWRIGHT_OUTPUT_DIR: './test-results' }, 4242)).toBe(
-      './test-results',
+      './test-results'
     );
   });
 });
