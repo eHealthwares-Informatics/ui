@@ -282,3 +282,31 @@ Filed: seed#12 (deprovision stock_lots DELETE hang), ui#84 (items header remount
 **Pre-existing unpost failure** (receiving.spec.ts) is backend bug (movement type "in" not "out") — not related to new coverage.
 
 **Next**: PR test/pos-batch2-sweep → master (includes POS batch + Phase 3a list coverage).
+
+**Queued** — 2026-10-12 ~02:00 — Website Orders bespoke status transitions (rxsoft#168) committed on `master`.
+
+- **Coverage**: 4 bespoke tests covering UC-RX-WEBSITE-ORDERS-01 (advance/cancel):
+  - TC-WEB-ORD-ADVANCE-01: pending → confirmed (PATCH /status)
+  - TC-WEB-ORD-ADVANCE-02: confirmed → post-sale (creates draft sale)
+  - TC-WEB-ORD-ADVANCE-03: complete-sale (posts draft sale, depletes stock)
+  - TC-WEB-ORD-CANCEL-01: pending → cancelled (PATCH /status)
+- **List/pagination/sort/search/export**: covered by crud-suite (view-only, canCreate: false)
+- **Run status**: 4/4 pass (API-verified, no UI search flakiness)
+- **Next**: Scrum-master applies TC ticks for rxsoft#168 UC-RX-WEBSITE-ORDERS-01/06; PR already merged.
+
+**Queued + APPLIED — 2026-10-12 ~02:30 — Run 4c20 (Sales module) — board ticks applied in-session (scrum-master role).**
+
+- **4c20 (01:52–02:00, 8.5m; log `/tmp/pw-qa-4c20.log`): 12 passed / 2 flaky / 10 skipped / 2 did-not-run (cascade) / 0 failed.** Scope: `tests/rxsoft/sales.spec.ts` + crud-suite `Sales` & `Sales Lines` (fresh org, 1 worker). **Both flakes = the ui#107 shared-outputDir wipe AGAIN** (`browserContext.close ENOENT`, recurrence #3 — comment posted to ui#107 with the two signatures; cumulative: 6 runs affected across 3 days). The 2 DNR = serial-cascade victims (Sales export never executed — gap noted). Box load spiked 15–20 mid-run (concurrent Mac-side activity).
+- **Green coverage**: Sales — renders ✓, pagination ✓, empty-state ✓ (TC-04), column sort ✓ (ENOENT-flaked, retry green), debounce ✓; Sales Lines — renders ✓, pagination ✓, empty-state ✓ (TC-04), sort ✓, debounce ✓, **export download ✓ (TC-20)**. Honest skips: create/edit/delete families (view-only registry — real create path is the POS flow, Mac side's in-flight scope). Fresh org ships zero sales rows → search-narrows/search-clear unprovable (needs a created sale — pos-flow dependency), documented as the #125/#132 residual.
+- **APPLIED (in-session, JohnTheBeloved, both boards)**: rxsoft **#124** TC-04 ticked + evidence comment + **Done** (TC-01/02/03 re-validated; TC-05 loading = honest gap, no crud loading family); rxsoft **#131** TC-04 ticked + evidence + **Done** (same shape); rxsoft **#133** TC-20 ticked + evidence + **In Progress** (TC-21 CSV contents still open — export test asserts the toast, not file contents). Personal board + org board both updated (org items added — they were absent; both-boards rule). Issues left OPEN with residuals documented (#34 pattern — scrum-master closes at discretion).
+- **#125/#129/#132/#134 remain open** honestly: search-narrowing needs the POS create path; error/a11y has no coverage in this suite; both are #774-class follow-ups. #123/#130 umbrellas + #7 epic stay open.
+
+**Queued** — 2026-10-12 ~03:30 — Website Prescriptions (rxsoft#172) list-page coverage complete via crud-suite.
+
+- **Coverage**: UC-RX-WEBSITE-PRESCRIPTIONS-01/02/06 fully covered by crud-suite
+  - UC-01 (List, sort, paginate): 3 tests pass
+  - UC-02 (Search, filter): 3 tests pass (empty state, debounce, empty submit blocked)
+  - UC-06 (Error handling & accessibility): 1 test passes (empty create submit blocked)
+- **Run status**: 6/6 pass, 7 honest skips (canCreate/Edit/Delete/Export all false — view-only)
+- **Files**: crud-suite/run-crud.spec.ts (existing), rxsoft-resources.ts (view-only config)
+- **Next**: Scrum-master applies TC ticks for rxsoft#172 UC-01/02/06; no new specs needed.
