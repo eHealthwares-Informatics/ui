@@ -276,3 +276,11 @@ Evidence: `/tmp/pw-qa-tc04-tail.log` (14p/3s/3.8m) + the parallel session's
     the mock + footer + page buttons all render — only the locator was wrong.
 - Box staging files cleaned up (rm of the 3 src additions + spec; pages/index.ts
   restored; routeTree regenerates); LIS session's dirty tree untouched.
+
+### Defect register (QA agent, 2026-10-13 evening)
+| Ticket | Defect | Evidence | Status |
+|---|---|---|---|
+| [rxsoft#786](https://github.com/ehealthwares/rxsoft/issues/786) | `GET /price-adjustments` 500s on EVERY request (TypeORM orderBy alias lost in the #68 enrichment rewrite; unit suite mocks the query builder so it passed) | rxsoft :8080 log stacks, 7×500/0×200 across the pah spec run; pah spec's 3 live tests auto-cover on fix | OPEN — blocks ui#133's live data |
+| [rxsoft#787](https://github.com/ehealthwares/rxsoft/issues/787) | 10 list endpoints ignore the `search` param (no-match search leaves all rows) — TC-04 gates fire for Payment/Insurance Providers, POS Terminals, Payments, Payment Transactions, Receivables, Orders, Branches, Roles, Org Payment Providers | TC-04 matrix run (`/tmp/pw-qa-tc04-tail.log`, `pw-validate.log`); 25 other endpoints honor search green the same day | OPEN — policy-elevated: gates now block UC completion (`ec5e7ac`) |
+
+Non-defect flags (tracked in §5/§6, no ticket): POS Terminals create red pending merge of `feat/10-select-testids` (`'Provider Type'` label fix); QA-box ~10-min run kills under load (ops pattern, workaround documented).
