@@ -1,6 +1,6 @@
 # Task: data-testid on all UI elements + testid-first e2e selectors
 
-**Status**: Spec ready for implementation
+**Status**: Done — foundations + enforcement landed (see §6); domain screens sweep continues under the active audit gates
 **Priority**: High — blocks stable Phase 3+ specs
 **Owner**: frontend + e2e
 **Requested by**: John — *"i mentioned to always assign and use data-test-id to all elements for consistency"*
@@ -68,13 +68,13 @@ Rules:
 
 | Gap | File | Work |
 |---|---|---|
-| Plain form inputs (text, number, textarea, date, password, checkbox) — **no testid on any branch** | `src/features/components/form/RenderField.tsx` (~503 lines, all type branches) | `data-testid={\`field-${field.name}\`}` on every rendered input |
-| SelectField static select | `src/features/components/form/RenderField.tsx` (`field.type === 'select'` branch, ~line 165) | input testid `field-<name>`; expose options `field-<name>-option` |
-| Wizard Stepper steps | `src/features/components/form/tab-groups.tsx:56–70` | `data-testid={\`wizard-tab-${tab.value}\`}` on each `Stepper.Step` |
-| Footer buttons Previous / Next / Create & Continue / Submit | `src/features/components/form/tab-groups.tsx:90–115` | `form-previous` / `form-next` / `form-create-continue` / `form-submit` |
-| ModalDataForm wrapper | `src/features/components/form/ModalDataForm.tsx` | `modal-title` on the modal title, `modal-form` on the form element |
-| Field error messages | all branches in RenderField | `field-error-<name>` (see companion task [schema_validation_task.md](schema_validation_task.md)) |
-| Remaining LabelField-embedded inputs | any custom field renderers outside RenderField | sweep with the lint rule in §5 |
+| Plain form inputs (text, number, textarea, date, password, checkbox) — ~~no testid on any branch~~ | ✅ **Landed**: every RenderField branch renders `data-testid={\`field-${field.name}\`}` (+ `field-error-<name>`) |
+| SelectField static select | ✅ **Landed** (ui#10): `SelectField` takes `testId`, input renders `field-<name>`; options render `field-<name>-option-<value>` (`src/features/components/form/select.tsx`) |
+| Wizard Stepper steps | ✅ **Landed**: `wizard-tab-${tab.value}` on each `Stepper.Step` (`src/features/components/form/tab-groups.tsx`) |
+| Footer buttons Previous / Next / Create & Continue / Submit | ✅ **Landed**: `form-previous` / `form-next` / `form-create-continue` / `form-submit` (+ `form-cancel`, `form-update`, `form-error-summary` in ModalDataForm) |
+| ModalDataForm wrapper | ✅ **Landed**: `modal-title` on the modal title, `modal-form` on the form element (`src/features/components/form/ModalDataForm.tsx`) |
+| Field error messages | ✅ **Landed**: `field-error-<name>` on every RenderField branch (see companion task [schema_validation_task.md](schema_validation_task.md)) |
+| Remaining LabelField-embedded inputs | any custom field renderers outside RenderField | 🟡 **Open** — the audit gates keep it visible: baseline scanner catches new source-level gaps; the weekly crawl (`RUN_TESTID_AUDIT=1 npx playwright test tests/rxsoft/testid-audit.spec.ts`) catches rendered ones |
 | Inventory adjust/transfer surfaces | `src/features/rxsoft/pages/inventory/index.tsx` | ✅ **Landed 2026-09-30**: `transfer-modal/-destination/-uom/-quantity/-submit`, `adjust-modal/-quantity/-reason/-submit`, `adjust-inline-form/-quantity/-reason/-submit`, `row-view-movements/-transfer/-adjust`; both specs migrated off `getByLabel`/`getByTitle` |
 
 ## 4. Implementation steps
@@ -93,11 +93,11 @@ Rules:
 
 ## 6. Acceptance criteria
 
-- [ ] Every branch of RenderField.tsx renders `data-testid="field-<name>"` (and `field-error-<name>` where error is rendered)
-- [ ] Stepper steps expose `wizard-tab-<value>`; footer buttons expose the four form-* testids
-- [ ] `crud-shell.page.ts` helpers select testid-first; items-wizard.spec.ts passes with zero label-proximity lookups
-- [ ] Lint rule or CI gate active; audit spec exists and runs
-- [ ] Docs updated: this file status → Done; INDEX.md row added
+- [x] Every branch of RenderField.tsx renders `data-testid="field-<name>"` (and `field-error-<name>` where error is rendered)
+- [x] Stepper steps expose `wizard-tab-<value>`; footer buttons expose the four form-* testids
+- [x] `crud-shell.page.ts` helpers select testid-first; items-wizard.spec.ts passes with zero label-proximity lookups (remaining `getByText` calls are status assertions, not field selectors)
+- [x] Lint rule or CI gate active; audit spec exists and runs — interim CI gate: baseline never-erodes scanner (`e2e/tasks/codemods/add-testid.mjs` + `e2e/tasks/codemods/testid-audit.test.ts` in `npm test`); rendered-output crawl: `e2e/tests/rxsoft/testid-audit.spec.ts` (opt-in weekly: `RUN_TESTID_AUDIT=1`)
+- [x] Docs updated: this file status → Done; INDEX.md row added
 
 ## 7. Estimate
 
