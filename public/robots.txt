@@ -1,0 +1,27 @@
+# eHealthWares — public crawl policy (ui#49)
+#
+# The storefront (/shop, /, marketing) is public and indexable. The admin and
+# operational surfaces are not: they require auth and should never appear in
+# search results.
+
+User-agent: *
+Allow: /
+
+# Authenticated / operational surfaces — never index.
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /clerk
+Disallow: /admin
+Disallow: /rxsoft
+Disallow: /emr
+Disallow: /lis
+Disallow: /identity
+Disallow: /apm
+Disallow: /pos
+Disallow: /shop/checkout
+Disallow: /shop/cart
+Disallow: /shop/dashboard
+Disallow: /shop/orders
+Disallow: /shop/pay
+
+Sitemap: /sitemap.xml
