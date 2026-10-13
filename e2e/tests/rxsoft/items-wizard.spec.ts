@@ -323,7 +323,7 @@ test.describe('RxSoft Items wizard', () => {
 
   test('TC-RX-ITEMS-14 — Pencil opens the inline edit modal', async () => {
     await crud.search(token);
-    await crud.rowAction(token, 'lucide-pencil').click();
+    await crud.rowAction(token, 'edit').click();
     await expect(crud.dialog).toBeVisible();
     await expect(crud.dialog.getByText('Item Details')).toBeVisible();
   });
@@ -332,7 +332,7 @@ test.describe('RxSoft Items wizard', () => {
     // Self-contained: beforeEach re-navigates (closing any modal a previous
     // test left open), so open the edit modal here — never rely on TC-14's.
     await crud.search(token);
-    await crud.rowAction(token, 'lucide-pencil').click();
+    await crud.rowAction(token, 'edit').click();
     await expect(crud.dialog).toBeVisible();
     await crud.fillField('Item Name (Brand/Variety)', '');
     await crud.dialog.getByRole('button', { name: 'Next' }).click();
@@ -347,7 +347,7 @@ test.describe('RxSoft Items wizard', () => {
     // Fresh edit session — the previous one ended in a validation error.
     await crud.page.keyboard.press('Escape');
     await crud.search(token);
-    await crud.rowAction(token, 'lucide-pencil').click();
+    await crud.rowAction(token, 'edit').click();
     await expect(crud.dialog).toBeVisible();
     await crud.fillField('Item Name (Brand/Variety)', `${token} v2`);
     await stepToLastTab();
@@ -658,9 +658,9 @@ test.describe('RxSoft Items wizard', () => {
     const accessToken = await readAccessToken(crud.page);
     test.skip(!accessToken, 'no access token — cleanup requires an authenticated session');
     await crud.search(`${token} v2`);
-    const hasTrash = (await crud.rowAction(`${token} v2`, 'lucide-trash-2').count()) > 0;
+    const hasTrash = (await crud.rowAction(`${token} v2`, 'delete').count()) > 0;
     if (hasTrash) {
-      await crud.rowAction(`${token} v2`, 'lucide-trash-2').click();
+      await crud.rowAction(`${token} v2`, 'delete').click();
       await crud.confirmDelete();
       await expect(crud.getRow(`${token} v2`)).toBeHidden();
       return;

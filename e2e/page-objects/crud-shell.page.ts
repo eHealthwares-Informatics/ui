@@ -80,12 +80,10 @@ export class CrudShellPage {
     return this.page.getByTestId('data-table-body').locator('tr').filter({ hasText: text }).first();
   }
 
-  /** Locates a row's action button by its lucide icon class (pencil / trash-2). */
-  rowAction(text: string, iconClass: 'lucide-pencil' | 'lucide-trash-2'): Locator {
-    return this.getRow(text)
-      .locator('button')
-      .filter({ has: this.page.locator(`svg.${iconClass}`) })
-      .first();
+  /** Locates a row's action button by its testid (edit / delete). */
+  rowAction(text: string, action: 'edit' | 'delete'): Locator {
+    const testId = action === 'edit' ? 'row-edit' : 'row-delete';
+    return this.getRow(text).locator(`[data-testid="${testId}"]`).first();
   }
 
   /**
