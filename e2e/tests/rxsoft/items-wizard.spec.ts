@@ -461,10 +461,8 @@ test.describe('RxSoft Items wizard', () => {
     page.on('request', (req) => {
       if (req.method() === 'POST' && req.url().includes('localhost:8080')) posts += 1;
     });
-    const rowSave = page
-      .locator('button')
-      .filter({ has: page.locator('svg.lucide-save') })
-      .first();
+    // Use testid-based locator (data-testid="row-save" added in ui#122)
+    const rowSave = page.locator('[data-testid="row-save"]').first();
     await rowSave.click();
     await page.waitForTimeout(1_000);
     expect(posts, 'invalid price must not produce any API call').toBe(0);
@@ -546,10 +544,8 @@ test.describe('RxSoft Items wizard', () => {
     // keepMounted note (r3/r4): the hidden Price List panel also renders
     // svg.lucide-save row buttons ahead of the Stock panel in DOM order —
     // scope to visible so the STOCK row's Save is clicked.
-    const rowSave = page
-      .locator('button:visible')
-      .filter({ has: page.locator('svg.lucide-save') })
-      .first();
+    // Use testid-based locator (data-testid="row-save" added in ui#122)
+    const rowSave = page.locator('[data-testid="row-save"]:visible').first();
     await rowSave.click();
     await page.waitForTimeout(1_000);
     expect(posts, 'invalid quantity must not produce any API call').toBe(0);
