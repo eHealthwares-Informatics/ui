@@ -192,10 +192,10 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
   });
 
   // ---- EMR API ----------------------------------------------------------
-  await page.route(/^https?:\/\/localhost:8093\/api\//, async (route) => {
+  await page.route(/^https?:\/\/localhost:5173\/api\/emr\//, async (route) => {
     const method = route.request().method();
     const url = new URL(route.request().url());
-    const path = url.pathname.replace(/^\/api/, '');
+    const path = url.pathname.replace(/^\/api\/emr/, '');
     const body = route.request().postDataJSON?.() ?? null;
 
     opts.onRequest?.(method, url.toString(), body);
@@ -278,8 +278,17 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
 
       // lists
       switch (path) {
-        case '/patients':
-          return route.fulfill({ json: listResponse(opts.patients ?? [], url) });
+        case '/patients': {
+          const searchParam = url.searchParams.get('search') ?? '';
+          // Handle cases where search is an empty object/array from URL sync
+          const search = (searchParam === '{}' || searchParam === '[]') ? '' : searchParam.toLowerCase();
+          const filtered = (opts.patients ?? []).filter((p) => {
+            if (!search) return true;
+            const name = `${p.firstName} ${p.lastName}`.toLowerCase();
+            return p.patientId.toLowerCase().includes(search) || name.includes(search);
+          });
+          return route.fulfill({ json: listResponse(filtered, url) });
+        }
         case '/forms/available':
           // Access-controlled list used by the Documentation popup
           return route.fulfill({

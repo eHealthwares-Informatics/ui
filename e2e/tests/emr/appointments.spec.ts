@@ -23,7 +23,7 @@ test('schedules an appointment for a patient (UC-10 schedule appointment)', asyn
   });
   await page.goto('/emr/appointments');
 
-  await page.getByRole('button', { name: 'Schedule Appointment' }).first().click();
+  await page.getByRole('button', { name: 'New' }).first().click();
 
   // Searchable patient picker
   await page.getByPlaceholder('Search by name or MRN').click();
@@ -86,7 +86,7 @@ test('filters appointments by patient via the column filter pattern', async ({ p
     .poll(() =>
       urls.some(
         (url) =>
-          url.includes('/api/appointments') && url.includes('patientName=FUZZY_MATCH%7Cada%7C')
+          url.includes('/api/emr/appointments') && url.includes('patientName=FUZZY_MATCH%7Cada%7C')
       )
     )
     .toBe(true);
