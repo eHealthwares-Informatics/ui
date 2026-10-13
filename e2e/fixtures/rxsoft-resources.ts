@@ -61,12 +61,21 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [
       { label: 'Code', value: t },
       { label: 'Name', value: t },
-      { label: 'Provider Type', kind: 'select', option: 'Cash' },
-      { label: 'Channel', kind: 'select', option: 'Cash' },
+      { label: 'Provider Type', kind: 'select', option: 'Moniepoint' },
+      { label: 'Channel', kind: 'select', option: 'POS' },
+      // Gateway providers require credentials. Reuse the seeded MONIEPOINT
+      // sandbox test_config (seeds/backend/inline/payment_providers.json) so
+      // the create is valid without inventing keys. (test_config here is the
+      // same sandbox value committed in the seed repo.)
+      {
+        label: 'Test Credentials (JSON)',
+        kind: 'textarea',
+        value: () => '{"apiKey":"mptp_f48a373ca61847f2b1c1968d3350b28b_46be03","contractCode":"6971731247"}',
+      },
     ],
-    // JSON credential fields (testConfig/liveConfig) are left empty on purpose.
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
