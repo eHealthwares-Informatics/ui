@@ -117,3 +117,76 @@ from the finance cluster remains open. Your queue is only the items in
 - **§2.4 ui#102: no action** — verify on the next long multi-spec run.
 - Handover doc itself: updated this session (this §4 + §2 annotations);
   changes are uncommitted in the frontend tree.
+
+## §5 · Multi-session log (2026-10-10 → 2026-10-13) — supersedes §4 staleness
+
+Written by the QA agent at 2026-10-13 via a master worktree (the frontend
+checkout is shared with parallel sessions — use `git worktree add <tmp>
+origin/master` for coordination commits; do NOT switch branches or reset).
+
+### Queue items resolved since §4
+- **§2.1 sort-tick rows: ✅ DONE** — the scrum master re-ran the sort suite
+  green (37p/2s, `/tmp/pw-qa-sort-20261010b.log`) and applied all 25 TC-02
+  ticks; QA agent verified no duplicates.
+- **§2.2 orphaned orgs: ✅ cleaned** (scrum master; scoped deletes, verified).
+- **#778: ✅ verified + closed** — backend PR #51 (toCsv header row) landed;
+  TC-RX-{SALES,PURCHASES}-ANALYTICS-21 auto-unskipped and passed first-try
+  (28.7s/28.9s, `/tmp/pw-qa-778verify.log`); UCs #204/#209 closed, entities
+  #201/#206 closed + Status=Done, epic #5 Done. Finance cluster 100% closed.
+
+### Phase-4 ticket batch B (QA agent, landed in `a5a65e9`)
+- New registry entries: **Purchases** (#104) + **Organisation Payment
+  Providers** (#149), view-only.
+- New specs: `tests/auth/reset-password.spec.ts` (#318 — **both TCs green
+  first-try**), `tests/rxsoft/journal-entry-lines.spec.ts` (#299 — TC-23
+  keyboard green; TC-01/02/03 honest-skip on fresh orgs: no journal entries
+  ship with seed), `tests/rxsoft/org-user-config.spec.ts` (#221/#240),
+  `tests/rxsoft/settings.spec.ts` extended (#316: TC-01 green flaky-retry).
+- **Known open spec issues (first-run failures, fixes superseded by the
+  4c18/4c19 alignment session's `d84a724`)**: settings TC-02/03/04 asserted
+  `page-title` testids but the section pages render the app settings layout
+  (h1 "Settings" + **h3 section headings**); user-config/org-config land on a
+  **picker first** ("Select an organisation above to configure it") — form
+  fields don't mount until an option is picked. If 4c18/4c19 coverage still
+  fails on these, re-apply the QA agent's fixes (h3-heading assertions +
+  `ensureFormMounted()` picker step).
+
+### TC-*-04 (empty state) — full matrix verified on the QA box (2026-10-13)
+Evidence: `/tmp/pw-qa-tc04-tail.log` (14p/3s/3.8m) + the parallel session's
+541-test `pw-validate.log` + `/tmp/pw-qa-tc04-sweep.log`.
+- **GREEN ≈25 resources** (Manufacturers, Price Lists, UOMs, Pharmaceutics,
+  Drug Components, Warehouses, Audit Logs, Payment Methods, GL Accounts,
+  Journals, Organizations, Stock Locations, Purchases, Journal Entries,
+  Users, Sales, Sales Lines, Products Prices, Items, Prescriptions, Goods
+  Receiving, Inventory, Categories, Customers, Suppliers).
+- **Honest gates ≈10** (search-ignoring endpoints — the skip branch fires):
+  Payment/Insurance Providers, POS Terminals, Payments, Payment
+  Transactions, Receivables, Orders, Branches, Roles, Org Payment
+  Providers. **0 failures.** This is PR #126's TC-04 re-enable validation.
+
+### ⛔ Blockers / flags
+- **POS Terminals create is red on the QA box branch** (old `'Provider'`
+  field label; the `'Provider Type'` fix sits on unmerged
+  `feat/10-select-testids`). It poisons the whole POS describe (serial
+  chain skips after it). **Merge that fix.**
+- **12× "renders the list page" failures + others in the killed 541-test
+  run tail** were environmental (services restarted mid-run by another
+  session); the resources pass in isolation.
+- **EMR coverage: 0/360 TCs visible** — review + plan posted on
+  ehealthwares/rxsoft#10 (TC-id visibility win ≈30 TCs; mock-backed EMR
+  crud-suite runner ≈+150; flow completions).
+
+### Ops notes (updated)
+- **QA box relocated to 192.168.1.230** — `~/.ssh/config` alias `uzo-qa`
+  updated. Same host (JohnTheBeloved-MacBookPro), services on
+  8080/8092/8094/5173/5432; LIS :8002 now up too.
+- **Runs keep getting killed ~10min in on the new box** (no cron/watchdog
+  found — looks like macOS memory-pressure kills). **Workaround: small
+  grep-scoped batches finish cleanly** (see the 3.8m tail sweep).
+- **Tracker policy change (scrum master, `ec5e7ac`)**: operational
+  (capability) gates no longer satisfy UC completion — gate TCs are
+  reported separately; re-read board-sync before future write-backs.
+- Serial discipline: other sessions run on the box — always check
+  `ps aux | grep playwright` and yield; never reset the tree under a live
+  run (it reverts uncommitted work — an incident on 2026-10-10 20:13 cost
+  8 src files of uncommitted work on the box).
