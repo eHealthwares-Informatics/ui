@@ -237,6 +237,23 @@ for (const resource of rxsoftResources) {
       expect(focused, 'Tab must move focus to another element').toBeTruthy();
     });
 
+    // ── TC-*-22 API error surfaces (previously uncovered — no spec) ───────
+    test('list surfaces a load error when the endpoint fails', async ({ page }, testInfo) => {
+      skipIfBackendDown(testInfo);
+      const listRe = new RegExp(resource.endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      await page.route(listRe, (route) =>
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'boom' }),
+        })
+      );
+      await crud.goto(resource.route);
+      // DataTable renders "Failed to load data" when `errorLoading` is set.
+      await expect(page.getByText('Failed to load data').first()).toBeVisible({ timeout: 15_000 });
+      await page.unroute(listRe);
+    });
+
     test('edits the created record through the modal', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
       test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
