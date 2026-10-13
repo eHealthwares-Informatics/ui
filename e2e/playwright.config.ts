@@ -27,9 +27,13 @@ const OUTPUT_DIR = resolveOutputDir();
  * Playwright config.
  *
  * Projects:
- *  - setup   : runs e2e/tests/auth.setup.ts, logs in as admin, writes e2e/.auth/admin.json
- *  - public  : no storageState -> auth, errors, root specs
- *  - admin   : admin storageState -> sign-out + /rxsoft + crud-suite + shop
+ *  - setup       : runs e2e/tests/auth.setup.ts, logs in as admin, writes e2e/.auth/admin.json
+ *  - public      : no storageState -> auth, errors, root specs
+ *  - admin       : admin storageState -> sign-out + /rxsoft + crud-suite + shop
+ *  - emr         : fully mocked API (identity + EMR), synthetic admin session, so the
+ *                  suite runs without any backend. See tests/emr and support/emr-mocks.ts.
+ *  - emr-real    : REAL BACKEND — provisions fresh org via seed :8094, tests against
+ *                  live Identity :8092, EMR :8093, RxSoft :8080. Signs in fresh per test.
  */
 export default defineConfig({
   testDir: '.',
@@ -91,6 +95,16 @@ export default defineConfig({
       testMatch: ['tests/emr/**/*.spec.ts'],
       use: {
         storageState: EMR_ADMIN_STORAGE_STATE,
+      },
+    },
+    // EMR Real-Backend: provisions fresh org via seed :8094, tests against
+    // live Identity :8092, EMR :8093, RxSoft :8080. No storageState — signs in fresh.
+    {
+      name: 'emr-real',
+      testMatch: 'emr-real.spec.ts',
+      use: {
+        // No storageState — each test signs in with provisioned org credentials
+        baseURL: 'http://localhost:5173',
       },
     },
   ],
