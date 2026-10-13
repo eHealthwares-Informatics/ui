@@ -34,6 +34,16 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// Enables the row-level edit action (ui#785). PUT/PATCH /organizations/:id
+// already exist; without this the edit modal was unreachable.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    code: (values.code as string) || undefined,
+    name: (values.name as string) || undefined,
+    isActive: values.isActive,
+  };
+}
+
 export const organizationsConfig: ModelConfig = {
   id: 'organizations',
   title: 'Organizations',
@@ -42,5 +52,6 @@ export const organizationsConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
   canDelete: true,
 };

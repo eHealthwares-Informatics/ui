@@ -190,7 +190,9 @@ export const stockLocationsConfig: ModelConfig = {
 
   detailPathBuilder: (row) => `/inventory/stock-locations/${row.id}`,
 
-  editPathBuilder: (row) => `/inventory/stock-locations/${row.id}/edit`,
+  // Edit uses the schema-driven modal (buildUpdatePayload above). The previous
+  // editPathBuilder pointed at /inventory/stock-locations/:id/edit, which has
+  // no route — the edit action navigated to a 404 (ui#785).
 
   deletePathBuilder: (row) => `/stock-locations/${row.id}`,
 };
