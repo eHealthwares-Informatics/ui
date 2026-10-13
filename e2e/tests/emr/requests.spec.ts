@@ -51,7 +51,9 @@ test('shows the status timeline on the request detail page (UC-37 timeline)', as
   await expect(page.getByText('LAB-EXT-9')).toBeVisible();
 });
 
-test('re-syncs the request to the external system (UC-40 re-sync)', async ({ page }) => {
+test('TC-EMR-REQUEST-LIFECYCLE-04: re-syncs the request to the external system (UC-40 re-sync)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     requests: [request],
@@ -68,7 +70,9 @@ test('re-syncs the request to the external system (UC-40 re-sync)', async ({ pag
   expect(posts.some((post) => post.url.endsWith('/requests/req-1/sync'))).toBe(true);
 });
 
-test('appends a note to the request timeline (UC-36 add note)', async ({ page }) => {
+test('TC-EMR-REQUEST-LIFECYCLE-03: appends a note to the request timeline (UC-36 add note)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     requests: [request],
@@ -93,7 +97,9 @@ test('appends a note to the request timeline (UC-36 add note)', async ({ page })
   });
 });
 
-test('transitions a request and records it (UC-35 status transition)', async ({ page }) => {
+test('TC-EMR-REQUEST-LIFECYCLE-02: transitions a request and records it (UC-35 status transition)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     requests: [request],

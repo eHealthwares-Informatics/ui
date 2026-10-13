@@ -11,7 +11,9 @@ const patient: EmrMockPatient = {
   isActive: true,
 };
 
-test('schedules an appointment for a patient (UC-10 schedule appointment)', async ({ page }) => {
+test('TC-EMR-APPOINTMENT-FLOW-01: schedules an appointment for a patient (UC-10 schedule appointment)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     patients: [patient],
@@ -53,7 +55,9 @@ test('schedules an appointment for a patient (UC-10 schedule appointment)', asyn
   });
 });
 
-test('filters appointments by patient via the column filter pattern', async ({ page }) => {
+test('TC-EMR-APPOINTMENTS-06: filters appointments by patient via the column filter pattern', async ({
+  page,
+}) => {
   const urls: string[] = [];
   await installEmrMocks(page, {
     appointments: [

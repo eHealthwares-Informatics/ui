@@ -25,7 +25,9 @@ const patients: EmrMockPatient[] = [
   },
 ];
 
-test('lists patients from the API and deep-links to a profile', async ({ page }) => {
+test('TC-EMR-PATIENTS-01 + TC-EMR-PATIENT-PROFILE-01: lists patients from the API and deep-links to a profile', async ({
+  page,
+}) => {
   const urls: string[] = [];
   await installEmrMocks(page, {
     patients,
@@ -50,7 +52,9 @@ test('lists patients from the API and deep-links to a profile', async ({ page })
   await expect(page.getByRole('tab', { name: 'Encounters' })).toBeVisible();
 });
 
-test('jumps straight to a profile from the sidebar MRN lookup (UC-05 by-mrn)', async ({ page }) => {
+test('TC-EMR-PATIENT-PROFILE-03: jumps straight to a profile from the sidebar MRN lookup (UC-05 by-mrn)', async ({
+  page,
+}) => {
   await installEmrMocks(page, { patients });
   await page.goto('/emr/patients');
 
@@ -62,7 +66,9 @@ test('jumps straight to a profile from the sidebar MRN lookup (UC-05 by-mrn)', a
   await expect(page.getByRole('tab', { name: 'Documentation' })).toBeVisible();
 });
 
-test('registers a new patient (UC-01 register patient)', async ({ page }) => {
+test('TC-EMR-PATIENTS-09 + TC-EMR-PATIENTS-11 + TC-EMR-PATIENTS-12: registers a new patient (UC-01 register patient)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   const urls: string[] = [];
   page.on('console', (msg) => {
