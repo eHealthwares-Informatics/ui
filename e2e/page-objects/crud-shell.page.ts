@@ -80,10 +80,19 @@ export class CrudShellPage {
     return this.page.getByTestId('data-table-body').locator('tr').filter({ hasText: text }).first();
   }
 
-  /** Locates a row's action button by its testid (edit / delete). */
+  /**
+   * Locates a row's action button (edit / delete).
+   *
+   * Prefers the explicit `row-edit` / `row-delete` testids added to ActionCell
+   * (PRs #120/#122). Falls back to the lucide icon class the button renders —
+   * `lucide-pencil` / `lucide-trash-2` — for any action cell that renders the
+   * control without the testid, so a missing testid degrades to a working
+   * locator instead of a silent "not visible" (ui#124).
+   */
   rowAction(text: string, action: 'edit' | 'delete'): Locator {
     const testId = action === 'edit' ? 'row-edit' : 'row-delete';
-    return this.getRow(text).locator(`[data-testid="${testId}"]`).first();
+    const iconClass = action === 'edit' ? 'lucide-pencil' : 'lucide-trash-2';
+    return this.getRow(text).locator(`[data-testid="${testId}"], .${iconClass}`).first();
   }
 
   /**
