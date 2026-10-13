@@ -24,6 +24,7 @@ export * from './insurance-providers';
 export * from './pharmaceutics';
 export * from './price-list-items';
 export * from './price-lists';
+export * from './price-adjustments';
 export * from './products';
 export * from './purchases';
 export * from './purchases-analytics';
