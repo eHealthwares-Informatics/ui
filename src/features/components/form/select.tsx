@@ -12,6 +12,13 @@ type SelectFieldProps = {
   error?: string;
   onBlur?: () => void;
   onFocus?: () => void;
+  /**
+   * Base testid for the control. The input gets `data-testid={testId}` and each
+   * option renders as `${testId}-option-${value}` (ui#10). Previously the
+   * `data-testid` prop was dropped entirely — custom components do not forward
+   * unknown props the way Mantine inputs do — so static selects had no testid.
+   */
+  testId?: string;
 };
 
 export function SelectField({
@@ -23,10 +30,15 @@ export function SelectField({
   className,
   disabled,
   error,
+  onBlur,
+  onFocus,
+  testId,
 }: SelectFieldProps) {
   return (
     <Select
+      data-testid={testId}
       label={label}
+      className={className}
       value={value?.value as string}
       onChange={(value, option) => {
         onChange(option);
@@ -37,6 +49,13 @@ export function SelectField({
       clearable
       searchable={false}
       error={error}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      renderOption={({ option }) => (
+        <div data-testid={testId ? `${testId}-option-${option.value}` : undefined}>
+          {option.label}
+        </div>
+      )}
     />
   );
 }
