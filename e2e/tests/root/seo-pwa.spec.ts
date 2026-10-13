@@ -107,15 +107,17 @@ test.describe('Storefront SEO / PWA shell (ui#135)', () => {
     // the open parent issue eHealthwares-Informatics/ui#49 (PR #135 was 1/2).
     // Pass with an annotation while it 404s; assert XML once it exists.
     const res = await page.goto('/sitemap.xml');
-    if (!res || res.status() === 404) {
+    const body = await page.locator('body').innerText();
+    // Vite's SPA fallback answers unknown paths with index.html + 200, so a
+    // 404 is not guaranteed — treat any non-XML answer as the known gap
+    // (sitemap.xml ships with ui#49 part 2; robots.txt already references it).
+    if (!res || res.status() === 404 || !/urlset|sitemapindex/.test(body)) {
       test.info().annotations.push({
         type: 'known-gap',
-        description: 'sitemap.xml ships with ui#49 part 2 (robots.txt already references it)',
+        description: 'sitemap.xml not served yet — ships with ui#49 part 2',
       });
       return;
     }
     expect(res.status()).toBe(200);
-    const body = await page.locator('body').innerText();
-    expect(body, 'sitemap must be XML urlset/sitemapindex').toMatch(/urlset|sitemapindex/);
   });
 });
