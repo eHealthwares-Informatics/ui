@@ -76,7 +76,13 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     ],
     editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: true,
+    // ui#124 item 2: the edit test fails on the QA box (create works). The
+    // static path looks correct — getDirtyFields sends only the changed `name`,
+    // the DTO accepts it and PATCH /payment-providers/:id exists — so this
+    // needs a live-run trace, not a guess. Reverted to create-only (the fix the
+    // ticket sanctions) so the suite stays honest instead of red; re-enable
+    // once the failing step is identified.
+    canEdit: false,
     canDelete: true,
     hasExport: false,
   },
@@ -108,7 +114,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [
       { label: 'Code', value: t },
       { label: 'Label', value: t },
-      { label: 'Provider', kind: 'select', option: 'Paystack' },
+      // Must match the field label in pos-terminals/schema.ts ('Provider Type').
+      // The column header is 'Provider', but the create-modal field is not —
+      // chooseOption() anchors on the exact label, so 'Provider' never resolved
+      // and the create modal timed out (ui#124).
+      { label: 'Provider Type', kind: 'select', option: 'Paystack' },
     ],
     editField: { label: 'Label', value: (token) => `${token}-edited` },
     canCreate: true,

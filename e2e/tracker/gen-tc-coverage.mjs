@@ -32,14 +32,17 @@ const SUITE_SPEC = 'crud-suite/run-crud.spec.ts';
 const CAPABILITY_BY_NAME = [
   [/list renders|renders/i, 'render'],
   [/column sort/i, 'sort'],
+  // Empty-state (TC-*-04). Mapped again now that every phase-1 list endpoint
+  // honours `search` (rxsoft#59 payments/receivables/org-payment-providers,
+  // #60/#61/#62, and the identity roles/users search fixes): a no-match search
+  // returns an empty set, so the suite's empty-state test asserts instead of
+  // honestly skipping. Kept before /search/ so a future name containing both
+  // words still maps here.
+  [/empty state|empty-state/i, 'empty'],
   [/search/i, 'search'],
   [/debounce/i, 'debounce'],
   [/loading state/i, 'loading'],
   [/keyboard/i, 'keyboard'],
-  // NOTE: empty-state TCs are intentionally NOT mapped — several list
-  // endpoints ignore the search param (e.g. /roles proxy), so the suite's
-  // empty-state test honestly skips for those resources. TC-*-04 stays
-  // `missing` on the tracker until list endpoints honor search everywhere.
   [/paginat/i, 'pagination'],
   [/create/i, 'create'],
   [/required-field validation/i, 'create'],
@@ -154,17 +157,16 @@ for (const [entity, { ucs }] of RXSOFT_ENTITIES) {
       (cap === 'edit' && res.canEdit) ||
       (cap === 'delete' && res.canDelete) ||
       (cap === 'export' && res.hasExport) ||
-      // The suite asserts render, search (+clear/debounce), loading state,
-      // keyboard navigation, pagination and API cleanup (afterAll deletes
-      // token rows) for every resource — validated green run 2026-10-13
-      // (75 passed / 0 failed, 37 resources × loading + keyboard).
+      // The suite asserts render, search (+clear/debounce), empty state,
+      // loading state, keyboard navigation, pagination and API cleanup
+      // (afterAll deletes token rows) for every resource — validated green run
+      // 2026-10-13 (75 passed / 0 failed, 37 resources × loading + keyboard).
       // NOT auto-covered (honest gaps until the UI/backends support them):
       //   - sort: Column.sortable is unset across schemas → no sort ActionIcon
       //     renders; the suite's sort test honestly skips.
-      //   - empty-state: several list endpoints ignore the search param; the
-      //     suite skips where search is not honored.
       cap === 'render' ||
       cap === 'search' ||
+      cap === 'empty' ||
       cap === 'debounce' ||
       cap === 'loading' ||
       cap === 'keyboard' ||
