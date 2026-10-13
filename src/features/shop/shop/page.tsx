@@ -297,6 +297,9 @@ export default function ShopPage({
   const { data: pharmaceuticalCls } = useClassifications('pharmaceutical');
   const { data: ndfCls } = useClassifications('ndf');
   const { data: emdexCls } = useClassifications('emdex');
+  // EMDEx pharmaceutical classes (PC-xxxxx) are a separate source from EMDEx
+  // ATC body systems (EC-xxxxx) — they get their own bucket and label.
+  const { data: emdexPharmaCls } = useClassifications('emdex_pharmaceutical');
   const showSearch = visibleFilters.includes('search');
   const showCategory = visibleFilters.includes('category');
   const showSort = visibleFilters.includes('sort');
@@ -326,6 +329,11 @@ export default function ShopPage({
     ...(emdexCls?.data ?? []).map((c) => ({
       value: c.code,
       label: `[EMDEx] ${c.name}`,
+      type: c.type,
+    })),
+    ...(emdexPharmaCls?.data ?? []).map((c) => ({
+      value: c.code,
+      label: `[EMDEx Pharmaceutical] ${c.name}`,
       type: c.type,
     })),
   ];

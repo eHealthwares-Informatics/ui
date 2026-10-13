@@ -15,7 +15,7 @@ import { apiFetch, readAccessToken } from '../../utils/api';
 /* ── Helpers ──────────────────────────────────────────────────── */
 
 const TS = Date.now().toString(36);
-let runId = TS;
+const runId = TS;
 
 /**
  * Creates a UOM category via API.
@@ -66,7 +66,11 @@ async function createCategory(page: import('@playwright/test').Page, code: strin
 /**
  * Creates a stock location via API.
  */
-async function createStockLocation(page: import('@playwright/test').Page, code: string, name: string) {
+async function createStockLocation(
+  page: import('@playwright/test').Page,
+  code: string,
+  name: string
+) {
   const res = await apiFetch<{ id: string }>(page, '/stock-locations', {
     method: 'POST',
     body: JSON.stringify({ code, name, locationType: 'internal', isActive: true }),
@@ -138,7 +142,11 @@ async function ensurePosConfig(
   await fetch('http://localhost:8080/api/user-pos-config/me', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ defaultPriceListId: priceListId, stockLocationId, autoSelectLocation: true }),
+    body: JSON.stringify({
+      defaultPriceListId: priceListId,
+      stockLocationId,
+      autoSelectLocation: true,
+    }),
   });
 }
 
@@ -204,7 +212,14 @@ test.describe.serial('POS Flow through Sales UI', () => {
     expect(stockLocationId).toBeTruthy();
 
     // Create item with UOMs so it appears in the POS picker with price
-    itemId = await createItem(page, `POS-Item-${runId}`, categoryId, unitUomId, packUomId, unitUomId);
+    itemId = await createItem(
+      page,
+      `POS-Item-${runId}`,
+      categoryId,
+      unitUomId,
+      packUomId,
+      unitUomId
+    );
     expect(itemId).toBeTruthy();
 
     priceListId = await createPriceList(page, `POS_PRICE_${runId}`, `POS-Pricelist-${runId}`);
@@ -234,7 +249,10 @@ test.describe.serial('POS Flow through Sales UI', () => {
 
     // Verify stock balance was created
     try {
-      const balanceRes = await apiFetch(page, `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`);
+      const balanceRes = await apiFetch(
+        page,
+        `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`
+      );
       console.log('Stock balance check:', balanceRes);
       if (!balanceRes.data || balanceRes.data.length === 0 || !balanceRes.data[0].quantityOnHand) {
         throw new Error('Stock balance not found after adjustment - sale will fail');
@@ -262,7 +280,10 @@ test.describe.serial('POS Flow through Sales UI', () => {
       console.error('Store stock location creation FAILED:', e);
       // Try to see if it already exists
       try {
-        const existing = await apiFetch(page, '/store-stock-locations?storeId=default&purpose=sale_issue&limit=1');
+        const existing = await apiFetch(
+          page,
+          '/store-stock-locations?storeId=default&purpose=sale_issue&limit=1'
+        );
         console.log('Existing store stock locations:', existing);
       } catch (e2) {
         console.error('Failed to check existing store stock locations:', e2);
@@ -272,7 +293,12 @@ test.describe.serial('POS Flow through Sales UI', () => {
     // Create a payment method
     const pmRes = await apiFetch<{ id: string }>(page, '/payment-methods', {
       method: 'POST',
-      body: JSON.stringify({ code: `CASH_${runId}`, name: `Cash ${runId}`, methodType: 'cash', isActive: true }),
+      body: JSON.stringify({
+        code: `CASH_${runId}`,
+        name: `Cash ${runId}`,
+        methodType: 'cash',
+        isActive: true,
+      }),
     });
     paymentMethodId = pmRes.id;
     expect(paymentMethodId).toBeTruthy();
@@ -292,30 +318,34 @@ test.describe.serial('POS Flow through Sales UI', () => {
 
   test('1. creates a POS sale via API and verifies it appears in the list', async ({ page }) => {
     // Create sale via API with explicit stockLocationId to bypass store stock location lookup
-    const createSaleRes = await apiFetch<{ id: string; saleNumber: string; status: string }>(page, '/sales', {
-      method: 'POST',
-      body: JSON.stringify({
-        saleNumber: `POS-UI-${runId}`,
-        saleChannel: 'pos',
-        storeId: 'default',
-        stockLocationId,  // Explicitly provide stock location to bypass store stock location lookup
-        lines: [
-          {
-            itemId,
-            uomId: unitUomId,
-            quantity: 3,
-            unitPrice: 25,
-          },
-        ],
-        payments: [
-          {
-            paymentMethodId,
-            amount: 75,
-          },
-        ],
-        hold: false,
-      }),
-    });
+    const createSaleRes = await apiFetch<{ id: string; saleNumber: string; status: string }>(
+      page,
+      '/sales',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          saleNumber: `POS-UI-${runId}`,
+          saleChannel: 'pos',
+          storeId: 'default',
+          stockLocationId, // Explicitly provide stock location to bypass store stock location lookup
+          lines: [
+            {
+              itemId,
+              uomId: unitUomId,
+              quantity: 3,
+              unitPrice: 25,
+            },
+          ],
+          payments: [
+            {
+              paymentMethodId,
+              amount: 75,
+            },
+          ],
+          hold: false,
+        }),
+      }
+    );
     expect(createSaleRes.id).toBeTruthy();
     expect(createSaleRes.status).toBe('posted');
     saleId = createSaleRes.id;

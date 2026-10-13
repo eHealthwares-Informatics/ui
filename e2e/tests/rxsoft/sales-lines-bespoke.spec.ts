@@ -50,7 +50,11 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
       ? { Authorization: `Bearer ${accessTokenStr}`, 'Content-Type': 'application/json' }
       : { 'Content-Type': 'application/json' };
     async function del(path: string) {
-      try { await request.delete(`http://localhost:8080/api${path}`, { headers }); } catch { /* ignore */ }
+      try {
+        await request.delete(`http://localhost:8080/api${path}`, { headers });
+      } catch {
+        /* ignore */
+      }
     }
     if (saleId) await del(`/sales/${saleId}`);
     if (receiptId) await del(`/receipts/${receiptId}`);
@@ -65,7 +69,9 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
 
   /* ── 0. Seed prerequisite data ── */
 
-  test('0. seeds supplier, warehouse, category, stock location, item, UOM, price list, PO, receipt, sale', async ({ page }) => {
+  test('0. seeds supplier, warehouse, category, stock location, item, UOM, price list, PO, receipt, sale', async ({
+    page,
+  }) => {
     accessTokenStr = await readAccessToken(page);
     runId = `${TS}-${Date.now().toString(36).slice(-4)}`;
 
@@ -155,7 +161,10 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
 
     // Verify stock balance was created
     try {
-      const balanceRes = await apiFetch(page, `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`);
+      const balanceRes = await apiFetch(
+        page,
+        `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`
+      );
       console.log('Stock balance check:', balanceRes);
       if (!balanceRes.data || balanceRes.data.length === 0 || !balanceRes.data[0].quantityOnHand) {
         throw new Error('Stock balance not found after adjustment - sale will fail');
@@ -200,21 +209,28 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     receiptId = recv.receiptNumber;
 
     // Get an existing payment method (cash) from seeded data
-    const pmRes = await apiFetch<{ data: Array<{ id: string; methodType: string }> }>(page, '/payment-methods?limit=10');
+    const pmRes = await apiFetch<{ data: Array<{ id: string; methodType: string }> }>(
+      page,
+      '/payment-methods?limit=10'
+    );
     const paymentMethod = pmRes.data?.find((p) => p.methodType === 'cash');
     const paymentMethodId = paymentMethod?.id;
     expect(paymentMethodId).toBeTruthy();
 
     // Create sale (with full payment to avoid customer requirement)
-    const sale = await apiCreate<{ id: string; saleNumber: string; status: string }>(page, '/sales', {
-      saleNumber: `SL-SALE-${TS}`,
-      saleChannel: 'pos',
-      storeId: 'default',
-      stockLocationId,
-      lines: [{ itemId, uomId, quantity: 10, unitPrice: 100 }],
-      payments: [{ paymentMethodId, amount: 1000 }],
-      hold: false,
-    });
+    const sale = await apiCreate<{ id: string; saleNumber: string; status: string }>(
+      page,
+      '/sales',
+      {
+        saleNumber: `SL-SALE-${TS}`,
+        saleChannel: 'pos',
+        storeId: 'default',
+        stockLocationId,
+        lines: [{ itemId, uomId, quantity: 10, unitPrice: 100 }],
+        payments: [{ paymentMethodId, amount: 1000 }],
+        hold: false,
+      }
+    );
     saleId = sale.id;
     expect(sale.status).toBe('posted');
   });
@@ -230,7 +246,19 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
 
     // Verify column headers
-    const headers = ['Sale', 'Date', 'Item', 'Line', 'Qty', 'UOM', 'Unit Price', 'Disc %', 'Tax %', 'Subtotal', 'Total'];
+    const headers = [
+      'Sale',
+      'Date',
+      'Item',
+      'Line',
+      'Qty',
+      'UOM',
+      'Unit Price',
+      'Disc %',
+      'Tax %',
+      'Subtotal',
+      'Total',
+    ];
     for (const header of headers) {
       // Use exact match for headers that could be substrings of others (e.g., Total vs Subtotal)
       const locator = page.locator('th').filter({ hasText: new RegExp(`^${header}$`) });
@@ -245,24 +273,36 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
 
     const pageSizeSelect = page.getByTestId('page-size-select').first();
-    if (await pageSizeSelect.count() > 0) {
+    if ((await pageSizeSelect.count()) > 0) {
       await expect(pageSizeSelect).toBeVisible();
       await pageSizeSelect.click();
       const opt = page.getByRole('option', { name: /25|50|100/ }).first();
-      if (await opt.count() > 0) {
+      if ((await opt.count()) > 0) {
         await opt.click();
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
 
     const nextBtn = page.getByRole('button', { name: /next|›/i }).first();
     const prevBtn = page.getByRole('button', { name: /previous|‹/i }).first();
-    if (await nextBtn.count() > 0 && await nextBtn.isEnabled()) {
+    if ((await nextBtn.count()) > 0 && (await nextBtn.isEnabled())) {
       await nextBtn.click();
-      await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+      await page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .first()
+        .waitFor({ state: 'visible', timeout: 15_000 });
       if (await prevBtn.isEnabled()) {
         await prevBtn.click();
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
   });
@@ -273,11 +313,19 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     const sortableHeaders = ['Sale', 'Date', 'Item', 'Qty', 'Unit Price'];
     for (const headerText of sortableHeaders) {
       const th = page.locator('th').filter({ hasText: headerText }).first();
-      if (await th.count() > 0) {
+      if ((await th.count()) > 0) {
         await th.click({ timeout: 10_000 });
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
         await th.click({ timeout: 10_000 });
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
   });
@@ -298,7 +346,11 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     // Clear search restores full list
     await searchInput.clear();
     await page.waitForTimeout(1_000);
-    await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+    await page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .first()
+      .waitFor({ state: 'visible', timeout: 15_000 });
   });
 
   test('TC-SL-02-02: no-match search shows empty state', async ({ page }) => {
@@ -347,7 +399,7 @@ test.describe.serial('RxSoft Sales Lines — Bespoke Detail View & Filters', () 
     await page.goto('/rxsoft/sales-lines', { timeout: 60_000 });
 
     const exportBtn = page.getByTestId('header-export').first();
-    if (await exportBtn.count() > 0) {
+    if ((await exportBtn.count()) > 0) {
       await expect(exportBtn).toBeVisible();
       await exportBtn.click();
       await page.getByRole('menuitem', { name: 'CSV' }).click({ timeout: 10_000 });
