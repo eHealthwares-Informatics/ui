@@ -236,6 +236,41 @@ export const websiteApi = {
       .get<WebPaymentProvider[]>('/website/payment-providers')
       .then((r) => (Array.isArray(r.data) ? r.data : [])),
 
+  // Payments (storefront). These MUST go through the website client: the admin
+  // `rxsoftApi` client defaults to `onSessionExpired: 'redirect'`, so a 401
+  // mid-checkout bounced shoppers to the admin /sign-in page instead of the
+  // storefront sign-in drawer (ui#2). This client is `onSessionExpired:
+  // 'ignore'`, so the checkout can surface the error and open the drawer.
+  initializeWebPayment: (data: {
+    amount: number;
+    sourceType: 'order' | 'wallet_deposit';
+    sourceId?: string | null;
+    userId?: string | null;
+    providerId?: string | null;
+    paymentMethodId?: string | null;
+    returnUrl?: string | null;
+    callbackUrl?: string | null;
+  }) =>
+    api
+      .post<{
+        reference: string;
+        checkoutUrl: string | null;
+        status: string;
+        provider: { code: string };
+      }>('/payments/initialize', data)
+      .then((r) => r.data),
+
+  verifyPayment: (reference: string) =>
+    api
+      .get<{
+        reference: string;
+        status: string;
+        amountPaid: number;
+        provider: string;
+        paid: boolean;
+      }>(`/payments/verify/${reference}`)
+      .then((r) => r.data),
+
   requestOtp: (data: { phone: string; channel?: 'sms' | 'whatsapp' }) =>
     api
       .post<{ sent: boolean; channel: string; code?: string }>('/website/auth/otp/request', data)

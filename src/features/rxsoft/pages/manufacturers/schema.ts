@@ -19,6 +19,15 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// Enables the row-level edit action (ui#785). PUT/PATCH /manufacturers/:id
+// already exist; without this the edit modal was unreachable.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    code: values.code ?? undefined,
+    name: (values.name as string) || undefined,
+  };
+}
+
 export const manufacturersConfig: ModelConfig = {
   id: 'manufacturers',
   title: 'Manufacturers',
@@ -27,6 +36,7 @@ export const manufacturersConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
   canDelete: true,
   metricsEndpoint: '/manufacturers/metrics',
   metricsConfig: {

@@ -25,6 +25,16 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// Enables the row-level edit action (ui#785). PUT/PATCH /suppliers/:id now exist.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    name: (values.name as string) || undefined,
+    phone: (values.phone as string) || undefined,
+    email: (values.email as string) || undefined,
+    address: (values.address as string) || undefined,
+  };
+}
+
 export const suppliersConfig: ModelConfig = {
   id: 'suppliers',
   title: 'Suppliers',
@@ -33,4 +43,5 @@ export const suppliersConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
 };

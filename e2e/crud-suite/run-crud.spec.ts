@@ -7,6 +7,33 @@ function tokenFor(resource: RxsoftCrudResource): string {
   return `${resource.uniquePrefix}-${Date.now().toString(36)}`;
 }
 
+/**
+ * Matches ONLY the JSON API list request for an endpoint — never the SPA
+ * document navigation. A bare RegExp / substring built from the endpoint also
+ * matches the page route (e.g. `/rxsoft/payment-providers` contains
+ * `/payment-providers`), so `page.route` would fulfil the document request with
+ * the mocked body and the app would never mount (rxsoft#780).
+ */
+function listApiMatcher(endpoint: string): (url: URL) => boolean {
+  const prefix = `${API_BASE_URL}${endpoint}`;
+  return (url: URL) => url.href.startsWith(prefix);
+}
+
+/**
+ * The list endpoint behind the page's DataPageShell/DataTable. For most
+ * resources this is `resource.endpoint`; the Inventory page instead embeds the
+ * Stock Balances shell (`/inventory/stock-balances`) while its fixture endpoint
+ * points at the bespoke movements table, so a mocked 500/loading delay must
+ * target the balances endpoint to reach DataTable's error/loading state (#780).
+ */
+const DATA_TABLE_ENDPOINT_OVERRIDES: Record<string, string> = {
+  'inventory-movements': '/inventory/stock-balances',
+};
+
+function dataTableEndpoint(resource: RxsoftCrudResource): string {
+  return DATA_TABLE_ENDPOINT_OVERRIDES[resource.id] ?? resource.endpoint;
+}
+
 /** Mirrors src/features/components/utils.ts getArrayPayload for API responses. */
 function getRows(payload: unknown): Array<Record<string, unknown>> {
   if (Array.isArray(payload)) {
@@ -206,8 +233,8 @@ for (const resource of rxsoftResources) {
       // Delay the list endpoint so the transient loading state is observable.
       // DataTable renders a Mantine Loader (`svg.mantine-Loader-root`) inside
       // `data-table-body` while the list query is pending.
-      const listRe = new RegExp(resource.endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-      await page.route(listRe, async (route) => {
+      const matcher = listApiMatcher(dataTableEndpoint(resource));
+      await page.route(matcher, async (route) => {
         await new Promise((resolve) => setTimeout(resolve, 1_500));
         await route.continue();
       });
@@ -215,7 +242,7 @@ for (const resource of rxsoftResources) {
       await crud.goto(resource.route);
       const loader = page.getByTestId('data-table-body').locator('.mantine-Loader-root');
       await expect(loader.first()).toBeVisible({ timeout: 8_000 });
-      await page.unroute(listRe);
+      await page.unroute(matcher);
       // Query resolves: the loader clears and a row (data or empty-state) renders.
       await expect(loader).toHaveCount(0, { timeout: 20_000 });
     });
@@ -237,36 +264,81 @@ for (const resource of rxsoftResources) {
       expect(focused, 'Tab must move focus to another element').toBeTruthy();
     });
 
-    // ── TC-*-22 API error surfaces (restored from 4137cd2 — lost in the
-    //    PR #120/#121 merge dance; the coverage mapping still credits it). ──
+    // ── TC-*-22 API error surfaces (previously uncovered — no spec) ───────
     test('list surfaces a load error when the endpoint fails', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
-      const listRe = new RegExp(resource.endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-      await page.route(listRe, (route) =>
-        route.fulfill({
+      const matcher = listApiMatcher(dataTableEndpoint(resource));
+      await page.route(matcher, (route) => {
+        const request = route.request();
+        // The API is cross-origin (localhost:8080 vs :5173) and the GET carries
+        // an Authorization header, so it is preflighted. Answer OPTIONS with a
+        // permissive CORS response so the real GET reaches our 500 (otherwise
+        // the app would only see an opaque network/CORS failure).
+        if (request.method() === 'OPTIONS') {
+          return route.fulfill({
+            status: 204,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET,OPTIONS',
+              'Access-Control-Allow-Headers': 'authorization,content-type',
+            },
+          });
+        }
+        return route.fulfill({
           status: 500,
           contentType: 'application/json',
+          headers: { 'Access-Control-Allow-Origin': '*' },
           body: JSON.stringify({ message: 'boom' }),
-        })
-      );
-      await crud.goto(resource.route);
-      // DataTable renders "Failed to load data" when `errorLoading` is set.
-      await expect(page.getByText('Failed to load data').first()).toBeVisible({ timeout: 15_000 });
-      await page.unroute(listRe);
+        });
+      });
+      try {
+        await crud.goto(resource.route);
+        // The server's error message must be surfaced to the user (rxsoft#780).
+        await expect(
+          page.locator('.mantine-Notification-root').filter({ hasText: 'boom' }).first()
+        ).toBeVisible({ timeout: 15_000 });
+        // DataTable renders "Failed to load data" when `errorLoading` is set.
+        await expect(
+          page.getByTestId('data-table-body').getByText('Failed to load data').first()
+        ).toBeVisible({ timeout: 15_000 });
+      } finally {
+        await page.unroute(matcher);
+      }
     });
 
-    test('edits the created record through the modal', async ({ page }, testInfo) => {
+    test('edits the created record (modal or edit route)', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
-      test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
+      test.skip(!resource.canEdit, 'resource is not editable');
       await crud.search(createdToken);
-      await expect(crud.rowAction(createdToken, 'edit')).toBeVisible();
-      await crud.rowAction(createdToken, 'edit').click();
-      await expect(crud.dialog).toBeVisible();
-      await crud.edit(resource, createdToken);
-      await expect(crud.dialog).toBeHidden();
+      const editBtn = crud.rowAction(createdToken, 'edit');
+      await expect(editBtn).toBeVisible();
+      await editBtn.click();
+
+      if (resource.editMode === 'route') {
+        // Route-based edit: the pencil navigates to a generic, schema-driven
+        // edit route (not a modal) — the list header disappears. Fill the
+        // field on the page and save.
+        await expect(crud.dialog).toBeHidden();
+        await expect(crud.searchInput).toBeHidden({ timeout: 15_000 });
+        await crud.fillField(
+          resource.editField!.label,
+          resource.editField!.value(createdToken),
+          'page'
+        );
+        await page
+          .getByRole('button', { name: /save|update|submit/i })
+          .first()
+          .click();
+      } else {
+        await expect(crud.dialog).toBeVisible();
+        await crud.edit(resource, createdToken);
+        await expect(crud.dialog).toBeHidden();
+      }
+
       updatedToken = resource.editField!.value(createdToken);
+      await crud.goto(resource.route);
       await crud.search(updatedToken);
-      await expect(crud.getRow(updatedToken)).toBeVisible();
+      await expect(crud.getRow(updatedToken)).toBeVisible({ timeout: 20_000 });
     });
 
     test('deletes the created record via the row action', async ({ page }, testInfo) => {
@@ -281,12 +353,7 @@ for (const resource of rxsoftResources) {
       // alone exhausts the default 60s per-test budget.
       test.setTimeout(120_000);
       const searchKey = updatedToken ?? createdToken;
-      // Clear search first in case previous test left it filled
-      await crud.searchInput.fill('');
-      await crud.page.waitForTimeout(500);
       await crud.search(searchKey);
-      // Wait for search to complete and row to appear
-      await expect(crud.getRow(searchKey)).toBeVisible({ timeout: 15_000 });
       await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
       await crud.rowAction(searchKey, 'delete').click();
       await crud.confirmDelete();

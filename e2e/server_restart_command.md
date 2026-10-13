@@ -20,7 +20,11 @@ cd identity && npm run start:dev
 cd seed && npm run start:dev
 
 # 4. frontend Vite — :5173 (always via dev-daemon so Playwright can reuse it)
-cd frontend && node e2e/tracker/dev-daemon.mjs --name vite-5173 --cwd "$PWD" --log /tmp/vite-5173.log -- yarn dev --host
+#    NODE_ENV=development is REQUIRED: Vite keys import.meta.env.DEV/PROD off
+#    NODE_ENV (not --mode), so a stray NODE_ENV=production turns on query
+#    retries and the global 500 → /500 redirect, which breaks the crud-suite
+#    API-error spec (rxsoft#780).
+cd frontend && node e2e/tracker/dev-daemon.mjs --name vite-5173 --cwd "$PWD" --log /tmp/vite-5173.log -- env NODE_ENV=development yarn dev --host
 ```
 
 Optionally wrap 1–3 in dev-daemon too (survives nothing across Freebuff restarts, but gives logs):

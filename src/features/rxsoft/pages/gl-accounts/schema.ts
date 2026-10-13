@@ -46,6 +46,18 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// Enables the row-level edit action (ui#785). PATCH /gl-accounts/:id already
+// exists; accountType support was added alongside it.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    accountCode: (values.accountCode as string) || undefined,
+    accountName: (values.accountName as string) || undefined,
+    accountType: (values.accountType as any)?.value ?? values.accountType,
+    allowsReconciliation: values.allowsReconciliation,
+    isActive: values.isActive,
+  };
+}
+
 export const glAccountsConfig: ModelConfig = {
   id: 'gl-accounts',
   title: 'Chart of Accounts',
@@ -54,5 +66,6 @@ export const glAccountsConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
   canDelete: true,
 };

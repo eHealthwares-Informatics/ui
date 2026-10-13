@@ -45,6 +45,19 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// DataPageShell gates the row-level edit action on `buildUpdatePayload` being
+// defined (ui#785). PUT/PATCH /insurance-providers/:id already exist.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    code: (values.code as string) || undefined,
+    name: (values.name as string) || undefined,
+    providerType: (values.providerType as any)?.value ?? values.providerType,
+    contactPhone: (values.contactPhone as string) || undefined,
+    contactEmail: (values.contactEmail as string) || undefined,
+    isActive: values.isActive,
+  };
+}
+
 export const insuranceProvidersConfig: ModelConfig = {
   id: 'insurance-providers',
   title: 'Insurance Providers',
@@ -53,5 +66,6 @@ export const insuranceProvidersConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
   canDelete: true,
 };

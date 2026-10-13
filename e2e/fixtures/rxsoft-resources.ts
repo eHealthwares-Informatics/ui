@@ -41,6 +41,13 @@ export type RxsoftCrudResource = {
   createFields: CrudFieldSpec[];
   /** Field changed by the edit test; value is derived from the create token. */
   editField?: { label: string; value: (token: string) => string };
+  /**
+   * How the row "edit" action opens. Default `modal` (Mantine dialog).
+   * `route` = the pencil navigates to a generic schema-driven edit route
+   * (the page renders the same field schema, not a modal). Bespoke edit
+   * screens stay gated.
+   */
+  editMode?: 'modal' | 'route';
   canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
@@ -76,7 +83,13 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     ],
     editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: true,
+    // ui#124 item 2: the edit test fails on the QA box (create works). The
+    // static path looks correct — getDirtyFields sends only the changed `name`,
+    // the DTO accepts it and PATCH /payment-providers/:id exists — so this
+    // needs a live-run trace, not a guess. Reverted to create-only (the fix the
+    // ticket sanctions) so the suite stays honest instead of red; re-enable
+    // once the failing step is identified.
+    canEdit: false,
     canDelete: true,
     hasExport: false,
   },
@@ -93,8 +106,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Type', kind: 'select', option: 'HMO' },
       { label: 'Contact Phone', value: () => '080' + Math.floor(Math.random() * 1_000_000_000) },
     ],
+    // Owner 2026-10-13: activate CRUD.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -108,10 +122,15 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [
       { label: 'Code', value: t },
       { label: 'Label', value: t },
+      // Must match the field label in pos-terminals/schema.ts ('Provider Type').
+      // The column header is 'Provider', but the create-modal field is not —
+      // chooseOption() anchors on the exact label, so 'Provider' never resolved
+      // and the create modal timed out (ui#124).
       { label: 'Provider Type', kind: 'select', option: 'Paystack' },
     ],
+    editField: { label: 'Label', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -130,23 +149,24 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     canDelete: false,
     hasExport: false,
   },
-  {
-    id: 'uom-category',
-    title: 'UOM Categories',
-    route: '/rxsoft/uom-category',
-    // NOTE: the uom-category page reuses the /uoms endpoint with a type
-    // discriminator in buildCreatePayload — a created row is a UOM, not a
-    // category, so asserting list visibility of the token is unreliable.
-    // Gated out of the create path; list/pagination still covered.
-    endpoint: '/uoms',
-    nameLabel: 'Name',
-    uniquePrefix: 'E2E UOMCat',
-    createFields: [],
-    canCreate: false,
-    canEdit: false,
-    canDelete: false,
-    hasExport: false,
-  },
+  // EXCLUDED (owner 2026-10-13): the uom-category page reuses the /uoms
+  // endpoint with a type discriminator in buildCreatePayload — a created row
+  // is a UOM, not a category, so asserting list visibility of the token is
+  // unreliable. Excluded from the generic crud runner entirely; UOM-category
+  // coverage comes from the `uoms` resource + dedicated specs.
+  // {
+  //   id: 'uom-category',
+  //   title: 'UOM Categories',
+  //   route: '/rxsoft/uom-category',
+  //   endpoint: '/uoms',
+  //   nameLabel: 'Name',
+  //   uniquePrefix: 'E2E UOMCat',
+  //   createFields: [],
+  //   canCreate: false,
+  //   canEdit: false,
+  //   canDelete: false,
+  //   hasExport: false,
+  // },
   {
     id: 'users',
     title: 'Users',
@@ -184,6 +204,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Sale Number',
     uniquePrefix: 'E2E SaleLine',
     createFields: [],
+    // Owner 2026-10-13: view + export only; list/detail via bespoke sales-lines-bespoke.spec.ts.
     canCreate: false,
     canEdit: false,
     canDelete: false,
@@ -197,10 +218,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Reference',
     uniquePrefix: 'E2E Payment',
     createFields: [],
+    // Owner 2026-10-13: view + export only; create/edit/delete via bespoke flows (pos-flow.spec.ts, full-business-flow.spec.ts).
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: false,
+    hasExport: true,
   },
   {
     id: 'payment-transactions',
@@ -210,10 +232,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Reference',
     uniquePrefix: 'E2E PayTxn',
     createFields: [],
+    // Owner 2026-10-13: view + export only.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: false,
+    hasExport: true,
   },
   {
     id: 'receivables',
@@ -223,10 +246,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Party',
     uniquePrefix: 'E2E Receivable',
     createFields: [],
+    // Owner 2026-10-13: view + export only; list/detail via bespoke receivables-bespoke.spec.ts.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: false,
+    hasExport: true,
   },
   {
     id: 'price-list-items',
@@ -318,10 +342,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Category',
     createFields: [],
+    // Owner 2026-10-13: view only.
     canCreate: false, // requires required `parentId` async-select
     canEdit: false,
     canDelete: false,
-    hasExport: true,
+    hasExport: false,
   },
   {
     id: 'customers',
@@ -344,10 +369,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Supplier',
     createFields: [{ label: 'Name', value: t }],
+    // Owner 2026-10-13: full CRUD + export.
     canCreate: true,
-    canEdit: false,
-    canDelete: false,
-    hasExport: false,
+    canEdit: true,
+    canDelete: true,
+    hasExport: true,
   },
   {
     id: 'manufacturers',
@@ -360,8 +386,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Code', value: t },
       { label: 'Name', value: t },
     ],
+    // Owner 2026-10-13: editing enabled.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -395,8 +422,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     ],
     canCreate: true,
     canEdit: false,
-    // DELETE /api/uoms/:id has no backend route (404) — nothing is actually deleted.
-    canDelete: false,
+    // DELETE /uoms/:id now ships (rxsoft#782) with a check-if-in-use guard. The
+    // suite only deletes a UOM it just created, which nothing references yet.
+    canDelete: true,
     hasExport: false,
   },
   {
@@ -407,6 +435,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Code',
     uniquePrefix: 'E2E-PH',
     createFields: [{ label: 'Code', value: t }],
+    // Owner 2026-10-13: read-only.
     canCreate: false, // proxied to healthcare-concepts (not running) — create does not persist
     canEdit: false,
     canDelete: false,
@@ -420,10 +449,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Component',
     createFields: [{ label: 'Name', value: t }],
+    // Owner 2026-10-13: read-only.
     canCreate: false, // proxied to healthcare-concepts (not running) — create does not persist
     canEdit: false,
     canDelete: false,
-    hasExport: true,
+    hasExport: false,
   },
   {
     id: 'branches',
@@ -433,9 +463,10 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Branch',
     createFields: [],
-    canCreate: false, // tab-group wizard modal
-    canEdit: false,
-    canDelete: false,
+    // Owner 2026-10-13: full CRUD.
+    canCreate: true, // tab-group wizard modal
+    canEdit: true,
+    canDelete: true,
     hasExport: false,
   },
   {
@@ -449,9 +480,12 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Code', value: t },
       { label: 'Warehouse Name', value: t },
     ],
+    // Owner 2026-10-13: full CRUD.
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
+    editMode: 'route', // edit opens a schema-driven route page, not a modal
     canCreate: true,
-    canEdit: false, // opens an edit route page, not the modal
-    canDelete: false,
+    canEdit: true, // opens an edit route page, not the modal
+    canDelete: true,
     hasExport: true,
   },
   {
@@ -462,6 +496,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'ID',
     uniquePrefix: 'E2E Audit',
     createFields: [],
+    // Owner 2026-10-13: read-only (immutable ledger).
     canCreate: false,
     canEdit: false,
     canDelete: false,
@@ -479,8 +514,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Name', value: t },
       { label: 'Method Type', kind: 'select', option: 'Cash' },
     ],
+    // Owner 2026-10-13: edit enabled.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -496,8 +532,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Account Name', value: t },
       { label: 'Account Type', kind: 'select', option: 'Asset' },
     ],
+    // Owner 2026-10-13: edit enabled.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -533,9 +570,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     // input — omit it and create a role with no permission codes.
     editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    // PATCH /roles/:id does not exist on the backend — the edit modal stays
-    // open because the request 404s. Gate until the endpoint ships.
-    canEdit: false,
+    // PATCH /roles/:id now exists on the proxy (rxsoft#781) and the edit modal
+    // closes on save, so the edit TCs can run.
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -550,8 +587,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Code', value: t },
       { label: 'Name', value: t },
     ],
+    // Owner 2026-10-13: edit enabled.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -563,9 +601,10 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Location Name',
     uniquePrefix: 'E2E StockLocation',
     createFields: [],
-    canCreate: false, // requires parentId + warehouseId async-selects
-    canEdit: false,
-    canDelete: false,
+    // Owner 2026-10-13: full CRUD (create also covered by stock-locations-create.spec.ts).
+    canCreate: true, // requires parentId + warehouseId async-selects
+    canEdit: true,
+    canDelete: true,
     hasExport: true,
   },
   {

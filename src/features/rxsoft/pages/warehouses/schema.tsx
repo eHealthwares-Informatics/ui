@@ -117,6 +117,8 @@ export const warehousesConfig: ModelConfig = {
   csvEndpoint: '/warehouses/export',
 
   detailPathBuilder: (row) => `/inventory/warehouses/${row.id}`,
-  editPathBuilder: (row) => `/inventory/warehouses/${row.id}/edit`,
+  // Edit uses the schema-driven modal (buildUpdatePayload above). The previous
+  // editPathBuilder pointed at /inventory/warehouses/:id/edit, which has no
+  // route — the edit action navigated to a 404 (ui#785).
   deletePathBuilder: (row) => `/warehouses/${row.id}`,
 };

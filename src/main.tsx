@@ -13,6 +13,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import axios, { AxiosError } from 'axios';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { handleServerError } from '@/lib/handle-server-error';
 import { getDefaultRoute } from '@/lib/subdomain';
 import { useAuthStore } from '@/stores/auth-store';
@@ -89,12 +90,17 @@ const queryClient = new QueryClient({
           const redirect = router.history.location.pathname + router.history.location.search;
           router.navigate({ to: '/sign-in', search: { redirect } });
         }
-        if (error.response?.status === 500) {
-          notifications.show({ title: 'Server Error', message: error.message, color: 'red' });
-          // Only navigate to error page in production to avoid disrupting HMR in development
-          if (import.meta.env.PROD) {
-            router.navigate({ to: '/500' });
-          }
+        const status = error.response?.status;
+        if (status && status >= 500) {
+          // Always surface the server's message for a failed API call — and
+          // never destroy the page. A failing list/query renders its own
+          // in-table error state ("Failed to load data"), so a background 5xx
+          // must not hard-navigate to /500 (rxsoft#780).
+          notifications.show({
+            title: 'Server Error',
+            message: getApiErrorMessage(error),
+            color: 'red',
+          });
         }
         if (error.response?.status === 403) {
           router.navigate({ to: '/403', replace: true });

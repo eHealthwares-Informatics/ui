@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { CheckCircle2, Package, ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { websiteApi } from '../website/api';
 import {
   WebsiteLayout,
   green,
@@ -39,14 +39,9 @@ export default function PayReturnPage() {
   const { data: tx, isLoading: txLoading } = useQuery({
     queryKey: ['pay-return', reference],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get(`/payments/verify/${reference}`);
-      return data as {
-        reference: string;
-        status: string;
-        amountPaid: number;
-        provider: string;
-        paid: boolean;
-      };
+      // Storefront route — use the website client so an expired shopper session
+      // never bounces to the admin /sign-in (ui#2).
+      return websiteApi.verifyPayment(reference);
     },
     enabled: !!reference,
     retry: 2,
