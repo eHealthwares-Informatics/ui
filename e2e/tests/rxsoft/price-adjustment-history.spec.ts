@@ -244,16 +244,19 @@ test.describe('RxSoft Price Adjustment History', () => {
     await page.goto('/rxsoft/price-adjustments');
 
     // Footer shows the total; Mantine Pagination renders (>1 page).
+    // NOTE: Mantine v9 Pagination does not expose an aria-label'd nav —
+    // locate the component by its root class and click the page-2 button
+    // (verified from the failure screenshot: buttons 1/2/3 render).
     await expect(page.getByText('45 adjustments')).toBeVisible({ timeout: 30_000 });
-    const pagination = page.getByRole('navigation', { name: 'pagination' });
-    await expect(pagination).toBeVisible();
+    const pagination = page.locator('.mantine-Pagination-root').first();
+    await expect(pagination).toBeVisible({ timeout: 15_000 });
 
     // Clicking page 2 re-requests with page=2.
     const nextPage = page.waitForResponse(
       (res) => res.url().includes('/api/price-adjustments') && res.url().includes('page=2'),
       { timeout: 30_000 }
     );
-    await pagination.getByRole('button', { name: '2' }).click();
+    await pagination.getByRole('button', { name: '2', exact: true }).click();
     expect((await nextPage).status()).toBeLessThan(400);
   });
 });
