@@ -174,6 +174,7 @@ export function PosSetPriceModal({
             value={`${uomName} (×${factor})`}
             disabled
             styles={{ input: { color: '#495057' } }}
+            data-testid="pos-set-price-uom-label"
           />
         )}
 
@@ -186,13 +187,19 @@ export function PosSetPriceModal({
           onChange={(v) => setPrice(Number(v) || 0)}
           min={0}
           required
+          data-testid="pos-set-price-input"
         />
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} data-testid="pos-set-price-cancel-btn">
             Cancel
           </Button>
-          <Button onClick={handleSave} loading={saving} disabled={price === null}>
+          <Button
+            onClick={handleSave}
+            loading={saving}
+            disabled={price === null}
+            data-testid="pos-set-price-save-btn"
+          >
             Save Price
           </Button>
         </Group>

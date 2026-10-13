@@ -133,13 +133,15 @@ export function InvoicePreviewModal({ opened, onClose, session, onProceedToPayme
         </Paper>
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} data-testid="pos-invoice-cancel-btn">
             Cancel
           </Button>
-          <Button variant="light" onClick={handlePrintInvoice}>
+          <Button variant="light" onClick={handlePrintInvoice} data-testid="pos-invoice-print-btn">
             Print Invoice
           </Button>
-          <Button onClick={onProceedToPayment}>Proceed to Payment</Button>
+          <Button onClick={onProceedToPayment} data-testid="pos-invoice-proceed-payment-btn">
+            Proceed to Payment
+          </Button>
         </Group>
       </Stack>
     </Modal>

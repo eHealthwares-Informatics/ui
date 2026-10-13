@@ -154,12 +154,14 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           label="Allow POS"
           checked={config?.allowPos ?? true}
           onChange={(e) => updateConfig.mutate({ allowPos: e.currentTarget.checked })}
+          data-testid="pos-settings-allow-pos"
         />
 
         <Switch
           label="Allow A4 Print (Wholesale)"
           checked={config?.allowA4Print ?? false}
           onChange={(e) => updateConfig.mutate({ allowA4Print: e.currentTarget.checked })}
+          data-testid="pos-settings-allow-a4"
         />
 
         <TextInput
@@ -167,6 +169,7 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           placeholder="default"
           value={config?.storeId ?? ''}
           onChange={(e) => updateConfig.mutate({ storeId: e.currentTarget.value || null })}
+          data-testid="pos-settings-store-id"
         />
 
         <Select
@@ -178,6 +181,7 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           searchable
           nothingFoundMessage="No locations found"
           onChange={handleStockLocationChange}
+          data-testid="pos-settings-stock-location"
         />
 
         <Select
@@ -189,6 +193,7 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           searchable
           nothingFoundMessage="No customers found"
           onChange={(value) => updateConfig.mutate({ defaultCustomerId: value })}
+          data-testid="pos-settings-default-customer"
         />
 
         <Select
@@ -200,24 +205,28 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           searchable
           nothingFoundMessage="No price lists found"
           onChange={(value) => updateConfig.mutate({ defaultPriceListId: value })}
+          data-testid="pos-settings-default-price-list"
         />
 
         <Switch
           label="Auto-select Stock Location"
           checked={config?.autoSelectLocation ?? true}
           onChange={(e) => updateConfig.mutate({ autoSelectLocation: e.currentTarget.checked })}
+          data-testid="pos-settings-auto-select-location"
         />
 
         <Switch
           label="Auto-select Customer"
           checked={config?.autoSelectCustomer ?? true}
           onChange={(e) => updateConfig.mutate({ autoSelectCustomer: e.currentTarget.checked })}
+          data-testid="pos-settings-auto-select-customer"
         />
 
         <Switch
           label="Auto-select Price List"
           checked={config?.autoSelectPriceList ?? true}
           onChange={(e) => updateConfig.mutate({ autoSelectPriceList: e.currentTarget.checked })}
+          data-testid="pos-settings-auto-select-price-list"
         />
 
         <NumberInput
@@ -226,9 +235,14 @@ export function PosSettingsDrawer({ opened, onClose }: Props) {
           onChange={(v) => updateConfig.mutate({ loginTimeoutMinutes: v ? Number(v) : null })}
           min={1}
           max={1440}
+          data-testid="pos-settings-login-timeout"
         />
 
-        <Switch label="Toggle Theme" onClick={() => toggleColorScheme()} />
+        <Switch
+          label="Toggle Theme"
+          onClick={() => toggleColorScheme()}
+          data-testid="pos-settings-toggle-theme"
+        />
 
         {/* ── Print Server ─────────────────────────────────────────── */}
         <Text fw={600} mt="md">

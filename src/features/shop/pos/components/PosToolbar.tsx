@@ -97,9 +97,15 @@ export function PosToolbar({
           clearable
           w={180}
           disabled={session.status === 'completed'}
+          data-testid="pos-toolbar-customer"
         />
 
-        <Button size="xs" leftSection={<Plus size={14} />} onClick={() => setCustomerModal(true)}>
+        <Button
+          size="xs"
+          leftSection={<Plus size={14} />}
+          onClick={() => setCustomerModal(true)}
+          data-testid="pos-toolbar-add-customer-btn"
+        >
           + Customer
         </Button>
 
@@ -122,9 +128,15 @@ export function PosToolbar({
           clearable
           w={170}
           disabled={session.status === 'completed'}
+          data-testid="pos-toolbar-price-list"
         />
 
-        <Button size="xs" leftSection={<Search size={14} />} onClick={onHeldSalesOpen}>
+        <Button
+          size="xs"
+          leftSection={<Search size={14} />}
+          onClick={onHeldSalesOpen}
+          data-testid="pos-toolbar-held-sales-btn"
+        >
           Sales{' '}
           {salesCount > 0 && (
             <Badge ml={4} size="xs">
@@ -144,12 +156,14 @@ export function PosToolbar({
           w={220}
           leftSection={<Search size={14} />}
           nothingFoundMessage="No sales or orders found"
+          data-testid="pos-toolbar-load-sale"
         />
 
         <Button
           size="xs"
           variant="light"
           leftSection={<RefreshCcw size={14} />}
+          data-testid="pos-toolbar-refresh-btn"
           onClick={() => {
             queryClient.invalidateQueries({ queryKey: ['pos-items'] });
             queryClient.invalidateQueries({ queryKey: ['item-uoms'] });
@@ -200,11 +214,17 @@ export function PosToolbar({
           leftSection={<RefreshCcw size={14} />}
           onClick={onReset}
           disabled={session.status === 'completed'}
+          data-testid="pos-toolbar-reset-btn"
         >
           Reset POS
         </Button>
 
-        <ActionIcon size="lg" variant="light" onClick={onSettings}>
+        <ActionIcon
+          size="lg"
+          variant="light"
+          onClick={onSettings}
+          data-testid="pos-toolbar-settings-btn"
+        >
           <Settings size={18} />
         </ActionIcon>
       </Group>

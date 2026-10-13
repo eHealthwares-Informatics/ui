@@ -41,12 +41,15 @@ export default function PosSalesPage() {
       <Paper radius={0} withBorder p="xs" bg="#d9edf5">
         <Group justify="space-between">
           <Group>
-            <Button size="xs">Next Sales</Button>
+            <Button size="xs" data-testid="pos2-next-sales-btn">
+              Next Sales
+            </Button>
 
             <TextInput
               leftSection={<Search size={16} />}
               placeholder="Enter Item to search for Here"
               w={400}
+              data-testid="pos2-item-search"
             />
           </Group>
 
@@ -57,26 +60,31 @@ export default function PosSalesPage() {
       {/* Toolbar */}
       <Paper radius={0} withBorder p="sm" bg="#bfe0ea">
         <Group>
-          <Button color="yellow" variant="filled">
+          <Button color="yellow" variant="filled" data-testid="pos2-single-item-selection-btn">
             Single Item Selection
           </Button>
 
-          <Button variant="filled">Multiple Item Selection</Button>
+          <Button variant="filled" data-testid="pos2-multi-item-selection-btn">
+            Multiple Item Selection
+          </Button>
 
           <Select
             label="Choose Customer"
             w={250}
             data={['ADOF HOSPITAL']}
             defaultValue="ADOF HOSPITAL"
+            data-testid="pos2-choose-customer"
           />
 
-          <Button leftSection={<Plus size={16} />}>+ Customer</Button>
+          <Button leftSection={<Plus size={16} />} data-testid="pos2-add-customer-btn">
+            + Customer
+          </Button>
 
           <Text fw={700} size="lg">
             Customer: 1
           </Text>
 
-          <Button color="red" leftSection={<RefreshCcw size={16} />}>
+          <Button color="red" leftSection={<RefreshCcw size={16} />} data-testid="pos2-reset-btn">
             Reset POS
           </Button>
 
@@ -104,20 +112,24 @@ export default function PosSalesPage() {
           <Table.Tbody>
             <Table.Tr>
               <Table.Td>
-                <Checkbox defaultChecked />
+                <Checkbox defaultChecked data-testid="pos2-item-row-checkbox" />
               </Table.Td>
 
               <Table.Td>CR0129</Table.Td>
 
               <Table.Td>
-                <Select data={['Amodiaquinne (X1)']} defaultValue="Amodiaquinne (X1)" />
+                <Select
+                  data={['Amodiaquinne (X1)']}
+                  defaultValue="Amodiaquinne (X1)"
+                  data-testid="pos2-item-select"
+                />
               </Table.Td>
 
               <Table.Td>40</Table.Td>
               <Table.Td>20</Table.Td>
 
               <Table.Td>
-                <NumberInput defaultValue={5} />
+                <NumberInput defaultValue={5} data-testid="pos2-item-qty" />
               </Table.Td>
 
               <Table.Td fw={700}>720</Table.Td>
@@ -198,7 +210,12 @@ export default function PosSalesPage() {
               </Flex>
             </Paper>
 
-            <Button fullWidth mt="md" leftSection={<Calculator size={16} />}>
+            <Button
+              fullWidth
+              mt="md"
+              leftSection={<Calculator size={16} />}
+              data-testid="pos2-calculate-sales-btn"
+            >
               Calculate Current Sales
             </Button>
 
@@ -212,19 +229,19 @@ export default function PosSalesPage() {
               </Title>
             </Paper>
 
-            <Button fullWidth mt="md">
+            <Button fullWidth mt="md" data-testid="pos2-sell-only-btn">
               Sell Only
             </Button>
 
-            <Button fullWidth mt="xs">
+            <Button fullWidth mt="xs" data-testid="pos2-sell-print-btn">
               Sell Print
             </Button>
 
-            <Button fullWidth mt="xs">
+            <Button fullWidth mt="xs" data-testid="pos2-print-wholesale-btn">
               Print Wholesale Receipt
             </Button>
 
-            <Button fullWidth mt="xs">
+            <Button fullWidth mt="xs" data-testid="pos2-next-customer-btn">
               Next Customer
             </Button>
           </Paper>

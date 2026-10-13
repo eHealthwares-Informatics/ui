@@ -41,12 +41,14 @@ export function QuickAddSupplierModal({ opened, onClose, onSupplierCreated }: Pr
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Supplier name"
           required
+          data-testid="po-supplier-quickadd-name"
         />
         <TextInput
           label="Phone"
           value={phone}
           onChange={(e) => setPhone(e.currentTarget.value)}
           placeholder="Phone number"
+          data-testid="po-supplier-quickadd-phone"
         />
         <TextInput
           label="Email"
@@ -54,18 +56,24 @@ export function QuickAddSupplierModal({ opened, onClose, onSupplierCreated }: Pr
           onChange={(e) => setEmail(e.currentTarget.value)}
           placeholder="Email address"
           type="email"
+          data-testid="po-supplier-quickadd-email"
         />
         <TextInput
           label="Address"
           value={address}
           onChange={(e) => setAddress(e.currentTarget.value)}
           placeholder="Address"
+          data-testid="po-supplier-quickadd-address"
         />
         <Group grow>
-          <Button loading={mutation.isPending} onClick={handleSubmit}>
+          <Button
+            loading={mutation.isPending}
+            onClick={handleSubmit}
+            data-testid="po-supplier-quickadd-create-btn"
+          >
             Create Supplier
           </Button>
-          <Button variant="light" onClick={onClose}>
+          <Button variant="light" onClick={onClose} data-testid="po-supplier-quickadd-cancel-btn">
             Cancel
           </Button>
         </Group>

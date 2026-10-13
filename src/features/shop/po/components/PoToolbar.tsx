@@ -144,7 +144,12 @@ export function PoToolbar({ onNew, onReset, onPrint, onSettings }: Props) {
           w={200}
         />
 
-        <Button size="xs" leftSection={<Plus size={14} />} onClick={() => setSupplierModal(true)}>
+        <Button
+          size="xs"
+          leftSection={<Plus size={14} />}
+          onClick={() => setSupplierModal(true)}
+          data-testid="po-toolbar-add-supplier-btn"
+        >
           + Supplier
         </Button>
 

@@ -161,6 +161,8 @@ function DispenseRowEditor({
   onAdd,
   onRemove,
   hideRemove,
+  /** Stable suffix for data-testids: persisted rows use orderItemId, the always-new empty row passes 'new'. */
+  testIdSuffix,
 }: {
   row: DispenseRow;
   priceListId?: string;
@@ -169,6 +171,7 @@ function DispenseRowEditor({
   onAdd: (item: CartItem) => void;
   onRemove: () => void;
   hideRemove?: boolean;
+  testIdSuffix: string;
 }) {
   const initialSelected: SelectedProduct | null = row.initialItem
     ? {
@@ -339,7 +342,13 @@ function DispenseRowEditor({
         ) : priceLoading ? (
           <Loader size={14} />
         ) : unitPriceDisplay === null ? (
-          <Button size="xs" variant="light" color="cyan" onClick={() => setSetPriceOpen(true)}>
+          <Button
+            size="xs"
+            variant="light"
+            color="cyan"
+            onClick={() => setSetPriceOpen(true)}
+            data-testid={`pos-dispense-${testIdSuffix}-set-price`}
+          >
             SetPrice
           </Button>
         ) : (
@@ -364,6 +373,7 @@ function DispenseRowEditor({
             placeholder="Pick UOM"
             disabled={itemUoms.length === 0}
             maxDropdownHeight={300}
+            data-testid={`pos-dispense-${testIdSuffix}-uom`}
           />
         )}
       </Table.Td>
@@ -374,6 +384,7 @@ function DispenseRowEditor({
           value={quantity}
           onChange={(v) => setQuantity(Number(v) || 1)}
           w={80}
+          data-testid={`pos-dispense-${testIdSuffix}-quantity`}
         />
       </Table.Td>
       <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>
@@ -642,6 +653,7 @@ export function ProductEntryTable({
                       prev.filter((r) => r.orderItemId !== row.orderItemId)
                     )
                   }
+                  testIdSuffix={row.orderItemId.startsWith('__new') ? 'new' : row.orderItemId}
                 />
               ))}
               {/* Always show one empty row for adding new items */}
@@ -661,6 +673,7 @@ export function ProductEntryTable({
                 onAdd={(item) => onDispenseAdd?.(item)}
                 onRemove={() => {}}
                 hideRemove
+                testIdSuffix="new"
               />
             </>
           ) : (
@@ -694,7 +707,13 @@ export function ProductEntryTable({
                   stockLoading ? (
                     <Loader size={14} />
                   ) : adjustedStockQty === null ? (
-                    <Button size="xs" variant="light" color="orange" onClick={openAdjustModal}>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      color="orange"
+                      onClick={openAdjustModal}
+                      data-testid="pos-entry-set-stock-btn"
+                    >
                       Set Stock
                     </Button>
                   ) : (
@@ -764,6 +783,7 @@ export function ProductEntryTable({
                   value={quantity}
                   onChange={(v) => setQuantity(Number(v) || 1)}
                   w={80}
+                  data-testid="pos-entry-quantity"
                 />
               </Table.Td>
               <Table.Td fw={700}>{total.toFixed(2)}</Table.Td>

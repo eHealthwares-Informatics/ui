@@ -35,18 +35,24 @@ export function CustomerQuickAddModal({ opened, onClose, onCustomerCreated }: Pr
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Customer name"
           required
+          data-testid="pos-customer-quickadd-name"
         />
         <TextInput
           label="Phone"
           value={phone}
           onChange={(e) => setPhone(e.currentTarget.value)}
           placeholder="Phone number"
+          data-testid="pos-customer-quickadd-phone"
         />
         <Group grow>
-          <Button loading={mutation.isPending} onClick={handleSubmit}>
+          <Button
+            loading={mutation.isPending}
+            onClick={handleSubmit}
+            data-testid="pos-customer-quickadd-create-btn"
+          >
             Create Customer
           </Button>
-          <Button variant="light" onClick={onClose}>
+          <Button variant="light" onClick={onClose} data-testid="pos-customer-quickadd-cancel-btn">
             Cancel
           </Button>
         </Group>

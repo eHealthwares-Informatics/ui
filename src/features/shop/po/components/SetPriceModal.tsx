@@ -117,6 +117,7 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
           decimalScale={4}
           min={0}
           step={0.01}
+          data-testid="po-set-price-input"
         />
 
         {purchaseUom && baseUom && purchaseUom.id !== baseUom.id && (
@@ -126,10 +127,12 @@ export function SetPriceModal({ opened, onClose, onConfirm, itemId, currentUnitC
         )}
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} data-testid="po-set-price-cancel-btn">
             Cancel
           </Button>
-          <Button onClick={() => onConfirm(unitCost)}>Confirm</Button>
+          <Button onClick={() => onConfirm(unitCost)} data-testid="po-set-price-confirm-btn">
+            Confirm
+          </Button>
         </Group>
       </Stack>
     </Modal>

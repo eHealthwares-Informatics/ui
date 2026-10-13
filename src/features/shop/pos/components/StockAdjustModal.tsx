@@ -100,6 +100,7 @@ export function StockAdjustModal({
             onChange={setSelectedLocationId}
             searchable
             nothingFoundMessage="No stock locations"
+            data-testid="pos-stock-adjust-location"
           />
         )}
 
@@ -109,16 +110,18 @@ export function StockAdjustModal({
           onChange={(v) => setNewQty(Number(v) || 0)}
           min={0}
           required
+          data-testid="pos-stock-adjust-qty"
         />
 
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} data-testid="pos-stock-adjust-cancel-btn">
             Cancel
           </Button>
           <Button
             onClick={() => adjustmentMutation.mutate()}
             loading={adjustmentMutation.isPending}
             disabled={newQty === currentQty || !effectiveLocationId}
+            data-testid="pos-stock-adjust-save-btn"
           >
             Update Stock
           </Button>

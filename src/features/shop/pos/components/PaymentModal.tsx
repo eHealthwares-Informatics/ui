@@ -450,6 +450,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           value={paid}
           onChange={(v) => setPaid(Number(v) || 0)}
           min={0}
+          data-testid="pos-payment-amount-paid"
         />
 
         {usesTerminal && (
@@ -459,6 +460,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
               value={terminalId}
               onChange={(v) => setTerminalId(v || null)}
               placeholder={terminals.length ? 'Select terminal' : 'No terminals configured'}
+              data-testid="pos-payment-terminal"
               data={terminals.map((t) => ({
                 value: t.id,
                 label: `${t.label ?? t.code} (${t.providerType})`,
@@ -473,11 +475,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                 leftSection={posStatus === 'awaiting' ? <Loader size={14} /> : undefined}
                 disabled={!terminalId || posStatus === 'awaiting' || posStatus === 'success'}
                 onClick={handleInitiatePos}
+                data-testid="pos-charge-card-btn"
               >
                 {posStatus === 'success' ? 'Card approved' : 'Charge Card on Terminal'}
               </Button>
               {posStatus !== 'idle' && posStatus !== 'success' && (
-                <Button variant="subtle" onClick={clearPosState}>
+                <Button variant="subtle" onClick={clearPosState} data-testid="pos-charge-reset-btn">
                   Reset
                 </Button>
               )}
@@ -505,6 +508,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                   value={providerId}
                   onChange={(v) => setProviderId(v || null)}
                   placeholder="Select provider"
+                  data-testid="pos-payment-provider"
                   data={providers
                     .filter((p) => p.configured)
                     .map((p) => ({ value: p.id, label: `${p.name} (${p.providerType})` }))}
@@ -514,6 +518,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                   disabled={!providerId}
                   onClick={handleGenerateLink}
                   leftSection={<Link size={14} />}
+                  data-testid="pos-generate-link-btn"
                 >
                   Generate Payment Link
                 </Button>
@@ -525,6 +530,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                 <TextInput
                   value={paymentLink.url}
                   readOnly
+                  data-testid="pos-payment-link-input"
                   rightSection={
                     <ActionIcon variant="subtle" onClick={handleCopyLink} title="Copy link">
                       <Copy size={14} />
@@ -537,6 +543,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                     size="xs"
                     leftSection={<ExternalLink size={14} />}
                     onClick={() => window.open(paymentLink.url, '_blank')}
+                    data-testid="pos-open-link-btn"
                   >
                     Open in Tab
                   </Button>
@@ -546,6 +553,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                     color="teal"
                     leftSection={<Mail size={14} />}
                     onClick={handleSendToCustomer}
+                    data-testid="pos-send-link-btn"
                   >
                     Send to Customer
                   </Button>
@@ -584,7 +592,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
               >
                 Complete sale offline
               </Button>
-              <Button variant="subtle" size="xs" onClick={() => setOfflinePrompt(false)}>
+              <Button
+                variant="subtle"
+                size="xs"
+                onClick={() => setOfflinePrompt(false)}
+                data-testid="pos-offline-cancel-btn"
+              >
                 Cancel
               </Button>
             </Group>

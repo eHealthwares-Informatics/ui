@@ -161,6 +161,7 @@ function CartRow({
           styles={{
             input: { color: 'lime', background: '#00185f', borderColor: '#2f8a53' },
           }}
+          data-testid={`pos-cart-qty-${item.id}`}
         />
       </Table.Td>
       <Table.Td c="lime">{(price * item.quantity * item.uomFactor).toFixed(2)}</Table.Td>

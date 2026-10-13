@@ -24,12 +24,13 @@ export function UnpostPasswordModal({ opened, onClose, onConfirm, loading }: Pro
           value={password}
           onChange={(e) => setPassword(e.currentTarget.value)}
           placeholder="password12"
+          data-testid="po-unpost-password"
         />
         <Group grow>
-          <Button loading={loading} onClick={handleSubmit}>
+          <Button loading={loading} onClick={handleSubmit} data-testid="po-unpost-confirm-btn">
             Confirm Unpost
           </Button>
-          <Button variant="light" onClick={onClose}>
+          <Button variant="light" onClick={onClose} data-testid="po-unpost-cancel-btn">
             Cancel
           </Button>
         </Group>

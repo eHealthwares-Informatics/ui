@@ -60,6 +60,7 @@ export function PoSummary({
             onChange={(e) => onReceivedDateChange(e.currentTarget.value)}
             w={160}
             disabled={isReadOnly}
+            data-testid="po-summary-received-date"
           />
           <Text size="xs">Lines: {lines.length}</Text>
           <Text size="xs">Receivable: {canReceive}</Text>

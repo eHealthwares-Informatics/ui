@@ -210,7 +210,7 @@ export function QuickAddProductModal({ opened, onClose, onProductCreated }: Prop
           >
             Create & Add
           </Button>
-          <Button variant="light" onClick={handleClose}>
+          <Button variant="light" onClick={handleClose} data-testid="quick-add-product-cancel">
             Cancel
           </Button>
         </Group>

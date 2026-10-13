@@ -29,6 +29,7 @@ export function HeldSalesDrawer({ opened, onClose, onResume, onPrintInvoice }: P
                   onResume(sale.id);
                   onClose();
                 }}
+                data-testid={`pos-held-resume-${sale.id}`}
               >
                 {sale.saleCode} - {sale.customerName || 'Walk-in'} · {itemCount} item
                 {itemCount !== 1 ? 's' : ''} · ₦{total.toFixed(2)}
@@ -37,6 +38,7 @@ export function HeldSalesDrawer({ opened, onClose, onResume, onPrintInvoice }: P
                 size="xs"
                 variant="outline"
                 leftSection={<Printer size={14} />}
+                data-testid={`pos-held-print-${sale.id}`}
                 onClick={() => {
                   onPrintInvoice(sale.id);
                   onClose();

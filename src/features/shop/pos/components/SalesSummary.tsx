@@ -69,6 +69,7 @@ export function SalesSummary({
           leftSection={<Calculator size={16} />}
           onClick={onCalculate}
           disabled={cartEmpty || sessionCompleted}
+          data-testid="pos-sales-summary-calculate-btn"
         >
           Print Invoice
         </Button>

@@ -69,6 +69,7 @@ function UomSelect({
       placeholder={isLoading ? 'Loading...' : 'UOM'}
       data={opts}
       value={value || null}
+      data-testid={`po-line-uom-${itemId}`}
       onChange={(v) => {
         if (v && v !== value) {
           onRequestChange(value, v, Array.isArray(uoms) ? uoms : []);
@@ -126,10 +127,14 @@ function UomChangeModal({
           </Text>
         )}
         <Group justify="flex-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} data-testid="po-alert-cancel-btn">
             Cancel
           </Button>
-          <Button onClick={onConfirm} disabled={sameCategory === false}>
+          <Button
+            onClick={onConfirm}
+            disabled={sameCategory === false}
+            data-testid="po-alert-confirm-btn"
+          >
             Confirm
           </Button>
         </Group>
