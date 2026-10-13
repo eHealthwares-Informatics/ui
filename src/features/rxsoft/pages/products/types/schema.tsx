@@ -42,6 +42,7 @@ function CategoryUomWatcher({
   updateField: (name: string, value: unknown) => void;
 }) {
   const category = formState.category as { value?: string; uomCategoryId?: string } | undefined;
+  const genericProduct = formState.genericProductCode as { value?: string } | undefined;
   useEffect(() => {
     if (category?.value && category?.uomCategoryId) {
       updateField('categoryUomCategoryId', category.uomCategoryId);
@@ -57,6 +58,36 @@ function CategoryUomWatcher({
         .catch(() => {});
     }
   }, [category?.value]);
+
+  useEffect(() => {
+    const code = genericProduct?.value;
+    if (!code) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const productResponse = await rxsoftApi.get(
+          `/generic-products/${encodeURIComponent(code)}`
+        );
+        const product = productResponse.data?.data ?? productResponse.data;
+        const uomCode = product?.uomCode as string | undefined;
+        if (!uomCode) return;
+
+        const uomResponse = await rxsoftApi.get('/uoms', {
+          params: { search: uomCode, limit: 100 },
+        });
+        const uoms = uomResponse.data?.data ?? [];
+        const uom = uoms.find((candidate: any) => candidate.code === uomCode);
+        if (!cancelled && uom) {
+          updateField('baseUom', { value: uom.id, label: uom.name });
+        }
+      } catch {
+        // The server still resolves the GP base UOM when the form submits.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [genericProduct?.value]);
   return null;
 }
 
@@ -177,6 +208,7 @@ const itemCreateFieldGroups: FieldGroup[] = [
           const uomCatId = fs.categoryUomCategoryId as string | undefined;
           return uomCatId ? { uomCategoryId: uomCatId } : {};
         },
+        required: true,
         col: 4,
       },
       {
@@ -203,6 +235,7 @@ const itemCreateFieldGroups: FieldGroup[] = [
           const uomCatId = fs.categoryUomCategoryId as string | undefined;
           return uomCatId ? { uomCategoryId: uomCatId } : {};
         },
+        required: true,
         col: 4,
       },
     ],
@@ -917,10 +950,8 @@ export function buildItemPayload(values: Record<string, any>) {
       reason: 'Initial stock setup from item creation',
     }));
 
-  // Base UOM is always required by the step gate. CreateItemDto marks
-  // purchase/sale UOM @IsOptional, but CreateItemUseCase hard-requires all
-  // three ids (400 otherwise) — when the wizard's step gate submits without
-  // them, default purchase/sale to the base UOM. Never emit undefined/null.
+  // The base UOM may be inherited from a selected GP. Purchase and sale UOMs
+  // remain explicit selections and are never defaulted from the base UOM.
   const baseUomId = (values.baseUom as any)?.value as string | undefined;
   const purchaseUomId = (values as any).purchaseUom?.value as string | undefined;
   const saleUomId = (values as any).saleUom?.value as string | undefined;
@@ -931,8 +962,8 @@ export function buildItemPayload(values: Record<string, any>) {
     categoryId: (values.category as any).value,
     genericProductCode: (values?.genericProductCode as any)?.value,
     baseUomId,
-    purchaseUomId: purchaseUomId || baseUomId,
-    saleUomId: saleUomId || baseUomId,
+    purchaseUomId,
+    saleUomId,
     barcode: values.barcode || undefined,
     alias: values.alias || undefined,
     isActive: values.isActive,

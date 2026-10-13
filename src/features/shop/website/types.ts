@@ -24,6 +24,8 @@ export interface WebsiteProduct {
   genericDrug?: ShopGenericDrugView | null;
   genericProduct: {
     id: string;
+    /** GP business code (GP-xxxxx) — checkout sends this as genericItemCode, never the concepts UUID. */
+    code?: string | null;
     name: string;
     dosageForm: string | null;
     strength: string | null;

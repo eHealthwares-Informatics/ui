@@ -49,7 +49,11 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
       ? { Authorization: `Bearer ${accessTokenStr}`, 'Content-Type': 'application/json' }
       : { 'Content-Type': 'application/json' };
     async function del(path: string) {
-      try { await request.delete(`http://localhost:8080/api${path}`, { headers }); } catch { /* ignore */ }
+      try {
+        await request.delete(`http://localhost:8080/api${path}`, { headers });
+      } catch {
+        /* ignore */
+      }
     }
     if (saleId) await del(`/sales/${saleId}`);
     if (receiptId) await del(`/receipts/${receiptId}`);
@@ -64,7 +68,9 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
 
   /* ── 0. Seed prerequisite data ── */
 
-  test('0. seeds supplier, warehouse, category, stock location, item, UOM, price list, PO, receipt, sale with customer', async ({ page }) => {
+  test('0. seeds supplier, warehouse, category, stock location, item, UOM, price list, PO, receipt, sale with customer', async ({
+    page,
+  }) => {
     accessTokenStr = await readAccessToken(page);
     runId = `${TS}-${Date.now().toString(36).slice(-4)}`;
 
@@ -162,7 +168,10 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
 
     // Verify stock balance
     try {
-      const balanceRes = await apiFetch(page, `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`);
+      const balanceRes = await apiFetch(
+        page,
+        `/inventory/stock-balances?itemId=${itemId}&locationId=${stockLocationId}&limit=1`
+      );
       console.log('Stock balance check:', balanceRes);
       if (!balanceRes.data || balanceRes.data.length === 0 || !balanceRes.data[0].quantityOnHand) {
         throw new Error('Stock balance not found after adjustment');
@@ -197,23 +206,30 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     customerId = cust.id;
 
     // Get an existing payment method (cash) from seeded data
-    const pmRes = await apiFetch<{ data: Array<{ id: string; methodType: string }> }>(page, '/payment-methods?limit=10');
+    const pmRes = await apiFetch<{ data: Array<{ id: string; methodType: string }> }>(
+      page,
+      '/payment-methods?limit=10'
+    );
     const paymentMethod = pmRes.data?.find((p) => p.methodType === 'cash');
     paymentMethodId = paymentMethod?.id;
     expect(paymentMethodId).toBeTruthy();
 
     // Create sale with partial payment to generate a receivable
     // Total = 1000 (10 * 100), pay only 400 -> outstanding = 600
-    const sale = await apiCreate<{ id: string; saleNumber: string; status: string }>(page, '/sales', {
-      saleNumber: `REC-SALE-${TS}`,
-      saleChannel: 'pos',
-      storeId: 'default',
-      stockLocationId,
-      customerId,
-      lines: [{ itemId, uomId, quantity: 10, unitPrice: 100 }],
-      payments: [{ paymentMethodId, amount: 400 }], // Partial payment
-      hold: false,
-    });
+    const sale = await apiCreate<{ id: string; saleNumber: string; status: string }>(
+      page,
+      '/sales',
+      {
+        saleNumber: `REC-SALE-${TS}`,
+        saleChannel: 'pos',
+        storeId: 'default',
+        stockLocationId,
+        customerId,
+        lines: [{ itemId, uomId, quantity: 10, unitPrice: 100 }],
+        payments: [{ paymentMethodId, amount: 400 }], // Partial payment
+        hold: false,
+      }
+    );
     saleId = sale.id;
     expect(sale.status).toBe('posted');
 
@@ -246,24 +262,36 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
 
     const pageSizeSelect = page.getByTestId('page-size-select').first();
-    if (await pageSizeSelect.count() > 0) {
+    if ((await pageSizeSelect.count()) > 0) {
       await expect(pageSizeSelect).toBeVisible();
       await pageSizeSelect.click();
       const opt = page.getByRole('option', { name: /25|50|100/ }).first();
-      if (await opt.count() > 0) {
+      if ((await opt.count()) > 0) {
         await opt.click();
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
 
     const nextBtn = page.getByRole('button', { name: /next|›/i }).first();
     const prevBtn = page.getByRole('button', { name: /previous|‹/i }).first();
-    if (await nextBtn.count() > 0 && await nextBtn.isEnabled()) {
+    if ((await nextBtn.count()) > 0 && (await nextBtn.isEnabled())) {
       await nextBtn.click();
-      await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+      await page
+        .getByTestId('data-table-body')
+        .locator('tr')
+        .first()
+        .waitFor({ state: 'visible', timeout: 15_000 });
       if (await prevBtn.isEnabled()) {
         await prevBtn.click();
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
   });
@@ -274,11 +302,19 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     const sortableHeaders = ['Customer', 'Sale', 'Status', 'Original Amount', 'Outstanding Amount'];
     for (const headerText of sortableHeaders) {
       const th = page.locator('th').filter({ hasText: headerText }).first();
-      if (await th.count() > 0) {
+      if ((await th.count()) > 0) {
         await th.click({ timeout: 10_000 });
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
         await th.click({ timeout: 10_000 });
-        await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .getByTestId('data-table-body')
+          .locator('tr')
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
       }
     }
   });
@@ -299,7 +335,11 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     // Clear search restores full list
     await searchInput.clear();
     await page.waitForTimeout(1_000);
-    await page.getByTestId('data-table-body').locator('tr').first().waitFor({ state: 'visible', timeout: 15_000 });
+    await page
+      .getByTestId('data-table-body')
+      .locator('tr')
+      .first()
+      .waitFor({ state: 'visible', timeout: 15_000 });
   });
 
   test('TC-REC-02-02: no-match search shows empty state or error', async ({ page }) => {
@@ -326,10 +366,10 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
 
     // Check if there's a status filter dropdown
     const statusFilter = page.getByTestId('filter-status').first();
-    if (await statusFilter.count() > 0) {
+    if ((await statusFilter.count()) > 0) {
       await statusFilter.click();
       const partialOption = page.getByRole('option', { name: /partial|outstanding/i }).first();
-      if (await partialOption.count() > 0) {
+      if ((await partialOption.count()) > 0) {
         await partialOption.click();
         await page.waitForTimeout(1_000);
         const body = page.getByTestId('data-table-body');
@@ -346,7 +386,7 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     await page.goto('/rxsoft/receivables', { timeout: 60_000 });
 
     const exportBtn = page.getByTestId('header-export').first();
-    if (await exportBtn.count() > 0) {
+    if ((await exportBtn.count()) > 0) {
       await expect(exportBtn).toBeVisible();
       await exportBtn.click();
       await page.getByRole('menuitem', { name: 'CSV' }).click({ timeout: 10_000 });
@@ -396,8 +436,14 @@ test.describe.serial('RxSoft Receivables — Bespoke Filters & View', () => {
     await expect(body.locator('tr').first()).toBeVisible({ timeout: 15_000 });
 
     // Find the Sale column (index 2) and check for the badge link
-    const saleBadge = body.locator('tr').first().locator('td').nth(2).locator('badge, [role="button"]').first();
-    if (await saleBadge.count() > 0) {
+    const saleBadge = body
+      .locator('tr')
+      .first()
+      .locator('td')
+      .nth(2)
+      .locator('badge, [role="button"]')
+      .first();
+    if ((await saleBadge.count()) > 0) {
       await expect(saleBadge).toBeVisible();
       // Note: clicking would navigate away, so we just verify it exists
     }
