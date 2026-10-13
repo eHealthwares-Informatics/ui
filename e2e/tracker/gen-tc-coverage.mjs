@@ -42,10 +42,13 @@ const CAPABILITY_BY_NAME = [
   // `missing` on the tracker until list endpoints honor search everywhere.
   [/paginat/i, 'pagination'],
   [/create/i, 'create'],
+  [/required-field validation/i, 'create'],
   [/edit|update/i, 'edit'],
+  [/persist change/i, 'edit'],
   [/delete|archive/i, 'delete'],
   [/cleanup/i, 'cleanup'],
   [/export csv/i, 'export'],
+  [/export triggers/i, 'export'],
 ];
 
 /**
