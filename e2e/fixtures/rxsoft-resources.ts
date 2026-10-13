@@ -184,6 +184,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Sale Number',
     uniquePrefix: 'E2E SaleLine',
     createFields: [],
+    // Create needs Lines/Payments JSON arrays — bespoke sales-lines-bespoke.spec.ts
+    // covers the real create path (this generic gate is a no-op).
     canCreate: false,
     canEdit: false,
     canDelete: false,
@@ -264,6 +266,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Order Number',
     uniquePrefix: 'E2E WebOrder',
     createFields: [],
+    // Orders are created by the storefront, not the admin list — bespoke website-orders-bespoke.spec.ts
+    // covers status transitions; create is intentionally gated.
     canCreate: false,
     canEdit: false,
     canDelete: false,
@@ -290,6 +294,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Receipt Number',
     uniquePrefix: 'E2E Receipt',
     createFields: [],
+    // Receiving acts on posted POs — receiving.spec.ts covers receive/unpost
+    // (this generic gate is a no-op).
     canCreate: false,
     canEdit: false,
     canDelete: false,
@@ -303,6 +309,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Reference',
     uniquePrefix: 'E2E Move',
     createFields: [],
+    // Read-only ledger; mutations via adjust/transfer — inventory-adjust.spec.ts / inventory-transfer.spec.ts
+    // cover the write paths (this generic gate is a no-op).
     canCreate: false,
     canEdit: false,
     canDelete: false,
