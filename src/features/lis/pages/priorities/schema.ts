@@ -1,4 +1,5 @@
 import type { Column, Field } from '@/features/rxsoft/types';
+import { flattenOptionObjects } from '@/features/lis/schema/flatten-payload';
 import type { ModelConfig } from '@/features/shared/model-schema';
 
 const columns: Column[] = [
@@ -22,7 +23,8 @@ export const prioritiesConfig: ModelConfig = {
   endpoint: '/lis/priorities',
   columns,
   createFields,
-  buildCreatePayload: (v) => v,
-  buildUpdatePayload: (v) => v,
+  // Select fields store {value,label} option objects — flatten (see flatten-payload.ts).
+  buildCreatePayload: (v) => flattenOptionObjects(v),
+  buildUpdatePayload: (v) => flattenOptionObjects(v),
   canDelete: true,
 };

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { DataPageShell } from '@/features/components/page/data-page-shell';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { lisApi } from '@/lib/lis-api';
+import { flattenOptionObjects } from '../schema/flatten-payload';
 import { type LisResourceConfig } from '../schema/resources';
 
 function resourceToConfig(resource: LisResourceConfig): ModelConfig {
@@ -17,8 +18,10 @@ function resourceToConfig(resource: LisResourceConfig): ModelConfig {
     tabGroups: resource.tabGroups,
     createFields: resource.createFields,
     createFieldGroups: resource.createFieldGroups,
-    buildCreatePayload: (values) => values,
-    buildUpdatePayload: (values) => values,
+    // Select/async-select fields store {value,label} option objects in form
+    // state — flatten them or the LIS backend 400s the create payload.
+    buildCreatePayload: (values) => flattenOptionObjects(values),
+    buildUpdatePayload: (values) => flattenOptionObjects(values),
     canDelete: true,
   };
 }
