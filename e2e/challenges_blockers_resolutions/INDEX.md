@@ -24,6 +24,7 @@
 | Items create wizard is a full page (createPathBuilder), not a modal; page-scope option added to CrudShellPage | phase-2.md | resolved | page-object, wizard |
 | Create page requires more fields than schema marks; quiet validation (no DOM error, no POST) | phase-2.md | resolved | wizard, validation |
 | async-selects lack role=combobox; use data-testid=async-select-<field>; options detach mid-click (retry) | phase-2.md | resolved | selectors, mantine |
+| data-testid on all UI elements + testid-first e2e selectors: foundations landed, never-erodes CI gate + weekly audit active | data_test_id_task.md | done | selectors, qa, enforcement |
 | Serial+retry re-runs the whole group per pass under load; 120s budgets + self-contained tests | phase-2.md | resolved | playwright, flake |
 | Vite dev-server watch storm: Playwright artifacts (`e2e/reports`) reload the page mid-run | phase-2.md | resolved | e2e-harness, vite, hmr, flake |
 | Created rows land beyond page 1 of a 39k-row includeAll catalog; search before asserting | phase-2.md | resolved | list, assertions |

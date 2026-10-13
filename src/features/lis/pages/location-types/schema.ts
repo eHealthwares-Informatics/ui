@@ -1,5 +1,5 @@
-import type { Column, Field } from '@/features/rxsoft/types';
 import { flattenOptionObjects } from '@/features/lis/schema/flatten-payload';
+import type { Column, Field } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 
 const columns: Column[] = [

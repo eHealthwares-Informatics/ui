@@ -15,9 +15,7 @@
  * `providerType: (values.providerType as any)?.value ?? values.providerType`)
  * and the async-select flattening fixed for stock-locations.
  */
-export function flattenOptionObjects(
-  values: Record<string, unknown>
-): Record<string, unknown> {
+export function flattenOptionObjects(values: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(values)) {
     if (
