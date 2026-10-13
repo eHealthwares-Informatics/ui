@@ -237,6 +237,24 @@ for (const resource of rxsoftResources) {
       expect(focused, 'Tab must move focus to another element').toBeTruthy();
     });
 
+    // ── TC-*-22 API error surfaces (restored from 4137cd2 — lost in the
+    //    PR #120/#121 merge dance; the coverage mapping still credits it). ──
+    test('list surfaces a load error when the endpoint fails', async ({ page }, testInfo) => {
+      skipIfBackendDown(testInfo);
+      const listRe = new RegExp(resource.endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      await page.route(listRe, (route) =>
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'boom' }),
+        })
+      );
+      await crud.goto(resource.route);
+      // DataTable renders "Failed to load data" when `errorLoading` is set.
+      await expect(page.getByText('Failed to load data').first()).toBeVisible({ timeout: 15_000 });
+      await page.unroute(listRe);
+    });
+
     test('edits the created record through the modal', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
       test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
@@ -263,7 +281,12 @@ for (const resource of rxsoftResources) {
       // alone exhausts the default 60s per-test budget.
       test.setTimeout(120_000);
       const searchKey = updatedToken ?? createdToken;
+      // Clear search first in case previous test left it filled
+      await crud.searchInput.fill('');
+      await crud.page.waitForTimeout(500);
       await crud.search(searchKey);
+      // Wait for search to complete and row to appear
+      await expect(crud.getRow(searchKey)).toBeVisible({ timeout: 15_000 });
       await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
       await crud.rowAction(searchKey, 'delete').click();
       await crud.confirmDelete();

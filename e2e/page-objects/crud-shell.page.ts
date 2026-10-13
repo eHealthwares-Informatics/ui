@@ -159,9 +159,11 @@ export class CrudShellPage {
 
   /** Confirms the row-level delete ConfirmDialog. */
   async confirmDelete(): Promise<void> {
-    const dialog = this.page.getByRole('dialog', { name: 'Delete Item' });
-    await expect(dialog).toBeVisible();
-    const confirm = dialog.getByRole('button', { name: 'Delete' });
+    // There are two ConfirmDialogs on the page: one from DataPageShell and one from ActionCell.
+    // The ActionCell's dialog is the last one rendered, so use .last() to target it.
+    const dialog = this.page.getByTestId('confirm-dialog').last();
+    await expect(dialog).toBeVisible({ timeout: 15_000 });
+    const confirm = dialog.getByTestId('confirm-dialog-confirm');
     // The confirm button can stay disabled while a list refetch holds the
     // dialog in a loading state — wait for it to become enabled (observed
     // up to ~25s on slow list endpoints) instead of click-timing-out.
