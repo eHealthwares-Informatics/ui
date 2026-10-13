@@ -46,6 +46,21 @@ function buildCreatePayload(values: Record<string, unknown>) {
   };
 }
 
+// Required for the row-level edit action to render at all: DataPageShell gates
+// `onEdit` on `buildUpdatePayload` being defined. PATCH /pos-terminals/:id has
+// always existed on the backend — without this the edit modal was unreachable.
+function buildUpdatePayload(values: Record<string, unknown>) {
+  return {
+    code: (values.code as string) || undefined,
+    label: (values.label as string) || undefined,
+    providerType: (values.providerType as any)?.value ?? values.providerType,
+    serial: (values.serial as string) || undefined,
+    terminalId: (values.terminalId as string) || undefined,
+    storeId: (values.storeId as string) || undefined,
+    isActive: values.isActive,
+  };
+}
+
 export const posTerminalsConfig: ModelConfig = {
   id: 'pos-terminals',
   title: 'POS Terminals',
@@ -54,5 +69,6 @@ export const posTerminalsConfig: ModelConfig = {
   columns,
   createFields,
   buildCreatePayload,
+  buildUpdatePayload,
   canDelete: true,
 };

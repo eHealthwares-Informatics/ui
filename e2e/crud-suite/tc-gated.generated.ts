@@ -7,7 +7,7 @@
  * unimplemented test types stay missing until later phases.
  */
 
-// 141 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
+// 129 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
 // Board-sync scans this file (TC id per comment line) as coverage evidence.
 //   TC-RX-AUDIT-LOGS-20
 //   TC-RX-BRANCHES-14
@@ -57,9 +57,6 @@
 //   TC-RX-PAYMENT-METHODS-14
 //   TC-RX-PAYMENT-METHODS-15
 //   TC-RX-PAYMENT-METHODS-16
-//   TC-RX-PAYMENT-PROVIDERS-14
-//   TC-RX-PAYMENT-PROVIDERS-15
-//   TC-RX-PAYMENT-PROVIDERS-16
 //   TC-RX-PAYMENT-TRANSACTIONS-20
 //   TC-RX-PAYMENTS-09
 //   TC-RX-PAYMENTS-10
@@ -71,9 +68,6 @@
 //   TC-RX-PAYMENTS-17
 //   TC-RX-PAYMENTS-18
 //   TC-RX-PAYMENTS-19
-//   TC-RX-POS-TERMINALS-14
-//   TC-RX-POS-TERMINALS-15
-//   TC-RX-POS-TERMINALS-16
 //   TC-RX-PRICE-LIST-ITEMS-09
 //   TC-RX-PRICE-LIST-ITEMS-10
 //   TC-RX-PRICE-LIST-ITEMS-11
@@ -95,9 +89,6 @@
 //   TC-RX-PURCHASES-18
 //   TC-RX-PURCHASES-19
 //   TC-RX-RECEIVABLES-20
-//   TC-RX-ROLES-14
-//   TC-RX-ROLES-15
-//   TC-RX-ROLES-16
 //   TC-RX-SALES-09
 //   TC-RX-SALES-10
 //   TC-RX-SALES-11
@@ -137,9 +128,6 @@
 //   TC-RX-UOMS-14
 //   TC-RX-UOMS-15
 //   TC-RX-UOMS-16
-//   TC-RX-UOMS-17
-//   TC-RX-UOMS-18
-//   TC-RX-UOMS-19
 //   TC-RX-USERS-09
 //   TC-RX-USERS-10
 //   TC-RX-USERS-11

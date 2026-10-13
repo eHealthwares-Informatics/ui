@@ -108,10 +108,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [
       { label: 'Code', value: t },
       { label: 'Label', value: t },
-      { label: 'Provider Type', kind: 'select', option: 'Paystack' },
+      { label: 'Provider', kind: 'select', option: 'Paystack' },
     ],
+    editField: { label: 'Label', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -130,23 +131,24 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     canDelete: false,
     hasExport: false,
   },
-  {
-    id: 'uom-category',
-    title: 'UOM Categories',
-    route: '/rxsoft/uom-category',
-    // NOTE: the uom-category page reuses the /uoms endpoint with a type
-    // discriminator in buildCreatePayload — a created row is a UOM, not a
-    // category, so asserting list visibility of the token is unreliable.
-    // Gated out of the create path; list/pagination still covered.
-    endpoint: '/uoms',
-    nameLabel: 'Name',
-    uniquePrefix: 'E2E UOMCat',
-    createFields: [],
-    canCreate: false,
-    canEdit: false,
-    canDelete: false,
-    hasExport: false,
-  },
+  // EXCLUDED (owner 2026-10-13): the uom-category page reuses the /uoms
+  // endpoint with a type discriminator in buildCreatePayload — a created row
+  // is a UOM, not a category, so asserting list visibility of the token is
+  // unreliable. Excluded from the generic crud runner entirely; UOM-category
+  // coverage comes from the `uoms` resource + dedicated specs.
+  // {
+  //   id: 'uom-category',
+  //   title: 'UOM Categories',
+  //   route: '/rxsoft/uom-category',
+  //   endpoint: '/uoms',
+  //   nameLabel: 'Name',
+  //   uniquePrefix: 'E2E UOMCat',
+  //   createFields: [],
+  //   canCreate: false,
+  //   canEdit: false,
+  //   canDelete: false,
+  //   hasExport: false,
+  // },
   {
     id: 'users',
     title: 'Users',
@@ -395,8 +397,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     ],
     canCreate: true,
     canEdit: false,
-    // DELETE /api/uoms/:id has no backend route (404) — nothing is actually deleted.
-    canDelete: false,
+    // DELETE /uoms/:id now ships (rxsoft#782) with a check-if-in-use guard. The
+    // suite only deletes a UOM it just created, which nothing references yet.
+    canDelete: true,
     hasExport: false,
   },
   {
@@ -533,9 +536,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     // input — omit it and create a role with no permission codes.
     editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    // PATCH /roles/:id does not exist on the backend — the edit modal stays
-    // open because the request 404s. Gate until the endpoint ships.
-    canEdit: false,
+    // PATCH /roles/:id now exists on the proxy (rxsoft#781) and the edit modal
+    // closes on save, so the edit TCs can run.
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
