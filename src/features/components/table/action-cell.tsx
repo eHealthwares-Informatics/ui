@@ -70,13 +70,13 @@ export const ActionCell = ({
       )}
 
       {editPathBuilder && (
-        <ActionIcon variant="outline" component={Link} to={editPathBuilder(row)}>
+        <ActionIcon variant="outline" component={Link} to={editPathBuilder(row)} data-testid="row-edit">
           <Pencil size={16} />
         </ActionIcon>
       )}
 
       {!editPathBuilder && onEdit && (
-        <ActionIcon variant="outline" onClick={() => onEdit(row, rowIndex || 0)}>
+        <ActionIcon variant="outline" onClick={() => onEdit(row, rowIndex || 0)} data-testid="row-edit">
           <Pencil size={16} />
         </ActionIcon>
       )}
@@ -93,6 +93,7 @@ export const ActionCell = ({
           color="red"
           loading={deleteMutation && deleteMutation.isPending}
           onClick={() => setIsDeleteOpen(true)}
+          data-testid="row-delete"
         >
           <Trash2 size={16} />
         </ActionIcon>

@@ -241,8 +241,8 @@ for (const resource of rxsoftResources) {
       skipIfBackendDown(testInfo);
       test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
       await crud.search(createdToken);
-      await expect(crud.rowAction(createdToken, 'lucide-pencil')).toBeVisible();
-      await crud.rowAction(createdToken, 'lucide-pencil').click();
+      await expect(crud.rowAction(createdToken, 'edit')).toBeVisible();
+      await crud.rowAction(createdToken, 'edit').click();
       await expect(crud.dialog).toBeVisible();
       await crud.edit(resource, createdToken);
       await expect(crud.dialog).toBeHidden();
@@ -264,8 +264,8 @@ for (const resource of rxsoftResources) {
       test.setTimeout(120_000);
       const searchKey = updatedToken ?? createdToken;
       await crud.search(searchKey);
-      await expect(crud.rowAction(searchKey, 'lucide-trash-2')).toBeVisible();
-      await crud.rowAction(searchKey, 'lucide-trash-2').click();
+      await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
+      await crud.rowAction(searchKey, 'delete').click();
       await crud.confirmDelete();
       await expect(crud.getRow(searchKey)).toBeHidden();
     });
