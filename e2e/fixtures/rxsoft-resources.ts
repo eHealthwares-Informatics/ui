@@ -70,7 +70,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       {
         label: 'Test Credentials (JSON)',
         kind: 'textarea',
-        value: () => '{"apiKey":"mptp_f48a373ca61847f2b1c1968d3350b28b_46be03","contractCode":"6971731247"}',
+        value: () =>
+          '{"apiKey":"mptp_f48a373ca61847f2b1c1968d3350b28b_46be03","contractCode":"6971731247"}',
       },
     ],
     editField: { label: 'Name', value: (token) => `${token}-edited` },
