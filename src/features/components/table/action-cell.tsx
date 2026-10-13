@@ -70,13 +70,22 @@ export const ActionCell = ({
       )}
 
       {editPathBuilder && (
-        <ActionIcon variant="outline" component={Link} to={editPathBuilder(row)} data-testid="row-edit">
+        <ActionIcon
+          variant="outline"
+          component={Link}
+          to={editPathBuilder(row)}
+          data-testid="row-edit"
+        >
           <Pencil size={16} />
         </ActionIcon>
       )}
 
       {!editPathBuilder && onEdit && (
-        <ActionIcon variant="outline" onClick={() => onEdit(row, rowIndex || 0)} data-testid="row-edit">
+        <ActionIcon
+          variant="outline"
+          onClick={() => onEdit(row, rowIndex || 0)}
+          data-testid="row-edit"
+        >
           <Pencil size={16} />
         </ActionIcon>
       )}
