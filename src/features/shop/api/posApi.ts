@@ -148,13 +148,10 @@ export function useInitializeWebPayment() {
       returnUrl?: string | null;
       callbackUrl?: string | null;
     }) => {
-      const { data } = await rxsoftApi.post('/payments/initialize', payload);
-      return data as {
-        reference: string;
-        checkoutUrl: string | null;
-        status: string;
-        provider: { code: string };
-      };
+      // Storefront-only hook (used by the website checkout). Must go through
+      // the website client — rxsoftApi's 401 handler redirects to the admin
+      // /sign-in, which ejected shoppers mid-checkout (ui#2).
+      return websiteApi.initializeWebPayment(payload);
     },
   });
 }
