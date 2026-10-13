@@ -24,7 +24,9 @@
 
 export type CrudFieldSpec =
   | { label: string; kind?: 'text' | 'textarea' | 'switch'; value: (token: string) => string }
-  | { label: string; kind: 'select'; option: string };
+  | { label: string; kind: 'select'; option: string }
+  /** Async-select: opens the control and picks the first loaded option. */
+  | { label: string; kind: 'async-select'; testid: string };
 
 export type RxsoftCrudResource = {
   /** Stable id, used for the generated unique token prefix. */
@@ -237,9 +239,16 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     endpoint: '/price-lists/items',
     nameLabel: 'Item',
     uniquePrefix: 'E2E PLI',
-    createFields: [],
-    // Create requires price-list + item async-selects; gated.
-    canCreate: false,
+    createFields: [
+      // Product = any seeded item; Price List = the org's default (seed
+      // PL00001 "Retail", is_default) — both async-selects, pick the first
+      // loaded option.
+      { label: 'Product', kind: 'async-select', testid: 'async-select-item' },
+      { label: 'Price List', kind: 'async-select', testid: 'async-select-priceList' },
+      { label: 'Currency Code', value: () => 'NGN' },
+      { label: 'Unit Price', value: () => '100' },
+    ],
+    canCreate: true,
     canEdit: false,
     canDelete: false,
     hasExport: false,
@@ -339,9 +348,10 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Customer',
     createFields: [{ label: 'Name', value: t }],
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
-    canDelete: false,
+    canEdit: true,
+    canDelete: true,
     hasExport: true,
   },
   {
@@ -352,9 +362,10 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Name',
     uniquePrefix: 'E2E Supplier',
     createFields: [{ label: 'Name', value: t }],
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
-    canDelete: false,
+    canEdit: true,
+    canDelete: true,
     hasExport: false,
   },
   {
@@ -368,8 +379,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Code', value: t },
       { label: 'Name', value: t },
     ],
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },

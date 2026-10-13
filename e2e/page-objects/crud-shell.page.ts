@@ -203,9 +203,21 @@ export class CrudShellPage {
     });
   }
 
+  /** Picks the first option of an async-select by its testid. */
+  async chooseFirstAsyncOption(testid: string): Promise<void> {
+    const select = this.dialog.getByTestId(testid).first();
+    await expect(select).toBeVisible();
+    await select.click();
+    const option = this.page.getByRole('option').first();
+    await expect(option).toBeVisible({ timeout: 15_000 });
+    await option.click();
+  }
+
   private async setField(field: CrudFieldSpec, token: string): Promise<void> {
     if (field.kind === 'select') {
       await this.chooseOption(field.label, field.option);
+    } else if (field.kind === 'async-select') {
+      await this.chooseFirstAsyncOption(field.testid);
     } else {
       await this.fillField(field.label, field.value(token));
     }
