@@ -190,3 +190,68 @@ Evidence: `/tmp/pw-qa-tc04-tail.log` (14p/3s/3.8m) + the parallel session's
   `ps aux | grep playwright` and yield; never reset the tree under a live
   run (it reverts uncommitted work — an incident on 2026-10-10 20:13 cost
   8 src files of uncommitted work on the box).
+
+## §6 · QA agent log (2026-10-13 evening) — price-adjustment spec + PR coverage audit
+
+### New spec: Price Adjustment History (rxsoft#68 + ui#133)
+- `e2e/tests/rxsoft/price-adjustment-history.spec.ts` (master@69e765c) —
+  6 tests for `/rxsoft/price-adjustments`: page render (filter card +
+  7-column table + count), empty state (mocked zero page), **#68 display-name
+  enrichment** (mocked rows: itemName/itemCode/priceListName, NGN money
+  window, ±delta badges, reason, By=user slice(8)), filter params reach the
+  API (priceListId + fromDate via picker), `?itemId` deep-link + Clear
+  reset, pagination (total=45 → Mantine Pagination → page=2 request).
+- Run status: blocked earlier by box saturation; spec + the 3 feature src
+  files were **surgically staged from master onto the box branch**
+  (`git checkout origin/master -- <paths>` — no branch switch, no disruption
+  to the parallel sessions' dirty trees) and a run launched once load fell
+  below 10. Restore plan after the run: `rm -rf` the two new src dirs +
+  `git checkout HEAD -- src/features/rxsoft/pages/index.ts`; the spec file
+  `git restore --staged` + delete; routeTree regenerates via the vite plugin.
+- **Backend #68 is live on the box** (nest watch recompiled it: box backend
+  at 9d7c0ea includes bd1186e).
+
+### Merged-UI-PR coverage audit (evidence greps on origin/master)
+- ✅ Covered: #122 (rowAction → whole crud-suite), #123 (TC-22 error tests,
+  green in the 10-13 validation run), #125 (wizard row-save tests),
+  #127 (owner gates + route edit), #128 (runner edit tests), #130 (forms
+  testids consumed by tests/emr/forms.spec.ts), #132/#134 (LIS suites ARE
+  the specs), #133 (this section's new spec).
+- ⚠️ Partial: #126 (TC-04 matrix verified 25-green/10-gates; **POS Terminals
+  create still red** pending merge of the `'Provider Type'` fix on
+  `feat/10-select-testids` — poisons the POS describe), #129 (storefront
+  redirect asserts exist; payments-specific redirect untested), #131
+  (notifications section renders — **the SRS 7.9 switches untested**).
+- ❌ Gap: **#135 SEO/PWA shell** (robots.txt, manifest, OG, JSON-LD — zero
+  e2e references).
+
+### Open QA issues vs existing coverage
+- **ui#63** (offline walk-in, PR #62): pos.spec tests 9+10 (walk-in queue,
+  business-error block) + online regression 11–17 ✓; **gap: ask-3
+  sync-after-reconnect**. Issue says "stays in Todo until picked up".
+- **ui#39** (POS batch #33–#38): pos.spec tests 1/3/5/6/7/8 ✓; tests 2 (#34
+  placeholders) + 4 (#36 X-clears) are documented honest skips (headless
+  timing). Emzor priority (backend #12) = test 7 ✓.
+- **ui#61** (PR #60 batch): form validation VAL-01/02 ✓, loading-screen ✓,
+  priceListId ✓ (pos.spec 3); **gaps: forgot/verify-email website auth
+  paths (my reset-password spec covers form+mismatch only) and
+  coupons/consultations/delivery-areas admin CRUD (not in the crud
+  registry)**.
+
+### Recommended next specs (cheap → valuable)
+1. SEO/PWA static-route assertions (robots.txt 200 + sitemap link,
+   manifest.json fields, OG/JSON-LD meta) — closes the #135 gap.
+2. Notification-switch toggle behaviour (#131) — settings/display or
+   notifications section toggle + PATCH assertion.
+3. ui#63 sync-after-reconnect (re-enable network → queued sale syncs with
+   original saleNumber).
+4. Website auth forgot/verify-email paths + admin website CRUD registry
+   entries (ui#61 leftovers).
+
+### Box ops (evening)
+- Saturation pattern: parallel sessions pushed load to 30–90; two of my
+  runs were killed mid-flight. **Rule that worked: poll `uptime` until <10,
+  launch immediately, prefer small grep-scoped runs.**
+- Parallel-session artifacts observed: `fe_vitest_serial2.log` (vitest on
+  `fix/68-testid-enforcement`), `ci_watch.log` (GH Actions watcher for
+  ui#136). No Playwright suite was running at 20:00; load back to ~5.
