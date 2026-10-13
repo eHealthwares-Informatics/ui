@@ -91,6 +91,10 @@ Actions: `tick-box`, `close-issue` (always `--reason completed`), `reopen`, `com
 | 2026-10-12 | UC-RX-SALES-LINES-06 #131 — CSV export (TC-01) | tick-box | ehealthwares/rxsoft#131 — TC-RX-SALES-LINES-10 | **Done** | crud-suite export test + bespoke spec (TC-SL-06-01 export button triggers download). UC stays open (C12 — export empty-rows edge case uncovered). |
 | 2026-10-12 | UC-RX-SALES-LINES-07 #131 — error handling/accessibility (TC-01/02) | tick-box | ehealthwares/rxsoft#131 — TC-RX-SALES-LINES-11/12 | **Done** | Bespoke spec (TC-SL-07-01 empty state accessible, TC-SL-07-02 keyboard nav). TC-SL-07-03 API error injection skipped (C12 gate). UC stays open (C12). |
 | 2026-10-12 | Bespoke spec created: sales-lines-bespoke.spec.ts (11 passed, 1 skip) | create-issue | ehealthwares/rxsoft#130 (Sales Lines — E2E) | **Done** | New spec file covers saleId filter (detail view), export, error handling & accessibility. All 11 tests pass; 1 honest skip (API error injection). PR to be opened. |
+| 2026-10-13 | testid-first rowAction for edit/delete buttons (PR #122) | tick-box + comment | ui#68 (testids task); rxsoft #35 #41 #48 #55 #65 #72 #79 | **Done** | Added `data-testid="row-edit"|"row-delete"` to ActionCell buttons; updated CrudShellPage.rowAction() + confirmDelete() to use testid locators; updated crud-suite run-crud.spec.ts + items-wizard.spec.ts. Replaces fragile lucide icon class selectors. Debug tests confirm edit/delete buttons render with testids on Payment Providers, POS Terminals, Price Lists, UOMs, Categories, Items, UOM Categories. Search timing issue remains for delete test (record created in prior test not immediately searchable); debug test creating+searching in same flow passes. Related: eHealthwares-Informatics/ui#122 |
+|---|---|---|---|---|---|
+
+
 
 ---
 
