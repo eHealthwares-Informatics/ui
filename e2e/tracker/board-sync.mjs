@@ -411,7 +411,13 @@ function buildCoverage(board, specs) {
       else if (state === 'missing-path') uc.coverage.missingPath++;
       else uc.coverage.missing++;
     }
-    uc.complete = uc.tcs.length > 0 && uc.coverage.covered + uc.coverage.gated === uc.tcs.length;
+    // Policy (owner 2026-10-13): a UC is NOT complete while any TC is merely
+    // `gated`. Capability gates (canCreate/canEdit/canDelete/hasExport false)
+    // are OPERATIONAL/test-harness gates, not resolved acceptance — they must
+    // block closure until a bespoke spec genuinely covers the capability (or
+    // the capability is confirmed intentionally out of scope). Only `covered`
+    // TCs satisfy acceptance.
+    uc.complete = uc.tcs.length > 0 && uc.coverage.covered === uc.tcs.length;
   }
   // Roll UCs up to entity tasks.
   for (const task of board.tasks.values()) {
