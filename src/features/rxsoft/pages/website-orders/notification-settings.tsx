@@ -13,8 +13,12 @@ const CHANNELS = [
 ] as const;
 
 const SCENARIOS = [
+  { key: 'order_confirmation', label: 'Order confirmation' },
+  { key: 'payment_confirmation', label: 'Payment confirmation' },
   { key: 'status_changed', label: 'Status changed' },
   { key: 'payment_receivable', label: 'Payment / receivable' },
+  { key: 'dispatch', label: 'Dispatch' },
+  { key: 'delivery', label: 'Delivery' },
 ] as const;
 
 /** Opens the per-facility channel x scenario notification switches. */
