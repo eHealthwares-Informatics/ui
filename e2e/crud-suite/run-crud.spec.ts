@@ -306,18 +306,39 @@ for (const resource of rxsoftResources) {
       }
     });
 
-    test('edits the created record through the modal', async ({ page }, testInfo) => {
+    test('edits the created record (modal or edit route)', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
-      test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
+      test.skip(!resource.canEdit, 'resource is not editable');
       await crud.search(createdToken);
-      await expect(crud.rowAction(createdToken, 'edit')).toBeVisible();
-      await crud.rowAction(createdToken, 'edit').click();
-      await expect(crud.dialog).toBeVisible();
-      await crud.edit(resource, createdToken);
-      await expect(crud.dialog).toBeHidden();
+      const editBtn = crud.rowAction(createdToken, 'edit');
+      await expect(editBtn).toBeVisible();
+      await editBtn.click();
+
+      if (resource.editMode === 'route') {
+        // Route-based edit: the pencil navigates to a generic, schema-driven
+        // edit route (not a modal) — the list header disappears. Fill the
+        // field on the page and save.
+        await expect(crud.dialog).toBeHidden();
+        await expect(crud.searchInput).toBeHidden({ timeout: 15_000 });
+        await crud.fillField(
+          resource.editField!.label,
+          resource.editField!.value(createdToken),
+          'page'
+        );
+        await page
+          .getByRole('button', { name: /save|update|submit/i })
+          .first()
+          .click();
+      } else {
+        await expect(crud.dialog).toBeVisible();
+        await crud.edit(resource, createdToken);
+        await expect(crud.dialog).toBeHidden();
+      }
+
       updatedToken = resource.editField!.value(createdToken);
+      await crud.goto(resource.route);
       await crud.search(updatedToken);
-      await expect(crud.getRow(updatedToken)).toBeVisible();
+      await expect(crud.getRow(updatedToken)).toBeVisible({ timeout: 20_000 });
     });
 
     test('deletes the created record via the row action', async ({ page }, testInfo) => {
