@@ -49,7 +49,6 @@ const CAPABILITY_BY_NAME = [
   [/cleanup/i, 'cleanup'],
   [/export csv/i, 'export'],
   [/export triggers/i, 'export'],
-  [/api error/i, 'error'],
 ];
 
 /**
@@ -165,7 +164,6 @@ for (const [entity, { ucs }] of RXSOFT_ENTITIES) {
       cap === 'debounce' ||
       cap === 'loading' ||
       cap === 'keyboard' ||
-      cap === 'error' ||
       cap === 'pagination' ||
       cap === 'cleanup';
     if (capable) {
