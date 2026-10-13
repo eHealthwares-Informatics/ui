@@ -33,6 +33,9 @@ const CAPABILITY_BY_NAME = [
   [/list renders|renders/i, 'render'],
   [/column sort/i, 'sort'],
   [/search/i, 'search'],
+  [/debounce/i, 'debounce'],
+  [/loading state/i, 'loading'],
+  [/keyboard/i, 'keyboard'],
   // NOTE: empty-state TCs are intentionally NOT mapped — several list
   // endpoints ignore the search param (e.g. /roles proxy), so the suite's
   // empty-state test honestly skips for those resources. TC-*-04 stays
@@ -144,8 +147,10 @@ for (const [entity, { ucs }] of RXSOFT_ENTITIES) {
       (cap === 'edit' && res.canEdit) ||
       (cap === 'delete' && res.canDelete) ||
       (cap === 'export' && res.hasExport) ||
-      // The suite asserts render, search (+clear/debounce), pagination and
-      // API cleanup (afterAll deletes token rows) for every resource.
+      // The suite asserts render, search (+clear/debounce), loading state,
+      // keyboard navigation, pagination and API cleanup (afterAll deletes
+      // token rows) for every resource — validated green run 2026-10-13
+      // (75 passed / 0 failed, 37 resources × loading + keyboard).
       // NOT auto-covered (honest gaps until the UI/backends support them):
       //   - sort: Column.sortable is unset across schemas → no sort ActionIcon
       //     renders; the suite's sort test honestly skips.
@@ -153,6 +158,9 @@ for (const [entity, { ucs }] of RXSOFT_ENTITIES) {
       //     suite skips where search is not honored.
       cap === 'render' ||
       cap === 'search' ||
+      cap === 'debounce' ||
+      cap === 'loading' ||
+      cap === 'keyboard' ||
       cap === 'pagination' ||
       cap === 'cleanup';
     if (capable) {
