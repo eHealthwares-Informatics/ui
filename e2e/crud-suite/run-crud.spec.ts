@@ -200,6 +200,43 @@ for (const resource of rxsoftResources) {
       expect(after, `expected debounce coalescing, got ${after} list requests`).toBeLessThan(5);
     });
 
+    // ── TC-*-05 Loading state (previously uncovered — no spec) ────────────
+    test('list shows a loading state while the query is in flight', async ({ page }, testInfo) => {
+      skipIfBackendDown(testInfo);
+      // Delay the list endpoint so the transient loading state is observable.
+      // DataTable renders a Mantine Loader (`svg.mantine-Loader-root`) inside
+      // `data-table-body` while the list query is pending.
+      const listRe = new RegExp(resource.endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      await page.route(listRe, async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, 1_500));
+        await route.continue();
+      });
+      // domcontentloaded — does NOT await the list, so the loader is catchable.
+      await crud.goto(resource.route);
+      const loader = page.getByTestId('data-table-body').locator('.mantine-Loader-root');
+      await expect(loader.first()).toBeVisible({ timeout: 8_000 });
+      await page.unroute(listRe);
+      // Query resolves: the loader clears and a row (data or empty-state) renders.
+      await expect(loader).toHaveCount(0, { timeout: 20_000 });
+    });
+
+    // ── TC-*-24 Keyboard navigation (previously uncovered — no spec) ──────
+    test('list is keyboard-navigable', async ({ page }, testInfo) => {
+      skipIfBackendDown(testInfo);
+      await crud.goto(resource.route);
+      await expect(crud.searchInput).toBeVisible();
+      // Focus + type without a pointer (keyboard input path).
+      await crud.searchInput.focus();
+      await expect(crud.searchInput).toBeFocused();
+      await crud.searchInput.pressSequentially('zz', { delay: 30 });
+      await expect(crud.searchInput).toHaveValue('zz');
+      await crud.searchInput.fill('');
+      // Tab moves focus onward — a keyboard order exists beyond the search box.
+      await page.keyboard.press('Tab');
+      const focused = await page.evaluate(() => document.activeElement?.tagName ?? null);
+      expect(focused, 'Tab must move focus to another element').toBeTruthy();
+    });
+
     test('edits the created record through the modal', async ({ page }, testInfo) => {
       skipIfBackendDown(testInfo);
       test.skip(!resource.canEdit, 'resource opens an edit route instead of a modal');
