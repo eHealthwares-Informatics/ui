@@ -198,9 +198,9 @@ function RenderFieldComponent({
 
   if (field.type === 'select') {
     return (
-      <LabelField label={field.label} required={field.required} data-testid={`field-${field.name}`}>
+      <LabelField label={field.label} required={field.required}>
         <SelectField
-          data-testid={`field-${field.name}`}
+          testId={`field-${field.name}`}
           value={
             typeof fieldValue === 'string'
               ? { label: fieldValue, value: fieldValue }
@@ -260,7 +260,7 @@ function RenderFieldComponent({
     return (
       <>
         <SelectField
-          data-testid={`field-${field.name}`}
+          testId={`field-${field.name}`}
           value={fieldValue as Option}
           disabled={disabled}
           onChange={(option) => option && toggle(option)}
