@@ -98,7 +98,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [
       { label: 'Code', value: t },
       { label: 'Label', value: t },
-      { label: 'Provider', kind: 'select', option: 'Paystack' },
+      { label: 'Provider Type', kind: 'select', option: 'Paystack' },
     ],
     canCreate: true,
     canEdit: false,
