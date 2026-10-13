@@ -255,3 +255,24 @@ Evidence: `/tmp/pw-qa-tc04-tail.log` (14p/3s/3.8m) + the parallel session's
 - Parallel-session artifacts observed: `fe_vitest_serial2.log` (vitest on
   `fix/68-testid-enforcement`), `ci_watch.log` (GH Actions watcher for
   ui#136). No Playwright suite was running at 20:00; load back to ~5.
+
+### §6 addendum — price-adjustment spec run outcome (2026-10-13 20:20)
+- Run `/tmp/pw-qa-pah2.log` (box load settled to <10): **4 passed / 3 failed**.
+  - ✅ pass: page render, empty state, **#68 enrichment rendering**
+    (screenshot proof: Paracetamol/PCM, Retail, NGN money window, ±Δ
+    badges, reason, By-slice — the UI half of #68 is sound), auth setup.
+  - ❌ fail: the 3 live-API tests — **backend defect: GET /price-adjustments
+    500s on EVERY request** (7×500 / 0×200 in the rxsoft log), incl. the
+    unfiltered base call. TypeORM `databaseName` TypeError in
+    `createOrderByCombinedWithSelectExpression` from
+    `PricingService.listPriceAdjustments` (pricing.service.ts:113) — the
+    #68 enrichment rewrite lost the orderBy alias. Filed as
+    **ehealthwares/rxsoft#786** with stack trace, repro matrix, and the
+    unit-suite gap note (jest mocks the QB → needs a DB-backed integration
+    test). The 3 tests auto-cover on fix (same pattern as #778).
+  - ❌ fail (spec bug, fixed): pagination test assumed Mantine v9 Pagination
+    exposes `aria-label="pagination"` nav — it does not; fixed to
+    `.mantine-Pagination-root` (master@89ac5d7). Failure screenshot proved
+    the mock + footer + page buttons all render — only the locator was wrong.
+- Box staging files cleaned up (rm of the 3 src additions + spec; pages/index.ts
+  restored; routeTree regenerates); LIS session's dirty tree untouched.
