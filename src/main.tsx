@@ -15,6 +15,7 @@ import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { handleServerError } from '@/lib/handle-server-error';
+import { shouldRetryQuery } from '@/lib/query-retry';
 import { getDefaultRoute } from '@/lib/subdomain';
 import { useAuthStore } from '@/stores/auth-store';
 import { FontProvider } from './context/font-provider';
@@ -52,16 +53,10 @@ const queryClient = new QueryClient({
     queries: {
       // No query retries in dev/e2e: failures surface immediately instead of
       // tests waiting through retry backoff before an error state is visible.
-      retry: import.meta.env.DEV
-        ? false
-        : (failureCount, error) => {
-            if (failureCount > 3) {
-              return false;
-            }
-            return !(
-              error instanceof AxiosError && [401, 403].includes(error.response?.status ?? 0)
-            );
-          },
+      // In prod, only genuinely transient failures are retried — an HTTP error
+      // surfaces at once, so the DataTable error state is never delayed out of
+      // sight (rxsoft-qa#780).
+      retry: import.meta.env.DEV ? false : shouldRetryQuery,
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 10 * 1000, // 10s
     },
