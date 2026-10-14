@@ -1,43 +1,12 @@
 import { Menu, UnstyledButton, Group, Stack, Text, Box, Loader } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  ChevronsUpDown,
-  Command,
-  AudioWaveform,
-  MessageSquare,
-  Boxes,
-  Microscope,
-  Shield,
-  HeartPulse,
-  Globe,
-} from 'lucide-react';
+import { ChevronsUpDown, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
+import { moduleIcons, modulePlans } from '@/features/shared/module-meta';
 import type { ModuleId } from '@/features/shared/module-data';
 import { getModuleDashboard } from '@/lib/module-routing';
 import { useAuthStore, type ModuleInfo } from '@/stores/auth-store';
-
-const moduleIcons: Record<string, React.ElementType> = {
-  rxsoft: Command,
-  communication: AudioWaveform,
-  conversation: MessageSquare,
-  'coding-concept': Boxes,
-  lis: Microscope,
-  emr: HeartPulse,
-  admin: Shield,
-  website: Globe,
-};
-
-const modulePlans: Record<string, string> = {
-  rxsoft: 'Pharmacy Admin',
-  communication: 'Messaging & Routing',
-  conversation: 'Workflow Chat',
-  'coding-concept': 'Terminology',
-  lis: 'Laboratory',
-  emr: 'Electronic Health Record',
-  admin: 'Administration',
-  website: 'Website Content',
-};
 
 function toTeams(modules: ModuleInfo[]) {
   return modules.map((mod) => ({

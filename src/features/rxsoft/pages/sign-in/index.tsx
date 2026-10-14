@@ -5,6 +5,7 @@ import { Lock, User, ShieldCheck, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
 import { getRememberMe } from '@/lib/auth-tokens';
 import { useAuthStore } from '@/stores/auth-store';
 import { OnboardOrganisation } from './onboard-organisation';
@@ -100,19 +101,14 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
       const authState = useAuthStore.getState();
 
       if (authState.user) {
-        const firstModule = authState.modules[0];
-        const fallbackRoot = '/';
-        let targetUrl = redirectTo || firstModule?.root || fallbackRoot;
-        try {
-          if (targetUrl.startsWith('http')) {
-            const parsed = new URL(targetUrl);
-            targetUrl = parsed.pathname + parsed.search;
-          }
-        } catch {
-          /* not a valid URL, use as-is */
-        }
-        const finalUrl = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
-        window.location.href = finalUrl;
+        // Post-login landing: explicit redirect wins; a single available
+        // module goes straight to its dashboard; otherwise the module
+        // chooser grid (default page after login).
+        const targetUrl = resolvePostLoginTarget(
+          redirectTo,
+          authState.modules.map((m) => m.id)
+        );
+        window.location.href = targetUrl;
       }
     } catch (err) {
       console.error('Login error:', err);

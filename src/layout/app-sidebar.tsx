@@ -20,7 +20,7 @@ export function AppSidebar() {
     moduleId === 'emr' ? (user?.locationId ?? null) : null
   );
 
-  const navGroups = filterNavGroupsByModule(sidebarData.navGroups, moduleId);
+  const navGroups = filterNavGroupsByModule(sidebarData.navGroups, moduleId, user?.permissions ?? []);
   const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
 
   const resetExpandState = (index: number, expanded: boolean) => {

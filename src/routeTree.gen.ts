@@ -24,6 +24,7 @@ import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errorsServiceUnavailableRouteImport } from './routes/(errors)/service-unavailable'
 import { Route as AuthenticatedModuleIdRouteImport } from './routes/_authenticated/$moduleId'
+import { Route as AuthenticatedModulesRouteImport } from './routes/_authenticated/modules'
 import { Route as ApmIndexRouteImport } from './routes/apm/index'
 import { Route as ApmAchievementsRouteImport } from './routes/apm/achievements'
 import { Route as ApmAdminRouteRouteImport } from './routes/apm/admin/route'
@@ -402,6 +403,11 @@ const errorsServiceUnavailableRoute =
 const AuthenticatedModuleIdRoute = AuthenticatedModuleIdRouteImport.update({
   id: '/$moduleId',
   path: '/$moduleId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedModulesRoute = AuthenticatedModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApmIndexRoute = ApmIndexRouteImport.update({
@@ -2167,6 +2173,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503Route
   '/service-unavailable': typeof errorsServiceUnavailableRoute
   '/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren
+  '/modules': typeof AuthenticatedModulesRoute
   '/apm/achievements': typeof ApmAchievementsRoute
   '/apm/agenda': typeof ApmAgendaRoute
   '/apm/contact': typeof ApmContactRoute
@@ -2484,6 +2491,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/service-unavailable': typeof errorsServiceUnavailableRoute
+  '/modules': typeof AuthenticatedModulesRoute
   '/apm/achievements': typeof ApmAchievementsRoute
   '/apm/agenda': typeof ApmAgendaRoute
   '/apm/contact': typeof ApmContactRoute
@@ -2805,6 +2813,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503Route
   '/(errors)/service-unavailable': typeof errorsServiceUnavailableRoute
   '/_authenticated/$moduleId': typeof AuthenticatedModuleIdRouteWithChildren
+  '/_authenticated/modules': typeof AuthenticatedModulesRoute
   '/apm/achievements': typeof ApmAchievementsRoute
   '/apm/agenda': typeof ApmAgendaRoute
   '/apm/contact': typeof ApmContactRoute
@@ -3125,6 +3134,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/service-unavailable'
     | '/$moduleId'
+    | '/modules'
     | '/apm/achievements'
     | '/apm/agenda'
     | '/apm/contact'
@@ -3442,6 +3452,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/service-unavailable'
+    | '/modules'
     | '/apm/achievements'
     | '/apm/agenda'
     | '/apm/contact'
@@ -3762,6 +3773,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/(errors)/service-unavailable'
     | '/_authenticated/$moduleId'
+    | '/_authenticated/modules'
     | '/apm/achievements'
     | '/apm/agenda'
     | '/apm/contact'
@@ -4238,6 +4250,13 @@ declare module '@tanstack/react-router' {
       path: '/$moduleId'
       fullPath: '/$moduleId'
       preLoaderRoute: typeof AuthenticatedModuleIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/modules': {
+      id: '/_authenticated/modules'
+      path: '/modules'
+      fullPath: '/modules'
+      preLoaderRoute: typeof AuthenticatedModulesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/apm/': {
@@ -6502,6 +6521,7 @@ const AuthenticatedRxsoftUomsUomIdRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedModuleIdRoute: typeof AuthenticatedModuleIdRouteWithChildren
+  AuthenticatedModulesRoute: typeof AuthenticatedModulesRoute
   AuthenticatedCommunicationAesRouteRoute: typeof AuthenticatedCommunicationAesRouteRoute
   AuthenticatedCommunicationCommunicationChannelsRouteRoute: typeof AuthenticatedCommunicationCommunicationChannelsRouteRoute
   AuthenticatedCommunicationMappingRouteRoute: typeof AuthenticatedCommunicationMappingRouteRoute
@@ -6715,6 +6735,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModuleIdRoute: AuthenticatedModuleIdRouteWithChildren,
+  AuthenticatedModulesRoute: AuthenticatedModulesRoute,
   AuthenticatedCommunicationAesRouteRoute:
     AuthenticatedCommunicationAesRouteRoute,
   AuthenticatedCommunicationCommunicationChannelsRouteRoute:

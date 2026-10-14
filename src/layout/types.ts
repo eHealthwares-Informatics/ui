@@ -19,6 +19,14 @@ type BaseNavItem = {
   badge?: string;
   icon?: React.ElementType;
   modules?: ModuleId[];
+  /**
+   * MENU (group) / SUBMENU (item) enforcement: the permission code(s)
+   * required to see this entry. A single code must be held (wildcards
+   * apply); an array means ANY ONE of the codes is sufficient. Untagged
+   * entries stay visible to everyone with module access — the backend
+   * remains the real gate (phased rollout, phase 1).
+   */
+  permission?: string | string[];
 };
 
 type NavLink = BaseNavItem & {
