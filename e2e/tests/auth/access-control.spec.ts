@@ -85,24 +85,35 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await expect(page.getByTestId('module-card-admin-title')).toHaveCount(0);
   });
 
-  test('sidebar MENU gating: identity/finance/payments/website/configuration groups hidden', async ({
+  test('sidebar item gating: code-tagged items hidden, untagged stay visible (Phase-1 honesty)', async ({
     page,
   }) => {
     await page.goto('/sign-in');
     await signInAsCashier(page);
     await page.goto('/rxsoft/dashboard');
 
-    // Groups the cashier lacks codes for → hidden. Untagged/allowed stay.
-    for (const hidden of ['People', 'Payments', 'Finance', 'Website', 'Configuration', 'Shop']) {
+    // TAGGED items the cashier LACKS the code for → hidden.
+    // (Group-level hiding is Phase-3 work: every rxsoft group currently has
+    // untagged members — Customers/Suppliers/Categories etc. — which stay
+    // visible by the "never hides what the API allows" invariant.)
+    for (const hidden of ['Users', 'Roles', 'Reports', 'Audit Logs']) {
       await expect(
         page.getByRole('button', { name: hidden, exact: false }),
-        `${hidden} group must be hidden for cashier`
+        `${hidden} (tagged, code lacking) must be hidden`
       ).toHaveCount(0, { timeout: 15_000 });
     }
-    for (const visible of ['Overview', 'Catalog', 'Operations']) {
+    // TAGGED items the cashier HOLDS → visible.
+    for (const visible of ['Sales', 'Inventory', 'Products']) {
       await expect(
         page.getByRole('button', { name: visible, exact: false }).first(),
-        `${visible} group must stay visible`
+        `${visible} (tagged, code held) must stay visible`
+      ).toBeVisible({ timeout: 15_000 });
+    }
+    // UNTAGGED items → always visible (Phase-1 invariant).
+    for (const visible of ['Customers', 'Suppliers', 'Categories']) {
+      await expect(
+        page.getByRole('button', { name: visible, exact: false }).first(),
+        `${visible} (untagged) must stay visible`
       ).toBeVisible({ timeout: 15_000 });
     }
   });
@@ -118,7 +129,7 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await expect(page.getByRole('button', { name: 'Users', exact: false })).toHaveCount(0, {
       timeout: 15_000,
     });
-    // POS is tagged rxsoft.sales.sale.create — cashier HAS it.
+    // POS (/shop/pos) is tagged rxsoft.sales.sale.create — cashier HAS it.
     await expect(page.getByRole('button', { name: 'POS', exact: false }).first()).toBeVisible({
       timeout: 15_000,
     });
