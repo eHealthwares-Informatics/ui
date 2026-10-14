@@ -1320,12 +1320,15 @@ function ReconcileModal({
                       <TextInput
                         size="xs"
                         value={d.freetextName ?? item.freetextName ?? ''}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          // Read during dispatch — see rxsoft-qa#794: React nulls
+                          // `currentTarget` before the state updater runs.
+                          const freetextName = e.currentTarget.value;
                           setDraft((prev) => ({
                             ...prev,
-                            [item.id]: { ...prev[item.id], freetextName: e.currentTarget.value },
-                          }))
-                        }
+                            [item.id]: { ...prev[item.id], freetextName },
+                          }));
+                        }}
                         disabled={!!(d.itemId ?? item.itemId)}
                       />
                     </Table.Td>
