@@ -141,7 +141,18 @@ async function signInAsAdmin(page: any) {
   await page.getByLabel('Username').fill(username);
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/\/emr/); // EMR module root redirect
+
+  // Post-login target (resolvePostLoginTarget): a single-module user lands on
+  // that module's dashboard; anyone else gets the module chooser. The
+  // provisioned owner holds many modules (rxsoft, lis, emr, …), so expect the
+  // chooser — asserting `/emr` directly only held before the module landing
+  // grid existed.
+  await expect(page).toHaveURL(/\/(modules|emr)/, { timeout: 15_000 });
+
+  if (!/\/emr/.test(page.url())) {
+    await page.goto(`${FRONTEND_BASE_URL}/emr`);
+  }
+  await expect(page).toHaveURL(/\/emr/);
 }
 
 // Create a patient via EMR API
