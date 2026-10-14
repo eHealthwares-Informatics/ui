@@ -638,6 +638,61 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     canDelete: false,
     hasExport: false,
   },
+  // ── ui#61 asks 2–3: admin website CRUD surfaces (coupons / consultations /
+  // delivery-areas) — plain DataPageShell pages from the rxsoft#34 batch.
+  {
+    id: 'coupons',
+    title: 'Coupons',
+    route: '/rxsoft/coupons',
+    endpoint: '/coupons',
+    nameLabel: 'Code',
+    uniquePrefix: 'E2E Coupon',
+    createFields: [
+      { label: 'Code', value: t },
+      { label: 'Type', kind: 'select', option: 'Percent' },
+      { label: 'Value (percent / ₦)', value: () => '5' },
+    ],
+    editField: { label: 'Value (percent / ₦)', value: () => '7' },
+    canCreate: true,
+    canEdit: true,
+    canDelete: true,
+    hasExport: false,
+  },
+  {
+    id: 'website-consultations',
+    title: 'Consultations',
+    route: '/rxsoft/website-consultations',
+    endpoint: '/website/admin/consultations',
+    nameLabel: 'Name',
+    uniquePrefix: 'E2E Consult',
+    createFields: [
+      { label: 'Name', value: t },
+      { label: 'Phone', value: () => '0809' + Math.floor(Math.random() * 1_000_000_000) },
+    ],
+    editField: { label: 'Phone', value: () => '0803' + Math.floor(Math.random() * 1_000_000_000) },
+    canCreate: true,
+    canEdit: true,
+    canDelete: true,
+    hasExport: false,
+  },
+  {
+    id: 'website-delivery-areas',
+    title: 'Delivery Areas',
+    route: '/rxsoft/website-delivery-areas',
+    endpoint: '/website/admin/delivery-areas',
+    nameLabel: 'City',
+    uniquePrefix: 'E2E Area',
+    createFields: [
+      { label: 'State', value: () => 'Lagos' },
+      { label: 'City', value: t },
+    ],
+    // No buildUpdatePayload on the schema → modal edit is not wired; stay
+    // honest (the finance-batch rule).
+    canCreate: true,
+    canEdit: false,
+    canDelete: true,
+    hasExport: false,
+  },
   {
     id: 'organisation-payment-providers',
     title: 'Organisation Payment Providers',
