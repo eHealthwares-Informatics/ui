@@ -3,8 +3,8 @@ import { useNavigate } from '@tanstack/react-router';
 import { ChevronsUpDown, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
-import { moduleIcons, modulePlans } from '@/features/shared/module-meta';
 import type { ModuleId } from '@/features/shared/module-data';
+import { moduleIcons, modulePlans } from '@/features/shared/module-meta';
 import { getModuleDashboard } from '@/lib/module-routing';
 import { useAuthStore, type ModuleInfo } from '@/stores/auth-store';
 
