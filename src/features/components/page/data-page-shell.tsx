@@ -26,6 +26,7 @@ import { MetricsBar } from '../table/MetricsBar';
 import { Pagination } from '../table/pagination';
 import { DataTable } from '../table/table';
 import { getArrayPayload } from '../utils';
+import { buildRxsoftListParams } from './build-list-params';
 import { InfoDrawer } from './info-drawer';
 import { RxPage } from './rx-page';
 
@@ -303,30 +304,8 @@ export function DataPageShell(props: DataPageShellProps) {
   const query = useQuery({
     queryKey: [...listKeyBase, queryParams] satisfies QueryKey,
     queryFn: async () => {
-      let params: any = queryParams;
-      if (moduleId === 'rxsoft' && Object.keys(queryParams).length > 2) {
-        const { page, limit, sortBy: sort, sortOrder: order, ...rest } = queryParams;
-        // Config-driven top-level params (config.listParams) are re-emitted as
-        // real query params, never JSON-encoded into the search bag.
-        for (const key of Object.keys(config.listParams ?? {})) {
-          delete rest[key];
-        }
-        // A free-text search alone must be sent as a PLAIN string: every backend
-        // implements the ILIKE fallback for it, but JSON-parsing backends treat
-        // `{"search":"..."}` as a column filter (no-op) and plain-LIKE backends
-        // try to match the JSON text itself (returns nothing). JSON-encode only
-        // when real column filters are present.
-        const restKeys = Object.keys(rest);
-        const onlyPlainSearch = restKeys.length === 1 && restKeys[0] === 'search';
-        const search = onlyPlainSearch ? String(rest.search) : JSON.stringify(rest);
-        params = {
-          page,
-          limit,
-          ...(sort ? { sortBy: sort, sortOrder: order ?? 'desc' } : {}),
-          search,
-          ...(config.listParams ?? {}),
-        };
-      }
+      const params =
+        moduleId === 'rxsoft' ? buildRxsoftListParams(queryParams, config) : queryParams;
       const response = await apiProvider.get(endpoint, { params });
       const meta = response.data?.meta;
 
