@@ -9,6 +9,7 @@ import { ModuleContext, useModuleContext } from '@/context/module-context';
 import { entityInfoMap } from '@/features/lis/schema/entity-info';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields } from '@/features/shared/payload-utils';
+import { gateRowActions, permits } from '@/lib/permissions';
 import { useAuthStore } from '@/stores/auth-store';
 import { JsonPreviewDialog } from '../../rxsoft';
 import { FILTERS, type FilterValue } from '../../rxsoft/types';
@@ -85,6 +86,7 @@ export function DataPageShell(props: DataPageShellProps) {
     defaultSort,
     renderCreateModal,
     canCreate,
+    permissions: actionPermissions,
   } = config;
   const moduleContext = useModuleContext();
   const listKeyBase = queryKeyBase ?? ['rxsoft-data-page', endpoint];
@@ -222,7 +224,21 @@ export function DataPageShell(props: DataPageShellProps) {
   const hasCreateConfig = Boolean(
     tabGroups || createFields || createFieldGroups || renderCreateModal
   );
-  const hasCreate = canCreate !== false && hasCreateConfig;
+
+  // ACTIONS-level gating (access-control ladder, phase 2): a page's action map
+  // hides create/delete/export unless the user holds the code. An absent code
+  // leaves the action unchanged, so untagged pages behave exactly as before.
+  const userPermissions = useAuthStore((state) => state.user?.permissions ?? []);
+  const canCreateAction = permits(userPermissions, actionPermissions?.create);
+  const canDeleteAction = permits(userPermissions, actionPermissions?.delete);
+  const canExportAction = permits(userPermissions, actionPermissions?.export);
+  const gatedRowActions = gateRowActions(
+    config.rowActions,
+    actionPermissions?.rowActions,
+    userPermissions
+  );
+
+  const hasCreate = canCreate !== false && hasCreateConfig && canCreateAction;
   const hasInlineEdit = hasCreateConfig && !editPathBuilder;
   const hasFilterableColumns = columns.some((c) => c.filters && c.filters.length > 0);
 
@@ -501,10 +517,18 @@ export function DataPageShell(props: DataPageShellProps) {
             },
           })}
           onExportCsv={
-            canExport && csvEndpoint ? () => exportMutation.mutate(exportParams) : undefined
+            canExport && canExportAction && csvEndpoint
+              ? () => exportMutation.mutate(exportParams)
+              : undefined
           }
-          onExportPdf={canExport && pdfEndpoint ? () => void downloadPdf() : undefined}
-          onDelete={canDelete || deletePathBuilder ? () => setIsDeleteOpen(true) : undefined}
+          onExportPdf={
+            canExport && canExportAction && pdfEndpoint ? () => void downloadPdf() : undefined
+          }
+          onDelete={
+            (canDelete || deletePathBuilder) && canDeleteAction
+              ? () => setIsDeleteOpen(true)
+              : undefined
+          }
           hasFilterableColumns={hasFilterableColumns}
           minSearchLength={minSearchLength}
           debounceMs={debounceMs}
@@ -534,9 +558,10 @@ export function DataPageShell(props: DataPageShellProps) {
                 detailPathBuilder,
                 editPathBuilder,
                 onEdit: buildUpdatePayload && openModal,
-                onDelete: deletePathBuilder || canDelete ? () => undefined : undefined,
+                onDelete:
+                  (deletePathBuilder || canDelete) && canDeleteAction ? () => undefined : undefined,
                 deleteMutation,
-                rowActions: config.rowActions,
+                rowActions: gatedRowActions,
               }
             : undefined
         }

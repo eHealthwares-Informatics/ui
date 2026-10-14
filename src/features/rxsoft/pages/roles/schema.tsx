@@ -80,4 +80,10 @@ export const rolesConfig: ModelConfig = {
   buildCreatePayload,
   buildUpdatePayload,
   canDelete: true,
+  // ACTIONS gating — codes mirror identity's catalog (rxsoft.identity.role.*).
+  permissions: {
+    create: 'rxsoft.identity.role.create',
+    update: 'rxsoft.identity.role.update',
+    delete: 'rxsoft.identity.role.delete',
+  },
 };

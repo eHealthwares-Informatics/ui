@@ -79,9 +79,32 @@ export type ModelConfig<T = any> = {
   rowActions?: RowAction[];
   /** Query-key prefix used by the data page. Defaults to ['rxsoft-data-page', endpoint]. */
   queryKeyBase?: unknown[];
+  /**
+   * ACTIONS-level permission codes (access-control ladder, phase 2). When a code
+   * is set the matching action is hidden unless the user's permissions match it
+   * (wildcards apply — see `hasPermission`). An absent code leaves the action
+   * exactly as it was, so untagged pages are unaffected.
+   */
+  permissions?: ActionPermissions;
+};
+
+/**
+ * Per-page action map: which in-page button maps to which catalog code. Codes
+ * mirror the backend catalog (`rxsoft.<module>.<resource>.<action>`).
+ */
+export type ActionPermissions = {
+  create?: string;
+  update?: string;
+  delete?: string;
+  export?: string;
+  archive?: string;
+  /** Per-row-action codes, keyed by `RowAction.id`. */
+  rowActions?: Record<string, string>;
 };
 
 export type RowAction = {
+  /** Stable key, used to look the action's permission code up in `permissions.rowActions`. */
+  id?: string;
   label: string;
   icon?: React.ComponentType<{ size?: number }>;
   /** Navigate to a route when selected. */
