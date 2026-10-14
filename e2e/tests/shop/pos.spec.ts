@@ -793,17 +793,17 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
       `/items?search=POS-Item-${runId}&limit=1`
     );
     const stockItem = itemRes.data?.[0];
-    const locRes = await apiFetch<{ data?: Array<{ id: string }> }>(
-      page,
-      '/stock-locations?limit=1'
-    );
-    const loc = locRes.data?.[0];
-    test.skip(!stockItem || !loc, 'seeded item or stock location not resolvable');
+    // The session location is the user's POS config (pos.tsx derives it from
+    // /user-pos-config/me) — adjusting any other location leaves the replay
+    // stockless ("No stock balance found" on sync).
+    const cfg = await apiFetch<{ stockLocationId?: string | null }>(page, '/user-pos-config/me');
+    const locId = cfg?.stockLocationId;
+    test.skip(!stockItem || !locId, 'seeded item or POS-configured stock location not resolvable');
     await apiFetch(page, '/inventory/adjust-quantity', {
       method: 'POST',
       body: JSON.stringify({
         itemId: stockItem!.id,
-        locationId: loc!.id,
+        locationId: locId,
         deltaQuantity: 100,
         reason: 'POS stock adjustment',
       }),
