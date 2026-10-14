@@ -9,7 +9,11 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { provisionOrganization, deprovisionOrganization, activeAdminCredentials } from './utils/provision';
+import {
+  provisionOrganization,
+  deprovisionOrganization,
+  activeAdminCredentials,
+} from './utils/provision';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -141,14 +145,17 @@ async function signInAsAdmin(page: any) {
 }
 
 // Create a patient via EMR API
-async function createPatientViaApi(token: string, patient: {
-  patientId: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  dateOfBirth?: string;
-  phone?: string;
-}): Promise<any> {
+async function createPatientViaApi(
+  token: string,
+  patient: {
+    patientId: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+    dateOfBirth?: string;
+    phone?: string;
+  }
+): Promise<any> {
   const res = await fetch('http://localhost:8093/api/patients', {
     method: 'POST',
     headers: {
@@ -162,14 +169,17 @@ async function createPatientViaApi(token: string, patient: {
 }
 
 // Create an appointment via EMR API
-async function createAppointmentViaApi(token: string, appt: {
-  patientId: string;
-  patientName: string;
-  appointmentType: string;
-  date: string;
-  startTime: string;
-  priority?: string;
-}): Promise<any> {
+async function createAppointmentViaApi(
+  token: string,
+  appt: {
+    patientId: string;
+    patientName: string;
+    appointmentType: string;
+    date: string;
+    startTime: string;
+    priority?: string;
+  }
+): Promise<any> {
   const res = await fetch('http://localhost:8093/api/appointments', {
     method: 'POST',
     headers: {
@@ -309,8 +319,12 @@ test.describe('EMR Real-Backend — Bespoke Flow: Appointment → Visit → Enco
 
     // Patient picker
     await page.getByPlaceholder('Search by name or MRN').click();
-    await page.getByPlaceholder('Search by name or MRN').fill(testPatient!.patientName.split(' ')[0]);
-    await expect(page.getByRole('option', { name: new RegExp(testPatient!.patientId) })).toBeVisible({ timeout: 10_000 });
+    await page
+      .getByPlaceholder('Search by name or MRN')
+      .fill(testPatient!.patientName.split(' ')[0]);
+    await expect(
+      page.getByRole('option', { name: new RegExp(testPatient!.patientId) })
+    ).toBeVisible({ timeout: 10_000 });
     await page.getByRole('option', { name: new RegExp(testPatient!.patientId) }).click();
 
     // Appointment type
@@ -338,11 +352,16 @@ test.describe('EMR Real-Backend — Bespoke Flow: Appointment → Visit → Enco
 
     // Find the appointment row and click "Begin Visit"
     // The appointment should have status SCHEDULED
-    const appointmentRow = page.getByRole('row', { name: new RegExp(testAppointment!.appointmentNumber) });
+    const appointmentRow = page.getByRole('row', {
+      name: new RegExp(testAppointment!.appointmentNumber),
+    });
     await expect(appointmentRow).toBeVisible({ timeout: 10_000 });
 
     // Click Begin Visit button (stethoscope icon)
-    await appointmentRow.getByRole('button', { name: /Begin Visit|Check In/i }).first().click();
+    await appointmentRow
+      .getByRole('button', { name: /Begin Visit|Check In/i })
+      .first()
+      .click();
 
     // Should navigate to visit detail page
     await expect(page).toHaveURL(/\/emr\/visits\/[^/]+$/, { timeout: 15_000 });
@@ -388,7 +407,9 @@ test.describe('EMR Real-Backend — Bespoke Flow: Appointment → Visit → Enco
     await page.getByLabel('Clinical note').fill('Test clinical note from E2E run');
     await page.getByRole('button', { name: 'Submit Documentation' }).click();
 
-    await expect(page.getByText('Documentation submitted successfully')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Documentation submitted successfully')).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test('UC-32: Amend documentation submission', async ({ page }) => {
@@ -479,7 +500,10 @@ test.describe('EMR Real-Backend — Bespoke Flow: Clinical Requests (Lab/Rad/Pha
     // Add test item
     await page.getByPlaceholder('Search test').fill('CBC');
     await page.waitForTimeout(500);
-    await page.getByRole('option', { name: /CBC|Complete Blood Count/i }).first().click();
+    await page
+      .getByRole('option', { name: /CBC|Complete Blood Count/i })
+      .first()
+      .click();
 
     await page.getByRole('button', { name: 'Create Request' }).click();
     await expect(page.getByText('Request created')).toBeVisible({ timeout: 10_000 });
@@ -507,7 +531,8 @@ test.describe('EMR Real-Backend — Bespoke Flow: Clinical Requests (Lab/Rad/Pha
     const requestRow = page.getByRole('row', { name: /REQ-\d+/ }).first();
     await requestRow.click();
 
-    await page.getByPlaceholder('Append an update without changing the request status…')
+    await page
+      .getByPlaceholder('Append an update without changing the request status…')
       .fill('E2E test note appended to timeline');
     await page.getByRole('button', { name: 'Add note' }).click();
 
@@ -622,7 +647,10 @@ test.describe('EMR Real-Backend — Ward/Admission Flow', () => {
     // Click into a ward to see bed board
     const wardRow = page.getByRole('row').first();
     await expect(wardRow).toBeVisible({ timeout: 15_000 });
-    await wardRow.getByRole('button', { name: /View|Beds|Details/i }).first().click();
+    await wardRow
+      .getByRole('button', { name: /View|Beds|Details/i })
+      .first()
+      .click();
 
     // Bed allocation board should render
     await expect(page.getByText(/Bed Allocation|Bed Board/i)).toBeVisible({ timeout: 10_000 });
@@ -728,7 +756,9 @@ test.describe('EMR Real-Backend — Patient Registration & Lookup', () => {
     await page.getByLabel('Date of birth').fill('1995-07-15');
 
     await page.getByRole('button', { name: 'Create' }).last().click();
-    await expect(page.getByText('Patient registered successfully')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Patient registered successfully')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Verify in list
     await page.getByPlaceholder('Search').fill(mrn);

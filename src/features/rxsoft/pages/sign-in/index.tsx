@@ -5,6 +5,7 @@ import { Lock, User, ShieldCheck, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { getRememberMe } from '@/lib/auth-tokens';
 import { useAuthStore } from '@/stores/auth-store';
 import { OnboardOrganisation } from './onboard-organisation';
 
@@ -42,6 +43,9 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
   const [mode, setMode] = useState<'signin' | 'onboard'>('signin');
+  // "Remember me" — persisted preference; controls whether tokens survive a
+  // browser restart (localStorage) or are session-only (sessionStorage).
+  const [remember, setRemember] = useState(getRememberMe);
 
   const {
     register,
@@ -58,7 +62,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
 
   const onSubmit = async (values: SignInValues) => {
     try {
-      await login(values.username, values.password);
+      await login(values.username, values.password, remember);
 
       const authState = useAuthStore.getState();
 
@@ -331,6 +335,9 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   <Checkbox
                     label="Remember me"
                     size="sm"
+                    data-testid="sign-in-remember-me"
+                    checked={remember}
+                    onChange={(event) => setRemember(event.currentTarget.checked)}
                     styles={{
                       label: { color: '#6B7280' },
                     }}

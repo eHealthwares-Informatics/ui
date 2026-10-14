@@ -18,7 +18,7 @@ export interface WebsiteAuthStore {
   isAuthenticated: boolean;
   setUser: (user: WebsiteUser, token: string, refreshToken: string) => void;
   logout: () => void;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string, remember?: boolean) => Promise<void>;
   register: (data: {
     username: string;
     email?: string;
@@ -77,9 +77,9 @@ export const useAuthStore = create<WebsiteAuthStore>()(
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
       },
 
-      login: async (username, password) => {
+      login: async (username, password, remember) => {
         const res = await websiteApi.login({ username, password });
-        persistTokens(res.accessToken, res.refreshToken);
+        persistTokens(res.accessToken, res.refreshToken, remember);
         const user = decodeToken(res.accessToken);
         set({
           user,

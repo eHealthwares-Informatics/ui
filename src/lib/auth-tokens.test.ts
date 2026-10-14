@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
+  getAccessToken,
   getAccessTokenExpiry,
+  getRefreshToken,
+  getRememberMe,
   persistTokens,
   clearTokens,
+  setRememberMe,
   ACCESS_TOKEN_KEY,
   REFRESH_TOKEN_KEY,
 } from './auth-tokens';
@@ -54,5 +58,49 @@ describe('auth-tokens storage', () => {
     clearTokens();
     expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
+  });
+
+  it('defaults "remember me" to true and persists the preference', () => {
+    localStorage.clear();
+    expect(getRememberMe()).toBe(true);
+    setRememberMe(false);
+    expect(getRememberMe()).toBe(false);
+    expect(localStorage.getItem('rxsoft_admin_remember_me')).toBe('false');
+    setRememberMe(true);
+    expect(getRememberMe()).toBe(true);
+  });
+
+  it('stores tokens in localStorage when remembered (survives restart)', () => {
+    persistTokens('at-2', 'rt-2', true);
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-2');
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(getAccessToken()).toBe('at-2');
+  });
+
+  it('stores tokens in sessionStorage when not remembered (session-only)', () => {
+    persistTokens('at-3', 'rt-3', false);
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-3');
+    expect(sessionStorage.getItem(REFRESH_TOKEN_KEY)).toBe('rt-3');
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    // Reads find the token whichever storage holds it.
+    expect(getAccessToken()).toBe('at-3');
+    expect(getRefreshToken()).toBe('rt-3');
+  });
+
+  it('moves tokens between storages when the preference flips', () => {
+    persistTokens('at-4', 'rt-4', true);
+    persistTokens('at-5', 'rt-5', false);
+    // The remembered copy is removed so a stale persistent token can't linger.
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-5');
+  });
+
+  it('clearTokens clears both storages', () => {
+    persistTokens('at-6', 'rt-6', true);
+    persistTokens('at-6', 'rt-6', false);
+    clearTokens();
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(getAccessToken()).toBeNull();
   });
 });
