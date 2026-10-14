@@ -784,6 +784,31 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
   }) => {
     await gotoPosReady(page);
 
+    // The synced replay goes through full stock validation server-side (the
+    // backend rejected a stockless replay with "No stock balance found" in an
+    // earlier run) — seed stock at the session location via the same API the
+    // Adjust-Stock modal uses before building the offline sale.
+    const itemRes = await apiFetch<{ data?: Array<{ id: string }> }>(
+      page,
+      `/items?search=POS-Item-${runId}&limit=1`
+    );
+    const stockItem = itemRes.data?.[0];
+    const locRes = await apiFetch<{ data?: Array<{ id: string }> }>(
+      page,
+      '/stock-locations?limit=1'
+    );
+    const loc = locRes.data?.[0];
+    test.skip(!stockItem || !loc, 'seeded item or stock location not resolvable');
+    await apiFetch(page, '/inventory/adjust-quantity', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemId: stockItem!.id,
+        locationId: loc!.id,
+        deltaQuantity: 100,
+        reason: 'POS stock adjustment',
+      }),
+    });
+
     // Build a sale with a NEW customer name (mirrors test 9's offline setup).
     const productSelect = page.getByTestId('pos-product-select');
     await productSelect.click();
