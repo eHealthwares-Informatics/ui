@@ -94,4 +94,33 @@ test.describe('Website auth — forgot / verify email (ui#61)', () => {
       timeout: 15_000,
     });
   });
+
+  test('verify-email error state: resend control fires the verification POST (ui#792/PR#154)', async ({
+    page,
+  }, testInfo) => {
+    skipIfBackendDown(testInfo);
+    // Bad-token error state (the resend control ships there per PR #154).
+    await page.goto('/shop/verify-email?token=e2e-bad-token-resend');
+    await expect(page.getByText('Verification Failed')).toBeVisible({ timeout: 30_000 });
+
+    const resend = page.getByTestId('resend-verification');
+    await expect(resend).toBeVisible({ timeout: 15_000 });
+
+    // Empty email → orange toast, no request.
+    await resend.click();
+    await expect(page.getByText('Enter your email address to resend.')).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // With an email → POST /website/auth/resend-verification fires.
+    await page.getByLabel('Email').fill(`ui792-${Date.now().toString(36)}@example.com`);
+    const post = page.waitForResponse(
+      (res) =>
+        res.request().method() === 'POST' &&
+        res.url().includes('/website/auth/resend-verification'),
+      { timeout: 20_000 }
+    );
+    await resend.click();
+    expect((await post).status(), 'resend endpoint must respond').toBeLessThan(500);
+  });
 });
