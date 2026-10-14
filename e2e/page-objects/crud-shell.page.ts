@@ -168,9 +168,22 @@ export class CrudShellPage {
 
   /** Confirms the row-level delete ConfirmDialog. */
   async confirmDelete(): Promise<void> {
-    // There are two ConfirmDialogs on the page: one from DataPageShell and one from ActionCell.
-    // The ActionCell's dialog is the last one rendered, so use .last() to target it.
-    const dialog = this.page.getByTestId('confirm-dialog').last();
+    // Multiple ConfirmDialog instances exist (DataPageShell + one per
+    // ActionCell row), and depending on resource the LAST DOM node can be an
+    // `open` but HIDDEN transition duplicate (observed on Delivery Areas:
+    // two [open] roots, .last() = hidden → 15s toBeVisible timeout; and on
+    // LIS Priorities: last row's empty Modal shadowed the open one). Pick the
+    // first VISIBLE instance instead; fall back to .last() if none reports
+    // visible yet (still mid-mount).
+    const dialogs = this.page.getByTestId('confirm-dialog');
+    let dialog = dialogs.last();
+    const count = await dialogs.count();
+    for (let i = 0; i < count; i += 1) {
+      if (await dialogs.nth(i).isVisible()) {
+        dialog = dialogs.nth(i);
+        break;
+      }
+    }
     await expect(dialog).toBeVisible({ timeout: 15_000 });
     const confirm = dialog.getByTestId('confirm-dialog-confirm');
     // The confirm button can stay disabled while a list refetch holds the
