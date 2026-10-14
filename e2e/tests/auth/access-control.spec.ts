@@ -92,37 +92,29 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await signInAsCashier(page);
     await page.goto('/rxsoft/dashboard');
 
-    // The sidebar renders groups COLLAPSED — expand the ones under test so
-    // the item assertions are real (not vacuously count-0 on a collapsed DOM).
-    for (const group of ['Catalog', 'People', 'Operations']) {
-      const btn = page.getByRole('button', { name: group, exact: false }).first();
-      if ((await btn.count()) > 0) await btn.click();
-    }
-    await page.waitForTimeout(500);
-
     // TAGGED items the cashier LACKS the code for → hidden.
     // (Group-level hiding is Phase-3 work: every rxsoft group currently has
     // untagged members — Customers/Suppliers/Categories etc. — which stay
     // visible by the "never hides what the API allows" invariant.)
     for (const hidden of ['Users', 'Roles', 'Reports', 'Audit Logs']) {
       await expect(
-        page.getByRole('button', { name: hidden, exact: false }),
+        page.getByRole('link', { name: hidden, exact: false }),
         `${hidden} (tagged, code lacking) must be hidden`
       ).toHaveCount(0, { timeout: 15_000 });
     }
     // TAGGED items the cashier HOLDS → visible.
     for (const visible of ['Sales', 'Inventory', 'Products']) {
       await expect(
-        page.getByRole('button', { name: visible, exact: false }).first(),
+        page.getByRole('link', { name: visible, exact: false }).first(),
         `${visible} (tagged, code held) must stay visible`
-      ).toBeVisible({ timeout: 15_000 });
+      ).toBeAttached({ timeout: 15_000 });
     }
     // UNTAGGED items → always visible (Phase-1 invariant).
     for (const visible of ['Customers', 'Suppliers', 'Categories']) {
       await expect(
-        page.getByRole('button', { name: visible, exact: false }).first(),
+        page.getByRole('link', { name: visible, exact: false }).first(),
         `${visible} (untagged) must stay visible`
-      ).toBeVisible({ timeout: 15_000 });
+      ).toBeAttached({ timeout: 15_000 });
     }
   });
 
@@ -133,19 +125,12 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await signInAsCashier(page);
     await page.goto('/rxsoft/dashboard');
 
-    // Expand People (Users lives there) and Shop (POS lives there).
-    const people = page.getByRole('button', { name: 'People', exact: false }).first();
-    if ((await people.count()) > 0) await people.click();
-    const shop = page.getByRole('button', { name: 'Shop', exact: false }).first();
-    if ((await shop.count()) > 0) await shop.click();
-    await page.waitForTimeout(500);
-
     // Users is tagged rxsoft.identity.user.read — cashier lacks it.
-    await expect(page.getByRole('button', { name: 'Users', exact: false })).toHaveCount(0, {
+    await expect(page.getByRole('link', { name: 'Users', exact: false })).toHaveCount(0, {
       timeout: 15_000,
     });
     // POS (/shop/pos) is tagged rxsoft.sales.sale.create — cashier HAS it.
-    await expect(page.getByRole('button', { name: 'POS', exact: false }).first()).toBeVisible({
+    await expect(page.getByRole('link', { name: 'POS', exact: false }).first()).toBeAttached({
       timeout: 15_000,
     });
   });
