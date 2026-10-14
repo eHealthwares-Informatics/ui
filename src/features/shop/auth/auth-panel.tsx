@@ -14,6 +14,7 @@ import { notifications } from '@mantine/notifications';
 import { useNavigate } from '@tanstack/react-router';
 import { KeyRound, Lock, Mail, Phone, User, UserPlus } from 'lucide-react';
 import { useState } from 'react';
+import { getRememberMe } from '@/lib/auth-tokens';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useAuthStore } from '../website/auth-store';
 import { green, ink, muted, line, buttonStyles } from '../website/components';
@@ -81,6 +82,9 @@ export function AuthPanel({ variant, initialTab = 'signin', onSuccess }: AuthPan
   const [devCode, setDevCode] = useState<string | null>(null);
   const [otpSending, setOtpSending] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  // "Remember me" — persisted preference; on = tokens survive a browser
+  // restart (localStorage), off = session-only (sessionStorage).
+  const [remember, setRemember] = useState(getRememberMe);
 
   // ── Register ───────────────────────────────────────────────
   const [regName, setRegName] = useState('');
@@ -167,7 +171,7 @@ export function AuthPanel({ variant, initialTab = 'signin', onSuccess }: AuthPan
 
     setLoginLoading(true);
     try {
-      await authLogin(identifier, password);
+      await authLogin(identifier, password, remember);
       finish();
     } catch {
       // OTP fallback: password auth failed but a code was sent → try it.
@@ -411,7 +415,14 @@ export function AuthPanel({ variant, initialTab = 'signin', onSuccess }: AuthPan
           </div>
 
           <Group justify="space-between">
-            <Checkbox label="Remember me" color="green" size="xs" />
+            <Checkbox
+              label="Remember me"
+              color="green"
+              size="xs"
+              data-testid="shop-remember-me"
+              checked={remember}
+              onChange={(event) => setRemember(event.currentTarget.checked)}
+            />
             <Text
               size="xs"
               fw={800}

@@ -1,10 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { TextInput, PasswordInput, Button, Stack, Text, Group, Divider } from '@mantine/core';
+import {
+  TextInput,
+  PasswordInput,
+  Button,
+  Stack,
+  Text,
+  Group,
+  Divider,
+  Checkbox,
+} from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { getRememberMe } from '@/lib/auth-tokens';
 import { useAuthStore } from '@/stores/auth-store';
 
 const formSchema = z.object({
@@ -18,6 +28,9 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
 
 export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  // "Remember me" — persisted preference; on = tokens survive a browser
+  // restart (localStorage), off = session-only (sessionStorage).
+  const [remember, setRemember] = useState(getRememberMe);
   const login = useAuthStore((state) => state.login);
   const error = useAuthStore((state) => state.error);
 
@@ -32,7 +45,7 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    await login(data.username, data.password);
+    await login(data.username, data.password, remember);
 
     setIsLoading(false);
 
@@ -74,6 +87,15 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
             Forgot password?
           </Link>
         </div>
+
+        {/* Remember me */}
+        <Checkbox
+          label="Remember me"
+          size="sm"
+          data-testid="sign-in-remember-me"
+          checked={remember}
+          onChange={(event) => setRemember(event.currentTarget.checked)}
+        />
 
         {/* Error */}
         {error && (
