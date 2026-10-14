@@ -9,17 +9,11 @@ export const Route = createFileRoute('/')({
       throw redirect({ to: '/sign-in' });
     }
 
-    const hasRxsoft = userModules.some((m) => m.id === 'rxsoft');
-    if (hasRxsoft) {
-      throw redirect({ to: '/dashboard/sales' });
+    // Single module: go straight to its dashboard. Multiple modules: the
+    // module landing grid (default page after login — the user chooses).
+    if (userModules.length === 1) {
+      throw redirect({ href: `/${userModules[0].id}` });
     }
-
-    // Modules may still be loading (or /auth/me failed) — never render a blank
-    // page at "/". Fall back to the first known module, else sign-in.
-    const firstModule = userModules[0];
-    if (firstModule?.root) {
-      throw redirect({ href: `/${firstModule.id}${firstModule.root}` });
-    }
-    throw redirect({ to: '/sign-in' });
+    throw redirect({ to: '/modules' });
   },
 });

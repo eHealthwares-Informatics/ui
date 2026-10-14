@@ -17,11 +17,30 @@ export type ModuleInfo = {
   root: string;
 };
 
+/**
+ * How the effective permissions were resolved (access-control plan, phase 1):
+ *  - 'org'  — permissions derive from the user's organisation-scoped roles
+ *             (identity role_permissions is the single source today)
+ *  - 'user' — reserved for user-direct permission grants (later phase)
+ */
+export type PermissionMode = 'org' | 'user';
+
+/** Shape of identity's GET /auth/me response. */
+export type MeResponse = {
+  id: string;
+  username: string;
+  roles: string[];
+  permissions: string[];
+  modules: ModuleInfo[];
+  permissionMode: PermissionMode;
+};
+
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
   user: AuthUser | null;
   modules: ModuleInfo[];
+  permissionMode: PermissionMode;
   loading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<void>;
@@ -39,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       user: null,
       modules: [],
+      permissionMode: 'org',
       loading: false,
       error: null,
       pendingModulesFetch: null,
@@ -67,20 +87,18 @@ export const useAuthStore = create<AuthState>()(
 
           // Fetch user modules after login
           try {
-            const meResponse = await identityApi.get<{
-              id: string;
-              username: string;
-              roles: string[];
-              permissions: string[];
-              modules: ModuleInfo[];
-            }>('/auth/me');
-            set({ modules: meResponse.data.modules });
+            const meResponse = await identityApi.get<MeResponse>('/auth/me');
+            set({
+              modules: meResponse.data.modules,
+              permissionMode: meResponse.data.permissionMode,
+            });
           } catch {
             set({
               modules: [
                 { id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy Admin', root: '/items' },
                 { id: 'admin', name: 'Admin Console', description: 'Administration', root: '/' },
               ],
+              permissionMode: 'org',
             });
           }
         } catch {
@@ -102,6 +120,7 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           user: null,
           modules: [],
+          permissionMode: 'org',
           loading: false,
           error: null,
           pendingModulesFetch: null,
@@ -123,6 +142,7 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
           user: null,
           modules: [],
+          permissionMode: 'org',
           loading: false,
           error: null,
           pendingModulesFetch: null,
@@ -163,14 +183,11 @@ export const useAuthStore = create<AuthState>()(
 
         const pending = (async () => {
           try {
-            const meResponse = await identityApi.get<{
-              id: string;
-              username: string;
-              roles: string[];
-              permissions: string[];
-              modules: ModuleInfo[];
-            }>('/auth/me');
-            set({ modules: meResponse.data.modules });
+            const meResponse = await identityApi.get<MeResponse>('/auth/me');
+            set({
+              modules: meResponse.data.modules,
+              permissionMode: meResponse.data.permissionMode ?? 'org',
+            });
           } catch {
             // Silently fail - modules will be empty until fetched
           } finally {

@@ -59,15 +59,38 @@ import {
   Settings,
 } from 'lucide-react';
 import type { ModuleId } from '@/features/shared/module-data';
+import { hasPermission } from '@/lib/permissions';
 import { NavItem, type SidebarData } from '../types';
 
-export function filterNavGroupsByModule(navGroups: NavItem[], selectedModule: ModuleId): NavItem[] {
+/**
+ * Sidebar visibility = module match + permission match (MENU + SUBMENU
+ * enforcement levels, phase 1 of the access-control plan):
+ *   - module: item is tagged `modules: [...]`; the selected module decides
+ *     ('admin' module view shows everything)
+ *   - permission: entries tagged `permission: '<code>'` are hidden unless the
+ *     user's token permissions satisfy the code (wildcards apply, same matcher
+ *     semantics as the backends). UNTAGGED entries remain visible — the
+ *     backend guard is still the real enforcement.
+ */
+export function filterNavGroupsByModule(
+  navGroups: NavItem[],
+  selectedModule: ModuleId,
+  userPermissions: string[] = []
+): NavItem[] {
+  const permissionAllows = (item: NavItem): boolean => {
+    if (!item.permission) return true;
+    const required = Array.isArray(item.permission) ? item.permission : [item.permission];
+    return required.some((code) => hasPermission(userPermissions, code));
+  };
+
   return navGroups
+    .filter(permissionAllows)
     .map((group: NavItem) => ({
       ...group,
       items: (group.items || []).filter(
         (item) =>
-          selectedModule === 'admin' || !item.modules || item.modules.includes(selectedModule)
+          permissionAllows(item) &&
+          (selectedModule === 'admin' || !item.modules || item.modules.includes(selectedModule))
       ),
       url: undefined,
     }))
@@ -132,24 +155,32 @@ export const sidebarData: SidebarData = {
         {
           title: 'Dashboard',
           url: '/dashboard/sales',
+          permission: 'rxsoft.reports.sales.view',
           icon: LayoutDashboard,
           modules: ['rxsoft'],
         },
         {
           title: 'Purchases',
           url: '/dashboard/purchases',
+          permission: 'rxsoft.purchases.order.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
         {
           title: 'Reports',
           url: '/rxsoft/reports',
+          permission: [
+            'rxsoft.reports.sales.view',
+            'rxsoft.reports.inventory.view',
+            'rxsoft.reports.financial.view',
+          ],
           icon: ChartColumn,
           modules: ['rxsoft'],
         },
         {
           title: 'Audit Logs',
           url: '/rxsoft/audit-logs',
+          permission: 'rxsoft.admin.audit.read',
           icon: Package,
           modules: ['admin'],
         },
@@ -162,18 +193,21 @@ export const sidebarData: SidebarData = {
         {
           title: 'Website',
           url: '/shop',
+          permission: 'rxsoft.website.content.read',
           icon: Globe,
           modules: ['rxsoft'],
         },
         {
           title: 'Purchases',
           url: '/shop/purchases',
+          permission: 'rxsoft.purchases.order.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
         {
           title: 'POS',
           url: '/shop/pos',
+          permission: 'rxsoft.sales.sale.create',
           icon: Store,
           modules: ['rxsoft'],
         },
@@ -186,6 +220,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Products',
           url: '/rxsoft/items',
+          permission: 'rxsoft.catalog.item.read',
           icon: Package,
           modules: ['rxsoft'],
         },
@@ -234,6 +269,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Users',
           url: '/rxsoft/users',
+          permission: 'rxsoft.identity.user.read',
           icon: Users,
           modules: ['rxsoft', 'admin'],
         },
@@ -252,6 +288,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Roles',
           url: '/rxsoft/roles',
+          permission: 'rxsoft.identity.role.read',
           icon: Shield,
           modules: ['rxsoft', 'admin'],
         },
@@ -270,48 +307,56 @@ export const sidebarData: SidebarData = {
         {
           title: 'Orders',
           url: '/rxsoft/orders',
+          permission: 'rxsoft.sales.sale.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
         {
           title: 'Sales',
           url: '/rxsoft/sales',
+          permission: 'rxsoft.sales.sale.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
         {
           title: 'Sales Lines',
           url: '/rxsoft/sales-lines',
+          permission: 'rxsoft.sales.sale.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
         {
           title: 'Receivables',
           url: '/rxsoft/receivables',
+          permission: 'rxsoft.receivables.transaction.read',
           icon: HandCoins,
           modules: ['rxsoft'],
         },
         {
           title: 'Purchases',
           url: '/rxsoft/purchases',
+          permission: 'rxsoft.purchases.order.read',
           icon: ReceiptText,
           modules: ['rxsoft'],
         },
         {
           title: 'Inventory',
           url: '/rxsoft/inventory',
+          permission: 'rxsoft.inventory.stock.read',
           icon: Boxes,
           modules: ['rxsoft'],
         },
         {
           title: 'Goods Receiving',
           url: '/rxsoft/receiving',
+          permission: 'rxsoft.purchases.order.read',
           icon: PackageSearch,
           modules: ['rxsoft'],
         },
         {
           title: 'Website Orders',
           url: '/rxsoft/website-orders',
+          permission: 'rxsoft.website.orders.read',
           icon: ShoppingCart,
           modules: ['rxsoft'],
         },
@@ -324,6 +369,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Settings',
           url: '/rxsoft/settings',
+          permission: 'rxsoft.admin.settings.read',
           icon: Cog,
           modules: ['rxsoft', 'admin'],
         },
@@ -432,42 +478,49 @@ export const sidebarData: SidebarData = {
         {
           title: 'Health Concerns',
           url: '/rxsoft/website-health-concerns',
+          permission: 'rxsoft.website.content.read',
           icon: HeartPulse,
           modules: ['rxsoft'],
         },
         {
           title: 'Blog Articles',
           url: '/rxsoft/website-articles',
+          permission: 'rxsoft.website.content.read',
           icon: BookOpen,
           modules: ['rxsoft'],
         },
         {
           title: 'Prescriptions',
           url: '/rxsoft/website-prescriptions',
+          permission: 'rxsoft.website.prescriptions.read',
           icon: FileText,
           modules: ['rxsoft'],
         },
         {
           title: 'Consultations',
           url: '/rxsoft/website-consultations',
+          permission: 'rxsoft.website.consultations.read',
           icon: Stethoscope,
           modules: ['rxsoft'],
         },
         {
           title: 'Delivery Areas',
           url: '/rxsoft/website-delivery-areas',
+          permission: 'rxsoft.website.content.read',
           icon: Truck,
           modules: ['rxsoft'],
         },
         {
           title: 'Reward Programs',
           url: '/rxsoft/website-reward-programs',
+          permission: 'rxsoft.website.rewards.read',
           icon: HandCoins,
           modules: ['rxsoft'],
         },
         {
           title: 'Coupons',
           url: '/rxsoft/coupons',
+          permission: 'rxsoft.website.content.read',
           icon: Receipt,
           modules: ['rxsoft'],
         },
@@ -480,78 +533,91 @@ export const sidebarData: SidebarData = {
         {
           title: 'Hero Slides',
           url: '/rxsoft/ehealthwares-hero-slides',
+          permission: 'rxsoft.website.content.read',
           icon: Store,
           modules: ['website'],
         },
         {
           title: 'Products',
           url: '/rxsoft/ehealthwares-products',
+          permission: 'rxsoft.website.content.read',
           icon: Package,
           modules: ['website'],
         },
         {
           title: 'Services',
           url: '/rxsoft/ehealthwares-services',
+          permission: 'rxsoft.website.content.read',
           icon: PackageSearch,
           modules: ['website'],
         },
         {
           title: 'Categories',
           url: '/rxsoft/ehealthwares-categories',
+          permission: 'rxsoft.website.content.read',
           icon: Tags,
           modules: ['website'],
         },
         {
           title: 'Articles',
           url: '/rxsoft/ehealthwares-articles',
+          permission: 'rxsoft.website.content.read',
           icon: BookOpen,
           modules: ['website'],
         },
         {
           title: 'Testimonials',
           url: '/rxsoft/ehealthwares-testimonials',
+          permission: 'rxsoft.website.content.read',
           icon: HeartPulse,
           modules: ['website'],
         },
         {
           title: 'Partners',
           url: '/rxsoft/ehealthwares-partners',
+          permission: 'rxsoft.website.content.read',
           icon: HandCoins,
           modules: ['website'],
         },
         {
           title: 'Team',
           url: '/rxsoft/ehealthwares-team',
+          permission: 'rxsoft.website.content.read',
           icon: Users,
           modules: ['website'],
         },
         {
           title: 'Investor Data',
           url: '/rxsoft/ehealthwares-investors',
+          permission: 'rxsoft.website.content.read',
           icon: ChartColumn,
           modules: ['website'],
         },
         {
           title: 'Careers',
           url: '/rxsoft/ehealthwares-careers',
+          permission: 'rxsoft.website.content.read',
           icon: FileText,
           modules: ['website'],
         },
         {
           title: 'Site Sections',
           url: '/rxsoft/ehealthwares-sections',
+          permission: 'rxsoft.website.content.read',
           icon: Layers3,
           modules: ['website'],
         },
         {
           title: 'Site Settings',
           url: '/rxsoft/ehealthwares-settings',
+          permission: 'rxsoft.website.content.read',
           icon: Cog,
           modules: ['website'],
         },
         {
           title: 'Contact Submissions',
           url: '/rxsoft/ehealthwares-contact-submissions',
+          permission: 'rxsoft.website.content.read',
           icon: ContactRound,
           modules: ['website'],
         },
@@ -564,18 +630,21 @@ export const sidebarData: SidebarData = {
         {
           title: 'Organizations',
           url: '/rxsoft/organizations',
+          permission: 'rxsoft.admin.settings.read',
           icon: Shield,
           modules: ['admin'],
         },
         {
           title: 'Locations',
           url: '/rxsoft/stock-locations',
+          permission: 'rxsoft.admin.settings.read',
           icon: Store,
           modules: ['admin'],
         },
         {
           title: 'Warehouses',
           url: '/rxsoft/warehouses',
+          permission: 'rxsoft.admin.settings.read',
           icon: Building2,
           modules: ['admin'],
         },
@@ -588,12 +657,14 @@ export const sidebarData: SidebarData = {
         {
           title: 'User Config',
           url: '/rxsoft/user-config',
+          permission: 'rxsoft.identity.user.read',
           icon: UserCog,
           modules: ['rxsoft'],
         },
         {
           title: 'Organisation Config',
           url: '/rxsoft/organisation-config',
+          permission: 'rxsoft.admin.settings.read',
           icon: Building2,
           modules: ['rxsoft'],
         },
@@ -602,22 +673,26 @@ export const sidebarData: SidebarData = {
     {
       title: 'Identity & Access',
       icon: ShieldCheck,
+      permission: 'rxsoft.identity.user.read',
       items: [
         {
           title: 'Users',
           url: '/identity/users',
+          permission: 'rxsoft.identity.user.read',
           icon: UserCog,
           modules: ['identity'],
         },
         {
           title: 'Roles',
           url: '/identity/roles',
+          permission: 'rxsoft.identity.role.read',
           icon: Shield,
           modules: ['identity'],
         },
         {
           title: 'Permissions',
           url: '/identity/permissions',
+          permission: 'rxsoft.identity.role.read',
           icon: KeyRound,
           modules: ['identity'],
         },
@@ -642,18 +717,21 @@ export const sidebarData: SidebarData = {
         {
           title: 'Questionnaires',
           url: '/conversation/questionnaires',
+          permission: 'conversation.read',
           icon: FileText,
           modules: ['conversation'],
         },
         {
           title: 'Questions',
           url: '/conversation/questions',
+          permission: 'conversation.read',
           icon: CircleDashed,
           modules: ['conversation'],
         },
         {
           title: 'Option Lists',
           url: '/conversation/option-lists',
+          permission: 'conversation.read',
           icon: ClipboardList,
           modules: ['conversation'],
         },
@@ -666,30 +744,35 @@ export const sidebarData: SidebarData = {
         {
           title: 'Conversations',
           url: '/conversation',
+          permission: 'conversation.read',
           icon: MessageSquare,
           modules: ['conversation'],
         },
         {
           title: 'Participants',
           url: '/conversation/participants',
+          permission: 'conversation.read',
           icon: ContactRound,
           modules: ['conversation'],
         },
         {
           title: 'Exchanges',
           url: '/conversation/exchanges',
+          permission: 'conversation.read',
           icon: FileText,
           modules: ['conversation'],
         },
         {
           title: 'Projections',
           url: '/conversation/projections',
+          permission: 'conversation.read',
           icon: ContactRound,
           modules: ['conversation'],
         },
         {
           title: 'Invites',
           url: '/conversation/invites',
+          permission: 'conversation.read',
           icon: FileText,
           modules: ['conversation'],
         },
@@ -702,6 +785,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Chats',
           url: '/conversation/chats',
+          permission: 'conversation.read',
           icon: MessageSquare,
           modules: ['conversation'],
         },
@@ -714,6 +798,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'Channels',
           url: '/conversation/channels',
+          permission: 'conversation.read',
           icon: Radio,
           modules: ['conversation'],
         },
@@ -726,48 +811,56 @@ export const sidebarData: SidebarData = {
         {
           title: 'Providers',
           url: '/conversation/ai/providers',
+          permission: 'conversation.manage',
           icon: Server,
           modules: ['conversation'],
         },
         {
           title: 'Models',
           url: '/conversation/ai/models',
+          permission: 'conversation.manage',
           icon: Cpu,
           modules: ['conversation'],
         },
         {
           title: 'Processors',
           url: '/conversation/ai/processors',
+          permission: 'conversation.manage',
           icon: Boxes,
           modules: ['conversation'],
         },
         {
           title: 'Instructions',
           url: '/conversation/ai/instructions',
+          permission: 'conversation.manage',
           icon: Brain,
           modules: ['conversation'],
         },
         {
           title: 'Eval Logs',
           url: '/conversation/ai/eval-logs',
+          permission: 'conversation.manage',
           icon: FileText,
           modules: ['conversation'],
         },
         {
           title: 'Costs',
           url: '/conversation/ai/costs',
+          permission: 'conversation.manage',
           icon: ChartColumn,
           modules: ['conversation'],
         },
         {
           title: 'Request Logs',
           url: '/conversation/ai/request-logs',
+          permission: 'conversation.manage',
           icon: Receipt,
           modules: ['conversation'],
         },
         {
           title: 'AI Config',
           url: '/conversation/ai/config',
+          permission: 'conversation.manage',
           icon: Settings,
           modules: ['conversation'],
         },
@@ -780,24 +873,28 @@ export const sidebarData: SidebarData = {
         {
           title: 'Workflows',
           url: '/conversation/workflows',
+          permission: 'conversation.read',
           icon: Workflow,
           modules: ['conversation'],
         },
         {
           title: 'Workflow Configuration',
           url: '/conversation/workflow-configuration',
+          permission: 'conversation.manage',
           icon: Workflow,
           modules: ['conversation'],
         },
         {
           title: 'Workflow Instances',
           url: '/conversation/workflow-instances',
+          permission: 'conversation.read',
           icon: Shuffle,
           modules: ['conversation'],
         },
         {
           title: 'Workflow Events',
           url: '/conversation/workflow-events',
+          permission: 'conversation.read',
           icon: Waypoints,
           modules: ['conversation'],
         },
@@ -810,24 +907,28 @@ export const sidebarData: SidebarData = {
         {
           title: 'Application Entities',
           url: '/communication/aes',
+          permission: 'communication.read',
           icon: MessageSquare,
           modules: ['communication'],
         },
         {
           title: 'Routes',
           url: '/communication/routing',
+          permission: 'communication.read',
           icon: MessageSquare,
           modules: ['communication'],
         },
         {
           title: 'Mapping',
           url: '/communication/mapping',
+          permission: 'communication.read',
           icon: MessageSquare,
           modules: ['communication'],
         },
         {
           title: 'Event Traces',
           url: '/communication/audit-center',
+          permission: 'communication.read',
           icon: FileText,
           modules: ['communication'],
         },
@@ -835,18 +936,21 @@ export const sidebarData: SidebarData = {
         {
           title: 'Flow Graph',
           url: '/communication/flow-graph',
+          permission: 'communication.read',
           icon: Layers3,
           modules: ['communication'],
         },
         {
           title: 'Trace Explorer',
           url: '/communication/trace-explorer',
+          permission: 'communication.read',
           icon: Waypoints,
           modules: ['communication'],
         },
         {
           title: 'Message Tester',
           url: '/communication/message-tester',
+          permission: 'communication.manage',
           icon: MessageSquare,
           modules: ['communication'],
         },
@@ -859,24 +963,28 @@ export const sidebarData: SidebarData = {
         {
           title: 'Concept Registry',
           url: '/coding-concept',
+          permission: 'coding-concept.read',
           icon: Layers3,
           modules: ['coding-concept'],
         },
         {
           title: 'Search',
           url: '/coding-concept/search',
+          permission: 'coding-concept.read',
           icon: Waypoints,
           modules: ['coding-concept'],
         },
         {
           title: 'Match',
           url: '/coding-concept/match',
+          permission: 'coding-concept.read',
           icon: GitBranch,
           modules: ['coding-concept'],
         },
         {
           title: 'Upload',
           url: '/coding-concept/upload',
+          permission: 'coding-concept.read',
           icon: FileText,
           modules: ['coding-concept'],
         },
@@ -889,54 +997,63 @@ export const sidebarData: SidebarData = {
         {
           title: 'Facilities',
           url: '/coding-concept/facilities',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Pharmacies',
           url: '/coding-concept/facilities/pharmacies',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Hospitals',
           url: '/coding-concept/facilities/hospitals',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Laboratories',
           url: '/coding-concept/facilities/laboratories',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'States',
           url: '/coding-concept/facilities/states',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'LGAs',
           url: '/coding-concept/facilities/lgas',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Wards',
           url: '/coding-concept/facilities/wards',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Facility Types',
           url: '/coding-concept/facilities/types',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
         {
           title: 'Facility Levels',
           url: '/coding-concept/facilities/levels',
+          permission: 'coding-concept.read',
           icon: Building2,
           modules: ['coding-concept'],
         },
@@ -949,48 +1066,56 @@ export const sidebarData: SidebarData = {
         {
           title: 'Generic Drugs',
           url: '/coding-concept/generic-drugs',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Generic Products',
           url: '/coding-concept/generic-products',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Pharmaceutics',
           url: '/coding-concept/pharmaceutics',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Drug Components',
           url: '/coding-concept/drug-components',
+          permission: 'coding-concept.read',
           icon: Layers3,
           modules: ['coding-concept'],
         },
         {
           title: 'Dosage Forms',
           url: '/coding-concept/dosage-forms',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Formulations',
           url: '/coding-concept/formulations',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Manufacturers',
           url: '/coding-concept/manufacturers',
+          permission: 'coding-concept.read',
           icon: Pill,
           modules: ['coding-concept'],
         },
         {
           title: 'Drug Classifications',
           url: '/coding-concept/drug-classifications',
+          permission: 'coding-concept.read',
           icon: Tags,
           modules: ['coding-concept'],
         },
@@ -1034,16 +1159,24 @@ export const sidebarData: SidebarData = {
       title: 'Orders',
       icon: FileText,
       items: [
-        { title: 'Orders', url: '/lis/orders', icon: FileText, modules: ['lis'] },
+        {
+          title: 'Orders',
+          url: '/lis/orders',
+          permission: 'lis.order.read',
+          icon: FileText,
+          modules: ['lis'],
+        },
         {
           title: 'Orders Dashboard',
           url: '/lis/orders/dashboard',
+          permission: 'lis.order.read',
           icon: LayoutDashboard,
           modules: ['lis'],
         },
         {
           title: 'Workflow',
           url: '/lis/orders/workflow/enter',
+          permission: 'lis.order.read',
           icon: FileText,
           modules: ['lis'],
         },
@@ -1056,16 +1189,24 @@ export const sidebarData: SidebarData = {
       title: 'Results',
       icon: NotebookPen,
       items: [
-        { title: 'Results', url: '/lis/results', icon: NotebookPen, modules: ['lis'] },
+        {
+          title: 'Results',
+          url: '/lis/results',
+          permission: 'lis.result.read',
+          icon: NotebookPen,
+          modules: ['lis'],
+        },
         {
           title: 'Result Signatures',
           url: '/lis/result-signatures',
+          permission: 'lis.result.read',
           icon: NotebookPen,
           modules: ['lis'],
         },
         {
           title: 'Validation Dashboard',
           url: '/lis/validation-dashboard',
+          permission: 'lis.result.read',
           icon: NotebookPen,
           modules: ['lis'],
         },
@@ -1153,24 +1294,45 @@ export const sidebarData: SidebarData = {
       title: 'EMR',
       icon: HeartPulse,
       items: [
-        { title: 'Dashboard', url: '/emr', icon: LayoutDashboard, modules: ['emr'] },
+        {
+          title: 'Dashboard',
+          url: '/emr',
+          permission: 'emr.patient.read',
+          icon: LayoutDashboard,
+          modules: ['emr'],
+        },
         {
           title: 'Appointments',
           url: '/emr/appointments',
+          permission: 'emr.appointment.read',
           icon: CalendarDays,
           modules: ['emr'],
         },
-        { title: 'Patients', url: '/emr/patients', icon: UserRound, modules: ['emr'] },
-        { title: 'Visits', url: '/emr/visits', icon: Bed, modules: ['emr'] },
+        {
+          title: 'Patients',
+          url: '/emr/patients',
+          permission: 'emr.patient.read',
+          icon: UserRound,
+          modules: ['emr'],
+        },
+        {
+          title: 'Visits',
+          url: '/emr/visits',
+          permission: 'emr.visit.read',
+          icon: Bed,
+          modules: ['emr'],
+        },
         {
           title: 'Encounters',
           url: '/emr/encounters',
+          permission: 'emr.encounter.read',
           icon: Stethoscope,
           modules: ['emr'],
         },
         {
           title: 'Clinical Requests',
           url: '/emr/requests',
+          permission: 'emr.request.read',
           icon: FilePlus2,
           modules: ['emr'],
         },
@@ -1235,7 +1397,13 @@ export const sidebarData: SidebarData = {
           icon: Building2,
           modules: ['emr'],
         },
-        { title: 'Forms', url: '/emr/forms', icon: FileSpreadsheet, modules: ['emr'] },
+        {
+          title: 'Forms',
+          url: '/emr/forms',
+          permission: 'emr.form.read',
+          icon: FileSpreadsheet,
+          modules: ['emr'],
+        },
         { title: 'Tags', url: '/emr/tags', icon: Tags, modules: ['emr'] },
         {
           title: 'Message Templates',
