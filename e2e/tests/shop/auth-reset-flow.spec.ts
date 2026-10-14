@@ -66,4 +66,32 @@ test.describe('Website auth — forgot / verify email (ui#61)', () => {
     await expect(page.getByText('Verification Failed')).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole('button', { name: 'Continue Shopping' })).toBeVisible();
   });
+
+  test('verify-email: the failed state resends the verification email (rxsoft-qa#792)', async ({
+    page,
+  }, testInfo) => {
+    skipIfBackendDown(testInfo);
+
+    const resendCalls: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('/website/auth/resend-verification'))
+        resendCalls.push(request.url());
+    });
+
+    // `email` is prefilled from the query param so the user need not retype it.
+    await page.goto('/shop/verify-email?token=e2e-bad-token-2026&email=shopper@example.com');
+    await expect(page.getByText('Verification Failed')).toBeVisible({ timeout: 30_000 });
+
+    const resend = page.getByTestId('resend-verification');
+    await expect(resend).toBeVisible();
+    await expect(page.getByTestId('resend-email')).toHaveValue('shopper@example.com');
+
+    await resend.click();
+
+    // The POST actually fires and the user gets a confirmation.
+    await expect.poll(() => resendCalls.length, { timeout: 15_000 }).toBeGreaterThan(0);
+    await expect(page.getByText(/verification link to shopper@example\.com/i)).toBeVisible({
+      timeout: 15_000,
+    });
+  });
 });
