@@ -38,8 +38,17 @@ describe('permissionMatches', () => {
     );
   });
 
-  it('a shorter user permission than the required code does not match', () => {
-    expect(permissionMatches('rxsoft.catalog', 'rxsoft.catalog.item.read')).toBe(false);
+  it('a parent grant covers its whole subtree (the default wildcard)', () => {
+    expect(permissionMatches('rxsoft.catalog', 'rxsoft.catalog.item.read')).toBe(true);
+    expect(permissionMatches('rxsoft.catalog', 'rxsoft.catalog.item.delete')).toBe(true);
+    expect(permissionMatches('rxsoft.catalog', 'rxsoft.catalog')).toBe(true);
+    expect(permissionMatches('rxsoft', 'rxsoft.catalog.item.read')).toBe(true);
+  });
+
+  it('a parent grant does not leak sideways or to unrelated namespaces', () => {
+    expect(permissionMatches('rxsoft.catalog', 'rxsoft.sales.sale.read')).toBe(false);
+    expect(permissionMatches('rxsoft.catalog', 'lis.order.read')).toBe(false);
+    expect(permissionMatches('rxsoft.catalog.item', 'rxsoft.catalog.itemX.read')).toBe(false);
   });
 });
 

@@ -6,9 +6,17 @@ import { useAuthStore } from '@/stores/auth-store';
  * (rxsoft/src/common/utils/permission-matcher.ts), so the UI never hides
  * something the API would allow or shows something the API would 403.
  *
- * A user permission matches a required code when every dot-segment matches,
- * with `*` wildcards: `rxsoft.*` covers `rxsoft.catalog.item.read`,
- * `rxsoft.catalog.*` covers any catalog code, `*` covers everything.
+ * A user permission matches a required code when every dot-segment matches.
+ * Two wildcard forms are understood:
+ *
+ *   - **Parent grant (preferred).** A *prefix* grant covers its whole subtree:
+ *     `rxsoft.catalog` covers `rxsoft.catalog.item.read`, `…item.create`, and so
+ *     on. The module/parent code IS the default wildcard — you do not append
+ *     `.*`.
+ *   - **Explicit `*` segments (legacy).** `rxsoft.*` covers any single-segment
+ *     suffix, `rxsoft.catalog.*` covers everything under `catalog`, and a bare
+ *     `*` covers everything. Kept for backward compatibility; new grants should
+ *     use the parent form.
  */
 export function permissionMatches(userPerm: string, requiredCode: string): boolean {
   if (userPerm === '*') return true;
@@ -25,7 +33,11 @@ export function permissionMatches(userPerm: string, requiredCode: string): boole
     if (userParts[i] !== requiredParts[i]) return false;
   }
 
-  return userParts.length === requiredParts.length;
+  // Every granted segment matched positionally, so the grant is a prefix of the
+  // required code — a parent grant covering its subtree. (Previously this
+  // required equal lengths, which is why `rxsoft.catalog` could not cover
+  // `rxsoft.catalog.item.read` and only the `.*` form worked.)
+  return true;
 }
 
 /** True when the user holds any permission satisfying `required` (wildcards apply). */
