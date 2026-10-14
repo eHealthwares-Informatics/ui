@@ -92,6 +92,14 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await signInAsCashier(page);
     await page.goto('/rxsoft/dashboard');
 
+    // The sidebar renders groups COLLAPSED — expand the ones under test so
+    // the item assertions are real (not vacuously count-0 on a collapsed DOM).
+    for (const group of ['Catalog', 'People', 'Operations']) {
+      const btn = page.getByRole('button', { name: group, exact: false }).first();
+      if ((await btn.count()) > 0) await btn.click();
+    }
+    await page.waitForTimeout(500);
+
     // TAGGED items the cashier LACKS the code for → hidden.
     // (Group-level hiding is Phase-3 work: every rxsoft group currently has
     // untagged members — Customers/Suppliers/Categories etc. — which stay
@@ -124,6 +132,13 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await page.goto('/sign-in');
     await signInAsCashier(page);
     await page.goto('/rxsoft/dashboard');
+
+    // Expand People (Users lives there) and Shop (POS lives there).
+    const people = page.getByRole('button', { name: 'People', exact: false }).first();
+    if ((await people.count()) > 0) await people.click();
+    const shop = page.getByRole('button', { name: 'Shop', exact: false }).first();
+    if ((await shop.count()) > 0) await shop.click();
+    await page.waitForTimeout(500);
 
     // Users is tagged rxsoft.identity.user.read — cashier lacks it.
     await expect(page.getByRole('button', { name: 'Users', exact: false })).toHaveCount(0, {
