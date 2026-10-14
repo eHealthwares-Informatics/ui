@@ -29,6 +29,7 @@ import { DataTable } from '../table/table';
 import { getArrayPayload } from '../utils';
 import { buildRxsoftListParams } from './build-list-params';
 import { InfoDrawer } from './info-drawer';
+import { resolveListTotal } from './list-total';
 import { RxPage } from './rx-page';
 
 function getRowsFromPayload(payload: unknown): Record<string, unknown>[] {
@@ -323,9 +324,8 @@ export function DataPageShell(props: DataPageShellProps) {
       const params =
         moduleId === 'rxsoft' ? buildRxsoftListParams(queryParams, config) : queryParams;
       const response = await apiProvider.get(endpoint, { params });
-      const meta = response.data?.meta;
 
-      setTotalItems(meta?.total ?? response.data.length);
+      setTotalItems(resolveListTotal(response.data));
 
       return response.data;
     },
