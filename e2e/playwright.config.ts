@@ -63,6 +63,8 @@ export default defineConfig({
       testMatch: [
         'tests/auth/sign-in.spec.ts',
         'tests/auth/reset-password.spec.ts',
+        'tests/auth/social-console-sign-in.spec.ts',
+        'tests/shop/social-sign-in.spec.ts',
         'tests/errors/**',
         'tests/root/**',
       ],
@@ -77,6 +79,8 @@ export default defineConfig({
         'tests/emr/**',
         'tests/auth/sign-in.spec.ts',
         'tests/auth/reset-password.spec.ts',
+        'tests/auth/social-console-sign-in.spec.ts',
+        'tests/shop/social-sign-in.spec.ts',
         'tests/root/**',
       ],
       use: {

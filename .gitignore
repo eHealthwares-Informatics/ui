@@ -135,6 +135,8 @@ dist
 
 # Playwright E2E
 e2e/.auth/
+# Real-credential store for the social sign-in e2e suite — never commit.
+e2e/.env.credentials
 e2e/.runtime/
 e2e/reports/
 e2e/tracker/.board-cache.json
