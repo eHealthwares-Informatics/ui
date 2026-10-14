@@ -57,7 +57,9 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     // Pick the first facility — GET .../notification-settings/:orgId fires.
     // Mantine option detaches mid-click are a known flake (playbook) — retry
     // the pick until the request actually lands.
-    const facility = page.getByLabel('Facility (organisation)');
+    // .first(): Mantine associates the label with BOTH the input and the
+    // options listbox after the recent DOM change (strict-mode guard).
+    const facility = page.getByLabel('Facility (organisation)').first();
     let picked = false;
     for (let attempt = 0; attempt < 3 && !picked; attempt += 1) {
       await facility.click();
