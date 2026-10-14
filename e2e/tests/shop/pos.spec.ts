@@ -910,3 +910,4 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     expect(syncedNumber, 'sync response must carry the original saleNumber').toBe(queued.saleCode);
     expect(sale.customerId ?? null, 'synced sale must be walk-in (no customerId)').toBeNull();
   });
+});
