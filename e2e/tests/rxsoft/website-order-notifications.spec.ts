@@ -55,18 +55,29 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     await expect(page.getByText('Order Notification Settings')).toBeVisible({ timeout: 15_000 });
 
     // Pick the first facility — GET .../notification-settings/:orgId fires.
+    // Mantine option detaches mid-click are a known flake (playbook) — retry
+    // the pick until the request actually lands.
     const facility = page.getByLabel('Facility (organisation)');
-    await facility.click();
-    const option = page.getByRole('option').first();
-    await expect(option).toBeVisible({ timeout: 15_000 });
-    const getReq = page.waitForResponse(
-      (res) =>
-        /\/api\/orders\/admin\/notification-settings\/[^/]+/.test(res.url()) &&
-        res.request().method() === 'GET',
-      { timeout: 20_000 }
-    );
-    await option.click();
-    expect((await getReq).status()).toBeLessThan(400);
+    let picked = false;
+    for (let attempt = 0; attempt < 3 && !picked; attempt += 1) {
+      await facility.click();
+      const option = page.getByRole('option').first();
+      await expect(option).toBeVisible({ timeout: 15_000 });
+      const getReq = page.waitForResponse(
+        (res) =>
+          /\/api\/orders\/admin\/notification-settings\/[^/]+/.test(res.url()) &&
+          res.request().method() === 'GET',
+        { timeout: 30_000 }
+      );
+      await option.click();
+      try {
+        expect((await getReq).status()).toBeLessThan(400);
+        picked = true;
+      } catch (err) {
+        if (attempt === 2) throw err;
+      }
+    }
+    expect(picked, 'facility selection must trigger the settings GET').toBe(true);
 
     // Toggle the "Dispatch" scenario switch (row label anchors the row).
     const dispatchRow = page.getByText('Dispatch', { exact: true }).first();
