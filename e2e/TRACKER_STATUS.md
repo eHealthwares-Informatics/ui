@@ -1,6 +1,6 @@
 # Tracker Status — RxSoft Alpha Test Plan
 
-> Generated 2026-10-13T22:35:28.031Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 125 entity tasks / 596 use cases
+> Generated 2026-10-14T15:16:12.209Z · board: https://github.com/users/ehealthwares/projects/1 · items: 22 epics / 125 entity tasks / 596 use cases
 
 **Storage state:** ⚠️ `e2e/.auth/admin.json` is **absent** — rerun `npx playwright test --project=setup` before the admin suites.
 
@@ -15,7 +15,7 @@
 
 | Covered | Gated | Missing | Missing-path | TCs mapped | Coverage (of mappable) |
 |---|---|---|---|---|---|
-| 505 | 218 | 1382 | 0 | 2105 | 34.3% |
+| 505 | 225 | 1375 | 0 | 2105 | 34.7% |
 
 ## Per-phase matrix
 
@@ -23,7 +23,7 @@
 |---|---|---|---|---|---|---|
 | 0-baseline | 1 | 1 | 12 | 4 | 0 | 0 |
 | 1-rxsoft-crud | 87 | 37 | 173 | 69 | 51 | 0 |
-| 2-catalog | 50 | 20 | 87 | 45 | 35 | 0 |
+| 2-catalog | 50 | 20 | 87 | 52 | 28 | 0 |
 | 3-operations | 48 | 23 | 109 | 24 | 34 | 0 |
 | 4-commerce | 65 | 21 | 101 | 74 | 36 | 0 |
 | 5-modules | 360 | 1 | 23 | 2 | 1226 | 0 |
@@ -125,7 +125,7 @@
 | rxsoft | [rxsoft] POS Terminals — E2E | 2-catalog | 20/21 | — | [#79](eHealthwares-Informatics/rxsoft-qa/issues/79) |
 | rxsoft | [rxsoft] Price List Items — E2E | 2-catalog | 20/21 | — | [#48](eHealthwares-Informatics/rxsoft-qa/issues/48) |
 | rxsoft | [rxsoft] Price Lists — E2E | 2-catalog | 20/21 | — | [#41](eHealthwares-Informatics/rxsoft-qa/issues/41) |
-| rxsoft | [rxsoft] Products — E2E | 2-catalog | 0/21 | — | [#72](eHealthwares-Informatics/rxsoft-qa/issues/72) |
+| rxsoft | [rxsoft] Products — E2E | 2-catalog | 7/21 | — | [#72](eHealthwares-Informatics/rxsoft-qa/issues/72) |
 | rxsoft | [rxsoft] Purchases — E2E | 3-operations | 20/21 | — | [#104](eHealthwares-Informatics/rxsoft-qa/issues/104) |
 | rxsoft | [rxsoft] Purchases Analytics — E2E | 4-commerce | 12/12 | — | [#206](eHealthwares-Informatics/rxsoft-qa/issues/206) |
 | rxsoft | [rxsoft] Receivables — E2E | 1-rxsoft-crud | 11/15 | — | [#304](eHealthwares-Informatics/rxsoft-qa/issues/304) |
@@ -175,6 +175,9 @@
 - tests/rxsoft/journal-entry-lines.spec.ts
 - tests/rxsoft/org-user-config.spec.ts
 - tests/rxsoft/price-adjustment-history.spec.ts
+- tests/rxsoft/products.spec.ts
 - tests/rxsoft/purchases-analytics.spec.ts
 - tests/rxsoft/reports.spec.ts
 - tests/rxsoft/sales-analytics.spec.ts
+- tests/rxsoft/website-order-notifications.spec.ts
+- tests/shop/auth-reset-flow.spec.ts
