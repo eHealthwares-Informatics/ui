@@ -32,7 +32,7 @@ const admissions = [
   },
 ];
 
-test('lists wards through the data page shell', async ({ page }) => {
+test('TC-EMR-WARDS-01: lists wards through the data page shell', async ({ page }) => {
   await installEmrMocks(page, { wards, beds });
   await page.goto('/emr/wards');
 
@@ -40,7 +40,7 @@ test('lists wards through the data page shell', async ({ page }) => {
   await expect(page.getByText('Male General Ward').first()).toBeVisible();
 });
 
-test('lists beds and shows the bed allocation board', async ({ page }) => {
+test('TC-EMR-BEDS-01: lists beds and shows the bed allocation board', async ({ page }) => {
   await installEmrMocks(page, { wards, beds });
 
   await page.goto('/emr/wards/beds');
@@ -53,7 +53,9 @@ test('lists beds and shows the bed allocation board', async ({ page }) => {
   await expect(page.getByText('B-101').first()).toBeVisible();
 });
 
-test('opens admissions through the Wards submenu and lists admissions', async ({ page }) => {
+test('TC-EMR-ADMISSIONS-01: opens admissions through the Wards submenu and lists admissions', async ({
+  page,
+}) => {
   await installEmrMocks(page, { wards, beds, admissions });
   await page.goto('/emr');
 

@@ -35,7 +35,7 @@ const departments = [
   },
 ];
 
-test('lists staff members with their roles', async ({ page }) => {
+test('TC-EMR-STAFF-01: lists staff members with their roles', async ({ page }) => {
   await installEmrMocks(page, { staff });
   await page.goto('/emr/staff');
 
@@ -45,7 +45,9 @@ test('lists staff members with their roles', async ({ page }) => {
   await expect(page.getByText('Cardiology')).toBeVisible();
 });
 
-test('registers a new staff member (UC-07 register staff)', async ({ page }) => {
+test('TC-EMR-STAFF-09 + TC-EMR-STAFF-11 + TC-EMR-STAFF-12: registers a new staff member (UC-07 register staff)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     staff,

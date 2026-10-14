@@ -267,6 +267,7 @@ import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './rout
 import { Route as AuthenticatedRxsoftPriceAdjustmentsIndexRouteImport } from './routes/_authenticated/rxsoft/price-adjustments/index'
 import { Route as AuthenticatedRxsoftPriceListItemsIndexRouteImport } from './routes/_authenticated/rxsoft/price-list-items/index'
 import { Route as AuthenticatedRxsoftPriceListsIndexRouteImport } from './routes/_authenticated/rxsoft/price-lists/index'
+import { Route as AuthenticatedRxsoftProductsIndexRouteImport } from './routes/_authenticated/rxsoft/products/index'
 import { Route as AuthenticatedRxsoftPurchasesIndexRouteImport } from './routes/_authenticated/rxsoft/purchases/index'
 import { Route as AuthenticatedRxsoftReceivablesIndexRouteImport } from './routes/_authenticated/rxsoft/receivables/index'
 import { Route as AuthenticatedRxsoftReceivingIndexRouteImport } from './routes/_authenticated/rxsoft/receiving/index'
@@ -1782,6 +1783,12 @@ const AuthenticatedRxsoftPriceListsIndexRoute =
     path: '/rxsoft/price-lists/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftProductsIndexRoute =
+  AuthenticatedRxsoftProductsIndexRouteImport.update({
+    id: '/rxsoft/products/',
+    path: '/rxsoft/products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftPurchasesIndexRoute =
   AuthenticatedRxsoftPurchasesIndexRouteImport.update({
     id: '/rxsoft/purchases/',
@@ -2413,6 +2420,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/price-adjustments/': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/products/': typeof AuthenticatedRxsoftProductsIndexRoute
   '/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
   '/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
@@ -2729,6 +2737,7 @@ export interface FileRoutesByTo {
   '/rxsoft/price-adjustments': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/rxsoft/price-list-items': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/products': typeof AuthenticatedRxsoftProductsIndexRoute
   '/rxsoft/purchases': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/rxsoft/receivables': typeof AuthenticatedRxsoftReceivablesIndexRoute
   '/rxsoft/receiving': typeof AuthenticatedRxsoftReceivingIndexRoute
@@ -3051,6 +3060,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/price-adjustments/': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/_authenticated/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/_authenticated/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/_authenticated/rxsoft/products/': typeof AuthenticatedRxsoftProductsIndexRoute
   '/_authenticated/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/_authenticated/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
   '/_authenticated/rxsoft/receiving/': typeof AuthenticatedRxsoftReceivingIndexRoute
@@ -3371,6 +3381,7 @@ export interface FileRouteTypes {
     | '/rxsoft/price-adjustments/'
     | '/rxsoft/price-list-items/'
     | '/rxsoft/price-lists/'
+    | '/rxsoft/products/'
     | '/rxsoft/purchases/'
     | '/rxsoft/receivables/'
     | '/rxsoft/receiving/'
@@ -3687,6 +3698,7 @@ export interface FileRouteTypes {
     | '/rxsoft/price-adjustments'
     | '/rxsoft/price-list-items'
     | '/rxsoft/price-lists'
+    | '/rxsoft/products'
     | '/rxsoft/purchases'
     | '/rxsoft/receivables'
     | '/rxsoft/receiving'
@@ -4008,6 +4020,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/price-adjustments/'
     | '/_authenticated/rxsoft/price-list-items/'
     | '/_authenticated/rxsoft/price-lists/'
+    | '/_authenticated/rxsoft/products/'
     | '/_authenticated/rxsoft/purchases/'
     | '/_authenticated/rxsoft/receivables/'
     | '/_authenticated/rxsoft/receiving/'
@@ -5940,6 +5953,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftPriceListsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/products/': {
+      id: '/_authenticated/rxsoft/products/'
+      path: '/rxsoft/products'
+      fullPath: '/rxsoft/products/'
+      preLoaderRoute: typeof AuthenticatedRxsoftProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/purchases/': {
       id: '/_authenticated/rxsoft/purchases/'
       path: '/rxsoft/purchases'
@@ -6663,6 +6683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftPriceAdjustmentsIndexRoute: typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   AuthenticatedRxsoftPriceListItemsIndexRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   AuthenticatedRxsoftPriceListsIndexRoute: typeof AuthenticatedRxsoftPriceListsIndexRoute
+  AuthenticatedRxsoftProductsIndexRoute: typeof AuthenticatedRxsoftProductsIndexRoute
   AuthenticatedRxsoftPurchasesIndexRoute: typeof AuthenticatedRxsoftPurchasesIndexRoute
   AuthenticatedRxsoftReceivablesIndexRoute: typeof AuthenticatedRxsoftReceivablesIndexRoute
   AuthenticatedRxsoftReceivingIndexRoute: typeof AuthenticatedRxsoftReceivingIndexRoute
@@ -6975,6 +6996,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftPriceListItemsIndexRoute,
   AuthenticatedRxsoftPriceListsIndexRoute:
     AuthenticatedRxsoftPriceListsIndexRoute,
+  AuthenticatedRxsoftProductsIndexRoute: AuthenticatedRxsoftProductsIndexRoute,
   AuthenticatedRxsoftPurchasesIndexRoute:
     AuthenticatedRxsoftPurchasesIndexRoute,
   AuthenticatedRxsoftReceivablesIndexRoute:

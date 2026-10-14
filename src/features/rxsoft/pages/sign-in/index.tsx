@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
+import { getRememberMe } from '@/lib/auth-tokens';
 import { useAuthStore } from '@/stores/auth-store';
 import { OnboardOrganisation } from './onboard-organisation';
 
@@ -40,9 +41,13 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const login = useAuthStore((state) => state.login);
   const loading = useAuthStore((state) => state.loading);
   const error = useAuthStore((state) => state.error);
+  const [socialBusy, setSocialBusy] = useState<null | 'google'>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
   const [mode, setMode] = useState<'signin' | 'onboard'>('signin');
+  // "Remember me" — persisted preference; controls whether tokens survive a
+  // browser restart (localStorage) or are session-only (sessionStorage).
+  const [remember, setRemember] = useState(getRememberMe);
 
   const {
     register,
@@ -57,9 +62,41 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
     },
   });
 
+  /** Google popup sign-in: browser gets the token, the identity service
+   * verifies it, links (or auto-registers) the account by verified email. */
+  const handleSocial = async () => {
+    if (socialBusy) return;
+    setSocialBusy('google');
+    try {
+      const { googleLogin } = await import('@/lib/social-auth');
+      const accessToken = await googleLogin();
+      if (!accessToken) return;
+      await useAuthStore.getState().loginWithOAuth('google', { accessToken });
+      const authState = useAuthStore.getState();
+      if (authState.user) {
+        const firstModule = authState.modules[0];
+        let targetUrl = redirectTo || firstModule?.root || '/';
+        try {
+          if (targetUrl.startsWith('http')) {
+            const parsed = new URL(targetUrl);
+            targetUrl = parsed.pathname + parsed.search;
+          }
+        } catch {
+          /* not a valid URL, use as-is */
+        }
+        const finalUrl = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+        window.location.href = finalUrl;
+      }
+    } catch (err) {
+      console.error('Google sign-in error:', err);
+    } finally {
+      setSocialBusy(null);
+    }
+  };
+
   const onSubmit = async (values: SignInValues) => {
     try {
-      await login(values.username, values.password);
+      await login(values.username, values.password, remember);
 
       const authState = useAuthStore.getState();
 
@@ -327,6 +364,9 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   <Checkbox
                     label="Remember me"
                     size="sm"
+                    data-testid="sign-in-remember-me"
+                    checked={remember}
+                    onChange={(event) => setRemember(event.currentTarget.checked)}
                     styles={{
                       label: { color: '#6B7280' },
                     }}
@@ -381,6 +421,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   variant="outline"
                   fullWidth
                   size="lg"
+                  disabled={loading || socialBusy !== null}
                   style={{
                     height: 48,
                     borderRadius: '8px',
@@ -388,6 +429,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                     color: '#374151',
                     fontWeight: 500,
                   }}
+                  onClick={() => void handleSocial()}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
                     <path

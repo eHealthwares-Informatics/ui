@@ -775,4 +775,139 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
         .catch(() => {});
     }
   });
+
+  /* ── 18. ui#63 (ask 3): queued offline sale syncs after reconnect,
+     preserving the original saleNumber, as a walk-in sale ── */
+
+  test('18. offline sale syncs after reconnect with original saleNumber (walk-in)', async ({
+    page,
+  }) => {
+    await gotoPosReady(page);
+
+    // The synced replay goes through full stock validation server-side (the
+    // backend rejected a stockless replay with "No stock balance found" in an
+    // earlier run) — seed stock at the session location via the same API the
+    // Adjust-Stock modal uses before building the offline sale.
+    const itemRes = await apiFetch<{ data?: Array<{ id: string }> }>(
+      page,
+      `/items?search=POS-Item-${runId}&limit=1`
+    );
+    const stockItem = itemRes.data?.[0];
+    // The session location is the user's POS config (pos.tsx derives it from
+    // /user-pos-config/me) — adjusting any other location leaves the replay
+    // stockless ("No stock balance found" on sync).
+    const cfg = await apiFetch<{ stockLocationId?: string | null }>(page, '/user-pos-config/me');
+    const locId = cfg?.stockLocationId;
+    test.skip(!stockItem || !locId, 'seeded item or POS-configured stock location not resolvable');
+    await apiFetch(page, '/inventory/adjust-quantity', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemId: stockItem!.id,
+        locationId: locId,
+        deltaQuantity: 100,
+        reason: 'POS stock adjustment',
+      }),
+    });
+
+    // Build a sale with a NEW customer name (mirrors test 9's offline setup).
+    const productSelect = page.getByTestId('pos-product-select');
+    await productSelect.click();
+    await productSelect.fill(`POS-Item-${runId}`);
+    await page.waitForTimeout(500);
+    const option = page.getByRole('option', { name: `POS-Item-${runId}`, exact: false }).first();
+    await expect(option).toBeVisible({ timeout: waits.pos.productSelect });
+    await option.click();
+    await page.getByTestId('pos-add-to-cart-btn').click();
+
+    await page.getByTestId('pos-sell-only-btn').click();
+    const dialog = page.getByRole('dialog', { name: 'Payment' });
+    await expect(dialog).toBeVisible({ timeout: waits.pos.paymentModal });
+    await page.getByTestId('pos-payment-method').click();
+    await page.getByRole('option').first().click();
+    const newCustomerName = `Sync QA ${Date.now().toString(36)}`;
+    await page.getByTestId('pos-customer-name').fill(newCustomerName);
+
+    // Transport-level backend outage: new-customer creation + sale POST fail
+    // (navigator.onLine stays true — the same simulation test 9 uses).
+    await page.route('**/api/customers', (route) => route.abort('failed'));
+    await page.route('**/api/sales', (route) =>
+      route.request().method() === 'POST' ? route.abort('failed') : route.continue()
+    );
+
+    await page.getByTestId('pos-complete-sale-btn').click();
+    const offlinePrompt = page.getByTestId('pos-offline-prompt');
+    await expect(offlinePrompt).toBeVisible({ timeout: 20_000 });
+    await page.getByTestId('pos-complete-offline-btn').click();
+
+    // The queue must hold the walk-in sale with its original saleCode.
+    await expect
+      .poll(
+        async () =>
+          page.evaluate(() => {
+            const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+            return (raw?.state?.offlineSaleQueue ?? []).length;
+          }),
+        { timeout: 10_000 }
+      )
+      .toBeGreaterThan(0);
+    const queued = await page.evaluate(() => {
+      const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+      const last = (raw?.state?.offlineSaleQueue ?? []).slice(-1)[0];
+      return {
+        id: last?.id as string,
+        saleCode: last?.saleCode as string,
+        customerId: last?.payload?.customerId,
+      };
+    });
+    expect(queued.saleCode, 'queued record must keep the original sale code').toBeTruthy();
+    expect(queued.customerId, 'walk-in sync requires a null customerId').toBeNull();
+
+    // (No cart reset needed: complete-offline already clears the cart —
+    // the Hold Sale button is disabled on an empty cart.)
+
+    // ── RECONNECT: lift the outage + fire the window `online` event the
+    // useOfflineSales hook listens on → runSync replays the queue.
+    await page.unroute('**/api/customers');
+    await page.unroute('**/api/sales');
+    const syncPost = page.waitForResponse(
+      (res) =>
+        res.request().method() === 'POST' && /\/api\/sales(\?.*)?$/.test(res.url()) && res.ok(),
+      { timeout: 30_000 }
+    );
+    await page.evaluate(() => window.dispatchEvent(new Event('online')));
+    const res = await syncPost;
+    expect(res.status(), 'sync POST must succeed after reconnect').toBeLessThan(400);
+
+    // The queue entry flips to synced; the success toast names the count.
+    await expect
+      .poll(
+        async () =>
+          page.evaluate((id) => {
+            const raw = JSON.parse(localStorage.getItem('pos-store') || '{}');
+            const entry = (
+              (raw?.state?.offlineSaleQueue ?? []) as Array<{ id: string; status: string }>
+            ).find((e) => e.id === id);
+            return entry?.status;
+          }, queued.id),
+        { timeout: 15_000 }
+      )
+      .toBe('synced');
+    await expect(page.getByText(/Synced \d+ offline sale/)).toBeVisible({ timeout: 10_000 });
+
+    // Server-side evidence: the sync POST's own response carries the created
+    // sale with its ORIGINAL saleNumber (preserved through the offline queue
+    // replay) and a null customerId (walk-in). (GET /sales?search=… is not
+    // used here: the list endpoint currently 400s casting 'default' to uuid
+    // — a separate backend quirk.)
+    const created = (await res.json()) as {
+      saleNumber?: string;
+      number?: string;
+      customerId?: string | null;
+      data?: { saleNumber?: string; number?: string; customerId?: string | null };
+    };
+    const sale = created.data ?? created;
+    const syncedNumber = sale.saleNumber ?? sale.number;
+    expect(syncedNumber, 'sync response must carry the original saleNumber').toBe(queued.saleCode);
+    expect(sale.customerId ?? null, 'synced sale must be walk-in (no customerId)').toBeNull();
+  });
 });

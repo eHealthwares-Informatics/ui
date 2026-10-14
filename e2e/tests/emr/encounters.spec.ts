@@ -43,7 +43,9 @@ const submission = {
   submittedByName: 'dr.ade',
 };
 
-test('amends a submission from the encounter documentation tab (UC-32 amend)', async ({ page }) => {
+test('TC-EMR-FORM-SUBMISSION-02: amends a submission from the encounter documentation tab (UC-32 amend)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     encounters: [encounter],
@@ -76,7 +78,7 @@ test('amends a submission from the encounter documentation tab (UC-32 amend)', a
   });
 });
 
-test('submits documentation against the active encounter (UC-30 documentation popup)', async ({
+test('TC-EMR-FORM-SUBMISSION-01: submits documentation against the active encounter (UC-30 documentation popup)', async ({
   page,
 }) => {
   const posts: { method: string; url: string; body: unknown }[] = [];

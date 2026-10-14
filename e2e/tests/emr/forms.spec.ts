@@ -26,7 +26,9 @@ const draftForm: EmrMockForm = {
   publishedVersion: null,
 };
 
-test('publishes and unpublishes a form definition (UC-25/26)', async ({ page }) => {
+test('TC-EMR-FORM-BUILDER-03: publishes and unpublishes a form definition (UC-25/26)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     forms: [forms[0], draftForm],
@@ -52,7 +54,9 @@ test('publishes and unpublishes a form definition (UC-25/26)', async ({ page }) 
   expect(posts.some((post) => post.url.endsWith('/form-definitions/form-1/unpublish'))).toBe(true);
 });
 
-test('builds a form with an item/drug searchable field type', async ({ page }) => {
+test('TC-EMR-FORM-BUILDER-02: builds a form with an item/drug searchable field type', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     forms,
@@ -91,7 +95,9 @@ test('builds a form with an item/drug searchable field type', async ({ page }) =
   });
 });
 
-test('builds and saves a new form definition (UC-24 form builder)', async ({ page }) => {
+test('TC-EMR-FORM-BUILDER-01: builds and saves a new form definition (UC-24 form builder)', async ({
+  page,
+}) => {
   const posts: { method: string; url: string; body: unknown }[] = [];
   await installEmrMocks(page, {
     forms,

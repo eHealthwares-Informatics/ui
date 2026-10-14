@@ -54,7 +54,10 @@ function loadScript(src: string): Promise<void> {
     script.src = src;
     script.async = true;
     script.defer = true;
-    script.crossOrigin = 'anonymous';
+    // No crossOrigin: GSI/FB SDK scripts are classic scripts; adding
+    // crossOrigin="anonymous" forces a CORS-mode fetch that Google's
+    // accounts.google.com host does not satisfy with ACAO headers, which
+    // blocks the whole script from loading (with or without consent).
     script.addEventListener('load', () => {
       script.dataset.loaded = 'true';
       resolve();

@@ -43,7 +43,12 @@ type AuthState = {
   permissionMode: PermissionMode;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string, remember?: boolean) => Promise<void>;
+  loginWithOAuth: (
+    provider: 'google' | 'facebook',
+    payload: { accessToken?: string; idToken?: string },
+    remember?: boolean
+  ) => Promise<void>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   bootstrap: () => void;
@@ -63,14 +68,14 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       pendingModulesFetch: null,
 
-      login: async (username, password) => {
+      login: async (username, password, remember) => {
         set({ loading: true, error: null });
         try {
           const response = await identityApi.post<{
             accessToken: string;
             refreshToken: string;
           }>('/auth/login', { username, password });
-          persistTokens(response.data.accessToken, response.data.refreshToken);
+          persistTokens(response.data.accessToken, response.data.refreshToken, remember);
           const user = decodeUserFromAccessToken(response.data.accessToken);
 
           if (!user) {
@@ -125,6 +130,42 @@ export const useAuthStore = create<AuthState>()(
           error: null,
           pendingModulesFetch: null,
         });
+      },
+
+      /**
+       * Shared consumer-channel OAuth sign-in (Google/Facebook). The identity
+       * service verifies the provider token server-side and either links the
+       * verified email to any existing account role or auto-registers the
+       * account; tokens are issued exactly like a password login.
+       */
+      loginWithOAuth: async (provider, payload, remember) => {
+        set({ loading: true, error: null });
+        try {
+          const response = await identityApi.post<{
+            accessToken: string;
+            refreshToken: string;
+          }>(`/auth/oauth/${provider}`, { ...payload, channel: 'console' });
+          persistTokens(response.data.accessToken, response.data.refreshToken, remember);
+          const user = decodeUserFromAccessToken(response.data.accessToken);
+
+          if (!user) {
+            throw new Error('Invalid access token payload.');
+          }
+
+          set({
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            user,
+            loading: false,
+            error: null,
+          });
+          get().fetchModules();
+        } catch (err) {
+          const message =
+            (err as { response?: { data?: { message?: string } } }).response?.data?.message ??
+            'Social sign in failed';
+          set({ loading: false, error: message });
+        }
       },
 
       logoutAll: async () => {
