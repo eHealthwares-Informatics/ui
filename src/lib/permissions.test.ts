@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasPermission, permissionMatches } from './permissions';
+import { gateRowActions, hasPermission, permissionMatches, permits } from './permissions';
 
 /**
  * The UI matcher MUST mirror the backend matcher semantics exactly
@@ -61,5 +61,64 @@ describe('hasPermission', () => {
 
   it('an empty permission list never matches', () => {
     expect(hasPermission([], 'rxsoft.catalog.item.read')).toBe(false);
+  });
+});
+
+/**
+ * ACTIONS-level gating (access-control ladder, phase 2). An absent code must
+ * always leave an action visible — untagged pages must not regress.
+ */
+describe('permits', () => {
+  const perms = ['rxsoft.catalog.item.read', 'rxsoft.catalog.item.create'];
+
+  it('allows an action with no code (untagged → unchanged)', () => {
+    expect(permits(perms, undefined)).toBe(true);
+    expect(permits([], undefined)).toBe(true);
+  });
+
+  it('allows an action whose code the user holds', () => {
+    expect(permits(perms, 'rxsoft.catalog.item.create')).toBe(true);
+  });
+
+  it('hides an action whose code the user lacks', () => {
+    expect(permits(perms, 'rxsoft.catalog.item.delete')).toBe(false);
+  });
+
+  it('honours wildcards', () => {
+    expect(permits(['rxsoft.catalog.*'], 'rxsoft.catalog.item.delete')).toBe(true);
+  });
+});
+
+describe('gateRowActions', () => {
+  const actions = [
+    { id: 'print', label: 'Print' },
+    { id: 'archive', label: 'Archive' },
+    { id: 'unkeyed', label: 'Untagged' },
+  ];
+
+  it('keeps everything when there is no code map', () => {
+    expect(gateRowActions(actions, undefined, [])).toBe(actions);
+  });
+
+  it('keeps everything when there are no row actions', () => {
+    expect(gateRowActions(undefined, { print: 'x.y.z' }, [])).toBeUndefined();
+  });
+
+  it('keeps an action whose code the user holds', () => {
+    const gated = gateRowActions(actions, { print: 'rxsoft.catalog.item.read' }, [
+      'rxsoft.catalog.item.read',
+    ]);
+    expect(gated?.map((a) => a.id)).toEqual(['print', 'archive', 'unkeyed']);
+  });
+
+  it('drops an action whose code the user lacks, keeping untagged ones', () => {
+    const gated = gateRowActions(actions, { print: 'rxsoft.catalog.item.read' }, []);
+    // `print` is dropped; `archive`/`unkeyed` carry no code → left visible.
+    expect(gated?.map((a) => a.id)).toEqual(['archive', 'unkeyed']);
+  });
+
+  it('never mutates the source list', () => {
+    gateRowActions(actions, { print: 'rxsoft.catalog.item.read' }, []);
+    expect(actions).toHaveLength(3);
   });
 });

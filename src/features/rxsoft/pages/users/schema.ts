@@ -316,4 +316,10 @@ export const usersConfig: ModelConfig = {
   buildUpdatePayload,
   buildFormState,
   canDelete: true,
+  // ACTIONS gating — codes mirror identity's catalog (rxsoft.identity.user.*).
+  permissions: {
+    create: 'rxsoft.identity.user.create',
+    update: 'rxsoft.identity.user.update',
+    delete: 'rxsoft.identity.user.delete',
+  },
 };

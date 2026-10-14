@@ -1,3 +1,4 @@
+import type { RowAction } from '@/features/shared/model-schema';
 import { useAuthStore } from '@/stores/auth-store';
 
 /**
@@ -49,4 +50,28 @@ export type AccessEnforcementLevel = (typeof ACCESS_ENFORCEMENT_LEVELS)[number];
 export function useHasPermission(required: string): boolean {
   const userPermissions = useAuthStore((state) => state.user?.permissions ?? []);
   return hasPermission(userPermissions, required);
+}
+
+/**
+ * True when `code` is unset (untagged action → unchanged) or the user holds it.
+ * Used to gate a page's actions from its `permissions` action map.
+ */
+export function permits(userPermissions: string[], code?: string): boolean {
+  return !code || hasPermission(userPermissions, code);
+}
+
+/**
+ * Drops row actions whose catalog code (looked up by `RowAction.id`) the user
+ * does not hold. Actions with no id, or ids absent from the map, are kept, so
+ * partially-tagged pages degrade to "still visible" rather than "disappeared".
+ */
+export function gateRowActions(
+  rowActions: RowAction[] | undefined,
+  codes: Record<string, string> | undefined,
+  userPermissions: string[]
+): RowAction[] | undefined {
+  if (!rowActions || !codes) return rowActions;
+  return rowActions.filter((action) =>
+    permits(userPermissions, action.id ? codes[action.id] : undefined)
+  );
 }
