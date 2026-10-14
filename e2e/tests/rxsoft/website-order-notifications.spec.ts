@@ -81,8 +81,8 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     }
     expect(picked, 'facility selection must trigger the settings GET').toBe(true);
 
-    // Toggle the "Dispatch" scenario switch (row label anchors the row).
-    const dispatchRow = page.getByText('Dispatch', { exact: true }).first();
+    // Switches carry aria-labels "<Channel> — <Scenario>" (post-#153 markup).
+    const toggle = page.getByRole('switch', { name: 'Email — Dispatch' }).first();
     const rowScope = dispatchRow.locator(
       'xpath=ancestor-or-self::*[.//input[@type="checkbox"] or @role="switch"][1]'
     );
