@@ -281,7 +281,8 @@ export async function installEmrMocks(page: Page, opts: EmrMockOptions = {}) {
         case '/patients': {
           const searchParam = url.searchParams.get('search') ?? '';
           // Handle cases where search is an empty object/array from URL sync
-          const search = (searchParam === '{}' || searchParam === '[]') ? '' : searchParam.toLowerCase();
+          const search =
+            searchParam === '{}' || searchParam === '[]' ? '' : searchParam.toLowerCase();
           const filtered = (opts.patients ?? []).filter((p) => {
             if (!search) return true;
             const name = `${p.firstName} ${p.lastName}`.toLowerCase();
