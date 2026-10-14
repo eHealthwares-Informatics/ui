@@ -152,9 +152,13 @@ export function NotificationSettingsButton() {
                           <Switch
                             aria-label={`${c.label} — ${s.label}`}
                             checked={values[key] ?? true}
-                            onChange={(e) =>
-                              setValues((prev) => ({ ...prev, [key]: e.currentTarget.checked }))
-                            }
+                            onChange={(e) => {
+                              // Read during dispatch: React nulls
+                              // `currentTarget` once the event finishes, and the
+                              // updater runs later (rxsoft-qa#794).
+                              const checked = e.currentTarget.checked;
+                              setValues((prev) => ({ ...prev, [key]: checked }));
+                            }}
                           />
                         </Table.Td>
                       );
