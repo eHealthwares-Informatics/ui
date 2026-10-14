@@ -837,8 +837,8 @@ test.describe.serial('POS Batch #2 — PRs #33-38, #42, #62 (full scenario cover
     expect(queued.saleCode, 'queued record must keep the original sale code').toBeTruthy();
     expect(queued.customerId, 'walk-in sync requires a null customerId').toBeNull();
 
-    // Reset the cart so later tests start clean (same as test 9).
-    await page.getByTestId('pos-hold-sale-btn').click();
+    // (No cart reset needed: complete-offline already clears the cart —
+    // the Hold Sale button is disabled on an empty cart.)
 
     // ── RECONNECT: lift the outage + fire the window `online` event the
     // useOfflineSales hook listens on → runSync replays the queue.
