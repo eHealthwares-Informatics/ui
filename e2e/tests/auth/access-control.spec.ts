@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
  * test runs in a fresh, unauthenticated context.
  */
 
-const E2E_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
+const E2E_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 type OrgUser = { username: string; password: string; roles: string[] };
 
