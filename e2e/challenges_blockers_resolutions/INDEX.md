@@ -29,3 +29,12 @@
 | Vite dev-server watch storm: Playwright artifacts (`e2e/reports`) reload the page mid-run | phase-2.md | resolved | e2e-harness, vite, hmr, flake |
 | Created rows land beyond page 1 of a 39k-row includeAll catalog; search before asserting | phase-2.md | resolved | list, assertions |
 | Board 0/N counters move only when UC sub-issues close; complete UCs, then write back | phase-2.md | resolved | tracker, methodology |
+| Provisioned org users got `modules: []` — seed granted `.*` wildcards, identity maps only stored codes | phase-3-emr-real.md | resolved | seed, identity, provisioning, permissions |
+| Seed provisioner OOM: ~40k items whitelisted per org blows the 4GB heap serialising the response | phase-3-emr-real.md | resolved (QA workaround; upstream cap pending) | seed, provisioning, oom |
+| emr-real identity probe demanded a `/health` route identity never had → suite self-skipped | phase-3-emr-real.md | resolved | e2e-harness, emr-real, health-check |
+| Dev EMR API calls got SPA-fallback HTML (no Vite proxy, `VITE_EMR_API_URL` unset) → dashboard 500 boundary | phase-3-emr-real.md | resolved | e2e-harness, vite, proxy, app-bug |
+| Redesigned sign-in renders labels as `<Text>` not `<label>`; old `Username`/`Sign in` locators dead | phase-3-emr-real.md | resolved | e2e-harness, selectors, testid-first |
+| emr-real dashboard asserted a nonexistent "EMR" heading; page renders greeting + metric subtitles | phase-3-emr-real.md | resolved | e2e-harness, assertions |
+| Appointments POST: `patient_name` NOT NULL but DTO-unvalidated → raw SQL 400 | phase-3-emr-real.md | open (filed to backend; QA fixture composes name) | emr, validation, dto |
+| Playwright-template provisioning degrades 55s→7m53s across runs; undici 300s headers-timeout kills clients | phase-3-emr-real.md | **resolved** (seed af120aa: price_list_items 4.15M-row hydration removed — 56s→1s; 'minimal' template added) | seed, provisioning, performance |
+| APP: visit-detail renders two nested "Record Encounter" dialogs (EncounterForm Modal inside page Modal) | phase-3-emr-real.md | open (filed to backend; spec scopes to inner dialog) | emr, app-bug, modal |

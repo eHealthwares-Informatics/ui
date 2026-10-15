@@ -141,7 +141,10 @@ test.beforeAll(async ({}, testInfo) => {
       provisionedOrg = await provisionOrganization({
         code: orgCode,
         name: `EMR E2E ${stamp} ${Date.now().toString(36)}`,
-        template: 'playwright',
+        // 'minimal' (seed): identity + structural reference data only — no
+        // demo clinical data (the 55s→7m53s→OOM path, C15) and no GL chart.
+        // The suite creates its own patients/appointments/visits via the API.
+        template: 'minimal',
         password: 'password',
         // EMR flows never touch the rxsoft pharmacy catalogue. Whitelisting all
         // ~40k global items per org OOM'd the seed process (4GB heap) and pushed
@@ -477,13 +480,20 @@ test.describe('EMR Real-Backend — Bespoke Flow: Appointment → Visit → Enco
 
     // Add an encounter
     await page.getByRole('button', { name: 'Add encounter' }).click();
-    await expect(page.getByRole('dialog', { name: 'Record Encounter' })).toBeVisible();
+    // Visit-detail wraps EncounterForm (which renders its own Modal titled
+    // "Record Encounter") inside another Modal of the same title — two dialog
+    // sections mount at once (C21, app defect). The functional one with the
+    // form fields is the inner/last; strict mode would reject the pair.
+    const encounterDialog = page
+      .getByRole('dialog', { name: 'Record Encounter' })
+      .last();
+    await expect(encounterDialog).toBeVisible();
 
     // Fill encounter form
-    await page.getByPlaceholder('Select type').click();
+    await encounterDialog.getByPlaceholder('Select type').click();
     await page.getByRole('option', { name: 'Consultation' }).click();
-    await page.getByLabel('Reason').fill('Test encounter for E2E');
-    await page.getByRole('button', { name: 'Save' }).click();
+    await encounterDialog.getByLabel('Reason').fill('Test encounter for E2E');
+    await encounterDialog.getByRole('button', { name: 'Save' }).click();
 
     await expect(page.getByText('Encounter recorded')).toBeVisible({ timeout: 10_000 });
 
