@@ -78,13 +78,45 @@ async function probe(url: string): Promise<boolean> {
   }
 }
 
-test.beforeAll(async () => {
-  // Probe required services
+// Identity exposes no /health route (always 404) — treat ANY HTTP response as
+// "service is listening". A connection-level failure is the only down signal.
+async function probeIdentity(): Promise<boolean> {
+  try {
+    const res = await fetch(IDENTITY_BASE_URL, { signal: AbortSignal.timeout(5_000) });
+    return res.status > 0; // 404/405/etc all prove the service is up
+  } catch {
+    return false;
+  }
+}
+
+/** Retry a probe — a single transient blip must not skip a 27-test run. */
+async function probeStable(url: string, attempts = 3, gapMs = 3_000): Promise<boolean> {
+  for (let i = 0; i < attempts; i++) {
+    if (await probe(url)) return true;
+    if (i < attempts - 1) await new Promise((r) => setTimeout(r, gapMs));
+  }
+  return false;
+}
+
+async function probeIdentityStable(attempts = 3, gapMs = 3_000): Promise<boolean> {
+  for (let i = 0; i < attempts; i++) {
+    if (await probeIdentity()) return true;
+    if (i < attempts - 1) await new Promise((r) => setTimeout(r, gapMs));
+  }
+  return false;
+}
+
+test.beforeAll(async ({}, testInfo) => {
+  // Playwright-template provisioning (demo patients/visits/admissions + GL)
+  // takes ~55s idle but 190s+ under suite load (Vite/Chromium competing) —
+  // extend ONLY this hook's budget; per-test timeouts stay at config value.
+  testInfo.setTimeout(600_000);
+  // Probe required services (retried — see probeStable)
   const [identityUp, seedUp, emrUp, frontendUp] = await Promise.all([
-    probe(`${IDENTITY_BASE_URL}/health`),
-    probe(`${SEED_BASE_URL}/api/imports/health`),
-    probe('http://localhost:8093/api/health'),
-    probe(FRONTEND_BASE_URL),
+    probeIdentityStable(),
+    probeStable(`${SEED_BASE_URL}/api/imports/health`),
+    probeStable('http://localhost:8093/api/health'),
+    probeStable(FRONTEND_BASE_URL),
   ]);
 
   if (!identityUp || !seedUp || !emrUp || !frontendUp) {
@@ -95,29 +127,57 @@ test.beforeAll(async () => {
     return; // Tests will skip automatically via test.skip() in beforeEach
   }
 
-  // Provision fresh org
+  // Provision fresh org — with retries: the playwright template's demo-data
+  // insert path degrades across runs (55s idle → 190s → 470s+ under suite
+  // load, C15 family) and Node/undici's 300s default headersTimeout kills the
+  // client fetch mid-provision while seed completes fine server-side. Retry
+  // gives the backend room without masking a hard failure.
   const stamp = new Date().toISOString().slice(0, 10).replace(/[-:]/g, '');
   const orgCode = `EMR-${stamp}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
-  try {
-    provisionedOrg = await provisionOrganization({
-      code: orgCode,
-      name: `EMR E2E ${stamp} ${Date.now().toString(36)}`,
-      template: 'playwright',
-      password: 'password',
-    });
-    console.log(`[emr-real] Provisioned org ${orgCode} (id: ${provisionedOrg.organizationId})`);
+  const PROVISION_ATTEMPTS = 3;
+  for (let attempt = 1; attempt <= PROVISION_ATTEMPTS; attempt++) {
+    try {
+      provisionedOrg = await provisionOrganization({
+        code: orgCode,
+        name: `EMR E2E ${stamp} ${Date.now().toString(36)}`,
+        template: 'playwright',
+        password: 'password',
+        // EMR flows never touch the rxsoft pharmacy catalogue. Whitelisting all
+        // ~40k global items per org OOM'd the seed process (4GB heap) and pushed
+        // provisioning past the beforeAll hook budget. An unknown code is
+        // skipped-with-warning by the provisioner → zero items whitelisted.
+        items: ['EMR-E2E-NO-ITEMS'],
+      });
+      console.log(
+        `[emr-real] Provisioned org ${orgCode} (id: ${provisionedOrg.organizationId}, attempt ${attempt})`
+      );
+      break;
+    } catch (err) {
+      const isLast = attempt === PROVISION_ATTEMPTS;
+      console.warn(
+        `[emr-real] Provision attempt ${attempt}/${PROVISION_ATTEMPTS} failed: ${(err as Error).message}` +
+          (isLast ? '' : ' — retrying in 30s')
+      );
+      provisionedOrg = null;
+      if (isLast) break;
+      await new Promise((r) => setTimeout(r, 30_000));
+    }
+  }
 
-    // Get admin token for the provisioned org
-    const { username, password } = activeAdminCredentials();
-    adminToken = await getIdentityToken(username, password);
+  if (provisionedOrg) {
+    try {
+      // Get admin token for the provisioned org
+      const { username, password } = activeAdminCredentials();
+      adminToken = await getIdentityToken(username, password);
 
-    // Write org state for potential debugging
-    mkdirSync(dirname(ORG_STATE_PATH), { recursive: true });
-    writeFileSync(ORG_STATE_PATH, JSON.stringify(provisionedOrg, null, 2), 'utf-8');
-  } catch (err) {
-    console.error(`[emr-real] Provisioning failed: ${(err as Error).message}`);
-    provisionedOrg = null;
+      // Write org state for potential debugging
+      mkdirSync(dirname(ORG_STATE_PATH), { recursive: true });
+      writeFileSync(ORG_STATE_PATH, JSON.stringify(provisionedOrg, null, 2), 'utf-8');
+    } catch (err) {
+      console.error(`[emr-real] Post-provision setup failed: ${(err as Error).message}`);
+      provisionedOrg = null;
+    }
   }
 });
 
@@ -138,9 +198,12 @@ async function signInAsAdmin(page: any) {
   if (!provisionedOrg) throw new Error('Org not provisioned — skipping test');
   const { username, password } = activeAdminCredentials();
   await page.goto(`${FRONTEND_BASE_URL}/sign-in`);
-  await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  // Redesigned auth screen (master, src/features/rxsoft/pages/sign-in):
+  // labels are plain <Text>, NOT real <label> elements → getByLabel fails.
+  // Testid-first (canon): sign-in-username / sign-in-password / sign-in-submit.
+  await page.getByTestId('sign-in-username').fill(username);
+  await page.getByTestId('sign-in-password').fill(password);
+  await page.getByTestId('sign-in-submit').click();
 
   // Post-login target (resolvePostLoginTarget): a single-module user lands on
   // that module's dashboard; anyone else gets the module chooser. The
@@ -176,7 +239,12 @@ async function createPatientViaApi(
     body: JSON.stringify(patient),
   });
   if (!res.ok) throw new Error(`create patient failed: ${res.status} ${await res.text()}`);
-  return res.json();
+  const created = await res.json();
+  // The patients API stores firstName/lastName; appointments.patient_name is
+  // NOT NULL and the UI's PatientPicker composes the display name. Compose it
+  // here so appointment fixtures carry the same shape the UI would send.
+  const name = [created?.firstName, created?.lastName].filter(Boolean).join(' ').trim();
+  return { ...created, patientName: name || created?.patientId };
 }
 
 // Create an appointment via EMR API
@@ -231,12 +299,17 @@ test.describe('EMR Real-Backend — Dashboard & Resources', () => {
 
   test('UC-EMR-01: Dashboard summary renders (GET /dashboard)', async ({ page }) => {
     await page.goto(`${FRONTEND_BASE_URL}/emr`);
-    await expect(page.getByRole('heading', { name: /EMR Dashboard|EMR/ })).toBeVisible();
-    // Metric cards: Today's Appointments, Checked In, Providers on Duty, Avg Wait Time
-    await expect(page.getByText(/Today.*Appointments|Appointments.*Today/i)).toBeVisible();
-    await expect(page.getByText(/Checked In|Checked.*In/i)).toBeVisible();
-    await expect(page.getByText(/Providers on Duty|Providers.*Duty/i)).toBeVisible();
-    await expect(page.getByText(/Avg Wait|Average Wait/i)).toBeVisible();
+    // Dashboard renders a greeting heading; there is no "EMR Dashboard" title
+    // (RxPage title is empty; "EMR" only appears in breadcrumb/sidebar).
+    await expect(
+      page.getByRole('heading', { name: /Good (morning|afternoon|evening)/i })
+    ).toBeVisible();
+    // Metric cards — target the unique subtitles (labels also appear as the
+    // workspace section title, which would trip strict-mode dupe detection).
+    await expect(page.getByText(/still scheduled/)).toBeVisible();
+    await expect(page.getByText(/visits in progress/)).toBeVisible();
+    await expect(page.getByText('Provider Workload')).toBeVisible();
+    await expect(page.getByText(/No check-ins yet/i)).toBeVisible();
   });
 
   test('UC-EMR-02: Patients list renders and searches', async ({ page }) => {
@@ -269,8 +342,15 @@ test.describe('EMR Real-Backend — Dashboard & Resources', () => {
 
   test('UC-EMR-06: Forms list renders and searches', async ({ page }) => {
     await page.goto(`${FRONTEND_BASE_URL}/emr/forms`);
-    await expect(page.getByRole('heading', { name: 'Forms' })).toBeVisible();
+    // Page heading is "Form Definitions" (RxPage), not "Forms".
+    await expect(page.getByRole('heading', { name: 'Form Definitions' })).toBeVisible();
     await expect(page.getByRole('table')).toBeVisible({ timeout: 15_000 });
+    // Seeded by the EMR SEED_ON_START upserts
+    await expect(page.getByText('CLINICAL_NOTE').first()).toBeVisible();
+    await expect(page.getByText('VITALS').first()).toBeVisible();
+    // Search box
+    await page.getByPlaceholder('Search forms…').fill('vital');
+    await expect(page.getByText('VITALS').first()).toBeVisible();
   });
 
   test('UC-EMR-07: Requests list renders and searches', async ({ page }) => {
