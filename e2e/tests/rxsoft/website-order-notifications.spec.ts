@@ -85,7 +85,7 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     const toggle = page.getByRole('switch', { name: 'Email — Dispatch' }).first();
     await expect(toggle).toBeVisible({ timeout: 15_000 });
     const before = await toggle.getAttribute('aria-checked').catch(() => null);
-    await toggle.click();
+    await toggle.click({ force: true }); // force: overlay interception on the matrix cell
 
     // Save → PUT with the settings payload + success toast + modal closes.
     const putReq = page.waitForResponse(
@@ -108,7 +108,7 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     await expect(toggle).toBeVisible({ timeout: 15_000 });
     const after = await toggle.getAttribute('aria-checked').catch(() => null);
     if (after !== before) {
-      await toggle.click();
+      await toggle.click({ force: true }); // force: overlay interception on the matrix cell
       const restore = page.waitForResponse(
         (res) =>
           /\/api\/orders\/admin\/notification-settings\/[^/]+/.test(res.url()) &&
