@@ -168,22 +168,15 @@ export class CrudShellPage {
 
   /** Confirms the row-level delete ConfirmDialog. */
   async confirmDelete(): Promise<void> {
-    // Multiple ConfirmDialog instances exist (DataPageShell + one per
-    // ActionCell row), and depending on resource the LAST DOM node can be an
-    // `open` but HIDDEN transition duplicate (observed on Delivery Areas:
-    // two [open] roots, .last() = hidden → 15s toBeVisible timeout; and on
-    // LIS Priorities: last row's empty Modal shadowed the open one). Pick the
-    // first VISIBLE instance instead; fall back to .last() if none reports
-    // visible yet (still mid-mount).
-    const dialogs = this.page.getByTestId('confirm-dialog');
-    let dialog = dialogs.last();
-    const count = await dialogs.count();
-    for (let i = 0; i < count; i += 1) {
-      if (await dialogs.nth(i).isVisible()) {
-        dialog = dialogs.nth(i);
-        break;
-      }
-    }
+    // `confirm-dialog` is on the dialog BODY, which only exists while the
+    // dialog is open — so this is a unique, genuinely visible node. It used to
+    // be on Mantine's modal ROOT, a zero-height wrapper (both children are
+    // `position: fixed`): there is one root per ActionCell row + one for the
+    // shell, they are all mounted even while closed, and `isVisible()` is false
+    // for every one of them in every state. The previous "pick the first
+    // visible instance" workaround therefore never matched anything and every
+    // delete chain timed out (rxsoft-qa#802).
+    const dialog = this.page.getByTestId('confirm-dialog');
     await expect(dialog).toBeVisible({ timeout: 15_000 });
     const confirm = dialog.getByTestId('confirm-dialog-confirm');
     // The confirm button can stay disabled while a list refetch holds the

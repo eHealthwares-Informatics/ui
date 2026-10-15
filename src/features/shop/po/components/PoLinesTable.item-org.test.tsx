@@ -10,9 +10,9 @@ import { PoLinesTable } from './PoLinesTable';
  * (no organisation_items row), so picking one must prompt the user to add
  * the item to the organisation before it lands on the PO line.
  *
- * NOTE: assertions use the dialog's CONTENT (title / confirm button), not the
- * modal root — Mantine keeps the Modal root (data-testid="confirm-dialog")
- * mounted even while closed.
+ * NOTE: assertions use the dialog's CONTENT (confirm / cancel buttons). The
+ * dialog's own testid is on the body and only exists while open
+ * (rxsoft-qa#802), but the modal ROOT stays mounted while closed.
  */
 
 const addItemMock = vi.fn();
