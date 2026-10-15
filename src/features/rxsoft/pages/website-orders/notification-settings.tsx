@@ -5,6 +5,7 @@ import { Settings2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { useAuthStore } from '@/stores/auth-store';
 
 const CHANNELS = [
   { key: 'email', label: 'Email' },
@@ -57,29 +58,44 @@ export function NotificationSettingsButton() {
     [scenarioCatalog]
   );
 
+  // The switches live on the facility config now (rxsoft-qa#804). Ordinary
+  // admins only ever see their own facility — the server takes it from the
+  // token — so the picker is superadmin-only, same as every other facility
+  // switcher in the console.
+  const currentUser = useAuthStore((state) => state.user);
+  const isSuperAdmin = currentUser?.roles?.includes('super_admin') ?? false;
+
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations', 'all'],
     queryFn: async () => {
       const { data } = await rxsoftApi.get('/organizations', { params: { limit: 200 } });
       return data?.data ?? data ?? [];
     },
+    enabled: isSuperAdmin,
   });
+
+  const endpoint =
+    isSuperAdmin && orgId
+      ? `/organisation-config/by-organization/${orgId}`
+      : '/organisation-config';
 
   // Load the facility's switches whenever one is chosen; missing keys mean
   // "never configured" and default to enabled.
   useEffect(() => {
-    if (!orgId) {
+    // A superadmin has to pick a facility first; everyone else is scoped by
+    // their token, so load straight away.
+    if (isSuperAdmin && !orgId) {
       return;
     }
     let cancelled = false;
     setLoading(true);
     rxsoftApi
-      .get(`/orders/admin/notification-settings/${orgId}`)
+      .get(endpoint)
       .then(({ data }) => {
         if (cancelled) {
           return;
         }
-        const saved = data?.data ?? {};
+        const saved = data?.data?.notificationSettings ?? {};
         const merged: Record<string, boolean> = {};
         for (const c of CHANNELS) {
           for (const s of scenarios) {
@@ -108,11 +124,11 @@ export function NotificationSettingsButton() {
     return () => {
       cancelled = true;
     };
-  }, [orgId, scenarios]);
+  }, [endpoint, isSuperAdmin, orgId, scenarios]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      await rxsoftApi.put(`/orders/admin/notification-settings/${orgId}`, { settings: values });
+      await rxsoftApi.patch(endpoint, { notificationSettings: values });
     },
     onSuccess: () => {
       notifications.show({ message: 'Notification settings saved.', color: 'green' });
@@ -131,7 +147,7 @@ export function NotificationSettingsButton() {
         leftSection={<Settings2 size={14} />}
         onClick={() => {
           setOpened(true);
-          if (!orgId && organizations[0]?.id) {
+          if (isSuperAdmin && !orgId && organizations[0]?.id) {
             setOrgId(organizations[0].id);
           }
         }}
@@ -141,26 +157,29 @@ export function NotificationSettingsButton() {
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title="Order Notification Settings"
+        title="Notification Settings"
         centered
       >
         <Stack>
           <Text size="sm" c="dimmed">
-            Choose which channels send order notifications for each facility and scenario. Switches
-            that have never been configured default to on.
+            Choose which channels send customer notifications for each scenario — orders, payments,
+            prescriptions, refill reminders and campaigns. Switches that have never been configured
+            default to on.
           </Text>
-          <Select
-            label="Facility (organisation)"
-            placeholder="Select facility"
-            data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({
-              value: o.id,
-              label: o.name,
-            }))}
-            value={orgId}
-            onChange={setOrgId}
-            searchable
-          />
-          {orgId ? (
+          {isSuperAdmin && (
+            <Select
+              label="Facility (organisation)"
+              placeholder="Select facility"
+              data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({
+                value: o.id,
+                label: o.name,
+              }))}
+              value={orgId}
+              onChange={setOrgId}
+              searchable
+            />
+          )}
+          {!isSuperAdmin || orgId ? (
             <Table.ScrollContainer minWidth={720}>
               <Table withTableBorder verticalSpacing="xs" style={{ opacity: loading ? 0.5 : 1 }}>
                 <Table.Thead>
@@ -209,7 +228,7 @@ export function NotificationSettingsButton() {
             </Button>
             <Button
               loading={saveMutation.isPending}
-              disabled={!orgId || loading}
+              disabled={(isSuperAdmin && !orgId) || loading}
               onClick={() => saveMutation.mutate()}
             >
               Save
