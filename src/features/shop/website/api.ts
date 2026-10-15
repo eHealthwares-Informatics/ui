@@ -22,6 +22,7 @@ import type {
   GenericDrugDetail,
   GenericProductSearchResult,
   WebsiteSettings,
+  NotificationPreferences,
 } from './types';
 
 export interface WebPaymentProvider {
@@ -354,6 +355,17 @@ export const websiteApi = {
 
   verifyEmail: (data: { token: string }) =>
     api.post<{ verified: boolean }>('/website/auth/verify-email', data).then((r) => r.data),
+
+  // Notification preferences (SRS 7.9) — the signed-in shopper's own switches.
+  getNotificationPreferences: () =>
+    api
+      .get<{ data: NotificationPreferences }>('/website/notification-preferences')
+      .then((r) => r.data.data),
+
+  updateNotificationPreferences: (payload: Partial<NotificationPreferences>) =>
+    api
+      .put<{ data: NotificationPreferences }>('/website/notification-preferences', payload)
+      .then((r) => r.data.data),
 
   // Search
   search: (q: string, type?: string) =>
