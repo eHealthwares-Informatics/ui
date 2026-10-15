@@ -83,10 +83,6 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
 
     // Switches carry aria-labels "<Channel> — <Scenario>" (post-#153 markup).
     const toggle = page.getByRole('switch', { name: 'Email — Dispatch' }).first();
-    const rowScope = dispatchRow.locator(
-      'xpath=ancestor-or-self::*[.//input[@type="checkbox"] or @role="switch"][1]'
-    );
-    const toggle = rowScope.locator('button[role="switch"], input[type="checkbox"]').first();
     await expect(toggle).toBeVisible({ timeout: 15_000 });
     const before = await toggle.getAttribute('aria-checked').catch(() => null);
     await toggle.click();
