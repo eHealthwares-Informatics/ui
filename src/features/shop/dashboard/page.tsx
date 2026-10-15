@@ -4,6 +4,7 @@ import { Package, FileText, Star, MessageCircle, Heart } from 'lucide-react';
 import { useOrders, usePrescriptions, useConsultations, useRewards } from '../website/hooks';
 import { WebsiteLayout, green, ink, muted, line, soft } from '../website/layout';
 import { PageLoader } from '../website/loaders';
+import { NotificationPreferencesCard } from '../website/notification-preferences';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -123,6 +124,7 @@ export default function DashboardPage() {
               </Paper>
             </Grid.Col>
           </Grid>
+          <NotificationPreferencesCard />
         </Stack>
       </Container>
     </WebsiteLayout>
