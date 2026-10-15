@@ -100,24 +100,18 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     await expect(page.getByText('Notification settings saved.')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText('Order Notification Settings')).toBeHidden();
 
-    // Restore: reopen, toggle back, save again (no residual mutation).
+    // Persistence check: reopen, re-pick the facility, and verify the saved
+    // state reloaded (the switch we turned OFF is still OFF). The e2e org is
+    // ephemeral, so no round-trip restore is needed.
     await page.getByRole('button', { name: 'Notifications' }).click();
     await expect(page.getByText('Order Notification Settings')).toBeVisible({ timeout: 15_000 });
-    await facility.click();
+    const facility2 = page.getByLabel('Facility (organisation)').first();
+    await facility2.click();
     await page.getByRole('option').first().click();
-    await expect(toggle).toBeVisible({ timeout: 15_000 });
-    const after = await toggle.getAttribute('aria-checked').catch(() => null);
-    if (after !== before) {
-      await toggle.click({ force: true }); // force: overlay interception on the matrix cell
-      const restore = page.waitForResponse(
-        (res) =>
-          /\/api\/orders\/admin\/notification-settings\/[^/]+/.test(res.url()) &&
-          res.request().method() === 'PUT',
-        { timeout: 20_000 }
-      );
-      await page.getByRole('button', { name: 'Save' }).click();
-      expect((await restore).status()).toBeLessThan(400);
-      await expect(page.getByText('Notification settings saved.')).toBeVisible({ timeout: 10_000 });
-    }
+    const toggle2 = page.getByRole('switch', { name: 'Email — Dispatch' }).first();
+    await expect(toggle2).toBeVisible({ timeout: 15_000 });
+    await expect(toggle2, 'saved OFF state must reload from the server').not.toBeChecked({
+      timeout: 15_000,
+    });
   });
 });
