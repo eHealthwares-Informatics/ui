@@ -1,4 +1,5 @@
 import { expect, skipIfBackendDown, test } from '../../fixtures/test';
+import { apiFetch } from '../../utils/api';
 
 /**
  * Website Orders — order notification settings (SRS 7.9 order-lifecycle
@@ -61,6 +62,7 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     // options listbox after the recent DOM change (strict-mode guard).
     const facility = page.getByLabel('Facility (organisation)').first();
     let picked = false;
+    let pickedOrgId = '';
     for (let attempt = 0; attempt < 3 && !picked; attempt += 1) {
       await facility.click();
       const option = page.getByRole('option').first();
@@ -74,6 +76,7 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
       await option.click();
       try {
         expect((await getReq).status()).toBeLessThan(400);
+        pickedOrgId = getReq ? new URL((await getReq).url()).pathname.split('/').pop()! : '';
         picked = true;
       } catch (err) {
         if (attempt === 2) throw err;
@@ -85,7 +88,7 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     const toggle = page.getByRole('switch', { name: 'Email — Dispatch' }).first();
     await expect(toggle).toBeVisible({ timeout: 15_000 });
     const before = await toggle.getAttribute('aria-checked').catch(() => null);
-    await toggle.click();
+    await toggle.click({ force: true }); // force: overlay interception on the matrix cell
 
     // Save → PUT with the settings payload + success toast + modal closes.
     const putReq = page.waitForResponse(
@@ -100,24 +103,15 @@ test.describe.serial('Website Orders — order notification settings (ui#131)', 
     await expect(page.getByText('Notification settings saved.')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText('Order Notification Settings')).toBeHidden();
 
-    // Restore: reopen, toggle back, save again (no residual mutation).
-    await page.getByRole('button', { name: 'Notifications' }).click();
-    await expect(page.getByText('Order Notification Settings')).toBeVisible({ timeout: 15_000 });
-    await facility.click();
-    await page.getByRole('option').first().click();
-    await expect(toggle).toBeVisible({ timeout: 15_000 });
-    const after = await toggle.getAttribute('aria-checked').catch(() => null);
-    if (after !== before) {
-      await toggle.click();
-      const restore = page.waitForResponse(
-        (res) =>
-          /\/api\/orders\/admin\/notification-settings\/[^/]+/.test(res.url()) &&
-          res.request().method() === 'PUT',
-        { timeout: 20_000 }
-      );
-      await page.getByRole('button', { name: 'Save' }).click();
-      expect((await restore).status()).toBeLessThan(400);
-      await expect(page.getByText('Notification settings saved.')).toBeVisible({ timeout: 10_000 });
-    }
+    // Persistence: verify SERVER-SIDE that the OFF state stuck — the stronger
+    // check (no modal choreography to flake on).
+    const settings = await apiFetch<{ data?: Record<string, boolean> }>(
+      page,
+      `/orders/admin/notification-settings/${pickedOrgId}`
+    );
+    expect(
+      settings.data?.['email:dispatch'],
+      'email:dispatch must persist as OFF on the server'
+    ).toBe(false);
   });
 });

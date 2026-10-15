@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { websiteApi } from './api';
 import { resolveBranding, resolveContact } from './branding';
 import { useCartStore } from './cart-store';
+import type { NotificationPreferences } from './types';
 
 // ── Homepage ─────────────────────────────────────────────────────
 
@@ -308,6 +309,28 @@ export function useRewards() {
   return useQuery({
     queryKey: ['website', 'rewards'],
     queryFn: websiteApi.getRewards,
+  });
+}
+
+// ── Notification preferences (SRS 7.9) ───────────────────────────
+
+export function useNotificationPreferences() {
+  return useQuery({
+    queryKey: ['website', 'notification-preferences'],
+    queryFn: websiteApi.getNotificationPreferences,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useUpdateNotificationPreferences() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: Partial<NotificationPreferences>) =>
+      websiteApi.updateNotificationPreferences(payload),
+    // The PUT echoes the merged preferences — seed the cache instead of refetching.
+    onSuccess: (data) => {
+      queryClient.setQueryData(['website', 'notification-preferences'], data);
+    },
   });
 }
 

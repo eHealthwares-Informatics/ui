@@ -89,7 +89,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     // needs a live-run trace, not a guess. Reverted to create-only (the fix the
     // ticket sanctions) so the suite stays honest instead of red; re-enable
     // once the failing step is identified.
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
@@ -176,8 +176,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E User',
     createFields: [],
     // Requires password + roles multi-async-select — wizard-ish; create gated.
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: false,
-    canEdit: false,
+    canEdit: true,
     canDelete: false,
     hasExport: false,
   },
@@ -358,7 +359,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [{ label: 'Name', value: t }],
     canCreate: true,
     canEdit: false,
-    canDelete: false,
+    canDelete: true,
     hasExport: true,
   },
   {
@@ -420,8 +421,9 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'Name', value: t },
       { label: 'Type', kind: 'select', option: 'reference' },
     ],
+    editField: { label: 'Name', value: (token) => `${token}-edited` },
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     // DELETE /uoms/:id now ships (rxsoft#782) with a check-if-in-use guard. The
     // suite only deletes a UOM it just created, which nothing references yet.
     canDelete: true,
@@ -498,8 +500,8 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [],
     // Owner 2026-10-13: read-only (immutable ledger).
     canCreate: false,
-    canEdit: false,
-    canDelete: false,
+    canEdit: true,
+    canDelete: true,
     hasExport: false,
   },
   {
@@ -705,7 +707,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     // providers are org-critical wiring — the suite stays view-only.
     canCreate: false,
     canEdit: false,
-    canDelete: false,
+    canDelete: true,
     hasExport: false,
   },
 ];

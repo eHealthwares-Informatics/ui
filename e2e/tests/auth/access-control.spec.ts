@@ -96,25 +96,31 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     // (Group-level hiding is Phase-3 work: every rxsoft group currently has
     // untagged members — Customers/Suppliers/Categories etc. — which stay
     // visible by the "never hides what the API allows" invariant.)
-    for (const hidden of ['Users', 'Roles', 'Reports', 'Audit Logs']) {
+    for (const href of [
+      '/rxsoft/users',
+      '/rxsoft/roles',
+      '/rxsoft/reports',
+      '/rxsoft/audit-logs',
+    ]) {
       await expect(
-        page.getByRole('link', { name: hidden, exact: false }),
-        `${hidden} (tagged, code lacking) must be hidden`
+        page.locator(`a[href="${href}"]`),
+        `${href} (tagged, code lacking) must be hidden`
       ).toHaveCount(0, { timeout: 15_000 });
     }
     // TAGGED items the cashier HOLDS → visible.
-    for (const visible of ['Sales', 'Inventory', 'Products']) {
+    for (const href of ['/rxsoft/sales', '/rxsoft/inventory', '/rxsoft/items']) {
+      // >= 1: the module dashboard's Quick links section also links here.
       await expect(
-        page.getByRole('link', { name: visible, exact: false }).first(),
-        `${visible} (tagged, code held) must stay visible`
-      ).toBeAttached({ timeout: 15_000 });
+        page.locator(`a[href="${href}"]`),
+        `${href} (tagged, code held) must stay visible`
+      ).not.toHaveCount(0, { timeout: 15_000 });
     }
     // UNTAGGED items → always visible (Phase-1 invariant).
-    for (const visible of ['Customers', 'Suppliers', 'Categories']) {
+    for (const href of ['/rxsoft/customers', '/rxsoft/suppliers', '/rxsoft/categories']) {
       await expect(
-        page.getByRole('link', { name: visible, exact: false }).first(),
-        `${visible} (untagged) must stay visible`
-      ).toBeAttached({ timeout: 15_000 });
+        page.locator(`a[href="${href}"]`),
+        `${href} (untagged) must stay visible`
+      ).not.toHaveCount(0, { timeout: 15_000 });
     }
   });
 
@@ -126,12 +132,8 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     await page.goto('/rxsoft/dashboard');
 
     // Users is tagged rxsoft.identity.user.read — cashier lacks it.
-    await expect(page.getByRole('link', { name: 'Users', exact: false })).toHaveCount(0, {
-      timeout: 15_000,
-    });
+    await expect(page.locator('a[href="/rxsoft/users"]')).toHaveCount(0, { timeout: 15_000 });
     // POS (/shop/pos) is tagged rxsoft.sales.sale.create — cashier HAS it.
-    await expect(page.getByRole('link', { name: 'POS', exact: false }).first()).toBeAttached({
-      timeout: 15_000,
-    });
+    await expect(page.locator('a[href="/shop/pos"]')).not.toHaveCount(0, { timeout: 15_000 });
   });
 });

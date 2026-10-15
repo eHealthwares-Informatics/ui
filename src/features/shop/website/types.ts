@@ -332,3 +332,13 @@ export interface WebsiteSettings {
   contactWhatsApp: string;
   contactAddress: string;
 }
+
+/**
+ * Customer opt-in/out per channel (SRS 7.9). The API returns flat booleans and
+ * defaults every channel to true — the storefront page is opt-OUT.
+ */
+export interface NotificationPreferences {
+  email: boolean;
+  sms: boolean;
+  whatsapp: boolean;
+}

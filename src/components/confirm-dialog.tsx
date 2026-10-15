@@ -19,6 +19,9 @@ type ConfirmDialogProps = {
 
 export function ConfirmDialog(props: ConfirmDialogProps) {
   const {
+    // `open` is consumed here, NOT spread onto <Modal>: leaving it in `actions`
+    // leaked it to the DOM as an `open=""` attribute on the modal root.
+    open,
     title,
     desc,
     description,
@@ -38,8 +41,7 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
   const confirmHandler = onConfirm ?? handleConfirm;
   return (
     <Modal
-      data-testid="confirm-dialog"
-      opened={props.open}
+      opened={open}
       onClose={() => handleConfirm && handleConfirm()}
       title={
         <Text fw={700} size="lg">
@@ -49,7 +51,22 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
       centered
       {...actions}
     >
-      <Stack gap="md">
+      {/*
+       * `data-testid="confirm-dialog"` lives on the BODY, not on <Modal>.
+       *
+       * Mantine keeps the modal ROOT (`div.mantine-Modal-root`) mounted even
+       * while closed, and that root is a zero-height wrapper: both of its
+       * children (the overlay and `Modal-inner`) are `position: fixed`, so the
+       * root never has a bounding box. Playwright's `isVisible()` requires a
+       * non-empty box, so a testid on the root reports hidden in EVERY state —
+       * including while the dialog is open. Verified in Chromium: root is
+       * 1280×0 closed AND open; the content (`[role="dialog"]`) is 440×169 and
+       * visible (rxsoft-qa#802).
+       *
+       * The body only exists while the dialog is open and has real layout, so
+       * `getByTestId('confirm-dialog')` now matches exactly one visible node.
+       */}
+      <Stack gap="md" data-testid="confirm-dialog">
         <Text size="sm" c="dimmed">
           {dialogDescription}
         </Text>
