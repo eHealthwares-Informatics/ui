@@ -109,17 +109,18 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     }
     // TAGGED items the cashier HOLDS → visible.
     for (const href of ['/rxsoft/sales', '/rxsoft/inventory', '/rxsoft/items']) {
+      // >= 1: the module dashboard's Quick links section also links here.
       await expect(
         page.locator(`a[href="${href}"]`),
         `${href} (tagged, code held) must stay visible`
-      ).toHaveCount(1, { timeout: 15_000 });
+      ).not.toHaveCount(0, { timeout: 15_000 });
     }
     // UNTAGGED items → always visible (Phase-1 invariant).
     for (const href of ['/rxsoft/customers', '/rxsoft/suppliers', '/rxsoft/categories']) {
       await expect(
         page.locator(`a[href="${href}"]`),
         `${href} (untagged) must stay visible`
-      ).toHaveCount(1, { timeout: 15_000 });
+      ).not.toHaveCount(0, { timeout: 15_000 });
     }
   });
 
@@ -133,6 +134,6 @@ test.describe('Access-control Phase 1 — restricted-role enforcement (ui#145 / 
     // Users is tagged rxsoft.identity.user.read — cashier lacks it.
     await expect(page.locator('a[href="/rxsoft/users"]')).toHaveCount(0, { timeout: 15_000 });
     // POS (/shop/pos) is tagged rxsoft.sales.sale.create — cashier HAS it.
-    await expect(page.locator('a[href="/shop/pos"]')).toHaveCount(1, { timeout: 15_000 });
+    await expect(page.locator('a[href="/shop/pos"]')).not.toHaveCount(0, { timeout: 15_000 });
   });
 });
