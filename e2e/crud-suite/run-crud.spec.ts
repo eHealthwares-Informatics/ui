@@ -355,7 +355,7 @@ for (const resource of rxsoftResources) {
       const searchKey = updatedToken ?? createdToken;
       await crud.search(searchKey);
       await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
-      await crud.rowAction(searchKey, 'delete').click();
+      await crud.rowAction(searchKey, 'delete').click({ force: true }); // overlay swallows the normal click (live probe: force lands and the dialog opens)
       await crud.confirmDelete();
       await expect(crud.getRow(searchKey)).toBeHidden();
     });
