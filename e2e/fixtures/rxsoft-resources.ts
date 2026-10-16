@@ -359,7 +359,7 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     createFields: [{ label: 'Name', value: t }],
     canCreate: true,
     canEdit: false,
-    canDelete: true,
+    canDelete: false, // per-row delete not exposed by the customers page (no deleteMutation config),
     hasExport: true,
   },
   {
