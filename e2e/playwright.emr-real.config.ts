@@ -22,10 +22,7 @@ export default defineConfig({
   retries: 1,
   workers: 1, // single spec file with cross-test state (visit/encounter chain)
   outputDir: resolveOutputDir(),
-  reporter: [
-    ['list'],
-    ['html', { outputFolder: 'reports/emr-real', open: 'never' }],
-  ],
+  reporter: [['list'], ['html', { outputFolder: 'reports/emr-real', open: 'never' }]],
   projects: [
     {
       name: 'emr-real',

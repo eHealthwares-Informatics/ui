@@ -484,9 +484,7 @@ test.describe('EMR Real-Backend — Bespoke Flow: Appointment → Visit → Enco
     // "Record Encounter") inside another Modal of the same title — two dialog
     // sections mount at once (C21, app defect). The functional one with the
     // form fields is the inner/last; strict mode would reject the pair.
-    const encounterDialog = page
-      .getByRole('dialog', { name: 'Record Encounter' })
-      .last();
+    const encounterDialog = page.getByRole('dialog', { name: 'Record Encounter' }).last();
     await expect(encounterDialog).toBeVisible();
 
     // Fill encounter form
