@@ -169,32 +169,46 @@ test.describe('RxSoft Inventory — List Page (UC-RX-INVENTORY-01/02/06)', () =>
     }
   });
 
-  test('TC-RX-INVENTORY-01-03: column sorting on stock balances table', async ({ page }) => {
+  test('TC-RX-INVENTORY-01-03 + TC-RX-INVENTORY-02: column sort toggles asc/desc and sends sort params to the API', async ({
+    page,
+  }) => {
     await page.goto('/rxsoft/inventory', { timeout: 60_000 });
 
     const onHandHeader = page.locator('th').filter({ hasText: 'On Hand' }).first();
     await expect(onHandHeader).toBeVisible({ timeout: 15_000 });
     const balancesTable = onHandHeader.locator('xpath=ancestor::table[1]');
+    await expect(balancesTable.locator('tbody tr').first()).toBeVisible({ timeout: 30_000 });
 
-    // Sortable columns should have clickable headers
-    const sortableHeaders = ['Item', 'Location', 'On Hand', 'Unit'];
-    for (const headerText of sortableHeaders) {
-      const th = page.locator('th').filter({ hasText: headerText }).first();
-      if ((await th.count()) > 0) {
-        await th.click({ timeout: 10_000 });
-        // Wait for table reload
-        await balancesTable
-          .locator('tbody tr')
-          .first()
-          .waitFor({ state: 'visible', timeout: 15_000 });
-        // Click again for reverse sort
-        await th.click({ timeout: 10_000 });
-        await balancesTable
-          .locator('tbody tr')
-          .first()
-          .waitFor({ state: 'visible', timeout: 15_000 });
-      }
-    }
+    // The first column ("Item") is sortable by default; TableHeader renders the
+    // sort control as an ActionIcon labelled `Sort by <label>`.
+    const itemSort = balancesTable.getByRole('button', { name: 'Sort by Item', exact: true });
+    await expect(itemSort).toBeVisible();
+
+    const stockBalancesUrl = (req: typeof import('@playwright/test').Request) =>
+      req.url().includes('/inventory/stock-balances');
+
+    // 1st click → ascending: assert the outbound list request carries
+    // sortBy=item&sortOrder=asc.
+    const ascRequest = page.waitForRequest(
+      (req) =>
+        stockBalancesUrl(req) &&
+        new URL(req.url()).searchParams.get('sortBy') === 'item' &&
+        new URL(req.url()).searchParams.get('sortOrder') === 'asc'
+    );
+    await itemSort.click();
+    await ascRequest;
+    await expect(balancesTable.locator('tbody tr').first()).toBeVisible({ timeout: 15_000 });
+
+    // 2nd click → descending: the first column toggles asc → desc.
+    const descRequest = page.waitForRequest(
+      (req) =>
+        stockBalancesUrl(req) &&
+        new URL(req.url()).searchParams.get('sortBy') === 'item' &&
+        new URL(req.url()).searchParams.get('sortOrder') === 'desc'
+    );
+    await itemSort.click();
+    await descRequest;
+    await expect(balancesTable.locator('tbody tr').first()).toBeVisible({ timeout: 15_000 });
   });
 
   // ── UC-RX-INVENTORY-02: Search and filter ───────────────────
