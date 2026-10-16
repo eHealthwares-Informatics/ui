@@ -250,7 +250,7 @@ export function useSearchSales(search?: string) {
   });
 }
 
-export function useCustomers(search?: string) {
+export function useCustomers(search?: string, options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: customerKeys.list(search),
     queryFn: async () => {
@@ -260,6 +260,9 @@ export function useCustomers(search?: string) {
       return data?.data ?? data ?? [];
     },
     staleTime: 60_000,
+    // The POS payment dialog looks a customer up from the phone being typed, so
+    // it must not fire on an empty search.
+    enabled: options.enabled ?? true,
   });
 }
 
@@ -425,6 +428,13 @@ export function usePosItems(search?: string) {
         saleUomId?: string | null;
         smallImageUrl?: string;
         imageUrl?: string;
+        /**
+         * Organisation visibility. `whitelisted` = the org has an
+         * organisation_items row for it; `default` = catalog-only;
+         * `blacklisted` = explicitly excluded. Only whitelisted items can be
+         * sold, so the POS prompts before adding anything else (rxsoft-qa#806).
+         */
+        visibility?: 'default' | 'whitelisted' | 'blacklisted';
       }>;
     },
     staleTime: 60_000,
@@ -523,6 +533,25 @@ export function useUomsSearch(search?: string) {
       }>;
     },
     staleTime: 300_000,
+  });
+}
+
+/**
+ * Whitelists a catalog item for the current organisation (PUT /items/me/:id
+ * creates an active organisation_items row) so the POS can sell it. Same
+ * activation the purchases flow uses before a PO line lands.
+ */
+export function useActivatePosItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (itemId: string) => {
+      const { data } = await rxsoftApi.put(`/items/me/${itemId}`, { isActive: true });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pos-items'] });
+      qc.invalidateQueries({ queryKey: ['whitelisted-items'] });
+    },
   });
 }
 

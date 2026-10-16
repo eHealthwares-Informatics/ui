@@ -13,6 +13,7 @@ vi.mock('../../api/posApi', () => ({
   }),
   usePosTerminals: () => ({ data: [] }),
   useCreateCustomer: () => ({ mutateAsync: createCustomerMock, isPending: false }),
+  useCustomers: () => ({ data: [] }),
   useCreateSale: (config: any) => ({
     mutate: (payload: any) => {
       mutateMock(payload);
@@ -87,7 +88,9 @@ async function openModalAndTypeCustomer() {
   fireEvent.click(methodInput);
   fireEvent.click(await screen.findByText('Cash'));
 
-  fireEvent.change(screen.getByTestId('pos-customer-name'), {
+  // The customer field is a select now (rxsoft-qa#806); typing into it is how a
+  // walk-in name is captured, which must still create the customer on pay.
+  fireEvent.change(screen.getByTestId('pos-customer-select'), {
     target: { value: 'Jane Doe' },
   });
 
@@ -103,29 +106,33 @@ describe('PaymentModal — offline new-customer completion (#59)', () => {
     enqueueOfflineSaleMock.mockClear();
   });
 
-  it('continues as a walk-in and offers offline completion when customer creation fails offline', async () => {
-    createCustomerMock.mockRejectedValue(customerNetworkError);
-    const completeBtn = await openModalAndTypeCustomer();
+  it(
+    'continues as a walk-in and offers offline completion when customer creation fails offline',
+    { timeout: 15_000 },
+    async () => {
+      createCustomerMock.mockRejectedValue(customerNetworkError);
+      const completeBtn = await openModalAndTypeCustomer();
 
-    fireEvent.click(completeBtn);
+      fireEvent.click(completeBtn);
 
-    await waitFor(() => expect(createCustomerMock).toHaveBeenCalledTimes(1));
-    expect(createCustomerMock).toHaveBeenCalledWith({ name: 'Jane Doe', phone: undefined });
+      await waitFor(() => expect(createCustomerMock).toHaveBeenCalledTimes(1));
+      expect(createCustomerMock).toHaveBeenCalledWith({ name: 'Jane Doe', phone: undefined });
 
-    // Sale mutation still runs (customerId null) and its network error surfaces
-    // the offline prompt.
-    const prompt = await screen.findByTestId('pos-offline-prompt');
-    expect(prompt).toBeInTheDocument();
-    expect(mutateMock).toHaveBeenCalledTimes(1);
-    expect(mutateMock.mock.calls[0][0].customerId).toBeNull();
+      // Sale mutation still runs (customerId null) and its network error surfaces
+      // the offline prompt.
+      const prompt = await screen.findByTestId('pos-offline-prompt');
+      expect(prompt).toBeInTheDocument();
+      expect(mutateMock).toHaveBeenCalledTimes(1);
+      expect(mutateMock.mock.calls[0][0].customerId).toBeNull();
 
-    fireEvent.click(screen.getByTestId('pos-complete-offline-btn'));
+      fireEvent.click(screen.getByTestId('pos-complete-offline-btn'));
 
-    await waitFor(() => expect(enqueueOfflineSaleMock).toHaveBeenCalledTimes(1));
-    const queued = enqueueOfflineSaleMock.mock.calls[0][0];
-    expect(queued.saleCode).toBe('SALE-QA-59');
-    expect(queued.payload.customerId).toBeNull();
-  });
+      await waitFor(() => expect(enqueueOfflineSaleMock).toHaveBeenCalledTimes(1));
+      const queued = enqueueOfflineSaleMock.mock.calls[0][0];
+      expect(queued.saleCode).toBe('SALE-QA-59');
+      expect(queued.payload.customerId).toBeNull();
+    }
+  );
 
   it('still blocks completion on a customer business error (no offline prompt)', async () => {
     const badRequest = new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {

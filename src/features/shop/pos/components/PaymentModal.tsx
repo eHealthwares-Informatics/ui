@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, Link, Mail, Copy } from 'lucide-react';
@@ -21,6 +22,7 @@ import { rxsoftApi } from '@/lib/rxsoft-api';
 import {
   useCreateCustomer,
   useCreateSale,
+  useCustomers,
   useDebitWallet,
   useInitiatePosPayment,
   usePaymentMethods,
@@ -36,6 +38,11 @@ interface Props {
   totals: { total: number };
   session: any;
   onComplete: (saleResult?: any) => void;
+}
+
+/** Digits only — phone formats differ between customers. */
+function phoneDigits(value: string | null | undefined): string {
+  return (value ?? '').replace(/\D/g, '');
 }
 
 const POS_TERMINAL_TIMEOUT_MS = 120_000;
@@ -54,6 +61,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  /**
+   * Selected customer. The payment dialog shows a customer SELECT; the free-text
+   * name remains only as "the thing being typed", so a walk-in with just a name
+   * still resolves to a new customer (rxsoft-qa#806).
+   */
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const [walletPaymentRef, setWalletPaymentRef] = useState<string | null>(null);
   const [walletDebited, setWalletDebited] = useState(false);
   const [offlinePrompt, setOfflinePrompt] = useState(false);
@@ -69,6 +82,50 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     walletDebitedRef.current = false;
   }
 
+  // ── Customer: select + phone lookup (rxsoft-qa#806) ──────────────────────
+  // The select is server-searched (name/phone/email all match on the backend).
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [debouncedCustomerSearch] = useDebouncedValue(customerSearch, 300);
+  const { data: customerResults = [] } = useCustomers(debouncedCustomerSearch.trim() || undefined, {
+    enabled: debouncedCustomerSearch.trim().length >= 3,
+  });
+
+  // …and typing a NUMBER first looks the customer up and selects them.
+  const [debouncedPhone] = useDebouncedValue(customerPhone, 400);
+  const phoneDigitsTyped = phoneDigits(debouncedPhone);
+  const { data: phoneResults = [] } = useCustomers(
+    phoneDigitsTyped.length >= 6 ? debouncedPhone.trim() : undefined,
+    { enabled: phoneDigitsTyped.length >= 6 }
+  );
+
+  useEffect(() => {
+    if (phoneDigitsTyped.length < 6) {
+      return;
+    }
+    // Exact phone equality only — a partial number must not hijack the select.
+    const match = (phoneResults as Array<{ id: string; name?: string; phone?: string }>).find(
+      (c) => phoneDigits(c.phone) === phoneDigitsTyped
+    );
+    if (match && match.id !== customerId) {
+      setCustomerId(match.id);
+      setCustomerName(match.name ?? '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phoneDigitsTyped, phoneResults]);
+
+  // Options come from BOTH searches: a customer found by their phone number must
+  // also be an option, or the select would hold a value with no label and the
+  // picked customer would be invisible to the operator.
+  const customerSelectData = [
+    ...(customerResults as Array<{ id: string; name?: string; phone?: string }>),
+    ...(phoneResults as Array<{ id: string; name?: string; phone?: string }>),
+  ]
+    .filter((c, index, all) => all.findIndex((o) => o.id === c.id) === index)
+    .map((c) => ({
+      value: c.id,
+      label: `${c.name ?? c.id}${c.phone ? ` · ${c.phone}` : ''}`,
+    }));
+
   useEffect(() => {
     if (opened) {
       setPaid(totals.total);
@@ -83,6 +140,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       // Pre-fill customer fields from session
       setCustomerName(session?.customerName || '');
       setCustomerPhone(session?.customer?.phone || '');
+      setCustomerId(session?.customerId ?? null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, totals.total, session?.customerName, session?.customer?.phone]);
@@ -287,15 +345,20 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   }
 
   async function handleComplete() {
-    // Create customer first if name is provided but no customer is set
-    let customerId = session.customerId || null;
-    if (customerName && !customerId) {
+    // Customer: a selected customer wins; otherwise a typed name or the phone
+    // number creates one. A number with no match still resolves to a customer
+    // (rxsoft-qa#806), using the number itself as the name when nothing else is
+    // known.
+    let resolvedCustomerId = customerId ?? session.customerId ?? null;
+    const typedName = customerName.trim() || customerSearch.trim();
+    const typedPhone = customerPhone.trim();
+    if (!resolvedCustomerId && (typedName || typedPhone)) {
       try {
         const newCustomer = await createCustomer.mutateAsync({
-          name: customerName,
-          phone: customerPhone || undefined,
+          name: typedName || typedPhone,
+          phone: typedPhone || undefined,
         });
-        customerId = newCustomer.id;
+        resolvedCustomerId = newCustomer.id;
       } catch (e: any) {
         if (isNetworkError(e)) {
           // Backend unreachable — do not block the sale. Continue as a walk-in
@@ -308,7 +371,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
               'The customer could not be created because the backend is unreachable — continuing as a walk-in. The sale will be queued offline.',
             autoClose: false,
           });
-          customerId = null;
+          resolvedCustomerId = null;
         } else {
           notifications.show({
             color: 'red',
@@ -366,7 +429,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       saleNumber: session.saleCode,
       saleChannel: 'pos',
       storeId: posConfig?.storeId ?? 'default',
-      customerId,
+      customerId: resolvedCustomerId,
       stockLocationId: posConfig?.stockLocationId ?? null,
       lines,
       payments: methodId
@@ -430,12 +493,27 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           data-testid="pos-payment-method"
         />
 
-        <TextInput
-          label="Customer Name"
-          placeholder="Enter customer name (leave blank for walk-in)"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.currentTarget.value)}
-          data-testid="pos-customer-name"
+        <Select
+          label="Customer"
+          data-testid="pos-customer-select"
+          placeholder="Search by name or phone (leave blank for walk-in)"
+          searchable
+          clearable
+          nothingFoundMessage="No match — this name/number will create a customer"
+          data={customerSelectData}
+          value={customerId}
+          searchValue={customerSearch}
+          onSearchChange={setCustomerSearch}
+          onChange={(value) => {
+            setCustomerId(value ?? null);
+            const picked = customerResults.find((c: any) => c.id === value);
+            if (picked) {
+              setCustomerName(picked.name ?? '');
+              if (picked.phone) {
+                setCustomerPhone(picked.phone);
+              }
+            }
+          }}
         />
         <TextInput
           label="Customer Phone"
