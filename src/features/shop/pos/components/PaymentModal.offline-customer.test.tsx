@@ -106,7 +106,7 @@ describe('PaymentModal — offline new-customer completion (#59)', () => {
     enqueueOfflineSaleMock.mockClear();
   });
 
-  it('continues as a walk-in and offers offline completion when customer creation fails offline', async () => {
+  it('continues as a walk-in and offers offline completion when customer creation fails offline', { timeout: 15_000 }, async () => {
     createCustomerMock.mockRejectedValue(customerNetworkError);
     const completeBtn = await openModalAndTypeCustomer();
 

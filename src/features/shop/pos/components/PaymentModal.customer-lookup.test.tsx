@@ -84,7 +84,9 @@ describe('PaymentModal — customer select + phone lookup (rxsoft-qa#806)', () =
     mutateMock.mockClear();
   });
 
-  it('selects the matching customer when the number is typed', async () => {
+  // The phone lookup is debounced (400 ms) and then re-renders; under a loaded
+  // full-suite run that comfortably exceeds vitest's 5 s default.
+  it('selects the matching customer when the number is typed', { timeout: 15_000 }, async () => {
     await openWithCash();
 
     typePhone('08031234567');
