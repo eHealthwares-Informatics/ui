@@ -220,10 +220,13 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Payment',
     createFields: [],
     // Owner 2026-10-13: view + export only; create/edit/delete via bespoke flows (pos-flow.spec.ts, full-business-flow.spec.ts).
+    // CODE TRUTH (2026-10-16 sweep): paymentsConfig wires columns only — no
+    // canExport and no csvEndpoint (no /payments/export exists in src), so no
+    // export button renders. Gated honestly.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: true,
+    hasExport: false,
   },
   {
     id: 'payment-transactions',
@@ -234,10 +237,12 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E PayTxn',
     createFields: [],
     // Owner 2026-10-13: view + export only.
+    // CODE TRUTH (2026-10-16 sweep): this page reuses the payments config — no
+    // canExport / csvEndpoint, so no export button renders. Gated honestly.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: true,
+    hasExport: false,
   },
   {
     id: 'receivables',
@@ -248,10 +253,12 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Receivable',
     createFields: [],
     // Owner 2026-10-13: view + export only; list/detail via bespoke receivables-bespoke.spec.ts.
+    // CODE TRUTH (2026-10-16 sweep): receivablesConfig wires columns only — no
+    // canExport / csvEndpoint, so no export button renders. Gated honestly.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: true,
+    hasExport: false,
   },
   {
     id: 'price-list-items',
@@ -328,10 +335,12 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     nameLabel: 'Reference',
     uniquePrefix: 'E2E Move',
     createFields: [],
+    // CODE TRUTH (2026-10-16 sweep): stockMovementsConfig wires canExport: true +
+    // csvEndpoint '/inventory/stock-movements/export'. Export lifted.
     canCreate: false,
     canEdit: false,
     canDelete: false,
-    hasExport: false,
+    hasExport: true,
   },
 
   // ── Carried over from the original registry (verified, still current) ────
@@ -344,10 +353,14 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Category',
     createFields: [],
     // Owner 2026-10-13: view only.
+    // CODE TRUTH (2026-10-16 sweep): categoriesConfig DOES wire a delete action,
+    // canExport and csvEndpoint '/categories/export' — the fixture was
+    // under-declaring it. Create still needs the required `parentId`
+    // async-select, so that stays gated.
     canCreate: false, // requires required `parentId` async-select
     canEdit: false,
-    canDelete: false,
-    hasExport: false,
+    canDelete: true,
+    hasExport: true,
   },
   {
     id: 'customers',
@@ -371,10 +384,17 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Supplier',
     createFields: [{ label: 'Name', value: t }],
     // Owner 2026-10-13: full CRUD + export.
+    // CODE TRUTH (2026-10-16 sweep): suppliersConfig wires createFields +
+    // buildCreatePayload/buildUpdatePayload only — no canDelete, no
+    // deletePathBuilder, no canExport/csvEndpoint (and never did: `git log -S`
+    // over the schema is empty, so this was never code-backed). data-page-shell
+    // therefore renders no delete and no export button, and the suite's
+    // toBeVisible assertions fail rather than covering anything. Gated honestly
+    // — same call as the customers revert (d482b4f).
     canCreate: true,
     canEdit: true,
-    canDelete: true,
-    hasExport: true,
+    canDelete: false,
+    hasExport: false,
   },
   {
     id: 'manufacturers',
@@ -452,10 +472,13 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Component',
     createFields: [{ label: 'Name', value: t }],
     // Owner 2026-10-13: read-only.
+    // CODE TRUTH (2026-10-16 sweep): drugComponentsConfig wires canExport: true +
+    // csvEndpoint '/drug-components/export'. (It also exposes a delete action, but
+    // create is proxied so the suite never owns a row it may delete.) Export lifted.
     canCreate: false, // proxied to healthcare-concepts (not running) — create does not persist
     canEdit: false,
     canDelete: false,
-    hasExport: false,
+    hasExport: true,
   },
   {
     id: 'branches',
@@ -466,9 +489,13 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Branch',
     createFields: [],
     // Owner 2026-10-13: full CRUD.
+    // CODE TRUTH (2026-10-16 sweep): branchesConfig wires tabGroups +
+    // buildCreatePayload/buildUpdatePayload only — no canDelete and no
+    // deletePathBuilder (never did). No delete button renders, so the delete TC
+    // is gated honestly rather than asserted into a red failure.
     canCreate: true, // tab-group wizard modal
     canEdit: true,
-    canDelete: true,
+    canDelete: false,
     hasExport: false,
   },
   {
@@ -484,9 +511,12 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     ],
     // Owner 2026-10-13: full CRUD.
     editField: { label: 'Name', value: (token) => `${token}-edited` },
-    editMode: 'route', // edit opens a schema-driven route page, not a modal
+    // CODE TRUTH (2026-10-16 sweep): warehousesConfig now wires buildUpdatePayload
+    // and the broken editPathBuilder was removed (ui#785 — it pointed at
+    // /inventory/warehouses/:id/edit, which has no route). Edit opens the modal,
+    // so this resource is no longer editMode:'route'.
     canCreate: true,
-    canEdit: true, // opens an edit route page, not the modal
+    canEdit: true,
     canDelete: true,
     hasExport: true,
   },
@@ -499,9 +529,14 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     uniquePrefix: 'E2E Audit',
     createFields: [],
     // Owner 2026-10-13: read-only (immutable ledger).
+    // CODE TRUTH (2026-10-16 sweep): auditLogsConfig wires no buildUpdatePayload,
+    // no canDelete and no deletePathBuilder — data-page-shell.tsx only renders the
+    // action cell when one of those is set, so audit-logs has NO edit/delete
+    // buttons. The 2026-10-15 gate-lift (4ca9c6af) flipped both to true by
+    // mistake and this fixture has been contradicting its own comment since.
     canCreate: false,
-    canEdit: true,
-    canDelete: true,
+    canEdit: false,
+    canDelete: false,
     hasExport: false,
   },
   {
@@ -688,10 +723,11 @@ export const rxsoftResources: RxsoftCrudResource[] = [
       { label: 'State', value: () => 'Lagos' },
       { label: 'City', value: t },
     ],
-    // No buildUpdatePayload on the schema → modal edit is not wired; stay
-    // honest (the finance-batch rule).
+    // CODE TRUTH (2026-10-16 sweep): the schema NOW wires buildUpdatePayload
+    // (buildPayload), so the modal edit is wired and the old "not wired" gate is
+    // stale. Edit lifted.
     canCreate: true,
-    canEdit: false,
+    canEdit: true,
     canDelete: true,
     hasExport: false,
   },
