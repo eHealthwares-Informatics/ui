@@ -9,6 +9,7 @@ vi.mock('../../api/posApi', () => ({
     data: [{ id: 'pm-cash', name: 'Cash', code: 'CASH', methodType: 'cash' }],
   }),
   usePosTerminals: () => ({ data: [] }),
+  useCustomers: () => ({ data: [] }),
   useCreateCustomer: () => ({ mutateAsync: vi.fn() }),
   useCreateSale: () => ({ mutate: mutateMock, isPending: false }),
   useInitiatePosPayment: () => ({ mutate: vi.fn(), isPending: false }),

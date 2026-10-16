@@ -6,9 +6,11 @@ import {
   Image,
   InputBase,
   Loader,
+  Modal,
   NumberInput,
   Paper,
   Select,
+  Stack,
   Table,
   Text,
   UnstyledButton,
@@ -21,8 +23,15 @@ import { ChevronDown, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { getUomEffectiveFactor } from '@/lib/uom-utils';
-import { UomOption, usePosItemPrice, usePosItemUoms, usePosItems } from '../../api/posApi';
+import {
+  UomOption,
+  useActivatePosItem,
+  usePosItemPrice,
+  usePosItemUoms,
+  usePosItems,
+} from '../../api/posApi';
 import { SaleSession, CartItem, DispenseRow } from '../types';
+import { needsOrganisationActivation, type ItemVisibility } from '../utils/item-visibility';
 import { PosSetPriceModal } from './PosSetPriceModal';
 import { QuickAddProductModal } from './QuickAddProductModal';
 import { StockAdjustModal } from './StockAdjustModal';
@@ -37,6 +46,8 @@ type PosItemOption = {
   saleUomId?: string | null;
   smallImageUrl?: string;
   imageUrl?: string;
+  /** Organisation visibility — only `whitelisted` items can be sold. */
+  visibility?: ItemVisibility;
 };
 
 type SelectedProduct = {
@@ -45,6 +56,7 @@ type SelectedProduct = {
   name: string;
   saleUomId: string | null;
   imageUrl: string;
+  visibility?: ItemVisibility;
 };
 
 interface Props {
@@ -260,6 +272,7 @@ function DispenseRowEditor({
       name: item.displayName || item.name || '',
       saleUomId: item.saleUomId ?? null,
       imageUrl: item.smallImageUrl || item.imageUrl || '',
+      visibility: item.visibility,
     });
     setSelectedProductId(item.id);
     setUomId(null);
@@ -446,6 +459,9 @@ export function ProductEntryTable({
 
   const [setPriceOpen, setSetPriceOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  // Item selected that the organisation has not added to its catalogue yet.
+  const [activationItem, setActivationItem] = useState<SelectedProduct | null>(null);
+  const activateItem = useActivatePosItem();
 
   const { data: itemUoms = [], isLoading: uomsLoading } = usePosItemUoms(selectedProductId);
   const { data: unitPrice = null, isLoading: priceLoading } = usePosItemPrice(
@@ -572,6 +588,23 @@ export function ProductEntryTable({
       });
       return;
     }
+    // An item the organisation has not added to its catalogue has no
+    // organisation_items row, so it cannot be sold — ask to activate it before
+    // it reaches the cart rather than letting the sale fail at the till
+    // (rxsoft-qa#806). Unknown visibility (e.g. an item just quick-created for
+    // this org) is left alone.
+    if (needsOrganisationActivation(selected?.visibility)) {
+      setActivationItem(selected);
+      return;
+    }
+    commitAdd(uom);
+  }
+
+  /** Adds the selected product to the cart. Callers have validated the rows. */
+  function commitAdd(uom: UomOption) {
+    if (!selectedProductId) {
+      return;
+    }
     const item: CartItem = {
       id: selectedProductId,
       code: itemCode,
@@ -591,6 +624,31 @@ export function ProductEntryTable({
     setSelectedProductId(null);
     setQuantity(1);
     setUomId(null);
+  }
+
+  /**
+   * Activate-then-add: whitelists the pending item for the organisation, then
+   * completes the add the operator already asked for.
+   */
+  async function confirmActivation() {
+    const pending = activationItem;
+    if (!pending) {
+      return;
+    }
+    try {
+      await activateItem.mutateAsync(pending.id);
+    } catch {
+      notifications.show({
+        color: 'red',
+        message: `Could not add ${pending.name || 'this item'} to your organisation's catalogue`,
+      });
+      return;
+    }
+    setActivationItem(null);
+    const uom = uomId ? itemUomMap.get(uomId) : undefined;
+    if (uom) {
+      commitAdd(uom);
+    }
   }
 
   function openAdjustModal() {
@@ -811,6 +869,32 @@ export function ProductEntryTable({
         onClose={() => setQuickAddOpen(false)}
         onProductCreated={handleQuickAddCreated}
       />
+
+      <Modal
+        opened={!!activationItem}
+        onClose={() => setActivationItem(null)}
+        title="Item not in your catalogue"
+        centered
+        data-testid="pos-item-activation-prompt"
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            {`"${activationItem?.name || activationItem?.code || ''}" is not added to your organisation's catalogue. Only items your organisation has added can be sold.`}
+          </Text>
+          <Group justify="flex-end">
+            <Button variant="light" onClick={() => setActivationItem(null)}>
+              Cancel
+            </Button>
+            <Button
+              data-testid="pos-item-activate-confirm"
+              loading={activateItem.isPending}
+              onClick={confirmActivation}
+            >
+              Add &amp; continue
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Paper>
   );
 }

@@ -13,6 +13,7 @@ vi.mock('../../api/posApi', () => ({
   }),
   usePosTerminals: () => ({ data: [] }),
   useCreateCustomer: () => ({ mutateAsync: createCustomerMock, isPending: false }),
+  useCustomers: () => ({ data: [] }),
   useCreateSale: (config: any) => ({
     mutate: (payload: any) => {
       mutateMock(payload);
@@ -87,7 +88,9 @@ async function openModalAndTypeCustomer() {
   fireEvent.click(methodInput);
   fireEvent.click(await screen.findByText('Cash'));
 
-  fireEvent.change(screen.getByTestId('pos-customer-name'), {
+  // The customer field is a select now (rxsoft-qa#806); typing into it is how a
+  // walk-in name is captured, which must still create the customer on pay.
+  fireEvent.change(screen.getByTestId('pos-customer-select'), {
     target: { value: 'Jane Doe' },
   });
 
