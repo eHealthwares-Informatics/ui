@@ -284,3 +284,43 @@ Evidence: `/tmp/pw-qa-tc04-tail.log` (14p/3s/3.8m) + the parallel session's
 | [rxsoft#787](https://github.com/ehealthwares/rxsoft/issues/787) | 10 list endpoints ignore the `search` param (no-match search leaves all rows) — TC-04 gates fire for Payment/Insurance Providers, POS Terminals, Payments, Payment Transactions, Receivables, Orders, Branches, Roles, Org Payment Providers | TC-04 matrix run (`/tmp/pw-qa-tc04-tail.log`, `pw-validate.log`); 25 other endpoints honor search green the same day | OPEN — policy-elevated: gates now block UC completion (`ec5e7ac`) |
 
 Non-defect flags (tracked in §5/§6, no ticket): POS Terminals create red pending merge of `feat/10-select-testids` (`'Provider Type'` label fix); QA-box ~10-min run kills under load (ops pattern, workaround documented).
+
+## §7 · QA agent log (2026-10-16) — seed resource-burn root cause + EMR emr-real re-run
+
+### The seed was eating the box — root-caused and fixed
+- **Cause**: every provision call on the pre-#23 build hydrated the entire
+  **4.15M-row `price_list_items`** catalog (named in seed#23's writeup as the
+  OOM root cause). Every e2e `global-setup` pays a fresh provision → the
+  5–20 min provisions, box saturation, and the "runs die at ~10 min" pattern
+  of 2026-10-14/15 all trace to this.
+- **Fix live**: seed#23 (scoped read + `minimal` template) — but the process
+  holding :8094 predated the rebuild; cycling the port (kill lsof :8094 →
+  start the rebuilt dist, 09:48) landed it. Provisions now complete in
+  **~1.6s**, proven by seed#23's own `[timing]` logs
+  (`+1.6s warehouse+stock … Provisioned`).
+- **Follow-up (queued below)**: the standard e2e `global-setup` still
+  provisions the FULL template (raw `{code,name}` probes stayed slow) —
+  switch it to `minimal` behind an env flag; full stays for suites that need
+  GL/journals seeded.
+- ⚠️ **Ops lesson**: restarting seed requires killing the port holder first
+  (`lsof -ti:8094 | xargs kill`) — three rebuild attempts died on
+  EADDRINUSE against the old process.
+
+### EMR `emr-real` suite — fresh tally vs the ui#162 baseline
+| Layer | Fresh run | ui#162 baseline |
+|---|---|---|
+| Resource layer (UC-01…07: dashboard/patients/appointments/visits/encounters/forms/requests) | **8/8 green** (22–50s, first-try) | ~7 |
+| Schedule + check-in (UC-10/UC-11) | **2/2 green** (UC-11 green warm, 34.6s) | partially gated |
+| Flow layer (UC-30/32, lab-request UC-35/36/37/40, admissions UC-13/14) | red — 8–16 min internal waits (backend answers in 8–28ms; the waits are in-spec interactions) | red, honestly documented |
+| Form builder (UC-24/25-26) | **UC-24 red WARM (40.1s)** — genuine failure, not cold-compile | red |
+
+Net **≥10/28 green vs 11/27 baseline** — resource layer fully solid, no
+regressions, and the flow failures match the baseline's documented gates.
+**UC-24 (form builder) is the one warm real failure** — worth a dev look.
+The final flow-run number continues in `/tmp/pw-qa-emrflow.log` on the box.
+
+### Box ops (2026-10-16)
+- Box at **192.168.1.100** (alias updated); password-expect wrapper for
+  access (post-restart pubkey refusal is the standing quirk).
+- emr-real provisions per-run (own `emr-org-state.json`); the suite uses the
+  **minimal** template (fast) — the standard global-setup does not yet.
