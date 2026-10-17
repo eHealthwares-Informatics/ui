@@ -1116,7 +1116,7 @@ test.describe('EMR Real-Backend  Patient Registration & Lookup', () => {
     await page.getByRole('option', { name: 'Female' }).click();
     await page.getByTestId('field-dateOfBirth').fill('1995-07-15');
 
-    await page.getByRole('button', { name: 'Create' }).last().click();
+    await page.getByTestId('form-create').click();
 
     // Modal should close on successful create
     await expect(page.getByTestId('modal-form')).toBeHidden({ timeout: 10_000 });
