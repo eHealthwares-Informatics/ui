@@ -1,12 +1,15 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Card,
   Container,
+  Divider,
   Group,
   Image,
   Loader,
   NumberInput,
+  Radio,
   Select,
   Stack,
   Switch,
@@ -16,9 +19,13 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+
+type ChannelType = 'email' | 'sms' | 'whatsapp';
+type NotificationChannel = { id: string; label: string; type: ChannelType; code?: string | null };
 
 type OrganisationConfig = {
   id: string;
@@ -34,6 +41,7 @@ type OrganisationConfig = {
   defaultLoginTimeoutMinutes: number;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
+  notificationChannels: NotificationChannel[];
 };
 
 type OrgOption = { id: string; name: string; code?: string };
@@ -51,6 +59,8 @@ type Draft = {
   defaultLoginTimeoutMinutes: number | string;
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
+  /** Channel codes staff pick from when sending a payment link to a customer. */
+  notificationChannels: Array<{ id: string; label: string; type: ChannelType; code: string }>;
 };
 
 const emptyDraft: Draft = {
@@ -65,6 +75,7 @@ const emptyDraft: Draft = {
   defaultLoginTimeoutMinutes: 480,
   defaultAllowPos: true,
   defaultAllowA4Print: false,
+  notificationChannels: [],
 };
 
 export function RxOrganisationConfigPage() {
@@ -124,6 +135,12 @@ export function RxOrganisationConfigPage() {
       defaultLoginTimeoutMinutes: config.defaultLoginTimeoutMinutes,
       defaultAllowPos: config.defaultAllowPos,
       defaultAllowA4Print: config.defaultAllowA4Print,
+      notificationChannels: (config.notificationChannels ?? []).map((c) => ({
+        id: c.id,
+        label: c.label,
+        type: c.type,
+        code: c.code ?? '',
+      })),
     });
   }, [config]);
 
@@ -146,6 +163,13 @@ export function RxOrganisationConfigPage() {
               : Number(draft.defaultLoginTimeoutMinutes),
           defaultAllowPos: draft.defaultAllowPos,
           defaultAllowA4Print: draft.defaultAllowA4Print,
+          notificationChannels: draft.notificationChannels.map((c) => ({
+            id: c.id,
+            label: c.label,
+            type: c.type,
+            // Email needs no conversation channel code.
+            code: c.type === 'email' ? null : c.code || null,
+          })),
         }
       );
       return data as OrganisationConfig;
@@ -339,6 +363,112 @@ export function RxOrganisationConfigPage() {
                   setDraft((d) => ({ ...d, defaultAllowA4Print: e.currentTarget.checked }))
                 }
               />
+              <Divider my="sm" label="Notification channels" labelPosition="left" />
+              <Text size="sm" c="dimmed">
+                Channel codes staff pick from when sending an order/payment link to a customer. For
+                SMS/WhatsApp enter the conversation channel code; Email needs none.
+              </Text>
+              <Stack gap="xs">
+                {draft.notificationChannels.map((channel, index) => (
+                  <Group key={channel.id} gap="xs" align="flex-end" wrap="nowrap">
+                    <TextInput
+                      label={index === 0 ? 'Label' : undefined}
+                      placeholder="e.g. Transactional SMS"
+                      value={channel.label}
+                      style={{ flex: 2 }}
+                      onChange={(e) => {
+                        const label = e.currentTarget.value;
+                        setDraft((d) => ({
+                          ...d,
+                          notificationChannels: d.notificationChannels.map((c) =>
+                            c.id === channel.id ? { ...c, label } : c
+                          ),
+                        }));
+                      }}
+                      data-testid={`org-channel-label-${index}`}
+                    />
+                    <Select
+                      label={index === 0 ? 'Type' : undefined}
+                      data={[
+                        { value: 'sms', label: 'SMS' },
+                        { value: 'whatsapp', label: 'WhatsApp' },
+                        { value: 'email', label: 'Email' },
+                      ]}
+                      value={channel.type}
+                      style={{ flex: 1 }}
+                      onChange={(value) => {
+                        const type = (value ?? 'sms') as ChannelType;
+                        setDraft((d) => ({
+                          ...d,
+                          notificationChannels: d.notificationChannels.map((c) =>
+                            c.id === channel.id ? { ...c, type } : c
+                          ),
+                        }));
+                      }}
+                      data-testid={`org-channel-type-${index}`}
+                    />
+                    <TextInput
+                      label={index === 0 ? 'Channel code' : undefined}
+                      placeholder={channel.type === 'email' ? '—' : 'e.g. ORDER_SMS'}
+                      value={channel.type === 'email' ? '' : channel.code}
+                      disabled={channel.type === 'email'}
+                      style={{ flex: 2 }}
+                      onChange={(e) => {
+                        const code = e.currentTarget.value;
+                        setDraft((d) => ({
+                          ...d,
+                          notificationChannels: d.notificationChannels.map((c) =>
+                            c.id === channel.id ? { ...c, code } : c
+                          ),
+                        }));
+                      }}
+                      data-testid={`org-channel-code-${index}`}
+                    />
+                    <ActionIcon
+                      color="red"
+                      variant="subtle"
+                      mb={4}
+                      aria-label="Remove channel"
+                      onClick={() =>
+                        setDraft((d) => ({
+                          ...d,
+                          notificationChannels: d.notificationChannels.filter(
+                            (c) => c.id !== channel.id
+                          ),
+                        }))
+                      }
+                    >
+                      <Trash2 size={16} />
+                    </ActionIcon>
+                  </Group>
+                ))}
+                <Group>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    leftSection={<Plus size={14} />}
+                    onClick={() =>
+                      setDraft((d) => ({
+                        ...d,
+                        notificationChannels: [
+                          ...d.notificationChannels,
+                          {
+                            id:
+                              globalThis.crypto?.randomUUID?.() ?? `ch-${Date.now().toString(36)}`,
+                            label: '',
+                            type: 'sms' as ChannelType,
+                            code: '',
+                          },
+                        ],
+                      }))
+                    }
+                    data-testid="org-channel-add"
+                  >
+                    Add channel
+                  </Button>
+                </Group>
+              </Stack>
+
               <Group justify="flex-end" mt="sm">
                 <Button onClick={() => save.mutate()} loading={save.isPending}>
                   Save Configuration
