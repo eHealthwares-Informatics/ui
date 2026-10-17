@@ -354,7 +354,8 @@ for (const resource of rxsoftResources) {
       test.setTimeout(120_000);
       const searchKey = updatedToken ?? createdToken;
       await crud.search(searchKey);
-      // Debounce + refetch settle — clicking mid-refetch detaches the row.
+      // Debounce + refetch settle (same pattern as the empty-state test) —
+      // clicking mid-refetch detaches the row and the onClick is lost.
       await page.waitForTimeout(1_500);
       await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
       await crud.rowAction(searchKey, 'delete').click({ force: true }); // overlay swallows the normal click (live probe: force lands and the dialog opens)
