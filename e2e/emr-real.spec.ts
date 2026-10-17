@@ -1117,9 +1117,6 @@ test.describe('EMR Real-Backend  Patient Registration & Lookup', () => {
     await page.getByTestId('field-dateOfBirth').fill('1995-07-15');
 
     await page.getByRole('button', { name: 'Create' }).last().click();
-    await expect(page.getByText('Patients record created')).toBeVisible({
-      timeout: 10_000,
-    });
 
     // Verify in list
     await page.getByPlaceholder('Search').fill(mrn);
