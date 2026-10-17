@@ -30,7 +30,9 @@ const SUITE_SPEC = 'crud-suite/run-crud.spec.ts';
 
 /** Board TC name keywords → capability the crud-suite actually exercises. */
 const CAPABILITY_BY_NAME = [
-  [/list renders|renders/i, 'render'],
+  // Hierarchical spec names (e.g. TC-RX-INVENTORY-01-01 "inventory page loads
+  // and shows stock balances table") predate this regex — keep before /renders/.
+  [/list renders|page loads|loads and shows|renders/i, 'render'],
   [/column sort/i, 'sort'],
   // Empty-state (TC-*-04). Mapped again now that every phase-1 list endpoint
   // honours `search` (rxsoft#59 payments/receivables/org-payment-providers,
@@ -73,28 +75,6 @@ if (!existsSync(CACHE)) {
 const cache = JSON.parse(readFileSync(CACHE, 'utf-8'));
 const items = cache.items ?? [];
 
-/** Entity names of interest: only [rxsoft] entities implemented by the suite. */
-const RXSOFT_ENTITIES = new Map(); // lower entity name → { prefix, ucs: [body] }
-const UC_RE = /\*\*(TC-RX-[A-Z0-9-]+-\d+)\*\* — (.+)/g;
-
-for (const it of items) {
-  const body = (it.content ?? {}).body ?? '';
-  if (!body || !it.title?.startsWith('UC-RX-')) continue;
-  for (const m of body.matchAll(UC_RE)) {
-    const tcId = m[1];
-    const name = m[2].trim();
-    // tcId form: TC-RX-<ENTITY>-<NN>; entity may contain hyphens → strip NN
-    const withoutPrefix = tcId.replace(/^TC-RX-/, '');
-    // Keep the raw suffix (e.g. '01') — Number('01') drops the leading zero
-    // and the entity slice then retains a trailing hyphen ('sales-'), which
-    // misses every fixture resource and silently drops list/pagination TCs.
-    const nnStr = withoutPrefix.match(/(\d+)$/)?.[1] ?? '';
-    const entity = withoutPrefix.slice(0, withoutPrefix.length - nnStr.length - 1).toLowerCase();
-    if (!RXSOFT_ENTITIES.has(entity)) RXSOFT_ENTITIES.set(entity, { ucs: [] });
-    RXSOFT_ENTITIES.get(entity).ucs.push({ tcId, name, nn: nnStr, body });
-  }
-}
-
 /** Fixture registry (text) → per-resource capability flags. */
 const regText = readFileSync(RESOURCES, 'utf-8');
 const flag = (entry, name) =>
@@ -133,6 +113,41 @@ const ALIAS = new Map([
 function resourceFor(entity) {
   const norm = ALIAS.get(entity) ?? entity;
   return resources.find((r) => r.id === norm);
+}
+
+/** Entity names of interest: only [rxsoft] entities implemented by the suite. */
+const RXSOFT_ENTITIES = new Map(); // lower entity name → { prefix, ucs: [body] }
+const UC_RE = /\*\*(TC-RX-[A-Z0-9-]+-\d+)\*\* — (.+)/g;
+
+for (const it of items) {
+  const body = (it.content ?? {}).body ?? '';
+  if (!body || !it.title?.startsWith('UC-RX-')) continue;
+  for (const m of body.matchAll(UC_RE)) {
+    const tcId = m[1];
+    const name = m[2].trim();
+    // tcId form: TC-RX-<ENTITY>-<NN>, or hierarchical TC-RX-<ENTITY>-<UC>-<NN>
+    // (e.g. the inventory spec's TC-RX-INVENTORY-01-03). Entity names may
+    // contain hyphens (price-list-items, stock-locations), so strip trailing
+    // -NN groups and take the first candidate that resolves to a fixture
+    // resource — never assume a single numeric suffix.
+    let rest = tcId.replace(/^TC-RX-/, '');
+    let entity = null;
+    for (;;) {
+      const cand = rest.replace(/-\d+$/, '');
+      if (!cand || cand === rest) break;
+      if (resourceFor(cand.toLowerCase())) {
+        entity = cand.toLowerCase();
+        break;
+      }
+      rest = cand;
+    }
+    if (!entity) continue;
+    // Keep the raw trailing digits (e.g. '01') — Number('01') drops the leading
+    // zero and the entity slice then retains a trailing hyphen ('sales-').
+    const nnStr = tcId.replace(/^TC-RX-/, '').match(/(\d+)$/)?.[1] ?? '';
+    if (!RXSOFT_ENTITIES.has(entity)) RXSOFT_ENTITIES.set(entity, { ucs: [] });
+    RXSOFT_ENTITIES.get(entity).ucs.push({ tcId, name, nn: nnStr, body });
+  }
 }
 
 /** Which capability a TC name implies (null = not asserted by the suite). */
