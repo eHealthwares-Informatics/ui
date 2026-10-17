@@ -23,6 +23,14 @@ function naira(amount: number) {
   return `₦${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+type StatusPayment = {
+  status: string;
+  reference: string;
+  providerType?: string;
+  checkoutUrl?: string | null;
+  amount?: number;
+};
+
 export default function PayPage() {
   const { token } = useParams({ from: '/shop/pay/$token' });
   const [providerId, setProviderId] = useState<string | null>(null);
@@ -30,6 +38,12 @@ export default function PayPage() {
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [liveStatus, setLiveStatus] = useState<string | null>(null);
+  // The SERVER payment (provider payment record) — the source of truth for
+  // "a provider payment has already been generated". The local session is
+  // only a display fallback (it is device/browser scoped).
+  const [payment, setPayment] = useState<StatusPayment | null>(null);
+  // Escape hatch: reveal the chooser again for a failed/abandoned attempt.
+  const [forceChoose, setForceChoose] = useState(false);
 
   const { data: link, isLoading } = useQuery({
     queryKey: ['pay-link', token],
@@ -84,6 +98,7 @@ export default function PayPage() {
     }
     try {
       const res = await payApi.status(token);
+      setPayment(res.payment ?? null);
       setLiveStatus(res.payment?.status ?? res.link.status ?? 'pending');
       if (res.payment?.status === 'success') {
         clearPaySession(token);
@@ -93,14 +108,23 @@ export default function PayPage() {
     }
   }, [token]);
 
+  // Always ask the server on load — a provider payment may already exist even
+  // when this browser has no local session (different device / cleared storage).
   useEffect(() => {
-    if (session) {
-      refreshStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void refreshStatus();
+  }, [refreshStatus]);
 
-  const confirmed = liveStatus === 'success';
+  const confirmed =
+    liveStatus === 'success' || liveStatus === 'used' || payment?.status === 'success';
+  const hasPayment = !!payment;
+  // "A provider payment has been generated" = a server payment exists, or the
+  // local session recorded the initialize() reference. Either way, don't offer
+  // the provider list again.
+  const inProgress = !confirmed && !forceChoose && (hasPayment || !!session);
+  const showProviderChooser = !confirmed && !forceChoose && !inProgress;
+  const providerName = session?.provider ?? payment?.providerType ?? '';
+  const reference = session?.reference ?? payment?.reference ?? '';
+  const paymentStatus = payment?.status ?? session?.status ?? 'pending';
 
   return (
     <WebsiteLayout>
@@ -202,7 +226,7 @@ export default function PayPage() {
                   </Stack>
                 </Paper>
 
-                {!confirmed && (
+                {showProviderChooser && (
                   <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
                     <Stack gap="md">
                       <Text fw={900} size="lg" className="damorex-heading">
@@ -274,20 +298,70 @@ export default function PayPage() {
                       </Text>
                     </Stack>
                   </Paper>
-                ) : session ? (
-                  <Group justify="center">
-                    <Button
-                      variant="light"
-                      radius="xl"
-                      leftSection={<RefreshCw size={16} />}
-                      onClick={refreshStatus}
-                    >
-                      Check payment status
-                    </Button>
-                    <Text size="sm" c={muted}>
-                      Waiting for payment: {session.reference} ({session.provider})
-                    </Text>
-                  </Group>
+                ) : inProgress ? (
+                  <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+                    <Stack gap="md" align="center">
+                      <Text fw={900} size="lg" className="damorex-heading">
+                        Payment in progress
+                      </Text>
+                      <Stack gap={6} w="100%">
+                        <Group justify="space-between">
+                          <Text size="sm" c={muted}>
+                            Amount
+                          </Text>
+                          <Text size="sm" fw={700}>
+                            {naira(payment?.amount ?? link.amount)}
+                          </Text>
+                        </Group>
+                        <Group justify="space-between">
+                          <Text size="sm" c={muted}>
+                            Provider
+                          </Text>
+                          <Text size="sm" fw={700}>
+                            {providerName || '—'}
+                          </Text>
+                        </Group>
+                        <Group justify="space-between">
+                          <Text size="sm" c={muted}>
+                            Reference
+                          </Text>
+                          <Text size="sm" fw={700}>
+                            {reference}
+                          </Text>
+                        </Group>
+                        <Group justify="space-between">
+                          <Text size="sm" c={muted}>
+                            Status
+                          </Text>
+                          <Text size="sm" fw={700} tt="capitalize">
+                            {paymentStatus}
+                          </Text>
+                        </Group>
+                      </Stack>
+                      <Button
+                        variant="light"
+                        radius="xl"
+                        leftSection={<RefreshCw size={16} />}
+                        onClick={refreshStatus}
+                        fullWidth
+                      >
+                        Check payment status
+                      </Button>
+                      <Button
+                        variant="subtle"
+                        size="xs"
+                        c={muted}
+                        onClick={() => {
+                          clearPaySession(token);
+                          setSession(null);
+                          setLiveStatus(null);
+                          setForceChoose(true);
+                        }}
+                      >
+                        Use a different payment method
+                      </Button>
+                    </Stack>
+                  </Paper>
                 ) : null}
               </>
             )}

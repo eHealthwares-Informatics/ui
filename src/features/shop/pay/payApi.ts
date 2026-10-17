@@ -66,9 +66,16 @@ export const payApi = {
 
   status: (token: string) =>
     http
-      .get<{ link: { status: string }; payment: { status: string; reference: string } | null }>(
-        `/payment-links/${token}/status`
-      )
+      .get<{
+        link: { status: string };
+        payment: {
+          status: string;
+          reference: string;
+          providerType?: string;
+          checkoutUrl?: string | null;
+          amount?: number;
+        } | null;
+      }>(`/payment-links/${token}/status`)
       .then((r) => r.data),
 
   complete: (token: string) =>
