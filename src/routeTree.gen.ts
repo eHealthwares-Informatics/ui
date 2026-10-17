@@ -292,6 +292,7 @@ import { Route as AuthenticatedRxsoftWarehousesIndexRouteImport } from './routes
 import { Route as AuthenticatedRxsoftWebsiteConsultationsIndexRouteImport } from './routes/_authenticated/rxsoft/website-consultations/index'
 import { Route as AuthenticatedRxsoftWebsiteDeliveryAreasIndexRouteImport } from './routes/_authenticated/rxsoft/website-delivery-areas/index'
 import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
+import { Route as AuthenticatedRxsoftWebsiteOrdersOrderIdRouteImport } from './routes/_authenticated/rxsoft/website-orders/$orderId'
 import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index'
 import { Route as AuthenticatedRxsoftWebsiteRewardProgramsIndexRouteImport } from './routes/_authenticated/rxsoft/website-reward-programs/index'
 import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
@@ -1933,6 +1934,12 @@ const AuthenticatedRxsoftWebsiteOrdersIndexRoute =
     path: '/rxsoft/website-orders/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftWebsiteOrdersOrderIdRoute =
+  AuthenticatedRxsoftWebsiteOrdersOrderIdRouteImport.update({
+    id: '/rxsoft/website-orders/$orderId',
+    path: '/rxsoft/website-orders/$orderId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftWebsitePrescriptionsIndexRoute =
   AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport.update({
     id: '/rxsoft/website-prescriptions/',
@@ -2310,6 +2317,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
   '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -2627,6 +2635,7 @@ export interface FileRoutesByTo {
   '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
   '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/coding-concept/dosage-forms': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -2950,6 +2959,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
   '/_authenticated/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/_authenticated/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  '/_authenticated/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/_authenticated/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -3271,6 +3281,7 @@ export interface FileRouteTypes {
     | '/rxsoft/settings/display'
     | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
+    | '/rxsoft/website-orders/$orderId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/coding-concept/dosage-forms/'
@@ -3588,6 +3599,7 @@ export interface FileRouteTypes {
     | '/rxsoft/settings/display'
     | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
+    | '/rxsoft/website-orders/$orderId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/coding-concept/dosage-forms'
@@ -3910,6 +3922,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/settings/display'
     | '/_authenticated/rxsoft/settings/notifications'
     | '/_authenticated/rxsoft/uoms/$uomId'
+    | '/_authenticated/rxsoft/website-orders/$orderId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/_authenticated/coding-concept/dosage-forms/'
@@ -6128,6 +6141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftWebsiteOrdersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/website-orders/$orderId': {
+      id: '/_authenticated/rxsoft/website-orders/$orderId'
+      path: '/rxsoft/website-orders/$orderId'
+      fullPath: '/rxsoft/website-orders/$orderId'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/website-prescriptions/': {
       id: '/_authenticated/rxsoft/website-prescriptions/'
       path: '/rxsoft/website-prescriptions'
@@ -6575,6 +6595,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
   AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute
   AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
+  AuthenticatedRxsoftWebsiteOrdersOrderIdRoute: typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   AuthenticatedCodingConceptDosageFormsIndexRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRoute
   AuthenticatedCodingConceptDrugClassificationsIndexRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
   AuthenticatedCodingConceptDrugComponentsIndexRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
@@ -6817,6 +6838,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftItemsCreateRoute: AuthenticatedRxsoftItemsCreateRoute,
   AuthenticatedRxsoftUomsUomIdRoute:
     AuthenticatedRxsoftUomsUomIdRouteWithChildren,
+  AuthenticatedRxsoftWebsiteOrdersOrderIdRoute:
+    AuthenticatedRxsoftWebsiteOrdersOrderIdRoute,
   AuthenticatedCodingConceptDosageFormsIndexRoute:
     AuthenticatedCodingConceptDosageFormsIndexRoute,
   AuthenticatedCodingConceptDrugClassificationsIndexRoute:
