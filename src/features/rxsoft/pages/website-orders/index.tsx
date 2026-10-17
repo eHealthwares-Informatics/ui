@@ -406,7 +406,11 @@ export function RxWebsiteOrdersPage() {
               </Tooltip>
             )}
             <Tooltip label="View order">
-              <ActionIcon variant="light" onClick={() => openDetail(row)}>
+              <ActionIcon
+                variant="light"
+                data-testid="row-view-order"
+                onClick={() => openDetail(row)}
+              >
                 <Eye size={16} />
               </ActionIcon>
             </Tooltip>
@@ -434,6 +438,7 @@ export function RxWebsiteOrdersPage() {
             <Select
               size="xs"
               placeholder="Change"
+              data-testid="row-status-select"
               data={
                 STATUS_TRANSITIONS[row.orderStatus ?? 'pending']?.map((s) => ({
                   value: s,
@@ -1506,6 +1511,7 @@ function DetailModal({
       title={`Order ${order?.orderNumber ?? ''}`}
       size="lg"
       centered
+      data-testid="order-detail-modal"
     >
       {isLoading ? (
         <Text c="dimmed">Loading...</Text>
@@ -1551,7 +1557,11 @@ function DetailModal({
           )}
 
           <Group>
-            <Badge color={STATUS_COLORS[status] ?? 'gray'} size="lg">
+            <Badge
+              color={STATUS_COLORS[status] ?? 'gray'}
+              size="lg"
+              data-testid="order-detail-status"
+            >
               {statusLabel(status)}
             </Badge>
             {order.parentOrderId && (
@@ -1676,7 +1686,7 @@ function DetailModal({
           )}
 
           {order.items?.length > 0 && (
-            <Card withBorder p="sm">
+            <Card withBorder p="sm" data-testid="order-detail-items">
               <Text fw={600} mb="xs">
                 Items
               </Text>
@@ -1712,6 +1722,7 @@ function DetailModal({
               <Select
                 label="Update Status"
                 placeholder="Select status"
+                data-testid="order-detail-status-select"
                 value={selectedStatus}
                 onChange={(v) => {
                   if (!v) {
