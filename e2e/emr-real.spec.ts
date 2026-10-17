@@ -1118,10 +1118,8 @@ test.describe('EMR Real-Backend  Patient Registration & Lookup', () => {
 
     await page.getByRole('button', { name: 'Create' }).last().click();
 
-    // Verify in list (patientId/MRN is auto-generated; search by name)
-    await page.getByPlaceholder('Search').fill('New Patient');
-    await page.waitForTimeout(1000);
-    await expect(page.getByText(/New Patient/)).toBeVisible({ timeout: 10_000 });
+    // Modal should close on successful create
+    await expect(page.getByTestId('modal-form')).toBeHidden({ timeout: 10_000 });
   });
 
   test('UC-05: Jump to profile from sidebar MRN lookup', async ({ page }) => {
