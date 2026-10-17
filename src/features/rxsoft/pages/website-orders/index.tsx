@@ -28,8 +28,10 @@ import {
   CornerDownRight,
   Ban,
   Copy,
+  Send,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { SendPaymentLinkModal } from '@/features/rxsoft/payment-links/SendPaymentLinkModal';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
@@ -44,6 +46,10 @@ import { STATUS_COLORS, STATUS_TRANSITIONS, statusLabel } from './status';
 export function RxWebsiteOrdersPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  // Send-payment-link (channel picker) state
+  const [sendLinkOpen, setSendLinkOpen] = useState(false);
+  const [sendLinkToken, setSendLinkToken] = useState<string | null>(null);
+  const [sendLinkLabel, setSendLinkLabel] = useState<string | undefined>(undefined);
   // Post as Sale state
   const [postSaleOpen, setPostSaleOpen] = useState(false);
   const [postSaleOrderId, setPostSaleOrderId] = useState<string | null>(null);
@@ -573,6 +579,27 @@ export function RxWebsiteOrdersPage() {
                       )}
                     </CopyButton>
                   )}
+                  {!revoked && (
+                    <Tooltip label="Send to customer">
+                      <ActionIcon
+                        size="sm"
+                        variant="subtle"
+                        color="teal"
+                        onClick={() => {
+                          setSendLinkToken(link.token);
+                          setSendLinkLabel(
+                            `Order ${row.orderNumber ?? row.id} — ₦${Number(
+                              row.totalAmount ?? 0
+                            ).toLocaleString()}`
+                          );
+                          setSendLinkOpen(true);
+                        }}
+                        data-testid="order-send-payment-link"
+                      >
+                        <Send size={14} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
                   {!revoked ? (
                     <Tooltip label="Revoke link">
                       <ActionIcon
@@ -614,6 +641,20 @@ export function RxWebsiteOrdersPage() {
       actions={<NotificationSettingsButton />}
     >
       <DataPageShell config={config} />
+
+      {/* Send a payment link to the customer over an org-configured channel */}
+      {sendLinkOpen && (
+        <SendPaymentLinkModal
+          opened
+          onClose={() => {
+            setSendLinkOpen(false);
+            setSendLinkToken(null);
+          }}
+          token={sendLinkToken}
+          contextLabel={sendLinkLabel}
+        />
+      )}
+
       {/* Post as Sale — unreconciled warning with the 3 post options */}
       <Modal
         opened={matchCheckOpen}

@@ -17,6 +17,7 @@ import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { ExternalLink, Link, Mail, Copy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { SendPaymentLinkModal } from '@/features/rxsoft/payment-links/SendPaymentLinkModal';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import {
@@ -66,6 +67,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [providerId, setProviderId] = useState<string | null>(null);
   const [paymentLink, setPaymentLink] = useState<{ token: string; url: string } | null>(null);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [sendLinkOpen, setSendLinkOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   /**
@@ -389,8 +391,9 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     if (!paymentLink) {
       return;
     }
-    window.open(paymentLink.url, '_blank');
-    notifications.show({ color: 'green', message: 'Payment link opened for customer' });
+    // Ask which org-configured channel to send over (channel codes live in
+    // Organisation Config) before sending to the customer — do NOT just open a tab.
+    setSendLinkOpen(true);
   }
 
   function handleCopyLink() {
@@ -762,6 +765,15 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           </Button>
         </Group>
       </Stack>
+
+      {sendLinkOpen && (
+        <SendPaymentLinkModal
+          opened
+          onClose={() => setSendLinkOpen(false)}
+          token={paymentLink?.token ?? null}
+          contextLabel={`Payment link for ₦${paid.toFixed(2)}`}
+        />
+      )}
     </Modal>
   );
 }
