@@ -7,14 +7,15 @@
  * unimplemented test types stay missing until later phases.
  */
 
-// 83 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
+// 89 TC ids exercised or gated by crud-suite/run-crud.spec.ts.
 // Board-sync scans this file (TC id per comment line) as coverage evidence.
 //   TC-RX-AUDIT-LOGS-20
+//   TC-RX-BRANCHES-17
+//   TC-RX-BRANCHES-18
+//   TC-RX-BRANCHES-19
 //   TC-RX-CATEGORIES-14
 //   TC-RX-CATEGORIES-15
 //   TC-RX-CATEGORIES-16
-//   TC-RX-CATEGORIES-20
-//   TC-RX-DRUG-COMPONENTS-20
 //   TC-RX-JOURNAL-ENTRIES-09
 //   TC-RX-JOURNAL-ENTRIES-10
 //   TC-RX-JOURNAL-ENTRIES-11
@@ -35,6 +36,7 @@
 //   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-14
 //   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-15
 //   TC-RX-ORGANISATION-PAYMENT-PROVIDERS-16
+//   TC-RX-PAYMENT-TRANSACTIONS-20
 //   TC-RX-PAYMENTS-09
 //   TC-RX-PAYMENTS-10
 //   TC-RX-PAYMENTS-11
@@ -65,6 +67,7 @@
 //   TC-RX-PURCHASES-17
 //   TC-RX-PURCHASES-18
 //   TC-RX-PURCHASES-19
+//   TC-RX-RECEIVABLES-20
 //   TC-RX-SALES-09
 //   TC-RX-SALES-10
 //   TC-RX-SALES-11
@@ -75,6 +78,9 @@
 //   TC-RX-SALES-17
 //   TC-RX-SALES-18
 //   TC-RX-SALES-19
+//   TC-RX-SUPPLIERS-17
+//   TC-RX-SUPPLIERS-18
+//   TC-RX-SUPPLIERS-19
 //   TC-RX-UOM-CATEGORY-09
 //   TC-RX-UOM-CATEGORY-10
 //   TC-RX-UOM-CATEGORY-11
