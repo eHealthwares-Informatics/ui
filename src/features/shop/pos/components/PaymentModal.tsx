@@ -48,6 +48,13 @@ function phoneDigits(value: string | null | undefined): string {
 const POS_TERMINAL_TIMEOUT_MS = 120_000;
 const POS_POLL_INTERVAL_MS = 3_000;
 
+/**
+ * Sentinel select value for "no customer" (a walk-in sale). The select shows
+ * "Walk-In" and the sale is submitted with `customerId: null`, but the sentinel
+ * must never leak to the API or be mistaken for a real customer id.
+ */
+export const WALK_IN_CUSTOMER_ID = '__walk_in__';
+
 export function PaymentModal({ opened, onClose, totals, session, onComplete }: Props) {
   const [paid, setPaid] = useState(totals.total);
   const [methodId, setMethodId] = useState<string | null>(null);
@@ -72,6 +79,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [offlinePrompt, setOfflinePrompt] = useState(false);
   const lastPayloadRef = useRef<any>(null);
   const walletDebitedRef = useRef(false);
+  const cashDefaultedRef = useRef(false);
   const enqueueOfflineSale = usePosStore((s) => s.enqueueOfflineSale);
 
   function resetAttemptState() {
@@ -113,23 +121,40 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phoneDigitsTyped, phoneResults]);
 
-  // Options come from BOTH searches: a customer found by their phone number must
-  // also be an option, or the select would hold a value with no label and the
-  // picked customer would be invisible to the operator.
-  const customerSelectData = [
+  // The customer selected in the toolbar (if any) must be an option even when
+  // the server-side search has not returned it — otherwise the select would
+  // hold a value with no label and the prefill would look empty.
+  const sessionCustomer = session?.customerId
+    ? {
+        id: String(session.customerId),
+        name: String(session.customerName ?? session.customer?.name ?? ''),
+        phone: session.customer?.phone as string | undefined,
+      }
+    : null;
+
+  // Options come from the session selection + BOTH searches: a customer found
+  // by their phone number must also be an option, or the picked customer would
+  // be invisible to the operator.
+  const rawCustomerOptions = [
+    ...(sessionCustomer ? [sessionCustomer] : []),
     ...(customerResults as Array<{ id: string; name?: string; phone?: string }>),
     ...(phoneResults as Array<{ id: string; name?: string; phone?: string }>),
-  ]
-    .filter((c, index, all) => all.findIndex((o) => o.id === c.id) === index)
-    .map((c) => ({
+  ].filter((c, index, all) => all.findIndex((o) => o.id === c.id) === index);
+
+  // "Walk-In" is always available as the explicit no-customer choice.
+  const customerSelectData = [
+    { value: WALK_IN_CUSTOMER_ID, label: 'Walk-In' },
+    ...rawCustomerOptions.map((c) => ({
       value: c.id,
-      label: `${c.name ?? c.id}${c.phone ? ` · ${c.phone}` : ''}`,
-    }));
+      label: `${c.name || c.id}${c.phone ? ` · ${c.phone}` : ''}`,
+    })),
+  ];
 
   useEffect(() => {
     if (opened) {
       setPaid(totals.total);
       setMethodId(null);
+      cashDefaultedRef.current = false;
       setTerminalId(null);
       setPosRef(null);
       setPosStatus('idle');
@@ -137,13 +162,24 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       setPaymentLink(null);
       setIsGeneratingLink(false);
       resetAttemptState();
-      // Pre-fill customer fields from session
-      setCustomerName(session?.customerName || '');
+      // Pre-fill customer name + phone from the toolbar selection. With no
+      // customer selected the sale defaults to Walk-In with an empty phone.
+      const hasCustomer = !!session?.customerId;
+      setCustomerId(hasCustomer ? String(session.customerId) : WALK_IN_CUSTOMER_ID);
+      setCustomerName(
+        hasCustomer ? String(session?.customerName ?? session?.customer?.name ?? '') : 'Walk-In'
+      );
       setCustomerPhone(session?.customer?.phone || '');
-      setCustomerId(session?.customerId ?? null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opened, totals.total, session?.customerName, session?.customer?.phone]);
+  }, [
+    opened,
+    totals.total,
+    session?.customerId,
+    session?.customerName,
+    session?.customer?.name,
+    session?.customer?.phone,
+  ]);
 
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -220,6 +256,27 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const selectedMethod = (Array.isArray(paymentMethods) ? paymentMethods : []).find(
     (pm: any) => pm.id === methodId
   ) as { code?: string; methodType?: string } | undefined;
+
+  // Default the payment method to Cash on each open (once the methods load).
+  // A manual change is respected — the ref stops us re-defaulting if the
+  // cashier clears the select.
+  useEffect(() => {
+    if (!opened || cashDefaultedRef.current) {
+      return;
+    }
+    const methods = Array.isArray(paymentMethods) ? paymentMethods : [];
+    if (methods.length === 0) {
+      return;
+    }
+    const cash = methods.find(
+      (pm: any) => pm.code === 'CASH' || /^cash$/i.test(String(pm.name ?? '').trim())
+    );
+    if (cash) {
+      setMethodId(cash.id);
+    }
+    cashDefaultedRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened, paymentMethods]);
 
   const usesTerminal =
     selectedMethod && (selectedMethod.code === 'POS' || selectedMethod.code === 'WEB');
@@ -346,11 +403,22 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
 
   async function handleComplete() {
     // Customer: a selected customer wins; otherwise a typed name or the phone
-    // number creates one. A number with no match still resolves to a customer
-    // (rxsoft-qa#806), using the number itself as the name when nothing else is
-    // known.
-    let resolvedCustomerId = customerId ?? session.customerId ?? null;
-    const typedName = customerName.trim() || customerSearch.trim();
+    // number creates one. The Walk-In sentinel means "no customer" and must
+    // never create a customer or leak into the payload. A number with no match
+    // still resolves to a customer (rxsoft-qa#806), using the number itself as
+    // the name when nothing else is known.
+    const isWalkIn = customerId === WALK_IN_CUSTOMER_ID;
+    let resolvedCustomerId = isWalkIn ? null : (customerId ?? session.customerId ?? null);
+    // Mantine mirrors the selected option's label into `searchValue`, so a
+    // Walk-In selection can also surface as the search text. Ignore the
+    // "Walk-In" label in both places or we would create a customer literally
+    // named Walk-In.
+    const typedNameRaw = customerName.trim();
+    const searchName = customerSearch.trim();
+    const notWalkInLabel = (value: string) => value.toLowerCase() !== 'walk-in';
+    const typedName =
+      (typedNameRaw && notWalkInLabel(typedNameRaw) ? typedNameRaw : '') ||
+      (searchName && notWalkInLabel(searchName) ? searchName : '');
     const typedPhone = customerPhone.trim();
     if (!resolvedCustomerId && (typedName || typedPhone)) {
       try {
@@ -505,13 +573,17 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           searchValue={customerSearch}
           onSearchChange={setCustomerSearch}
           onChange={(value) => {
-            setCustomerId(value ?? null);
-            const picked = customerResults.find((c: any) => c.id === value);
+            const next = value ?? WALK_IN_CUSTOMER_ID;
+            setCustomerId(next);
+            if (next === WALK_IN_CUSTOMER_ID) {
+              setCustomerName('Walk-In');
+              setCustomerPhone('');
+              return;
+            }
+            const picked = rawCustomerOptions.find((c) => c.id === next);
             if (picked) {
               setCustomerName(picked.name ?? '');
-              if (picked.phone) {
-                setCustomerPhone(picked.phone);
-              }
+              setCustomerPhone(picked.phone ?? '');
             }
           }}
         />

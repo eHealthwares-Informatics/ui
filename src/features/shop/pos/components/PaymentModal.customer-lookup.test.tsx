@@ -70,8 +70,10 @@ async function openWithCash() {
       session={session() as never}
     />
   );
-  fireEvent.click(screen.getByTestId('pos-payment-method'));
-  fireEvent.click(await screen.findByText('Cash'));
+  // Cash is the default payment method — no manual selection required.
+  await waitFor(() =>
+    expect((screen.getByTestId('pos-payment-method') as HTMLInputElement).value).toBe('Cash')
+  );
 }
 
 function typePhone(value: string) {
