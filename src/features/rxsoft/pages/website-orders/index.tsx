@@ -1,7 +1,6 @@
 import {
   Badge,
   Button,
-  Card,
   CopyButton,
   Group,
   Modal,
@@ -14,7 +13,6 @@ import {
   TextInput,
   NumberInput,
   Table,
-  Timeline,
   Alert,
   Anchor,
 } from '@mantine/core';
@@ -22,18 +20,12 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
-  ShoppingCart,
   CircleCheck,
-  CircleX,
-  Truck,
-  MapPin,
-  PackageSearch,
   AlertTriangle,
   Eye,
   List,
   ReceiptText,
   CornerDownRight,
-  Link2,
   Ban,
   Copy,
 } from 'lucide-react';
@@ -42,49 +34,16 @@ import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { DataPageShell } from '../../../components/page/data-page-shell';
 import { RxPage } from '../../../components/page/rx-page';
+import { CancelReasonModal } from './components/cancel-reason-modal';
+import { CascadeCancelModal } from './components/cascade-cancel-modal';
 import { NotificationSettingsButton } from './notification-settings';
 import { flattenChildRows } from './order-children';
 import { websiteOrdersConfig } from './schema';
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'yellow',
-  confirmed: 'cyan',
-  processing: 'blue',
-  dispatched: 'violet',
-  in_transit: 'indigo',
-  delivered: 'green',
-  cancelled: 'red',
-};
-
-const STATUS_ICONS: Record<string, React.ReactNode> = {
-  pending: <ShoppingCart size={16} />,
-  confirmed: <CircleCheck size={16} />,
-  processing: <PackageSearch size={16} />,
-  dispatched: <Truck size={16} />,
-  in_transit: <MapPin size={16} />,
-  delivered: <CircleCheck size={16} />,
-  cancelled: <CircleX size={16} />,
-};
-
-const STATUS_TRANSITIONS: Record<string, string[]> = {
-  pending: ['confirmed', 'cancelled'],
-  confirmed: ['processing', 'cancelled'],
-  processing: ['dispatched', 'cancelled'],
-  dispatched: ['in_transit'],
-  in_transit: ['delivered'],
-  delivered: [],
-  cancelled: [],
-};
-
-function statusLabel(s: string) {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import { STATUS_COLORS, STATUS_TRANSITIONS, statusLabel } from './status';
 
 export function RxWebsiteOrdersPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
   // Post as Sale state
   const [postSaleOpen, setPostSaleOpen] = useState(false);
   const [postSaleOrderId, setPostSaleOrderId] = useState<string | null>(null);
@@ -119,6 +78,9 @@ export function RxWebsiteOrdersPage() {
   const [reconciledOrderIds, setReconciledOrderIds] = useState<Set<string>>(new Set());
   // Cancel-cascade prompt: parent order awaiting the "cancel children too?" answer
   const [cascadeCancelOrder, setCascadeCancelOrder] = useState<any>(null);
+  // Cancel-reason prompt: row awaiting a free-text reason before cancelling
+  const [reasonOrder, setReasonOrder] = useState<any>(null);
+  const [pendingCancelReason, setPendingCancelReason] = useState('');
   // Per-row payment-link action state: `${orderId}:${token}` while a revoke is in flight
   const [linkBusyKey, setLinkBusyKey] = useState<string | null>(null);
 
@@ -180,14 +142,17 @@ export function RxWebsiteOrdersPage() {
       id,
       status,
       cascadeCancelChildren,
+      reason,
     }: {
       id: string;
       status: string;
       cascadeCancelChildren?: boolean;
+      reason?: string;
     }) => {
       const { data } = await rxsoftApi.patch(`/website/admin/orders/${id}/status`, {
         status,
         cascadeCancelChildren: cascadeCancelChildren || undefined,
+        reason: reason || undefined,
       });
       return data;
     },
@@ -253,8 +218,7 @@ export function RxWebsiteOrdersPage() {
   });
 
   function openDetail(order: any) {
-    setSelectedOrder(order);
-    setDetailOpen(true);
+    navigate({ to: '/rxsoft/website-orders/$orderId', params: { orderId: order.id } });
   }
 
   function openReconcile(order: any) {
@@ -291,13 +255,28 @@ export function RxWebsiteOrdersPage() {
         (c.items ?? []).some((i: any) => !i.itemId)
     );
 
-  /** Status select hook: intercept parent cancels that would strand children. */
+  /** Status select hook: cancels prompt for a reason (then optionally cascade). */
   function handleStatusSelect(row: any, status: string) {
-    if (status === 'cancelled' && cancellableChildrenOf(row).length > 0) {
-      setCascadeCancelOrder(row);
+    if (status === 'cancelled') {
+      setPendingCancelReason('');
+      setReasonOrder(row);
       return;
     }
     statusUpdateMutation.mutate({ id: row.id, status });
+  }
+
+  function submitCancelReason(reason: string) {
+    const row = reasonOrder;
+    setReasonOrder(null);
+    if (!row) {
+      return;
+    }
+    setPendingCancelReason(reason);
+    if (cancellableChildrenOf(row).length > 0) {
+      setCascadeCancelOrder(row);
+      return;
+    }
+    statusUpdateMutation.mutate({ id: row.id, status: 'cancelled', reason });
   }
 
   function confirmCascadeCancel(cascade: boolean) {
@@ -309,6 +288,7 @@ export function RxWebsiteOrdersPage() {
     statusUpdateMutation.mutate({
       id: order.id,
       status: 'cancelled',
+      reason: pendingCancelReason,
       cascadeCancelChildren: cascade,
     });
   }
@@ -406,7 +386,11 @@ export function RxWebsiteOrdersPage() {
               </Tooltip>
             )}
             <Tooltip label="View order">
-              <ActionIcon variant="light" onClick={() => openDetail(row)}>
+              <ActionIcon
+                variant="light"
+                data-testid="row-view-order"
+                onClick={() => openDetail(row)}
+              >
                 <Eye size={16} />
               </ActionIcon>
             </Tooltip>
@@ -434,6 +418,7 @@ export function RxWebsiteOrdersPage() {
             <Select
               size="xs"
               placeholder="Change"
+              data-testid="row-status-select"
               data={
                 STATUS_TRANSITIONS[row.orderStatus ?? 'pending']?.map((s) => ({
                   value: s,
@@ -817,76 +802,15 @@ export function RxWebsiteOrdersPage() {
         defaultOrgId={organizations[0]?.id ?? null}
       />
 
-      <DetailModal
-        orderId={selectedOrder?.id}
-        opened={detailOpen}
-        onClose={() => {
-          setDetailOpen(false);
-          setSelectedOrder(null);
-        }}
-        onStatusChange={invalidateOrders}
-        onCascadeCancelPrompt={(o) => setCascadeCancelOrder(o)}
-        onOpenOrder={(target) => {
-          // Breadcrumb navigation: swap the open detail modal to the related
-          // order. Invalidate cached detail/history so nothing stale lingers.
-          setSelectedOrder({ id: target.id, orderNumber: target.orderNumber });
-          qc.invalidateQueries({ queryKey: ['website-order-detail', target.id] });
-          qc.invalidateQueries({ queryKey: ['website-order-status-history', target.id] });
-        }}
+      <CancelReasonModal
+        opened={!!reasonOrder}
+        onClose={() => setReasonOrder(null)}
+        onConfirm={submitCancelReason}
+        loading={statusUpdateMutation.isPending}
       />
     </RxPage>
   );
 }
-function CascadeCancelModal({
-  order,
-  cancellableChildren,
-  onConfirm,
-  onCancel,
-}: {
-  order: any;
-  cancellableChildren: any[];
-  onConfirm: (cascade: boolean) => void;
-  onCancel: () => void;
-}) {
-  if (!order) {
-    return null;
-  }
-  return (
-    <Modal opened={!!order} onClose={onCancel} title="Cancel child orders too?" centered>
-      <Stack>
-        <Alert
-          icon={<AlertTriangle size={16} />}
-          color="orange"
-          title="This parent has open child orders"
-        >
-          <Text size="sm">
-            {cancellableChildren.length} child order(s) created for leftover unreconciled items are
-            still open:
-          </Text>
-          <Stack gap={2} mt="xs">
-            {cancellableChildren.map((c: any) => (
-              <Text key={c.id} size="sm">
-                • {c.orderNumber} — {c.unreconciledItems} of {c.totalItems} item(s) unreconciled
-              </Text>
-            ))}
-          </Stack>
-        </Alert>
-        <Group justify="flex-end">
-          <Button variant="subtle" color="gray" onClick={onCancel}>
-            Go back
-          </Button>
-          <Button variant="light" color="red" onClick={() => onConfirm(false)}>
-            Cancel parent only
-          </Button>
-          <Button color="red" onClick={() => onConfirm(true)}>
-            Cancel parent + children
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
-  );
-}
-
 function PostConfirmationModal({
   opened,
   onClose,
@@ -1425,321 +1349,6 @@ function ReconcileModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
-  );
-}
-
-function DetailModal({
-  orderId,
-  opened,
-  onClose,
-  onStatusChange,
-  onCascadeCancelPrompt,
-  onOpenOrder,
-}: {
-  orderId: string | null;
-  opened: boolean;
-  onClose: () => void;
-  onStatusChange: () => void;
-  onCascadeCancelPrompt: (order: any) => void;
-  /** Opens another order's detail modal (breadcrumb navigation between related orders). */
-  onOpenOrder: (orderLike: { id: string; orderNumber: string }) => void;
-}) {
-  const qc = useQueryClient();
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-
-  const { data: order, isLoading } = useQuery({
-    queryKey: ['website-order-detail', orderId],
-    queryFn: async () => {
-      if (!orderId) {
-        return null;
-      }
-      const { data } = await rxsoftApi.get(`/website/admin/orders/${orderId}`);
-      return data;
-    },
-    enabled: !!orderId && opened,
-  });
-
-  const { data: statusHistory = [] } = useQuery({
-    queryKey: ['website-order-status-history', orderId],
-    queryFn: async () => {
-      if (!orderId) {
-        return [];
-      }
-      const { data } = await rxsoftApi.get(`/website/admin/orders/${orderId}/status-history`);
-      return data?.data ?? data ?? [];
-    },
-    enabled: !!orderId && opened,
-  });
-
-  const statusUpdateMutation = useMutation({
-    mutationFn: async (status: string) => {
-      await rxsoftApi.patch(`/website/admin/orders/${orderId}/status`, { status });
-    },
-    onSuccess: () => {
-      notifications.show({ message: 'Status updated.', color: 'green' });
-      qc.invalidateQueries({ queryKey: ['website-order-detail', orderId] });
-      onStatusChange();
-      setSelectedStatus(null);
-    },
-    onError: (err: any) => {
-      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
-    },
-  });
-
-  const status = order?.orderStatus ?? 'pending';
-  const allowed = STATUS_TRANSITIONS[status] ?? [];
-  const timelineOrder = [
-    'pending',
-    'confirmed',
-    'processing',
-    'dispatched',
-    'in_transit',
-    'delivered',
-  ];
-  const currentIdx = timelineOrder.indexOf(status);
-
-  return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={`Order ${order?.orderNumber ?? ''}`}
-      size="lg"
-      centered
-    >
-      {isLoading ? (
-        <Text c="dimmed">Loading...</Text>
-      ) : !order ? (
-        <Text c="dimmed">Order not found.</Text>
-      ) : (
-        <Stack>
-          {/* Parent ↔ child linkage — clickable in both directions. */}
-          {Boolean(order.parentOrderId || order.childOrders?.length) && (
-            <Group gap="xs">
-              {order.parentOrderId && (
-                <Anchor
-                  size="sm"
-                  underline="hover"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onOpenOrder({
-                      id: order.parentOrderId,
-                      orderNumber:
-                        order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId,
-                    });
-                  }}
-                >
-                  ↑ Parent:{' '}
-                  {order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId}
-                </Anchor>
-              )}
-              {(order.childOrders ?? []).map((c: any) => (
-                <Anchor
-                  key={c.id}
-                  size="sm"
-                  underline="hover"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onOpenOrder({ id: c.id, orderNumber: c.orderNumber });
-                  }}
-                >
-                  ↓ {c.orderNumber} · {statusLabel(c.orderStatus)}
-                  {c.unreconciledItems > 0 ? ` · ${c.unreconciledItems} to reconcile` : ''}
-                </Anchor>
-              ))}
-            </Group>
-          )}
-
-          <Group>
-            <Badge color={STATUS_COLORS[status] ?? 'gray'} size="lg">
-              {statusLabel(status)}
-            </Badge>
-            {order.parentOrderId && (
-              <Badge color="grape" variant="light" size="lg">
-                Child of{' '}
-                {order.parentOrderNumber ?? order.parent?.orderNumber ?? order.parentOrderId}
-              </Badge>
-            )}
-            {order.paymentIntent === 'receivable' && (
-              <Badge color="orange" variant="light" size="lg">
-                Receivable
-              </Badge>
-            )}
-          </Group>
-
-          {order.items?.some((i: any) => !i.itemId) && (
-            <Badge color="orange" variant="light" size="lg">
-              Contains freetext items — reconcile before posting
-            </Badge>
-          )}
-
-          <Timeline active={currentIdx} bulletSize={24} lineWidth={2}>
-            {timelineOrder.map((s) => (
-              <Timeline.Item key={s} bullet={STATUS_ICONS[s]} title={statusLabel(s)}>
-                <Text size="xs" c="dimmed">
-                  {s === status ? 'Current status' : s === 'delivered' ? 'Final' : ''}
-                </Text>
-              </Timeline.Item>
-            ))}
-          </Timeline>
-
-          {statusHistory.length > 0 && (
-            <Card withBorder p="sm">
-              <Text fw={600} mb="xs">
-                Status History
-              </Text>
-              <Table striped withTableBorder>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>From</Table.Th>
-                    <Table.Th>To</Table.Th>
-                    <Table.Th>When</Table.Th>
-                    <Table.Th>By</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {statusHistory.map((h: any) => (
-                    <Table.Tr key={h.id}>
-                      <Table.Td>{h.fromStatus ? statusLabel(h.fromStatus) : '—'}</Table.Td>
-                      <Table.Td>
-                        <Badge color={STATUS_COLORS[h.toStatus] ?? 'gray'} size="sm">
-                          {statusLabel(h.toStatus)}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td>{new Date(h.changedAt).toLocaleString()}</Table.Td>
-                      <Table.Td>{h.changedBy ?? '—'}</Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Card>
-          )}
-
-          {order.delivery ? (
-            <Card withBorder p="sm">
-              <Text fw={600} mb="xs">
-                Delivery
-              </Text>
-              <Stack gap={4}>
-                <Text size="sm">
-                  <b>Address:</b> {order.delivery.address}
-                </Text>
-                {order.delivery.city && (
-                  <Text size="sm">
-                    <b>City:</b> {order.delivery.city}
-                  </Text>
-                )}
-                {order.delivery.state && (
-                  <Text size="sm">
-                    <b>State:</b> {order.delivery.state}
-                  </Text>
-                )}
-                {order.delivery.phone && (
-                  <Text size="sm">
-                    <b>Phone:</b> {order.delivery.phone}
-                  </Text>
-                )}
-                {order.delivery.shippingMethod && (
-                  <Text size="sm">
-                    <b>Shipping:</b> {order.delivery.shippingMethod}
-                  </Text>
-                )}
-              </Stack>
-            </Card>
-          ) : null}
-
-          {order.notes && (
-            <Card withBorder p="sm">
-              <Text size="sm">
-                <b>Notes:</b> {order.notes}
-              </Text>
-            </Card>
-          )}
-
-          {order.sale && (
-            <Card withBorder p="sm">
-              <Text fw={600} mb="xs">
-                Linked Sale
-              </Text>
-              <Stack gap={4}>
-                <Text size="sm">
-                  <b>Sale #:</b> {order.sale.saleNumber}
-                </Text>
-                <Text size="sm">
-                  <b>Status:</b>{' '}
-                  <Badge color={order.sale.status === 'posted' ? 'green' : 'yellow'} size="sm">
-                    {order.sale.status}
-                  </Badge>
-                </Text>
-              </Stack>
-            </Card>
-          )}
-
-          {order.items?.length > 0 && (
-            <Card withBorder p="sm">
-              <Text fw={600} mb="xs">
-                Items
-              </Text>
-              <Table striped withTableBorder>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>#</Table.Th>
-                    <Table.Th>Item</Table.Th>
-                    <Table.Th>Qty</Table.Th>
-                    <Table.Th>Price</Table.Th>
-                    <Table.Th>Total</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {order.items.map((l: any, i: number) => (
-                    <Table.Tr key={l.id}>
-                      <Table.Td>{i + 1}</Table.Td>
-                      <Table.Td>
-                        {[l.freetextName, l.genericItemCode, l.itemId].filter(Boolean).join(' · ')}
-                      </Table.Td>
-                      <Table.Td>{l.quantity}</Table.Td>
-                      <Table.Td>{(+l.unitPrice).toLocaleString()}</Table.Td>
-                      <Table.Td>{(+l.unitPrice * +l.quantity).toLocaleString()}</Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Card>
-          )}
-
-          {allowed.length > 0 && (
-            <Group>
-              <Select
-                label="Update Status"
-                placeholder="Select status"
-                value={selectedStatus}
-                onChange={(v) => {
-                  if (!v) {
-                    return;
-                  }
-                  // Parents with open unreconciled children get the cascade prompt.
-                  if (
-                    v === 'cancelled' &&
-                    (order.childOrders ?? []).some(
-                      (c: any) =>
-                        (c.orderStatus === 'pending' || c.orderStatus === 'confirmed') &&
-                        (c.items ?? []).some((i: any) => !i.itemId)
-                    )
-                  ) {
-                    setSelectedStatus(null);
-                    onCascadeCancelPrompt(order);
-                    return;
-                  }
-                  setSelectedStatus(v);
-                  statusUpdateMutation.mutate(v);
-                }}
-                data={allowed.map((s) => ({ value: s, label: statusLabel(s) }))}
-                style={{ width: 220 }}
-              />
-            </Group>
-          )}
-        </Stack>
-      )}
     </Modal>
   );
 }
