@@ -52,7 +52,10 @@ export function DebouncedTextInput({
         }
         props.onBlur?.(event);
       }}
-      onChange={(e) => setLocalValue(e.currentTarget.value)}
+      onChange={(e) => {
+        setLocalValue(e.currentTarget.value);
+        props.onChange?.(e.currentTarget.value);
+      }}
     />
   );
 }
