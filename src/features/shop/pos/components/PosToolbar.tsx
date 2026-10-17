@@ -9,7 +9,7 @@ import { CustomerQuickAddModal } from './CustomerQuickAddModal';
 
 interface Props {
   session: SaleSession;
-  onCustomerChange: (customerId: string, customerName: string) => void;
+  onCustomerChange: (customerId: string, customerName: string, customerPhone?: string) => void;
   onPriceListChange: (priceListId: string, priceListName: string) => void;
   onPricingModeChange: (mode: 'retail' | 'wholesale') => void;
   onReset: () => void;
@@ -51,6 +51,16 @@ export function PosToolbar({
     label: c.name,
   }));
 
+  // Keep the persisted toolbar selection visible even when the current search
+  // does not return it (e.g. on reload), so the customer input is never blank
+  // while a customer is actually attached to the session.
+  if (session.customerId && !customerData.some((c) => c.value === session.customerId)) {
+    customerData.unshift({
+      value: session.customerId,
+      label: session.customerName || session.customer?.name || session.customerId,
+    });
+  }
+
   const priceListData = (Array.isArray(priceLists) ? priceLists : []).map((p: any) => ({
     value: p.id,
     label: p.name,
@@ -88,9 +98,17 @@ export function PosToolbar({
           data={customerData}
           value={session.customerId || null}
           onChange={(value, option) => {
-            if (value) {
-              onCustomerChange(value, option.label);
+            if (!value) {
+              return;
             }
+            const picked = (Array.isArray(customers) ? customers : []).find(
+              (c: any) => c.id === value
+            );
+            onCustomerChange(
+              value,
+              picked?.name ?? option?.label ?? value,
+              picked?.phone as string | undefined
+            );
           }}
           onSearchChange={setCustomerSearch}
           searchable

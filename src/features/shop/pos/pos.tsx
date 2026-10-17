@@ -168,8 +168,12 @@ export default function PosSalesPage() {
     return null;
   }
 
-  function handleCustomerChange(customerId: string, customerName: string) {
-    setCustomer(activeSession.id, { id: customerId, name: customerName } as Customer);
+  function handleCustomerChange(customerId: string, customerName: string, customerPhone?: string) {
+    setCustomer(activeSession.id, {
+      id: customerId,
+      name: customerName,
+      phone: customerPhone,
+    } as Customer);
   }
 
   function handlePriceListChange(priceListId: string, priceListName: string) {

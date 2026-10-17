@@ -66,8 +66,8 @@ async function completeSaleWithPriceList(priceListId?: string) {
   );
 
   const methodInput = screen.getByTestId('pos-payment-method');
-  fireEvent.click(methodInput);
-  fireEvent.click(await screen.findByText('Cash'));
+  // Cash is the default payment method — no manual selection required.
+  await waitFor(() => expect((methodInput as HTMLInputElement).value).toBe('Cash'));
 
   const completeBtn = screen.getByTestId('pos-complete-sale-btn');
   await waitFor(() => expect(completeBtn).not.toBeDisabled());

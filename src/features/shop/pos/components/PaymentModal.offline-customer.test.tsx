@@ -85,8 +85,8 @@ async function openModalAndTypeCustomer() {
   );
 
   const methodInput = screen.getByTestId('pos-payment-method');
-  fireEvent.click(methodInput);
-  fireEvent.click(await screen.findByText('Cash'));
+  // Cash is the default payment method — no manual selection required.
+  await waitFor(() => expect((methodInput as HTMLInputElement).value).toBe('Cash'));
 
   // The customer field is a select now (rxsoft-qa#806); typing into it is how a
   // walk-in name is captured, which must still create the customer on pay.
