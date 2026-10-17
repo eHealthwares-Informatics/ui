@@ -470,46 +470,42 @@ function RenderFieldComponent({
   }
 
   return (
-    <LabelField
-      label={inTable ? '' : field.label}
-      required={!inTable && field.required}
-      data-testid={`field-${field.name}`}
-    >
-      <Group align="flex-end" gap={4} wrap="nowrap">
-        <DebouncedTextInput
-          data-testid={`field-${field.name}`}
-          value={(fieldValue as string) ?? ''}
-          readOnly={disabled}
-          onChange={(v) => handleChange(v)}
-          onBlur={onBlur}
-          onFocus={onFocus}
-          placeholder={field.placeholder}
-          type={field.type}
-          error={fieldError}
+    <>
+      <DebouncedTextInput
+        label={inTable ? '' : field.label}
+        required={!inTable && field.required}
+        data-testid={`field-${field.name}`}
+        value={(fieldValue as string) ?? ''}
+        readOnly={disabled}
+        onChange={(v) => handleChange(v)}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        placeholder={field.placeholder}
+        type={field.type}
+        error={fieldError}
+        disabled={disabled}
+        size={inTable ? 'xs' : undefined}
+        styles={
+          inTable
+            ? {
+                input: {
+                  borderBottom: '1px solid var(--mantine-color-gray-3)',
+                  borderRadius: 0, // Optional: neat flat underline look
+                },
+              }
+            : undefined
+        }
+        style={{ flex: 1 }}
+        w={inTable ? 100 : undefined}
+      />
+      {field.generateCode && !inTable ? (
+        <GenerateCodeLink
+          field={field}
+          formState={formState}
+          onGenerated={handleChange}
           disabled={disabled}
-          size={inTable ? 'xs' : undefined}
-          styles={
-            inTable
-              ? {
-                  input: {
-                    borderBottom: '1px solid var(--mantine-color-gray-3)',
-                    borderRadius: 0, // Optional: neat flat underline look
-                  },
-                }
-              : undefined
-          }
-          style={{ flex: 1 }}
-          w={inTable ? 100 : undefined}
         />
-        {field.generateCode && !inTable ? (
-          <GenerateCodeLink
-            field={field}
-            formState={formState}
-            onGenerated={handleChange}
-            disabled={disabled}
-          />
-        ) : null}
-      </Group>
+      ) : null}
       <span
         data-testid={`field-error-${field.name}`}
         role="alert"
@@ -517,7 +513,7 @@ function RenderFieldComponent({
       >
         {fieldError}
       </span>
-    </LabelField>
+    </>
   );
 }
 

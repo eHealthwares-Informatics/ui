@@ -53,7 +53,7 @@ interface EmrOrgState {
   provisionedAt: string;
 }
 
-//  Global Setup / Teardown 
+//  Global Setup / Teardown
 
 let provisionedOrg: EmrOrgState | null = null;
 let adminToken: string | null = null;
@@ -107,9 +107,8 @@ async function probeIdentityStable(attempts = 3, gapMs = 3_000): Promise<boolean
 }
 
 test.beforeAll(async ({}, testInfo) => {
-
   // Playwright-template provisioning (demo patients/visits/admissions + GL)
-  // takes ~55s idle but 190s+ under suite load (Vite/Chromium competing) 
+  // takes ~55s idle but 190s+ under suite load (Vite/Chromium competing)
   // extend ONLY this hook's budget; per-test timeouts stay at config value.
   testInfo.setTimeout(600_000);
   // Probe required services (retried  see probeStable)
@@ -197,9 +196,7 @@ test.afterAll(async () => {
   }
 });
 
-//  Helpers 
-
-
+//  Helpers
 
 async function signInAsAdmin(page: any) {
   if (!provisionedOrg) throw new Error('Org not provisioned  skipping test');
@@ -363,7 +360,6 @@ async function createFormDefinitionViaApi(
       schemaJson: {
         fields: [{ key: 'note', label: 'Note', type: 'text', required: false }],
       },
-
     }),
   });
   if (!res.ok) throw new Error(`create form definition failed: ${res.status} ${await res.text()}`);
@@ -438,7 +434,7 @@ async function submitDocumentationViaApi(
   return res.json();
 }
 
-//  Test Suite 
+//  Test Suite
 
 test.describe.configure({ retries: 1 });
 
@@ -846,7 +842,10 @@ test.describe('EMR Real-Backend  Bespoke Flow: Clinical Requests (Lab/Rad/Pharma
   });
 
   test('UC-37: Request status timeline visible', async ({ page }) => {
-    test.skip(!provisionedOrg || !adminToken || !testPatient || !testVisit, 'Backend services not available or provisioning failed');
+    test.skip(
+      !provisionedOrg || !adminToken || !testPatient || !testVisit,
+      'Backend services not available or provisioning failed'
+    );
 
     // Self-sufficient: create our own request so we never depend on UC-35
     // having run first in this org.
@@ -857,7 +856,9 @@ test.describe('EMR Real-Backend  Bespoke Flow: Clinical Requests (Lab/Rad/Pharma
     });
 
     await page.goto(FRONTEND_BASE_URL + '/emr/requests/' + myRequest.id);
-    await expect(page.getByRole('heading', { name: /Request REQ-/ })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Request REQ-/ })).toBeVisible({
+      timeout: 15_000,
+    });
 
     await page.getByRole('button', { name: 'Mark In Progress' }).click();
     await expect(page.getByText('Request marked in progress')).toBeVisible({ timeout: 10_000 });
