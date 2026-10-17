@@ -1111,7 +1111,7 @@ test.describe('EMR Real-Backend  Patient Registration & Lookup', () => {
     const mrn = `MRN-${Date.now().toString(36).toUpperCase()}`;
     await page.getByLabel('First name').fill('New');
     await page.getByLabel('Last name').fill('Patient');
-    await page.getByLabel('Phone').fill('0809988776');
+    await page.getByTestId('field-phone').fill('0809988776');
     await page.getByPlaceholder('Select gender').click();
     await page.getByRole('option', { name: 'Female' }).click();
     await page.getByLabel('Date of birth').fill('1995-07-15');
