@@ -5,6 +5,7 @@ import {
   Container,
   Group,
   Loader,
+  Modal,
   Paper,
   Radio,
   Stack,
@@ -44,6 +45,9 @@ export default function PayPage() {
   const [payment, setPayment] = useState<StatusPayment | null>(null);
   // Escape hatch: reveal the chooser again for a failed/abandoned attempt.
   const [forceChoose, setForceChoose] = useState(false);
+  // Spinner while /status is in flight (the page otherwise looks static).
+  const [checking, setChecking] = useState(false);
+  const [confirmRetry, setConfirmRetry] = useState(false);
 
   const { data: link, isLoading } = useQuery({
     queryKey: ['pay-link', token],
@@ -82,6 +86,7 @@ export default function PayPage() {
       };
       savePaySession(token, sessionObj);
       setSession(sessionObj);
+      setForceChoose(false);
       if (res.checkoutUrl) {
         window.location.href = res.checkoutUrl;
       }
@@ -108,6 +113,15 @@ export default function PayPage() {
     }
   }, [token]);
 
+  const handleCheck = useCallback(async () => {
+    setChecking(true);
+    try {
+      await refreshStatus();
+    } finally {
+      setChecking(false);
+    }
+  }, [refreshStatus]);
+
   // Always ask the server on load — a provider payment may already exist even
   // when this browser has no local session (different device / cleared storage).
   useEffect(() => {
@@ -121,7 +135,7 @@ export default function PayPage() {
   // local session recorded the initialize() reference. Either way, don't offer
   // the provider list again.
   const inProgress = !confirmed && !forceChoose && (hasPayment || !!session);
-  const showProviderChooser = !confirmed && !forceChoose && !inProgress;
+  const showProviderChooser = !confirmed && !inProgress;
   const providerName = session?.provider ?? payment?.providerType ?? '';
   const reference = session?.reference ?? payment?.reference ?? '';
   const paymentStatus = payment?.status ?? session?.status ?? 'pending';
@@ -341,22 +355,28 @@ export default function PayPage() {
                       <Button
                         variant="light"
                         radius="xl"
-                        leftSection={<RefreshCw size={16} />}
-                        onClick={refreshStatus}
+                        leftSection={checking ? undefined : <RefreshCw size={16} />}
+                        loading={checking}
+                        onClick={handleCheck}
                         fullWidth
+                        data-testid="pay-check-status"
                       >
-                        Check payment status
+                        {checking ? 'Checking payment status…' : 'Check payment status'}
                       </Button>
+                      {checking && (
+                        <Group gap={6} justify="center">
+                          <Loader size={14} />
+                          <Text size="xs" c={muted}>
+                            Contacting the payment provider…
+                          </Text>
+                        </Group>
+                      )}
                       <Button
                         variant="subtle"
                         size="xs"
                         c={muted}
-                        onClick={() => {
-                          clearPaySession(token);
-                          setSession(null);
-                          setLiveStatus(null);
-                          setForceChoose(true);
-                        }}
+                        data-testid="pay-retry"
+                        onClick={() => setConfirmRetry(true)}
                       >
                         Use a different payment method
                       </Button>
@@ -368,6 +388,44 @@ export default function PayPage() {
           </Stack>
         </Container>
       </Box>
+
+      <Modal
+        opened={confirmRetry}
+        onClose={() => setConfirmRetry(false)}
+        title="Retry payment?"
+        centered
+        data-testid="pay-retry-modal"
+      >
+        <Stack>
+          <Text size="sm">
+            Are you sure you want to retry your payment? A new payment will be created and you can
+            choose a provider again.
+          </Text>
+          <Group justify="flex-end">
+            <Button
+              variant="light"
+              onClick={() => setConfirmRetry(false)}
+              data-testid="pay-retry-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              color="green"
+              data-testid="pay-retry-confirm"
+              onClick={() => {
+                clearPaySession(token);
+                setSession(null);
+                setLiveStatus(null);
+                setPayment(null);
+                setForceChoose(true);
+                setConfirmRetry(false);
+              }}
+            >
+              Yes, retry payment
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </WebsiteLayout>
   );
 }
