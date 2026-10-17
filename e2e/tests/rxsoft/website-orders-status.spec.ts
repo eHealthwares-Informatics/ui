@@ -5,18 +5,17 @@ import { apiFetch, readAccessToken } from '../../utils/api';
  * RxSoft Website Orders — Advance / cancel a website order
  * UC-RX-WEBSITE-ORDERS-STATUS-01 (rxsoft-qa#741)
  *
- *   TC-RX-WEBSITE-ORDERS-STATUS-01 — order detail opens (line items + status)
+ *   TC-RX-WEBSITE-ORDERS-STATUS-01 — order detail opens (a sub-page with a
+ *     breadcrumb back to the list, line NAMES and a left→right progress)
  *   TC-RX-WEBSITE-ORDERS-STATUS-02 — advance status via the UI (chip updates, API confirms)
- *   TC-RX-WEBSITE-ORDERS-STATUS-03 — cancel via the UI (status → Cancelled, history records it)
+ *   TC-RX-WEBSITE-ORDERS-STATUS-03 — cancel via the UI with a recorded REASON
  *
  * The API-only transition matrix lives in website-orders-bespoke.spec.ts. This
  * spec drives the same transitions THROUGH the /rxsoft/website-orders UI.
- *
- * Honest gap (TC-03): the cancel transition is recorded (from→to, changedBy) but
- * neither the API DTO nor the UI capture a free-text cancel REASON — see #741.
  */
 
 const TS = Date.now().toString(36);
+const CANCEL_REASON = `E2E cancel reason ${TS}`;
 
 async function apiCreate<T>(
   page: import('@playwright/test').Page,
@@ -52,17 +51,18 @@ async function createOrder(
   return { id: created.id, orderNumber };
 }
 
-/** Search the list for an order and return its row. */
-async function findOrderRow(
+/** Search the list for an order, open its sub-page, and return when it renders. */
+async function openOrderDetail(
   page: import('@playwright/test').Page,
-  orderNumber: string
-): Promise<import('@playwright/test').Locator> {
+  order: { id: string; orderNumber: string }
+): Promise<void> {
   const search = page.getByTestId('header-search').first();
   await expect(search).toBeVisible();
-  await search.fill(orderNumber);
-  const row = page.getByTestId('data-table-row').filter({ hasText: orderNumber }).first();
+  await search.fill(order.orderNumber);
+  const row = page.getByTestId('data-table-row').filter({ hasText: order.orderNumber }).first();
   await expect(row).toBeVisible({ timeout: 20_000 });
-  return row;
+  await row.getByTestId('row-view-order').click();
+  await expect(page).toHaveURL(new RegExp(`/rxsoft/website-orders/${order.id}`));
 }
 
 test.describe
@@ -74,6 +74,7 @@ test.describe
   let uomCategoryId = '';
   let uomId = '';
   let itemId = '';
+  let itemName = '';
   const createdOrderIds: string[] = [];
 
   test.afterAll(async ({ request }) => {
@@ -118,8 +119,9 @@ test.describe
     categoryId = cats.data?.[0]?.id ?? '';
     expect(categoryId).toBeTruthy();
 
+    itemName = `WebOrdStatus Item ${TS}`;
     const item = await apiCreate<{ id: string }>(page, '/items', {
-      name: `WebOrdStatus Item ${TS}`,
+      name: itemName,
       categoryId,
       baseUomId: uomId,
       purchaseUomId: uomId,
@@ -129,7 +131,7 @@ test.describe
     itemId = item.id;
   });
 
-  test('TC-RX-WEBSITE-ORDERS-STATUS-01: order detail opens with items and status', async ({
+  test('TC-RX-WEBSITE-ORDERS-STATUS-01: order detail sub-page opens with breadcrumb, progress and item names', async ({
     page,
   }) => {
     const order = await createOrder(page, itemId);
@@ -140,20 +142,21 @@ test.describe
       'Website Orders'
     );
 
-    const row = await findOrderRow(page, order.orderNumber);
-    await expect(row).toContainText('Pending');
+    await openOrderDetail(page, order);
 
-    await row.getByTestId('row-view-order').click();
+    // Breadcrumb back to the list.
+    await expect(page.getByRole('link', { name: 'Website Orders' })).toBeVisible();
+    await expect(page.getByTestId('page-title')).toContainText(order.orderNumber);
+    await expect(page.getByTestId('order-detail-status')).toHaveText('Pending');
 
-    // The detail modal content (Mantine's root wrapper reports hidden, so assert
-    // on the inner elements): status badge + line items.
-    await expect(page.getByTestId('order-detail-status')).toHaveText('Pending', {
-      timeout: 20_000,
-    });
+    // Left→right fulfilment progress.
+    await expect(page.getByTestId('order-progress')).toBeVisible();
 
+    // Line items show the item NAME, never the raw id.
     const items = page.getByTestId('order-detail-items');
     await expect(items).toBeVisible();
-    await expect(items).toContainText(itemId);
+    await expect(items).toContainText(itemName);
+    await expect(items).not.toContainText(itemId);
   });
 
   test('TC-RX-WEBSITE-ORDERS-STATUS-02: advance status via the UI updates chip + API', async ({
@@ -163,8 +166,7 @@ test.describe
     createdOrderIds.push(order.id);
 
     await page.goto('/rxsoft/website-orders', { timeout: 60_000 });
-    const row = await findOrderRow(page, order.orderNumber);
-    await row.getByTestId('row-view-order').click();
+    await openOrderDetail(page, order);
 
     await expect(page.getByTestId('order-detail-status')).toHaveText('Pending');
 
@@ -176,7 +178,6 @@ test.describe
       timeout: 20_000,
     });
 
-    // API confirms the transition.
     const verified = await apiFetch<{ orderStatus: string }>(
       page,
       `/website/admin/orders/${order.id}`
@@ -184,37 +185,45 @@ test.describe
     expect(verified.orderStatus).toBe('confirmed');
   });
 
-  test('TC-RX-WEBSITE-ORDERS-STATUS-03: cancel via the UI sets Cancelled and records history', async ({
-    page,
-  }) => {
+  test('TC-RX-WEBSITE-ORDERS-STATUS-03: cancel via the UI records the reason', async ({ page }) => {
     const order = await createOrder(page, itemId);
     createdOrderIds.push(order.id);
 
     await page.goto('/rxsoft/website-orders', { timeout: 60_000 });
-    const row = await findOrderRow(page, order.orderNumber);
-    await row.getByTestId('row-view-order').click();
+    await openOrderDetail(page, order);
 
     await page.getByTestId('order-detail-status-select').click();
     await page.getByRole('option', { name: 'Cancelled' }).click();
+
+    // The reason prompt (was previously not captured at all).
+    const reasonInput = page.getByTestId('cancel-reason-input');
+    await expect(reasonInput).toBeVisible({ timeout: 15_000 });
+    await reasonInput.fill(CANCEL_REASON);
+    await page.getByTestId('cancel-reason-confirm').click();
 
     await expect(page.getByTestId('order-detail-status')).toHaveText('Cancelled', {
       timeout: 20_000,
     });
 
-    // API confirms cancelled.
+    // The reason is surfaced in the status history table.
+    await expect(
+      page.getByTestId('status-history-reason').filter({ hasText: CANCEL_REASON }).first()
+    ).toBeVisible({ timeout: 15_000 });
+
+    // API confirms cancelled AND that the reason was persisted.
     const verified = await apiFetch<{ orderStatus: string }>(
       page,
       `/website/admin/orders/${order.id}`
     );
     expect(verified.orderStatus).toBe('cancelled');
 
-    // The status transition is recorded in history (the "reason" is the recorded
-    // from→to change; the API captures no free-text reason — see #741).
-    const history = await apiFetch<Array<{ fromStatus: string; toStatus: string }>>(
+    const history = await apiFetch<Array<{ fromStatus: string; toStatus: string; reason: string }>>(
       page,
       `/website/admin/orders/${order.id}/status-history`
     );
     const entries = Array.isArray(history) ? history : [];
-    expect(entries.some((h) => h.toStatus === 'cancelled')).toBe(true);
+    const cancelEntry = entries.find((h) => h.toStatus === 'cancelled');
+    expect(cancelEntry).toBeTruthy();
+    expect(cancelEntry?.reason).toBe(CANCEL_REASON);
   });
 });

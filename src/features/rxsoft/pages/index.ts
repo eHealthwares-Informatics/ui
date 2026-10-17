@@ -48,6 +48,7 @@ export * from './uoms';
 export * from './users';
 export * from './user-config';
 export * from './website-orders';
+export { RxWebsiteOrderDetailPage } from './website-orders/detail';
 export * from './website-prescriptions';
 export * from './website-consultations';
 export * from './website-delivery-areas';
