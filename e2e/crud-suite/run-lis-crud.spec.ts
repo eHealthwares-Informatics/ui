@@ -255,11 +255,24 @@ for (const resource of lisResources) {
       const searchKey = updatedToken ?? createdToken;
       await crud.searchInput.fill('');
       await crud.page.waitForTimeout(500);
+      // The search debounce fires a list GET after the last keystroke. The
+      // row is often already visible from the PREVIOUS list response, so
+      // clicking row-delete before the token-search GET lands opens the
+      // dialog into a re-render that remounts ActionCell and resets
+      // isDeleteOpen — the dialog silently closes ~200ms later (proven by
+      // probe timeline 2026-10-13). Wait for the filtered GET to land first.
+      const tokenSuffix = searchKey.split('-').pop() ?? searchKey;
+      const searchSettled = page
+        .waitForResponse(
+          (r) => r.url().includes(resource.endpoint) && r.url().includes(tokenSuffix),
+          { timeout: 10_000 }
+        )
+        .catch(() => null);
       await crud.search(searchKey);
+      await searchSettled;
       await expect(crud.getRow(searchKey)).toBeVisible({ timeout: 15_000 });
       await expect(crud.rowAction(searchKey, 'delete')).toBeVisible();
-      await crud.rowAction(searchKey, 'delete').click();
-      await crud.confirmDelete();
+      await crud.deleteRow(searchKey);
       await expect(crud.getRow(searchKey)).toBeHidden();
     });
 

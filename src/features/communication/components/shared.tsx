@@ -2,6 +2,7 @@ import { Button, Modal, Text, Group, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus, X } from 'lucide-react';
+import { cloneElement, isValidElement } from 'react';
 import { getArrayPayload } from '@/features/components/utils';
 import { Option } from '@/features/rxsoft/types';
 import { communicationApi } from '@/lib/communication-api';
@@ -128,11 +129,9 @@ export function LabelField({
 }) {
   return (
     <Stack gap={4}>
-      <Text size="sm" fw={500}>
-        {label}
-        {required && <span className="ml-1 text-red-500">*</span>}
-      </Text>
-      {children}
+      {isValidElement(children)
+        ? cloneElement(children as React.ReactElement, { label, required })
+        : children}
     </Stack>
   );
 }

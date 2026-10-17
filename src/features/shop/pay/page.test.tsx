@@ -1,4 +1,4 @@
-import { render, screen } from '@test-utils';
+import { fireEvent, render, screen } from '@test-utils';
 import { vi } from 'vitest';
 import PayPage from './page';
 
@@ -112,5 +112,26 @@ describe('PayPage — post-generation view', () => {
     expect(await screen.findByText('Payment in progress')).toBeInTheDocument();
     expect(screen.queryByText('Choose payment method')).not.toBeInTheDocument();
     expect(screen.getByText('LOCAL-REF')).toBeInTheDocument();
+  });
+
+  it('asks for confirmation, then shows the provider list again on retry', async () => {
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus({ status: 'pending', reference: 'SRV-REF', providerType: 'paystack' });
+
+    render(<PayPage />);
+    await screen.findByText('Payment in progress');
+
+    fireEvent.click(screen.getByTestId('pay-retry'));
+
+    // Confirmation prompt before re-choosing a provider.
+    expect(
+      await screen.findByText(/Are you sure you want to retry your payment/i)
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Choose payment method')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('pay-retry-confirm'));
+
+    expect(await screen.findByText('Choose payment method')).toBeInTheDocument();
+    expect(screen.getByText(/Paystack/)).toBeInTheDocument();
   });
 });
