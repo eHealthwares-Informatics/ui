@@ -864,7 +864,7 @@ test.describe('EMR Real-Backend  Bespoke Flow: Clinical Requests (Lab/Rad/Pharma
     await expect(page.getByText('Request marked in progress')).toBeVisible({ timeout: 10_000 });
 
     await expect(page.getByText(/Created · Requested/i)).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText(/Requested  In Progress/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Requested → In Progress/i)).toBeVisible({ timeout: 10_000 });
   });
   test('UC-40: Re-sync request to external system', async ({ page }) => {
     test.skip(!testRequest, 'No request fixture created');
