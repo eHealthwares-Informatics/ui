@@ -549,6 +549,10 @@ export function ProductEntryTable({
       name: item.displayName || item.name || '',
       saleUomId: item.saleUomId ?? null,
       imageUrl: item.smallImageUrl || item.imageUrl || '',
+      // Carry the organisation visibility so the activation gate in handleAdd
+      // can fire (rxsoft-qa#806) — without it the item lands in the cart and
+      // the sale fails at the till with "Item(s) not active".
+      visibility: item.visibility,
     };
     setSelected(prod);
     setSelectedProductId(item.id);
