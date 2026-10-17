@@ -1114,7 +1114,7 @@ test.describe('EMR Real-Backend  Patient Registration & Lookup', () => {
     await page.getByTestId('field-phone').fill('0809988776');
     await page.getByTestId('field-gender').click();
     await page.getByRole('option', { name: 'Female' }).click();
-    await page.getByLabel('Date of birth').fill('1995-07-15');
+    await page.getByTestId('field-dateOfBirth').fill('1995-07-15');
 
     await page.getByRole('button', { name: 'Create' }).last().click();
     await expect(page.getByText('Patient registered successfully')).toBeVisible({
