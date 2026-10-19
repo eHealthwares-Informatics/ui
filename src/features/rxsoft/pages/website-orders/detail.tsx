@@ -1,8 +1,8 @@
-import { Badge, Button, Card, Group, Select, Stack, Table, Text } from '@mantine/core';
+import { Badge, Button, Card, Group, Select, Stack, Table, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { RxPage } from '../../../components/page/rx-page';
@@ -76,6 +76,51 @@ export function RxWebsiteOrderDetailPage({ orderId }: { orderId: string }) {
       setSelectedStatus(null);
       setReasonOpen(false);
       setPendingReason('');
+      invalidate();
+    },
+    onError: (err: any) => {
+      notifications.show({ message: getApiErrorMessage(err), color: 'red' });
+    },
+  });
+
+  // Customer (Party) contact details. Guest orders have no linked customer —
+  // saving creates one and links it to the order (server keeps the delivery
+  // phone in step so notifications/payment links use the corrected number).
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+
+  const customerName0 = order?.customer?.name ?? '';
+  const customerPhone0 = order?.customer?.phone ?? '';
+  const customerEmail0 = order?.customer?.email ?? '';
+
+  useEffect(() => {
+    setCustomerName(customerName0);
+    setCustomerPhone(customerPhone0);
+    setCustomerEmail(customerEmail0);
+  }, [order?.customer?.id, customerName0, customerPhone0, customerEmail0]);
+
+  const customerDirty =
+    customerName.trim() !== customerName0.trim() ||
+    customerPhone.trim() !== customerPhone0.trim() ||
+    customerEmail.trim() !== customerEmail0.trim();
+
+  const customerSaveMutation = useMutation({
+    mutationFn: async () => {
+      const patch: Record<string, string | null> = {};
+      const name = customerName.trim();
+      const phone = customerPhone.trim();
+      const email = customerEmail.trim();
+      if (name !== customerName0.trim()) patch.name = name;
+      if (phone !== customerPhone0.trim()) patch.phone = phone || null;
+      if (email !== customerEmail0.trim()) patch.email = email || null;
+      await rxsoftApi.patch(`/website/admin/orders/${orderId}/customer`, patch);
+    },
+    onSuccess: () => {
+      notifications.show({
+        message: order?.customer ? 'Customer updated.' : 'Customer created and linked.',
+        color: 'green',
+      });
       invalidate();
     },
     onError: (err: any) => {
@@ -248,6 +293,63 @@ export function RxWebsiteOrderDetailPage({ orderId }: { orderId: string }) {
             </Table>
           </Card>
         )}
+
+        <Card withBorder p="sm" data-testid="order-detail-customer">
+          <Group justify="space-between" mb="xs">
+            <Text fw={600}>Customer</Text>
+            {order.customer ? (
+              <Badge variant="light" color={order.customer.userId ? 'green' : 'gray'} size="sm">
+                {order.customer.userId ? 'Registered' : 'Customer record'}
+              </Badge>
+            ) : (
+              <Badge variant="light" color="orange" size="sm">
+                Guest checkout
+              </Badge>
+            )}
+          </Group>
+          <Stack gap="xs">
+            {!order.customer && (
+              <Text size="xs" c="dimmed">
+                No customer is linked to this order. Saving creates a customer from the details
+                below and links it to the order.
+              </Text>
+            )}
+            <TextInput
+              label="Name"
+              size="xs"
+              placeholder="Customer name"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.currentTarget.value)}
+            />
+            <TextInput
+              label="Phone"
+              size="xs"
+              placeholder={
+                order.delivery?.phone ? `Delivery: ${order.delivery.phone}` : 'Add a phone number'
+              }
+              value={customerPhone}
+              onChange={(e) => setCustomerPhone(e.currentTarget.value)}
+            />
+            <TextInput
+              label="Email"
+              size="xs"
+              placeholder="Add an email address"
+              value={customerEmail}
+              onChange={(e) => setCustomerEmail(e.currentTarget.value)}
+            />
+            <Group justify="flex-end">
+              <Button
+                size="compact-sm"
+                color="green"
+                loading={customerSaveMutation.isPending}
+                disabled={!customerDirty}
+                onClick={() => customerSaveMutation.mutate()}
+              >
+                {order.customer ? 'Save customer' : 'Create customer'}
+              </Button>
+            </Group>
+          </Stack>
+        </Card>
 
         {order.delivery ? (
           <Card withBorder p="sm">
