@@ -45,4 +45,6 @@ export const paymentsConfig: ModelConfig = {
   description: 'All payment transactions processed through the system.',
   endpoint: '/payments',
   columns,
+  // Same repair console as Payment Transactions (both read /payments).
+  detailPathBuilder: (row: Record<string, unknown>) => `/rxsoft/payment-transactions/${row.id}`,
 };

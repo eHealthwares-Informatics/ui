@@ -261,6 +261,7 @@ import { Route as AuthenticatedRxsoftOrganizationsIndexRouteImport } from './rou
 import { Route as AuthenticatedRxsoftPaymentMethodsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-methods/index'
 import { Route as AuthenticatedRxsoftPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/payment-providers/index'
 import { Route as AuthenticatedRxsoftPaymentTransactionsIndexRouteImport } from './routes/_authenticated/rxsoft/payment-transactions/index'
+import { Route as AuthenticatedRxsoftPaymentTransactionsTransactionIdRouteImport } from './routes/_authenticated/rxsoft/payment-transactions/$transactionId'
 import { Route as AuthenticatedRxsoftPaymentsIndexRouteImport } from './routes/_authenticated/rxsoft/payments/index'
 import { Route as AuthenticatedRxsoftPharmaceuticsIndexRouteImport } from './routes/_authenticated/rxsoft/pharmaceutics/index'
 import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './routes/_authenticated/rxsoft/pos-terminals/index'
@@ -1748,6 +1749,12 @@ const AuthenticatedRxsoftPaymentTransactionsIndexRoute =
     path: '/rxsoft/payment-transactions/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute =
+  AuthenticatedRxsoftPaymentTransactionsTransactionIdRouteImport.update({
+    id: '/rxsoft/payment-transactions/$transactionId',
+    path: '/rxsoft/payment-transactions/$transactionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftPaymentsIndexRoute =
   AuthenticatedRxsoftPaymentsIndexRouteImport.update({
     id: '/rxsoft/payments/',
@@ -2312,6 +2319,7 @@ export interface FileRoutesByFullPath {
   '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
   '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
@@ -2630,6 +2638,7 @@ export interface FileRoutesByTo {
   '/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
   '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
   '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
@@ -2954,6 +2963,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/wards/discharges': typeof AuthenticatedEmrWardsDischargesRoute
   '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
+  '/_authenticated/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
   '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
   '/_authenticated/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
   '/_authenticated/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
@@ -3276,6 +3286,7 @@ export interface FileRouteTypes {
     | '/emr/wards/discharges'
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
+    | '/rxsoft/payment-transactions/$transactionId'
     | '/rxsoft/settings/account'
     | '/rxsoft/settings/appearance'
     | '/rxsoft/settings/display'
@@ -3594,6 +3605,7 @@ export interface FileRouteTypes {
     | '/emr/wards/discharges'
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
+    | '/rxsoft/payment-transactions/$transactionId'
     | '/rxsoft/settings/account'
     | '/rxsoft/settings/appearance'
     | '/rxsoft/settings/display'
@@ -3917,6 +3929,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/wards/discharges'
     | '/_authenticated/lis/orders/dashboard'
     | '/_authenticated/rxsoft/items/create'
+    | '/_authenticated/rxsoft/payment-transactions/$transactionId'
     | '/_authenticated/rxsoft/settings/account'
     | '/_authenticated/rxsoft/settings/appearance'
     | '/_authenticated/rxsoft/settings/display'
@@ -5924,6 +5937,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftPaymentTransactionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/payment-transactions/$transactionId': {
+      id: '/_authenticated/rxsoft/payment-transactions/$transactionId'
+      path: '/rxsoft/payment-transactions/$transactionId'
+      fullPath: '/rxsoft/payment-transactions/$transactionId'
+      preLoaderRoute: typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/payments/': {
       id: '/_authenticated/rxsoft/payments/'
       path: '/rxsoft/payments'
@@ -6594,6 +6614,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrWardsDischargesRoute: typeof AuthenticatedEmrWardsDischargesRoute
   AuthenticatedLisOrdersDashboardRoute: typeof AuthenticatedLisOrdersDashboardRoute
   AuthenticatedRxsoftItemsCreateRoute: typeof AuthenticatedRxsoftItemsCreateRoute
+  AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute: typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
   AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   AuthenticatedRxsoftWebsiteOrdersOrderIdRoute: typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   AuthenticatedCodingConceptDosageFormsIndexRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -6836,6 +6857,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrWardsDischargesRoute: AuthenticatedEmrWardsDischargesRoute,
   AuthenticatedLisOrdersDashboardRoute: AuthenticatedLisOrdersDashboardRoute,
   AuthenticatedRxsoftItemsCreateRoute: AuthenticatedRxsoftItemsCreateRoute,
+  AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute:
+    AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute,
   AuthenticatedRxsoftUomsUomIdRoute:
     AuthenticatedRxsoftUomsUomIdRouteWithChildren,
   AuthenticatedRxsoftWebsiteOrdersOrderIdRoute:

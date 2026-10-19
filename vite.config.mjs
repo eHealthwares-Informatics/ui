@@ -49,6 +49,16 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev'],
+    // Same-origin API calls in dev: the browser hits :5173/api and Vite forwards
+    // to the backend. Lets a tunnelled page (ngrok) work on any device without a
+    // per-developer absolute API URL — see the VITE_RXSOFT_API_URL=/api note in
+    // .env.local.
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
     watch: {
       // Playwright writes its artifacts *while the dev server is running*
       // (`webServer.command: 'yarn dev --host'` shares the vite process with the
