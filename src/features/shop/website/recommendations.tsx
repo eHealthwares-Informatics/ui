@@ -245,6 +245,7 @@ export function FrequentlyBought({ productId: _productId }: { productId?: string
               leftSection={<ShoppingCart size={18} />}
               styles={buttonStyles}
               style={{ background: green }}
+              data-testid="recommendations-add-all-to-cart"
             >
               Add all to cart
             </Button>

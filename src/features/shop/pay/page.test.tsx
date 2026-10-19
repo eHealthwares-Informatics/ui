@@ -37,7 +37,28 @@ vi.mock('@tanstack/react-router', () => ({ useParams: () => ({ token: 'tok' }) }
 
 vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual: any = await importOriginal();
-  return { ...actual, useQuery: () => ({ data: LINK, isLoading: false }) };
+  return {
+    ...actual,
+    useQuery: (opts: any) =>
+      opts?.queryKey?.[0] === 'pay-attempts'
+        ? {
+            data: [
+              {
+                reference: 'PMT-ABC',
+                providerType: 'monnify',
+                status: 'initiated',
+                amount: 5000,
+                amountPaid: 0,
+                currency: 'NGN',
+                createdAt: '2026-10-18T14:31:03.079Z',
+                paidAt: null,
+              },
+            ],
+            isLoading: false,
+          }
+        : { data: LINK, isLoading: false },
+    useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  };
 });
 
 vi.mock('../website/layout', () => ({
@@ -63,6 +84,7 @@ vi.mock('./payApi', () => ({
   clearPaySession: vi.fn(),
   payApi: {
     getLink: vi.fn(async () => LINK),
+    payments: vi.fn(async () => []),
     status: vi.fn(),
     initialize: vi.fn(),
   },
@@ -87,6 +109,18 @@ describe('PayPage — post-generation view', () => {
 
     expect(await screen.findByText('Choose payment method')).toBeInTheDocument();
     expect(screen.getByText(/Paystack/)).toBeInTheDocument();
+  });
+
+  it('lists existing provider payments and their status before another is generated', async () => {
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus(null);
+
+    render(<PayPage />);
+
+    expect(await screen.findByTestId('pay-attempts')).toBeInTheDocument();
+    expect(screen.getByText('PMT-ABC')).toBeInTheDocument();
+    expect(screen.getByText('initiated')).toBeInTheDocument();
+    expect(screen.getByText(/Provider payments already generated/i)).toBeInTheDocument();
   });
 
   it('hides the provider list when a server payment exists, even with no local session', async () => {
