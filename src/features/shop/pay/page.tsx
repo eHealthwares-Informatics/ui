@@ -1,5 +1,6 @@
 import {
   Alert,
+  Badge,
   Box,
   Button,
   Container,
@@ -12,17 +13,30 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { ShieldCheck, Wallet, CheckCircle2, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { WebsiteLayout, green, ink, darkGreen, muted, line, soft } from '../website/layout';
 import { clearPaySession, loadPaySession, payApi, savePaySession, type PaySession } from './payApi';
+const baseURL = import.meta.env.VITE_CALLBACK_URL || 'http://localhost:8080';
 
 function naira(amount: number) {
   return `₦${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+const ATTEMPT_COLORS: Record<string, string> = {
+  success: 'green',
+  settled: 'teal',
+  pending: 'yellow',
+  initiated: 'blue',
+  failed: 'red',
+  cancelled: 'gray',
+  reversed: 'orange',
+  expired: 'gray',
+  unknown: 'gray',
+};
 
 type StatusPayment = {
   status: string;
@@ -34,6 +48,7 @@ type StatusPayment = {
 
 export default function PayPage() {
   const { token } = useParams({ from: '/shop/pay/$token' });
+  const queryClient = useQueryClient();
   const [providerId, setProviderId] = useState<string | null>(null);
   const [session, setSession] = useState<PaySession | null>(loadPaySession(token));
   const [starting, setStarting] = useState(false);
@@ -55,6 +70,14 @@ export default function PayPage() {
     staleTime: 30_000,
   });
 
+  // Every provider payment already generated for this link (server-side, so it
+  // is visible on any device). Shown before the customer starts another one.
+  const { data: attempts = [] } = useQuery({
+    queryKey: ['pay-attempts', token],
+    queryFn: () => payApi.payments(token),
+    staleTime: 15_000,
+  });
+
   const providers = link?.providers ?? [];
   useEffect(() => {
     if (!providerId && providers.length) {
@@ -67,7 +90,7 @@ export default function PayPage() {
     if (typeof window === 'undefined') {
       return undefined;
     }
-    return `${window.location.origin}/shop/pay/${token}`;
+    return `${baseURL || window.location.origin}/shop/pay/${token}`;
   }, [token]);
 
   const startPayment = useCallback(async () => {
@@ -87,6 +110,7 @@ export default function PayPage() {
       savePaySession(token, sessionObj);
       setSession(sessionObj);
       setForceChoose(false);
+      void queryClient.invalidateQueries({ queryKey: ['pay-attempts', token] });
       if (res.checkoutUrl) {
         window.location.href = res.checkoutUrl;
       }
@@ -95,7 +119,7 @@ export default function PayPage() {
     } finally {
       setStarting(false);
     }
-  }, [providerId, token, returnUrl]);
+  }, [providerId, token, returnUrl, queryClient]);
 
   const refreshStatus = useCallback(async () => {
     if (!token) {
@@ -117,10 +141,11 @@ export default function PayPage() {
     setChecking(true);
     try {
       await refreshStatus();
+      void queryClient.invalidateQueries({ queryKey: ['pay-attempts', token] });
     } finally {
       setChecking(false);
     }
-  }, [refreshStatus]);
+  }, [refreshStatus, queryClient, token]);
 
   // Always ask the server on load — a provider payment may already exist even
   // when this browser has no local session (different device / cleared storage).
@@ -284,6 +309,7 @@ export default function PayPage() {
                         onClick={startPayment}
                         fullWidth
                         style={{ backgroundColor: green }}
+                        data-testid="pay-now"
                       >
                         {paid ? 'Pay Now' : 'Start Payment'}
                       </Button>
@@ -383,6 +409,62 @@ export default function PayPage() {
                     </Stack>
                   </Paper>
                 ) : null}
+
+                {attempts.length > 0 && (
+                  <Paper
+                    radius={24}
+                    p="xl"
+                    withBorder
+                    style={{ borderColor: line }}
+                    data-testid="pay-attempts"
+                  >
+                    <Stack gap="md">
+                      <Stack gap={2}>
+                        <Text fw={900} size="lg" className="damorex-heading">
+                          Payment attempts
+                        </Text>
+                        <Text size="xs" c={muted}>
+                          Provider payments already generated for this link. Check their status
+                          before starting another one.
+                        </Text>
+                      </Stack>
+                      <Stack gap="sm">
+                        {attempts.map((attempt) => (
+                          <Group
+                            key={attempt.reference}
+                            justify="space-between"
+                            wrap="nowrap"
+                            gap="sm"
+                          >
+                            <Stack gap={0} style={{ minWidth: 0 }}>
+                              <Text size="sm" fw={700} tt="capitalize">
+                                {attempt.providerType}
+                              </Text>
+                              <Text size="xs" c={muted} truncate>
+                                {attempt.reference}
+                              </Text>
+                              <Text size="xs" c={muted}>
+                                {new Date(attempt.createdAt).toLocaleString()}
+                              </Text>
+                            </Stack>
+                            <Group gap="sm" wrap="nowrap">
+                              <Text size="sm" fw={700}>
+                                {naira(attempt.amount)}
+                              </Text>
+                              <Badge
+                                color={ATTEMPT_COLORS[attempt.status] ?? 'gray'}
+                                variant="light"
+                                tt="capitalize"
+                              >
+                                {attempt.status}
+                              </Badge>
+                            </Group>
+                          </Group>
+                        ))}
+                      </Stack>
+                    </Stack>
+                  </Paper>
+                )}
               </>
             )}
           </Stack>

@@ -53,8 +53,8 @@ test.describe('Console social sign-in (real credentials)', () => {
   });
 
   test('console Facebook button signs in / registers', async ({ page, context }) => {
-    // The console Facebook button lives on the wave-style sign-in form.
-    await page.goto('/sign-in-2');
+    // The console Facebook button lives on the RxSignIn sign-in form.
+    await page.goto('/sign-in');
     await page.waitForLoadState('networkidle');
 
     const fbBtn = page.getByRole('button', { name: /facebook/i }).first();

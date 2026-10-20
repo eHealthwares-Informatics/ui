@@ -73,10 +73,18 @@ export async function googleLogin(): Promise<string | null> {
     throw new Error('Google sign-in is not configured');
   }
   await loadScript('https://accounts.google.com/gsi/client');
+  // The GSI client sets window.accounts asynchronously after the script's
+  // load event fires; poll until it is available (or time out).
   const w = window as unknown as GoogleGlobal;
+  let waited = 0;
+  while (!w.accounts?.oauth2 && waited < 5000) {
+    await new Promise((r) => setTimeout(r, 50));
+    waited += 50;
+  }
   const oauth2 = w.accounts?.oauth2;
   if (!oauth2) {
-    throw new Error('Google sign-in unavailable');
+    console.error('Google sign-in: window.accounts =', w.accounts);
+    throw new Error('Google sign-in unavailable (accounts.oauth2 not found on window after 5s)');
   }
 
   return new Promise<string | null>((resolve, reject) => {

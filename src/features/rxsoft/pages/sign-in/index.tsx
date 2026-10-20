@@ -41,7 +41,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const login = useAuthStore((state) => state.login);
   const loading = useAuthStore((state) => state.loading);
   const error = useAuthStore((state) => state.error);
-  const [socialBusy, setSocialBusy] = useState<null | 'google'>(null);
+  const [socialBusy, setSocialBusy] = useState<null | 'google' | 'facebook'>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
   const [mode, setMode] = useState<'signin' | 'onboard'>('signin');
@@ -64,14 +64,27 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
 
   /** Google popup sign-in: browser gets the token, the identity service
    * verifies it, links (or auto-registers) the account by verified email. */
-  const handleSocial = async () => {
+  const handleSocial = async (provider: 'google' | 'facebook') => {
     if (socialBusy) return;
-    setSocialBusy('google');
+    setSocialBusy(provider);
     try {
-      const { googleLogin } = await import('@/lib/social-auth');
-      const accessToken = await googleLogin();
-      if (!accessToken) return;
-      await useAuthStore.getState().loginWithOAuth('google', { accessToken });
+      if (provider === 'google') {
+        const { googleLogin } = await import('@/lib/social-auth');
+        const accessToken = await googleLogin();
+        if (!accessToken) {
+          console.warn('Google sign-in cancelled by user');
+          return;
+        }
+        await useAuthStore.getState().loginWithOAuth('google', { accessToken });
+      } else {
+        const { facebookLogin } = await import('@/lib/social-auth');
+        const accessToken = await facebookLogin();
+        if (!accessToken) {
+          console.warn('Facebook sign-in cancelled by user');
+          return;
+        }
+        await useAuthStore.getState().loginWithOAuth('facebook', { accessToken });
+      }
       const authState = useAuthStore.getState();
       if (authState.user) {
         const firstModule = authState.modules[0];
@@ -88,7 +101,10 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
         window.location.href = finalUrl;
       }
     } catch (err) {
-      console.error('Google sign-in error:', err);
+      console.error(`${provider} sign-in error:`, err);
+      const msg = err instanceof Error ? err.message : 'Sign-in failed';
+      useAuthStore.setState({ error: msg, loading: false });
+      setTimeout(() => useAuthStore.setState({ error: null }), 5000);
     } finally {
       setSocialBusy(null);
     }
@@ -429,7 +445,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                     color: '#374151',
                     fontWeight: 500,
                   }}
-                  onClick={() => void handleSocial()}
+                  onClick={() => void handleSocial('google')}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
                     <path
@@ -450,6 +466,30 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                     />
                   </svg>
                   Sign in with Google
+                </Button>
+
+                {/* Facebook sign in */}
+                <Button
+                  variant="outline"
+                  fullWidth
+                  size="lg"
+                  disabled={loading || socialBusy !== null}
+                  style={{
+                    height: 48,
+                    borderRadius: '8px',
+                    border: '1px solid #E5E7EB',
+                    color: '#374151',
+                    fontWeight: 500,
+                  }}
+                  onClick={() => void handleSocial('facebook')}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
+                    <path
+                      d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                      fill="#1877F2"
+                    />
+                  </svg>
+                  Continue with Facebook
                 </Button>
 
                 {/* Security notice */}

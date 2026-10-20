@@ -390,6 +390,7 @@ export function RxOrganisationConfigPage() {
                     <Select
                       label={index === 0 ? 'Type' : undefined}
                       data={[
+                        { value: 'sms_proxy', label: 'SMS_PROXY' },
                         { value: 'sms', label: 'SMS' },
                         { value: 'whatsapp', label: 'WhatsApp' },
                         { value: 'email', label: 'Email' },

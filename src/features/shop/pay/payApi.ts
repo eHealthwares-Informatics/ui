@@ -45,9 +45,23 @@ export type PayLinkView = {
   };
 };
 
+export type PayAttempt = {
+  reference: string;
+  providerType: string;
+  status: string;
+  amount: number;
+  amountPaid: number;
+  currency: string;
+  createdAt: string;
+  paidAt?: string | null;
+};
+
 export const payApi = {
   getLink: (token: string) =>
     http.get<PayLinkView>(`/payment-links/public/${token}`).then((r) => r.data),
+
+  payments: (token: string) =>
+    http.get<PayAttempt[]>(`/payment-links/public/${token}/payments`).then((r) => r.data),
 
   initialize: (
     token: string,
