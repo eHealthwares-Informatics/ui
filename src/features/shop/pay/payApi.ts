@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_RXSOFT_API_URL || 'http://localhost:8080/api';
+// Same-origin by default so dev/prod both go through the same /api path
+// (Vite proxy in dev, nginx in prod). An absolute localhost fallback here would
+// break any tunnelled/remote page.
+const baseURL = import.meta.env.VITE_RXSOFT_API_URL || '/api';
 
 const http = axios.create({ baseURL, timeout: 20000 });
 

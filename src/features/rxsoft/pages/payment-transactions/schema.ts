@@ -39,4 +39,6 @@ export const paymentTransactionsConfig: ModelConfig = {
   description: 'Detailed payment transaction records with verify capability.',
   endpoint: '/payments',
   columns,
+  // Row "View" → repair console (resend / status check / complete / retry + logs).
+  detailPathBuilder: (row: Record<string, unknown>) => `/rxsoft/payment-transactions/${row.id}`,
 };

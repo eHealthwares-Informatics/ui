@@ -17,6 +17,7 @@ export * from './orders';
 export * from './payment-methods';
 export * from './payments';
 export * from './payment-transactions';
+export { RxPaymentTransactionDetailPage } from './payment-transactions/detail';
 export * from './payment-providers';
 export * from './organisation-payment-providers';
 export * from './pos-terminals';
