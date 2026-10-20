@@ -195,6 +195,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   defaultState: {
     name: '',
     type: option('WEB'),
+    code: '',
     provider: '',
     externalId: '',
     pseudoParticipantId: null,
@@ -205,6 +206,7 @@ export const channelPageSchema: ModelConfig = withDefaultActions({
   buildFormState: (row) => ({
     name: text(row.name),
     type: option(row.type),
+    code: text(row.code),
     provider: text(row.provider),
     externalId: text(row.externalId),
     pseudoParticipantId: option(row.pseudoParticipantId),

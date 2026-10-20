@@ -29,6 +29,7 @@ import { DataTable } from '../table/table';
 import { getArrayPayload } from '../utils';
 import { buildRxsoftListParams } from './build-list-params';
 import { InfoDrawer } from './info-drawer';
+import { hasServerTotal, paginateRows } from './list-rows';
 import { resolveListTotal } from './list-total';
 import { RxPage } from './rx-page';
 
@@ -331,9 +332,15 @@ export function DataPageShell(props: DataPageShellProps) {
     },
   });
 
-  const rows = transformRows
+  // Some backends (e.g. conversation `/channels`) answer list endpoints with a
+  // bare array and ignore page/limit. When the payload carries no server-side
+  // total, paginate client-side so the page controls and page-size select work
+  // instead of re-rendering every row on each page change.
+  const allRows = transformRows
     ? transformRows(getRowsFromPayload(query.data))
     : getRowsFromPayload(query.data);
+
+  const rows = hasServerTotal(query.data) ? allRows : paginateRows(allRows, pageIndex, pageSize);
 
   // Store LIS order IDs in localStorage for Prev/Next navigation on report page
   useEffect(() => {
@@ -555,7 +562,10 @@ export function DataPageShell(props: DataPageShellProps) {
         pageSize={pageSize}
         totalItems={totalItems}
         onPageChange={setPageIndex}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPageIndex(1);
+        }}
       />
       {renderCreateModal && showModal && !editingRow ? (
         renderCreateModal({
