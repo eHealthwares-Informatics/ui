@@ -70,6 +70,7 @@ export function EmptyProducts({ title, message }: EmptyStateProps) {
           <Button
             radius="xl"
             style={{ background: green }}
+            data-testid="empty-products-browse-catalog"
             onClick={() => navigate({ to: '/shop/shop' })}
           >
             Browse Catalog
@@ -78,6 +79,7 @@ export function EmptyProducts({ title, message }: EmptyStateProps) {
             radius="xl"
             variant="outline"
             color="gray"
+            data-testid="empty-products-search"
             onClick={() => navigate({ to: '/shop/search' })}
           >
             Search
@@ -104,6 +106,7 @@ export function EmptySearchResults({ title, message }: EmptyStateProps) {
             radius="xl"
             variant="outline"
             color="gray"
+            data-testid="empty-search-try-again"
             onClick={() => navigate({ to: '/shop/search' })}
           >
             Try Again
@@ -111,6 +114,7 @@ export function EmptySearchResults({ title, message }: EmptyStateProps) {
           <Button
             radius="xl"
             style={{ background: green }}
+            data-testid="empty-search-browse-categories"
             onClick={() => navigate({ to: '/shop/shop' })}
           >
             Browse Categories
@@ -135,6 +139,7 @@ export function EmptyOrders({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-orders-start-shopping"
           onClick={() => navigate({ to: '/shop/shop' })}
         >
           Start Shopping
@@ -158,6 +163,7 @@ export function EmptyPrescriptions({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-prescriptions-upload"
           onClick={() => navigate({ to: '/shop/upload-prescription' })}
         >
           Upload Prescription
@@ -180,6 +186,7 @@ export function EmptyCart({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-cart-browse-medicines"
           onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse Medicines
@@ -203,6 +210,7 @@ export function EmptySavedMedicines({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-saved-browse-save"
           onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse & Save
@@ -226,6 +234,7 @@ export function EmptyConsultations({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-consultations-book"
           onClick={() => navigate({ to: '/shop/consult-pharmacist' })}
         >
           Book a Consultation
@@ -250,6 +259,7 @@ export function EmptyRewards({ title, message }: EmptyStateProps) {
           radius="xl"
           variant="outline"
           color="green"
+          data-testid="empty-rewards-learn"
           onClick={() => navigate({ to: '/shop/shop' })}
         >
           Learn About Rewards
@@ -274,6 +284,7 @@ export function EmptyBlog({ title, message }: EmptyStateProps) {
           radius="xl"
           variant="outline"
           color="gray"
+          data-testid="empty-blog-check-back"
           onClick={() => navigate({ to: '/shop/blog' })}
         >
           Check Back Later
@@ -296,6 +307,7 @@ export function EmptyCategories({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-categories-browse-all"
           onClick={() => navigate({ to: '/shop/shop' })}
         >
           Browse All
@@ -319,6 +331,7 @@ export function EmptyHealthConcerns({ title, message }: EmptyStateProps) {
         <Button
           radius="xl"
           style={{ background: green }}
+          data-testid="empty-health-concerns-browse-all"
           onClick={() => navigate({ to: '/shop/health-concerns' })}
         >
           Browse All

@@ -255,6 +255,7 @@ export function OutlineButton({
       leftSection={leftSection}
       styles={buttonStyles}
       onClick={onClick}
+      data-testid="website-category-chip"
       style={{
         borderColor: '#B9D9C6',
         color: darkGreen,
@@ -390,6 +391,7 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 leftSection={<ShoppingCart size={16} />}
                 styles={buttonStyles}
                 aria-label="Add to cart"
+                data-testid={`add-to-cart-${product.id}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   addToCart();
@@ -404,6 +406,7 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 color="green"
                 p={8}
                 aria-label="View product"
+                data-testid={`view-product-${product.id}`}
                 styles={buttonStyles}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -439,6 +442,7 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 color="green"
                 p={8}
                 aria-label="Order via chat"
+                data-testid={`order-via-chat-${product.id}`}
                 styles={buttonStyles}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -465,6 +469,7 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
                 color="blue"
                 p={8}
                 aria-label="Chat with a pharmacist"
+                data-testid={`chat-pharmacist-${product.id}`}
                 styles={buttonStyles}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -642,6 +647,7 @@ export function PrescriptionUploadSection() {
                   leftSection={<FileUp size={18} />}
                   w="fit-content"
                   styles={buttonStyles}
+                  data-testid="upload-prescription-cta"
                   onClick={() => navigate({ to: '/shop/upload-prescription' })}
                 >
                   Upload Prescription
@@ -843,6 +849,7 @@ export function NewsletterSection() {
                 size="md"
                 leftSection={<Smartphone size={18} />}
                 styles={buttonStyles}
+                data-testid="newsletter-subscribe"
                 style={{ background: green, alignSelf: 'flex-start' }}
               >
                 Subscribe
