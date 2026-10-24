@@ -311,7 +311,7 @@ export function WebsiteHeader() {
                         size="sm"
                         leftSection={<MenuIcon size={16} style={{ color: menu.color }} />}
                         rightSection={<ChevronDown size={14} />}
-                        data-testid={`website-menu-${menu.key}`}
+                        data-testid={`website-menu-${menu.label.toLowerCase().replace(/\s+/g, '-')}`}
                         style={{
                           transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
                         }}
