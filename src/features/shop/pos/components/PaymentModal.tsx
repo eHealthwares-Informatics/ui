@@ -15,7 +15,7 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { ExternalLink, Link, Mail, Copy } from 'lucide-react';
+import { ExternalLink, Link, Mail, Copy, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SendPaymentLinkModal } from '@/features/rxsoft/payment-links/SendPaymentLinkModal';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
@@ -48,6 +48,22 @@ function phoneDigits(value: string | null | undefined): string {
 
 const POS_TERMINAL_TIMEOUT_MS = 120_000;
 const POS_POLL_INTERVAL_MS = 3_000;
+// Transfer links: auto-refresh the payment status until it resolves, so the
+// Complete Sale button enables on its own once the customer pays.
+const LINK_POLL_INTERVAL_MS = 3_000;
+const LINK_POLL_TIMEOUT_MS = 10 * 60 * 1000;
+
+/** A payment status that means "the customer has paid". */
+function isPaidLinkStatus(status: string | null): boolean {
+  return status === 'success' || status === 'settled' || status === 'used';
+}
+
+/** A terminal, non-paid status — polling should stop. */
+function isFailedLinkStatus(status: string | null): boolean {
+  return (
+    status === 'failed' || status === 'cancelled' || status === 'expired' || status === 'reversed'
+  );
+}
 
 /**
  * Sentinel select value for "no customer" (a walk-in sale). The select shows
@@ -64,8 +80,11 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   const [posStatus, setPosStatus] = useState<
     'idle' | 'initiating' | 'awaiting' | 'success' | 'failed'
   >('idle');
-  const [providerId, setProviderId] = useState<string | null>(null);
   const [paymentLink, setPaymentLink] = useState<{ token: string; url: string } | null>(null);
+  // Transfer link: we only let the cashier complete the sale once the provider
+  // confirms the customer actually paid (Status Check).
+  const [linkStatus, setLinkStatus] = useState<string | null>(null);
+  const [checkingLink, setCheckingLink] = useState(false);
   const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   const [sendLinkOpen, setSendLinkOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
@@ -160,9 +179,11 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       setTerminalId(null);
       setPosRef(null);
       setPosStatus('idle');
-      setProviderId(null);
       setPaymentLink(null);
+      setLinkStatus(null);
+      setCheckingLink(false);
       setIsGeneratingLink(false);
+      stopLinkPolling();
       resetAttemptState();
       // Pre-fill customer name + phone from the toolbar selection. With no
       // customer selected the sale defaults to Walk-In with an empty phone.
@@ -184,6 +205,7 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   ]);
 
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const linkPollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: paymentMethods = [] } = usePaymentMethods();
   const { data: terminals = [] } = usePosTerminals();
@@ -192,24 +214,6 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     queryFn: async () => {
       const { data } = await rxsoftApi.get('/user-pos-config/me');
       return data;
-    },
-    staleTime: 60_000,
-  });
-
-  const { data: providers = [] } = useQuery({
-    queryKey: ['payment-providers', 'available', 'web'],
-    queryFn: async () => {
-      const { data } = await rxsoftApi.get('/payment-providers/available', {
-        params: { channel: 'web' },
-      });
-      return (Array.isArray(data) ? data : (data?.data ?? [])) as Array<{
-        id: string;
-        code: string;
-        name: string;
-        providerType: string;
-        production: boolean;
-        configured: boolean;
-      }>;
     },
     staleTime: 60_000,
   });
@@ -280,8 +284,9 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, paymentMethods]);
 
-  const usesTerminal =
-    selectedMethod && (selectedMethod.code === 'POS' || selectedMethod.code === 'WEB');
+  // "Web Payment" (code WEB) is the transfer/link flow (`methodType ===
+  // 'transfer'`), not a physical terminal charge — only POS uses a terminal.
+  const usesTerminal = selectedMethod?.code === 'POS';
   const usesWallet = selectedMethod?.code === 'WALLET';
   const usesTransfer = selectedMethod?.methodType === 'transfer';
   const balance = totals.total - paid;
@@ -292,18 +297,30 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
       if (pollTimer.current) {
         clearTimeout(pollTimer.current);
       }
+      if (linkPollRef.current) {
+        clearTimeout(linkPollRef.current);
+      }
     };
   }, []);
+
+  function stopLinkPolling() {
+    if (linkPollRef.current) {
+      clearTimeout(linkPollRef.current);
+      linkPollRef.current = null;
+    }
+  }
 
   function clearPosState() {
     if (pollTimer.current) {
       clearTimeout(pollTimer.current);
     }
+    stopLinkPolling();
     setPosRef(null);
     setPosStatus('idle');
     setPaymentLink(null);
+    setLinkStatus(null);
+    setCheckingLink(false);
     setIsGeneratingLink(false);
-    setProviderId(null);
   }
 
   async function handleInitiatePos() {
@@ -364,9 +381,6 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
   }
 
   async function handleGenerateLink() {
-    if (!providerId) {
-      return;
-    }
     setIsGeneratingLink(true);
     try {
       const { data } = await rxsoftApi.post('/payment-links', {
@@ -376,7 +390,12 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
         userId: null,
       });
       setPaymentLink({ token: data.token, url: data.url });
+      setLinkStatus('pending');
       notifications.show({ color: 'green', message: 'Payment link generated' });
+      // Auto-refresh the link status so Complete Sale enables itself once the
+      // customer pays, instead of waiting for the cashier to hit Status Check.
+      stopLinkPolling();
+      pollLinkStatus(data.token);
     } catch (e: any) {
       notifications.show({
         color: 'red',
@@ -402,6 +421,67 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     }
     navigator.clipboard.writeText(paymentLink.url);
     notifications.show({ color: 'green', message: 'Link copied to clipboard' });
+  }
+
+  /**
+   * Re-check the transfer link with the provider. The sale may only be
+   * completed once the provider confirms the customer paid.
+   */
+  async function handleCheckLinkStatus() {
+    if (!paymentLink) {
+      return;
+    }
+    setCheckingLink(true);
+    try {
+      const { data } = await rxsoftApi.get(`/payment-links/${paymentLink.token}/status`);
+      const status: string = data?.payment?.status ?? data?.link?.status ?? 'pending';
+      setLinkStatus(status);
+      if (isPaidLinkStatus(status)) {
+        notifications.show({
+          color: 'green',
+          message: 'Payment confirmed — you can complete the sale',
+        });
+      } else if (isFailedLinkStatus(status)) {
+        notifications.show({ color: 'red', message: `Payment ${status}` });
+      } else {
+        notifications.show({ color: 'blue', message: `Payment status: ${status}` });
+      }
+    } catch (e: any) {
+      notifications.show({ color: 'red', message: getApiErrorMessage(e) });
+    } finally {
+      setCheckingLink(false);
+    }
+  }
+
+  /**
+   * Poll the link's status until it resolves to paid or a terminal failure,
+   * then stop. Each tick is silent — only the final state surfaces to the UI.
+   */
+  function pollLinkStatus(token: string, elapsed = 0) {
+    if (!token || elapsed >= LINK_POLL_TIMEOUT_MS) {
+      return;
+    }
+    rxsoftApi
+      .get(`/payment-links/${token}/status`)
+      .then(({ data }) => {
+        const status: string = data?.payment?.status ?? data?.link?.status ?? 'pending';
+        setLinkStatus(status);
+        if (isPaidLinkStatus(status) || isFailedLinkStatus(status)) {
+          stopLinkPolling();
+          return;
+        }
+        linkPollRef.current = setTimeout(
+          () => pollLinkStatus(token, elapsed + LINK_POLL_INTERVAL_MS),
+          LINK_POLL_INTERVAL_MS
+        );
+      })
+      .catch(() => {
+        // Transient error — keep polling until the timeout.
+        linkPollRef.current = setTimeout(
+          () => pollLinkStatus(token, elapsed + LINK_POLL_INTERVAL_MS),
+          LINK_POLL_INTERVAL_MS
+        );
+      });
   }
 
   async function handleComplete() {
@@ -530,12 +610,15 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
     onClose();
   }
 
+  const linkPaid = isPaidLinkStatus(linkStatus);
+  const linkFailed = isFailedLinkStatus(linkStatus);
+
   const canComplete = usesTerminal
     ? posStatus === 'success'
     : usesWallet
       ? !debitWallet.isPending
       : usesTransfer
-        ? !!paymentLink
+        ? linkPaid
         : true && !!methodId;
 
   return (
@@ -653,18 +736,8 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
           <>
             {!paymentLink && (
               <>
-                <Select
-                  label="Payment Provider"
-                  value={providerId}
-                  onChange={(v) => setProviderId(v || null)}
-                  placeholder="Select provider"
-                  data={providers
-                    .filter((p) => p.configured)
-                    .map((p) => ({ value: p.id, label: `${p.name} (${p.providerType})` }))}
-                />
                 <Button
                   loading={isGeneratingLink}
-                  disabled={!providerId}
                   onClick={handleGenerateLink}
                   leftSection={<Link size={14} />}
                 >
@@ -702,9 +775,24 @@ export function PaymentModal({ opened, onClose, totals, session, onComplete }: P
                   >
                     Send to Customer
                   </Button>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    color="blue"
+                    leftSection={<RefreshCw size={14} />}
+                    loading={checkingLink}
+                    onClick={() => void handleCheckLinkStatus()}
+                    data-testid="pos-check-link-status"
+                  >
+                    Status Check
+                  </Button>
                 </Group>
-                <Badge variant="light" color="teal">
-                  Link generated — waiting for customer to pay
+                <Badge variant="light" color={linkPaid ? 'green' : linkFailed ? 'red' : 'teal'}>
+                  {linkPaid
+                    ? 'Payment confirmed — ready to complete the sale'
+                    : linkFailed
+                      ? `Payment ${linkStatus}`
+                      : 'Link generated — waiting for customer to pay'}
                 </Badge>
               </Stack>
             )}

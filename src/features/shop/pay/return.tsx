@@ -12,8 +12,8 @@ import {
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { CheckCircle2, Package, ShoppingCart } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CheckCircle2, Package, RefreshCw, ShoppingCart } from 'lucide-react';
+import { parseOrderParam } from '../order-query';
 import { websiteApi } from '../website/api';
 import {
   WebsiteLayout,
@@ -33,14 +33,26 @@ function naira(amount: number) {
 export default function PayReturnPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: '/shop/pay/return' }) as Record<string, string>;
-  const orderId = search.order;
-  const reference = search.trxref || search.reference;
+  // Providers append their own query to our redirect URL (sometimes with a
+  // second '?'), so the order param can arrive as "<id>?paymentReference=...".
+  const parsedOrder = parseOrderParam(search.order);
+  const orderId = parsedOrder.orderId;
+  const reference =
+    search.trxref || search.reference || search.paymentReference || parsedOrder.paymentReference;
 
-  const { data: tx, isLoading: txLoading } = useQuery({
+  const {
+    data: tx,
+    isLoading: txLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ['pay-return', reference],
     queryFn: async () => {
       // Storefront route — use the website client so an expired shopper session
       // never bounces to the admin /sign-in (ui#2).
+      if (!reference) {
+        throw new Error('Missing payment reference');
+      }
       return websiteApi.verifyPayment(reference);
     },
     enabled: !!reference,
@@ -105,9 +117,28 @@ export default function PayReturnPage() {
                       styles={buttonStyles}
                       style={{ background: green }}
                       leftSection={<Package size={18} />}
-                      onClick={() => navigate({ to: '/shop/orders/$id', params: { id: orderId } })}
+                      onClick={() =>
+                        navigate({
+                          to: '/shop/orders/$id',
+                          params: { id: orderId },
+                          search: (reference ? { paymentReference: reference } : {}) as any,
+                        })
+                      }
                     >
                       Track Order
+                    </Button>
+                  )}
+                  {reference && (
+                    <Button
+                      radius="xl"
+                      variant="light"
+                      color="green"
+                      leftSection={<RefreshCw size={18} />}
+                      loading={isFetching}
+                      onClick={() => void refetch()}
+                      data-testid="pay-return-confirm"
+                    >
+                      Confirm payment status
                     </Button>
                   )}
                   <Button
@@ -139,16 +170,37 @@ export default function PayReturnPage() {
                   )}
                 </Text>
                 <Loader size="sm" />
-                {orderId && (
-                  <Button
-                    radius="xl"
-                    variant="light"
-                    color="green"
-                    onClick={() => navigate({ to: '/shop/orders/$id', params: { id: orderId } })}
-                  >
-                    View Order
-                  </Button>
-                )}
+                <Group gap="sm">
+                  {orderId && (
+                    <Button
+                      radius="xl"
+                      variant="light"
+                      color="green"
+                      onClick={() =>
+                        navigate({
+                          to: '/shop/orders/$id',
+                          params: { id: orderId },
+                          search: (reference ? { paymentReference: reference } : {}) as any,
+                        })
+                      }
+                    >
+                      View Order
+                    </Button>
+                  )}
+                  {reference && (
+                    <Button
+                      radius="xl"
+                      variant="light"
+                      color="green"
+                      leftSection={<RefreshCw size={18} />}
+                      loading={isFetching}
+                      onClick={() => void refetch()}
+                      data-testid="pay-return-confirm"
+                    >
+                      Confirm payment status
+                    </Button>
+                  )}
+                </Group>
               </>
             )}
           </Stack>

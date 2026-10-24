@@ -311,6 +311,7 @@ export function WebsiteHeader() {
                         size="sm"
                         leftSection={<MenuIcon size={16} style={{ color: menu.color }} />}
                         rightSection={<ChevronDown size={14} />}
+                        data-testid={`website-menu-${menu.label.toLowerCase().replace(/\s+/g, '-')}`}
                         style={{
                           transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
                         }}
@@ -463,6 +464,7 @@ export function WebsiteHeader() {
                 leftSection={<Upload size={16} />}
                 styles={buttonStyles}
                 onClick={() => navigate({ to: '/shop/upload-prescription' })}
+                data-testid="shop-upload-prescription"
               >
                 Upload Prescription
               </Button>
@@ -644,6 +646,7 @@ export function WebsiteHeader() {
                             closeCartHover();
                             navigate({ to: '/shop/cart' });
                           }}
+                          data-testid="shop-view-cart"
                         >
                           View cart
                         </Button>

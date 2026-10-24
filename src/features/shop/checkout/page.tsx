@@ -9,6 +9,7 @@ import {
   Group,
   Image,
   Input,
+  Loader,
   Paper,
   Progress,
   Radio,
@@ -30,24 +31,32 @@ import {
   FileUp,
   MapPin,
   MessageSquare,
+  Navigation,
   Package,
   Pill,
   ShoppingBag,
   ShoppingCart,
   Stethoscope,
+  Store,
   Truck,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
+import { getNearbyPharmacies, type NearbyPharmacyRecord } from '../locator/api';
+import { publicBaseUrl } from '../public-base-url';
 import { useAccountDrawerStore } from '../website/account-drawer-store';
 import { websiteApi } from '../website/api';
 import { useAuthStore } from '../website/auth-store';
 import { useCartStore } from '../website/cart-store';
 import { useChatbotStore } from '../website/chatbot-store';
 import { toHL7Prescription, QUESTIONNAIRE_CODES } from '../website/hl7-prescription';
-import { useCartProductHydration } from '../website/hooks';
-import { useCreateOrder, useDeliveryAreas } from '../website/hooks';
+import {
+  useBranches,
+  useCartProductHydration,
+  useCreateOrder,
+  useDeliveryAreas,
+} from '../website/hooks';
 import {
   WebsiteLayout,
   green,
@@ -58,8 +67,31 @@ import {
   soft,
   buttonStyles,
 } from '../website/layout';
-import type { WebsiteProduct } from '../website/types';
-import type { OrderView, DeliveryAreaView } from '../website/types';
+import type { DeliveryAreaView, OrderView, WebsiteProduct } from '../website/types';
+type DeliveryMode = 'dispatch' | 'contact' | 'pickup';
+
+/**
+ * A pickup choice: either an internal branch (`isBranch`) or a pharmacy from
+ * the national registry returned by /v1/pharmacies/nearby.
+ */
+interface PickupOption {
+  id: string;
+  name: string;
+  address: string;
+  city?: string | null;
+  state?: string | null;
+  phone?: string | null;
+  isBranch: boolean;
+}
+
+/** Address line without repeating city/state already present in the street. */
+function pickupAddressLine(option: PickupOption): string {
+  const parts = [option.address];
+  const joined = () => parts.join(' ').toLowerCase();
+  if (option.city && !joined().includes(option.city.toLowerCase())) parts.push(option.city);
+  if (option.state && !joined().includes(option.state.toLowerCase())) parts.push(option.state);
+  return parts.filter(Boolean).join(', ');
+}
 
 const productPrices: Record<string, number> = {
   '1': 2500,
@@ -226,9 +258,10 @@ const mockDeliveryAreas: DeliveryAreaView[] = [
 
 export default function CheckoutPage() {
   const { items, totalItems, clearCart } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { mutate: placeOrder, isPending } = useCreateOrder();
   const { data: deliveryAreasData, isLoading: areasLoading } = useDeliveryAreas();
+  const { data: allBranches = [], isLoading: branchesLoading } = useBranches();
   const { data: providers = [] } = useWebPaymentProviders('web');
   const initialize = useInitializeWebPayment();
   const navigate = useNavigate();
@@ -245,13 +278,37 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  // Signed-in shoppers: prefill the contact details we already hold.
+  useEffect(() => {
+    if (!user) return;
+    setPhone((prev) => prev || user.phone || '');
+    // Phone-only accounts can carry their user id in `email`; never prefill it.
+    const accountEmail = user.email?.includes('@') ? user.email : '';
+    setEmail((prev) => prev || accountEmail);
+  }, [user]);
+
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state_, setState_] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  // Delivery Options: dispatch (address), just call me (phone only), or pickup
+  // at a nearby pharmacy.
+  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('dispatch');
+  const [pickupBranchId, setPickupBranchId] = useState<string | null>(null);
+  const [nearbyPickup, setNearbyPickup] = useState<NearbyPharmacyRecord[]>([]);
+  const [locating, setLocating] = useState(false);
+  const [locationNote, setLocationNote] = useState<string | null>(null);
   const [deliveryAreaId, setDeliveryAreaId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(providers[0]?.id ?? null);
+
+  // Default to the first available provider once the list resolves.
+  useEffect(() => {
+    if (!paymentMethod && providers.length > 0) {
+      setPaymentMethod(providers[0].id);
+    }
+  }, [providers, paymentMethod]);
   const [promoCode, setPromoCode] = useState('');
   // Coupon state: validated against POST /coupons/validate before apply, and
   // passed to the order for server-side redemption + discount.
@@ -270,18 +327,136 @@ export default function CheckoutPage() {
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const openAccountDrawer = useAccountDrawerStore((s) => s.open);
 
+  // Returning customer: entering a known phone fills the delivery details.
+  const autofillFromPhone = async () => {
+    const digits = phone.replace(/\D/g, '');
+    if (deliveryMode !== 'dispatch' || digits.length < 7) return;
+    try {
+      const found = await websiteApi.lookupCheckoutCustomer(phone);
+      if (!found) return;
+      if (!address && found.address) setAddress(found.address);
+      if (!email && found.email) setEmail(found.email);
+    } catch {
+      /* best-effort autofill */
+    }
+  };
+
   const selectedArea = deliveryAreas.find((a) => a.id === deliveryAreaId);
+
+  // Pickup: nearby pharmacies from the national register (returned by
+  // "Use my location") come first, then matching internal branches. The
+  // branches table can legitimately be empty, so the registry results are the
+  // primary source rather than a fallback.
+  const pickupBranches = useMemo((): PickupOption[] => {
+    const cityFilter = (city || selectedArea?.city || '').trim().toLowerCase();
+    const stateFilter = (state_ || selectedArea?.state || '').trim().toLowerCase();
+
+    const registry = nearbyPickup.map((pharmacy) => ({
+      id: `pharmacy:${pharmacy.id}`,
+      name: pharmacy.premisesName?.trim() || 'Pharmacy',
+      address: pharmacy.premisesAddress?.trim() || '',
+      city: pharmacy.areaName ?? pharmacy.lgaName ?? null,
+      state: pharmacy.stateName ?? null,
+      phone: null,
+      isBranch: false,
+    }));
+
+    const matchingBranches = allBranches.filter((branch) => {
+      const branchCity = (branch.city ?? '').toLowerCase();
+      const branchState = (branch.state ?? '').toLowerCase();
+      const branchAddress = (branch.address ?? '').toLowerCase();
+      const cityOk =
+        !cityFilter || branchCity.includes(cityFilter) || branchAddress.includes(cityFilter);
+      const stateOk = !stateFilter || branchState.includes(stateFilter);
+      return cityOk && stateOk;
+    });
+    // With registry results present, only add branches that match the area;
+    // otherwise keep the old "all branches" fallback.
+    const branchRows = (
+      matchingBranches.length > 0 || nearbyPickup.length === 0 ? matchingBranches : []
+    ).map((branch) => ({
+      id: branch.id,
+      name: branch.name,
+      address: branch.address,
+      city: branch.city,
+      state: branch.state,
+      phone: branch.phone,
+      isBranch: true,
+    }));
+
+    const seen = new Set<string>();
+    const options: PickupOption[] = [];
+    for (const option of [...registry, ...branchRows]) {
+      const key = `${option.name}|${option.address}`.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      options.push(option);
+    }
+    return options;
+  }, [allBranches, city, state_, selectedArea, nearbyPickup]);
+
+  // "Use my current location": geolocate, then use the nearest premises in the
+  // register to infer the area and filter the pharmacy list.
+  const useMyLocation = () => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocationNote('Location is not available in this browser — enter your city/state.');
+      return;
+    }
+    setLocating(true);
+    setLocationNote(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const nearby = await getNearbyPharmacies(
+            position.coords.latitude,
+            position.coords.longitude,
+            25,
+            5
+          );
+          setNearbyPickup(nearby);
+          const nearest = nearby[0];
+          if (nearest?.stateName) {
+            setState_(nearest.stateName);
+            if (nearest.areaName) {
+              setCity(nearest.areaName);
+            }
+            setLocationNote(
+              `Nearest area: ${nearest.areaName ?? nearest.lgaName ?? nearest.stateName}.`
+            );
+          } else {
+            setLocationNote('Could not match your location to an area — enter your city/state.');
+          }
+        } catch {
+          setLocationNote('Could not look up nearby pharmacies — enter your city/state.');
+        } finally {
+          setLocating(false);
+        }
+      },
+      () => {
+        setLocating(false);
+        setLocationNote('Location permission denied — enter your city/state.');
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
+  // Guards the auto-initiate flow so selecting a provider twice can't create
+  // two orders.
+  const placingRef = useRef(false);
 
   useCartProductHydration();
 
   const subtotal = items.reduce((sum, i) => sum + itemUnitPrice(i) * i.quantity, 0);
-  const deliveryFee = selectedArea
-    ? subtotal >= (selectedArea.freeDeliveryAbove || Infinity)
-      ? 0
-      : selectedArea.deliveryFee
-    : subtotal >= 10000
-      ? 0
-      : 1500;
+  const deliveryFee =
+    deliveryMode === 'dispatch'
+      ? selectedArea
+        ? subtotal >= (selectedArea.freeDeliveryAbove || Infinity)
+          ? 0
+          : selectedArea.deliveryFee
+        : subtotal >= 10000
+          ? 0
+          : 1500
+      : 0;
   const total = Math.max(subtotal + deliveryFee - (appliedCoupon?.discountAmount ?? 0), 0);
   const rxItems = items.filter(itemIsRx);
 
@@ -322,7 +497,10 @@ export default function CheckoutPage() {
       case 0:
         return items.length > 0;
       case 1:
-        return !!address && !!city && !!state_ && !!phone && !!deliveryAreaId;
+        if (!phone) return false;
+        if (deliveryMode === 'contact') return true;
+        if (deliveryMode === 'pickup') return !!pickupBranchId;
+        return !!address && !!city && !!state_ && !!deliveryAreaId;
       case 2:
         return true;
       case 3:
@@ -332,11 +510,21 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = (overrideProviderId?: string) => {
+    const providerId = overrideProviderId ?? paymentMethod;
+    if (!providerId || placingRef.current) {
+      return;
+    }
+    placingRef.current = true;
     setOrderError(null);
+    const selectedPickup =
+      deliveryMode === 'pickup'
+        ? (pickupBranches.find((option) => option.id === pickupBranchId) ?? null)
+        : null;
+    const registryPickup = selectedPickup && !selectedPickup.isBranch ? selectedPickup : null;
     placeOrder(
       {
-        paymentMethod: providers.find((p) => p.id === paymentMethod)?.name || 'Card',
+        paymentMethod: providers.find((p) => p.id === providerId)?.name || 'Card',
         notes: promoCode ? `Promo: ${promoCode}` : undefined,
         couponCode: appliedCoupon?.code,
         items: items.map((i) => {
@@ -381,38 +569,64 @@ export default function CheckoutPage() {
           return { freetextName: displayName, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 };
         }),
         delivery: {
-          address,
-          city,
-          state: state_,
-          phone,
-          shippingMethod: 'standard',
+          // Registry pharmacies have no branch row — record the chosen
+          // collection point as the delivery address so fulfilment sees it.
+          address:
+            deliveryMode === 'dispatch'
+              ? address
+              : registryPickup
+                ? [registryPickup.name, registryPickup.address].filter(Boolean).join(' — ')
+                : undefined,
+          city: deliveryMode === 'dispatch' ? city : (registryPickup?.city ?? undefined),
+          state: deliveryMode === 'dispatch' ? state_ : (registryPickup?.state ?? undefined),
+          phone: phone || undefined,
+          email: email || undefined,
+          contactOnly: deliveryMode === 'contact',
+          pickupBranchId:
+            deliveryMode === 'pickup' && selectedPickup?.isBranch ? selectedPickup.id : undefined,
+          shippingMethod:
+            deliveryMode === 'pickup'
+              ? 'pickup'
+              : deliveryMode === 'contact'
+                ? 'contact-only'
+                : 'standard',
         },
       },
       {
         onSuccess: (order) => {
           clearCart();
           setPlacedOrder(order);
-          // Kick off gateway payment for the newly created order.
+          // Initialise the gateway payment. The backend marks the order
+          // 'paying' as part of this call, BEFORE we navigate away.
           initialize.mutate(
             {
               amount: total,
               sourceType: 'order',
               sourceId: order.id,
-              providerId: paymentMethod,
-              returnUrl: `${window.location.origin}/shop/pay/return?order=${order.id}`,
+              providerId,
+              returnUrl: `${publicBaseUrl()}/shop/pay/return?order=${order.id}`,
             },
             {
               onSuccess: (res) => {
+                placingRef.current = false;
                 if (res.checkoutUrl) {
-                  setPaymentUrl(res.checkoutUrl);
+                  window.location.href = res.checkoutUrl;
+                  return;
                 }
+                setPaymentUrl(null);
                 setStep(4);
               },
-              onError: () => setStep(4),
+              onError: (err) => {
+                // Do not advance when the provider link cannot be generated.
+                placingRef.current = false;
+                setOrderError(getApiErrorMessage(err));
+                setStep(3);
+              },
             }
           );
         },
         onError: (error) => {
+          placingRef.current = false;
           setOrderError(getApiErrorMessage(error));
         },
       }
@@ -555,7 +769,7 @@ export default function CheckoutPage() {
             <Stepper.Step label="Cart Review" description="Review items">
               {/* No content here - rendered separately */}
             </Stepper.Step>
-            <Stepper.Step label="Delivery" description="Address & area" />
+            <Stepper.Step label="Delivery" description="Delivery or pickup" />
             <Stepper.Step label="Prescription" description="Validate Rx" />
             <Stepper.Step label="Payment" description="Pay" />
             <Stepper.Step label="Confirmation" description="Done" />
@@ -612,6 +826,18 @@ export default function CheckoutPage() {
                   setState_={setState_}
                   phone={phone}
                   setPhone={setPhone}
+                  onPhoneBlur={() => void autofillFromPhone()}
+                  email={email}
+                  setEmail={setEmail}
+                  deliveryMode={deliveryMode}
+                  setDeliveryMode={setDeliveryMode}
+                  pickupBranchId={pickupBranchId}
+                  setPickupBranchId={setPickupBranchId}
+                  branches={pickupBranches}
+                  branchesLoading={branchesLoading}
+                  onUseLocation={useMyLocation}
+                  locating={locating}
+                  locationNote={locationNote}
                   deliveryAreaId={deliveryAreaId}
                   setDeliveryAreaId={setDeliveryAreaId}
                   deliveryAreas={deliveryAreas}
@@ -627,7 +853,12 @@ export default function CheckoutPage() {
                 <StepPayment
                   providers={providers}
                   paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
+                  setPaymentMethod={(value) => {
+                    setPaymentMethod(value);
+                    // Selecting a provider immediately creates the order and
+                    // sends the shopper to the gateway.
+                    if (value) handlePlaceOrder(value);
+                  }}
                   promoCode={promoCode}
                   setPromoCode={setPromoCode}
                   items={items}
@@ -683,7 +914,7 @@ export default function CheckoutPage() {
                   leftSection={<CreditCard size={18} />}
                   styles={buttonStyles}
                   style={{ background: green }}
-                  onClick={handlePlaceOrder}
+                  onClick={() => handlePlaceOrder()}
                   loading={isPending}
                   disabled={!canGoNext()}
                 >
@@ -783,6 +1014,18 @@ function StepDeliveryDetails({
   setState_,
   phone,
   setPhone,
+  onPhoneBlur,
+  email,
+  setEmail,
+  deliveryMode,
+  setDeliveryMode,
+  pickupBranchId,
+  setPickupBranchId,
+  branches,
+  branchesLoading,
+  onUseLocation,
+  locating,
+  locationNote,
   deliveryAreaId,
   setDeliveryAreaId,
   deliveryAreas,
@@ -798,6 +1041,18 @@ function StepDeliveryDetails({
   setState_: (v: string) => void;
   phone: string;
   setPhone: (v: string) => void;
+  onPhoneBlur?: () => void;
+  email: string;
+  setEmail: (v: string) => void;
+  deliveryMode: DeliveryMode;
+  setDeliveryMode: (v: DeliveryMode) => void;
+  pickupBranchId: string | null;
+  setPickupBranchId: (v: string | null) => void;
+  branches: PickupOption[];
+  branchesLoading: boolean;
+  onUseLocation: () => void;
+  locating: boolean;
+  locationNote: string | null;
   deliveryAreaId: string | null;
   setDeliveryAreaId: (v: string | null) => void;
   deliveryAreas: DeliveryAreaView[];
@@ -805,48 +1060,87 @@ function StepDeliveryDetails({
   selectedArea: DeliveryAreaView | undefined;
   items: { productId?: string; name?: string; unitPrice?: number; quantity: number }[];
 }) {
+  const options: Array<{
+    value: DeliveryMode;
+    title: string;
+    description: string;
+    Icon: typeof Truck;
+  }> = [
+    {
+      value: 'dispatch',
+      title: 'Dispatch Delivery',
+      description: 'Delivered to your address',
+      Icon: Truck,
+    },
+    {
+      value: 'contact',
+      title: 'Just Call Me',
+      description: "We'll reach you by phone/email — no delivery address needed",
+      Icon: MessageSquare,
+    },
+    {
+      value: 'pickup',
+      title: 'Pickup at nearest Pharmacy',
+      description: 'Collect from a pharmacy near you',
+      Icon: Store,
+    },
+  ];
+
   return (
     <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
       <Stack gap="md">
         <Group gap={6}>
           <MapPin size={20} color={green} />
           <Text fw={900} size="lg">
-            Delivery Details
+            Delivery Options
           </Text>
         </Group>
         <Divider />
 
-        <TextInput
-          label="Street Address"
-          placeholder="House number, street name"
-          radius="xl"
-          value={address}
-          onChange={(e) => setAddress(e.currentTarget.value)}
-          styles={{ input: { borderColor: line } }}
-        />
-
-        <Grid>
-          <Grid.Col span={6}>
-            <TextInput
-              label="City"
-              placeholder="Lagos"
-              radius="xl"
-              value={city}
-              onChange={(e) => setCity(e.currentTarget.value)}
-              styles={{ input: { borderColor: line } }}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput
-              label="State"
-              placeholder="Lagos"
-              radius="xl"
-              value={state_}
-              onChange={(e) => setState_(e.currentTarget.value)}
-              styles={{ input: { borderColor: line } }}
-            />
-          </Grid.Col>
-        </Grid>
+        <Radio.Group
+          value={deliveryMode}
+          onChange={(value) => value && setDeliveryMode(value as DeliveryMode)}
+        >
+          <Stack gap="xs">
+            {options.map((option) => {
+              const selected = deliveryMode === option.value;
+              const Icon = option.Icon;
+              return (
+                <Paper
+                  key={option.value}
+                  radius={16}
+                  withBorder
+                  p="sm"
+                  style={{
+                    borderColor: selected ? green : line,
+                    background: selected ? soft : '#FFFFFF',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setDeliveryMode(option.value)}
+                  data-testid={`delivery-mode-${option.value}`}
+                >
+                  <Group gap="sm" wrap="nowrap">
+                    <Radio
+                      value={option.value}
+                      data-testid={`delivery-mode-radio-${option.value}`}
+                    />
+                    <ThemeIcon radius="xl" color="green" variant="light" size="md">
+                      <Icon size={16} />
+                    </ThemeIcon>
+                    <Box>
+                      <Text fw={800} size="sm">
+                        {option.title}
+                      </Text>
+                      <Text size="xs" c={muted}>
+                        {option.description}
+                      </Text>
+                    </Box>
+                  </Group>
+                </Paper>
+              );
+            })}
+          </Stack>
+        </Radio.Group>
 
         <TextInput
           label="Phone Number"
@@ -854,54 +1148,195 @@ function StepDeliveryDetails({
           radius="xl"
           value={phone}
           onChange={(e) => setPhone(e.currentTarget.value)}
+          onBlur={onPhoneBlur}
+          required
           styles={{ input: { borderColor: line } }}
         />
 
-        <Select
-          label="Delivery Area"
-          placeholder={areasLoading ? 'Loading areas...' : 'Select your delivery area'}
-          data={deliveryAreas.map((a) => ({
-            value: a.id,
-            label: `${a.city}, ${a.state} — ${formatPrice(a.deliveryFee)} fee`,
-          }))}
-          value={deliveryAreaId}
-          onChange={setDeliveryAreaId}
+        <TextInput
+          label="Email"
+          placeholder="you@example.com"
+          type="email"
           radius="xl"
-          searchable
-          nothingFoundMessage="No areas found"
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+          styles={{ input: { borderColor: line } }}
         />
 
-        {selectedArea ? (
-          <Paper radius={16} p="md" withBorder style={{ borderColor: line, background: soft }}>
-            <Group gap="md">
-              <ThemeIcon radius="xl" color="green" variant="light" size="md">
-                <Truck size={16} />
-              </ThemeIcon>
-              <Box>
-                <Text fw={800} size="sm">
-                  Estimated Delivery Time
-                </Text>
-                <Text size="sm" c={muted}>
-                  {selectedArea.estimatedDeliveryHours
-                    ? `${selectedArea.estimatedDeliveryHours} hours`
-                    : '1-3 business days'}
-                </Text>
-                {selectedArea.freeDeliveryAbove &&
-                subtotalValue(items) >= selectedArea.freeDeliveryAbove ? (
-                  <Text size="xs" c={green}>
-                    Free delivery applies
-                  </Text>
-                ) : null}
-              </Box>
-            </Group>
-          </Paper>
-        ) : null}
+        {deliveryMode === 'dispatch' && (
+          <>
+            <TextInput
+              label="Street Address"
+              placeholder="House number, street name"
+              radius="xl"
+              value={address}
+              onChange={(e) => setAddress(e.currentTarget.value)}
+              styles={{ input: { borderColor: line } }}
+            />
 
-        {!areasLoading && deliveryAreas.length === 0 ? (
-          <Alert icon={<AlertTriangle size={16} />} color="orange" variant="light" radius="lg">
-            No delivery areas loaded. Using default rates.
+            <Grid>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="City"
+                  placeholder="Lagos"
+                  radius="xl"
+                  value={city}
+                  onChange={(e) => setCity(e.currentTarget.value)}
+                  styles={{ input: { borderColor: line } }}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="State"
+                  placeholder="Lagos"
+                  radius="xl"
+                  value={state_}
+                  onChange={(e) => setState_(e.currentTarget.value)}
+                  styles={{ input: { borderColor: line } }}
+                />
+              </Grid.Col>
+            </Grid>
+
+            <Select
+              label="Delivery Area"
+              placeholder={areasLoading ? 'Loading areas...' : 'Select your delivery area'}
+              data={deliveryAreas.map((a) => ({
+                value: a.id,
+                label: `${a.city}, ${a.state} — ${formatPrice(a.deliveryFee)} fee`,
+              }))}
+              value={deliveryAreaId}
+              onChange={setDeliveryAreaId}
+              radius="xl"
+              searchable
+              nothingFoundMessage="No areas found"
+            />
+
+            {selectedArea ? (
+              <Paper radius={16} p="md" withBorder style={{ borderColor: line, background: soft }}>
+                <Group gap="md">
+                  <ThemeIcon radius="xl" color="green" variant="light" size="md">
+                    <Truck size={16} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800} size="sm">
+                      Estimated Delivery Time
+                    </Text>
+                    <Text size="sm" c={muted}>
+                      {selectedArea.estimatedDeliveryHours
+                        ? `${selectedArea.estimatedDeliveryHours} hours`
+                        : '1-3 business days'}
+                    </Text>
+                    {selectedArea.freeDeliveryAbove &&
+                    subtotalValue(items) >= selectedArea.freeDeliveryAbove ? (
+                      <Text size="xs" c={green}>
+                        Free delivery applies
+                      </Text>
+                    ) : null}
+                  </Box>
+                </Group>
+              </Paper>
+            ) : null}
+
+            {!areasLoading && deliveryAreas.length === 0 ? (
+              <Alert icon={<AlertTriangle size={16} />} color="orange" variant="light" radius="lg">
+                No delivery areas loaded. Using default rates.
+              </Alert>
+            ) : null}
+          </>
+        )}
+
+        {deliveryMode === 'contact' && (
+          <Alert color="blue" variant="light" radius="lg" icon={<MessageSquare size={16} />}>
+            We&apos;ll reach you on the phone or email above — no delivery address needed.
           </Alert>
-        ) : null}
+        )}
+
+        {deliveryMode === 'pickup' && (
+          <>
+            <Group justify="space-between" wrap="wrap" gap="sm">
+              <Text size="sm" c={muted}>
+                Choose the pharmacy you&apos;d like to collect from.
+              </Text>
+              <Button
+                variant="light"
+                radius="xl"
+                color="green"
+                leftSection={<Navigation size={16} />}
+                loading={locating}
+                onClick={onUseLocation}
+                data-testid="pickup-use-location"
+              >
+                Use my location
+              </Button>
+            </Group>
+
+            {locationNote ? (
+              <Text size="xs" c={muted}>
+                {locationNote}
+              </Text>
+            ) : null}
+
+            {branchesLoading ? (
+              <Group justify="center" py="md">
+                <Loader size="sm" />
+              </Group>
+            ) : branches.length === 0 ? (
+              <Alert icon={<AlertTriangle size={16} />} color="orange" variant="light" radius="lg">
+                {locationNote
+                  ? 'No pharmacies are available for pickup right now.'
+                  : 'Tap "Use my location" to find pharmacies near you.'}
+              </Alert>
+            ) : (
+              <Radio.Group value={pickupBranchId} onChange={setPickupBranchId}>
+                <Stack gap="xs">
+                  {branches.map((branch) => {
+                    const selected = pickupBranchId === branch.id;
+                    return (
+                      <Paper
+                        key={branch.id}
+                        radius={16}
+                        withBorder
+                        p="sm"
+                        style={{
+                          borderColor: selected ? green : line,
+                          background: selected ? soft : '#FFFFFF',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => setPickupBranchId(branch.id)}
+                        data-testid={`pickup-branch-${branch.id}`}
+                      >
+                        <Group gap="sm" wrap="nowrap" align="flex-start">
+                          <Radio
+                            value={branch.id}
+                            data-testid={`pickup-branch-radio-${branch.id}`}
+                          />
+                          <Box>
+                            <Text fw={800} size="sm">
+                              {branch.name}
+                            </Text>
+                            <Text size="xs" c={muted}>
+                              {pickupAddressLine(branch)}
+                            </Text>
+                            {branch.phone ? (
+                              <Text size="xs" c={muted}>
+                                {branch.phone}
+                              </Text>
+                            ) : null}
+                          </Box>
+                        </Group>
+                      </Paper>
+                    );
+                  })}
+                </Stack>
+              </Radio.Group>
+            )}
+
+            <Alert color="green" variant="light" radius="lg" icon={<Store size={16} />}>
+              Pickup is free — you&apos;ll collect from the selected pharmacy when your order is
+              ready.
+            </Alert>
+          </>
+        )}
       </Stack>
     </Paper>
   );

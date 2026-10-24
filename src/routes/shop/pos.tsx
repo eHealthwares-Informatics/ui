@@ -1,36 +1,21 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import PharmacyPOS from '@/features/shop/pos/pos';
+import { PosAuthGate } from '@/features/shop/pos/components/PosAuthGate';
+import { hasPosPermission } from '@/features/shop/pos/permissions';
 import { useAuthStore } from '@/stores/auth-store';
 
 /* ================= ROUTE ================= */
 
-function hasPosPermission(permissions: string[], roles: string[]) {
-  if (roles.includes('super_admin') || roles.includes('admin')) {
-    return true;
-  }
-  return permissions.some(
-    (p) =>
-      p === 'shop.pos' ||
-      p === 'shop.*' ||
-      p === 'rxsoft.*' ||
-      p.startsWith('shop.pos.') ||
-      (p.endsWith('.*') && p.startsWith('shop.'))
-  );
-}
-
 export const Route = createFileRoute('/shop/pos')({
-  beforeLoad: ({ location }) => {
+  beforeLoad: () => {
     useAuthStore.getState().bootstrap();
     const user = useAuthStore.getState().user;
-    if (!user) {
-      throw redirect({
-        to: '/sign-in',
-        search: { redirect: location.pathname + location.search },
-      });
-    }
-    if (!hasPosPermission(user.permissions ?? [], user.roles ?? [])) {
+
+    // No session — or an expired one, which `bootstrap` clears — is handled by
+    // PosAuthGate's inline quick-login form instead of bouncing to sign-in.
+    // Only reject a live session that lacks POS permission.
+    if (user && !hasPosPermission(user.permissions ?? [], user.roles ?? [])) {
       throw redirect({ to: '/403' });
     }
   },
-  component: PharmacyPOS,
+  component: PosAuthGate,
 });

@@ -49,6 +49,7 @@ import productPlaceholder from '../sample_images/generic_product_image.png';
 import { websiteApi } from './api';
 import { useCartStore } from './cart-store';
 import { useChatbotStore } from './chatbot-store';
+import { ComparePricesModal } from './compare-prices-modal';
 import { toHL7Prescription, QUESTIONNAIRE_CODES } from './hl7-prescription';
 import type { WebsiteProduct, HealthConcernView, TestimonialView } from './types';
 
@@ -254,6 +255,7 @@ export function OutlineButton({
       leftSection={leftSection}
       styles={buttonStyles}
       onClick={onClick}
+      data-testid="website-category-chip"
       style={{
         borderColor: '#B9D9C6',
         color: darkGreen,
@@ -269,6 +271,7 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
   const navigate = useNavigate();
   const gp = product.genericProduct;
   const addItem = useCartStore((s) => s.addItem);
+  const [compareOpen, setCompareOpen] = useState(false);
   // Server resolves the concepts flag (isPrescriptionRequired); fall back to
   // the nested product object when present, else to no-Rx.
   const rxRequired = product.isPrescriptionRequired ?? gp?.isPrescriptionRequired ?? false;
@@ -290,155 +293,212 @@ export function ProductCard({ product }: { product: WebsiteProduct }) {
   }
 
   return (
-    <Card
-      className="lift-card"
-      radius={24}
-      withBorder
-      padding="md"
-      style={{
-        borderColor: line,
-        boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
-        cursor: 'pointer',
-      }}
-      onClick={() => navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })}
-    >
-      <Card.Section
+    <>
+      <Card
+        className="lift-card"
+        radius={24}
+        withBorder
+        padding="md"
         style={{
-          background: '#F1F8F4',
-          borderBottom: `1px solid ${line}`,
-          position: 'relative',
+          borderColor: line,
+          boxShadow: '0 18px 52px rgba(15, 23, 42, 0.06)',
+          cursor: 'pointer',
         }}
+        onClick={() => navigate({ to: '/shop/shop/$slug', params: { slug: product.id } })}
       >
-        <Image
-          src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
-          alt={product.name}
-          h={190}
-          fit="contain"
-          p="lg"
-        />
-      </Card.Section>
-      <Stack mt="md" gap="sm">
-        <Box>
-          <Text fw={900} lh={1.25}>
-            {product.name}
-          </Text>
-          {gp ? (
-            <Text size="sm" c={muted}>
-              {gp.name}
+        <Card.Section
+          style={{
+            background: '#F1F8F4',
+            borderBottom: `1px solid ${line}`,
+            position: 'relative',
+          }}
+        >
+          <Image
+            src={product.mediumImageUrl || product.imageUrl || productPlaceholder}
+            alt={product.name}
+            h={190}
+            fit="contain"
+            p="lg"
+          />
+        </Card.Section>
+        <Stack mt="md" gap="sm">
+          <Box>
+            <Text fw={900} lh={1.25}>
+              {product.name}
             </Text>
-          ) : null}
-        </Box>
-        {product.unitPrice != null && (
-          <Text fw={700} size="lg" c={green}>
-            ₦{product.unitPrice.toLocaleString()}
-          </Text>
-        )}
-        <Group gap={6}>
-          {rxRequired ? (
-            <Badge
-              size="sm"
-              radius="xl"
-              variant="light"
-              color="orange"
-              leftSection={<Pill size={12} />}
-            >
-              Prescription required
-            </Badge>
-          ) : (
-            <Badge
-              size="sm"
-              radius="xl"
-              variant="light"
-              color="green"
-              leftSection={<BadgeCheck size={12} />}
-            >
-              No prescription needed
-            </Badge>
+            {gp ? (
+              <Text size="sm" c={muted}>
+                {gp.name}
+              </Text>
+            ) : null}
+          </Box>
+          <Group gap={6} wrap="nowrap" align="center" data-testid={`product-rating-${product.id}`}>
+            <Rating value={product.averageRating ?? 0} fractions={2} readOnly size="sm" />
+            <Text size="xs" c={muted}>
+              {product.reviewCount
+                ? `${(product.averageRating ?? 0).toFixed(1)} (${product.reviewCount})`
+                : 'No reviews yet'}
+            </Text>
+          </Group>
+          {product.unitPrice != null && (
+            <Text fw={700} size="lg" c={green}>
+              ₦{product.unitPrice.toLocaleString()}
+            </Text>
           )}
-        </Group>
-        <Group grow gap={6}>
-          <Tooltip label="Add to cart" withArrow position="top">
-            <Button
-              radius="xl"
-              size="sm"
-              style={{ background: green }}
-              leftSection={<ShoppingCart size={16} />}
-              styles={buttonStyles}
-              aria-label="Add to cart"
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart();
-              }}
-            />
-          </Tooltip>
-          <Tooltip label="View product details" withArrow position="top">
-            <Button
-              radius="xl"
-              size="sm"
-              variant="light"
-              color="green"
-              p={8}
-              aria-label="View product"
-              styles={buttonStyles}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate({ to: '/shop/shop/$slug', params: { slug: product.id } });
-              }}
-            >
-              <Eye size={16} />
-            </Button>
-          </Tooltip>
-          <Tooltip label="Order via chat — pharmacist technician bot" withArrow position="top">
-            <Button
-              radius="xl"
-              size="sm"
-              variant="light"
-              color="green"
-              p={8}
-              aria-label="Order via chat"
-              styles={buttonStyles}
-              onClick={(e) => {
-                e.stopPropagation();
-                const hl7 = toHL7Prescription(
-                  { product, quantity: 1 },
-                  {
-                    questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN,
-                    customerName: product.name,
-                  }
-                );
-                useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
-              }}
-            >
-              <MessageCircle size={16} />
-            </Button>
-          </Tooltip>
-          <Tooltip label="Chat with a pharmacist" withArrow position="top">
-            <Button
-              radius="xl"
-              size="sm"
-              variant="filled"
-              color="blue"
-              p={8}
-              aria-label="Chat with a pharmacist"
-              styles={buttonStyles}
-              onClick={(e) => {
-                e.stopPropagation();
-                const hl7 = toHL7Prescription(
-                  { product, quantity: 1 },
-                  {
-                    questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
-                    customerName: product.name,
-                  }
-                );
-                useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
-              }}
-            >
-              <MessageSquare size={16} />
-            </Button>
-          </Tooltip>
-        </Group>
-      </Stack>
-    </Card>
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            c={green}
+            fw={700}
+            underline="hover"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCompareOpen(true);
+            }}
+          >
+            Compare prices across pharmacies
+          </Anchor>
+          <Group gap={6}>
+            {rxRequired ? (
+              <Badge
+                size="sm"
+                radius="xl"
+                variant="light"
+                color="orange"
+                leftSection={<Pill size={12} />}
+              >
+                Prescription required
+              </Badge>
+            ) : (
+              <Badge
+                size="sm"
+                radius="xl"
+                variant="light"
+                color="green"
+                leftSection={<BadgeCheck size={12} />}
+              >
+                No prescription needed
+              </Badge>
+            )}
+          </Group>
+          <Group grow gap={6}>
+            <Tooltip label="Add to cart" withArrow position="top">
+              <Button
+                radius="xl"
+                size="sm"
+                style={{ background: green }}
+                leftSection={<ShoppingCart size={16} />}
+                styles={buttonStyles}
+                aria-label="Add to cart"
+                data-testid={`add-to-cart-${product.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart();
+                }}
+              />
+            </Tooltip>
+            <Tooltip label="View product details" withArrow position="top">
+              <Button
+                radius="xl"
+                size="sm"
+                variant="light"
+                color="green"
+                p={8}
+                aria-label="View product"
+                data-testid={`view-product-${product.id}`}
+                styles={buttonStyles}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate({ to: '/shop/shop/$slug', params: { slug: product.id } });
+                }}
+              >
+                <Eye size={16} />
+              </Button>
+            </Tooltip>
+            <Tooltip label="Compare prices across pharmacies" withArrow position="top">
+              <Button
+                radius="xl"
+                size="sm"
+                variant="light"
+                color="green"
+                p={8}
+                aria-label="Compare prices"
+                data-testid={`compare-prices-${product.id}`}
+                styles={buttonStyles}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCompareOpen(true);
+                }}
+              >
+                <Sparkles size={16} />
+              </Button>
+            </Tooltip>
+            <Tooltip label="Order via chat — pharmacist technician bot" withArrow position="top">
+              <Button
+                radius="xl"
+                size="sm"
+                variant="light"
+                color="green"
+                p={8}
+                aria-label="Order via chat"
+                data-testid={`order-via-chat-${product.id}`}
+                styles={buttonStyles}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const hl7 = toHL7Prescription(
+                    { product, quantity: 1 },
+                    {
+                      questionnaireCode: QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN,
+                      customerName: product.name,
+                    }
+                  );
+                  useChatbotStore
+                    .getState()
+                    .openWith(hl7, QUESTIONNAIRE_CODES.PHARMACIST_TECHNICIAN);
+                }}
+              >
+                <MessageCircle size={16} />
+              </Button>
+            </Tooltip>
+            <Tooltip label="Chat with a pharmacist" withArrow position="top">
+              <Button
+                radius="xl"
+                size="sm"
+                variant="filled"
+                color="blue"
+                p={8}
+                aria-label="Chat with a pharmacist"
+                data-testid={`chat-pharmacist-${product.id}`}
+                styles={buttonStyles}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const hl7 = toHL7Prescription(
+                    { product, quantity: 1 },
+                    {
+                      questionnaireCode: QUESTIONNAIRE_CODES.PRODUCT_INQUIRY,
+                      customerName: product.name,
+                    }
+                  );
+                  useChatbotStore.getState().openWith(hl7, QUESTIONNAIRE_CODES.PRODUCT_INQUIRY);
+                }}
+              >
+                <MessageSquare size={16} />
+              </Button>
+            </Tooltip>
+          </Group>
+        </Stack>
+      </Card>
+
+      {compareOpen ? (
+        <ComparePricesModal
+          opened
+          onClose={() => setCompareOpen(false)}
+          productId={product.id}
+          productName={product.name}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -587,6 +647,7 @@ export function PrescriptionUploadSection() {
                   leftSection={<FileUp size={18} />}
                   w="fit-content"
                   styles={buttonStyles}
+                  data-testid="upload-prescription-cta"
                   onClick={() => navigate({ to: '/shop/upload-prescription' })}
                 >
                   Upload Prescription
@@ -788,6 +849,7 @@ export function NewsletterSection() {
                 size="md"
                 leftSection={<Smartphone size={18} />}
                 styles={buttonStyles}
+                data-testid="newsletter-subscribe"
                 style={{ background: green, alignSelf: 'flex-start' }}
               >
                 Subscribe

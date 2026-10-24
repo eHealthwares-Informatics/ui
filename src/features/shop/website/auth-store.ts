@@ -31,12 +31,25 @@ export interface WebsiteAuthStore {
   facebookSignIn: (accessToken: string) => Promise<void>;
 }
 
+/**
+ * Phone-only accounts receive their user id in the token's `email` claim.
+ * Treat anything that is not a real address (or that equals the user id) as
+ * empty so it never leaks into forms like checkout.
+ */
+export function normaliseWebsiteEmail(email: unknown, userId?: string | null): string {
+  const value = typeof email === 'string' ? email.trim() : '';
+  if (!value || !value.includes('@') || (userId && value === userId)) {
+    return '';
+  }
+  return value;
+}
+
 function decodeToken(token: string): WebsiteUser {
   const payload = JSON.parse(atob(token.split('.')[1]));
   return {
     id: payload.sub,
     username: payload.username,
-    email: payload.email || '',
+    email: normaliseWebsiteEmail(payload.email, payload.sub),
     phone: payload.phone || '',
     roles: payload.roles || [],
   };
@@ -145,6 +158,22 @@ export const useAuthStore = create<WebsiteAuthStore>()(
       name: 'rxsoft-website-auth',
       merge: (persisted, current) => {
         const merged = { ...current, ...(persisted as Partial<WebsiteAuthStore>) };
+        if (merged.user) {
+          merged.user = {
+            ...merged.user,
+            email: normaliseWebsiteEmail(merged.user.email, merged.user.id),
+          };
+        }
+
+        // Keep the persisted session and the token storage in sync. The store
+        // can say "authenticated" while `getAccessToken()` is empty (new tab
+        // with sessionStorage, or a cleared token store), which sent checkout
+        // requests without a bearer token — e.g. /payments/initialize then
+        // failed with "Missing bearer token".
+        if (merged.accessToken && !getAccessToken()) {
+          persistTokens(merged.accessToken, merged.refreshToken ?? '');
+        }
+
         if (!merged.accessToken) {
           const session = tryImportAdminSession();
           if (session) {
@@ -153,6 +182,13 @@ export const useAuthStore = create<WebsiteAuthStore>()(
             merged.refreshToken = session.refreshToken;
             merged.isAuthenticated = true;
           }
+        }
+
+        // No usable session at all: don't leave the UI "signed in" while every
+        // request goes out unauthenticated.
+        if (!merged.accessToken) {
+          merged.user = null;
+          merged.isAuthenticated = false;
         }
         return merged;
       },

@@ -5,6 +5,7 @@ import type {
   CategoryView,
   ShopClassificationView,
   ShopProductDetailResponse,
+  ProductPharmaciesResponse,
   HealthConcernView,
   PrescriptionView,
   ConsultationView,
@@ -76,6 +77,10 @@ export const websiteApi = {
 
   getProduct: (id: string) =>
     api.get<ShopProductDetailResponse>(`/website/products/${id}`).then((r) => r.data),
+
+  /** Price/stock/delivery comparison for this product across pharmacies. */
+  getProductPharmacies: (id: string) =>
+    api.get<ProductPharmaciesResponse>(`/website/products/${id}/pharmacies`).then((r) => r.data),
 
   listClassifications: (type?: string) =>
     api
@@ -205,10 +210,15 @@ export const websiteApi = {
       unitPrice?: number;
     }>;
     delivery?: {
-      address: string;
+      address?: string;
       city?: string;
       state?: string;
       phone?: string;
+      email?: string;
+      /** "Just contact me" — skip delivery, keep phone/email only. */
+      contactOnly?: boolean;
+      /** Pickup at a pharmacy branch. */
+      pickupBranchId?: string;
       shippingMethod?: string;
     };
   }) => api.post<OrderView>('/website/orders', data).then((r) => r.data),
@@ -298,6 +308,17 @@ export const websiteApi = {
 
   listDeliveryAreas: () =>
     api.get<DeliveryAreaView[]>('/website/delivery-areas').then((r) => r.data),
+
+  /** Storefront checkout autofill: returning customer by phone (exact match). */
+  lookupCheckoutCustomer: (phone: string) =>
+    api
+      .get<{
+        name: string;
+        phone: string | null;
+        email: string | null;
+        address: string | null;
+      } | null>('/website/checkout/lookup', { params: { phone } })
+      .then((r) => r.data),
 
   // Branches
   listBranches: () => api.get<BranchView[]>('/website/branches').then((r) => r.data),

@@ -84,7 +84,12 @@ export const payApi = {
   status: (token: string) =>
     http
       .get<{
-        link: { status: string };
+        link: {
+          status: string;
+          type?: 'order_payment' | 'wallet_deposit' | 'receivable';
+          targetId?: string | null;
+          amount?: number | null;
+        };
         payment: {
           status: string;
           reference: string;

@@ -301,6 +301,9 @@ function CartItemRow({
     unitPrice?: number;
     quantity: number;
     product?: WebsiteProduct | null;
+    pharmacyName?: string;
+    priceListId?: string;
+    pharmacyOrganizationId?: string;
   };
 }) {
   const { updateQuantity, removeItem, saveForLater } = useCartStore();
@@ -352,6 +355,11 @@ function CartItemRow({
               <Text fw={800} size="sm" c={green} mt={2}>
                 {formatPrice(price)}/unit
               </Text>
+              {item.pharmacyName ? (
+                <Text size="xs" c={muted} mt={2}>
+                  Price from <strong>{item.pharmacyName}</strong> (selected offer)
+                </Text>
+              ) : null}
             </Box>
           </Group>
 

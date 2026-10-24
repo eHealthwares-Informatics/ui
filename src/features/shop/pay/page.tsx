@@ -16,11 +16,11 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { ShieldCheck, Wallet, CheckCircle2, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { publicBaseUrl } from '../public-base-url';
 import { WebsiteLayout, green, ink, darkGreen, muted, line, soft } from '../website/layout';
 import { clearPaySession, loadPaySession, payApi, savePaySession, type PaySession } from './payApi';
-const baseURL = import.meta.env.VITE_CALLBACK_URL || 'http://localhost:8080';
 
 function naira(amount: number) {
   return `₦${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -46,7 +46,19 @@ type StatusPayment = {
   amount?: number;
 };
 
-export default function PayPage() {
+type StatusLink = {
+  status: string;
+  type?: 'order_payment' | 'wallet_deposit' | 'receivable';
+  targetId?: string | null;
+  amount?: number | null;
+};
+
+export default function PayPage({
+  navigate,
+}: {
+  /** Test seam; the app always uses a full-page redirect. */
+  navigate?: (url: string) => void;
+} = {}) {
   const { token } = useParams({ from: '/shop/pay/$token' });
   const queryClient = useQueryClient();
   const [providerId, setProviderId] = useState<string | null>(null);
@@ -63,11 +75,39 @@ export default function PayPage() {
   // Spinner while /status is in flight (the page otherwise looks static).
   const [checking, setChecking] = useState(false);
   const [confirmRetry, setConfirmRetry] = useState(false);
+  // Status payload from the public /status endpoint. Unlike the link view this
+  // still resolves after the link is used/expired, so the page can show the
+  // payment instead of a dead-end "link expired" message.
+  const [statusLink, setStatusLink] = useState<StatusLink | null>(null);
+  const [statusLoaded, setStatusLoaded] = useState(false);
+  // Guards the auto-redirect so it fires at most once per page mount.
+  const autoNavigatedRef = useRef(false);
+
+  // Navigate to a provider checkout page, remembering the URL so a provider
+  // bounce-back does not immediately redirect the customer again.
+  const goTo = useCallback(
+    (url: string) => {
+      try {
+        window.sessionStorage.setItem(`pay-autonav:${token}`, url);
+      } catch {
+        /* storage disabled — navigation still proceeds */
+      }
+      if (navigate) {
+        navigate(url);
+        return;
+      }
+      window.location.href = url;
+    },
+    [navigate, token]
+  );
 
   const { data: link, isLoading } = useQuery({
     queryKey: ['pay-link', token],
     queryFn: () => payApi.getLink(token),
     staleTime: 30_000,
+    // A used/expired link is a deterministic 400 — don't retry it; fall back to
+    // the (still-public) status payload below.
+    retry: false,
   });
 
   // Every provider payment already generated for this link (server-side, so it
@@ -90,7 +130,7 @@ export default function PayPage() {
     if (typeof window === 'undefined') {
       return undefined;
     }
-    return `${baseURL || window.location.origin}/shop/pay/${token}`;
+    return `${publicBaseUrl()}/shop/pay/${token}`;
   }, [token]);
 
   const startPayment = useCallback(async () => {
@@ -112,14 +152,14 @@ export default function PayPage() {
       setForceChoose(false);
       void queryClient.invalidateQueries({ queryKey: ['pay-attempts', token] });
       if (res.checkoutUrl) {
-        window.location.href = res.checkoutUrl;
+        goTo(res.checkoutUrl);
       }
     } catch (e: any) {
       setError(getApiErrorMessage(e));
     } finally {
       setStarting(false);
     }
-  }, [providerId, token, returnUrl, queryClient]);
+  }, [providerId, token, returnUrl, queryClient, goTo]);
 
   const refreshStatus = useCallback(async () => {
     if (!token) {
@@ -128,12 +168,15 @@ export default function PayPage() {
     try {
       const res = await payApi.status(token);
       setPayment(res.payment ?? null);
+      setStatusLink(res.link ?? null);
       setLiveStatus(res.payment?.status ?? res.link.status ?? 'pending');
       if (res.payment?.status === 'success') {
         clearPaySession(token);
       }
     } catch {
       setLiveStatus('unknown');
+    } finally {
+      setStatusLoaded(true);
     }
   }, [token]);
 
@@ -165,6 +208,45 @@ export default function PayPage() {
   const reference = session?.reference ?? payment?.reference ?? '';
   const paymentStatus = payment?.status ?? session?.status ?? 'pending';
 
+  // Where "View payment status" goes when the link itself is no longer active:
+  // the order for order payments, otherwise the customer dashboard.
+  const statusHref = useMemo(() => {
+    if (statusLink?.type === 'order_payment' && statusLink.targetId) {
+      return `/shop/orders/${statusLink.targetId}`;
+    }
+    return '/shop/dashboard';
+  }, [statusLink]);
+
+  // If a provider payment was already generated for this link and still has a
+  // live checkout URL, take the customer straight to the provider instead of
+  // showing the chooser / "payment in progress". Keyed on the SERVER payment so
+  // it works on any device. The stored marker prevents a redirect loop when the
+  // provider bounces the customer back here after an abandoned attempt.
+  useEffect(() => {
+    if (!link || confirmed || forceChoose || autoNavigatedRef.current) {
+      return;
+    }
+    const checkoutUrl = payment?.checkoutUrl;
+    if (!checkoutUrl) {
+      return;
+    }
+    const status = payment?.status ?? 'pending';
+    if (!['initiated', 'pending', 'unknown'].includes(status)) {
+      return;
+    }
+    let alreadyNavigated: string | null = null;
+    try {
+      alreadyNavigated = window.sessionStorage.getItem(`pay-autonav:${token}`);
+    } catch {
+      alreadyNavigated = null;
+    }
+    if (alreadyNavigated === checkoutUrl) {
+      return;
+    }
+    autoNavigatedRef.current = true;
+    goTo(checkoutUrl);
+  }, [link, payment, confirmed, forceChoose, token, goTo]);
+
   return (
     <WebsiteLayout>
       <Box bg="#FFFFFF">
@@ -182,7 +264,93 @@ export default function PayPage() {
                 <Loader size="sm" />
               </Group>
             ) : !link ? (
-              <Alert color="red" title="Payment link not found or expired" />
+              !statusLoaded ? (
+                <Group justify="center" py={40}>
+                  <Loader size="sm" />
+                </Group>
+              ) : payment ? (
+                <Paper
+                  radius={24}
+                  p="xl"
+                  withBorder
+                  data-testid="pay-inactive-payment"
+                  style={{
+                    borderColor: confirmed ? green : line,
+                    background: confirmed ? soft : '#FFFFFF',
+                  }}
+                >
+                  <Stack align="center" gap="md">
+                    {confirmed ? (
+                      <CheckCircle2 size={36} color={green} />
+                    ) : (
+                      <RefreshCw size={28} color={green} />
+                    )}
+                    <Text
+                      fw={900}
+                      size="lg"
+                      c={confirmed ? darkGreen : ink}
+                      className="damorex-heading"
+                    >
+                      {confirmed ? 'Payment successful' : 'Payment in progress'}
+                    </Text>
+                    <Text size="sm" c={muted} ta="center">
+                      This payment link is no longer active, but a provider payment was found.
+                    </Text>
+                    <Stack gap={6} w="100%">
+                      <Group justify="space-between">
+                        <Text size="sm" c={muted}>
+                          Amount
+                        </Text>
+                        <Text size="sm" fw={700}>
+                          {naira(payment.amount ?? statusLink?.amount ?? 0)}
+                        </Text>
+                      </Group>
+                      <Group justify="space-between">
+                        <Text size="sm" c={muted}>
+                          Reference
+                        </Text>
+                        <Text size="sm" fw={700}>
+                          {payment.reference}
+                        </Text>
+                      </Group>
+                      <Group justify="space-between">
+                        <Text size="sm" c={muted}>
+                          Status
+                        </Text>
+                        <Text size="sm" fw={700} tt="capitalize">
+                          {payment.status}
+                        </Text>
+                      </Group>
+                    </Stack>
+                    {!confirmed && (
+                      <Button
+                        variant="light"
+                        radius="xl"
+                        leftSection={checking ? undefined : <RefreshCw size={16} />}
+                        loading={checking}
+                        onClick={handleCheck}
+                        fullWidth
+                        data-testid="pay-check-status"
+                      >
+                        {checking ? 'Checking payment status…' : 'Check payment status'}
+                      </Button>
+                    )}
+                    <Button
+                      component="a"
+                      href={statusHref}
+                      radius="xl"
+                      variant="light"
+                      color="green"
+                      fullWidth
+                      data-testid="pay-view-status"
+                    >
+                      View payment status
+                    </Button>
+                  </Stack>
+                </Paper>
+              ) : (
+                <Alert color="red" title="Payment link not found or expired" />
+              )
             ) : (
               <>
                 <Paper
