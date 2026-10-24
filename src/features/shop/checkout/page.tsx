@@ -1,5 +1,6 @@
 import {
   Alert,
+  Autocomplete,
   Badge,
   Box,
   Button,
@@ -13,7 +14,6 @@ import {
   Paper,
   Progress,
   Radio,
-  Select,
   Stack,
   Stepper,
   Text,
@@ -128,14 +128,24 @@ const productInfo: Record<
     dosage: '500mg Tablet',
     isRx: false,
   },
-  '4': { name: 'Omeprazole 20mg', genericName: 'Omeprazole', dosage: '20mg Capsule', isRx: false },
+  '4': {
+    name: 'Omeprazole 20mg',
+    genericName: 'Omeprazole',
+    dosage: '20mg Capsule',
+    isRx: false,
+  },
   '5': {
     name: 'Metformin 500mg',
     genericName: 'Metformin HCl',
     dosage: '500mg Tablet',
     isRx: true,
   },
-  '6': { name: 'Ibuprofen 400mg', genericName: 'Ibuprofen', dosage: '400mg Tablet', isRx: false },
+  '6': {
+    name: 'Ibuprofen 400mg',
+    genericName: 'Ibuprofen',
+    dosage: '400mg Tablet',
+    isRx: false,
+  },
   '7': {
     name: 'Atorvastatin 10mg',
     genericName: 'Atorvastatin Calcium',
@@ -148,7 +158,12 @@ const productInfo: Record<
     dosage: '1000mg Chewable',
     isRx: false,
   },
-  '9': { name: 'Lisinopril 5mg', genericName: 'Lisinopril', dosage: '5mg Tablet', isRx: true },
+  '9': {
+    name: 'Lisinopril 5mg',
+    genericName: 'Lisinopril',
+    dosage: '5mg Tablet',
+    isRx: true,
+  },
   '10': {
     name: 'Cetirizine 10mg',
     genericName: 'Cetirizine HCl',
@@ -207,6 +222,9 @@ function itemIsRx(i: { productId?: string; product?: WebsiteProduct | null }): b
 function formatPrice(n: number): string {
   return `₦${n.toLocaleString()}`;
 }
+
+/** Synthetic pickup id for a pharmacy the shopper typed in by hand. */
+const MANUAL_PICKUP_ID = 'manual-pickup';
 
 const mockDeliveryAreas: DeliveryAreaView[] = [
   {
@@ -301,6 +319,11 @@ export default function CheckoutPage() {
   const [locating, setLocating] = useState(false);
   const [locationNote, setLocationNote] = useState<string | null>(null);
   const [deliveryAreaId, setDeliveryAreaId] = useState<string | null>(null);
+  // Free-text fallbacks: the published area list and geolocation do not cover
+  // every address, so the shopper can type their area or pharmacy instead of
+  // being blocked at the delivery step.
+  const [manualArea, setManualArea] = useState('');
+  const [manualPharmacy, setManualPharmacy] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<string | null>(providers[0]?.id ?? null);
 
   // Default to the first available provider once the list resolves.
@@ -342,6 +365,8 @@ export default function CheckoutPage() {
   };
 
   const selectedArea = deliveryAreas.find((a) => a.id === deliveryAreaId);
+  const typedArea = !selectedArea ? manualArea.trim() : '';
+  const typedPharmacy = manualPharmacy.trim();
 
   // Pickup: nearby pharmacies from the national register (returned by
   // "Use my location") come first, then matching internal branches. The
@@ -392,8 +417,21 @@ export default function CheckoutPage() {
       seen.add(key);
       options.push(option);
     }
+    // A pharmacy the shopper typed in themselves (e.g. when the register has
+    // no nearby result because location is unavailable).
+    if (typedPharmacy) {
+      options.push({
+        id: MANUAL_PICKUP_ID,
+        name: typedPharmacy,
+        address: [city, state_].filter(Boolean).join(', '),
+        city: city || selectedArea?.city || null,
+        state: state_ || selectedArea?.state || null,
+        phone: null,
+        isBranch: false,
+      });
+    }
     return options;
-  }, [allBranches, city, state_, selectedArea, nearbyPickup]);
+  }, [allBranches, city, state_, selectedArea, nearbyPickup, typedPharmacy]);
 
   // "Use my current location": geolocate, then use the nearest premises in the
   // register to infer the area and filter the pharmacy list.
@@ -482,11 +520,17 @@ export default function CheckoutPage() {
         });
       } else {
         setAppliedCoupon(null);
-        setCouponStatus({ kind: 'error', message: result.reason ?? 'Invalid coupon code.' });
+        setCouponStatus({
+          kind: 'error',
+          message: result.reason ?? 'Invalid coupon code.',
+        });
       }
     } catch {
       setAppliedCoupon(null);
-      setCouponStatus({ kind: 'error', message: 'Could not validate the coupon. Try again.' });
+      setCouponStatus({
+        kind: 'error',
+        message: 'Could not validate the coupon. Try again.',
+      });
     } finally {
       setCheckingCoupon(false);
     }
@@ -499,8 +543,8 @@ export default function CheckoutPage() {
       case 1:
         if (!phone) return false;
         if (deliveryMode === 'contact') return true;
-        if (deliveryMode === 'pickup') return !!pickupBranchId;
-        return !!address && !!city && !!state_ && !!deliveryAreaId;
+        if (deliveryMode === 'pickup') return !!pickupBranchId || !!typedPharmacy;
+        return !!address && !!city && !!state_ && (!!deliveryAreaId || !!typedArea);
       case 2:
         return true;
       case 3:
@@ -525,7 +569,18 @@ export default function CheckoutPage() {
     placeOrder(
       {
         paymentMethod: providers.find((p) => p.id === providerId)?.name || 'Card',
-        notes: promoCode ? `Promo: ${promoCode}` : undefined,
+        // The typed area/pharmacy is not in the published list, so record it
+        // with the order for fulfilment to confirm.
+        notes:
+          [
+            promoCode ? `Promo: ${promoCode}` : null,
+            typedArea ? `Delivery area: ${typedArea}` : null,
+            deliveryMode === 'pickup' && pickupBranchId === MANUAL_PICKUP_ID && typedPharmacy
+              ? `Pickup at: ${typedPharmacy}`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' \u00b7 ') || undefined,
         couponCode: appliedCoupon?.code,
         items: items.map((i) => {
           // Every line carries all available descriptive fields so the order is
@@ -566,7 +621,11 @@ export default function CheckoutPage() {
               unitPrice: i.unitPrice ?? 0,
             };
           }
-          return { freetextName: displayName, quantity: i.quantity, unitPrice: i.unitPrice ?? 0 };
+          return {
+            freetextName: displayName,
+            quantity: i.quantity,
+            unitPrice: i.unitPrice ?? 0,
+          };
         }),
         delivery: {
           // Registry pharmacies have no branch row — record the chosen
@@ -682,7 +741,11 @@ export default function CheckoutPage() {
               p="md"
               mt="lg"
               withBorder
-              style={{ borderColor: line, background: soft, display: 'inline-block' }}
+              style={{
+                borderColor: line,
+                background: soft,
+                display: 'inline-block',
+              }}
             >
               <Stack gap={4} align="center">
                 <Text size="xs" c={muted} tt="uppercase" fw={700}>
@@ -844,6 +907,10 @@ export default function CheckoutPage() {
                   areasLoading={areasLoading}
                   selectedArea={selectedArea}
                   items={items}
+                  manualArea={manualArea}
+                  setManualArea={setManualArea}
+                  manualPharmacy={manualPharmacy}
+                  setManualPharmacy={setManualPharmacy}
                 />
               )}
 
@@ -934,7 +1001,12 @@ function StepCartReview({
   subtotal,
   totalItems,
 }: {
-  items: { productId?: string; name?: string; unitPrice?: number; quantity: number }[];
+  items: {
+    productId?: string;
+    name?: string;
+    unitPrice?: number;
+    quantity: number;
+  }[];
   subtotal: number;
   totalItems: number;
 }) {
@@ -1032,6 +1104,10 @@ function StepDeliveryDetails({
   areasLoading,
   selectedArea,
   items,
+  manualArea,
+  setManualArea,
+  manualPharmacy,
+  setManualPharmacy,
 }: {
   address: string;
   setAddress: (v: string) => void;
@@ -1058,8 +1134,19 @@ function StepDeliveryDetails({
   deliveryAreas: DeliveryAreaView[];
   areasLoading: boolean;
   selectedArea: DeliveryAreaView | undefined;
-  items: { productId?: string; name?: string; unitPrice?: number; quantity: number }[];
+  items: {
+    productId?: string;
+    name?: string;
+    unitPrice?: number;
+    quantity: number;
+  }[];
+  manualArea: string;
+  setManualArea: (v: string) => void;
+  manualPharmacy: string;
+  setManualPharmacy: (v: string) => void;
 }) {
+  // An area the shopper typed that is not in the published list.
+  const typedArea = selectedArea ? '' : manualArea.trim();
   const options: Array<{
     value: DeliveryMode;
     title: string;
@@ -1197,19 +1284,37 @@ function StepDeliveryDetails({
               </Grid.Col>
             </Grid>
 
-            <Select
+            <Autocomplete
               label="Delivery Area"
-              placeholder={areasLoading ? 'Loading areas...' : 'Select your delivery area'}
-              data={deliveryAreas.map((a) => ({
-                value: a.id,
-                label: `${a.city}, ${a.state} — ${formatPrice(a.deliveryFee)} fee`,
-              }))}
-              value={deliveryAreaId}
-              onChange={setDeliveryAreaId}
+              description="Pick a listed area or type yours if it isn't shown."
+              placeholder={areasLoading ? 'Loading areas...' : 'Area, city or LGA'}
+              data={deliveryAreas.map((a) => `${a.city}, ${a.state}`)}
+              value={
+                manualArea || (selectedArea ? `${selectedArea.city}, ${selectedArea.state}` : '')
+              }
+              onChange={(value) => {
+                setManualArea(value);
+                const match = deliveryAreas.find(
+                  (a) => `${a.city}, ${a.state}`.toLowerCase() === value.trim().toLowerCase()
+                );
+                setDeliveryAreaId(match?.id ?? null);
+              }}
               radius="xl"
-              searchable
-              nothingFoundMessage="No areas found"
+              data-testid="checkout-delivery-area"
             />
+
+            {typedArea ? (
+              <Alert
+                icon={<AlertTriangle size={16} />}
+                color="orange"
+                variant="light"
+                radius="lg"
+                data-testid="checkout-manual-area-note"
+              >
+                We&apos;ll confirm delivery to <strong>{typedArea}</strong> and the exact fee when
+                we call you. The standard delivery fee applies until then.
+              </Alert>
+            ) : null}
 
             {selectedArea ? (
               <Paper radius={16} p="md" withBorder style={{ borderColor: line, background: soft }}>
@@ -1276,6 +1381,46 @@ function StepDeliveryDetails({
               </Text>
             ) : null}
 
+            {/* Manual fallback: location services are optional, so the shopper
+                can name their area and pharmacy by hand. */}
+            <Grid>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="City / Area"
+                  placeholder="e.g. Ikeja"
+                  radius="xl"
+                  value={city}
+                  onChange={(e) => setCity(e.currentTarget.value)}
+                  data-testid="pickup-city"
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="State"
+                  placeholder="e.g. Lagos"
+                  radius="xl"
+                  value={state_}
+                  onChange={(e) => setState_(e.currentTarget.value)}
+                  data-testid="pickup-state"
+                />
+              </Grid.Col>
+            </Grid>
+
+            <TextInput
+              label="Pharmacy (if not listed)"
+              description="Type the pharmacy you want to collect from."
+              placeholder="e.g. Green Cross Pharmacy, Allen Avenue"
+              radius="xl"
+              value={manualPharmacy}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setManualPharmacy(value);
+                // Selecting the typed pharmacy is implicit; clearing unties it.
+                setPickupBranchId(value.trim() ? MANUAL_PICKUP_ID : null);
+              }}
+              data-testid="pickup-manual-pharmacy"
+            />
+
             {branchesLoading ? (
               <Group justify="center" py="md">
                 <Loader size="sm" />
@@ -1283,8 +1428,8 @@ function StepDeliveryDetails({
             ) : branches.length === 0 ? (
               <Alert icon={<AlertTriangle size={16} />} color="orange" variant="light" radius="lg">
                 {locationNote
-                  ? 'No pharmacies are available for pickup right now.'
-                  : 'Tap "Use my location" to find pharmacies near you.'}
+                  ? 'No pharmacies matched. Enter your area and pharmacy above to continue.'
+                  : 'Tap "Use my location", or enter your area and pharmacy above.'}
               </Alert>
             ) : (
               <Radio.Group value={pickupBranchId} onChange={setPickupBranchId}>
@@ -1351,7 +1496,12 @@ function subtotalValue(
 function StepPrescriptionValidation({
   rxItems,
 }: {
-  rxItems: { productId?: string; name?: string; unitPrice?: number; quantity: number }[];
+  rxItems: {
+    productId?: string;
+    name?: string;
+    unitPrice?: number;
+    quantity: number;
+  }[];
 }) {
   const navigate = useNavigate();
 
@@ -1473,17 +1623,31 @@ function StepPayment({
   couponStatus,
   onApplyCoupon,
 }: {
-  providers: Array<{ id: string; name: string; providerType: string; production: boolean }>;
+  providers: Array<{
+    id: string;
+    name: string;
+    providerType: string;
+    production: boolean;
+  }>;
   paymentMethod: string | null;
   setPaymentMethod: (v: string | null) => void;
   promoCode: string;
   setPromoCode: (v: string) => void;
-  items: { productId?: string; name?: string; unitPrice?: number; quantity: number }[];
+  items: {
+    productId?: string;
+    name?: string;
+    unitPrice?: number;
+    quantity: number;
+  }[];
   subtotal: number;
   deliveryFee: number;
   total: number;
   totalItems: number;
-  appliedCoupon: { code: string; discountAmount: number; type?: 'percent' | 'fixed' } | null;
+  appliedCoupon: {
+    code: string;
+    discountAmount: number;
+    type?: 'percent' | 'fixed';
+  } | null;
   checkingCoupon: boolean;
   couponStatus: { kind: 'idle' | 'error' | 'success'; message: string };
   onApplyCoupon: () => void;

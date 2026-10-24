@@ -82,7 +82,6 @@ function PosProductPicker({
 }) {
   const combobox = useCombobox();
   const [search, setSearch] = useState('');
-  const [focused, setFocused] = useState(false);
   const [debounced] = useDebouncedValue(search, 250);
   const { data: items = [], isLoading } = usePosItems(debounced);
 
@@ -112,7 +111,10 @@ function PosProductPicker({
           placeholder="Search product..."
           w={350}
           data-testid="pos-product-select"
-          value={search || (!focused ? selectedLabel : '') || ''}
+          // The label must survive selection: picking an option keeps focus in
+          // the input, so deriving the value from focus left the field blank
+          // until the cashier clicked elsewhere.
+          value={search || selectedLabel || ''}
           onChange={(e) => {
             setSearch(e.currentTarget.value);
             combobox.openDropdown();
@@ -120,16 +122,12 @@ function PosProductPicker({
           onClick={() => combobox.openDropdown()}
           onFocus={() => {
             setSearch(selectedLabel ?? '');
-            setFocused(true);
             combobox.openDropdown();
           }}
-          onBlur={() => {
-            setSearch('');
-            setFocused(false);
-          }}
+          onBlur={() => setSearch('')}
           rightSection={
             <Group gap={4} style={{ paddingRight: 4 }}>
-              {selectedLabel && !focused && (
+              {selectedLabel && (
                 <ActionIcon
                   size="sm"
                   variant="subtle"
@@ -137,6 +135,7 @@ function PosProductPicker({
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelect(null);
+                    setSearch('');
                   }}
                   aria-label="Clear product"
                 >
@@ -280,12 +279,18 @@ function DispenseRowEditor({
 
   function handleAdd() {
     if (!selectedProductId || !quantity) {
-      notifications.show({ color: 'red', message: 'Select a product and quantity first' });
+      notifications.show({
+        color: 'red',
+        message: 'Select a product and quantity first',
+      });
       return;
     }
     const uom = uomId ? itemUomMap.get(uomId) : undefined;
     if (!uom) {
-      notifications.show({ color: 'red', message: 'Please select a UOM for this product' });
+      notifications.show({
+        color: 'red',
+        message: 'Please select a UOM for this product',
+      });
       return;
     }
     if (effectivePrice === null) {
@@ -577,12 +582,18 @@ export function ProductEntryTable({
 
   function handleAdd() {
     if (!selectedProductId || !quantity) {
-      notifications.show({ color: 'red', message: 'Select a product and quantity first' });
+      notifications.show({
+        color: 'red',
+        message: 'Select a product and quantity first',
+      });
       return;
     }
     const uom = uomId ? itemUomMap.get(uomId) : undefined;
     if (!uom) {
-      notifications.show({ color: 'red', message: 'Please select a UOM for this product' });
+      notifications.show({
+        color: 'red',
+        message: 'Please select a UOM for this product',
+      });
       return;
     }
     if (effectivePrice === null) {

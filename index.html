@@ -129,6 +129,13 @@
 #rxsoft-loader .check.active .skip-link{display:inline}
 #rxsoft-loader .skip-all{color:#2879e8;font-size:12px;cursor:pointer;text-decoration:none;font-weight:600}
 #rxsoft-loader .skip-all:hover{text-decoration:underline}
+/* Generic startup state: every route except sign-in gets a neutral spinner
+   instead of the branded eHealthWares boot sequence. */
+#rxsoft-loader .generic-loader{display:none;flex-direction:column;align-items:center;gap:14px;color:var(--muted)}
+#rxsoft-loader.generic .generic-loader{display:flex}
+#rxsoft-loader.generic .card{display:none}
+#rxsoft-loader .generic-spinner{width:34px;height:34px;border:3px solid #dbe4ef;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+#rxsoft-loader .generic-label{font-size:13px;letter-spacing:.2px}
 </style>
 </head>
 <body>
@@ -167,7 +174,9 @@
 </div>
 <div class="progress"><div class="bar" id="bar"></div></div>
 <div class="footer" id="footer">Initializing secure healthcare services&hellip;</div>
-</section></main>
+</section>
+<div class="generic-loader" role="status" aria-live="polite"><span class="generic-spinner"></span><span class="generic-label">Loading&hellip;</span></div>
+</main>
 <div id="root"></div>
 <script>
 (function(){
@@ -177,10 +186,19 @@
      storefront /shop, sign-in, marketing, error pages — get the simple loader. */
   var hasToken = false;
   try { hasToken = !!(localStorage.getItem('access_token')||localStorage.getItem('refresh_token')); } catch(e){}
-  var simpleMode = !hasToken;
+  /* The branded eHealthWares boot sequence belongs to the sign-in screen only.
+     Every other URL (storefront, checkout, dashboards, public pages, deep
+     links) shows a neutral spinner while React starts. */
+  var isSignInRoute=/^\/(sign-in|sign-in-2|signin)\/?$/i.test(location.pathname);
+  var brandedLoader=isSignInRoute;
+  var loaderRoot=document.getElementById('rxsoft-loader');
+  if(!brandedLoader&&loaderRoot){loaderRoot.classList.add('generic');}
+  /* Skipping the healthcare checks is required off /sign-in, and also for a
+     signed-out visitor on /sign-in (nothing to check yet). */
+  var simpleMode = !brandedLoader || !hasToken;
   var $=function(id){return document.getElementById(id)};
   function initSimpleMode(){
-    if(!simpleMode){return;}
+    if(!brandedLoader){return;}
     var card=document.querySelector('#rxsoft-loader .card');
     var h1=document.querySelector('#rxsoft-loader h1');
     var blocks=document.querySelectorAll('#rxsoft-loader .checks, #rxsoft-loader .modules');
