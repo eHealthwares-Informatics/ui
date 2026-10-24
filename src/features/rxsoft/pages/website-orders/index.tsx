@@ -378,6 +378,7 @@ export function RxWebsiteOrdersPage() {
     const actionsColumn = {
       key: 'actions',
       label: '',
+      sortable: false,
       render: (row: any) => {
         const hasFreetext =
           !reconciledOrderIds.has(row.id) &&
@@ -495,10 +496,42 @@ export function RxWebsiteOrdersPage() {
               }
             : c
         )
+        .map((c) =>
+          c.key === 'paymentMethod'
+            ? {
+                ...c,
+                render: (row: any) => {
+                  const linkStatus = row.paymentLink?.status as string | undefined;
+                  if (linkStatus) {
+                    const color =
+                      linkStatus === 'used' ? 'green' : linkStatus === 'active' ? 'blue' : 'gray';
+                    return (
+                      <Badge color={color} variant="light" tt="capitalize">
+                        {linkStatus}
+                      </Badge>
+                    );
+                  }
+                  if (row.paymentIntent === 'receivable') {
+                    return (
+                      <Badge color="orange" variant="light">
+                        Receivable
+                      </Badge>
+                    );
+                  }
+                  return (
+                    <Badge color="gray" variant="light">
+                      {row.paymentMethod ?? '—'}
+                    </Badge>
+                  );
+                },
+              }
+            : c
+        )
         .concat([
           {
             key: 'sale',
             label: 'Sale',
+            sortable: false,
             render: (row: any) =>
               row.saleId ? (
                 <Badge
@@ -521,6 +554,7 @@ export function RxWebsiteOrdersPage() {
           {
             key: 'paymentLink',
             label: 'Payment link',
+            sortable: false,
             render: (row: any) => {
               const link = row.paymentLink;
               if (row._isChildRow) {
@@ -628,6 +662,7 @@ export function RxWebsiteOrdersPage() {
           {
             key: 'createdAt',
             label: 'Date',
+            sortable: true,
             render: (row: any) => (row.createdAt ? new Date(row.createdAt).toLocaleString() : '-'),
           },
           actionsColumn,

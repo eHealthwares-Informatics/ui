@@ -7,6 +7,7 @@ import {
   Divider,
   Group,
   Loader,
+  ScrollArea,
   SimpleGrid,
   Stack,
   Text,
@@ -267,26 +268,28 @@ export function RxPaymentTransactionDetailPage({ transactionId }: { transactionI
               No events recorded yet.
             </Text>
           ) : (
-            <Stack gap="sm">
-              {events.map((ev) => (
-                <Group key={ev.id} align="flex-start" wrap="nowrap" gap="sm">
-                  <Badge color={EVENT_COLORS[ev.status] ?? 'gray'} variant="light" w={90}>
-                    {ev.type}
-                  </Badge>
-                  <Stack gap={2} style={{ flex: 1 }}>
-                    <Text size="sm">{ev.message ?? '—'}</Text>
-                    <Text size="xs" c="dimmed">
-                      {fmtDateTime(ev.createdAt)}
-                    </Text>
-                    {ev.data && (
-                      <Code block style={{ fontSize: 11 }}>
-                        {JSON.stringify(ev.data)}
-                      </Code>
-                    )}
-                  </Stack>
-                </Group>
-              ))}
-            </Stack>
+            <ScrollArea.Autosize mah={360} type="auto" offsetScrollbars>
+              <Stack gap="sm" pr="xs">
+                {events.map((ev) => (
+                  <Group key={ev.id} align="flex-start" wrap="nowrap" gap="sm">
+                    <Badge color={EVENT_COLORS[ev.status] ?? 'gray'} variant="light" w={90}>
+                      {ev.type}
+                    </Badge>
+                    <Stack gap={2} style={{ flex: 1 }}>
+                      <Text size="sm">{ev.message ?? '—'}</Text>
+                      <Text size="xs" c="dimmed">
+                        {fmtDateTime(ev.createdAt)}
+                      </Text>
+                      {ev.data && (
+                        <Code block style={{ fontSize: 11 }}>
+                          {JSON.stringify(ev.data)}
+                        </Code>
+                      )}
+                    </Stack>
+                  </Group>
+                ))}
+              </Stack>
+            </ScrollArea.Autosize>
           )}
         </Card>
 

@@ -463,6 +463,7 @@ export function WebsiteHeader() {
                 leftSection={<Upload size={16} />}
                 styles={buttonStyles}
                 onClick={() => navigate({ to: '/shop/upload-prescription' })}
+                data-testid="shop-upload-prescription"
               >
                 Upload Prescription
               </Button>
@@ -644,6 +645,7 @@ export function WebsiteHeader() {
                             closeCartHover();
                             navigate({ to: '/shop/cart' });
                           }}
+                          data-testid="shop-view-cart"
                         >
                           View cart
                         </Button>

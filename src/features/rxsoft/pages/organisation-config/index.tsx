@@ -9,6 +9,7 @@ import {
   Image,
   Loader,
   NumberInput,
+  PasswordInput,
   Radio,
   Select,
   Stack,
@@ -19,7 +20,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2 } from 'lucide-react';
+import { Calculator, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
@@ -42,6 +43,13 @@ type OrganisationConfig = {
   defaultAllowPos: boolean;
   defaultAllowA4Print: boolean;
   notificationChannels: NotificationChannel[];
+  /** Per-org SMTP overrides; null fields fall back to the system config. */
+  emailSmtpHost: string | null;
+  emailSmtpPort: number | null;
+  emailSmtpSecure: boolean | null;
+  emailSmtpUser: string | null;
+  emailSmtpPasswordSet: boolean;
+  emailFrom: string | null;
 };
 
 type OrgOption = { id: string; name: string; code?: string };
@@ -61,6 +69,14 @@ type Draft = {
   defaultAllowA4Print: boolean;
   /** Channel codes staff pick from when sending a payment link to a customer. */
   notificationChannels: Array<{ id: string; label: string; type: ChannelType; code: string }>;
+  /** Per-org SMTP overrides. Empty strings mean "use the system config". */
+  emailSmtpHost: string;
+  emailSmtpPort: number | string;
+  emailSmtpSecure: boolean;
+  emailSmtpUser: string;
+  /** Only sent when the user types a new value; blank keeps the stored password. */
+  emailSmtpPassword: string;
+  emailFrom: string;
 };
 
 const emptyDraft: Draft = {
@@ -76,6 +92,12 @@ const emptyDraft: Draft = {
   defaultAllowPos: true,
   defaultAllowA4Print: false,
   notificationChannels: [],
+  emailSmtpHost: '',
+  emailSmtpPort: 587,
+  emailSmtpSecure: false,
+  emailSmtpUser: '',
+  emailSmtpPassword: '',
+  emailFrom: '',
 };
 
 export function RxOrganisationConfigPage() {
@@ -141,6 +163,12 @@ export function RxOrganisationConfigPage() {
         type: c.type,
         code: c.code ?? '',
       })),
+      emailSmtpHost: config.emailSmtpHost ?? '',
+      emailSmtpPort: config.emailSmtpPort ?? 587,
+      emailSmtpSecure: config.emailSmtpSecure ?? config.emailSmtpPort === 465,
+      emailSmtpUser: config.emailSmtpUser ?? '',
+      emailSmtpPassword: '',
+      emailFrom: config.emailFrom ?? '',
     });
   }, [config]);
 
@@ -167,9 +195,15 @@ export function RxOrganisationConfigPage() {
             id: c.id,
             label: c.label,
             type: c.type,
-            // Email needs no conversation channel code.
-            code: c.type === 'email' ? null : c.code || null,
+            code: c.code || null,
           })),
+          emailSmtpHost: draft.emailSmtpHost || null,
+          emailSmtpPort: draft.emailSmtpPort === '' ? null : Number(draft.emailSmtpPort),
+          emailSmtpSecure: draft.emailSmtpSecure,
+          emailSmtpUser: draft.emailSmtpUser || null,
+          // Omit when blank so the stored password is kept.
+          emailSmtpPassword: draft.emailSmtpPassword || undefined,
+          emailFrom: draft.emailFrom || null,
         }
       );
       return data as OrganisationConfig;
@@ -182,6 +216,39 @@ export function RxOrganisationConfigPage() {
     onError: (err: any) => {
       notifications.show({
         color: 'red',
+        message: getApiErrorMessage(err),
+      });
+    },
+  });
+
+  // Bulk job: compute the average price of all products in the selected price
+  // list and apply it to every product in that list.
+  const applyAveragePrice = useMutation({
+    mutationFn: async () => {
+      if (!draft.defaultPriceListId) {
+        throw new Error('Select a price list first');
+      }
+      const { data } = await rxsoftApi.post(
+        `/price-lists/${draft.defaultPriceListId}/average-price`
+      );
+      return data as { averagePrice: number | null; updatedCount: number };
+    },
+    onSuccess: ({ averagePrice, updatedCount }) => {
+      notifications.show({
+        color: 'green',
+        title: 'Average price applied',
+        message:
+          averagePrice == null
+            ? 'The selected price list has no products.'
+            : `Applied ₦${averagePrice.toLocaleString()} to ${updatedCount} product(s).`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['price-list-items'] });
+      queryClient.invalidateQueries({ queryKey: ['price-lists'] });
+    },
+    onError: (err: any) => {
+      notifications.show({
+        color: 'red',
+        title: 'Could not apply average price',
         message: getApiErrorMessage(err),
       });
     },
@@ -275,21 +342,35 @@ export function RxOrganisationConfigPage() {
                   </Text>
                 </Group>
               )}
-              <Select
-                label="Default Price List"
-                description="Price list used for storefront prices and sorting. Falls back to the price list marked default when unset."
-                placeholder={loadingPriceLists ? 'Loading price lists…' : 'Select a price list'}
-                data={priceListData}
-                value={draft.defaultPriceListId}
-                onChange={(value) => {
-                  const defaultPriceListId = value ?? null;
-                  setDraft((d) => ({ ...d, defaultPriceListId }));
-                }}
-                searchable
-                clearable
-                disabled={loadingPriceLists}
-                nothingFoundMessage="No price lists found"
-              />
+              <Group align="flex-end" gap="xs">
+                <Select
+                  label="Default Price List"
+                  description="Price list used for storefront prices and sorting. Falls back to the price list marked default when unset."
+                  placeholder={loadingPriceLists ? 'Loading price lists…' : 'Select a price list'}
+                  data={priceListData}
+                  value={draft.defaultPriceListId}
+                  onChange={(value) => {
+                    const defaultPriceListId = value ?? null;
+                    setDraft((d) => ({ ...d, defaultPriceListId }));
+                  }}
+                  searchable
+                  clearable
+                  disabled={loadingPriceLists}
+                  nothingFoundMessage="No price lists found"
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  variant="light"
+                  color="green"
+                  leftSection={<Calculator size={16} />}
+                  loading={applyAveragePrice.isPending}
+                  disabled={!draft.defaultPriceListId || loadingPriceLists}
+                  onClick={() => applyAveragePrice.mutate()}
+                  title="Compute the average price of all products in the selected price list and apply it to every product"
+                >
+                  Make average price
+                </Button>
+              </Group>
               <TextInput
                 label="Contact Phone"
                 description="Phone number shown on the storefront contact page."
@@ -363,10 +444,84 @@ export function RxOrganisationConfigPage() {
                   setDraft((d) => ({ ...d, defaultAllowA4Print: e.currentTarget.checked }))
                 }
               />
+              <Divider my="sm" label="Email (SMTP)" labelPosition="left" />
+              <Text size="sm" c="dimmed">
+                Used for order and payment-link emails. Leave a field blank to fall back to the
+                system SMTP configuration.
+              </Text>
+              <TextInput
+                label="SMTP Host"
+                description="Leave blank to use the system SMTP host."
+                placeholder="e.g. smtp.gmail.com"
+                value={draft.emailSmtpHost}
+                onChange={(e) => {
+                  const emailSmtpHost = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, emailSmtpHost }));
+                }}
+                data-testid="org-email-smtp-host"
+              />
+              <NumberInput
+                label="SMTP Port"
+                description="Usually 587 (STARTTLS) or 465 (implicit TLS)."
+                value={draft.emailSmtpPort}
+                onChange={(value) => setDraft((d) => ({ ...d, emailSmtpPort: value }))}
+                min={1}
+                allowDecimal={false}
+                data-testid="org-email-smtp-port"
+              />
+              <Switch
+                label="Implicit TLS"
+                description="Enable for port 465. Leave off for STARTTLS (587)."
+                checked={draft.emailSmtpSecure}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, emailSmtpSecure: e.currentTarget.checked }))
+                }
+                data-testid="org-email-smtp-secure"
+              />
+              <TextInput
+                label="SMTP Username"
+                description="Leave blank to use the system SMTP username."
+                placeholder="e.g. orders@example.com"
+                value={draft.emailSmtpUser}
+                onChange={(e) => {
+                  const emailSmtpUser = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, emailSmtpUser }));
+                }}
+                data-testid="org-email-smtp-user"
+              />
+              <PasswordInput
+                label="SMTP Password"
+                description={
+                  config?.emailSmtpPasswordSet
+                    ? 'A password is stored. Leave blank to keep it; type to replace it.'
+                    : 'Leave blank to use the system SMTP password.'
+                }
+                placeholder={
+                  config?.emailSmtpPasswordSet ? 'Stored — leave blank to keep' : undefined
+                }
+                value={draft.emailSmtpPassword}
+                onChange={(e) => {
+                  const emailSmtpPassword = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, emailSmtpPassword }));
+                }}
+                data-testid="org-email-smtp-password"
+              />
+              <TextInput
+                label="From Address"
+                description="From header for org email. Leave blank to use the system default."
+                placeholder='e.g. "Healthstack" <orders@healthstack.africa>'
+                value={draft.emailFrom}
+                onChange={(e) => {
+                  const emailFrom = e.currentTarget.value;
+                  setDraft((d) => ({ ...d, emailFrom }));
+                }}
+                data-testid="org-email-from"
+              />
               <Divider my="sm" label="Notification channels" labelPosition="left" />
               <Text size="sm" c="dimmed">
                 Channel codes staff pick from when sending an order/payment link to a customer. For
-                SMS/WhatsApp enter the conversation channel code; Email needs none.
+                SMS/WhatsApp enter the conversation channel code; for Email enter the email channel
+                code.
               </Text>
               <Stack gap="xs">
                 {draft.notificationChannels.map((channel, index) => (
@@ -410,9 +565,8 @@ export function RxOrganisationConfigPage() {
                     />
                     <TextInput
                       label={index === 0 ? 'Channel code' : undefined}
-                      placeholder={channel.type === 'email' ? '—' : 'e.g. ORDER_SMS'}
-                      value={channel.type === 'email' ? '' : channel.code}
-                      disabled={channel.type === 'email'}
+                      placeholder={channel.type === 'email' ? 'e.g. ORDER_EMAIL' : 'e.g. ORDER_SMS'}
+                      value={channel.code}
                       style={{ flex: 2 }}
                       onChange={(e) => {
                         const code = e.currentTarget.value;

@@ -36,6 +36,7 @@ import { toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import type { FormDefinition, FormFieldType, FormSchema } from '../../lib/emr-types';
 import { DynamicFormFields, type FormData } from '../documentation/dynamic-form';
+import { organDisplayName, organKeys } from './annotate/organ-catalog';
 
 const FIELD_TYPES: FormFieldType[] = [
   'text',
@@ -52,6 +53,7 @@ const FIELD_TYPES: FormFieldType[] = [
   'tab',
   'col',
   'item',
+  'annotate',
 ];
 
 const TABLE_COLUMN_TYPES: FormFieldType[] = ['text', 'number', 'textarea', 'date', 'checkbox'];
@@ -69,6 +71,11 @@ type BuilderField = {
   defaultValue: string;
   columns: BuilderColumn[];
   fields: BuilderField[];
+  annotateTarget: 'body' | 'dermatome' | 'organ';
+  annotateViews: Array<'front' | 'back'>;
+  annotateMultiple: boolean;
+  annotateShowLabels: boolean;
+  annotateOrgan: string;
 };
 
 const CATEGORIES = ['CLINICAL_NOTE', 'VITALS', 'ASSESSMENT', 'SCREENING', 'PROCEDURE', 'OTHER'];
@@ -91,6 +98,11 @@ function emptyField(): BuilderField {
     defaultValue: '',
     columns: [],
     fields: [],
+    annotateTarget: 'body',
+    annotateViews: ['front', 'back'],
+    annotateMultiple: true,
+    annotateShowLabels: true,
+    annotateOrgan: 'heart',
   };
 }
 
@@ -161,6 +173,24 @@ function builderFieldToSchema(field: BuilderField): Record<string, unknown> {
     ...(field.type === 'tab' || field.type === 'col'
       ? { fields: field.fields.map(builderFieldToSchema) }
       : {}),
+    ...(field.type === 'annotate'
+      ? {
+          annotate:
+            field.annotateTarget === 'organ'
+              ? {
+                  target: 'organ',
+                  organ: field.annotateOrgan || undefined,
+                  multiple: field.annotateMultiple,
+                }
+              : field.annotateTarget === 'dermatome'
+                ? {
+                    target: 'dermatome',
+                    views: field.annotateViews,
+                    showLabels: field.annotateShowLabels,
+                  }
+                : { target: 'body', views: field.annotateViews, multiple: field.annotateMultiple },
+        }
+      : {}),
   };
 }
 
@@ -187,6 +217,14 @@ function schemaToBuilder(schema: FormSchema | undefined): BuilderField[] {
         type: column.type,
       })) ?? [],
     fields: field.fields ? field.fields.map(mapField) : [],
+    annotateTarget: field.annotate?.target ?? 'body',
+    annotateViews: (field.annotate?.views as Array<'front' | 'back'> | undefined) ?? [
+      'front',
+      'back',
+    ],
+    annotateMultiple: field.annotate?.multiple !== false,
+    annotateShowLabels: field.annotate?.showLabels !== false,
+    annotateOrgan: field.annotate?.organ ?? 'heart',
   });
   return (schema?.fields ?? []).map(mapField);
 }
@@ -539,6 +577,64 @@ function FieldEditor({
             >
               Add column
             </Button>
+          </Stack>
+        )}
+
+        {field.type === 'annotate' && (
+          <Stack gap="xs">
+            <Select
+              size="xs"
+              label="Annotate target"
+              data={[
+                { value: 'body', label: 'Body regions' },
+                { value: 'dermatome', label: 'Dermatome levels' },
+                { value: 'organ', label: 'Organ parts' },
+              ]}
+              value={field.annotateTarget}
+              onChange={(value) =>
+                patch({
+                  annotateTarget: (value as 'body' | 'dermatome' | 'organ') ?? 'body',
+                })
+              }
+            />
+            {(field.annotateTarget === 'body' || field.annotateTarget === 'dermatome') && (
+              <Checkbox.Group
+                label="Views"
+                value={field.annotateViews}
+                onChange={(value) => patch({ annotateViews: value as Array<'front' | 'back'> })}
+              >
+                <Group gap="md" mt={4}>
+                  <Checkbox value="front" label="Front" />
+                  <Checkbox value="back" label="Back" />
+                </Group>
+              </Checkbox.Group>
+            )}
+            {field.annotateTarget === 'organ' && (
+              <Select
+                size="xs"
+                label="Organ"
+                searchable
+                data={organKeys.map((key) => ({ value: key, label: organDisplayName(key) }))}
+                value={field.annotateOrgan}
+                onChange={(value) => patch({ annotateOrgan: value ?? 'heart' })}
+              />
+            )}
+            {field.annotateTarget !== 'dermatome' && (
+              <Checkbox
+                size="xs"
+                label="Allow multiple selections"
+                checked={field.annotateMultiple}
+                onChange={(event) => patch({ annotateMultiple: event.currentTarget.checked })}
+              />
+            )}
+            {field.annotateTarget === 'dermatome' && (
+              <Checkbox
+                size="xs"
+                label="Show level labels"
+                checked={field.annotateShowLabels}
+                onChange={(event) => patch({ annotateShowLabels: event.currentTarget.checked })}
+              />
+            )}
           </Stack>
         )}
 

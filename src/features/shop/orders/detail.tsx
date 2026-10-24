@@ -1,18 +1,21 @@
 import {
   Badge,
   Box,
+  Button,
   Container,
-  Divider,
   Group,
   Paper,
   Stack,
   Text,
-  ThemeIcon,
   Title,
   Timeline,
 } from '@mantine/core';
 import { useParams } from '@tanstack/react-router';
-import { Package, MapPin, CreditCard, Truck, Check } from 'lucide-react';
+import { Package, MapPin, CreditCard, Truck, Check, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { parseOrderParam } from '../order-query';
+import { websiteApi } from '../website/api';
 import { EmptyOrders } from '../website/empty-states';
 import { useOrder } from '../website/hooks';
 import { WebsiteLayout, green, ink, muted, line } from '../website/layout';
@@ -57,8 +60,43 @@ function timelineActive(order: { orderStatus: string; saleId: string | null }): 
 }
 
 export default function OrderDetailPage() {
-  const { id } = useParams({ from: '/shop/orders_/$id' });
-  const { data: order, isLoading } = useOrder(id);
+  const { id: rawId } = useParams({ from: '/shop/orders_/$id' });
+  // The order URL can arrive with the provider query encoded into the id
+  // (`<id>%3FpaymentReference%3D…`), so recover both parts.
+  const parsed = parseOrderParam(rawId);
+  const orderId = parsed.orderId ?? rawId;
+  const urlReference =
+    typeof window !== 'undefined'
+      ? (new URLSearchParams(window.location.search).get('paymentReference') ?? undefined)
+      : undefined;
+  const paymentReference = parsed.paymentReference ?? urlReference;
+
+  const { data: order, isLoading, refetch } = useOrder(orderId);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+
+  const confirmPayment = async () => {
+    if (!paymentReference) {
+      return;
+    }
+    setConfirming(true);
+    setConfirmError(null);
+    try {
+      // Ask the provider and apply the result; then refresh the order state.
+      await websiteApi.verifyPayment(paymentReference);
+      await refetch();
+    } catch (error) {
+      setConfirmError(getApiErrorMessage(error));
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const awaitingPayment =
+    !!order &&
+    !order.saleId &&
+    order.orderStatus !== 'cancelled' &&
+    order.orderStatus !== 'delivered';
 
   return (
     <WebsiteLayout>
@@ -85,6 +123,34 @@ export default function OrderDetailPage() {
                 {new Date(order.createdAt).toLocaleDateString()}
               </Text>
             </Box>
+
+            {awaitingPayment && paymentReference && (
+              <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+                <Group justify="space-between" wrap="wrap" gap="sm">
+                  <Stack gap={2}>
+                    <Text fw={800}>Already paid?</Text>
+                    <Text size="sm" c={muted}>
+                      Re-check the payment provider for this order.
+                    </Text>
+                    {confirmError && (
+                      <Text size="sm" c="red">
+                        {confirmError}
+                      </Text>
+                    )}
+                  </Stack>
+                  <Button
+                    radius="xl"
+                    color="green"
+                    leftSection={<RefreshCw size={18} />}
+                    loading={confirming}
+                    onClick={() => void confirmPayment()}
+                    data-testid="order-confirm-payment"
+                  >
+                    Confirm payment status
+                  </Button>
+                </Group>
+              </Paper>
+            )}
 
             <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
               <Title order={3} className="damorex-heading" mb="md">

@@ -4,10 +4,26 @@ import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
 import { emrApi } from '@/lib/emr-api';
 import { useFormDefinition } from '../../hooks/use-form-definition';
-import type { FormSubmission } from '../../lib/emr-types';
+import type { FormFieldSchema, FormSubmission } from '../../lib/emr-types';
 import { printSubmission } from '../../lib/print-submission';
+import { formatAnnotateValue } from '../forms/annotate/format-annotate';
 import { StatusBadge } from '../shared/status-badge';
 import { SchemaOutdatedBadge } from './schema-outdated-badge';
+
+function findField(fields: FormFieldSchema[] | undefined, key: string): FormFieldSchema | null {
+  for (const field of fields ?? []) {
+    if (field.key === key) {
+      return field;
+    }
+    if ((field.type === 'tab' || field.type === 'col') && field.fields) {
+      const nested = findField(field.fields, key);
+      if (nested) {
+        return nested;
+      }
+    }
+  }
+  return null;
+}
 
 function renderValue(value: unknown): string {
   if (value === null || value === undefined || value === '') {
@@ -114,14 +130,18 @@ export function SubmissionViewModal({
 
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             {Object.entries(submission.dataJson ?? {}).map(([key, value]) => {
-              const label =
-                form?.schemaJson?.fields?.find((field) => field.key === key)?.label ?? key;
+              const field = findField(form?.schemaJson?.fields, key);
+              const label = field?.label ?? key;
               return (
                 <Stack key={key} gap={2}>
                   <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
                     {label}
                   </Text>
-                  <Text size="sm">{renderValue(value)}</Text>
+                  <Text size="sm">
+                    {field?.type === 'annotate'
+                      ? formatAnnotateValue(value, field.annotate)
+                      : renderValue(value)}
+                  </Text>
                 </Stack>
               );
             })}

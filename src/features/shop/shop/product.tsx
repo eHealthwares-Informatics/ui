@@ -10,6 +10,7 @@ import {
   Rating,
   SimpleGrid,
   Stack,
+  Tabs,
   Text,
   Title,
 } from '@mantine/core';
@@ -23,12 +24,14 @@ import {
   Pill,
   Plus,
   ShoppingCart,
+  Tag,
   Truck,
 } from 'lucide-react';
 import { useState } from 'react';
 import productPlaceholder from '../sample_images/generic_product_image.png';
 import { useCartStore } from '../website/cart-store';
 import { useChatbotStore } from '../website/chatbot-store';
+import { ComparePricesModal } from '../website/compare-prices-modal';
 import { ProductCard, BrandCountLink } from '../website/components';
 import { EmptyProducts } from '../website/empty-states';
 import {
@@ -49,6 +52,7 @@ import {
   buttonStyles,
 } from '../website/layout';
 import { PageLoader } from '../website/loaders';
+import { PriceAvailabilityTab } from './price-availability-tab';
 
 export default function ProductDetailPage() {
   const { slug } = useParams({ from: '/shop/shop_/$slug' });
@@ -58,6 +62,8 @@ export default function ProductDetailPage() {
   const addGenericItem = useCartStore((s) => s.addGenericItem);
   const totalItems = useCartStore((s) => s.totalItems);
   const [quantity, setQuantity] = useState(1);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string | null>('overview');
 
   const product = data?.product;
   const gp = (data?.genericProduct ?? product?.genericProduct ?? null) as {
@@ -180,6 +186,18 @@ export default function ProductDetailPage() {
                         ₦{product.unitPrice.toLocaleString()}
                       </Text>
                     )}
+                    <Button
+                      mt="sm"
+                      radius="xl"
+                      variant="light"
+                      color="green"
+                      leftSection={<Tag size={15} />}
+                      onClick={() => setCompareOpen(true)}
+                      styles={buttonStyles}
+                      data-testid="product-compare-prices"
+                    >
+                      Compare Prices
+                    </Button>
                   </Box>
 
                   {pharm ? (
@@ -479,231 +497,291 @@ export default function ProductDetailPage() {
               </Grid.Col>
             </Grid>
 
-            {hasDrugInfo ? (
-              <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
-                <Title order={3} className="damorex-heading" mb="md">
-                  Drug Information
-                </Title>
-                <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-                  {gp?.dosageForm ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Dosage Form
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {gp.dosageForm}
-                        {gp.strength ? ` — ${gp.strength}` : ''}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {gp?.therapeuticClass ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Therapeutic Class
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {gp.therapeuticClass}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.drugClass ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Drug Class
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.drugClass}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.indications ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Indications
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.indications}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.contraindications ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Contraindications
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.contraindications}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {gp?.adultDosage ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Adult Dosage
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {gp.adultDosage}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {gp?.pediatricDosage ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Pediatric Dosage
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {gp.pediatricDosage}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.dosage ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Dosage & Administration
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.dosage}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.mechanism ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Mechanism of Action
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.mechanism}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.pharmaceutics ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Pharmaceutics
-                      </Text>
-                      <Text c={muted} lh={1.7}>
-                        {pharm.pharmaceutics}
-                      </Text>
-                    </Box>
-                  ) : null}
-                  {pharm?.commonBrandName || pharm?.commonGenericName || pharm?.clinicalName ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Names
-                      </Text>
-                      <Stack gap={2}>
-                        {pharm?.commonBrandName ? (
-                          <Text size="sm" c={muted}>
-                            <strong style={{ color: ink }}>Brand:</strong> {pharm.commonBrandName}
-                          </Text>
-                        ) : null}
-                        {pharm?.commonGenericName ? (
-                          <Text size="sm" c={muted}>
-                            <strong style={{ color: ink }}>Generic:</strong>{' '}
-                            {pharm.commonGenericName}
-                          </Text>
-                        ) : null}
-                        {pharm?.clinicalName ? (
-                          <Text size="sm" c={muted}>
-                            <strong style={{ color: ink }}>Clinical:</strong> {pharm.clinicalName}
-                          </Text>
-                        ) : null}
-                      </Stack>
-                    </Box>
-                  ) : null}
-                  {gp?.isControlledSubstance ? (
-                    <Box>
-                      <Text fw={900} mb={4}>
-                        Controlled Substance
-                      </Text>
-                      <Badge size="lg" radius="xl" color="red" variant="light" w="fit-content">
-                        Restricted — special handling applies
-                      </Badge>
-                    </Box>
-                  ) : null}
-                </SimpleGrid>
-              </Paper>
-            ) : null}
+            <Tabs value={activeTab} onChange={setActiveTab} keepMounted={false}>
+              <Tabs.List mb="md">
+                <Tabs.Tab value="overview">Overview</Tabs.Tab>
+                <Tabs.Tab value="price">Price &amp; Availability</Tabs.Tab>
+                <Tabs.Tab value="reviews">Reviews</Tabs.Tab>
+                <Tabs.Tab value="similar">Similar Products</Tabs.Tab>
+              </Tabs.List>
 
-            {frequentlyBought.length > 0 ? (
-              <Box>
-                <Title order={3} className="damorex-heading" mb="md">
-                  Frequently Bought Together
-                </Title>
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-                  {frequentlyBought.map((p) => (
-                    <Paper key={p.id} radius={20} p="md" withBorder style={{ borderColor: line }}>
-                      <Stack gap="sm">
-                        <ProductCard product={p} />
-                        <Button
-                          radius="xl"
-                          variant="light"
-                          color="green"
-                          leftSection={<ShoppingCart size={16} />}
-                          styles={buttonStyles}
-                          onClick={() => {
-                            addItem(p.id, 1, {
-                              name: p.name,
-                              unitPrice: p.unitPrice ?? undefined,
-                              product: p,
-                            });
-                            notifications.show({
-                              message: `${p.name} added to cart`,
-                              color: 'green',
-                              icon: <ShoppingCart size={18} />,
-                            });
-                          }}
-                        >
-                          Add to Cart
-                        </Button>
-                      </Stack>
+              <Tabs.Panel value="overview">
+                <Stack gap="xl">
+                  {hasDrugInfo ? (
+                    <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+                      <Title order={3} className="damorex-heading" mb="md">
+                        Drug Information
+                      </Title>
+                      <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
+                        {gp?.dosageForm ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Dosage Form
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {gp.dosageForm}
+                              {gp.strength ? ` — ${gp.strength}` : ''}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {gp?.therapeuticClass ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Therapeutic Class
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {gp.therapeuticClass}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.drugClass ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Drug Class
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.drugClass}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.indications ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Indications
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.indications}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.contraindications ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Contraindications
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.contraindications}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {gp?.adultDosage ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Adult Dosage
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {gp.adultDosage}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {gp?.pediatricDosage ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Pediatric Dosage
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {gp.pediatricDosage}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.dosage ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Dosage & Administration
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.dosage}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.mechanism ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Mechanism of Action
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.mechanism}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.pharmaceutics ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Pharmaceutics
+                            </Text>
+                            <Text c={muted} lh={1.7}>
+                              {pharm.pharmaceutics}
+                            </Text>
+                          </Box>
+                        ) : null}
+                        {pharm?.commonBrandName ||
+                        pharm?.commonGenericName ||
+                        pharm?.clinicalName ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Names
+                            </Text>
+                            <Stack gap={2}>
+                              {pharm?.commonBrandName ? (
+                                <Text size="sm" c={muted}>
+                                  <strong style={{ color: ink }}>Brand:</strong>{' '}
+                                  {pharm.commonBrandName}
+                                </Text>
+                              ) : null}
+                              {pharm?.commonGenericName ? (
+                                <Text size="sm" c={muted}>
+                                  <strong style={{ color: ink }}>Generic:</strong>{' '}
+                                  {pharm.commonGenericName}
+                                </Text>
+                              ) : null}
+                              {pharm?.clinicalName ? (
+                                <Text size="sm" c={muted}>
+                                  <strong style={{ color: ink }}>Clinical:</strong>{' '}
+                                  {pharm.clinicalName}
+                                </Text>
+                              ) : null}
+                            </Stack>
+                          </Box>
+                        ) : null}
+                        {gp?.isControlledSubstance ? (
+                          <Box>
+                            <Text fw={900} mb={4}>
+                              Controlled Substance
+                            </Text>
+                            <Badge
+                              size="lg"
+                              radius="xl"
+                              color="red"
+                              variant="light"
+                              w="fit-content"
+                            >
+                              Restricted — special handling applies
+                            </Badge>
+                          </Box>
+                        ) : null}
+                      </SimpleGrid>
                     </Paper>
-                  ))}
-                </SimpleGrid>
-              </Box>
-            ) : null}
+                  ) : null}
 
-            {data?.reviews && data.reviews.length > 0 ? (
-              <Box>
-                <Title order={3} className="damorex-heading" mb="md">
-                  Customer Reviews
-                </Title>
-                <Stack gap="sm">
-                  {data.reviews.map((review) => (
-                    <Paper
-                      key={review.id}
-                      radius={20}
-                      p="md"
-                      withBorder
-                      style={{ borderColor: line }}
-                    >
-                      <Group justify="space-between" mb={4}>
-                        <Text fw={800}>{review.name || 'Anonymous'}</Text>
-                        <Rating value={review.rating} readOnly />
-                      </Group>
-                      {review.comment ? (
-                        <Text c={muted} lh={1.7}>
-                          {review.comment}
-                        </Text>
-                      ) : null}
-                    </Paper>
-                  ))}
+                  {frequentlyBought.length > 0 ? (
+                    <Box>
+                      <Title order={3} className="damorex-heading" mb="md">
+                        Frequently Bought Together
+                      </Title>
+                      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                        {frequentlyBought.map((p) => (
+                          <Paper
+                            key={p.id}
+                            radius={20}
+                            p="md"
+                            withBorder
+                            style={{ borderColor: line }}
+                          >
+                            <Stack gap="sm">
+                              <ProductCard product={p} />
+                              <Button
+                                radius="xl"
+                                variant="light"
+                                color="green"
+                                leftSection={<ShoppingCart size={16} />}
+                                styles={buttonStyles}
+                                onClick={() => {
+                                  addItem(p.id, 1, {
+                                    name: p.name,
+                                    unitPrice: p.unitPrice ?? undefined,
+                                    product: p,
+                                  });
+                                  notifications.show({
+                                    message: `${p.name} added to cart`,
+                                    color: 'green',
+                                    icon: <ShoppingCart size={18} />,
+                                  });
+                                }}
+                              >
+                                Add to Cart
+                              </Button>
+                            </Stack>
+                          </Paper>
+                        ))}
+                      </SimpleGrid>
+                    </Box>
+                  ) : null}
                 </Stack>
-              </Box>
-            ) : null}
+              </Tabs.Panel>
 
-            {data?.related && data.related.length > 0 ? (
-              <Box>
-                <Title order={3} className="damorex-heading" mb="md">
-                  Related Products
-                </Title>
-                <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-                  {data.related.map((p) => (
-                    <ProductCard key={p.id} product={p} />
-                  ))}
-                </SimpleGrid>
-              </Box>
-            ) : null}
+              <Tabs.Panel value="price">
+                <PriceAvailabilityTab
+                  productId={product.id}
+                  productName={product.name}
+                  unitPrice={product.unitPrice ?? null}
+                  rating={product.averageRating ?? null}
+                  reviewCount={product.reviewCount ?? 0}
+                  onViewAll={() => setCompareOpen(true)}
+                  enabled={activeTab === 'price'}
+                />
+              </Tabs.Panel>
+
+              <Tabs.Panel value="reviews">
+                {data?.reviews && data.reviews.length > 0 ? (
+                  <Box>
+                    <Title order={3} className="damorex-heading" mb="md">
+                      Customer Reviews
+                    </Title>
+                    <Stack gap="sm">
+                      {data.reviews.map((review) => (
+                        <Paper
+                          key={review.id}
+                          radius={20}
+                          p="md"
+                          withBorder
+                          style={{ borderColor: line }}
+                        >
+                          <Group justify="space-between" mb={4}>
+                            <Text fw={800}>{review.name || 'Anonymous'}</Text>
+                            <Rating value={review.rating} readOnly />
+                          </Group>
+                          {review.comment ? (
+                            <Text c={muted} lh={1.7}>
+                              {review.comment}
+                            </Text>
+                          ) : null}
+                        </Paper>
+                      ))}
+                    </Stack>
+                  </Box>
+                ) : (
+                  <Text c={muted} lh={1.7}>
+                    No reviews yet — be the first to review this product after purchase.
+                  </Text>
+                )}
+              </Tabs.Panel>
+
+              <Tabs.Panel value="similar">
+                {data?.related && data.related.length > 0 ? (
+                  <Box>
+                    <Title order={3} className="damorex-heading" mb="md">
+                      Related Products
+                    </Title>
+                    <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+                      {data.related.map((p) => (
+                        <ProductCard key={p.id} product={p} />
+                      ))}
+                    </SimpleGrid>
+                  </Box>
+                ) : (
+                  <Text c={muted} lh={1.7}>
+                    No similar products found yet.
+                  </Text>
+                )}
+              </Tabs.Panel>
+            </Tabs>
+
+            <ComparePricesModal
+              opened={compareOpen}
+              onClose={() => setCompareOpen(false)}
+              productId={product.id}
+              productName={product.name}
+            />
           </Stack>
         )}
       </Container>

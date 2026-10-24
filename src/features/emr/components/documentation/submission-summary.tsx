@@ -1,17 +1,18 @@
 import { Text } from '@mantine/core';
 import { useFormDefinition } from '../../hooks/use-form-definition';
 import type { FormFieldSchema, FormSubmission } from '../../lib/emr-types';
+import { formatAnnotateValue } from '../forms/annotate/format-annotate';
 
 const MAX_FIELDS = 3;
 const MAX_CHARS = 60;
 
-function findLabel(fields: FormFieldSchema[] | undefined, key: string): string | null {
+function findField(fields: FormFieldSchema[] | undefined, key: string): FormFieldSchema | null {
   for (const field of fields ?? []) {
     if (field.key === key) {
-      return field.label;
+      return field;
     }
     if ((field.type === 'tab' || field.type === 'col') && field.fields) {
-      const nested = findLabel(field.fields, key);
+      const nested = findField(field.fields, key);
       if (nested) {
         return nested;
       }
@@ -71,15 +72,20 @@ export function SubmissionSummary({ submission }: { submission: FormSubmission }
 
   return (
     <Text size="xs" c="dimmed" lineClamp={2}>
-      {shown.map(([key, value], index) => (
-        <span key={key}>
-          {index > 0 && ' · '}
-          <Text component="span" fw={600} c="gray.8">
-            {findLabel(form?.schemaJson?.fields, key) ?? key}:
-          </Text>{' '}
-          {summarizeValue(value)}
-        </span>
-      ))}
+      {shown.map(([key, value], index) => {
+        const field = findField(form?.schemaJson?.fields, key);
+        return (
+          <span key={key}>
+            {index > 0 && ' · '}
+            <Text component="span" fw={600} c="gray.8">
+              {field?.label ?? key}:
+            </Text>{' '}
+            {field?.type === 'annotate'
+              ? formatAnnotateValue(value, field.annotate)
+              : summarizeValue(value)}
+          </span>
+        );
+      })}
     </Text>
   );
 }

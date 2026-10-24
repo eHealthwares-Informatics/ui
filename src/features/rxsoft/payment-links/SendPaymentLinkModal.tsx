@@ -1,4 +1,4 @@
-import { Alert, Button, Group, Modal, Radio, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, Modal, Radio, Select, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -44,15 +44,20 @@ type Props = {
 export function SendPaymentLinkModal({ opened, onClose, token, contextLabel }: Props) {
   const { data: channels = [], isLoading, isError, error } = useNotificationChannels();
   const [channelId, setChannelId] = useState<string | null>(null);
+  const [fallbackChannelId, setFallbackChannelId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!opened) return;
     setChannelId(null);
+    setFallbackChannelId(null);
   }, [opened]);
 
   const send = useMutation({
     mutationFn: async () => {
-      const { data } = await rxsoftApi.post(`/payment-links/${token}/send`, { channelId });
+      const { data } = await rxsoftApi.post(`/payment-links/${token}/send`, {
+        channelId,
+        fallbackChannelId: fallbackChannelId || undefined,
+      });
       return data as { sent: boolean; recipient: string };
     },
     onSuccess: (data) => {
@@ -95,23 +100,44 @@ export function SendPaymentLinkModal({ opened, onClose, token, contextLabel }: P
             Add notification channel codes under Organisation Config, then try again.
           </Alert>
         ) : (
-          <Radio.Group
-            value={channelId}
-            onChange={setChannelId}
-            label="Send over"
-            data-testid="send-payment-link-channel-group"
-          >
-            <Stack gap="xs" mt="xs">
-              {channels.map((c) => (
-                <Radio
-                  key={c.id}
-                  value={c.id}
-                  label={`${c.label} (${c.type})`}
-                  data-testid={`send-channel-${c.id}`}
-                />
-              ))}
-            </Stack>
-          </Radio.Group>
+          <>
+            <Radio.Group
+              value={channelId}
+              onChange={(value) => {
+                setChannelId(value);
+                // A channel can't be both primary and fallback.
+                if (value && fallbackChannelId === value) {
+                  setFallbackChannelId(null);
+                }
+              }}
+              label="Send over"
+              data-testid="send-payment-link-channel-group"
+            >
+              <Stack gap="xs" mt="xs">
+                {channels.map((c) => (
+                  <Radio
+                    key={c.id}
+                    value={c.id}
+                    label={`${c.label} (${c.type})`}
+                    data-testid={`send-channel-${c.id}`}
+                  />
+                ))}
+              </Stack>
+            </Radio.Group>
+
+            <Select
+              label="Fallback channel (optional)"
+              description="Used if the primary channel fails to deliver."
+              placeholder="None"
+              data={channels
+                .filter((c) => c.id !== channelId)
+                .map((c) => ({ value: c.id, label: `${c.label} (${c.type})` }))}
+              value={fallbackChannelId}
+              onChange={setFallbackChannelId}
+              clearable
+              data-testid="send-payment-link-fallback-channel"
+            />
+          </>
         )}
 
         <Group justify="flex-end">

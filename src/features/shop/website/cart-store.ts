@@ -16,7 +16,14 @@ interface CartStore {
   addItem: (
     productId: string,
     quantity?: number,
-    details?: { name?: string; unitPrice?: number; product?: CartItem['product'] }
+    details?: {
+      name?: string;
+      unitPrice?: number;
+      product?: CartItem['product'];
+      priceListId?: string;
+      pharmacyOrganizationId?: string;
+      pharmacyName?: string;
+    }
   ) => void;
   addGenericItem: (entry: {
     name?: string;
@@ -32,7 +39,14 @@ interface CartStore {
   }) => void;
   updateItemDetails: (
     productId: string,
-    details: { name?: string; unitPrice?: number; product?: CartItem['product'] }
+    details: {
+      name?: string;
+      unitPrice?: number;
+      product?: CartItem['product'];
+      priceListId?: string;
+      pharmacyOrganizationId?: string;
+      pharmacyName?: string;
+    }
   ) => void;
   updateQuantity: (productId: string | undefined, quantity: number) => void;
   removeItem: (productId: string | undefined) => void;
@@ -53,7 +67,7 @@ function lineKey(i: CartItem): string | undefined {
 
 function computeSubtotal(items: CartItem[]): number {
   return items.reduce(
-    (sum, i) => sum + ((i.product as any)?.unitPrice ?? i.unitPrice ?? 0) * i.quantity,
+    (sum, i) => sum + (i.unitPrice ?? (i.product as any)?.unitPrice ?? 0) * i.quantity,
     0
   );
 }
@@ -71,9 +85,23 @@ export const useCartStore = create<CartStore>()(
           const existing = state.items.find((i) => i.productId === productId);
           let items: CartItem[];
           if (existing) {
-            items = state.items.map((i) =>
-              i.productId === productId ? { ...i, quantity: i.quantity + quantity } : i
-            );
+            items = state.items.map((i) => {
+              if (i.productId !== productId) return i;
+              const switchingOffer =
+                details?.priceListId != null && details.priceListId !== i.priceListId;
+              return {
+                ...i,
+                quantity: i.quantity + quantity,
+                ...(switchingOffer
+                  ? {
+                      unitPrice: details?.unitPrice,
+                      priceListId: details?.priceListId,
+                      pharmacyOrganizationId: details?.pharmacyOrganizationId,
+                      pharmacyName: details?.pharmacyName,
+                    }
+                  : {}),
+              };
+            });
           } else {
             items = [...state.items, { productId, quantity, ...(details ?? {}) }];
           }

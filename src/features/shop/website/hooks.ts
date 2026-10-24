@@ -37,6 +37,19 @@ export function useProduct(id: string) {
   });
 }
 
+/**
+ * Multi-pharmacy price/stock/delivery comparison for a product. Only fetched
+ * when the shopper opens the Compare Prices modal (`enabled`).
+ */
+export function useProductPharmacies(id: string, enabled = true) {
+  return useQuery({
+    queryKey: ['website', 'product', id, 'pharmacies'],
+    queryFn: () => websiteApi.getProductPharmacies(id),
+    enabled: !!id && enabled,
+    staleTime: 60_000,
+  });
+}
+
 // ── Drug Classifications (4 labeled sources) ──────────────────────
 
 export function useClassifications(type?: string) {
@@ -393,15 +406,24 @@ export function useCartProductHydration() {
             continue;
           }
           const price = p.unitPrice != null ? Number(p.unitPrice) : undefined;
+          // Lines added from a specific pharmacy offer carry their own
+          // price-list price. Never replace it with the current storefront
+          // price (which can be null/0) — only fill in the product snapshot.
+          const lockedOffer = Boolean(item.priceListId);
+          // Never erase a stored price when the storefront has none (the item
+          // may only be listed by another pharmacy's price list) — otherwise
+          // the cart line silently becomes ₦0.
+          const nextPrice = lockedOffer || price == null ? item.unitPrice : price;
+          const nextName = item.name || p.name;
           const needsPatch =
-            item.name !== p.name ||
-            item.unitPrice !== price ||
-            (item.product as any)?.unitPrice !== price ||
+            item.name !== nextName ||
+            item.unitPrice !== nextPrice ||
+            (item.product as any)?.unitPrice !== p.unitPrice ||
             item.product?.isPrescriptionRequired !== p.isPrescriptionRequired;
           if (needsPatch) {
             store.updateItemDetails(item.productId, {
-              name: p.name,
-              unitPrice: price,
+              name: nextName,
+              unitPrice: nextPrice,
               product: p,
             });
           }

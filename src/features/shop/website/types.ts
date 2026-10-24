@@ -57,8 +57,42 @@ export interface WebsiteProduct {
   mediumImageUrl?: string;
   largeImageUrl?: string;
   unitPrice?: number | null;
+  /** Approved review aggregate; 0 when the product has no reviews. */
+  averageRating?: number;
+  reviewCount?: number;
   /** Resolved from concepts generic products; null/undefined when unknown (frontend defaults to no-Rx). */
   isPrescriptionRequired?: boolean | null;
+}
+
+/** One pharmacy's offer for a product (see GET /website/products/:id/pharmacies). */
+export interface PharmacyPriceView {
+  organizationId: string;
+  name: string;
+  logoUrl: string | null;
+  address: string | null;
+  phone: string | null;
+  priceListId: string;
+  unitPrice: number;
+  currencyCode: string;
+  stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown';
+  stockLocations: number;
+  availableQuantity: number | null;
+  deliveryHours: number;
+  deliveryLabel: string;
+  isCurrentOrg: boolean;
+}
+
+export interface ProductPharmaciesResponse {
+  productId: string;
+  productName: string;
+  totalPharmacies: number;
+  inStockPharmacies: number;
+  lowestPrice: number | null;
+  highestPrice: number | null;
+  averagePrice: number | null;
+  rating: number | null;
+  reviewCount: number;
+  pharmacies: PharmacyPriceView[];
 }
 
 export interface ShopClassificationView {
@@ -289,6 +323,14 @@ export interface CartItem {
   unitPrice?: number;
   quantity: number;
   product?: WebsiteProduct;
+  /**
+   * Set when the line was added from a specific pharmacy's offer in the
+   * Compare Prices flow. The price belongs to that price list, so cart
+   * hydration must not overwrite it with the current storefront price.
+   */
+  priceListId?: string;
+  pharmacyOrganizationId?: string;
+  pharmacyName?: string;
 }
 
 export interface GenericDrugView {

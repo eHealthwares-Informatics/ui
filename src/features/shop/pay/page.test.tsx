@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@test-utils';
+import { fireEvent, render, screen, waitFor } from '@test-utils';
 import { vi } from 'vitest';
 import PayPage from './page';
 
@@ -35,6 +35,8 @@ const LINK = {
 
 vi.mock('@tanstack/react-router', () => ({ useParams: () => ({ token: 'tok' }) }));
 
+const mockState = vi.hoisted(() => ({ linkMissing: false }));
+
 vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual: any = await importOriginal();
   return {
@@ -56,7 +58,9 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
             ],
             isLoading: false,
           }
-        : { data: LINK, isLoading: false },
+        : mockState.linkMissing
+          ? { data: undefined, isLoading: false, isError: true }
+          : { data: LINK, isLoading: false },
     useQueryClient: () => ({ invalidateQueries: vi.fn() }),
   };
 });
@@ -92,13 +96,15 @@ vi.mock('./payApi', () => ({
 
 import { loadPaySession, payApi } from './payApi';
 
-function mockStatus(payment: unknown) {
-  (payApi.status as any).mockResolvedValue({ payment, link: { status: 'active' } });
+function mockStatus(payment: unknown, link: Record<string, unknown> = { status: 'active' }) {
+  (payApi.status as any).mockResolvedValue({ payment, link });
 }
 
 describe('PayPage — post-generation view', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.sessionStorage.clear();
+    mockState.linkMissing = false;
   });
 
   it('shows the provider list when NO payment has been generated', async () => {
@@ -167,5 +173,88 @@ describe('PayPage — post-generation view', () => {
 
     expect(await screen.findByText('Choose payment method')).toBeInTheDocument();
     expect(screen.getByText(/Paystack/)).toBeInTheDocument();
+  });
+
+  it('auto-navigates to an existing provider checkout URL', async () => {
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus({
+      status: 'initiated',
+      reference: 'SRV-REF',
+      providerType: 'monnify',
+      checkoutUrl: 'https://checkout.monnify.com/pay/abc',
+    });
+    const navigate = vi.fn();
+
+    render(<PayPage navigate={navigate} />);
+
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith('https://checkout.monnify.com/pay/abc')
+    );
+    // The URL is remembered so a bounce-back from the provider does not loop.
+    expect(window.sessionStorage.getItem('pay-autonav:tok')).toBe(
+      'https://checkout.monnify.com/pay/abc'
+    );
+  });
+
+  it('does not auto-navigate back to the same checkout URL after a bounce-back', async () => {
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus({
+      status: 'initiated',
+      reference: 'SRV-REF',
+      providerType: 'monnify',
+      checkoutUrl: 'https://checkout.monnify.com/pay/abc',
+    });
+    // Simulate the provider having just redirected the customer back here.
+    window.sessionStorage.setItem('pay-autonav:tok', 'https://checkout.monnify.com/pay/abc');
+    const navigate = vi.fn();
+
+    render(<PayPage navigate={navigate} />);
+
+    expect(await screen.findByText('Payment in progress')).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('does not auto-navigate once the payment is confirmed', async () => {
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus({
+      status: 'success',
+      reference: 'SRV-REF',
+      providerType: 'monnify',
+      checkoutUrl: 'https://checkout.monnify.com/pay/abc',
+    });
+    const navigate = vi.fn();
+
+    render(<PayPage navigate={navigate} />);
+
+    expect(await screen.findByText('Payment successful')).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('shows the payment and a status link when the link is expired but a payment exists', async () => {
+    mockState.linkMissing = true;
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus(
+      { status: 'success', reference: 'PMT-EXPIRED-1', providerType: 'monnify', amount: 130 },
+      { status: 'expired', type: 'order_payment', targetId: 'o1', amount: 130 }
+    );
+
+    render(<PayPage />);
+
+    expect(await screen.findByTestId('pay-inactive-payment')).toBeInTheDocument();
+    expect(screen.getByText('Payment successful')).toBeInTheDocument();
+    expect(screen.getByText('PMT-EXPIRED-1')).toBeInTheDocument();
+    expect(screen.getByTestId('pay-view-status')).toHaveAttribute('href', '/shop/orders/o1');
+    expect(screen.queryByText('Payment link not found or expired')).not.toBeInTheDocument();
+  });
+
+  it('still shows the expired notice when no payment exists', async () => {
+    mockState.linkMissing = true;
+    (loadPaySession as any).mockReturnValue(null);
+    mockStatus(null);
+
+    render(<PayPage />);
+
+    expect(await screen.findByText('Payment link not found or expired')).toBeInTheDocument();
+    expect(screen.queryByTestId('pay-inactive-payment')).not.toBeInTheDocument();
   });
 });

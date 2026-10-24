@@ -81,7 +81,24 @@ export type FormFieldType =
   | 'section'
   | 'tab'
   | 'col'
-  | 'item';
+  | 'item'
+  | 'annotate';
+
+export type AnnotateTarget = 'body' | 'dermatome' | 'organ';
+
+/**
+ * Configuration for the `annotate` field type. Values:
+ *   body / organ → string[] ids; dermatome → string | null.
+ */
+export type AnnotateConfig = {
+  target: AnnotateTarget;
+  views?: Array<'front' | 'back'>;
+  multiple?: boolean;
+  showLabels?: boolean;
+  regions?: string[];
+  organ?: string;
+  structures?: string[];
+};
 
 export type FormFieldSchema = {
   key: string;
@@ -95,6 +112,8 @@ export type FormFieldSchema = {
   columns?: { key: string; label: string; type: FormFieldType }[];
   /** Child fields — only used by the 'tab' container type. */
   fields?: FormFieldSchema[];
+  /** Configuration for the `annotate` field type. */
+  annotate?: AnnotateConfig;
 };
 
 export type FormSchema = {

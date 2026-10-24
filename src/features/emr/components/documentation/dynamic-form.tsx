@@ -18,6 +18,7 @@ import {
 import { Plus, Trash2 } from 'lucide-react';
 import { formatEnum } from '../../lib/emr-constants';
 import type { FormFieldSchema, FormSchema } from '../../lib/emr-types';
+import { AnnotateField } from '../forms/annotate';
 import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
 
 export type FormData = Record<string, unknown>;
@@ -258,6 +259,8 @@ function DynamicField({
       return <TableField field={field} value={value} onChange={onChange} />;
     case 'section':
       return <Divider label={field.label} labelPosition="left" />;
+    case 'annotate':
+      return <AnnotateField field={field} value={value} onChange={onChange} />;
     default:
       return (
         <TextInput
@@ -365,6 +368,15 @@ export function buildInitialFormData(schema: FormSchema): FormData {
         data[field.key] = [];
         continue;
       }
+      if (field.type === 'annotate') {
+        data[field.key] =
+          field.defaultValue !== undefined
+            ? field.defaultValue
+            : field.annotate?.target === 'dermatome'
+              ? undefined
+              : [];
+        continue;
+      }
       if (field.defaultValue !== undefined) {
         data[field.key] = field.defaultValue;
       }
@@ -389,6 +401,37 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       return;
     }
     if (field.type === 'table') {
+      return;
+    }
+    if (field.type === 'annotate') {
+      const fieldValue = data[field.key];
+      const target = field.annotate?.target ?? 'body';
+      const empty =
+        target === 'dermatome'
+          ? fieldValue === undefined || fieldValue === null || fieldValue === ''
+          : !Array.isArray(fieldValue) || fieldValue.length === 0;
+      if (field.required && empty) {
+        errors.push(`${field.label} is required`);
+        return;
+      }
+      if (target === 'dermatome') {
+        if (
+          fieldValue !== undefined &&
+          fieldValue !== null &&
+          fieldValue !== '' &&
+          typeof fieldValue !== 'string'
+        ) {
+          errors.push(`${field.label} must be a single dermatome level`);
+        }
+      } else if (fieldValue !== undefined && !Array.isArray(fieldValue)) {
+        errors.push(`${field.label} must be a list of selections`);
+      } else if (
+        Array.isArray(fieldValue) &&
+        field.annotate?.multiple === false &&
+        fieldValue.length > 1
+      ) {
+        errors.push(`${field.label} allows a single selection`);
+      }
       return;
     }
 
