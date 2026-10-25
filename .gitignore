@@ -133,6 +133,9 @@ dist
 # Sentry Config File
 .env.sentry-build-plugin
 
+# Local dev TLS certificates (self-signed — never commit private keys)
+certs/
+
 # Playwright E2E
 e2e/.auth/
 # Real-credential store for the social sign-in e2e suite — never commit.

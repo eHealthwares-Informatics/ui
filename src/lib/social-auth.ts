@@ -17,14 +17,23 @@ type GoogleTokenClient = {
 };
 
 type GoogleGlobal = {
-  accounts?: {
-    oauth2?: {
-      initTokenClient: (config: {
-        client_id: string;
-        scope: string;
-        callback: (response: { access_token?: string; error?: string }) => void;
-        error_callback?: (error: { type?: string }) => void;
-      }) => GoogleTokenClient;
+  google?: {
+    accounts?: {
+      oauth2?: {
+        initTokenClient: (config: {
+          client_id: string;
+          scope: string;
+          callback: (response: {
+            access_token?: string;
+            error?: string;
+            error_description?: string;
+          }) => void;
+          error_callback?: (error: {
+            type?: string;
+            message?: string;
+          }) => void;
+        }) => GoogleTokenClient;
+      };
     };
   };
 };
@@ -68,43 +77,91 @@ function loadScript(src: string): Promise<void> {
 }
 
 /** Open the Google sign-in popup and resolve with an access token. */
+
+/** Open the Google sign-in popup and resolve with an access token. */
 export async function googleLogin(): Promise<string | null> {
   if (!GOOGLE_CLIENT_ID) {
     throw new Error('Google sign-in is not configured');
   }
+
   await loadScript('https://accounts.google.com/gsi/client');
-  // The GSI client sets window.accounts asynchronously after the script's
-  // load event fires; poll until it is available (or time out).
+
   const w = window as unknown as GoogleGlobal;
-  let waited = 0;
-  while (!w.accounts?.oauth2 && waited < 5000) {
-    await new Promise((r) => setTimeout(r, 50));
-    waited += 50;
-  }
-  const oauth2 = w.accounts?.oauth2;
+  const oauth2 = w.google?.accounts?.oauth2;
+
   if (!oauth2) {
-    console.error('Google sign-in: window.accounts =', w.accounts);
-    throw new Error('Google sign-in unavailable (accounts.oauth2 not found on window after 5s)');
+    console.error(
+      'Google Identity Services OAuth API unavailable.',
+      {
+        google: w.google,
+        scriptLoaded: Boolean(
+          document.querySelector(
+            'script[src="https://accounts.google.com/gsi/client"]'
+          )
+        ),
+      }
+    );
+
+    throw new Error(
+      'Google sign-in unavailable. Check SDK loading, CSP, network errors, and OAuth client configuration.'
+    );
   }
 
   return new Promise<string | null>((resolve, reject) => {
-    const client = oauth2.initTokenClient({
-      client_id: GOOGLE_CLIENT_ID,
-      scope: 'openid email profile',
-      callback: (response) => {
-        if (response.access_token) {
-          resolve(response.access_token);
-        } else {
-          resolve(null); // User closed the popup / declined.
-        }
-      },
-      error_callback: () => {
-        reject(new Error('Google sign-in failed'));
-      },
-    });
-    client.requestAccessToken({ prompt: '' });
+    try {
+      const client = oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'openid email profile',
+
+        callback: (response) => {
+          if (response.access_token) {
+            resolve(response.access_token);
+            return;
+          }
+
+          if (response.error) {
+            if (
+              response.error === 'access_denied' ||
+              response.error === 'user_cancelled'
+            ) {
+              resolve(null);
+              return;
+            }
+
+            reject(
+              new Error(
+                response.error_description ||
+                  `Google OAuth failed: ${response.error}`
+              )
+            );
+            return;
+          }
+
+          resolve(null);
+        },
+
+        error_callback: (error) => {
+          reject(
+            new Error(
+              `Google popup failed: ${error.type ?? 'unknown error'}${
+                error.message ? ` — ${error.message}` : ''
+              }`
+            )
+          );
+        },
+      });
+
+      client.requestAccessToken({ prompt: '' });
+    } catch (error) {
+      reject(
+        error instanceof Error
+          ? error
+          : new Error('Google sign-in failed')
+      );
+    }
   });
 }
+
 
 /**
  * Open the Facebook sign-in flow: FB.getLoginStatus first (is the person

@@ -32,6 +32,10 @@ export function TeamSwitcher() {
   }, [user, storeModules.length, fetchModules]);
 
   const teams = toTeams(storeModules);
+  // Hook must stay above the empty-teams early return: modules are cleared on
+  // logout, and a conditional useState here made the hook count drop
+  // ("Rendered fewer hooks than expected") the moment the user signed out.
+  const [opened, setOpened] = useState(false);
   const activeTeam = teams.find((t) => t.moduleId === moduleId) ?? teams[0];
   if (teams.length === 0) {
     return (
@@ -40,8 +44,6 @@ export function TeamSwitcher() {
       </Box>
     );
   }
-
-  const [opened, setOpened] = useState(false);
 
   return (
     <Menu opened={opened} onChange={setOpened} width={220} position="right-start" offset={6}>
