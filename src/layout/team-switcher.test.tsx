@@ -1,4 +1,5 @@
-import { render, screen } from '@test-utils';
+import { act, render, screen } from '@test-utils';
+import { useSyncExternalStore } from 'react';
 import { ModuleProvider } from '@/context/module-provider';
 import { TeamSwitcher } from './team-switcher';
 
@@ -21,9 +22,26 @@ const mockState = {
 };
 
 vi.mock('@/stores/auth-store', () => ({
-  useAuthStore: (selector?: (state: typeof mockState) => any) =>
-    selector ? selector(mockState) : mockState,
+  useAuthStore: (selector?: (state: typeof mockState) => any) => {
+    // Re-render on store changes, like a real Zustand subscription.
+    useSyncExternalStore(
+      (onChange: () => void) => {
+        subscribers.add(onChange);
+        return () => subscribers.delete(onChange);
+      },
+      () => selector?.(mockState) ?? mockState
+    );
+    return selector ? selector(mockState) : mockState;
+  },
 }));
+
+// Simple external-store emulation so TeamSwitcher re-renders when modules
+// change between tests (mirrors the real Zustand behaviour on logout).
+const subscribers = new Set<() => void>();
+function setModules(modules: any[]) {
+  mockState.modules = modules;
+  subscribers.forEach((fn) => fn());
+}
 
 function renderWithProviders(ui: React.ReactNode) {
   return render(<ModuleProvider>{ui}</ModuleProvider>);
@@ -103,5 +121,20 @@ describe('TeamSwitcher', () => {
     renderWithProviders(<TeamSwitcher />);
     expect(screen.getByText('Unknown')).toBeInTheDocument();
     expect(screen.getByText('Desc')).toBeInTheDocument();
+  });
+
+  it('re-renders safely when modules clear on logout (hook order regression)', () => {
+    mockState.modules = [{ id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy', root: '/items' }];
+    const { container } = renderWithProviders(<TeamSwitcher />);
+    expect(screen.getByTestId('team-switcher-trigger')).toBeInTheDocument();
+
+    // Logout clears the module list: previously this crashed with
+    // "Rendered fewer hooks than expected" because useState ran only in the
+    // populated branch.
+    act(() => {
+      setModules([]);
+    });
+    expect(container.querySelector('[class*="Loader"]')).toBeInTheDocument();
+    expect(screen.queryByTestId('team-switcher-trigger')).toBeNull();
   });
 });

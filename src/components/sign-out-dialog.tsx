@@ -16,7 +16,18 @@ export function SignOutDialog({ open, onOpenChange, ...props }: SignOutDialogPro
   const logoutAll = useAuthStore((state) => state.logoutAll);
 
   const redirectToSignIn = () => {
-    const currentPath = location.pathname + location.search;
+    // TanStack Router hands `location.search` over as a parsed (null-prototype)
+    // object in this build; coercing it with `+` threw "Cannot convert object
+    // to primitive value" mid sign-out and the redirect never happened.
+    const raw = location.search;
+    let query = '';
+    if (typeof raw === 'string') {
+      query = raw;
+    } else if (raw) {
+      const qs = new URLSearchParams(raw as Record<string, string>).toString();
+      query = qs ? `?${qs}` : '';
+    }
+    const currentPath = location.pathname + query;
     navigate({
       to: '/sign-in',
       search: { redirect: currentPath },

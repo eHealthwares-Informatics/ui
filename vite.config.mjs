@@ -1,8 +1,27 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
+// ── Local dev TLS (self-signed) ─────────────────────────────────────────
+// Generated with: openssl req -x509 ... (CA) + openssl x509 -req (localhost).
+// Never committed — see .gitignore `certs/`. Trust `certs/dev/ca.crt` in your
+// OS/browser to remove the "not secure" warning, or click through it in dev.
+const certsDir = path.resolve(process.cwd(), 'certs/dev');
+const loadDevHttps = () => {
+  try {
+    return {
+      key: fs.readFileSync(path.join(certsDir, 'localhost.key')),
+      cert: fs.readFileSync(path.join(certsDir, 'localhost.crt')),
+      ca: fs.readFileSync(path.join(certsDir, 'ca.crt')),
+    };
+  } catch {
+    return undefined;
+  }
+};
+const httpsOptions = loadDevHttps();
 
 export default defineConfig({
    optimizeDeps: {
@@ -48,12 +67,20 @@ export default defineConfig({
     sourcemap: false
   },
   server: {
+    port: 5173,
+    https: httpsOptions,
     allowedHosts: ['kyung-unexempted-brunilda.ngrok-free.dev'],
     // Same-origin API calls in dev: the browser hits :5173/api and Vite forwards
-    // to the backend. Lets a tunnelled page (ngrok) work on any device without a
-    // per-developer absolute API URL — see the VITE_RXSOFT_API_URL=/api note in
-    // .env.local.
+    // to the backend server-side, so an HTTPS Vite page never trips mixed-content
+    // blocking. Identity is the focused backend; it is proxied through Vite with
+    // the `/api/identity` prefix stripped (identity routes are `/auth`, `/users`,
+    // … without a prefix). Keep `/api` (rxsoft) last so `/api/identity` wins.
     proxy: {
+      '/api/identity': {
+        target: 'http://localhost:8092',
+        changeOrigin: true,
+        pathRewrite: { '^/api/identity': '' },
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
