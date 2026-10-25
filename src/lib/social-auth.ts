@@ -28,10 +28,7 @@ type GoogleGlobal = {
             error?: string;
             error_description?: string;
           }) => void;
-          error_callback?: (error: {
-            type?: string;
-            message?: string;
-          }) => void;
+          error_callback?: (error: { type?: string; message?: string }) => void;
         }) => GoogleTokenClient;
       };
     };
@@ -90,17 +87,12 @@ export async function googleLogin(): Promise<string | null> {
   const oauth2 = w.google?.accounts?.oauth2;
 
   if (!oauth2) {
-    console.error(
-      'Google Identity Services OAuth API unavailable.',
-      {
-        google: w.google,
-        scriptLoaded: Boolean(
-          document.querySelector(
-            'script[src="https://accounts.google.com/gsi/client"]'
-          )
-        ),
-      }
-    );
+    console.error('Google Identity Services OAuth API unavailable.', {
+      google: w.google,
+      scriptLoaded: Boolean(
+        document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+      ),
+    });
 
     throw new Error(
       'Google sign-in unavailable. Check SDK loading, CSP, network errors, and OAuth client configuration.'
@@ -120,19 +112,13 @@ export async function googleLogin(): Promise<string | null> {
           }
 
           if (response.error) {
-            if (
-              response.error === 'access_denied' ||
-              response.error === 'user_cancelled'
-            ) {
+            if (response.error === 'access_denied' || response.error === 'user_cancelled') {
               resolve(null);
               return;
             }
 
             reject(
-              new Error(
-                response.error_description ||
-                  `Google OAuth failed: ${response.error}`
-              )
+              new Error(response.error_description || `Google OAuth failed: ${response.error}`)
             );
             return;
           }
@@ -153,15 +139,10 @@ export async function googleLogin(): Promise<string | null> {
 
       client.requestAccessToken({ prompt: '' });
     } catch (error) {
-      reject(
-        error instanceof Error
-          ? error
-          : new Error('Google sign-in failed')
-      );
+      reject(error instanceof Error ? error : new Error('Google sign-in failed'));
     }
   });
 }
-
 
 /**
  * Open the Facebook sign-in flow: FB.getLoginStatus first (is the person
