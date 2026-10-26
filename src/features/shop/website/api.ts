@@ -353,6 +353,16 @@ export const websiteApi = {
   getRewards: () => api.get<RewardView>('/website/rewards').then((r) => r.data),
 
   // Auth
+  /**
+   * Current session details — validates the stored access token server-side.
+   * Uses the storefront client (`onSessionExpired: 'ignore'`) so an expired
+   * session rejects instead of redirecting mid-checkout.
+   */
+  getSession: () =>
+    api
+      .get<{ id: string; username: string; roles: string[]; permissions: string[] }>('/auth/me')
+      .then((r) => r.data),
+
   register: (data: { username: string; email?: string; phone?: string; password: string }) =>
     api
       .post<{ accessToken: string; refreshToken: string }>('/website/auth/register', data)

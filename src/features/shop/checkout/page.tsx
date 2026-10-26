@@ -12,11 +12,13 @@ import {
   Input,
   Loader,
   Paper,
-  Progress,
   Radio,
+  ScrollArea,
+  SimpleGrid,
   Stack,
   Stepper,
   Text,
+  Textarea,
   TextInput,
   ThemeIcon,
   Title,
@@ -26,6 +28,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  BadgeCheck,
   Check,
   CreditCard,
   FileUp,
@@ -34,21 +37,29 @@ import {
   Navigation,
   Package,
   Pill,
+  ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Stethoscope,
   Store,
   Truck,
 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { useWebPaymentProviders, useInitializeWebPayment } from '../api/posApi';
-import { getNearbyPharmacies, type NearbyPharmacyRecord } from '../locator/api';
+import {
+  getNearbyPharmacies,
+  getStates,
+  searchPharmacies,
+  type ConceptsState,
+  type NearbyPharmacyRecord,
+  type PharmacyRecord,
+} from '../locator/api';
 import { publicBaseUrl } from '../public-base-url';
-import { useAccountDrawerStore } from '../website/account-drawer-store';
 import { websiteApi } from '../website/api';
 import { useAuthStore } from '../website/auth-store';
 import { useCartStore } from '../website/cart-store';
+import { findParticipantByPhone } from '../website/chatbot-service';
 import { useChatbotStore } from '../website/chatbot-store';
 import { toHL7Prescription, QUESTIONNAIRE_CODES } from '../website/hl7-prescription';
 import {
@@ -68,6 +79,7 @@ import {
   buttonStyles,
 } from '../website/layout';
 import type { DeliveryAreaView, OrderView, WebsiteProduct } from '../website/types';
+import { CheckoutPhoneLoginModal } from './CheckoutPhoneLoginModal';
 type DeliveryMode = 'dispatch' | 'contact' | 'pickup';
 
 /**
@@ -274,9 +286,49 @@ const mockDeliveryAreas: DeliveryAreaView[] = [
   },
 ];
 
+const NIGERIAN_STATES = [
+  'Abia',
+  'Adamawa',
+  'Akwa Ibom',
+  'Anambra',
+  'Bauchi',
+  'Bayelsa',
+  'Benue',
+  'Borno',
+  'Cross River',
+  'Delta',
+  'Ebonyi',
+  'Edo',
+  'Ekiti',
+  'Enugu',
+  'Federal Capital Territory',
+  'Gombe',
+  'Imo',
+  'Jigawa',
+  'Kaduna',
+  'Kano',
+  'Katsina',
+  'Kebbi',
+  'Kogi',
+  'Kwara',
+  'Lagos',
+  'Nasarawa',
+  'Niger',
+  'Ogun',
+  'Ondo',
+  'Osun',
+  'Oyo',
+  'Plateau',
+  'Rivers',
+  'Sokoto',
+  'Taraba',
+  'Yobe',
+  'Zamfara',
+];
+
 export default function CheckoutPage() {
   const { items, totalItems, clearCart } = useCartStore();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
   const { mutate: placeOrder, isPending } = useCreateOrder();
   const { data: deliveryAreasData, isLoading: areasLoading } = useDeliveryAreas();
   const { data: allBranches = [], isLoading: branchesLoading } = useBranches();
@@ -286,15 +338,6 @@ export default function CheckoutPage() {
 
   const deliveryAreas =
     deliveryAreasData && deliveryAreasData.length > 0 ? deliveryAreasData : mockDeliveryAreas;
-
-  // Signed-out shoppers get the auth drawer popped automatically (Sign In
-  // tab) — no need to click Sign In / Register first.
-  useEffect(() => {
-    if (!isAuthenticated) {
-      openAccountDrawer('signin');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
 
   // Signed-in shoppers: prefill the contact details we already hold.
   useEffect(() => {
@@ -316,6 +359,12 @@ export default function CheckoutPage() {
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('dispatch');
   const [pickupBranchId, setPickupBranchId] = useState<string | null>(null);
   const [nearbyPickup, setNearbyPickup] = useState<NearbyPharmacyRecord[]>([]);
+  // Pharmacy-register results searched by the area the shopper typed, used when
+  // geolocation is not active so pickup options still populate.
+  const [areaPharmacies, setAreaPharmacies] = useState<PharmacyRecord[]>([]);
+  // Register states (name ↔ code) so pharmacy searches can be scoped to the
+  // selected state.
+  const [states, setStates] = useState<ConceptsState[]>([]);
   const [locating, setLocating] = useState(false);
   const [locationNote, setLocationNote] = useState<string | null>(null);
   const [deliveryAreaId, setDeliveryAreaId] = useState<string | null>(null);
@@ -325,6 +374,15 @@ export default function CheckoutPage() {
   const [manualArea, setManualArea] = useState('');
   const [manualPharmacy, setManualPharmacy] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<string | null>(providers[0]?.id ?? null);
+
+  // Open the phone-login modal when a shopper enters a delivery phone but is
+  // not yet authenticated, so the JWT exists before /payments/initialize.
+  useEffect(() => {
+    const digits = phone.replace(/\D/g, '');
+    if (step === 1 && !isAuthenticated && digits.length >= 7) {
+      setLoginModalOpened(true);
+    }
+  }, [step, phone, isAuthenticated]);
 
   // Default to the first available provider once the list resolves.
   useEffect(() => {
@@ -348,7 +406,19 @@ export default function CheckoutPage() {
   const [placedOrder, setPlacedOrder] = useState<OrderView | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const openAccountDrawer = useAccountDrawerStore((s) => s.open);
+  const [loginModalOpened, setLoginModalOpened] = useState(false);
+
+  // Prescriber details captured inline on the prescription step (replaces the
+  // separate upload-prescription page).
+  const [prescriberType, setPrescriberType] = useState<'Pharmacist' | 'Doctor' | 'Professional'>(
+    'Doctor'
+  );
+  const [prescriberName, setPrescriberName] = useState('');
+  const [prescriberLicense, setPrescriberLicense] = useState('');
+  const [prescriberPhone, setPrescriberPhone] = useState('');
+  const [prescriptionNotes, setPrescriptionNotes] = useState('');
+  // Optional prescription image(s)/PDF attached on the prescription step.
+  const [rxFiles, setRxFiles] = useState<File[]>([]);
 
   // Returning customer: entering a known phone fills the delivery details.
   const autofillFromPhone = async () => {
@@ -364,6 +434,24 @@ export default function CheckoutPage() {
     }
   };
 
+  // On phone entry: confirm the stored session/token is still valid, then use
+  // that token to resolve the shopper's conversation participant by phone.
+  // An invalid/expired session is cleared and the shopper is asked to sign in.
+  const checkSessionAndParticipant = async () => {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 7 || !isAuthenticated) return;
+    try {
+      await websiteApi.getSession();
+    } catch {
+      // Token invalid and could not be refreshed — force a fresh sign-in.
+      logout();
+      setLoginModalOpened(true);
+      return;
+    }
+    // Resolve (do not create) the participant using the validated token.
+    await findParticipantByPhone(digits);
+  };
+
   const selectedArea = deliveryAreas.find((a) => a.id === deliveryAreaId);
   const typedArea = !selectedArea ? manualArea.trim() : '';
   const typedPharmacy = manualPharmacy.trim();
@@ -375,16 +463,39 @@ export default function CheckoutPage() {
   const pickupBranches = useMemo((): PickupOption[] => {
     const cityFilter = (city || selectedArea?.city || '').trim().toLowerCase();
     const stateFilter = (state_ || selectedArea?.state || '').trim().toLowerCase();
+    const nameFilter = typedPharmacy.toLowerCase();
 
-    const registry = nearbyPickup.map((pharmacy) => ({
-      id: `pharmacy:${pharmacy.id}`,
-      name: pharmacy.premisesName?.trim() || 'Pharmacy',
-      address: pharmacy.premisesAddress?.trim() || '',
-      city: pharmacy.areaName ?? pharmacy.lgaName ?? null,
-      state: pharmacy.stateName ?? null,
-      phone: null,
-      isBranch: false,
-    }));
+    const stateOkFor = (stateName?: string | null, address?: string | null) => {
+      if (!stateFilter) return true;
+      return `${stateName ?? ''} ${address ?? ''}`.toLowerCase().includes(stateFilter);
+    };
+    const nameOkFor = (name?: string | null) =>
+      !nameFilter || (name ?? '').toLowerCase().includes(nameFilter);
+
+    const registry = nearbyPickup
+      .filter((p) => stateOkFor(p.stateName, p.premisesAddress) && nameOkFor(p.premisesName))
+      .map((pharmacy) => ({
+        id: `pharmacy:${pharmacy.id}`,
+        name: pharmacy.premisesName?.trim() || 'Pharmacy',
+        address: pharmacy.premisesAddress?.trim() || '',
+        city: pharmacy.areaName ?? pharmacy.lgaName ?? null,
+        state: pharmacy.stateName ?? null,
+        phone: null,
+        isBranch: false,
+      }));
+
+    // Register results searched by the typed area / pharmacy name.
+    const areaRegistry = areaPharmacies
+      .filter((p) => stateOkFor(p.stateName, p.premisesAddress) && nameOkFor(p.premisesName))
+      .map((pharmacy) => ({
+        id: `pharmacy:${pharmacy.id}`,
+        name: pharmacy.premisesName?.trim() || 'Pharmacy',
+        address: pharmacy.premisesAddress?.trim() || '',
+        city: pharmacy.area ?? pharmacy.lgaName ?? null,
+        state: pharmacy.stateName ?? null,
+        phone: null,
+        isBranch: false,
+      }));
 
     const matchingBranches = allBranches.filter((branch) => {
       const branchCity = (branch.city ?? '').toLowerCase();
@@ -393,7 +504,8 @@ export default function CheckoutPage() {
       const cityOk =
         !cityFilter || branchCity.includes(cityFilter) || branchAddress.includes(cityFilter);
       const stateOk = !stateFilter || branchState.includes(stateFilter);
-      return cityOk && stateOk;
+      const nameOk = nameOkFor(branch.name);
+      return cityOk && stateOk && nameOk;
     });
     // With registry results present, only add branches that match the area;
     // otherwise keep the old "all branches" fallback.
@@ -411,7 +523,7 @@ export default function CheckoutPage() {
 
     const seen = new Set<string>();
     const options: PickupOption[] = [];
-    for (const option of [...registry, ...branchRows]) {
+    for (const option of [...registry, ...areaRegistry, ...branchRows]) {
       const key = `${option.name}|${option.address}`.toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -431,7 +543,83 @@ export default function CheckoutPage() {
       });
     }
     return options;
-  }, [allBranches, city, state_, selectedArea, nearbyPickup, typedPharmacy]);
+  }, [allBranches, city, state_, selectedArea, nearbyPickup, areaPharmacies, typedPharmacy]);
+
+  // Load register states once so the typed state name can resolve to its code
+  // and scope pharmacy searches.
+  useEffect(() => {
+    let cancelled = false;
+    getStates()
+      .then((list) => {
+        if (!cancelled) setStates(list);
+      })
+      .catch(() => {
+        if (!cancelled) setStates([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedStateCode = useMemo(() => {
+    const name = (state_ || selectedArea?.state || '').trim().toLowerCase();
+    if (!name) return null;
+    return states.find((s) => s.name.trim().toLowerCase() === name)?.code ?? null;
+  }, [state_, selectedArea, states]);
+
+  // When geolocation has not been used, search the pharmacy register by the
+  // area the shopper typed (city/state or the chosen delivery area) so pickup
+  // options populate without a location prompt.
+  useEffect(() => {
+    if (deliveryMode !== 'pickup') {
+      setAreaPharmacies([]);
+      return;
+    }
+    // A manually typed pharmacy name overrides the area search (fuzzy name
+    // match on the register) so the list narrows to that pharmacy.
+    const nameTerm = manualPharmacy.trim();
+    const byName = nameTerm.length >= 2;
+    if (!byName && nearbyPickup.length > 0) {
+      setAreaPharmacies([]);
+      return;
+    }
+    const cityTerm = (city || selectedArea?.city || '').trim();
+    const stateTerm = (state_ || selectedArea?.state || '').trim();
+    const term = byName ? nameTerm : cityTerm || stateTerm;
+    if (term.length < 2) {
+      setAreaPharmacies([]);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await searchPharmacies({
+          search: term,
+          state: selectedStateCode ?? undefined,
+          limit: 50,
+        });
+        if (!cancelled) {
+          setAreaPharmacies(res.data ?? []);
+        }
+      } catch {
+        if (!cancelled) {
+          setAreaPharmacies([]);
+        }
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [
+    deliveryMode,
+    nearbyPickup.length,
+    city,
+    state_,
+    selectedArea,
+    manualPharmacy,
+    selectedStateCode,
+  ]);
 
   // "Use my current location": geolocate, then use the nearest premises in the
   // register to infer the area and filter the pharmacy list.
@@ -546,7 +734,8 @@ export default function CheckoutPage() {
         if (deliveryMode === 'pickup') return !!pickupBranchId || !!typedPharmacy;
         return !!address && !!city && !!state_ && (!!deliveryAreaId || !!typedArea);
       case 2:
-        return true;
+        // Prescription-required items need the prescriber's details.
+        return rxItems.length === 0 || prescriberName.trim().length > 0;
       case 3:
         return !!paymentMethod;
       default:
@@ -554,13 +743,65 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePlaceOrder = (overrideProviderId?: string) => {
+  // Advance to the next step, requiring sign-in on delivery so the JWT exists
+  // before /payments/initialize. Shared by the top and bottom action buttons.
+  const advance = () => {
+    if (step === 1 && !isAuthenticated) {
+      setLoginModalOpened(true);
+      return;
+    }
+    setStep(step + 1);
+  };
+
+  const handlePlaceOrder = async (overrideProviderId?: string) => {
     const providerId = overrideProviderId ?? paymentMethod;
     if (!providerId || placingRef.current) {
       return;
     }
+    // /payments/initialize needs a bearer token: never create an order/payment
+    // for a shopper session that has no JWT.
+    if (!isAuthenticated) {
+      setLoginModalOpened(true);
+      return;
+    }
     placingRef.current = true;
     setOrderError(null);
+
+    // Prescription-required items: persist the prescriber details (and any
+    // attached files) as a prescription, then attach it to the order.
+    let prescriptionIds: string[] | undefined;
+    if (rxItems.length > 0) {
+      try {
+        const formData = new FormData();
+        rxFiles.forEach((file) => formData.append('files', file));
+        const details = [
+          prescriberName.trim() ? `Prescriber: ${prescriberName.trim()} (${prescriberType})` : '',
+          prescriberLicense.trim() ? `License: ${prescriberLicense.trim()}` : '',
+          prescriberPhone.trim() ? `Prescriber phone: ${prescriberPhone.trim()}` : '',
+          prescriptionNotes.trim() ? `Notes: ${prescriptionNotes.trim()}` : '',
+        ]
+          .filter(Boolean)
+          .join(' · ');
+        if (details) {
+          formData.append('notes', details);
+        }
+        if (phone) {
+          formData.append('phone', phone);
+        }
+        if (email) {
+          formData.append('email', email);
+        }
+        const saved = await websiteApi.createPrescription(formData);
+        if (saved?.id) {
+          prescriptionIds = [saved.id];
+        }
+      } catch (err) {
+        placingRef.current = false;
+        setOrderError(getApiErrorMessage(err));
+        return;
+      }
+    }
+
     const selectedPickup =
       deliveryMode === 'pickup'
         ? (pickupBranches.find((option) => option.id === pickupBranchId) ?? null)
@@ -578,10 +819,20 @@ export default function CheckoutPage() {
             deliveryMode === 'pickup' && pickupBranchId === MANUAL_PICKUP_ID && typedPharmacy
               ? `Pickup at: ${typedPharmacy}`
               : null,
+            // Prescriber details captured on the prescription step.
+            rxItems.length > 0 && prescriberName.trim()
+              ? `Prescriber: ${prescriberName.trim()} (${prescriberType})` +
+                (prescriberLicense.trim() ? ` · License: ${prescriberLicense.trim()}` : '') +
+                (prescriberPhone.trim() ? ` · ${prescriberPhone.trim()}` : '')
+              : null,
+            rxItems.length > 0 && prescriptionNotes.trim()
+              ? `Rx notes: ${prescriptionNotes.trim()}`
+              : null,
           ]
             .filter(Boolean)
             .join(' \u00b7 ') || undefined,
         couponCode: appliedCoupon?.code,
+        prescriptionIds,
         items: items.map((i) => {
           // Every line carries all available descriptive fields so the order is
           // readable before reconciliation: the item name as freetextName, plus
@@ -810,185 +1061,223 @@ export default function CheckoutPage() {
 
   return (
     <WebsiteLayout>
-      <Container size="xl" py={{ base: 28, md: 48 }}>
-        <Stack gap="xl">
-          <Box>
-            <Title order={1} className="damorex-heading" style={{ color: ink }}>
-              Checkout
-            </Title>
-            <Text c={muted} size="lg" lh={1.7}>
-              {totalItems} item{totalItems !== 1 ? 's' : ''} &middot; Complete your order
-            </Text>
-          </Box>
-
-          <Stepper
-            active={step}
-            onStepClick={setStep}
-            color="green"
-            radius="lg"
-            size="sm"
-            allowNextStepsSelect={false}
-          >
-            <Stepper.Step label="Cart Review" description="Review items">
-              {/* No content here - rendered separately */}
-            </Stepper.Step>
-            <Stepper.Step label="Delivery" description="Delivery or pickup" />
-            <Stepper.Step label="Prescription" description="Validate Rx" />
-            <Stepper.Step label="Payment" description="Pay" />
-            <Stepper.Step label="Confirmation" description="Done" />
-          </Stepper>
-
-          <Progress value={((step + 1) / 5) * 100} color="green" size="sm" radius="xl" />
-
-          {!isAuthenticated ? (
-            <Paper radius={24} p="xl" withBorder style={{ borderColor: line, textAlign: 'center' }}>
-              <ThemeIcon radius="xl" size={56} color="green" variant="light" mx="auto">
-                <ShoppingCart size={24} />
-              </ThemeIcon>
-              <Text fw={900} mt="md" size="lg">
-                Register to continue
+      <style>{`
+        @media (min-width: 62em) {
+          .checkout-summary-sticky {
+            position: sticky;
+            top: 84px;
+          }
+        }
+      `}</style>
+      <Container size="xl" py={{ base: 14, md: 24 }}>
+        <Stack gap="md">
+          <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+            <Group gap={8} align="baseline" wrap="nowrap">
+              <Text fw={900} className="damorex-heading" style={{ color: ink, fontSize: 14 }}>
+                Checkout
               </Text>
-              <Text c={muted} size="sm" mt={4}>
-                Create an account to complete your order. A token is issued so you can continue
-                checking out.
+              <Text size="xs" c={muted}>
+                {totalItems} item{totalItems !== 1 ? 's' : ''} &middot; Secure checkout
               </Text>
-              <Group justify="center" mt="lg" gap="sm">
-                <Button
-                  radius="xl"
-                  color="green"
-                  styles={buttonStyles}
-                  style={{ background: green }}
-                  onClick={() => openAccountDrawer('register')}
-                >
-                  Register
-                </Button>
-                <Button
-                  radius="xl"
-                  variant="light"
-                  color="green"
-                  styles={buttonStyles}
-                  onClick={() => openAccountDrawer('signin')}
-                >
-                  Sign In
-                </Button>
-              </Group>
-            </Paper>
-          ) : (
-            <>
-              {step === 0 && (
-                <StepCartReview items={items} subtotal={subtotal} totalItems={totalItems} />
-              )}
+            </Group>
+          </Group>
 
-              {step === 1 && (
-                <StepDeliveryDetails
-                  address={address}
-                  setAddress={setAddress}
-                  city={city}
-                  setCity={setCity}
-                  state_={state_}
-                  setState_={setState_}
-                  phone={phone}
-                  setPhone={setPhone}
-                  onPhoneBlur={() => void autofillFromPhone()}
-                  email={email}
-                  setEmail={setEmail}
-                  deliveryMode={deliveryMode}
-                  setDeliveryMode={setDeliveryMode}
-                  pickupBranchId={pickupBranchId}
-                  setPickupBranchId={setPickupBranchId}
-                  branches={pickupBranches}
-                  branchesLoading={branchesLoading}
-                  onUseLocation={useMyLocation}
-                  locating={locating}
-                  locationNote={locationNote}
-                  deliveryAreaId={deliveryAreaId}
-                  setDeliveryAreaId={setDeliveryAreaId}
-                  deliveryAreas={deliveryAreas}
-                  areasLoading={areasLoading}
-                  selectedArea={selectedArea}
-                  items={items}
-                  manualArea={manualArea}
-                  setManualArea={setManualArea}
-                  manualPharmacy={manualPharmacy}
-                  setManualPharmacy={setManualPharmacy}
-                />
-              )}
+          {/* Compact progress tracker — all five checkout steps stay visible */}
+          <Paper radius="lg" p="xs" withBorder style={{ borderColor: line, background: soft }}>
+            <Stepper
+              active={step}
+              onStepClick={setStep}
+              color="green"
+              radius="lg"
+              size="xs"
+              allowNextStepsSelect={false}
+            >
+              <Stepper.Step label="Cart" />
+              <Stepper.Step label="Delivery" />
+              <Stepper.Step label="Prescription" />
+              <Stepper.Step label="Payment" />
+              <Stepper.Step label="Done" />
+            </Stepper>
+          </Paper>
 
-              {step === 2 && <StepPrescriptionValidation rxItems={rxItems} />}
+          <Grid>
+            {/* Left column — the active step's form */}
+            <Grid.Col span={{ base: 12, md: 8 }}>
+              <Stack gap="lg">
+                {step === 0 && (
+                  <StepCartReview items={items} subtotal={subtotal} totalItems={totalItems} />
+                )}
 
-              {step === 3 && (
-                <StepPayment
-                  providers={providers}
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={(value) => {
-                    setPaymentMethod(value);
-                    // Selecting a provider immediately creates the order and
-                    // sends the shopper to the gateway.
-                    if (value) handlePlaceOrder(value);
-                  }}
-                  promoCode={promoCode}
-                  setPromoCode={setPromoCode}
+                {step === 1 && (
+                  <StepDeliveryDetails
+                    address={address}
+                    setAddress={setAddress}
+                    city={city}
+                    setCity={setCity}
+                    state_={state_}
+                    setState_={setState_}
+                    deliveryMode={deliveryMode}
+                    setDeliveryMode={setDeliveryMode}
+                    pickupBranchId={pickupBranchId}
+                    setPickupBranchId={setPickupBranchId}
+                    branches={pickupBranches}
+                    branchesLoading={branchesLoading}
+                    onUseLocation={useMyLocation}
+                    locating={locating}
+                    locationNote={locationNote}
+                    deliveryAreaId={deliveryAreaId}
+                    setDeliveryAreaId={setDeliveryAreaId}
+                    deliveryAreas={deliveryAreas}
+                    areasLoading={areasLoading}
+                    selectedArea={selectedArea}
+                    items={items}
+                    manualArea={manualArea}
+                    setManualArea={setManualArea}
+                    manualPharmacy={manualPharmacy}
+                    setManualPharmacy={setManualPharmacy}
+                  />
+                )}
+
+                {step === 2 && (
+                  <StepPrescriptionValidation
+                    rxItems={rxItems}
+                    prescriberType={prescriberType}
+                    setPrescriberType={setPrescriberType}
+                    prescriberName={prescriberName}
+                    setPrescriberName={setPrescriberName}
+                    prescriberLicense={prescriberLicense}
+                    setPrescriberLicense={setPrescriberLicense}
+                    prescriberPhone={prescriberPhone}
+                    setPrescriberPhone={setPrescriberPhone}
+                    prescriptionNotes={prescriptionNotes}
+                    setPrescriptionNotes={setPrescriptionNotes}
+                    rxFiles={rxFiles}
+                    setRxFiles={setRxFiles}
+                  />
+                )}
+
+                {step === 3 && (
+                  <StepPayment
+                    providers={providers}
+                    paymentMethod={paymentMethod}
+                    setPaymentMethod={(value) => {
+                      setPaymentMethod(value);
+                      // Selecting a provider immediately creates the order and
+                      // sends the shopper to the gateway.
+                      if (value) void handlePlaceOrder(value);
+                    }}
+                    promoCode={promoCode}
+                    setPromoCode={setPromoCode}
+                    appliedCoupon={appliedCoupon}
+                    checkingCoupon={checkingCoupon}
+                    couponStatus={couponStatus}
+                    onApplyCoupon={() => void handleApplyCoupon()}
+                  />
+                )}
+              </Stack>
+            </Grid.Col>
+
+            {/* Right column — persistent, sticky order summary + trust indicators */}
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Box className="checkout-summary-sticky" mt={{ base: 'lg', md: 0 }}>
+                <OrderSummary
                   items={items}
                   subtotal={subtotal}
                   deliveryFee={deliveryFee}
                   total={total}
                   totalItems={totalItems}
                   appliedCoupon={appliedCoupon}
-                  checkingCoupon={checkingCoupon}
-                  couponStatus={couponStatus}
-                  onApplyCoupon={() => void handleApplyCoupon()}
+                  footer={
+                    step < 3 ? (
+                      <Button
+                        radius="xl"
+                        fullWidth
+                        color="green"
+                        rightSection={<ArrowRight size={18} />}
+                        styles={buttonStyles}
+                        style={{ background: green }}
+                        onClick={advance}
+                        disabled={!canGoNext()}
+                      >
+                        Continue
+                      </Button>
+                    ) : step === 3 ? (
+                      <Button
+                        radius="xl"
+                        fullWidth
+                        color="green"
+                        leftSection={<CreditCard size={18} />}
+                        styles={buttonStyles}
+                        style={{ background: green }}
+                        onClick={() => void handlePlaceOrder()}
+                        loading={isPending}
+                        disabled={!canGoNext()}
+                      >
+                        Place Order &middot; {formatPrice(total)}
+                      </Button>
+                    ) : null
+                  }
                 />
-              )}
-            </>
+                <ContactDetails
+                  phone={phone}
+                  setPhone={setPhone}
+                  onPhoneBlur={() => {
+                    void checkSessionAndParticipant();
+                    void autofillFromPhone();
+                  }}
+                  email={email}
+                  setEmail={setEmail}
+                />
+                <TrustIndicators />
+              </Box>
+            </Grid.Col>
+          </Grid>
+
+          {/* Phone-login modal: opens when a delivery phone is entered while not
+              authenticated, so the JWT exists before /payments/initialize. On
+              success the token is persisted and the shopper can advance past
+              delivery to payment. */}
+          {loginModalOpened && !isAuthenticated && (
+            <CheckoutPhoneLoginModal
+              opened
+              onClose={() => setLoginModalOpened(false)}
+              onSuccess={() => setLoginModalOpened(false)}
+              phone={phone}
+            />
           )}
 
-          {isAuthenticated && step < 4 ? (
-            <Group justify="space-between" mt="lg">
-              <Button
-                radius="xl"
-                variant="light"
-                color="gray"
-                leftSection={<ArrowLeft size={18} />}
-                onClick={() => {
-                  if (step === 0) {
-                    navigate({ to: '/shop/cart' });
-                  } else {
-                    setStep(step - 1);
-                  }
-                }}
-                disabled={step === 3 && isPending}
-              >
-                {step === 0 ? 'Back to Cart' : 'Previous'}
-              </Button>
-
-              {step < 3 ? (
+          {step < 4 ? (
+            <Paper
+              radius="lg"
+              p="sm"
+              withBorder
+              style={{
+                borderColor: line,
+                position: 'sticky',
+                bottom: 0,
+                zIndex: 5,
+                background: '#fff',
+              }}
+            >
+              <Group justify="flex-start">
                 <Button
                   radius="xl"
-                  color="green"
-                  rightSection={<ArrowRight size={18} />}
-                  styles={buttonStyles}
-                  style={{ background: green }}
-                  onClick={() => setStep(step + 1)}
-                  disabled={!canGoNext()}
+                  variant="light"
+                  color="gray"
+                  leftSection={<ArrowLeft size={18} />}
+                  onClick={() => {
+                    if (step === 0) {
+                      navigate({ to: '/shop/cart' });
+                    } else {
+                      setStep(step - 1);
+                    }
+                  }}
+                  disabled={step === 3 && isPending}
                 >
-                  Continue
+                  {step === 0 ? 'Back to Cart' : 'Previous'}
                 </Button>
-              ) : step === 3 ? (
-                <Button
-                  radius="xl"
-                  size="lg"
-                  color="green"
-                  leftSection={<CreditCard size={18} />}
-                  styles={buttonStyles}
-                  style={{ background: green }}
-                  onClick={() => handlePlaceOrder()}
-                  loading={isPending}
-                  disabled={!canGoNext()}
-                >
-                  Place Order &middot; {formatPrice(total)}
-                </Button>
-              ) : null}
-            </Group>
+              </Group>
+            </Paper>
           ) : null}
         </Stack>
       </Container>
@@ -1011,7 +1300,7 @@ function StepCartReview({
   totalItems: number;
 }) {
   return (
-    <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+    <Paper radius={24} p="lg" withBorder style={{ borderColor: line }}>
       <Stack gap="md">
         <Group gap={6}>
           <ShoppingCart size={20} color={green} />
@@ -1084,11 +1373,6 @@ function StepDeliveryDetails({
   setCity,
   state_,
   setState_,
-  phone,
-  setPhone,
-  onPhoneBlur,
-  email,
-  setEmail,
   deliveryMode,
   setDeliveryMode,
   pickupBranchId,
@@ -1115,11 +1399,6 @@ function StepDeliveryDetails({
   setCity: (v: string) => void;
   state_: string;
   setState_: (v: string) => void;
-  phone: string;
-  setPhone: (v: string) => void;
-  onPhoneBlur?: () => void;
-  email: string;
-  setEmail: (v: string) => void;
   deliveryMode: DeliveryMode;
   setDeliveryMode: (v: DeliveryMode) => void;
   pickupBranchId: string | null;
@@ -1174,7 +1453,7 @@ function StepDeliveryDetails({
   ];
 
   return (
-    <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+    <Paper radius={24} p="lg" withBorder style={{ borderColor: line }}>
       <Stack gap="md">
         <Group gap={6}>
           <MapPin size={20} color={green} />
@@ -1188,7 +1467,7 @@ function StepDeliveryDetails({
           value={deliveryMode}
           onChange={(value) => value && setDeliveryMode(value as DeliveryMode)}
         >
-          <Stack gap="xs">
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs">
             {options.map((option) => {
               const selected = deliveryMode === option.value;
               const Icon = option.Icon;
@@ -1206,49 +1485,46 @@ function StepDeliveryDetails({
                   onClick={() => setDeliveryMode(option.value)}
                   data-testid={`delivery-mode-${option.value}`}
                 >
-                  <Group gap="sm" wrap="nowrap">
-                    <Radio
-                      value={option.value}
-                      data-testid={`delivery-mode-radio-${option.value}`}
-                    />
-                    <ThemeIcon radius="xl" color="green" variant="light" size="md">
-                      <Icon size={16} />
-                    </ThemeIcon>
-                    <Box>
-                      <Text fw={800} size="sm">
-                        {option.title}
-                      </Text>
-                      <Text size="xs" c={muted}>
-                        {option.description}
-                      </Text>
-                    </Box>
-                  </Group>
+                  <Stack gap={4}>
+                    <Group justify="space-between" wrap="nowrap">
+                      <ThemeIcon radius="xl" color="green" variant="light" size="sm">
+                        <Icon size={14} />
+                      </ThemeIcon>
+                      <Radio
+                        value={option.value}
+                        data-testid={`delivery-mode-radio-${option.value}`}
+                      />
+                    </Group>
+                    <Text fw={800} size="xs" lineClamp={1}>
+                      {option.title}
+                    </Text>
+                    <Text size="xs" c={muted} lineClamp={2}>
+                      {option.description}
+                    </Text>
+                    {option.value === 'pickup' ? (
+                      <Button
+                        size="compact-xs"
+                        variant="light"
+                        color="green"
+                        radius="xl"
+                        leftSection={<Navigation size={12} />}
+                        loading={locating}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setDeliveryMode('pickup');
+                          onUseLocation();
+                        }}
+                        data-testid="pickup-use-location"
+                      >
+                        Use my location
+                      </Button>
+                    ) : null}
+                  </Stack>
                 </Paper>
               );
             })}
-          </Stack>
+          </SimpleGrid>
         </Radio.Group>
-
-        <TextInput
-          label="Phone Number"
-          placeholder="+234 800 000 0000"
-          radius="xl"
-          value={phone}
-          onChange={(e) => setPhone(e.currentTarget.value)}
-          onBlur={onPhoneBlur}
-          required
-          styles={{ input: { borderColor: line } }}
-        />
-
-        <TextInput
-          label="Email"
-          placeholder="you@example.com"
-          type="email"
-          radius="xl"
-          value={email}
-          onChange={(e) => setEmail(e.currentTarget.value)}
-          styles={{ input: { borderColor: line } }}
-        />
 
         {deliveryMode === 'dispatch' && (
           <>
@@ -1273,12 +1549,14 @@ function StepDeliveryDetails({
                 />
               </Grid.Col>
               <Grid.Col span={6}>
-                <TextInput
+                <Autocomplete
                   label="State"
                   placeholder="Lagos"
+                  data={NIGERIAN_STATES}
+                  limit={8}
                   radius="xl"
                   value={state_}
-                  onChange={(e) => setState_(e.currentTarget.value)}
+                  onChange={setState_}
                   styles={{ input: { borderColor: line } }}
                 />
               </Grid.Col>
@@ -1358,22 +1636,9 @@ function StepDeliveryDetails({
 
         {deliveryMode === 'pickup' && (
           <>
-            <Group justify="space-between" wrap="wrap" gap="sm">
-              <Text size="sm" c={muted}>
-                Choose the pharmacy you&apos;d like to collect from.
-              </Text>
-              <Button
-                variant="light"
-                radius="xl"
-                color="green"
-                leftSection={<Navigation size={16} />}
-                loading={locating}
-                onClick={onUseLocation}
-                data-testid="pickup-use-location"
-              >
-                Use my location
-              </Button>
-            </Group>
+            <Text size="sm" c={muted}>
+              Choose the pharmacy you&apos;d like to collect from.
+            </Text>
 
             {locationNote ? (
               <Text size="xs" c={muted}>
@@ -1395,12 +1660,14 @@ function StepDeliveryDetails({
                 />
               </Grid.Col>
               <Grid.Col span={6}>
-                <TextInput
+                <Autocomplete
                   label="State"
                   placeholder="e.g. Lagos"
+                  data={NIGERIAN_STATES}
+                  limit={8}
                   radius="xl"
                   value={state_}
-                  onChange={(e) => setState_(e.currentTarget.value)}
+                  onChange={setState_}
                   data-testid="pickup-state"
                 />
               </Grid.Col>
@@ -1433,46 +1700,48 @@ function StepDeliveryDetails({
               </Alert>
             ) : (
               <Radio.Group value={pickupBranchId} onChange={setPickupBranchId}>
-                <Stack gap="xs">
-                  {branches.map((branch) => {
-                    const selected = pickupBranchId === branch.id;
-                    return (
-                      <Paper
-                        key={branch.id}
-                        radius={16}
-                        withBorder
-                        p="sm"
-                        style={{
-                          borderColor: selected ? green : line,
-                          background: selected ? soft : '#FFFFFF',
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => setPickupBranchId(branch.id)}
-                        data-testid={`pickup-branch-${branch.id}`}
-                      >
-                        <Group gap="sm" wrap="nowrap" align="flex-start">
-                          <Radio
-                            value={branch.id}
-                            data-testid={`pickup-branch-radio-${branch.id}`}
-                          />
-                          <Box>
-                            <Text fw={800} size="sm">
-                              {branch.name}
-                            </Text>
-                            <Text size="xs" c={muted}>
-                              {pickupAddressLine(branch)}
-                            </Text>
-                            {branch.phone ? (
-                              <Text size="xs" c={muted}>
-                                {branch.phone}
+                <ScrollArea.Autosize mah={280} type="scroll" offsetScrollbars>
+                  <Stack gap="xs" pr={6}>
+                    {branches.map((branch) => {
+                      const selected = pickupBranchId === branch.id;
+                      return (
+                        <Paper
+                          key={branch.id}
+                          radius={16}
+                          withBorder
+                          p="sm"
+                          style={{
+                            borderColor: selected ? green : line,
+                            background: selected ? soft : '#FFFFFF',
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => setPickupBranchId(branch.id)}
+                          data-testid={`pickup-branch-${branch.id}`}
+                        >
+                          <Group gap="sm" wrap="nowrap" align="flex-start">
+                            <Radio
+                              value={branch.id}
+                              data-testid={`pickup-branch-radio-${branch.id}`}
+                            />
+                            <Box>
+                              <Text fw={800} size="sm">
+                                {branch.name}
                               </Text>
-                            ) : null}
-                          </Box>
-                        </Group>
-                      </Paper>
-                    );
-                  })}
-                </Stack>
+                              <Text size="xs" c={muted}>
+                                {pickupAddressLine(branch)}
+                              </Text>
+                              {branch.phone ? (
+                                <Text size="xs" c={muted}>
+                                  {branch.phone}
+                                </Text>
+                              ) : null}
+                            </Box>
+                          </Group>
+                        </Paper>
+                      );
+                    })}
+                  </Stack>
+                </ScrollArea.Autosize>
               </Radio.Group>
             )}
 
@@ -1495,6 +1764,18 @@ function subtotalValue(
 
 function StepPrescriptionValidation({
   rxItems,
+  prescriberType,
+  setPrescriberType,
+  prescriberName,
+  setPrescriberName,
+  prescriberLicense,
+  setPrescriberLicense,
+  prescriberPhone,
+  setPrescriberPhone,
+  prescriptionNotes,
+  setPrescriptionNotes,
+  rxFiles,
+  setRxFiles,
 }: {
   rxItems: {
     productId?: string;
@@ -1502,16 +1783,27 @@ function StepPrescriptionValidation({
     unitPrice?: number;
     quantity: number;
   }[];
+  prescriberType: 'Pharmacist' | 'Doctor' | 'Professional';
+  setPrescriberType: (v: 'Pharmacist' | 'Doctor' | 'Professional') => void;
+  prescriberName: string;
+  setPrescriberName: (v: string) => void;
+  prescriberLicense: string;
+  setPrescriberLicense: (v: string) => void;
+  prescriberPhone: string;
+  setPrescriberPhone: (v: string) => void;
+  prescriptionNotes: string;
+  setPrescriptionNotes: (v: string) => void;
+  rxFiles: File[];
+  setRxFiles: (files: File[]) => void;
 }) {
-  const navigate = useNavigate();
-
+  const rxFileRef = useRef<HTMLInputElement>(null);
   return (
-    <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
+    <Paper radius={24} p="lg" withBorder style={{ borderColor: line }}>
       <Stack gap="md">
         <Group gap={6}>
           <Stethoscope size={20} color={green} />
           <Text fw={900} size="lg">
-            Prescription Validation
+            Prescription &amp; Prescriber
           </Text>
         </Group>
         <Divider />
@@ -1527,7 +1819,7 @@ function StepPrescriptionValidation({
                   No prescription-required items
                 </Text>
                 <Text size="xs" c={muted}>
-                  All items in your cart are over-the-counter.
+                  All items in your cart are over-the-counter — you can continue to payment.
                 </Text>
               </Box>
             </Group>
@@ -1535,8 +1827,8 @@ function StepPrescriptionValidation({
         ) : (
           <>
             <Text size="sm" c={muted}>
-              The following items require a valid prescription. Please upload your prescription or
-              contact a pharmacist for assistance.
+              These items require a prescription. Enter the details of the prescriber who issued it
+              — a pharmacist, doctor, or other licensed professional.
             </Text>
 
             {rxItems.map((item) => (
@@ -1562,19 +1854,132 @@ function StepPrescriptionValidation({
 
             <Divider />
 
-            <Group>
-              <Button
-                radius="xl"
-                color="green"
-                leftSection={<FileUp size={18} />}
-                styles={buttonStyles}
-                style={{ background: green }}
-                onClick={() => navigate({ to: '/shop/upload-prescription' })}
+            <Text fw={900} size="sm">
+              Prescriber Details
+            </Text>
+
+            <Radio.Group
+              value={prescriberType}
+              onChange={(value) =>
+                value && setPrescriberType(value as 'Pharmacist' | 'Doctor' | 'Professional')
+              }
+            >
+              <Group gap="lg" mt={4}>
+                <Radio value="Pharmacist" label="Pharmacist" />
+                <Radio value="Doctor" label="Doctor" />
+                <Radio value="Professional" label="Professional" />
+              </Group>
+            </Radio.Group>
+
+            <Grid>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <TextInput
+                  label="Prescriber name"
+                  placeholder="e.g. Dr. Jane Doe"
+                  radius="xl"
+                  value={prescriberName}
+                  onChange={(e) => setPrescriberName(e.currentTarget.value)}
+                  required
+                  styles={{ input: { borderColor: line } }}
+                  data-testid="prescriber-name"
+                />
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 6 }}>
+                <TextInput
+                  label="License / registration no."
+                  placeholder="e.g. MDCN/12345"
+                  radius="xl"
+                  value={prescriberLicense}
+                  onChange={(e) => setPrescriberLicense(e.currentTarget.value)}
+                  styles={{ input: { borderColor: line } }}
+                  data-testid="prescriber-license"
+                />
+              </Grid.Col>
+            </Grid>
+
+            <TextInput
+              label="Prescriber phone"
+              placeholder="+234 800 000 0000"
+              radius="xl"
+              value={prescriberPhone}
+              onChange={(e) => setPrescriberPhone(e.currentTarget.value)}
+              styles={{ input: { borderColor: line } }}
+              data-testid="prescriber-phone"
+            />
+
+            <Textarea
+              label="Prescription notes (optional)"
+              placeholder="Issuing facility, prescription reference, or special instructions"
+              radius="lg"
+              autosize
+              minRows={2}
+              value={prescriptionNotes}
+              onChange={(e) => setPrescriptionNotes(e.currentTarget.value)}
+              styles={{ input: { borderColor: line } }}
+            />
+
+            <Box>
+              <Text size="sm" fw={800} mb={4}>
+                Prescription file (optional)
+              </Text>
+              <Box
+                onClick={() => rxFileRef.current?.click()}
+                data-testid="prescription-dropzone"
+                style={{
+                  border: `2px dashed ${line}`,
+                  borderRadius: 16,
+                  padding: 16,
+                  cursor: 'pointer',
+                  background: soft,
+                }}
               >
-                Upload Prescription
-              </Button>
-              {/* Order via chat: opens the pharmacist-technician bot in the
-                  on-site chatbot with the order payload. */}
+                <input
+                  ref={rxFileRef}
+                  type="file"
+                  multiple
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  onChange={(e) => setRxFiles(Array.from(e.target.files || []).slice(0, 10))}
+                  style={{ display: 'none' }}
+                  data-testid="prescription-file-input"
+                />
+                <Group justify="center" gap="sm" wrap="nowrap">
+                  <ThemeIcon radius="xl" color="green" variant="light" size="md">
+                    <FileUp size={16} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text size="sm" fw={700} lineClamp={1}>
+                      {rxFiles.length
+                        ? `${rxFiles.length} file${rxFiles.length === 1 ? '' : 's'} selected`
+                        : 'Click to attach your prescription'}
+                    </Text>
+                    <Text size="xs" c={muted}>
+                      JPG, PNG or PDF · up to 10 files
+                    </Text>
+                  </Box>
+                </Group>
+              </Box>
+              {rxFiles.length > 0 ? (
+                <Group gap={6} mt={6}>
+                  {rxFiles.map((f, i) => (
+                    <Badge key={`${f.name}-${i}`} radius="xl" color="green" variant="light">
+                      {f.name}
+                    </Badge>
+                  ))}
+                  <Button
+                    size="compact-xs"
+                    variant="subtle"
+                    color="gray"
+                    onClick={() => setRxFiles([])}
+                  >
+                    Clear
+                  </Button>
+                </Group>
+              ) : null}
+            </Box>
+
+            {/* Order via chat: opens the pharmacist-technician bot in the
+                on-site chatbot with the order payload. */}
+            <Group>
               <Button
                 radius="xl"
                 variant="filled"
@@ -1598,7 +2003,8 @@ function StepPrescriptionValidation({
             </Group>
 
             <Alert icon={<Stethoscope size={16} />} color="blue" variant="light" radius="lg">
-              Our pharmacists will review your prescription and may contact you for clarification.
+              Our pharmacists will verify the prescriber&apos;s details and may contact you for
+              clarification.
             </Alert>
           </>
         )}
@@ -1607,32 +2013,61 @@ function StepPrescriptionValidation({
   );
 }
 
-function StepPayment({
-  providers,
-  paymentMethod,
-  setPaymentMethod,
-  promoCode,
-  setPromoCode,
+function ContactDetails({
+  phone,
+  setPhone,
+  onPhoneBlur,
+  email,
+  setEmail,
+}: {
+  phone: string;
+  setPhone: (v: string) => void;
+  onPhoneBlur?: () => void;
+  email: string;
+  setEmail: (v: string) => void;
+}) {
+  return (
+    <Paper radius={20} p="md" mt="md" withBorder style={{ borderColor: line }}>
+      <Stack gap="sm">
+        <Group gap={6}>
+          <MessageSquare size={16} color={green} />
+          <Text fw={900} size="sm">
+            Contact details
+          </Text>
+        </Group>
+        <TextInput
+          label="Phone Number"
+          placeholder="+234 800 000 0000"
+          radius="xl"
+          value={phone}
+          onChange={(e) => setPhone(e.currentTarget.value)}
+          onBlur={onPhoneBlur}
+          required
+          styles={{ input: { borderColor: line } }}
+        />
+        <TextInput
+          label="Email"
+          placeholder="you@example.com"
+          type="email"
+          radius="xl"
+          value={email}
+          onChange={(e) => setEmail(e.currentTarget.value)}
+          styles={{ input: { borderColor: line } }}
+        />
+      </Stack>
+    </Paper>
+  );
+}
+
+function OrderSummary({
   items,
   subtotal,
   deliveryFee,
   total,
-  totalItems: _totalItems,
+  totalItems,
   appliedCoupon,
-  checkingCoupon,
-  couponStatus,
-  onApplyCoupon,
+  footer,
 }: {
-  providers: Array<{
-    id: string;
-    name: string;
-    providerType: string;
-    production: boolean;
-  }>;
-  paymentMethod: string | null;
-  setPaymentMethod: (v: string | null) => void;
-  promoCode: string;
-  setPromoCode: (v: string) => void;
   items: {
     productId?: string;
     name?: string;
@@ -1648,150 +2083,213 @@ function StepPayment({
     discountAmount: number;
     type?: 'percent' | 'fixed';
   } | null;
+  footer?: ReactNode;
+}) {
+  return (
+    <Paper radius={24} p="lg" withBorder style={{ borderColor: line }}>
+      <Stack gap="sm">
+        <Group gap={6}>
+          <ShoppingCart size={18} color={green} />
+          <Text fw={900} size="lg">
+            Order Summary
+          </Text>
+        </Group>
+        <Divider />
+
+        <ScrollArea.Autosize mah={220} type="scroll" offsetScrollbars>
+          <Stack gap={8} pr={4}>
+            {items.map((item) => (
+              <Group key={item.productId ?? item.name} justify="space-between" wrap="nowrap">
+                <Text size="sm" c={muted} lineClamp={2}>
+                  {itemLabel(item)} ×{item.quantity}
+                </Text>
+                <Text fw={700} size="sm" style={{ whiteSpace: 'nowrap' }}>
+                  {formatPrice(itemUnitPrice(item) * item.quantity)}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        </ScrollArea.Autosize>
+
+        <Divider />
+        <Group justify="space-between">
+          <Text c={muted} size="sm">
+            Subtotal ({totalItems})
+          </Text>
+          <Text fw={800} size="sm">
+            {formatPrice(subtotal)}
+          </Text>
+        </Group>
+        <Group justify="space-between">
+          <Text c={muted} size="sm">
+            Delivery Fee
+          </Text>
+          <Text fw={800} size="sm">
+            {deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee)}
+          </Text>
+        </Group>
+        {appliedCoupon ? (
+          <Group justify="space-between">
+            <Text c={green} size="sm">
+              Coupon ({appliedCoupon.code})
+            </Text>
+            <Text fw={800} size="sm" c={green}>
+              −{formatPrice(appliedCoupon.discountAmount)}
+            </Text>
+          </Group>
+        ) : null}
+        <Divider />
+        <Group justify="space-between" align="baseline">
+          <Text fw={900} size="lg">
+            Total
+          </Text>
+          <Text fw={950} size="lg" c={darkGreen}>
+            {formatPrice(total)}
+          </Text>
+        </Group>
+        {footer}
+      </Stack>
+    </Paper>
+  );
+}
+
+function TrustIndicators() {
+  const items = [
+    { icon: ShieldCheck, title: 'Secure checkout', desc: 'Encrypted end to end' },
+    { icon: BadgeCheck, title: 'Authentic medicines', desc: 'Verified pharmacy partners' },
+    { icon: Truck, title: 'Fast delivery', desc: 'Same day – 3 days' },
+  ];
+  return (
+    <Paper radius={20} p="md" mt="md" withBorder style={{ borderColor: line, background: soft }}>
+      <Stack gap={10}>
+        {items.map(({ icon: Icon, title, desc }) => (
+          <Group key={title} gap="sm" wrap="nowrap">
+            <ThemeIcon radius="xl" size={28} color="green" variant="light">
+              <Icon size={15} />
+            </ThemeIcon>
+            <Box>
+              <Text size="xs" fw={700}>
+                {title}
+              </Text>
+              <Text size="xs" c={muted}>
+                {desc}
+              </Text>
+            </Box>
+          </Group>
+        ))}
+      </Stack>
+    </Paper>
+  );
+}
+
+function StepPayment({
+  providers,
+  paymentMethod,
+  setPaymentMethod,
+  promoCode,
+  setPromoCode,
+  appliedCoupon,
+  checkingCoupon,
+  couponStatus,
+  onApplyCoupon,
+}: {
+  providers: Array<{
+    id: string;
+    name: string;
+    providerType: string;
+    production: boolean;
+  }>;
+  paymentMethod: string | null;
+  setPaymentMethod: (v: string | null) => void;
+  promoCode: string;
+  setPromoCode: (v: string) => void;
+  appliedCoupon: {
+    code: string;
+    discountAmount: number;
+    type?: 'percent' | 'fixed';
+  } | null;
   checkingCoupon: boolean;
   couponStatus: { kind: 'idle' | 'error' | 'success'; message: string };
   onApplyCoupon: () => void;
 }) {
   return (
-    <Grid>
-      {/* Items/order summary on the LEFT — payment picks up on the right, */}
-      {/* matching the left-to-right flow of every other checkout step. */}
-      <Grid.Col span={{ base: 12, md: 7 }}>
-        <Paper radius={24} p="xl" withBorder style={{ borderColor: line }}>
-          <Stack gap="md">
-            <Group gap={6}>
-              <ShoppingCart size={20} color={green} />
-              <Text fw={900} size="lg">
-                Order Summary
-              </Text>
-            </Group>
-            <Divider />
+    <Paper radius={24} p="lg" withBorder style={{ borderColor: line, background: soft }}>
+      <Stack gap="md">
+        <Group gap={6}>
+          <CreditCard size={20} color={green} />
+          <Text fw={900} size="lg">
+            Payment Method
+          </Text>
+        </Group>
+        <Divider />
 
-            {items.map((item) => (
-              <Group key={item.productId ?? item.name} justify="space-between">
-                <Text size="sm" c={muted}>
-                  {itemLabel(item)} x{item.quantity}
-                </Text>
-                <Text fw={700} size="sm">
-                  {formatPrice(itemUnitPrice(item) * item.quantity)}
-                </Text>
-              </Group>
+        <Radio.Group value={paymentMethod} onChange={setPaymentMethod}>
+          <Stack gap="xs">
+            {providers.length === 0 && (
+              <Text size="sm" c={muted}>
+                No online payment providers are enabled yet.
+              </Text>
+            )}
+            {providers.map((p) => (
+              <Paper
+                key={p.id}
+                radius={16}
+                withBorder
+                p="sm"
+                style={{
+                  borderColor: paymentMethod === p.id ? green : line,
+                  background: paymentMethod === p.id ? '#FFFFFF' : soft,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setPaymentMethod(p.id)}
+              >
+                <Radio value={p.id} label={`${p.name} (${p.production ? 'Live' : 'Test'})`} />
+              </Paper>
             ))}
-
-            <Divider />
-            <Group justify="space-between">
-              <Text c={muted}>Subtotal</Text>
-              <Text fw={800}>{formatPrice(subtotal)}</Text>
-            </Group>
-            <Group justify="space-between">
-              <Text c={muted}>Delivery Fee</Text>
-              <Text fw={800}>{deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee)}</Text>
-            </Group>
-            <Divider />
-            {appliedCoupon && (
-              <>
-                <Group justify="space-between">
-                  <Text c={green}>Coupon ({appliedCoupon.code})</Text>
-                  <Text fw={800} c={green}>
-                    −{formatPrice(appliedCoupon.discountAmount)}
-                  </Text>
-                </Group>
-                <Divider />
-              </>
-            )}
-            <Group justify="space-between">
-              <Text fw={900} size="lg">
-                Total
-              </Text>
-              <Text fw={950} size="lg" c={darkGreen}>
-                {formatPrice(total)}
-              </Text>
-            </Group>
           </Stack>
-        </Paper>
-      </Grid.Col>
+        </Radio.Group>
 
-      {/* Payment method + promo on the RIGHT. */}
-      <Grid.Col span={{ base: 12, md: 5 }}>
-        <Paper radius={24} p="xl" withBorder style={{ borderColor: line, background: soft }}>
-          <Stack gap="md">
-            <Group gap={6}>
-              <CreditCard size={20} color={green} />
-              <Text fw={900} size="lg">
-                Payment Method
-              </Text>
-            </Group>
-            <Divider />
+        <Divider />
 
-            <Radio.Group value={paymentMethod} onChange={setPaymentMethod}>
-              <Stack gap="xs">
-                {providers.length === 0 && (
-                  <Text size="sm" c={muted}>
-                    No online payment providers are enabled yet.
-                  </Text>
-                )}
-                {providers.map((p) => (
-                  <Paper
-                    key={p.id}
-                    radius={16}
-                    withBorder
-                    p="sm"
-                    style={{
-                      borderColor: paymentMethod === p.id ? green : line,
-                      background: paymentMethod === p.id ? '#FFFFFF' : soft,
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => setPaymentMethod(p.id)}
-                  >
-                    <Radio value={p.id} label={`${p.name} (${p.production ? 'Live' : 'Test'})`} />
-                  </Paper>
-                ))}
-              </Stack>
-            </Radio.Group>
-
-            <Divider />
-
-            <Text fw={800} size="sm">
-              Promo Code
-            </Text>
-            <Input
-              placeholder="Enter promo code (e.g. WELCOME20)"
+        <Text fw={800} size="sm">
+          Promo Code
+        </Text>
+        <Input
+          placeholder="Enter promo code (e.g. WELCOME20)"
+          radius="xl"
+          value={promoCode}
+          onChange={(e) => setPromoCode(e.currentTarget.value)}
+          styles={{ input: { borderColor: line, background: '#FFFFFF' } }}
+          rightSection={
+            <Button
+              size="xs"
               radius="xl"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.currentTarget.value)}
-              styles={{ input: { borderColor: line, background: '#FFFFFF' } }}
-              rightSection={
-                <Button
-                  size="xs"
-                  radius="xl"
-                  color="green"
-                  variant="light"
-                  loading={checkingCoupon}
-                  style={{ marginRight: 4 }}
-                  onClick={onApplyCoupon}
-                >
-                  Apply
-                </Button>
-              }
-            />
-            {couponStatus.kind !== 'idle' && (
-              <Text size="xs" c={couponStatus.kind === 'error' ? 'red' : green}>
-                {couponStatus.message}
-              </Text>
-            )}
-            {appliedCoupon && (
-              <Group justify="space-between">
-                <Text size="sm" c={green} fw={700}>
-                  Coupon {appliedCoupon.code}
-                </Text>
-                <Text size="sm" c={green} fw={800}>
-                  −{formatPrice(appliedCoupon.discountAmount)}
-                </Text>
-              </Group>
-            )}
-          </Stack>
-        </Paper>
-      </Grid.Col>
-    </Grid>
+              color="green"
+              variant="light"
+              loading={checkingCoupon}
+              style={{ marginRight: 4 }}
+              onClick={onApplyCoupon}
+            >
+              Apply
+            </Button>
+          }
+        />
+        {couponStatus.kind !== 'idle' && (
+          <Text size="xs" c={couponStatus.kind === 'error' ? 'red' : green}>
+            {couponStatus.message}
+          </Text>
+        )}
+        {appliedCoupon && (
+          <Group justify="space-between">
+            <Text size="sm" c={green} fw={700}>
+              Coupon {appliedCoupon.code}
+            </Text>
+            <Text size="sm" c={green} fw={800}>
+              −{formatPrice(appliedCoupon.discountAmount)}
+            </Text>
+          </Group>
+        )}
+      </Stack>
+    </Paper>
   );
 }

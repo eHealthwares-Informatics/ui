@@ -49,7 +49,7 @@ function PharmacyCard({
   pharmacy: PharmacyPriceView;
   productId: string;
   productName: string;
-  onSelect: () => void;
+  onSelect?: (offer: PharmacyPriceView) => void;
 }) {
   const addItem = useCartStore((s) => s.addItem);
   const stock = stockMeta(pharmacy.stockStatus);
@@ -71,7 +71,7 @@ function PharmacyCard({
       color: 'green',
       icon: <ShoppingCart size={18} />,
     });
-    onSelect();
+    onSelect?.(pharmacy);
   };
 
   return (
@@ -105,7 +105,7 @@ function PharmacyCard({
           <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
             <Group gap={8} wrap="nowrap">
               <Text fw={800} size="sm" lineClamp={1}>
-                {pharmacy.name}
+                {pharmacy.priceListName ?? pharmacy.name}
               </Text>
               {pharmacy.isCurrentOrg ? (
                 <Badge size="xs" radius="xl" variant="light" color="green">
@@ -172,6 +172,9 @@ export interface ComparePricesModalProps {
   onClose: () => void;
   productId: string;
   productName?: string;
+  /** Fired when a shopper selects a price list offer, so the product detail
+   *  page can reflect the chosen price/price list. */
+  onPriceSelected?: (offer: PharmacyPriceView) => void;
 }
 
 /**
@@ -184,6 +187,7 @@ export function ComparePricesModal({
   onClose,
   productId,
   productName,
+  onPriceSelected,
 }: ComparePricesModalProps) {
   const [tab, setTab] = useState<'top' | 'all'>('top');
   const { data, isLoading } = useProductPharmacies(productId, opened);
@@ -309,7 +313,10 @@ export function ComparePricesModal({
                   pharmacy={pharmacy}
                   productId={productId}
                   productName={productName ?? data?.productName ?? 'Product'}
-                  onSelect={onClose}
+                  onSelect={(offer) => {
+                    onPriceSelected?.(offer);
+                    onClose();
+                  }}
                 />
               ))}
             </Stack>

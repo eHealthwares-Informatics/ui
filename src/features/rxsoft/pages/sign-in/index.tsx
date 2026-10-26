@@ -17,6 +17,7 @@ const signInSchema = z.object({
 
 type SignInValues = z.infer<typeof signInSchema>;
 
+
 // Footer
 function Footer({ isMobile }: { isMobile: boolean }) {
   return (
@@ -321,6 +322,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
               <Text size="sm" style={{ color: '#64748B' }}>
                 Sign in to your account to continue
               </Text>
+              
             </Box>
           </Group>
 

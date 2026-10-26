@@ -1,64 +1,64 @@
-# Graph Report - frontend  (2026-10-24)
+# Graph Report - frontend  (2026-10-25)
 
 ## Corpus Check
-- 1428 files · ~3,068,065 words
+- 1431 files · ~3,069,648 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 36 file(s) not represented in the graph (top: .avif 16, (none) 8, .ico 3)
 
 ## Summary
-- 11382 nodes · 32569 edges · 692 communities (432 shown, 260 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 2156 edges (avg confidence: 0.85)
+- 11414 nodes · 32594 edges · 554 communities (318 shown, 236 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 2154 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0cb7340e`
+- Built from commit: `fe9764e8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - routeTree.gen.ts
 - apm/website/layout.tsx
-- Rr
-- Q
+- chatbot-service.ts
+- D
+- data-page-shell.tsx
 - DataPageShell
-- s
 - lis/pages/index.ts
-- branches/schema.ts
+- paginated-data-table.tsx
 - chat-ui-page.tsx
-- @tanstack/react-router
+- lucide-react
 - roles/schema.tsx
 - admin-api.ts
-- react
+- JsonEditorField
 - form-builder-modal.tsx
-- has
-- coding-concept/pages/index.ts
-- RxPage
+- emr-real.spec.ts
+- Column
+- messages.tsx
 - locator/hooks.ts
-- payload-utils.ts
+- registry/index.ts
 - useAuthStore
-- Field
+- RenderField.tsx
 - questionnaire/index.tsx
 - yarn-4.14.1.cjs
 - dependencies
-- shop/website/components.tsx
+- features/shop/page.tsx
 - devDependencies
 - createCacheableRequest
-- module-context.tsx
+- module-data.ts
 - pages/website-orders/index.tsx
 - conversation-page-schemas.tsx
-- buildContentPayload
+- Field
 - admin-hooks.ts
-- theme-provider.tsx
+- appearance-form.tsx
 - LgasPage.tsx
 - Playwright E2E Test Plan — RxSoft Frontend (current)
 - frontend-design.md
-- app-sidebar.tsx
+- sign-out-dialog.test.tsx
 - 📑 Form Refactoring Implementation - Complete Index
 - Module Context Provider Implementation Summary
-- find
-- DL
+- Changelog — frontend
+- o9e
 - po/purchases.tsx
-- D
+- c
 - FRONTEND MANUAL — Healthcare Interoperability Switch
 - sales-analytics/index.tsx
 - Task: UI must visibly enforce schema + business rules before submission
@@ -66,8 +66,8 @@
 - FRONTEND MANUAL — Seed Service
 - Workflow Config Utils
 - MANUAL — Conversation Engine
-- makeMethodCaller
-- $moduleId/$page/$id.tsx
+- concat
+- generic-view-page.tsx
 - Damorex Online Pharmacy Homepage
 - FRONTEND MANUAL — Identity & Authentication
 - Declarative Effects System
@@ -81,15 +81,15 @@
 - team-switcher.test.tsx
 - MANUAL — RxSoft Backend
 - MANUAL — Seed Service
-- query
+- global-setup.ts
 - ProductEntryTable
 - organisation-payment-providers/schema.ts
 - package.json
 - posApi.ts
 - StakeholdersPage.tsx
-- $classificationId.tsx
-- notifications/api.ts
-- Sn
+- test-definitions/schema.ts
+- message-templates/schema.tsx
+- pages/message-tester.tsx
 - Form System Refactoring - Implementation Guide
 - rxsoft/pages/index.ts
 - emr/pages/dashboard-page.tsx
@@ -100,26 +100,26 @@
 - MANUAL — Healthcare Interoperability Switch
 - event.model.ts
 - vitest
-- v6e
+- test
 - ContentSection
-- jt
+- questionnaire.tsx
 - MANUAL — EMR Service
 - dashboard/pages/dashboard-page.tsx
-- constructor
-- d3e
+- chat-api.ts
+- ChatUiPage
 - MANUAL — RxSoft Identity
 - Wr
-- ModuleDashboardPage
+- @tanstack/react-router
 - user-insights/api.ts
 - @playwright/test
 - Form System Refactoring - Implementation Plan
 - master-item-meta.ts
 - pos.spec.ts
 - RxSoft Backend Fleet — Product Requirements Document
-- .get
+- .push
 - Phase 1 — rxsoft CRUD coverage: Challenges, Blockers & Resolutions
-- ASt
-- y
+- poApi.ts
+- F
 - FormContextValue
 - form-context.ts
 - board-sync.mjs
@@ -133,81 +133,81 @@
 - body-map.tsx
 - CodeGeneratorService
 - $uomId.tsx
-- Dn
+- use-chat-queries.ts
 - mutation.ts
-- iqe
+- PoToolbar.tsx
 - Concept Details
-- fetch
-- Ut
+- users/schema.ts
+- y
 - CrudShellPage
-- effects.ts
-- permission-picker.tsx
-- format-annotate.ts
-- purchases/schema.ts
 - PoLinesTable.tsx
+- permission-picker.tsx
+- emr-types.ts
+- chat-socket.ts
+- usePoStore.ts
 - rxsoft/pages/pharmaceutics/schema.ts
 - Form System Refactoring - Implementation Summary
 - website.md
 - pos/pos.tsx
 - Module Context Implementation Summary
 - Module Context Provider - Quick Checklist
-- ListeningPage.tsx
-- ModelConfig
+- apmBlue
+- journals/schema.ts
 - preview.tsx
 - layout/types.ts
-- .write
+- tags/schema.tsx
 - GotvPage.tsx
 - 7. Functional Requirements
 - printServer.ts
-- jKe
+- gl-accounts/schema.ts
 - addMethod
 - Task Plan: Comprehensive Playwright E2E Suite — RxSoft Frontend
-- statSync
-- MetricsBar.tsx
-- social-console-sign-in.spec.ts
-- .on
 - t
-- r
+- app-sidebar.tsx
+- social-console-sign-in.spec.ts
+- pos-terminals/schema.ts
+- product-setup-components.tsx
+- graph-view.tsx
 - PaymentModal
-- $hospitalId.tsx
+- hospitals/detail.tsx
 - Maintenance Error
 - Form System Refactoring - Implementation Status
-- test
-- match
+- ResultsPage.tsx
+- rxsoft/pages/manufacturers/schema.ts
 - functionality.md
 - react-hook-form
-- getCandidates
-- p
-- pos-flow.spec.ts
+- organizations/schema.tsx
+- r
+- utils/api.ts
 - pos_and_purchase.md
-- .push
+- customers/schema.ts
 - makeLibzipError
-- .indexOf
-- writeFilePromise
-- ka
+- price-list-items/schema.tsx
+- price-lists/schema.ts
+- website-consultations/schema.ts
 - rxsoft/manufacturers/index.tsx
-- fromJSON
-- findExtension
+- participant-modal.tsx
+- ConversationThread
 - reset-password/index.tsx
 - 6.3 Order Report (Result Entry & Print)
 - authenticated-layout.tsx
 - 11. Website Content (eHealthwares)
 - ls
 - $uomId/edit.tsx
-- wE
-- patients/schema.tsx
-- page.test.tsx
+- drag-and-drop-list.tsx
+- ResetPasswordPage
+- pay/page.tsx
 - skip-if.ts
-- rxsoft/organisation-config/index.tsx
+- (auth)/sign-in-2.tsx
 - SignInPage
 - $projectionId.tsx
-- rxsoft/uoms/index.tsx
+- mapping/route.tsx
 - chats/index.tsx
 - subdomain.ts
 - FilterType
 - 7. Reference Data
 - $laboratoryId.tsx
-- message-templates/schema.tsx
+- $id/permissions/index.tsx
 - ehealthwares-careers/index.tsx
 - __root.tsx
 - 3. LIS Dashboard
@@ -215,41 +215,42 @@
 - 6. Orders — Full Workflow
 - ⏳ NOT STARTED
 - 8. Quality Control
-- ehealthwares-categories/index.tsx
+- $moduleId/$page/$id.tsx
 - ehealthwares-contact-submissions/index.tsx
-- ehealthwares-hero-slides/index.tsx
+- _authenticated/$page/$id.tsx
 - ehealthwares-investors/index.tsx
 - ehealthwares-partners/index.tsx
-- emit
+- constructor
 - CartTable.tsx
 - Compact UI
 - ehealthwares-products/index.tsx
+- medicines.$code.tsx
 - 10. Common UI Patterns
-- forEach
+- .slice
 - admin/index.ts
 - ehealthwares-sections/index.tsx
 - 9. External Quality Assessment (EQA)
 - RxSoft Admin Agent
 - 10. Documentation (Dynamic Forms)
 - ehealthwares-services/index.tsx
-- o9e
+- Aa
 - ehealthwares-settings/index.tsx
 - useOrderContext
-- ehealthwares-team/index.tsx
-- PosAuthGate.tsx
+- emr/appointments/index.tsx
+- emr/patients/index.tsx
 - POS Rules
 - 🚀 Quick Start Guide
 - 11. Clinical Requests (Orders)
-- shift
+- run
 - payment-providers/schema.ts
 - POS REQUIREMENTS
 - vitest.setup.mjs
-- @mantine/core
+- getApiErrorMessage
 - ehealthwares-testimonials/index.tsx
 - AppLayoutPage
 - FRONTEND MANUAL — Conversation Engine
 - FRONTEND MANUAL — EMR (Electronic Medical Records)
-- .slice
+- emr/requests/index.tsx
 - CLAUDE.md — Frontend Website Rules
 - React CRUD Page — rxsoft-admin-3
 - 4. Patient Management
@@ -294,27 +295,22 @@
 - Light Dashboard Screenshot
 - identity/organizations/index.tsx
 - identity/index.tsx
-- mapToBase
-- wishlist-store.ts
+- label.tsx
+- zustand
 - identity/roles/index.tsx
-- openSync
+- lis/results/index.tsx
 - rules
 - identity/users/index.tsx
-- exec
-- create
-- error
+- lis/statuses/index.tsx
+- shop/dashboard.tsx
 - providers/index.tsx
 - request-logs/index.tsx
-- dashboard/purchases.tsx
 - types/schema.tsx
-- .read
 - compilerOptions
-- resolveEverything
-- Ca
+- Rr
 - zod
 - rxsoft/role-requests/index.tsx
 - rxsoft/branches/index.tsx
-- split
 - rxsoft/categories/index.tsx
 - render
 - channels/index.tsx
@@ -341,17 +337,14 @@
 - rxsoft/journal-entry-lines/index.tsx
 - 8. Financial Accounting
 - rxsoft/journals/index.tsx
-- (auth)/forgot-password.tsx
-- rxsoft/pages/orders/index.tsx
 - 10. Technical Requirements
 - 7. Appointment Scheduling
 - rxsoft/organisation-payment-providers/index.tsx
-- rxsoft/payment-providers/index.tsx
 - 4. Catalog & Inventory
 - 6. Sales & Purchases
 - users.ts
 - rxsoft/types.ts
-- emr-real.spec.ts
+- provision.ts
 - ✨ Feature Highlights
 - rxsoft/payments/index.tsx
 - PURCHASE MANAGEMENT (INFLOW)
@@ -368,7 +361,6 @@
 - Gk
 - locator/facility-locator.tsx
 - rxsoft/receiving/index.tsx
-- rxsoft/roles/index.tsx
 - Tracker Status — RxSoft Alpha Test Plan
 - Purchase Rules
 - Troubleshooting
@@ -377,7 +369,6 @@
 - FRONTEND MANUAL — LIMS (Laboratory Information System)
 - Welcome.tsx
 - 10. Administration
-- resolve
 - rxsoft/sales/index.tsx
 - $conversationId.tsx
 - rxsoft/settings/index.tsx
@@ -395,39 +386,22 @@
 - Use Cases by Module
 - workflow-events/index.tsx
 - workflows/index.tsx
-- team-switcher.tsx
-- fte
+- ip
 - display.tsx
 - $orderId.tsx
 - (auth)/route.tsx
 - items/index.tsx
-- inventory/utils.ts
-- pM
-- reduce
-- writeFileSync
-- reportInfo
-- submit
-- verify
-- alert
-- PROPOSED TICKET (Mac agent: file if agreed — evidence below)
-- K5
-- concat
-- _filter
+- items-wizard.spec.ts
 - Playwright E2E — handover & status (read this first in a fresh session)
-- sort
 - 7. Customers & Pricing
 - compile
-- pricing-matrix-helper.ts
 - otp.tsx
 - sign-up.tsx
 - coding-concept/dosage-forms/index.tsx
 - coding-concept/drug-classifications/index.tsx
 - coding-concept/drug-components/index.tsx
-- coding-concept/facilities/index.tsx
-- coding-concept/generic-drugs/index.tsx
 - AUTHENTICATION
 - Architecture Rules
-- levels/index.tsx
 - lgas/index.tsx
 - locator-shell.tsx
 - 3. EMR Dashboard
@@ -471,42 +445,25 @@
 - Pages
 - Context
 - UI Rules
-- facilities/hospitals/index.tsx
 - facilities/laboratories/index.tsx
 - 4. Branding Requirements
-- coding-concept/manufacturers/index.tsx
 - Task: Newly created items must appear at the top of the list
 - manifest.json
-- coding-concept/pharmaceutics/index.tsx
 - facilities/pharmacies/index.tsx
 - 403.tsx
-- 401.tsx
 - rxsoft/audit-logs/index.tsx
 - config/index.tsx
 - rxsoft/gl-accounts/index.tsx
 - showSubmittedData
 - $exchangeId.tsx
-- PosSettingsDrawer.tsx
 - $inviteId.tsx
 - rxsoft/receivables/index.tsx
-- account.tsx
 - identity/permissions/index.tsx
 - appearance.tsx
 - settings/notifications.tsx
 - routes/shop/supermarket.tsx
-- from
-- ape
 - Task: QA coverage — branch ↔ stock-location link & per-branch storefront stock (rxsoft#20 slice 1)
-- run
-- once
-- isDisabled
-- aBt
-- demangle
-- preorderDepthFirstWalk
 - use-sales-analytics.ts
-- number
-- removeSync
-- Wht
 - tmp-token-sync.cjs
 - coding-concept/match.tsx
 - coding-concept/index.tsx
@@ -525,12 +482,10 @@
 - 6. Product Categories
 - 9. Inventory Integration
 - Damorex Online Pharmacy Platform
-- resolveFilename
 - costs/index.tsx
 - Task: data-testid on all UI elements + testid-first e2e selectors
 - eval-logs/index.tsx
 - instructions/index.tsx
-- toDER
 - models/index.tsx
 - CART MODULE
 - CONTACT MODULE
@@ -539,167 +494,75 @@
 - NEWSLETTER MODULE
 - ORDER TRACKING
 - REWARDS MODULE
-- processors/index.tsx
 - renovate.json
 - EventType
 - broadcasts/route.tsx
-- invites/route.tsx
 - participants/index.tsx
 - MessageStatus
 - conversation/index.tsx
 - rxsoft/coupons/index.tsx
 - coupons/schema.ts
-- Lwe
 - rxsoft/customers/index.tsx
 - exchanges/index.tsx
 - rxsoft/insurance-providers/index.tsx
 - rxsoft/inventory/index.tsx
-- Orphaned E2E org — detection & manual cleanup
+- playwright_e2e.md
 - Field Editor
 - rxsoft/journal-entries/index.tsx
 - locator/pharmacy-locator.tsx
-- option-lists/index.tsx
 - enums/index.ts
 - rxsoft/orders/index.tsx
 - rxsoft/organizations/index.tsx
-- pop
 - rxsoft/payment-methods/index.tsx
 - website-delivery-areas/schema.ts
 - rxsoft/payment-transactions/index.tsx
 - rxsoft/pharmaceutics/index.tsx
 - rxsoft/price-lists/index.tsx
 - projections/index.tsx
-- Vi
 - questionnaires/index.tsx
 - questions/index.tsx
 - rxsoft/reports/index.tsx
-- rxsoft/users/index.tsx
 - rxsoft/website-consultations/index.tsx
 - Challenges · Blockers · Resolutions
-- parse
 - ProtocolType
-- rxsoft/website-prescriptions/index.tsx
 - workflow-instances/index.tsx
 - sales.tsx
-- selectors.ts
-- routes/_authenticated/route.tsx
-- clerk/route.tsx
-- usePosStore.ts
-- eUe
-- vse
-- shared/types.ts
-- rxsoft-api.ts
-- kg
-- Zc
-- Endpoints
+- offline-sales.ts
+- @mantine/core
+- create
 - AEStatus
 - orders/schema.ts
-- display-form.tsx
-- ah
 - ome
 - GitHub Tracker Manifest — RxSoft Alpha Test Plan
-- gte
-- setTimeout
-- encode
-- _handleEntry
-- $H
-- request
-- 5. Source Types
-- appearance-form.tsx
 - notifications-form.tsx
-- SetPriceModal.tsx
-- register
-- [ehe]
-- stat
-- rxsoft/sales-lines/index.tsx
-- pI
-- P2e
 - settings/route.tsx
-- Lg
-- exit
-- start
-- 8. Behavior Details
-- sign-in/sign-in-2.tsx
+- user-auth-form.tsx
 - user-management.tsx
-- equals
-- Cpe
-- isContextSpecific
-- wvt
 - pages/departments/index.tsx
 - pages/medications/index.tsx
 - pages/referrals/index.tsx
 - beds-list/index.tsx
 - discharges/index.tsx
 - wards/wards/index.tsx
-- product-images-tab.tsx
 - VerifyEmailPage
-- a
-- toChoice
-- unref
-- aFe
-- kKe
-- ave
-- jat
-- cBt
-- lm
-- _dt
 - FileRoutesByPath
-- S1t
-- [Gp]
-- y$
-- 2. Root-cause investigation (verified against source)
 - 7.7 Delivery System
 - shop/pos2.tsx
-- a8e
-- b2t
-- Ect
-- compare
-- e3e
 - PROGRESS_LOG.md
 - format-changed.sh
-- wdt
-- getProjectDatabase
-- toDate
-- Got
-- y4
-- pushPointer
-- YBe
-- image-cell.tsx
 - $transactionId.tsx
-- H0t
-- release
-- addPositional
-- [Lpe]
-- c8e
-- toBoolean
-- Qf
-- getConditions
-- getWorkspaceByCwd
-- hasDependency
-- imt
-- kBt
-- L2t
-- toInteger
-- sign
-- restore
-- complement
-- defaults
-- disconnect
-- inverse
-- locate
-- sAe
 
 ## God Nodes (most connected - your core abstractions)
 1. `@tanstack/react-router` - 441 edges
-2. `@mantine/core` - 403 edges
+2. `@mantine/core` - 404 edges
 3. `DataPageShell()` - 329 edges
 4. `t()` - 326 edges
 5. `FileRoutesByPath` - 324 edges
 6. `react` - 291 edges
-7. `lucide-react` - 235 edges
+7. `lucide-react` - 236 edges
 8. `r()` - 214 edges
-9. `getApiErrorMessage()` - 202 edges
-10. `ModelConfig` - 166 edges
+9. `getApiErrorMessage()` - 204 edges
+10. `ModelConfig` - 165 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Test cases` --references--> `request()`  [INFERRED]
@@ -738,47 +601,47 @@
 ## Hyperedges (group relationships)
 - **Damorex Core Platform Capabilities** — pharmacy_ecommerce, prescription_management, delivery_coverage, consultation_system, smart_search, whatsapp_ordering, multi_branch_inventory [INFERRED 0.95]
 
-## Communities (692 total, 260 thin omitted)
+## Communities (554 total, 236 thin omitted)
 
 ### Community 0 - "routeTree.gen.ts"
 Cohesion: 0.01
-Nodes (364): ApmAchievementsRoute, ApmAdminAgentsRoute, ApmAdminCanvassingRoute, ApmAdminContentRoute, ApmAdminConversionRoute, ApmAdminGotvRoute, ApmAdminIncidentsRoute, ApmAdminLgasRoute (+356 more)
+Nodes (375): Route, Route, Route, Route, Route, Route, Route, Route (+367 more)
 
 ### Community 1 - "apm/website/layout.tsx"
-Cohesion: 0.13
-Nodes (32): AgendaPage(), iconLUT, ContactPage(), EventDetailPage(), EventsPage(), JoinPage(), MediaPage(), MeetAdekanmbiPage() (+24 more)
-
-### Community 2 - "Rr"
-Cohesion: 0.03
-Nodes (78): aM(), an(), aNe(), BFe(), BOe(), BS(), cre(), d4e() (+70 more)
-
-### Community 3 - "Q"
-Cohesion: 0.10
-Nodes (77): $1(), AP(), B2(), bf(), Ch(), da(), df(), dP() (+69 more)
-
-### Community 4 - "DataPageShell"
-Cohesion: 0.03
-Nodes (76): Option A: Dynamic CRUD via ModelConfig (preferred for simple resources), triggerBlobDownload(), CreateMutationProps, DeteleMutationProps, ExportMutationProps, MutationProps, UpdateMutationProps, useCreateMutation() (+68 more)
-
-### Community 5 - "s"
 Cohesion: 0.08
-Nodes (55): $ae(), aG(), bI(), d5(), ddt(), Dpe(), dynamic(), ele() (+47 more)
+Nodes (42): AgendaPage(), iconLUT, ContactPage(), EventDetailPage(), EventsPage(), JoinPage(), MediaPage(), NewsArticlePage() (+34 more)
+
+### Community 2 - "chatbot-service.ts"
+Cohesion: 0.05
+Nodes (72): TypingBubble(), TypingDots(), AuthPanel(), AuthPanelProps, AuthTab, FacebookIcon(), GoogleIcon(), isPhoneIdentifier() (+64 more)
+
+### Community 3 - "D"
+Cohesion: 0.09
+Nodes (92): $1(), AP(), as(), cP(), da(), dP(), Dy(), D() (+84 more)
+
+### Community 4 - "data-page-shell.tsx"
+Cohesion: 0.05
+Nodes (34): buildRxsoftListParams(), DataPageShellProps, EntityInfo, InfoDrawer(), InfoDrawerProps, InfoField, hasServerTotal(), paginateRows() (+26 more)
+
+### Community 5 - "DataPageShell"
+Cohesion: 0.04
+Nodes (52): columns, conceptsEndpoint, config, Mapping(), mappingsEndpoint, triggerBlobDownload(), CreateMutationProps, DeteleMutationProps (+44 more)
 
 ### Community 6 - "lis/pages/index.ts"
 Cohesion: 0.02
-Nodes (99): LisAttributeDefinitionsPage(), attributeDefinitionsConfig, columns, tabGroups, LisEqaEnrollmentsPage(), columns, createFieldGroups, eqaEnrollmentsConfig (+91 more)
+Nodes (98): LisAttributeDefinitionsPage(), attributeDefinitionsConfig, columns, tabGroups, LisEqaEnrollmentsPage(), columns, createFieldGroups, eqaEnrollmentsConfig (+90 more)
 
-### Community 7 - "branches/schema.ts"
-Cohesion: 0.29
-Nodes (4): RxBranchesPage(), branchesConfig, columns, tabGroups
+### Community 7 - "paginated-data-table.tsx"
+Cohesion: 0.12
+Nodes (25): ActionCell(), ActionCellProps, dateValue(), FilterRow(), LocalFilter, toDate(), isNoValueFilter(), isRangeFilter() (+17 more)
 
 ### Community 8 - "chat-ui-page.tsx"
-Cohesion: 0.05
-Nodes (72): socket.io-client, Chats(), conversationModuleDescription, conversationModuleId, conversationModuleName, AddProjectionModal(), addEntry(), onParticipantSelect() (+64 more)
+Cohesion: 0.15
+Nodes (18): ChatUiPageProps, ConversationListItem(), INBOX_STATUSES, InboxSidebar(), MessageBubble(), ChatMode, ConversationDirection, ConversationInboxItem (+10 more)
 
-### Community 9 - "@tanstack/react-router"
-Cohesion: 0.02
-Nodes (248): lucide-react, @tanstack/react-router, TypingBubble(), TypingDots(), ImageUploaderProps, sizeMap, useInitializeWebPayment(), useWebPaymentProviders() (+240 more)
+### Community 9 - "lucide-react"
+Cohesion: 0.03
+Nodes (207): lucide-react, ImageUploaderProps, sizeMap, useInitializeWebPayment(), useWebPaymentProviders(), State, ArticlePage(), ArticleSkeleton() (+199 more)
 
 ### Community 10 - "roles/schema.tsx"
 Cohesion: 0.31
@@ -786,59 +649,59 @@ Nodes (7): RxRolesPage(), buildCreatePayload(), buildUpdatePayload(), columns, c
 
 ### Community 11 - "admin-api.ts"
 Cohesion: 0.07
-Nodes (53): apmAdminApi, AgentStats, CandidateTour, CanvassingSession, CanvassingStats, CanvassingVisit, ContentAsset, ConversionActivity (+45 more)
+Nodes (54): AgentStats, CandidateTour, CanvassingSession, CanvassingStats, CanvassingVisit, ContentAsset, ConversionActivity, ConversionDashboard (+46 more)
 
-### Community 12 - "react"
-Cohesion: 0.05
-Nodes (46): react, AttributesTab(), GeneralTab(), InboundTab(), ApplicationEntitiesPage(), Provider, useForm, OutboundTab() (+38 more)
+### Community 12 - "JsonEditorField"
+Cohesion: 0.07
+Nodes (45): AttributesTab(), GeneralTab(), InboundTab(), ApplicationEntitiesPage(), Provider, useForm, OutboundTab(), SecurityTab() (+37 more)
 
 ### Community 13 - "form-builder-modal.tsx"
-Cohesion: 0.21
-Nodes (18): BuilderColumn, BuilderField, builderFieldToSchema(), builderToSchema(), CATEGORIES, deriveKey(), duplicateField(), emptyField() (+10 more)
+Cohesion: 0.12
+Nodes (27): `all`, DermatomeMapField(), AnnotateField(), organCatalog, organDisplayName(), organKeys, OrganStructure, OrganMapField() (+19 more)
 
-### Community 14 - "has"
+### Community 14 - "emr-real.spec.ts"
+Cohesion: 0.07
+Nodes (18): C14 — Provisioned org users get `modules: []` (wildcard permissions not expanded), C15 escalation — playwright-template provisioning degrades run over run, C15 — Seed provisioner OOM: whitelists ~40k items per org, 4GB heap exceeded, C16 — emr-real identity probe requires a `/health` route identity doesn't have, C17 — Dev `VITE_EMR_API_URL` unset → SPA fallback returned HTML for EMR API calls (500 error boundary), C18 — Redesigned sign-in screen broke emr-real `signInAsAdmin`, C19 — emr-real dashboard assertion asserted a nonexistent heading, C20 — Appointments API: `patient_name` NOT NULL but not DTO-validated (raw SQL 400) (+10 more)
+
+### Community 15 - "Column"
+Cohesion: 0.02
+Nodes (81): conceptsEndpoint, config, Values(), valuesEndpoint, CodedDosageFormsPage(), columns, createFields, dosageFormsConfig (+73 more)
+
+### Community 16 - "messages.tsx"
 Cohesion: 0.08
-Nodes (50): a0t(), attachInternalDependencies(), c0t(), cacheCleanup(), delete(), EK(), finalizeInstall(), finalizeInstallWithPnp() (+42 more)
-
-### Community 15 - "coding-concept/pages/index.ts"
-Cohesion: 0.03
-Nodes (70): columns, conceptFields, Concepts(), conceptsEndpoint, config, columns, conceptsEndpoint, config (+62 more)
-
-### Community 16 - "RxPage"
-Cohesion: 0.03
-Nodes (136): ConfirmDialog(), ConfirmDialogProps, Relations, GeoRef, Hospital, NearbyHospital, GeoRef, Laboratory (+128 more)
+Nodes (57): ConfirmDialog(), ConfirmDialogProps, BroadcastFormState, BroadcastsPage(), columns, defaultFormState, columns, CommunicationChannelFormState (+49 more)
 
 ### Community 17 - "locator/hooks.ts"
 Cohesion: 0.13
 Nodes (24): Centroid, conceptsApi, ConceptsLga, FacilityRecord, FacilitySearchParams, getCentroids(), getLgas(), getNearbyFacilities() (+16 more)
 
-### Community 18 - "payload-utils.ts"
+### Community 18 - "registry/index.ts"
 Cohesion: 0.06
-Nodes (50): 2.1 frontend working tree (on `master`, all green: typecheck ✅ / lint 0 errors ✅ / vitest 75/75 ✅), 8. Landed implementation (2026-09-30), FieldGroup, FormProps, ModalDataForm(), buildZodSchema(), BuiltSchema, clearValidationErrors() (+42 more)
+Nodes (49): Dynamic CRUD system, 2.1 frontend working tree (on `master`, all green: typecheck ✅ / lint 0 errors ✅ / vitest 75/75 ✅), 8. Landed implementation (2026-09-30), Option A: Dynamic CRUD via ModelConfig (preferred for simple resources), Option B: Custom page (for complex UIs), Workflow, Provider, useForm (+41 more)
 
 ### Community 19 - "useAuthStore"
-Cohesion: 0.05
-Nodes (57): axios, SignOutDialog(), SignOutDialogProps, AdminLayout(), adminNavItems, formSchema, SocialIconFacebook(), SocialIconGoogle() (+49 more)
-
-### Community 20 - "Field"
 Cohesion: 0.07
-Nodes (46): useApiProvider(), AccordionArrayField(), AccordionArrayProps, AccordionSingleField(), AccordionSingleProps, JsonAccordionArrayField(), JsonItemEditor(), AsyncSelectField() (+38 more)
+Nodes (44): ACTIVITY_EVENTS, AutoLogout(), computeSessionDelay(), Footer(), RxSignIn(), signInSchema, SignInValues, inputStyle (+36 more)
+
+### Community 20 - "RenderField.tsx"
+Cohesion: 0.11
+Nodes (30): useApiProvider(), AccordionArrayField(), AccordionArrayProps, AccordionSingleField(), AccordionSingleProps, JsonAccordionArrayField(), JsonItemEditor(), AsyncSelectField() (+22 more)
 
 ### Community 21 - "questionnaire/index.tsx"
 Cohesion: 0.08
-Nodes (41): AnswerValue, formatAnswer(), getInputKind(), getOptionValue(), getQuestionKey(), HorizontalQuestionView(), isQuestionAnswered(), normalizeQuestions() (+33 more)
+Nodes (38): QuestionnaireQuestion, ConversationLoader(), Props, EntryModeTabs(), Props, ParticipantSearch(), Props, ConversationSection() (+30 more)
 
 ### Community 22 - "yarn-4.14.1.cjs"
 Cohesion: 0.00
-Nodes (125): abortOnCannotGrowMemory(), addAlgoliaAgent(), Agt(), aj(), at(), attachCustomData(), attachExternalDependents(), b4() (+117 more)
+Nodes (556): _3e(), _4e(), a3e(), a4e(), a8e(), A$e(), abort(), abortOnCannotGrowMemory() (+548 more)
 
 ### Community 23 - "dependencies"
 Cohesion: 0.06
 Nodes (36): dependencies, axios, dayjs, @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities, @hookform/resolvers, leaflet (+28 more)
 
-### Community 24 - "shop/website/components.tsx"
-Cohesion: 0.02
-Nodes (140): zustand, EntityStore, AuthPanel(), AuthPanelProps, AuthTab, FacebookIcon(), GoogleIcon(), isPhoneIdentifier() (+132 more)
+### Community 24 - "features/shop/page.tsx"
+Cohesion: 0.03
+Nodes (98): ArrowRightIcon(), ArticleCard(), ConditionContent, conditionContentMap, defaultContent, getContent(), HealthConcernDetailPage(), KnownAsBadge() (+90 more)
 
 ### Community 25 - "devDependencies"
 Cohesion: 0.07
@@ -848,45 +711,45 @@ Nodes (28): devDependencies, identity-obj-proxy, jsdom, oxfmt, oxlint, @playwrig
 Cohesion: 0.09
 Nodes (34): AGe(), _ageValue(), _allowsStoringAuthenticated(), _assertRequestHasHeaders(), buffer(), _copyWithoutHopByHopHeaders(), createCacheableRequest(), createTimestamp() (+26 more)
 
-### Community 28 - "module-context.tsx"
-Cohesion: 0.15
-Nodes (23): ModuleContext, ModuleContextType, useAvailableModules(), useModuleContext(), useModuleDefinition(), useModuleId(), useModuleName(), useSetSelectedModule() (+15 more)
+### Community 28 - "module-data.ts"
+Cohesion: 0.10
+Nodes (22): ModuleContext, ModuleContextType, ModuleProviderProps, defaultModule, ModuleDefinition, ModuleId, moduleMap, modules (+14 more)
 
 ### Community 29 - "pages/website-orders/index.tsx"
-Cohesion: 0.08
-Nodes (31): EVENT_COLORS, Field(), fmtDateTime(), fmtMoney(), PaymentEvent, RxPaymentTransactionDetailPage(), STATUS_COLORS, CancelReasonModal() (+23 more)
+Cohesion: 0.11
+Nodes (20): CancelReasonModal(), CascadeCancelModal(), OrderProgress(), RxWebsiteOrderDetailPage(), PostConfirmationModal(), ReconcileModal(), RxWebsiteOrdersPage(), handleGeneratePaymentLink() (+12 more)
 
 ### Community 30 - "conversation-page-schemas.tsx"
-Cohesion: 0.09
-Nodes (46): AI_PROVIDER_OPTIONS, AI_ROUTING_OPTIONS, AI_TIER_OPTIONS, aiConfigPageSchema, aiModelPageSchema, aiProcessorPageSchema, broadcastPageSchema, buildPolisher() (+38 more)
+Cohesion: 0.07
+Nodes (57): AI_PROVIDER_OPTIONS, AI_ROUTING_OPTIONS, AI_TIER_OPTIONS, aiConfigPageSchema, aiCostPageSchema, aiEvalLogPageSchema, aiInstructionPageSchema, aiModelPageSchema (+49 more)
 
-### Community 31 - "buildContentPayload"
-Cohesion: 0.03
-Nodes (76): EhealthwaresArticlesPage(), buildCreatePayload(), buildUpdatePayload(), columns, createFields, ehealthwaresArticlesConfig, EhealthwaresCareersPage(), buildCreatePayload() (+68 more)
+### Community 31 - "Field"
+Cohesion: 0.04
+Nodes (67): buildCreatePayload(), buildUpdatePayload(), columns, createFields, EhealthwaresCareersPage(), buildCreatePayload(), buildUpdatePayload(), columns (+59 more)
 
 ### Community 32 - "admin-hooks.ts"
-Cohesion: 0.05
-Nodes (50): AgentsPage(), CanvassingPage(), ContentFactoryPage(), IncidentsPage(), conversionColors, PollingUnitsPage(), riskColors, ToursPage() (+42 more)
+Cohesion: 0.06
+Nodes (44): AgentsPage(), CanvassingPage(), IncidentsPage(), ListeningPage(), platformColors, ToursPage(), VolunteersPage(), apmAdminApi (+36 more)
 
-### Community 33 - "theme-provider.tsx"
-Cohesion: 0.14
-Nodes (20): Font, FontContext, FontContextType, FontProvider(), Collapsible, LayoutContext, LayoutContextType, LayoutProvider() (+12 more)
+### Community 33 - "appearance-form.tsx"
+Cohesion: 0.11
+Nodes (25): fonts, Font, FontContext, FontContextType, FontProvider(), useFont(), Collapsible, LayoutContext (+17 more)
 
 ### Community 34 - "LgasPage.tsx"
-Cohesion: 0.12
-Nodes (21): ConversionDashboard(), statusColor(), LgasPage(), statusBadgeColor(), statusColor(), ResultsPage(), statusColor(), WardsPage() (+13 more)
+Cohesion: 0.17
+Nodes (15): ConversionDashboard(), statusColor(), LgasPage(), statusBadgeColor(), statusColor(), statusColor(), WardsPage(), useConversionDashboard() (+7 more)
 
 ### Community 35 - "Playwright E2E Test Plan — RxSoft Frontend (current)"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (16): 1. Goal & Scope, 2. Environment, 4. Current coverage matrix (verified green), 5. Phases, 6. Running, 7. Risks, Playwright E2E Test Plan — RxSoft Frontend (current), Artifacts & the Vite dev server (ui#94) (+8 more)
 
 ### Community 36 - "frontend-design.md"
 Cohesion: 0.05
 Nodes (43): Accessibility, Accessibility, Active, Body, Brand, Buttons, Component Standards, Consultation CTA (+35 more)
 
-### Community 37 - "app-sidebar.tsx"
-Cohesion: 0.12
-Nodes (20): PatientLookup(), LocationOption, useCurrentLocation(), AppSidebar(), filterNavGroupsByModule(), sidebarData, anyOf, lisOnly (+12 more)
+### Community 37 - "sign-out-dialog.test.tsx"
+Cohesion: 0.24
+Nodes (8): SignOutDialog(), SignOutDialogProps, logoutAllMock, logoutMock, navigateMock, nullProtoSearch, NavUser(), NavUserProps
 
 ### Community 38 - "📑 Form Refactoring Implementation - Complete Index"
 Cohesion: 0.04
@@ -896,41 +759,41 @@ Nodes (48): 1. **Comprehensive Plan** 📋, 2. **Implementation Tracking** 📊,
 Cohesion: 0.04
 Nodes (46): 1. **`src/context/module-context.tsx`** (Core Context), 1. **`src/stores/module-store.ts`**, 2. **`src/context/module-provider.tsx`** (Provider Component), 2. **`src/main.tsx`**, 3. **`src/features/shared/module-context-examples.tsx`** (Examples), 4. **`MODULE_CONTEXT_GUIDE.md`** (Documentation), Access the API provider, 🏗️ Architecture (+38 more)
 
-### Community 40 - "find"
-Cohesion: 0.10
-Nodes (46): addPlugin(), C4(), changeFileBufferPromise(), changeFilePromise(), changeFileTextPromise(), cs(), executeRegular(), existsPromise() (+38 more)
+### Community 40 - "Changelog — frontend"
+Cohesion: 0.08
+Nodes (25): [0cb7340] - 2026-10-25, [0f82617] - 2026-10-24, [178b815] - 2026-10-24, [1c2b908] - 2026-10-23, [39a5c34] - 2026-10-23, [40085f3] - 2026-10-23, [742d0b5] - 2026-10-23, [9d95f2e] - 2026-10-23 (+17 more)
 
-### Community 41 - "DL"
-Cohesion: 0.19
-Nodes (22): bL(), Cg(), d2(), DL(), F2(), Ga(), mh(), Nh() (+14 more)
+### Community 41 - "o9e"
+Cohesion: 0.09
+Nodes (38): bL(), BP(), Cg(), d2(), DL(), F2(), k8e(), lc() (+30 more)
 
 ### Community 42 - "po/purchases.tsx"
-Cohesion: 0.10
-Nodes (29): poKeys, receiptKeys, useAddPoLine(), useCreatePurchaseOrder(), useCreateSupplier(), usePurchaseOrders(), useReceiveGoods(), useSuppliers() (+21 more)
+Cohesion: 0.15
+Nodes (13): useAddPoLine(), useCreatePurchaseOrder(), useReceiveGoods(), useUnpostGoods(), PoSummary(), SetPriceModal(), UnpostPasswordModal(), PurchasesPage() (+5 more)
 
-### Community 43 - "D"
-Cohesion: 0.10
-Nodes (46): Ac(), bh(), bt(), ci(), D(), Q(), EP(), fc() (+38 more)
+### Community 43 - "c"
+Cohesion: 0.09
+Nodes (31): au(), bU(), cx(), Do(), _dt(), gn(), hE(), ir() (+23 more)
 
 ### Community 44 - "FRONTEND MANUAL — Healthcare Interoperability Switch"
 Cohesion: 0.05
 Nodes (40): 10. Audit Center, 11. Message Tester, 12. Flow Graph, 13. Trace Explorer, 14. Common UI Patterns, 15. Tips & Shortcuts, 16. Troubleshooting, 17. Related Documentation (+32 more)
 
 ### Community 45 - "sales-analytics/index.tsx"
-Cohesion: 0.14
-Nodes (32): dayjs, @mantine/charts, ChartDefs(), CURSOR_GRADIENTS, GradientCursor(), GradientCursorProps, useGradientCursor(), ChartCard() (+24 more)
+Cohesion: 0.13
+Nodes (35): dayjs, @mantine/charts, ChartDefs(), CURSOR_GRADIENTS, GradientCursor(), GradientCursorProps, useGradientCursor(), ChartCard() (+27 more)
 
 ### Community 46 - "Task: UI must visibly enforce schema + business rules before submission"
-Cohesion: 0.15
-Nodes (13): 1. Problem statement (as observed in Phase 2), 3.1 Single submit gate (frontend core), 3.2 Schema as source of truth (frontend + backend), 3.3 Visible failure contract (the part e2e can test), 3. Target design, 4.1 New shared helper — `page-objects/validation-assertions.ts`, 4.2 New TC family — add to crud-suite + board, 4.3 Existing specs (+5 more)
+Cohesion: 0.13
+Nodes (15): 1. Problem statement (as observed in Phase 2), 2.2 Secondary contributors, 2. Root-cause investigation (verified against source), 3.1 Single submit gate (frontend core), 3.2 Schema as source of truth (frontend + backend), 3.3 Visible failure contract (the part e2e can test), 3. Target design, 4.1 New shared helper — `page-objects/validation-assertions.ts` (+7 more)
 
 ### Community 47 - "mapping.tsx"
 Cohesion: 0.18
 Nodes (15): executeTransformation(), flattenJsonPaths(), getValueAtPath(), MAPPING_TYPE_OPTIONS, MappingEditorPage(), runPipeline(), setValueAtPath(), TRANSFORMER_OPTIONS (+7 more)
 
 ### Community 48 - "FRONTEND MANUAL — Seed Service"
-Cohesion: 0.08
-Nodes (25): 10. Environment Variables, 11. Troubleshooting, 12. Related Documentation, 1. What You Can Do, 2. Overview, 3. Using the CLI, 5. Auto-Seed on Startup, 6. Source Types (+17 more)
+Cohesion: 0.06
+Nodes (33): 10. Environment Variables, 11. Troubleshooting, 12. Related Documentation, 1. What You Can Do, 2. Overview, 3. Using the CLI, 4. Using the HTTP API, 5. Auto-Seed on Startup (+25 more)
 
 ### Community 49 - "Workflow Config Utils"
 Cohesion: 0.18
@@ -940,13 +803,13 @@ Nodes (18): buildWorkflowAttachmentValidation(), extractConditionAttributes(), e
 Cohesion: 0.06
 Nodes (31): 10. Commands, 11. Troubleshooting, 12. Related Documentation, 1. What This Service Does, 2. Getting Started, 3. Environment Variables, 4. Architecture, 5. End-to-End Flow (+23 more)
 
-### Community 51 - "makeMethodCaller"
-Cohesion: 0.12
-Nodes (24): anyNeedsWireRead(), anyNeedsWireWrite(), buildCallerFunction(), buildJSCallerFunction(), constructType(), getDynCall(), getType(), getTypes() (+16 more)
+### Community 51 - "concat"
+Cohesion: 0.04
+Nodes (60): anyNeedsWireRead(), anyNeedsWireWrite(), B8(), buildCallerFunction(), buildJSCallerFunction(), Co(), concat(), constructType() (+52 more)
 
-### Community 52 - "$moduleId/$page/$id.tsx"
-Cohesion: 0.08
-Nodes (33): useViewProvider(), codingModuleLabel(), Concept, MetadataItem, CodingConcept, ConceptAttributeValue, ExternalConceptMapping, codingConceptView (+25 more)
+### Community 52 - "generic-view-page.tsx"
+Cohesion: 0.06
+Nodes (34): useViewProvider(), CodingConcept, ConceptAttributeValue, ExternalConceptMapping, codingConceptView, ACCORDION_TYPES, columnToViewField(), deriveEndpoint() (+26 more)
 
 ### Community 53 - "Damorex Online Pharmacy Homepage"
 Cohesion: 0.07
@@ -957,8 +820,8 @@ Cohesion: 0.06
 Nodes (34): 10. Tips & Shortcuts, 11. Troubleshooting, 12. Related Documentation, 1. What You Can Do, 2. Getting Started, 3. Authentication, 4. User Management, 5. Role Management (+26 more)
 
 ### Community 56 - "dermatome-map.tsx"
-Cohesion: 0.16
-Nodes (17): Dermatome, dermatomeColor(), DermatomeId, dermatomeMirror, DermatomeRegion, dermatomeRegions, dermatomes, dermatomeShapes (+9 more)
+Cohesion: 0.18
+Nodes (15): Dermatome, dermatomeColor(), DermatomeId, dermatomeMirror, DermatomeRegion, dermatomeRegions, dermatomes, dermatomeShapes (+7 more)
 
 ### Community 57 - "ae.model.ts"
 Cohesion: 0.14
@@ -966,7 +829,7 @@ Nodes (12): AECreatePayload, AEFacilityProfile, AEListFilter, AEListResponse, AE
 
 ### Community 58 - "apm/page.tsx"
 Cohesion: 0.04
-Nodes (19): AchievementsPage(), iconLUT, imageLUT, achievementIcons, AgendaSection(), ApmHomepage(), CitizensSpeakForm(), getInfoValue() (+11 more)
+Nodes (19): AchievementsPage(), iconLUT, imageLUT, MeetAdekanmbiPage(), achievementIcons, AgendaSection(), ApmHomepage(), CitizensSpeakForm() (+11 more)
 
 ### Community 59 - "conversation/components/shared.tsx"
 Cohesion: 0.16
@@ -977,8 +840,8 @@ Cohesion: 0.11
 Nodes (19): scripts, build, dev, format:changed, format:test, format:write, lint, oxlint (+11 more)
 
 ### Community 61 - "apm/website/hooks.ts"
-Cohesion: 0.14
-Nodes (26): api, apmApi, useDonate(), useJoinMovement(), useRegisterForEvent(), useRegisterVolunteer(), useReportIssue(), useSimpleMutation() (+18 more)
+Cohesion: 0.15
+Nodes (23): api, apmApi, useDonate(), useRegisterForEvent(), useReportIssue(), useSimpleMutation(), useSubmitFeedback(), Achievement (+15 more)
 
 ### Community 62 - "routing.model.ts"
 Cohesion: 0.10
@@ -993,16 +856,16 @@ Cohesion: 0.07
 Nodes (28): 10. Troubleshooting, 11. Related Documentation, 1. What This Service Does, 2. Getting Started, 3. Environment Variables, 4. Architecture, 5. Authentication, 6.1 Catalog (+20 more)
 
 ### Community 65 - "MANUAL — Seed Service"
-Cohesion: 0.13
-Nodes (15): 10. Troubleshooting, 11. Related Documentation, 1. What This Service Does, 2. Getting Started, 3. Environment Variables, 4. Running Imports, 6. Data Layout, 7. Adding a New Entity (+7 more)
+Cohesion: 0.08
+Nodes (26): 10. Troubleshooting, 11. Related Documentation, 1. What This Service Does, 2. Getting Started, 3. Environment Variables, 4. Running Imports, 5. Source Types, 6. Data Layout (+18 more)
 
-### Community 66 - "query"
-Cohesion: 0.19
-Nodes (14): Co(), createSession(), fetchNextAnswer(), genEnforcedDependencies(), genEnforcedFields(), hat(), hme(), lookup() (+6 more)
+### Community 66 - "global-setup.ts"
+Cohesion: 0.11
+Nodes (20): Background dev servers die with the shell (no setsid on macOS), Docker Desktop down kills identity/rxsoft (ECONNREFUSED ::1:5432), Fresh orgs had zero GL accounts (org-scoped, nothing seeds them), global-setup artifact check: stale endpoints + bare-array responses misread, NestJS services bind port 0 when .env PORT isn't loaded, Phase 0 — Challenge Log, Provisioning 500s on second org: demo MRNs/visit numbers are globally unique, Seed provisioning requires x-api-key; e2e global-setup reads it from process env (+12 more)
 
 ### Community 67 - "ProductEntryTable"
-Cohesion: 0.13
-Nodes (14): useActivatePosItem(), usePosItemPrice(), PosSetPriceModal(), handleSave(), open(), round2(), DispenseRowEditor(), ProductEntryTable() (+6 more)
+Cohesion: 0.15
+Nodes (10): useActivatePosItem(), usePosItemPrice(), DispenseRowEditor(), ProductEntryTable(), commitAdd(), confirmActivation(), handleAdd(), ItemVisibility (+2 more)
 
 ### Community 68 - "organisation-payment-providers/schema.ts"
 Cohesion: 0.17
@@ -1010,43 +873,39 @@ Nodes (6): RxOrganisationPaymentProvidersPage(), channelOptions, columns, create
 
 ### Community 69 - "package.json"
 Cohesion: 0.05
-Nodes (40): stylelint-config-standard-scss, name, packageManager, private, type, version, @dnd-kit/core, @dnd-kit/sortable (+32 more)
+Nodes (42): stylelint-config-standard-scss, name, packageManager, private, type, version, @dnd-kit/core, @dnd-kit/sortable (+34 more)
 
 ### Community 70 - "posApi.ts"
-Cohesion: 0.06
-Nodes (43): createSale(), customerKeys, fetchSales(), itemUomsKeys, paymentMethodKeys, posTerminalKeys, priceListKeys, salesKeys (+35 more)
+Cohesion: 0.07
+Nodes (31): customerKeys, fetchSales(), itemUomsKeys, paymentMethodKeys, posTerminalKeys, priceListKeys, UomOption, useCategoriesSearch() (+23 more)
 
 ### Community 71 - "StakeholdersPage.tsx"
-Cohesion: 0.20
-Nodes (12): affiliationOptions, influenceOptions, roleOptions, StakeholdersPage(), statusColor(), statusOptions, useCreateStakeholder(), useStakeholders() (+4 more)
+Cohesion: 0.24
+Nodes (10): affiliationOptions, influenceOptions, roleOptions, StakeholdersPage(), statusColor(), statusOptions, useCreateStakeholder(), useStakeholders() (+2 more)
 
-### Community 72 - "$classificationId.tsx"
-Cohesion: 0.40
-Nodes (4): CodedDrugClassificationDetailPage(), LinkList(), DrugClassificationDetailRoute(), Route
+### Community 72 - "test-definitions/schema.ts"
+Cohesion: 0.11
+Nodes (16): LisLocationsPage(), columns, locationsConfig, tabGroups, toApiPayload(), LisReferenceRangesPage(), allFields, columns (+8 more)
 
-### Community 73 - "notifications/api.ts"
-Cohesion: 0.10
-Nodes (31): ChannelOption, createMessageTemplate(), fetchMessageTemplates(), fetchNotifications(), fetchUnreadCount(), markAllNotificationsRead(), markNotificationRead(), normalizeNotification() (+23 more)
+### Community 73 - "message-templates/schema.tsx"
+Cohesion: 0.07
+Nodes (46): ChannelOption, createMessageTemplate(), fetchChannelCodeOptions(), fetchMessageTemplates(), fetchNotifications(), fetchUnreadCount(), markAllNotificationsRead(), markNotificationRead() (+38 more)
 
-### Community 74 - "Sn"
-Cohesion: 0.05
-Nodes (45): _4e(), A$e(), B4e(), BTe(), Dr(), dxe(), e4e(), eNe() (+37 more)
+### Community 74 - "pages/message-tester.tsx"
+Cohesion: 0.13
+Nodes (15): FormFields(), FormValues, messageProtocols, MessageTesterPage(), messageTypes, schema, SelectField(), SelectFieldProps (+7 more)
 
 ### Community 75 - "Form System Refactoring - Implementation Guide"
 Cohesion: 0.07
 Nodes (27): 🔄 API Reference, Backward Compatibility, Compute Effect, 📚 Documentation Files, ⚙️ Effects System Details, Fetch Effect, FieldGroupEffect Type, FieldGroupSpec Type (+19 more)
 
 ### Community 76 - "rxsoft/pages/index.ts"
-Cohesion: 0.03
-Nodes (42): rxsoftModuleDescription, rxsoftModuleId, rxsoftModuleName, RxCustomersPage(), columns, createFields, customersConfig, RxGlAccountsPage() (+34 more)
+Cohesion: 0.04
+Nodes (34): rxsoftModuleDescription, rxsoftModuleId, rxsoftModuleName, RxAuditLogsPage(), auditLogsConfig, columns, RxCategoriesPage(), categoriesConfig (+26 more)
 
 ### Community 77 - "emr/pages/dashboard-page.tsx"
-Cohesion: 0.08
-Nodes (28): C14 — Provisioned org users get `modules: []` (wildcard permissions not expanded), C15 escalation — playwright-template provisioning degrades run over run, C15 — Seed provisioner OOM: whitelists ~40k items per org, 4GB heap exceeded, C17 — Dev `VITE_EMR_API_URL` unset → SPA fallback returned HTML for EMR API calls (500 error boundary), C18 — Redesigned sign-in screen broke emr-real `signInAsAdmin`, C19 — emr-real dashboard assertion asserted a nonexistent heading, C20 — Appointments API: `patient_name` NOT NULL but not DTO-validated (raw SQL 400), C21 — APP DEFECT: visit-detail renders two "Record Encounter" dialogs (+20 more)
-
-### Community 78 - "$pharmacyId.tsx"
-Cohesion: 0.40
-Nodes (4): CodedPharmacyDetailPage(), localityName(), CodedPharmacyDetailRoute(), Route
+Cohesion: 0.14
+Nodes (18): AppointmentRow(), appointmentAction(), appointmentStyle(), PRIORITY_STYLE, STATUS_STYLES, StatusStyle, MetricCard(), AVATAR_COLORS (+10 more)
 
 ### Community 80 - "canonical.model.ts"
 Cohesion: 0.12
@@ -1065,20 +924,20 @@ Cohesion: 0.22
 Nodes (6): EventMetadata, EventSnapshot, EventStream, EventTracer, MessageEvent, MessageEventAuditEntry
 
 ### Community 84 - "vitest"
-Cohesion: 0.06
-Nodes (44): @testing-library/react, @testing-library/user-event, vitest, logoutAllMock, logoutMock, navigateMock, nullProtoSearch, FieldGroupAdd() (+36 more)
+Cohesion: 0.05
+Nodes (52): @testing-library/react, vitest, FieldGroupAdd(), buildFieldGroup(), matrixRows, setup(), mergeRowToSaved(), { get, patch, auth } (+44 more)
 
-### Community 85 - "v6e"
-Cohesion: 0.07
-Nodes (60): a2(), bo(), Do(), Ea(), gn(), kt(), lo(), ma() (+52 more)
+### Community 85 - "test"
+Cohesion: 0.08
+Nodes (54): a2(), Cf(), ele(), Hu(), jk(), Ld(), lo(), ma() (+46 more)
 
 ### Community 86 - "ContentSection"
-Cohesion: 0.31
-Nodes (6): SettingsAccount(), SettingsAppearance(), ContentSection(), ContentSectionProps, SettingsProfile(), ProfileForm()
+Cohesion: 0.22
+Nodes (10): SettingsAccount(), AppearanceForm(), onSubmit(), SettingsAppearance(), ContentSection(), ContentSectionProps, DisplayForm(), SettingsDisplay() (+2 more)
 
-### Community 87 - "jt"
-Cohesion: 0.09
-Nodes (45): addWorkspace(), aI(), anchoredPackage(), av(), bpe(), check(), D0(), d8() (+37 more)
+### Community 87 - "questionnaire.tsx"
+Cohesion: 0.20
+Nodes (18): AnswerValue, formatAnswer(), getInputKind(), getOptionValue(), getQuestionKey(), HorizontalQuestionView(), isQuestionAnswered(), normalizeQuestions() (+10 more)
 
 ### Community 88 - "MANUAL — EMR Service"
 Cohesion: 0.09
@@ -1088,25 +947,25 @@ Nodes (23): 10. Production Build, 11. Troubleshooting, 12. Related Documentation
 Cohesion: 0.27
 Nodes (7): recharts, Analytics(), AnalyticsChart(), data, data, Overview(), Dashboard()
 
-### Community 90 - "constructor"
-Cohesion: 0.05
-Nodes (41): applyChanges(), _checkIterableAdaptar(), clear(), clearCache(), componentDidMount(), componentWillUnmount(), constructor(), cursorHide() (+33 more)
+### Community 90 - "chat-api.ts"
+Cohesion: 0.21
+Nodes (14): AddProjectionModal(), addEntry(), onParticipantSelect(), updateEntry(), createEntry(), Entry, Props, ROLES (+6 more)
 
-### Community 91 - "d3e"
-Cohesion: 0.05
-Nodes (42): _3e(), a3e(), b0t(), Cw(), d0t(), d3e(), e8e(), f3e() (+34 more)
+### Community 91 - "ChatUiPage"
+Cohesion: 0.15
+Nodes (9): Chats(), conversationModuleDescription, conversationModuleId, conversationModuleName, PhoneSetupModal(), Props, ChatUiPage(), ChatPhoneState (+1 more)
 
 ### Community 92 - "MANUAL — RxSoft Identity"
 Cohesion: 0.09
 Nodes (23): 10. Troubleshooting, 11. Related Documentation, 1. What This Service Does, 2. Getting Started, 3. Environment Variables, 4.1 Authentication, 4.2 Users, 4.3 Roles (+15 more)
 
 ### Community 93 - "Wr"
-Cohesion: 0.07
-Nodes (58): _9e(), ax(), B9e(), C9e(), __decorate(), _defineHidden(), disableMember(), e_() (+50 more)
+Cohesion: 0.16
+Nodes (35): _9e(), B9e(), C9e(), ere(), F9e(), fx(), G2(), G9e() (+27 more)
 
-### Community 94 - "ModuleDashboardPage"
-Cohesion: 0.17
-Nodes (12): ModuleDashboardPage(), Route, Route, Route, Route, Route, Route, Route (+4 more)
+### Community 94 - "@tanstack/react-router"
+Cohesion: 0.02
+Nodes (55): @tanstack/react-router, UnauthorisedError(), ModuleDashboardPage(), Route, Route, Route, Route, Route (+47 more)
 
 ### Community 95 - "user-insights/api.ts"
 Cohesion: 0.19
@@ -1121,8 +980,8 @@ Cohesion: 0.09
 Nodes (23): 1.1 Enhanced FormProvider Context, 1.2 Form Field Types & Schema, 1.3 FormProvider Tests, 2.1 MutationMode Standardization, 2.2 FieldGroup Component Refactoring, 2.3 RenderField Refactoring, 3.1 Breadcrumb/Stepper System, 3.2 TabGroups Integration (+15 more)
 
 ### Community 98 - "master-item-meta.ts"
-Cohesion: 0.50
-Nodes (3): buildItemName(), MasterItemKind, PickerReference
+Cohesion: 0.47
+Nodes (4): buildItemName(), buildReferenceCode(), MasterItemKind, PickerReference
 
 ### Community 99 - "pos.spec.ts"
 Cohesion: 0.09
@@ -1132,25 +991,25 @@ Nodes (18): ensurePosConfig(), pickSelectOption(), DATA_DIR, DATA_FILE, DEFAULTS
 Cohesion: 0.09
 Nodes (22): 1. Executive Summary, 2. System Overview, 3.1 RxSoft Identity (`identity`, port 8092), 3.2 RxSoft Backend (`rxsoft`, port 8080), 3.3 EMR Service (`emr`, port 8094), 3.4 LIMS Backend (`lims`, port 8091), 3.5 Healthcare Interoperability Switch (`interop`, port 3000), 3.6 Conversation Engine (`conversation`, port 8090) (+14 more)
 
-### Community 101 - ".get"
-Cohesion: 0.08
-Nodes (56): A5(), add(), Aht(), aot(), applyLightResolution(), Bot(), CB(), commitTips() (+48 more)
+### Community 101 - ".push"
+Cohesion: 0.02
+Nodes (372): a0t(), A5(), A8(), a9(), accepts(), add(), addAlgoliaAgent(), addKey() (+364 more)
 
 ### Community 102 - "Phase 1 — rxsoft CRUD coverage: Challenges, Blockers & Resolutions"
-Cohesion: 0.04
-Nodes (46): APP BUG: auth guard crashed on unauthenticated deep links (TC-ROOT-02), Background dev servers die with the shell (no setsid on macOS), Docker Desktop down kills identity/rxsoft (ECONNREFUSED ::1:5432), Fresh orgs had zero GL accounts (org-scoped, nothing seeds them), NestJS services bind port 0 when .env PORT isn't loaded, Phase 0 — Challenge Log, Provisioning 500s on second org: demo MRNs/visit numbers are globally unique, Seed provisioning requires x-api-key; e2e global-setup reads it from process env (+38 more)
+Cohesion: 0.05
+Nodes (38): APP BUG: auth guard crashed on unauthenticated deep links (TC-ROOT-02), C10 — Ambiguous `admin` login in probe scripts, C11 — Playwright-managed Vite webServer died mid-run → 231 did-not-run, C12 — Tracker coverage semantics: gated ≠ missing ⚠️ methodology, C13 — Legacy-spec drift surfaced by the fresh backend (out of Phase 1 scope), C2 — Chart of Accounts create timed out on `page.goto` (run 2, 52s), C3 — Journals delete: confirm-dialog `Delete` button not clickable (run 2), C5 — UOMs delete: `DELETE /api/uoms/:id` has no backend route (404) (+30 more)
 
-### Community 103 - "ASt"
-Cohesion: 0.24
-Nodes (10): ASt(), CL(), fromFile(), fromText(), genCommitMessage(), kce(), loadFile(), loadFromText() (+2 more)
+### Community 103 - "poApi.ts"
+Cohesion: 0.16
+Nodes (7): poKeys, receiptKeys, useCreateSupplier(), useUpdatePurchaseOrder(), Props, QuickAddSupplierModal(), PurchaseOrder
 
-### Community 104 - "y"
-Cohesion: 0.06
-Nodes (66): aje(), ao(), Br(), By(), c2(), d(), dh(), eje() (+58 more)
+### Community 104 - "F"
+Cohesion: 0.05
+Nodes (89): aje(), Be(), Bg(), Br(), d(), Dut(), ie(), te() (+81 more)
 
 ### Community 106 - "form-context.ts"
-Cohesion: 0.15
-Nodes (12): CollectionRow, EffectsContext, FieldGroupEffect, FieldValue, FormField, FormSubscriber, MutationContext, MutationMode (+4 more)
+Cohesion: 0.10
+Nodes (28): 2.1 The validation machinery exists but is bypassed on submit, buildEffectDependencies(), executeEffectsWithHandler(), runComputeEffect(), runEffect(), runEffects(), runFetchEffect(), runSyncEffect() (+20 more)
 
 ### Community 107 - "board-sync.mjs"
 Cohesion: 0.11
@@ -1161,8 +1020,8 @@ Cohesion: 0.25
 Nodes (5): RxPaymentMethodsPage(), columns, createFields, methodTypeOptions, paymentMethodsConfig
 
 ### Community 109 - "test.ts"
-Cohesion: 0.05
-Nodes (36): DATA_TABLE_ENDPOINT_OVERRIDES, AppFixtures, test, PANEL_HEADINGS, apiCreate(), BalanceSetup, ensureBalance(), apiCreate() (+28 more)
+Cohesion: 0.07
+Nodes (22): AppFixtures, test, PANEL_HEADINGS, EN_MONTHS, EntryRow, EN_MONTHS, ENRICHED, CHART_TITLES (+14 more)
 
 ### Community 110 - "MANUAL — RxSoft LIS Backend"
 Cohesion: 0.10
@@ -1186,59 +1045,59 @@ Nodes (26): 1. Simple Form, 2. Access Form State, 3. Individual Field, 4. Collec
 
 ### Community 115 - "body-map.tsx"
 Cohesion: 0.16
-Nodes (13): ARROWS, BodyMapField(), toggle(), BodyMapFieldProps, BodyMapRegion, BodyMapView, directions, nextRegion() (+5 more)
+Nodes (14): ARROWS, BodyMapField(), toggle(), BodyMapFieldProps, BodyMapRegion, bodyMapRegions, BodyMapView, directions (+6 more)
 
 ### Community 117 - "$uomId.tsx"
 Cohesion: 0.50
 Nodes (3): RxUomDetailsPage(), Route, UomDetailsRoute()
 
-### Community 118 - "Dn"
-Cohesion: 0.06
-Nodes (42): a4e(), ake(), aOe(), az(), B3e(), BM(), BX(), c4e() (+34 more)
+### Community 118 - "use-chat-queries.ts"
+Cohesion: 0.22
+Nodes (12): chatKeys, useAddProjection(), useConversationInbox(), useCreateConversation(), useMarkConversationRead(), useSendConversationMessage(), createConversation(), fetchConversationInbox() (+4 more)
 
 ### Community 119 - "mutation.ts"
-Cohesion: 0.39
-Nodes (7): createMutationHandler(), handleCellMode(), handleCollectionMode(), handleFieldMode(), handleRowMode(), runMutation(), validateMutationForMode()
+Cohesion: 0.26
+Nodes (10): createMutationHandler(), handleCellMode(), handleCollectionMode(), handleFieldMode(), handleRowMode(), runMutation(), validateMutationForMode(), FormState (+2 more)
 
-### Community 120 - "iqe"
-Cohesion: 0.06
-Nodes (37): allocate(), aqe(), assert(), Ba(), Bqe(), Bre(), cz(), Eqe() (+29 more)
+### Community 120 - "PoToolbar.tsx"
+Cohesion: 0.33
+Nodes (11): usePurchaseOrders(), useSuppliers(), useWarehouses(), PoSettingsDrawer(), PoToolbar(), Props, handleSaveDraft(), handleSubmitApprove() (+3 more)
 
 ### Community 121 - "Concept Details"
 Cohesion: 0.40
 Nodes (5): concept, ConceptDetailsPage(), conceptFields, Field, getFieldIcon()
 
-### Community 122 - "fetch"
-Cohesion: 0.09
-Nodes (35): Bw(), cloneFromRemote(), copyPromise(), downloadHosted(), E0t(), ensureVirtualLink(), executeProxy(), fetch() (+27 more)
+### Community 122 - "users/schema.ts"
+Cohesion: 0.20
+Nodes (6): RxUsersPage(), columns, posConfigFields, tabGroups, userCreateFields, usersConfig
 
-### Community 123 - "Ut"
-Cohesion: 0.09
-Nodes (39): Oe(), as(), BP(), Cf(), cP(), Ds(), Eh(), Eu() (+31 more)
+### Community 123 - "y"
+Cohesion: 0.07
+Nodes (61): Oe(), $ae(), ao(), bf(), bh(), By(), c2(), Cce() (+53 more)
 
 ### Community 124 - "CrudShellPage"
 Cohesion: 0.06
-Nodes (20): C4 — `page-title` strict-mode violations on routes that mount the shell twice, C1 — "New" does NOT open a modal: it navigates to a full-page wizard, C2 — The create page renders MORE required fields than the schema marks, C3 — async-selects: label lookups flaky, `input[role="combobox"]` absent, C4 — Serial mode + retries re-run the WHOLE group per retry pass, C5 — Created rows are invisible on page 1 of a 39k-row catalog, C6 — The board "0/N" counters only move when UC sub-issues CLOSE, C7 — Vite dev-server watch storm: Playwright artifacts reload the page mid-run (+12 more)
+Nodes (17): C4 — `page-title` strict-mode violations on routes that mount the shell twice, C1 — "New" does NOT open a modal: it navigates to a full-page wizard, C2 — The create page renders MORE required fields than the schema marks, C3 — async-selects: label lookups flaky, `input[role="combobox"]` absent, C4 — Serial mode + retries re-run the WHOLE group per retry pass, C5 — Created rows are invisible on page 1 of a 39k-row catalog, C6 — The board "0/N" counters only move when UC sub-issues CLOSE, C7 — Vite dev-server watch storm: Playwright artifacts reload the page mid-run (+9 more)
 
-### Community 125 - "effects.ts"
-Cohesion: 0.36
-Nodes (7): executeEffectsWithHandler(), runComputeEffect(), runEffect(), runEffects(), runFetchEffect(), runSyncEffect(), FormState
+### Community 125 - "PoLinesTable.tsx"
+Cohesion: 0.31
+Nodes (10): useAddItemToOrganisation(), useItems(), useItemUoms(), ItemSearchSelect(), PoLinesTable(), PriceListCell(), PriceListItem, UomChangeModal() (+2 more)
 
 ### Community 126 - "permission-picker.tsx"
-Cohesion: 0.12
-Nodes (24): allCodes(), CatalogAction, CatalogEntity, CatalogModule, entityCodes(), Focus, groupByResource(), isAllChecked() (+16 more)
+Cohesion: 0.15
+Nodes (22): allCodes(), CatalogAction, CatalogEntity, CatalogModule, entityCodes(), Focus, groupByResource(), isAllChecked() (+14 more)
 
-### Community 127 - "format-annotate.ts"
-Cohesion: 0.18
-Nodes (11): bodyMapRegions, bodyLabels, formatAnnotateValue(), humanizeId(), organCatalog, organDisplayName(), organKeys, OrganStructure (+3 more)
+### Community 127 - "emr-types.ts"
+Cohesion: 0.04
+Nodes (102): AppointmentRow, AppointmentViewModal(), Field(), ActiveEncounter, DocumentationModal(), buildInitialFormData(), DynamicField(), DynamicFormFields() (+94 more)
 
-### Community 128 - "purchases/schema.ts"
-Cohesion: 0.22
-Nodes (6): RxPurchasesPage(), columns, createFields, purchaseLineEditConfig, purchasesConfig, purchasesView
+### Community 128 - "chat-socket.ts"
+Cohesion: 0.25
+Nodes (8): socket.io-client, CONVERSATION_API_BASE_URL, useChatSocket(), getConversationSocket(), identity, resetConversationSocket(), setConversationIdentity(), SocketIdentity
 
-### Community 129 - "PoLinesTable.tsx"
-Cohesion: 0.11
-Nodes (25): useAddItemToOrganisation(), useItems(), useItemUoms(), addItemMock, emptyLine(), onUpdateLine, setup(), ItemSearchSelect() (+17 more)
+### Community 129 - "usePoStore.ts"
+Cohesion: 0.27
+Nodes (11): Props, Props, statusColors, defaultTabState(), emptyLine(), PoStoreState, PoTab, GoodsReceipt (+3 more)
 
 ### Community 130 - "rxsoft/pages/pharmaceutics/schema.ts"
 Cohesion: 0.33
@@ -1254,31 +1113,31 @@ Nodes (18): 11. SEO Requirements, 12. Content Requirements, 13. Blog & Education
 
 ### Community 133 - "pos/pos.tsx"
 Cohesion: 0.09
-Nodes (19): useCompleteDispense(), useOrderDetail(), useOrganisationConfig(), Props, SalesSummary(), Props, SaleTabs(), PosSalesPage() (+11 more)
+Nodes (21): useCompleteDispense(), useOrderDetail(), useOrganisationConfig(), useStockLocations(), Props, SalesSummary(), Props, SaleTabs() (+13 more)
 
 ### Community 135 - "Module Context Provider - Quick Checklist"
 Cohesion: 0.12
 Nodes (15): 1. Test Application Startup, 2. Test Module Selection Persistence, 3. Test Hook Usage, 4. Test Backward Compatibility, 🔗 Accessing Module Data, ❓ Common Questions, 📚 Documentation Files, ✅ Implementation Checklist (+7 more)
 
-### Community 136 - "ListeningPage.tsx"
-Cohesion: 0.19
-Nodes (12): ListeningPage(), platformColors, SentimentPage(), useCreateMention(), useCreateResponse(), useListeningStats(), useMentions(), useSentimentDashboard() (+4 more)
+### Community 136 - "apmBlue"
+Cohesion: 0.10
+Nodes (22): ContentFactoryPage(), conversionColors, PollingUnitsPage(), riskColors, SentimentPage(), levelOptions, WhatsAppGroupsPage(), useContentAssets() (+14 more)
 
-### Community 137 - "ModelConfig"
-Cohesion: 0.03
-Nodes (53): Dynamic CRUD system, FieldGroupEngineProps, FieldGroupSpec, DataPageForm(), DataPageFormProps, EhealthwaresContactSubmissionsPage(), columns, ehealthwaresContactsConfig (+45 more)
+### Community 137 - "journals/schema.ts"
+Cohesion: 0.33
+Nodes (4): RxJournalsPage(), columns, createFields, journalsConfig
 
 ### Community 138 - "preview.tsx"
-Cohesion: 0.40
-Nodes (4): storybook, decorators, globalTypes, parameters
+Cohesion: 0.33
+Nodes (5): storybook, theme, decorators, globalTypes, parameters
 
 ### Community 139 - "layout/types.ts"
-Cohesion: 0.09
-Nodes (23): SidebarNavItem(), SidebarNavItemProps, SubMenuLinks(), baseItem, leafItem, Settings(), sidebarNavItems, conversationGroup (+15 more)
+Cohesion: 0.06
+Nodes (37): SidebarNavItem(), SidebarNavItemProps, SubMenuLinks(), baseItem, leafItem, Settings(), sidebarNavItems, sidebarData (+29 more)
 
-### Community 140 - ".write"
-Cohesion: 0.08
-Nodes (23): createStreamReporter(), end(), Lh(), [m6](), MK(), npe(), O1t(), Odt() (+15 more)
+### Community 140 - "tags/schema.tsx"
+Cohesion: 0.28
+Nodes (5): TagsPage(), columns, fieldGroups, tagsConfig, Route
 
 ### Community 141 - "GotvPage.tsx"
 Cohesion: 0.43
@@ -1289,168 +1148,164 @@ Cohesion: 0.13
 Nodes (15): 7.10 Loyalty & Rewards, 7.11 Subscription & Refill System, 7.1 Ecommerce System, 7.2 Product Detail Page, 7.3 Smart Search System, 7.4 Prescription Management, 7.5 User Accounts, 7.6 Multi-Branch Management (+7 more)
 
 ### Community 143 - "printServer.ts"
-Cohesion: 0.20
-Nodes (20): handlePrintHeldInvoice(), printPosReceipt(), printPosReceiptRemote(), AgentInfo, AgentReceiptPayload, buildTestReceipt(), discoverPrintServers(), getPrintServerUrl() (+12 more)
+Cohesion: 0.15
+Nodes (27): useUpdateUserPosConfig(), useUserPosConfig(), FindState, PosSettingsDrawer(), Props, TestPrintState, handlePrintHeldInvoice(), printPosReceipt() (+19 more)
 
-### Community 144 - "jKe"
-Cohesion: 0.07
-Nodes (31): B8e(), BNe(), dle(), dUe(), dz(), e3(), g8e(), gt() (+23 more)
+### Community 144 - "gl-accounts/schema.ts"
+Cohesion: 0.25
+Nodes (5): RxGlAccountsPage(), accountTypeOptions, columns, createFields, glAccountsConfig
 
 ### Community 146 - "Task Plan: Comprehensive Playwright E2E Suite — RxSoft Frontend"
 Cohesion: 0.12
 Nodes (16): Current Phase, Decisions Made, Errors Encountered, Goal, Key Questions, Notes, Phase 0: Plan docs & baseline, Phase 1: RxSoft reference/master-data CRUD (runnable now) (+8 more)
 
-### Community 147 - "statSync"
-Cohesion: 0.08
-Nodes (43): copySync(), cU(), [Dv](), genTraversePromise(), gZ(), hBe(), isBlockDevice(), isCharacterDevice() (+35 more)
+### Community 147 - "t"
+Cohesion: 0.03
+Nodes (215): accessPromise(), accessSync(), appendFile(), appendFilePromise(), appendFileSync(), ax(), [B6](), Bc() (+207 more)
 
-### Community 148 - "MetricsBar.tsx"
-Cohesion: 0.39
-Nodes (7): formatCurrency(), formatValue(), getIcon(), ICON_MAP, MetricsBar(), StatCard(), MetricsConfig
+### Community 148 - "app-sidebar.tsx"
+Cohesion: 0.13
+Nodes (28): useAvailableModules(), useModuleContext(), useModuleDefinition(), useModuleId(), useModuleName(), useSetSelectedModule(), formatCurrency(), formatValue() (+20 more)
 
 ### Community 149 - "social-console-sign-in.spec.ts"
 Cohesion: 0.08
 Nodes (23): __dirname, logPath, outDir, creds, creds, CREDENTIALS_FILE, E2E_DIR, parseEnvFile() (+15 more)
 
-### Community 150 - ".on"
-Cohesion: 0.10
-Nodes (23): [a6](), b2e(), collect(), dump(), exe(), g2e(), [I6](), [_j]() (+15 more)
+### Community 150 - "pos-terminals/schema.ts"
+Cohesion: 0.25
+Nodes (5): RxPosTerminalsPage(), columns, createFields, posTerminalsConfig, terminalProviderOptions
 
-### Community 151 - "t"
-Cohesion: 0.12
-Nodes (30): chmod(), chown(), chownSync(), fchmodPromise(), fchmodSync(), fchownPromise(), fchownSync(), fdToPath() (+22 more)
+### Community 151 - "product-setup-components.tsx"
+Cohesion: 0.36
+Nodes (7): ItemLookup, ItemLookupInput(), ItemPriceListSetup(), ItemStockQuantitySetup(), SimpleLookup, useLookups(), usePriceListUpdater()
 
-### Community 152 - "r"
-Cohesion: 0.08
-Nodes (23): _0t(), B6e(), bVe(), dE(), dU(), Dw(), Dze(), enabled() (+15 more)
+### Community 152 - "graph-view.tsx"
+Cohesion: 0.32
+Nodes (6): reactflow, AENode(), FlowTopology, GraphViewPage(), sampleTopology, Route
 
 ### Community 154 - "PaymentModal"
-Cohesion: 0.10
-Nodes (23): useDebitWallet(), useInitiatePosPayment(), usePaymentMethods(), usePosTerminals(), useQueryPosPayment(), isFailedLinkStatus(), isPaidLinkStatus(), PaymentModal() (+15 more)
+Cohesion: 0.14
+Nodes (23): useCreateSale(), useDebitWallet(), useInitiatePosPayment(), usePaymentMethods(), usePosTerminals(), useQueryPosPayment(), isFailedLinkStatus(), isPaidLinkStatus() (+15 more)
 
-### Community 155 - "$hospitalId.tsx"
-Cohesion: 0.40
-Nodes (4): CodedHospitalDetailPage(), refName(), CodedHospitalDetailRoute(), Route
+### Community 155 - "hospitals/detail.tsx"
+Cohesion: 0.24
+Nodes (7): CodedHospitalDetailPage(), GeoRef, Hospital, NearbyHospital, refName(), CodedHospitalDetailRoute(), Route
 
 ### Community 157 - "Form System Refactoring - Implementation Status"
 Cohesion: 0.14
 Nodes (14): Architecture Decisions, ⚠️ Breaking Changes, 🚧 Current Blockers, Current Phase: Phase 1 - Core Architecture Setup, Field Types Supported, Form System Refactoring - Implementation Status, 📝 Implementation Notes, 📊 Key Metrics (+6 more)
 
-### Community 158 - "test"
-Cohesion: 0.08
-Nodes (26): $5(), a0e(), accepts(), cit(), cut(), e9(), Eit(), eme() (+18 more)
+### Community 158 - "ResultsPage.tsx"
+Cohesion: 0.43
+Nodes (6): ResultsPage(), useCreateResult(), useResultDashboard(), useResults(), useVerifyResult(), Route
 
-### Community 159 - "match"
-Cohesion: 0.09
-Nodes (27): A0(), braceExpand(), D1t(), dat(), DBe(), debug(), dtt(), ensureJSsource() (+19 more)
+### Community 159 - "rxsoft/pages/manufacturers/schema.ts"
+Cohesion: 0.29
+Nodes (4): RxManufacturersPage(), columns, createFields, manufacturersConfig
 
 ### Community 160 - "functionality.md"
 Cohesion: 0.14
 Nodes (13): ADMIN FEATURES, BUSINESS OVERVIEW, /checkout, CHECKOUT MODULE, CUSTOMER REVIEWS, DELIVERABLES, FRONTEND STRUCTURE, PERFORMANCE (+5 more)
 
 ### Community 161 - "react-hook-form"
-Cohesion: 0.23
-Nodes (8): @hookform/resolvers, react-hook-form, ForgotPasswordForm(), onSubmit(), formSchema, formSchema, OtpFormProps, sleep()
+Cohesion: 0.15
+Nodes (12): @hookform/resolvers, react-hook-form, ForgotPasswordForm(), onSubmit(), formSchema, formSchema, OtpFormProps, defaultValues (+4 more)
 
-### Community 162 - "getCandidates"
-Cohesion: 0.10
-Nodes (27): a9(), AK(), $b(), bindDescriptor(), DQ(), f8(), fetchHostedRepository(), getCandidates() (+19 more)
+### Community 162 - "organizations/schema.tsx"
+Cohesion: 0.29
+Nodes (4): RxOrganizationsPage(), columns, createFields, organizationsConfig
 
-### Community 163 - "p"
-Cohesion: 0.07
-Nodes (58): c(), Cze(), Dut(), I(), ie(), U(), ue(), V() (+50 more)
+### Community 163 - "r"
+Cohesion: 0.01
+Nodes (257): _0t(), $5e(), a0e(), addOrCreate(), addPath(), Adt(), Agt(), ah() (+249 more)
+
+### Community 164 - "utils/api.ts"
+Cohesion: 0.06
+Nodes (21): apiCreate(), BalanceSetup, ensureBalance(), apiCreate(), BalanceSetup, ensureBalance(), ensurePosConfig(), apiCreate() (+13 more)
 
 ### Community 165 - "pos_and_purchase.md"
 Cohesion: 0.14
 Nodes (13): Before Writing Any Code, CLAUDE.md — RxSoft ERP Development Rules, Code Quality, CODE QUALITY, Component Rules, Core Principle, DELIVERABLES, Inventory Valuation (+5 more)
 
-### Community 166 - ".push"
-Cohesion: 0.08
-Nodes (26): addKey(), eyt(), F1t(), gyt(), iat(), intArrayToString(), jL(), Jst() (+18 more)
+### Community 166 - "customers/schema.ts"
+Cohesion: 0.33
+Nodes (4): RxCustomersPage(), columns, createFields, customersConfig
 
 ### Community 167 - "makeLibzipError"
-Cohesion: 0.10
-Nodes (27): addDirectory(), ait(), allocateBuffer(), allocateSource(), allocateUnattachedSource(), dg(), discardAndClose(), getBufferAndClose() (+19 more)
+Cohesion: 0.07
+Nodes (40): addDirectory(), ait(), allocateBuffer(), allocateSource(), allocateUnattachedSource(), AQ(), aze(), cq() (+32 more)
 
-### Community 168 - ".indexOf"
-Cohesion: 0.11
-Nodes (19): adjascentGlobstarOptimize(), B1t(), dj(), firstPhasePreProcess(), _getKeyUnprefix(), kae(), kp(), levelOneOptimize() (+11 more)
+### Community 168 - "price-list-items/schema.tsx"
+Cohesion: 0.33
+Nodes (4): RxPriceListItemsPage(), columns, fieldGroups, priceListItemsConfig
 
-### Community 169 - "writeFilePromise"
-Cohesion: 0.20
-Nodes (25): appendFile(), appendFilePromise(), chmodPromise(), chownPromise(), copyFilePromise(), jje(), linkPromise(), lockPromise() (+17 more)
+### Community 169 - "price-lists/schema.ts"
+Cohesion: 0.33
+Nodes (4): RxPriceListsPage(), columns, createFields, priceListsConfig
 
-### Community 170 - "ka"
-Cohesion: 0.09
-Nodes (23): A8(), c8(), Cce(), firstHook(), Gbe(), getChecksumFilename(), getLocatorFilename(), getLocatorPath() (+15 more)
+### Community 170 - "website-consultations/schema.ts"
+Cohesion: 0.33
+Nodes (4): RxWebsiteConsultationsPage(), columns, consultationsConfig, createFields
 
-### Community 172 - "fromJSON"
-Cohesion: 0.11
-Nodes (23): checkFinalSnapsnot(), checkFinalTimestamp(), commonFieldsFromJSON(), Es(), FBe(), fromJSON(), gi(), isDelegatedRole() (+15 more)
+### Community 172 - "participant-modal.tsx"
+Cohesion: 0.38
+Nodes (6): ParticipantModal(), Props, useListProjections(), useRemoveParticipantProjections(), listProjections(), removeParticipantProjections()
 
-### Community 173 - "findExtension"
-Cohesion: 0.09
-Nodes (23): extAuthorityKeyID(), extBasicConstraints(), extension(), extKeyUsage(), extSCT(), extSubjectAltName(), extSubjectKeyID(), findExtension() (+15 more)
+### Community 173 - "ConversationThread"
+Cohesion: 0.33
+Nodes (7): useConversationMessages(), useConversationThread(), usePendingExchanges(), ConversationThread(), groupMessagesByDate(), fetchConversationMessages(), sendWebhookMessage()
 
 ### Community 174 - "reset-password/index.tsx"
-Cohesion: 0.15
-Nodes (11): AuthLayout(), AuthLayoutProps, ForgotPassword(), OtpForm(), onSubmit(), Otp(), SignUpForm(), SignUp() (+3 more)
+Cohesion: 0.16
+Nodes (10): AuthLayout(), AuthLayoutProps, ForgotPassword(), OtpForm(), Otp(), SignUpForm(), SignUp(), resetPasswordSchema (+2 more)
 
 ### Community 175 - "6.3 Order Report (Result Entry & Print)"
 Cohesion: 0.29
 Nodes (7): 6.3 Order Report (Result Entry & Print), Actions Bar, Header, PDF Report Generation, Previous/Next Navigation, Reference Range Auto-Selection, Result Entry Table
 
 ### Community 176 - "authenticated-layout.tsx"
-Cohesion: 0.15
-Nodes (15): ACTIVITY_EVENTS, AutoLogout(), computeSessionDelay(), moduleFavicons, useModuleFavicon(), moduleTitles, useModuleTitle(), AuthenticatedLayout() (+7 more)
+Cohesion: 0.19
+Nodes (12): registerNotificationSubscription(), NotificationSubscriptionRegistrar(), useNotificationSubscription(), moduleFavicons, useModuleFavicon(), moduleTitles, useModuleTitle(), AuthenticatedLayout() (+4 more)
 
 ### Community 177 - "11. Website Content (eHealthwares)"
 Cohesion: 0.15
 Nodes (13): 11. Website Content (eHealthwares), Articles, Careers, Categories (Website), Contact Submissions, Hero Slides, Investors, Partners (+5 more)
 
 ### Community 178 - "ls"
-Cohesion: 0.27
-Nodes (22): a5e(), c5e(), CE(), d5e(), e5e(), EE(), Fr(), g5e() (+14 more)
+Cohesion: 0.26
+Nodes (23): a5e(), c5e(), CE(), d5e(), e5e(), Fr(), g5e(), h5e() (+15 more)
 
-### Community 180 - "wE"
-Cohesion: 0.10
-Nodes (22): ate(), cTe(), Eht(), Hn(), ig(), isEmpty(), J5e(), Nn() (+14 more)
+### Community 180 - "drag-and-drop-list.tsx"
+Cohesion: 0.33
+Nodes (3): DragAndDropColumn, DragAndDropList(), DragAndDropListProps
 
-### Community 181 - "patients/schema.tsx"
-Cohesion: 0.19
-Nodes (14): PaymentProvidersCell(), TagChips(), TagSummary, buildCreatePayload(), buildFormState(), buildPatientsConfig(), buildUpdatePayload(), columns (+6 more)
+### Community 181 - "ResetPasswordPage"
+Cohesion: 0.50
+Nodes (4): ResetPasswordPage(), handleSubmit(), ResetPasswordRoute(), Route
 
-### Community 182 - "page.test.tsx"
-Cohesion: 0.16
-Nodes (15): naira(), PayPage(), LINK, mockState, SESSION, clearPaySession(), http, loadPaySession() (+7 more)
+### Community 182 - "pay/page.tsx"
+Cohesion: 0.13
+Nodes (19): axios, ATTEMPT_COLORS, naira(), PayPage(), StatusLink, StatusPayment, clearPaySession(), http (+11 more)
 
 ### Community 183 - "skip-if.ts"
 Cohesion: 0.07
 Nodes (31): 3. Infra (in place), BackendHealth, BackendScope, __dirname, DOWN, HEALTH_FILE, readBackendHealth(), skipIfModuleMissing() (+23 more)
 
 ### Community 185 - "SignInPage"
-Cohesion: 0.09
-Nodes (20): adminCredentials(), moduleRoots, SignInPage, E2E_DIR, orgCreds(), OrgUser, signIn(), cashierCreds() (+12 more)
+Cohesion: 0.08
+Nodes (22): signInAsAdmin(), adminCredentials(), moduleRoots, SignInPage, E2E_DIR, orgCreds(), OrgUser, signIn() (+14 more)
 
 ### Community 189 - "subdomain.ts"
 Cohesion: 0.50
 Nodes (4): getDefaultRoute(), getSubdomain(), HOST_ALIASES, SUBDOMAIN_ROUTES
 
 ### Community 190 - "FilterType"
-Cohesion: 0.07
-Nodes (26): columns, config, MappingPage(), RxPriceListItemsPage(), columns, fieldGroups, priceListItemsConfig, FilterType (+18 more)
+Cohesion: 0.11
+Nodes (19): FilterType, BETWEEN, CONTAINS, EQUALS, FUZZY_MATCH, GREATER_THAN, GREATER_THAN_OR_EQUAL, LAST_MONTH (+11 more)
 
 ### Community 191 - "7. Reference Data"
 Cohesion: 0.33
 Nodes (6): 7. Reference Data, Attribute Definitions, Priorities, Reference Ranges, Rejection Reasons, UOMs (Units of Measure)
-
-### Community 192 - "$laboratoryId.tsx"
-Cohesion: 0.40
-Nodes (4): CodedLaboratoryDetailPage(), refName(), CodedLaboratoryDetailRoute(), Route
-
-### Community 193 - "message-templates/schema.tsx"
-Cohesion: 0.17
-Nodes (18): fetchChannelCodeOptions(), CONTENT_TYPE_OPTIONS, DESTINATION_OPTIONS, MESSAGE_TEMPLATES_KEY, MessageTemplatesPage(), buildDefaultState(), buildFormState(), buildMessageTemplatesConfig() (+10 more)
 
 ### Community 195 - "__root.tsx"
 Cohesion: 0.17
@@ -1476,9 +1331,9 @@ Nodes (13): ✅ COMPLETED, Detailed Task Progress, 🔄 IN PROGRESS, ⏳ NOT STA
 Cohesion: 0.40
 Nodes (5): 8. Quality Control, QA Checklist Items, QC Alerts, QC Lots, QC Results
 
-### Community 206 - "emit"
-Cohesion: 0.07
-Nodes (38): abort(), [CBe](), close(), closeFreeSessions(), [d6](), destroy(), [e6](), Edt() (+30 more)
+### Community 206 - "constructor"
+Cohesion: 0.02
+Nodes (195): addListener(), aj(), ale(), api(), applyChanges(), b2e(), _beforeError(), Bz() (+187 more)
 
 ### Community 207 - "CartTable.tsx"
 Cohesion: 0.17
@@ -1488,9 +1343,9 @@ Nodes (18): usePosItemUoms(), CartRow(), CartRowProps, CartStockAdjustContext, C
 Cohesion: 0.50
 Nodes (4): 10. Common UI Patterns, Async-Select Fields, Multi-Async-Select, Resource Pages
 
-### Community 212 - "forEach"
-Cohesion: 0.07
-Nodes (29): A7(), addOnExit(), addOnInit(), addOnPreMain(), _atexit(), C9(), cGe(), cyt() (+21 more)
+### Community 212 - ".slice"
+Cohesion: 0.01
+Nodes (215): 5. Enforcement (so this never erodes), A0(), [a6](), A7(), addOnExit(), addOnInit(), addOnPreMain(), adjascentGlobstarOptimize() (+207 more)
 
 ### Community 213 - "admin/index.ts"
 Cohesion: 0.50
@@ -1508,17 +1363,13 @@ Nodes (10): API clients, Auth, Key commands, Module architecture, Modules archit
 Cohesion: 0.29
 Nodes (7): 10. Documentation (Dynamic Forms), Amending a Submission, Creating Documentation, Form Definitions, Listing Forms, PDF Export, Viewing a Submission
 
-### Community 221 - "o9e"
-Cohesion: 0.07
-Nodes (48): Aa(), Ct(), dc(), Et(), hc(), ot(), kl(), mE() (+40 more)
+### Community 221 - "Aa"
+Cohesion: 0.08
+Nodes (55): Aa(), Ac(), bo(), bt(), ci(), Ct(), EE(), EP() (+47 more)
 
 ### Community 223 - "useOrderContext"
-Cohesion: 0.04
-Nodes (86): displayFor(), LoincTest, LoincTestSearch(), ClipboardListIcon(), COLUMNS, DashboardMetrics, LisOrdersDashboardPage(), MetricCardDef (+78 more)
-
-### Community 225 - "PosAuthGate.tsx"
-Cohesion: 0.54
-Nodes (5): PosAccessDenied(), PosAuthGate(), PosQuickLogin(), hasPosPermission(), Route
+Cohesion: 0.05
+Nodes (77): displayFor(), LoincTest, LoincTestSearch(), ClipboardListIcon(), COLUMNS, DashboardMetrics, LisOrdersDashboardPage(), MetricCardDef (+69 more)
 
 ### Community 226 - "POS Rules"
 Cohesion: 0.17
@@ -1532,9 +1383,9 @@ Nodes (11): 1. Basic Form with FormProvider, 2. Using useFormField Hook, 3. Usin
 Cohesion: 0.18
 Nodes (11): 11. Clinical Requests (Orders), Activity Timeline, Adding a Note, Creating a Request, Documentation Tab, Header, Line Items Tab, Re-syncing to External System (+3 more)
 
-### Community 229 - "shift"
-Cohesion: 0.12
-Nodes (21): addOnPostRun(), addOnPreRun(), bce(), [BN](), callRuntimeCallbacks(), Dce(), _emscripten_get_now(), _emscripten_set_main_loop() (+13 more)
+### Community 229 - "run"
+Cohesion: 0.06
+Nodes (44): addOnPostRun(), addOnPreRun(), ask(), [BN](), BS(), callRuntimeCallbacks(), definition(), definitions() (+36 more)
 
 ### Community 230 - "payment-providers/schema.ts"
 Cohesion: 0.21
@@ -1544,9 +1395,9 @@ Nodes (11): RxPaymentProvidersPage(), buildCreatePayload(), buildFormState(), bu
 Cohesion: 0.18
 Nodes (11): Cart Rules, Checkout Flow, Discounts, Inventory Validation, Multi Session POS, Payment Modal, POS REQUIREMENTS, Pricing (+3 more)
 
-### Community 233 - "@mantine/core"
-Cohesion: 0.02
-Nodes (237): @mantine/core, @mantine/form, @mantine/hooks, @mantine/notifications, @tanstack/react-query, AppointmentRowActions(), ConfirmState, useAppointmentMutation() (+229 more)
+### Community 233 - "getApiErrorMessage"
+Cohesion: 0.03
+Nodes (166): @mantine/form, @mantine/hooks, @mantine/notifications, @tanstack/react-query, AppointmentRowActions(), ConfirmState, useAppointmentMutation(), AppointmentForm() (+158 more)
 
 ### Community 236 - "FRONTEND MANUAL — Conversation Engine"
 Cohesion: 0.05
@@ -1556,17 +1407,13 @@ Nodes (44): 10. Exchanges (Message History), 11. Workflows, 12. Workflow Configu
 Cohesion: 0.20
 Nodes (10): 12. Navigation Patterns, 13. Tips & Shortcuts, 14. Troubleshooting, 15. Related Documentation, 1. What You Can Do, 2. Navigation, 6. Department Management, Department Picker (+2 more)
 
-### Community 238 - ".slice"
-Cohesion: 0.12
-Nodes (17): B5e(), captureString(), clean(), cse(), Dot(), f5e(), getLocalPath(), getLocatorUrl() (+9 more)
-
 ### Community 239 - "CLAUDE.md — Frontend Website Rules"
 Cohesion: 0.20
 Nodes (9): Always Do First, Anti-Generic Guardrails, Brand Assets, CLAUDE.md — Frontend Website Rules, Hard Rules, Local Server, Output Defaults, Reference Images (+1 more)
 
 ### Community 240 - "React CRUD Page — rxsoft-admin-3"
-Cohesion: 0.22
-Nodes (8): Inputs, Option B: Custom page (for complex UIs), Purpose, React CRUD Page — rxsoft-admin-3, Refactoring, When not to invoke, When to invoke, Workflow
+Cohesion: 0.29
+Nodes (6): Inputs, Purpose, React CRUD Page — rxsoft-admin-3, Refactoring, When not to invoke, When to invoke
 
 ### Community 241 - "4. Patient Management"
 Cohesion: 0.22
@@ -1581,76 +1428,44 @@ Cohesion: 0.22
 Nodes (9): 12. Communication, 13. Reports, 14. Tips & Shortcuts, 15. Troubleshooting, 16. Related Documentation, 1. What You Can Do, 2. Navigation, Conversation (+1 more)
 
 ### Community 245 - "On"
-Cohesion: 0.09
-Nodes (4): On(), pushNode(), removeNode(), unshiftNode()
+Cohesion: 0.07
+Nodes (6): Cdt(), On(), pushNode(), removeNode(), unshiftNode(), Vi()
 
 ### Community 252 - "bootstrap.ts"
 Cohesion: 0.26
 Nodes (9): ViewProvider(), ViewProviderContext, ViewProviderValue, AttributeDefinition, bootstrapKeys, fetchAttributeDefinitions(), useAttributeDefinitionsBootstrap(), AttributeStore (+1 more)
 
-### Community 285 - "mapToBase"
-Cohesion: 0.19
-Nodes (20): accessPromise(), accessSync(), chmodSync(), findMount(), getUnixMode(), linkSync(), lutimesSync(), makeCallSync() (+12 more)
-
-### Community 286 - "wishlist-store.ts"
-Cohesion: 0.50
-Nodes (3): useWishlistStore, WishlistItem, WishlistStore
-
-### Community 288 - "openSync"
-Cohesion: 0.16
-Nodes (20): checksumFilePromise(), closePromise(), closeSync(), createReadStream(), createWriteStream(), downloadBytes(), downloadFile(), ex() (+12 more)
+### Community 286 - "zustand"
+Cohesion: 0.18
+Nodes (7): zustand, EntityStore, RecentItem, RecentStore, useWishlistStore, WishlistItem, WishlistStore
 
 ### Community 289 - "rules"
 Cohesion: 0.09
 Nodes (21): extends, stylelint-config-standard-scss, rules, alpha-value-notation, color-function-notation, comment-empty-line-before, custom-property-empty-line-before, custom-property-pattern (+13 more)
 
-### Community 291 - "exec"
-Cohesion: 0.11
-Nodes (19): Dte(), eGe(), Ett(), exec(), hte(), Itt(), K5e(), nGe() (+11 more)
-
-### Community 292 - "create"
-Cohesion: 0.29
-Nodes (8): activatePlugin(), CEt(), create(), importSettings(), package(), preAuthEncoding(), prepare(), testify()
-
-### Community 293 - "error"
-Cohesion: 0.11
-Nodes (19): 5. Enforcement (so this never erodes), cancel(), error(), HSt(), LSt(), off(), qt(), removeListener() (+11 more)
-
 ### Community 297 - "types/schema.tsx"
-Cohesion: 0.09
-Nodes (22): buildPayload(), PendingPriceListEntry, PendingStockEntry, buildItemPayload(), buildItemUpdatePayload(), flattenOptionValue(), hasNumericValue(), itemColumns (+14 more)
-
-### Community 298 - ".read"
-Cohesion: 0.13
-Nodes (17): api(), c3(), default(), _getReaderOptions(), _getRootDirectory(), ggt(), hgt(), mgt() (+9 more)
+Cohesion: 0.06
+Nodes (36): buildPayload(), ImageUploader(), imageFields, ProductImagesTab(), ProductImagesTabProps, PendingPriceListEntry, PendingStockEntry, buildItemPayload() (+28 more)
 
 ### Community 299 - "compilerOptions"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, allowSyntheticDefaultImports, forceConsistentCasingInFileNames, isolatedModules, jsx, lib, module (+11 more)
 
-### Community 300 - "resolveEverything"
-Cohesion: 0.09
-Nodes (45): Bg(), catch(), d4(), te(), executeInteractive(), $Ge(), gw(), i1e() (+37 more)
-
-### Community 301 - "Ca"
-Cohesion: 0.05
-Nodes (49): _8e(), au(), B_e(), bU(), c_e(), Ca(), cx(), d_e() (+41 more)
+### Community 301 - "Rr"
+Cohesion: 0.06
+Nodes (46): _8e(), aUe(), B2(), B_e(), c_e(), Ca(), d_e(), dOe() (+38 more)
 
 ### Community 302 - "zod"
 Cohesion: 0.25
 Nodes (4): zod, SignIn(), Route, searchSchema
 
-### Community 305 - "split"
-Cohesion: 0.12
-Nodes (19): B7(), BK(), EPe(), filterChanges(), fromString(), kCt(), list(), OB() (+11 more)
-
 ### Community 307 - "render"
-Cohesion: 0.14
-Nodes (19): altDown(), altUp(), complete(), completion(), cutForward(), deleteForward(), element(), footer() (+11 more)
+Cohesion: 0.03
+Nodes (114): addChoice(), addWorkspace(), alert(), altDown(), altUp(), append(), backward(), cast() (+106 more)
 
 ### Community 329 - ".toString"
-Cohesion: 0.07
-Nodes (30): bIt(), Byt(), decode(), dyt(), f6e(), findGeneralName(), FIt(), FVe() (+22 more)
+Cohesion: 0.02
+Nodes (154): _2e(), _2t(), $5(), a(), A2t(), aBt(), addOption(), appendChar() (+146 more)
 
 ### Community 331 - "RxSoft Admin 3"
 Cohesion: 0.22
@@ -1659,10 +1474,6 @@ Nodes (8): Architecture Patterns, Path Aliases, Project Structure, Quick Start, 
 ### Community 333 - "8. Financial Accounting"
 Cohesion: 0.22
 Nodes (9): 8. Financial Accounting, Balance Sheet, GL Accounts (General Ledger), Income Statement, Journal Entries, Journal Entry Lines, Journals, Receivables (+1 more)
-
-### Community 336 - "rxsoft/pages/orders/index.tsx"
-Cohesion: 0.10
-Nodes (19): columns, createFieldGroups, rowActions, samplesConfig, ORDER_LISTING_TABS, ORDER_STATUS_COLORS, orderColumns, OrderListingTab (+11 more)
 
 ### Community 337 - "10. Technical Requirements"
 Cohesion: 0.22
@@ -1682,15 +1493,15 @@ Nodes (8): 6. Sales & Purchases, Purchases, Purchases Analytics, Receiving (Good
 
 ### Community 343 - "users.ts"
 Cohesion: 0.07
-Nodes (24): IdentityLocationsPage(), IdentityOrganizationsPage(), IdentityRolesPage(), IdentityUsersPage(), columns, createFields, identityLocationsConfig, columns (+16 more)
+Nodes (23): IdentityLocationsPage(), IdentityOrganizationsPage(), IdentityRolesPage(), IdentityUsersPage(), columns, createFields, identityLocationsConfig, columns (+15 more)
 
 ### Community 344 - "rxsoft/types.ts"
 Cohesion: 0.02
-Nodes (92): CodedGenericDrugsPage(), columns, createFields, genericDrugsConfig, CodedPharmaceuticsPage(), buildCreatePayload(), buildUpdatePayload(), codedPharmaceuticsConfig (+84 more)
+Nodes (90): columns, conceptFields, conceptsEndpoint, config, CodedGenericProductsPage(), columns, createFields, genericProductsConfig (+82 more)
 
-### Community 345 - "emr-real.spec.ts"
-Cohesion: 0.04
-Nodes (47): global-setup artifact check: stale endpoints + bare-array responses misread, C16 — emr-real identity probe requires a `/health` route identity doesn't have, __dirname, EmrOrgState, ORG_STATE_PATH, probe(), probeIdentity(), probeIdentityStable() (+39 more)
+### Community 345 - "provision.ts"
+Cohesion: 0.10
+Nodes (22): globalTeardown(), buildAndDirectSubmitPo(), enterReceiptAndLineValues(), escapeRegex(), fillNumberInput(), lineInput(), ListRow, loadPoFromSelect() (+14 more)
 
 ### Community 347 - "✨ Feature Highlights"
 Cohesion: 0.33
@@ -1725,8 +1536,8 @@ Cohesion: 0.29
 Nodes (7): 5. Inventory Management, Inventory, Receiving, Stock Balances, Stock Locations, Stock Movements, Warehouses
 
 ### Community 360 - "Gk"
-Cohesion: 0.06
-Nodes (41): A4(), c0(), cxe(), dae(), dB(), Dje(), E4(), f0() (+33 more)
+Cohesion: 0.09
+Nodes (26): A4(), cxe(), dae(), Dje(), E4(), f0(), fae(), _fillStorage() (+18 more)
 
 ### Community 361 - "locator/facility-locator.tsx"
 Cohesion: 0.23
@@ -1760,10 +1571,6 @@ Nodes (6): 11. Tips & Shortcuts, 12. Troubleshooting, 13. Related Documentation,
 Cohesion: 0.33
 Nodes (6): 10. Administration, Audit Logs, Branches, Organizations, Roles, Users
 
-### Community 372 - "resolve"
-Cohesion: 0.13
-Nodes (19): choiceMessage(), choiceSeparator(), getResolverByLocator(), indent(), indicator(), [iT](), lre(), normalizeDependencyMap() (+11 more)
-
 ### Community 374 - "$conversationId.tsx"
 Cohesion: 0.40
 Nodes (4): DetailRow(), RxConversationDetailsPage(), ConversationDetailsRoute(), Route
@@ -1792,81 +1599,25 @@ Nodes (13): 10. Damorex — 48 tests (project `public`), 11. Clerk & Questionnai
 Cohesion: 0.15
 Nodes (13): 10. Damorex (34 pages, ~42 use cases) — **public**, 11. Clerk & Questionnaire (5 use cases), 1. Auth & Root (13 use cases), 2. APM — Public Website (12 pages, 12 use cases) — OUT OF SCOPE (historical), 3. APM — Admin (17 pages, 18 use cases) — OUT OF SCOPE (historical), 4. RxSoft (44 routes, ~52 use cases), 5. EMR (7 pages, ~8 use cases) — **admin**, backend `:8093`, 6. LIS (38 pages, ~45 use cases) — **admin**, backend `:8002` (+5 more)
 
-### Community 390 - "team-switcher.tsx"
-Cohesion: 0.20
-Nodes (11): ModuleLandingPage(), ModuleGrid(), ModuleGridProps, resolvePostLoginTarget(), moduleIcons, modulePlans, TeamSwitcher(), toTeams() (+3 more)
+### Community 391 - "ip"
+Cohesion: 0.19
+Nodes (19): aRe(), axe(), dMe(), Ff(), fOe(), fte(), hz(), ip() (+11 more)
 
-### Community 391 - "fte"
-Cohesion: 0.18
-Nodes (18): axe(), dMe(), Ff(), fOe(), fte(), hz(), jte(), jU() (+10 more)
-
-### Community 396 - "inventory/utils.ts"
-Cohesion: 0.70
-Nodes (3): uomEffectiveFactor(), UomFactorInfo, uomToBaseQuantity()
-
-### Community 397 - "pM"
-Cohesion: 0.11
-Nodes (18): BKe(), dM(), dre(), eTe(), gLe(), gre(), hre(), jRe() (+10 more)
-
-### Community 398 - "reduce"
-Cohesion: 0.15
-Nodes (17): addOption(), e1t(), Gwt(), jwt(), Kwt(), LBe(), Lwt(), Mwt() (+9 more)
-
-### Community 399 - "writeFileSync"
-Cohesion: 0.18
-Nodes (17): appendFileSync(), changeFileBufferSync(), changeFileSync(), changeFileTextSync(), copyFileSync(), fsMapToBase(), hydrateDirectory(), ue() (+9 more)
-
-### Community 400 - "reportInfo"
-Cohesion: 0.29
-Nodes (17): commit(), finalize(), formatIndent(), formatName(), formatNameWithHyperlink(), formatPrefix(), Iy(), Qvt() (+9 more)
-
-### Community 401 - "submit"
-Cohesion: 0.17
-Nodes (15): cast(), decrement(), _g(), initialize(), isFalse(), isTrue(), isValue(), prev() (+7 more)
-
-### Community 402 - "verify"
-Cohesion: 0.17
-Nodes (15): _2t(), A2t(), downloadTarget(), Ebe(), findCachedTarget(), generateTargetPath(), uvt(), vbe() (+7 more)
-
-### Community 403 - "alert"
-Cohesion: 0.25
-Nodes (15): alert(), append(), backward(), disable(), dispatch(), forward(), getItem(), increment() (+7 more)
-
-### Community 404 - "PROPOSED TICKET (Mac agent: file if agreed — evidence below)"
-Cohesion: 0.25
-Nodes (9): Board updates queue — for the scrum-master agent, Done log, Format, PROPOSED TICKET (Mac agent: file if agreed — evidence below), clickSaveConfiguration(), pickFirstConfigEntity(), validatePricingRow(), validateStockRow() (+1 more)
-
-### Community 405 - "K5"
-Cohesion: 0.13
-Nodes (13): Bc(), Bje(), jot(), K5(), kje(), Pje(), QC(), Qje() (+5 more)
-
-### Community 406 - "concat"
-Cohesion: 0.13
-Nodes (14): concat(), e7e(), first(), FJe(), ist(), map(), Pwe(), Q2e() (+6 more)
-
-### Community 407 - "_filter"
-Cohesion: 0.13
-Nodes (15): _createIndexRecord(), _filter(), _getEntryLevel(), getFilter(), _getMatcher(), _getNegativePatternsRe(), _isDuplicateEntry(), _isMatchToPatterns() (+7 more)
+### Community 404 - "items-wizard.spec.ts"
+Cohesion: 0.24
+Nodes (10): Done log, PROPOSED TICKET (Mac agent: file if agreed — evidence below), pickSuggestion(), saveStepOneAndUnlock(), stepButton(), stepToLastTab(), clickSaveConfiguration(), pickFirstConfigEntity() (+2 more)
 
 ### Community 408 - "Playwright E2E — handover & status (read this first in a fresh session)"
 Cohesion: 0.17
 Nodes (12): 0. Orientation (30 seconds), 1. Merged state (safe ground), 2.2 rxsoft working tree (on branch `phase-1-pricing-patch`, which is also **1 commit ahead of origin**), 2.3 ⛔ DO NOT TOUCH — user's in-flight POS work (uncommitted), 2. Landed in this session — **UNCOMMITTED** (verify with `git status` first!), 3. Verification state & next actions (in order), 4. Going forward — phase plan, 5. Environment & machine quirks (this Mac) (+4 more)
-
-### Community 409 - "sort"
-Cohesion: 0.17
-Nodes (15): dK(), EB(), generateLockfile(), Iae(), install(), mg(), P4(), P5() (+7 more)
 
 ### Community 410 - "7. Customers & Pricing"
 Cohesion: 0.40
 Nodes (5): 7. Customers & Pricing, Customers, Insurance Providers, Price List Items, Price Lists
 
 ### Community 411 - "compile"
-Cohesion: 0.21
-Nodes (14): C1 — `routeTree.gen.ts` regenerates unformatted during `vite build`, aRe(), build(), command(), commands(), compile(), cqe(), Fu() (+6 more)
-
-### Community 412 - "pricing-matrix-helper.ts"
-Cohesion: 0.18
-Nodes (9): buildCreatePricePayload(), buildUpdatePriceEndpoint(), buildUpdatePricePayload(), getRowsFromResponse(), ItemPriceItem, mergePricingLists(), persistPricingRow(), PriceList (+1 more)
+Cohesion: 0.26
+Nodes (12): C1 — `routeTree.gen.ts` regenerates unformatted during `vite build`, build(), command(), commands(), compile(), cqe(), Fu(), ire() (+4 more)
 
 ### Community 420 - "AUTHENTICATION"
 Cohesion: 0.40
@@ -1941,68 +1692,16 @@ Cohesion: 0.20
 Nodes (9): background_color, description, display, icons, name, scope, short_name, start_url (+1 more)
 
 ### Community 484 - "showSubmittedData"
-Cohesion: 0.20
-Nodes (11): AccountForm(), onSubmit(), accountFormSchema, AccountFormValues, defaultValues, languages, AppearanceForm(), onSubmit() (+3 more)
-
-### Community 485 - "$exchangeId.tsx"
-Cohesion: 0.40
-Nodes (4): DetailRow(), RxExchangeDetailsPage(), ExchangeDetailsRoute(), Route
-
-### Community 486 - "PosSettingsDrawer.tsx"
 Cohesion: 0.21
-Nodes (12): useCustomers(), useDispenseOrders(), usePriceLists(), useStockLocations(), useUpdateUserPosConfig(), useUserPosConfig(), FindState, PosSettingsDrawer() (+4 more)
-
-### Community 494 - "from"
-Cohesion: 0.14
-Nodes (13): _2e(), Adt(), BGe(), fdt(), from(), kBe(), Mmt(), pdt() (+5 more)
-
-### Community 495 - "ape"
-Cohesion: 0.20
-Nodes (13): ape(), finally(), gtt(), jtt(), kj(), kR(), lv(), pipeTo() (+5 more)
+Nodes (10): onSubmit(), AccountForm(), onSubmit(), accountFormSchema, AccountFormValues, defaultValues, languages, defaultValues (+2 more)
 
 ### Community 496 - "Task: QA coverage — branch ↔ stock-location link & per-branch storefront stock (rxsoft#20 slice 1)"
 Cohesion: 0.22
 Nodes (8): 1. What shipped (2026-10-16, slice 1 of #20), 2. NOT shipped yet (do not write UI e2e for these), 3. Test cases, 4. Documented skip gates (C12), 5. Where the specs live, 6. Estimate, Board note, Task: QA coverage — branch ↔ stock-location link & per-branch storefront stock (rxsoft#20 slice 1)
 
-### Community 497 - "run"
-Cohesion: 0.21
-Nodes (13): ask(), definition(), definitions(), format(), getUsageByIndex(), getUsageByRegistration(), inc(), limit() (+5 more)
-
-### Community 498 - "once"
-Cohesion: 0.24
-Nodes (14): _beforeError(), [C6](), connect(), createConnection(), _finalizeBody(), ket(), _lockWrite(), _makeRequest() (+6 more)
-
-### Community 499 - "isDisabled"
-Cohesion: 0.20
-Nodes (14): choices(), down(), focus(), isDisabled(), K0e(), pageDown(), pageUp(), scrollDown() (+6 more)
-
-### Community 500 - "aBt"
-Cohesion: 0.18
-Nodes (13): aBt(), compareDigest(), compareSignature(), fBt(), hBt(), iBt(), lBt(), mBt() (+5 more)
-
-### Community 501 - "demangle"
-Cohesion: 0.18
-Nodes (13): demangle(), demangleAll(), HEAPU8(), intArrayFromString(), jsStackTrace(), lengthBytesUTF8(), Pointer_stringify(), pushCString() (+5 more)
-
-### Community 502 - "preorderDepthFirstWalk"
-Cohesion: 0.23
-Nodes (13): getTargetInfo(), isDelegatedPath(), loadLocalMetadata(), loadRoot(), loadSnapshot(), loadTargets(), loadTimestamp(), persistMetadata() (+5 more)
-
 ### Community 503 - "use-sales-analytics.ts"
-Cohesion: 0.24
-Nodes (9): fetchOptions(), FilterOption, normalizeList(), PurchasesAnalyticsFilters, usePurchasesAnalyticsFilterOptions(), SalesAnalyticsFilters, useSalesAnalyticsFilterOptions(), PurchasesAnalytics (+1 more)
-
-### Community 504 - "number"
-Cohesion: 0.20
-Nodes (8): insert(), keypress(), normalizeArguments(), number(), paste(), q0t(), UEt(), xet()
-
-### Community 505 - "removeSync"
-Cohesion: 0.21
-Nodes (12): [B6](), cLe(), deleteEntry(), mktempSync(), removeSync(), rmdirSync(), rmSync(), rmtempSync() (+4 more)
-
-### Community 506 - "Wht"
-Cohesion: 0.20
-Nodes (12): C1e(), Ght(), Kht(), qht(), Vht(), Wht(), writeFile(), WW() (+4 more)
+Cohesion: 0.36
+Nodes (6): fetchOptions(), FilterOption, normalizeList(), SalesAnalyticsFilters, useSalesAnalyticsFilterOptions(), SalesAnalytics
 
 ### Community 513 - "APPLICATION STRUCTURE"
 Cohesion: 0.67
@@ -2052,17 +1751,9 @@ Nodes (3): 9. Inventory Integration, Possible Integration Methods, Required Inte
 Cohesion: 0.67
 Nodes (3): Damorex Online Pharmacy Platform, Project Information, Software Requirements Specification (SRS)
 
-### Community 525 - "resolveFilename"
-Cohesion: 0.26
-Nodes (10): getFileSource(), mapFromBase(), Qdt(), readFileBuffer(), readlinkPromise(), realpathPromise(), realpathSync(), resolveFilename() (+2 more)
-
 ### Community 527 - "Task: data-testid on all UI elements + testid-first e2e selectors"
 Cohesion: 0.25
 Nodes (8): 1. Why, 2. Naming convention (canonical), 3.1 Covered (keep, align to convention), 3.2 Gaps (must add), 3. Audit — current coverage, 6. Acceptance criteria, 7. Estimate, Task: data-testid on all UI elements + testid-first e2e selectors
-
-### Community 530 - "toDER"
-Cohesion: 0.24
-Nodes (11): appendChar(), appendUint16(), appendUint24(), appendView(), clone(), copyIn(), dEt(), ensureCapacity() (+3 more)
 
 ### Community 540 - "renovate.json"
 Cohesion: 0.22
@@ -2080,13 +1771,9 @@ Nodes (9): MessageStatus, ACKNOWLEDGED, FAILED, MAPPING, PARSED, RECEIVED, ROUTI
 Cohesion: 0.31
 Nodes (7): RxCouponsPage(), buildCreatePayload(), buildUpdatePayload(), columns, couponsConfig, createFields, toNumber()
 
-### Community 549 - "Lwe"
-Cohesion: 0.22
-Nodes (11): cht(), cq(), gF(), hF(), lht(), lq(), Lwe(), mht() (+3 more)
-
-### Community 554 - "Orphaned E2E org — detection & manual cleanup"
-Cohesion: 0.25
-Nodes (7): 1. Detect, 2. Why the API can't clean it, 3. Scope it — always before deleting, 4. Cleanup, 5. Verify, 6. Gotchas hit while doing this, Orphaned E2E org — detection & manual cleanup
+### Community 554 - "playwright_e2e.md"
+Cohesion: 0.14
+Nodes (9): Board updates queue — for the scrum-master agent, Format, 1. Detect, 2. Why the API can't clean it, 3. Scope it — always before deleting, 4. Cleanup, 5. Verify, 6. Gotchas hit while doing this (+1 more)
 
 ### Community 555 - "Field Editor"
 Cohesion: 0.25
@@ -2100,10 +1787,6 @@ Nodes (16): getLocalityOptions(), getWardOptions(), NearbyPharmacyRecord, Pharma
 Cohesion: 0.25
 Nodes (4): RouteStatus, ACTIVE, DELETED, INACTIVE
 
-### Community 562 - "pop"
-Cohesion: 0.18
-Nodes (11): createEntry(), cutLeft(), [Gj](), GSe(), jSe(), lSe(), pop(), qSe() (+3 more)
-
 ### Community 564 - "website-delivery-areas/schema.ts"
 Cohesion: 0.32
 Nodes (6): RxWebsiteDeliveryAreasPage(), buildPayload(), columns, createFields, deliveryAreasConfig, toNumber()
@@ -2112,165 +1795,49 @@ Nodes (6): RxWebsiteDeliveryAreasPage(), buildPayload(), columns, createFields, 
 Cohesion: 0.29
 Nodes (5): Challenge Index, Challenges · Blockers · Resolutions, Convention, Rules, Why
 
-### Community 576 - "parse"
-Cohesion: 0.27
-Nodes (11): fromGlob(), getBlock(), getUint16(), getUint8(), JDe(), lyt(), p9(), parse() (+3 more)
-
 ### Community 577 - "ProtocolType"
 Cohesion: 0.29
 Nodes (6): ProtocolType, CUSTOM_JSON, FHIR_R4, HL7_V2, HTTP, TCP
 
-### Community 581 - "selectors.ts"
-Cohesion: 0.40
-Nodes (5): generalErrorBody(), generalErrorH1(), notFoundBody(), notFoundButtons(), notFoundH1()
+### Community 584 - "offline-sales.ts"
+Cohesion: 0.18
+Nodes (13): createSale(), salesKeys, HeldSalesDrawer(), Props, createEmptySession(), generateSaleCode(), getLineTotal(), OfflineSaleRecord (+5 more)
 
-### Community 584 - "usePosStore.ts"
-Cohesion: 0.31
-Nodes (8): HeldSalesDrawer(), Props, createEmptySession(), generateSaleCode(), getLineTotal(), OfflineSaleRecord, OfflineSaleStatus, usePosStore
+### Community 588 - "@mantine/core"
+Cohesion: 0.02
+Nodes (148): @mantine/core, @mantine/dates, react, adminNavItems, Concepts(), CodedDrugClassificationDetailPage(), LinkList(), Relations (+140 more)
 
-### Community 585 - "eUe"
-Cohesion: 0.22
-Nodes (10): aUe(), BUe(), cUe(), eUe(), lUe(), oUe(), rUe(), vUe() (+2 more)
-
-### Community 586 - "vse"
-Cohesion: 0.20
-Nodes (10): bse(), Dse(), i7e(), n7e(), o7e(), Pse(), r7e(), s7e() (+2 more)
-
-### Community 587 - "shared/types.ts"
-Cohesion: 0.22
-Nodes (3): DataTableColumn, ModuleAwareProps, SharedLayoutProps
-
-### Community 588 - "rxsoft-api.ts"
-Cohesion: 0.03
-Nodes (99): @mantine/dates, buildEffectDependencies(), FieldGroupEngine(), LocalRowsDisplay(), FormContextGeneric, FormProvider(), useFieldArray(), useFormContext() (+91 more)
-
-### Community 589 - "kg"
-Cohesion: 0.25
-Nodes (9): $5e(), e9e(), kg(), MU(), q5e(), Qte(), r9e(), t9e() (+1 more)
-
-### Community 591 - "Endpoints"
-Cohesion: 0.25
-Nodes (8): 4. Using the HTTP API, Endpoints, Health Check, Response Format, Run a Single Entity, Run a Specific Target, Run All Imports, Start the Service
+### Community 590 - "create"
+Cohesion: 0.14
+Nodes (11): activatePlugin(), CEt(), create(), importSettings(), JEt(), package(), preAuthEncoding(), prepare() (+3 more)
 
 ### Community 592 - "AEStatus"
 Cohesion: 0.33
 Nodes (5): AEStatus, ACTIVE, ERROR, INACTIVE, MAINTENANCE
 
 ### Community 593 - "orders/schema.ts"
-Cohesion: 0.32
-Nodes (5): columns, ordersConfig, tabGroups, toApiPayload(), unwrapOption()
-
-### Community 594 - "display-form.tsx"
-Cohesion: 0.32
-Nodes (6): defaultValues, DisplayForm(), displayFormSchema, DisplayFormValues, items, SettingsDisplay()
-
-### Community 595 - "ah"
-Cohesion: 0.32
-Nodes (4): ah(), F2e(), _flush(), Sgt()
+Cohesion: 0.28
+Nodes (6): LisOrdersPage(), columns, ordersConfig, tabGroups, toApiPayload(), unwrapOption()
 
 ### Community 596 - "ome"
-Cohesion: 0.25
-Nodes (8): BMe(), Gme(), Kme(), ome(), S9(), w9(), Wme(), Yme()
+Cohesion: 0.11
+Nodes (18): B9(), BMe(), FW(), Gme(), jat(), Kme(), Nwe(), oht() (+10 more)
 
 ### Community 597 - "GitHub Tracker Manifest — RxSoft Alpha Test Plan"
 Cohesion: 0.40
 Nodes (4): Entities, Epics, GitHub Tracker Manifest — RxSoft Alpha Test Plan, Totals
 
-### Community 598 - "gte"
-Cohesion: 0.25
-Nodes (8): Bz(), cFe(), gte(), kTe(), lFe(), [mm](), mTe(), yM()
-
-### Community 599 - "setTimeout"
-Cohesion: 0.29
-Nodes (8): clearProgress(), refreshProgress(), setTimeout(), sweep(), _tick(), toggleLightGC(), writeLines(), writeProgress()
-
-### Community 600 - "encode"
-Cohesion: 0.29
-Nodes (4): [Cv](), encode(), encodeBody(), encodeField()
-
-### Community 601 - "_handleEntry"
-Cohesion: 0.29
-Nodes (8): _emitEntry(), _handleDirectory(), _handleEntry(), _handleError(), _handleQueue(), _pushToQueue(), _pushToStorage(), _worker()
-
-### Community 602 - "$H"
-Cohesion: 0.32
-Nodes (8): FQ(), $H(), ij(), sj(), Stt(), vtt(), wB(), Yk()
-
-### Community 603 - "request"
-Cohesion: 0.25
-Nodes (8): FW(), Nwe(), oht(), Pvt(), request(), resolveVirtual(), send(), zT()
-
-### Community 604 - "5. Source Types"
-Cohesion: 0.29
-Nodes (7): 5. Source Types, `all`, `csv`, `google`, `inline`, `json`, uniqueKey()
-
-### Community 605 - "appearance-form.tsx"
-Cohesion: 0.33
-Nodes (5): fonts, useFont(), useTheme(), appearanceFormSchema, AppearanceFormValues
-
 ### Community 606 - "notifications-form.tsx"
 Cohesion: 0.38
 Nodes (5): defaultValues, NotificationsForm(), notificationsFormSchema, NotificationsFormValues, SettingsNotifications()
 
-### Community 607 - "SetPriceModal.tsx"
-Cohesion: 0.29
-Nodes (6): ItemWithUoms, PriceListItem, Props, SetPriceModal(), UomData, UomInfo
-
-### Community 608 - "register"
-Cohesion: 0.29
-Nodes (6): addPath(), commitBuffer(), pushBuffer(), pushExternal(), register(), setContext()
-
-### Community 609 - "[ehe]"
-Cohesion: 0.29
-Nodes (7): aHe(), cHe(), [ehe](), lHe(), oHe(), ug(), uHe()
-
-### Community 610 - "stat"
-Cohesion: 0.38
-Nodes (7): AQ(), aze(), Fle(), lze(), nle(), s3(), stat()
-
-### Community 612 - "pI"
-Cohesion: 0.43
-Nodes (7): B8(), LB(), Lce(), Oce(), pI(), Uce(), v8()
-
-### Community 613 - "P2e"
-Cohesion: 0.33
-Nodes (6): cN(), fgt(), P2e(), pgt(), rgt(), x2e()
-
-### Community 615 - "Lg"
-Cohesion: 0.29
-Nodes (5): dht(), GWe(), jWe(), Lg(), qWe()
-
-### Community 616 - "exit"
-Cohesion: 0.29
-Nodes (7): evt(), exit(), ExitStatus(), Fvt(), ivt(), rvt(), xBt()
-
-### Community 617 - "start"
-Cohesion: 0.29
-Nodes (7): EZ(), Jg(), start(), stop(), uit(), Xhe(), zhe()
-
-### Community 618 - "8. Behavior Details"
-Cohesion: 0.33
-Nodes (6): 8. Behavior Details, Idempotency, NOT_FOUND Handling, Organization Scoping, Relation Resolution, Soft Delete
+### Community 619 - "user-auth-form.tsx"
+Cohesion: 0.13
+Nodes (14): formSchema, SocialIconFacebook(), SocialIconGoogle(), UserAuthForm(), handleSocial(), UserAuthFormProps, FACEBOOK_APP_ID, FacebookGlobal (+6 more)
 
 ### Community 620 - "user-management.tsx"
 Cohesion: 0.40
 Nodes (5): Route, Unauthorized(), User, UserManagement(), users
-
-### Community 621 - "equals"
-Cohesion: 0.40
-Nodes (6): buildPaths(), checkPath(), equals(), findIssuer(), H2t(), N2t()
-
-### Community 622 - "Cpe"
-Cohesion: 0.33
-Nodes (6): Cpe(), ltt(), NK(), Qj(), tUe(), ZE()
-
-### Community 623 - "isContextSpecific"
-Cohesion: 0.33
-Nodes (6): extensionsObj(), findSequenceMember(), isContextSpecific(), keyIdentifier(), signedAttrsObj(), signedDataObj()
-
-### Community 624 - "wvt"
-Cohesion: 0.33
-Nodes (6): hexDigest(), Pmt(), Rbe(), sc(), Vvt(), wvt()
 
 ### Community 625 - "pages/departments/index.tsx"
 Cohesion: 0.50
@@ -2296,197 +1863,37 @@ Nodes (3): DischargesPage(), dischargesConfig, Route
 Cohesion: 0.50
 Nodes (3): WardsPage(), wardsConfig, Route
 
-### Community 631 - "product-images-tab.tsx"
-Cohesion: 0.50
-Nodes (4): ImageUploader(), imageFields, ProductImagesTab(), ProductImagesTabProps
-
 ### Community 632 - "VerifyEmailPage"
-Cohesion: 0.50
-Nodes (4): renderErrorState(), VerifyEmailPage(), Route, VerifyEmailRoute()
-
-### Community 633 - "a"
-Cohesion: 0.60
-Nodes (5): a(), isEnd(), isStart(), toMMPattern(), toRegExpSource()
-
-### Community 634 - "toChoice"
-Cohesion: 0.40
-Nodes (5): addChoice(), isChoice(), isSelected(), newItem(), toChoice()
-
-### Community 635 - "unref"
-Cohesion: 0.40
-Nodes (5): addListener(), createWorker(), makeInterval(), registerChangeListener(), unref()
-
-### Community 636 - "aFe"
-Cohesion: 0.40
-Nodes (5): aFe(), dFe(), hFe(), oFe(), pFe()
-
-### Community 637 - "kKe"
-Cohesion: 0.40
-Nodes (5): ale(), kKe(), f(), h(), lLe()
-
-### Community 638 - "ave"
-Cohesion: 0.40
-Nodes (5): ave(), isOctetString(), parseBuffer(), seek(), sve()
-
-### Community 639 - "jat"
-Cohesion: 0.40
-Nodes (5): B9(), jat(), Ume(), v9(), Vat()
-
-### Community 640 - "cBt"
-Cohesion: 0.40
-Nodes (5): BBt(), cBt(), validForDate(), wBt(), X2t()
-
-### Community 641 - "lm"
-Cohesion: 0.60
-Nodes (5): Bj(), fpe(), lm(), ov(), xR()
-
-### Community 642 - "_dt"
-Cohesion: 0.40
-Nodes (4): C2e(), _dt(), f(), zdt()
+Cohesion: 0.67
+Nodes (3): VerifyEmailPage(), Route, VerifyEmailRoute()
 
 ### Community 643 - "FileRoutesByPath"
-Cohesion: 0.02
-Nodes (121): Route, Route, Route, Route, Route, Route, Route, Route (+113 more)
-
-### Community 644 - "S1t"
-Cohesion: 0.50
-Nodes (4): enable(), S1t(), c(), f()
-
-### Community 645 - "[Gp]"
-Cohesion: 0.40
-Nodes (5): [Gp](), ile(), oke(), SKe(), Vd()
-
-### Community 646 - "y$"
-Cohesion: 0.40
-Nodes (5): o6e(), sync(), t6e(), v_e(), y$()
-
-### Community 647 - "2. Root-cause investigation (verified against source)"
-Cohesion: 0.50
-Nodes (4): 2.1 The validation machinery exists but is bypassed on submit, 2.2 Secondary contributors, 2. Root-cause investigation (verified against source), FormProviderProps
+Cohesion: 0.01
+Nodes (67): AdminLayout(), RxAIProcessorsPage(), RxInvitesPage(), RxOptionListsPage(), Route, Route, Route, Route (+59 more)
 
 ### Community 648 - "7.7 Delivery System"
 Cohesion: 0.67
 Nodes (3): 7.7 Delivery System, Delivery Coverage, Features
 
-### Community 650 - "a8e"
-Cohesion: 0.50
-Nodes (4): a8e(), j8e(), l8e(), o8e()
-
-### Community 651 - "b2t"
-Cohesion: 0.50
-Nodes (4): b2t(), getTarget(), P2t(), WDe()
-
-### Community 652 - "Ect"
-Cohesion: 0.50
-Nodes (4): CCt(), Ect(), ICt(), wCt()
-
-### Community 653 - "compare"
-Cohesion: 0.50
-Nodes (4): compare(), compareMain(), comparePre(), g8()
-
-### Community 654 - "e3e"
-Cohesion: 0.50
-Nodes (4): e3e(), px(), w3e(), z4e()
-
-### Community 658 - "wdt"
-Cohesion: 0.50
-Nodes (4): fd(), gdt(), n2e(), wdt()
-
-### Community 659 - "getProjectDatabase"
-Cohesion: 0.50
-Nodes (4): fullSource(), getDeclarations(), getProjectDatabase(), V0()
-
-### Community 663 - "toDate"
-Cohesion: 0.50
-Nodes (4): genTime(), notAfter(), notBefore(), toDate()
-
-### Community 664 - "Got"
-Cohesion: 0.50
-Nodes (4): getWorkspaceByFilePath(), Got(), Oge(), tryWorkspaceByFilePath()
-
-### Community 665 - "y4"
-Cohesion: 0.50
-Nodes (4): lae(), oae(), V4(), y4()
-
-### Community 666 - "pushPointer"
-Cohesion: 0.50
-Nodes (4): push64(), pushMutablePointer(), pushPointer(), pushValue()
-
-### Community 667 - "YBe"
-Cohesion: 0.50
-Nodes (4): Vmt(), YBe(), Ymt(), zmt()
-
-### Community 671 - "release"
-Cohesion: 0.67
-Nodes (3): addOrCreate(), release(), U()
-
-### Community 672 - "addPositional"
-Cohesion: 0.67
-Nodes (3): addPositional(), addProxy(), addRest()
-
-### Community 673 - "[Lpe]"
-Cohesion: 0.67
-Nodes (3): aMe(), [Lpe](), UK()
-
-### Community 674 - "c8e"
-Cohesion: 0.67
-Nodes (3): c8e(), s8e(), w8e()
-
-### Community 675 - "toBoolean"
-Cohesion: 0.67
-Nodes (3): critical(), isCA(), toBoolean()
-
-### Community 676 - "Qf"
-Cohesion: 0.67
-Nodes (3): d1e(), Qf(), reportInfoOnce()
-
-### Community 677 - "getConditions"
-Cohesion: 0.67
-Nodes (3): getConditions(), Qce(), y8()
-
-### Community 678 - "getWorkspaceByCwd"
-Cohesion: 0.67
-Nodes (3): getWorkspaceByCwd(), topLevelWorkspace(), tryWorkspaceByCwd()
-
-### Community 679 - "hasDependency"
-Cohesion: 0.67
-Nodes (3): hasDependency(), hasHardDependency(), hasSoftDependency()
-
-### Community 680 - "imt"
-Cohesion: 0.67
-Nodes (3): imt(), omt(), smt()
-
-### Community 681 - "kBt"
-Cohesion: 0.67
-Nodes (3): kBt(), QBt(), RBt()
-
-### Community 682 - "L2t"
-Cohesion: 0.67
-Nodes (3): L2t(), XDe(), ZDe()
-
-### Community 683 - "toInteger"
-Cohesion: 0.67
-Nodes (3): pathLenConstraint(), toInteger(), version()
-
 ## Knowledge Gaps
-- **2932 isolated node(s):** `$schema`, `paths`, `config`, `parameters`, `globalTypes` (+2927 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3930 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **260 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2949 isolated node(s):** `$schema`, `paths`, `config`, `parameters`, `globalTypes` (+2944 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 3949 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **236 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `b()` connect `y` to `D`, `resolveEverything`, `submit`, `ls`, `yarn-4.14.1.cjs`, `jt`, `o9e`, `permission-picker.tsx`?**
-  _High betweenness centrality (0.124) - this node is a cross-community bridge._
+- **Why does `b()` connect `F` to `ls`, `render`, `test`, `yarn-4.14.1.cjs`, `Aa`, `permission-picker.tsx`?**
+  _High betweenness centrality (0.117) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `DataPageShell()` (e.g. with `Dynamic CRUD system` and `Option A: Dynamic CRUD via ModelConfig (preferred for simple resources)`) actually correct?**
   _`DataPageShell()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `paths`, `config` to the rest of the system?**
-  _2932 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _2949 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `routeTree.gen.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.005479452054794521 - nodes in this community are weakly interconnected._
-- **Why does `@mantine/core` connect `@mantine/core` to `apm/website/layout.tsx`, `DataPageShell`, `lis/pages/index.ts`, `chat-ui-page.tsx`, `@tanstack/react-router`, `roles/schema.tsx`, `react`, `form-builder-modal.tsx`, `coding-concept/pages/index.ts`, `RxPage`, `payload-utils.ts`, `useAuthStore`, `Field`, `questionnaire/index.tsx`, `shop/website/components.tsx`, `module-context.tsx`, `pages/website-orders/index.tsx`, `conversation-page-schemas.tsx`, `admin-hooks.ts`, `LgasPage.tsx`, `app-sidebar.tsx`, `po/purchases.tsx`, `sales-analytics/index.tsx`, `locator/pharmacy-locator.tsx`, `mapping.tsx`, `$moduleId/$page/$id.tsx`, `dermatome-map.tsx`, `apm/page.tsx`, `conversation/components/shared.tsx`, `routing.model.ts`, `package.json`, `posApi.ts`, `StakeholdersPage.tsx`, `usePosStore.ts`, `notifications/api.ts`, `rxsoft-api.ts`, `emr/pages/dashboard-page.tsx`, `rxsoft/pages/index.ts`, `locator-map.tsx`, `display-form.tsx`, `vitest`, `ContentSection`, `dashboard/pages/dashboard-page.tsx`, `appearance-form.tsx`, `ModuleDashboardPage`, `user-insights/api.ts`, `notifications-form.tsx`, `SetPriceModal.tsx`, `user-management.tsx`, `body-map.tsx`, `product-images-tab.tsx`, `Concept Details`, `permission-picker.tsx`, `format-annotate.ts`, `PoLinesTable.tsx`, `pos/pos.tsx`, `ListeningPage.tsx`, `ModelConfig`, `shop/pos2.tsx`, `layout/types.ts`, `preview.tsx`, `GotvPage.tsx`, `MetricsBar.tsx`, `image-cell.tsx`, `Maintenance Error`, `react-hook-form`, `reset-password/index.tsx`, `authenticated-layout.tsx`, `patients/schema.tsx`, `message-templates/schema.tsx`, `__root.tsx`, `CartTable.tsx`, `useOrderContext`, `PosAuthGate.tsx`, `types/schema.tsx`, `rxsoft/pages/orders/index.tsx`, `rxsoft/types.ts`, `locator/facility-locator.tsx`, `Welcome.tsx`, `team-switcher.tsx`, `locator-shell.tsx`, `403.tsx`, `401.tsx`, `showSubmittedData`, `PosSettingsDrawer.tsx`?**
-  _High betweenness centrality (0.120) - this node is a cross-community bridge._
+  _Cohesion score 0.005315232089542247 - nodes in this community are weakly interconnected._
+- **Why does `@mantine/core` connect `@mantine/core` to `apm/website/layout.tsx`, `chatbot-service.ts`, `data-page-shell.tsx`, `DataPageShell`, `lis/pages/index.ts`, `paginated-data-table.tsx`, `chat-ui-page.tsx`, `lucide-react`, `roles/schema.tsx`, `JsonEditorField`, `form-builder-modal.tsx`, `Column`, `messages.tsx`, `registry/index.ts`, `useAuthStore`, `RenderField.tsx`, `questionnaire/index.tsx`, `features/shop/page.tsx`, `module-data.ts`, `pages/website-orders/index.tsx`, `conversation-page-schemas.tsx`, `admin-hooks.ts`, `appearance-form.tsx`, `LgasPage.tsx`, `sign-out-dialog.test.tsx`, `po/purchases.tsx`, `sales-analytics/index.tsx`, `locator/pharmacy-locator.tsx`, `mapping.tsx`, `generic-view-page.tsx`, `dermatome-map.tsx`, `apm/page.tsx`, `conversation/components/shared.tsx`, `routing.model.ts`, `package.json`, `posApi.ts`, `StakeholdersPage.tsx`, `offline-sales.ts`, `message-templates/schema.tsx`, `pages/message-tester.tsx`, `rxsoft/pages/index.ts`, `emr/pages/dashboard-page.tsx`, `locator-map.tsx`, `vitest`, `ContentSection`, `questionnaire.tsx`, `dashboard/pages/dashboard-page.tsx`, `chat-api.ts`, `ChatUiPage`, `@tanstack/react-router`, `user-insights/api.ts`, `notifications-form.tsx`, `poApi.ts`, `form-context.ts`, `user-auth-form.tsx`, `user-management.tsx`, `body-map.tsx`, `PoToolbar.tsx`, `Concept Details`, `PoLinesTable.tsx`, `permission-picker.tsx`, `emr-types.ts`, `usePoStore.ts`, `pos/pos.tsx`, `apmBlue`, `shop/pos2.tsx`, `preview.tsx`, `layout/types.ts`, `GotvPage.tsx`, `printServer.ts`, `app-sidebar.tsx`, `product-setup-components.tsx`, `graph-view.tsx`, `PaymentModal`, `hospitals/detail.tsx`, `Maintenance Error`, `ResultsPage.tsx`, `react-hook-form`, `organizations/schema.tsx`, `participant-modal.tsx`, `reset-password/index.tsx`, `authenticated-layout.tsx`, `drag-and-drop-list.tsx`, `pay/page.tsx`, `__root.tsx`, `CartTable.tsx`, `useOrderContext`, `getApiErrorMessage`, `types/schema.tsx`, `rxsoft/types.ts`, `locator/facility-locator.tsx`, `Welcome.tsx`, `locator-shell.tsx`, `403.tsx`, `showSubmittedData`?**
+  _High betweenness centrality (0.100) - this node is a cross-community bridge._
 - **Are the 260 inferred relationships involving `t()` (e.g. with `_0t()` and `accessPromise()`) actually correct?**
   _`t()` has 260 INFERRED edges - model-reasoned connections that need verification._
 - **Should `apm/website/layout.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.1278825995807128 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0819252432155658 - nodes in this community are weakly interconnected._

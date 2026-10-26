@@ -29,7 +29,7 @@ import { routeTree } from './routeTree.gen';
 // import './styles/tailwind-fallback.css'
 
 Sentry.init({
-  dsn: 'https://5eab9ae2db7f91247e0cc2e33f9b3cab@o4511611278000128.ingest.us.sentry.io/4511611282259968',
+  dsn: 'https://2729b1685a4ae722bd445f0cee2cb5b7@o4511611278000128.ingest.us.sentry.io/4511611379187712',
   dataCollection: {
     // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/options/#dataCollection
@@ -47,6 +47,7 @@ Sentry.init({
   // Enable logs to be sent to Sentry
   enableLogs: true,
 });
+
 
 const queryClient = new QueryClient({
   defaultOptions: {

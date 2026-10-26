@@ -72,6 +72,7 @@ export interface PharmacyPriceView {
   address: string | null;
   phone: string | null;
   priceListId: string;
+  priceListName?: string;
   unitPrice: number;
   currencyCode: string;
   stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown';

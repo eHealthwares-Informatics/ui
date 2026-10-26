@@ -41,17 +41,9 @@ import {
   QUESTIONNAIRE_CODES,
 } from '../website/hl7-prescription';
 import { useProduct } from '../website/hooks';
-import {
-  WebsiteLayout,
-  green,
-  darkGreen,
-  ink,
-  muted,
-  line,
-  soft,
-  buttonStyles,
-} from '../website/layout';
+import { WebsiteLayout, green, darkGreen, ink, muted, line, buttonStyles } from '../website/layout';
 import { PageLoader } from '../website/loaders';
+import type { PharmacyPriceView } from '../website/types';
 import { PriceAvailabilityTab } from './price-availability-tab';
 
 export default function ProductDetailPage() {
@@ -63,9 +55,11 @@ export default function ProductDetailPage() {
   const totalItems = useCartStore((s) => s.totalItems);
   const [quantity, setQuantity] = useState(1);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<PharmacyPriceView | null>(null);
   const [activeTab, setActiveTab] = useState<string | null>('overview');
 
   const product = data?.product;
+  const displayPrice = selectedOffer?.unitPrice ?? product?.unitPrice ?? null;
   const gp = (data?.genericProduct ?? product?.genericProduct ?? null) as {
     id?: string | null;
     code?: string | null;
@@ -115,6 +109,10 @@ export default function ProductDetailPage() {
 
   const goClassify = (code: string) =>
     navigate({ to: '/shop/shop', search: { classificationCode: code } as any });
+
+  const handlePriceSelected = (offer: PharmacyPriceView) => {
+    setSelectedOffer(offer);
+  };
 
   return (
     <WebsiteLayout>
@@ -200,49 +198,33 @@ export default function ProductDetailPage() {
                     </Button>
                   </Box>
 
-                  {pharm ? (
-                    <Paper
-                      radius={20}
-                      p="md"
-                      style={{ background: soft, border: `1px solid ${line}` }}
-                    >
-                      <Stack gap="xs">
-                        {pharm.commonBrandName ? (
-                          <Text size="sm">
-                            <strong>Brand:</strong> {pharm.commonBrandName}
-                          </Text>
-                        ) : null}
-                        {pharm.commonGenericName ? (
-                          <Text size="sm">
-                            <strong>Generic Name:</strong> {pharm.commonGenericName}
-                          </Text>
-                        ) : null}
-                        {pharm.drugClass ? (
-                          <Text size="sm">
-                            <strong>Drug Class:</strong> {pharm.drugClass}
-                          </Text>
-                        ) : null}
-                        {pharm.dosage ? (
-                          <Text size="sm">
-                            <strong>Dosage:</strong> {pharm.dosage}
-                          </Text>
-                        ) : null}
-                      </Stack>
-                    </Paper>
-                  ) : null}
-
                   <Paper radius={20} p="md" withBorder style={{ borderColor: line }}>
                     <Stack gap="md">
                       <Group>
                         <Text fw={950} size="xl" c={darkGreen}>
-                          {product.unitPrice != null
-                            ? `₦${product.unitPrice.toLocaleString()}`
-                            : 'Price on request'}
+                          {displayPrice != null ? (
+                            `₦${displayPrice.toLocaleString()}`
+                          ) : (
+                            <Button
+                              variant="text"
+                              color="green"
+                              size="sm"
+                              onClick={() => setCompareOpen(true)}
+                              data-testid="product-choose-price-list"
+                            >
+                              Choose price list
+                            </Button>
+                          )}
                         </Text>
                         <Text size="sm" c={muted}>
                           per unit
                         </Text>
                       </Group>
+                      {selectedOffer?.priceListName ? (
+                        <Text size="xs" c={muted} mt={-6}>
+                          Price list: <strong>{selectedOffer.priceListName}</strong>
+                        </Text>
+                      ) : null}
                       <Text size="xs" c={muted} fs="italic">
                         Prices may vary due to market fluctuations
                       </Text>
@@ -283,8 +265,15 @@ export default function ProductDetailPage() {
                           onClick={() => {
                             addItem(product.id, quantity, {
                               name: product.name,
-                              unitPrice: product.unitPrice ?? undefined,
+                              unitPrice: selectedOffer?.unitPrice ?? product.unitPrice ?? undefined,
                               product,
+                              ...(selectedOffer
+                                ? {
+                                    priceListId: selectedOffer.priceListId,
+                                    pharmacyOrganizationId: selectedOffer.organizationId,
+                                    pharmacyName: selectedOffer.name,
+                                  }
+                                : {}),
                             });
                             const count = useCartStore.getState().totalItems;
                             notifications.show({
@@ -781,6 +770,7 @@ export default function ProductDetailPage() {
               onClose={() => setCompareOpen(false)}
               productId={product.id}
               productName={product.name}
+              onPriceSelected={handlePriceSelected}
             />
           </Stack>
         )}
