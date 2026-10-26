@@ -48,7 +48,6 @@ Sentry.init({
   enableLogs: true,
 });
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
