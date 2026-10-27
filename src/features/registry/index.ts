@@ -283,6 +283,10 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
     import('@/features/ehealthwares/pages/careers/schema').then((m) => ({
       default: m.ehealthwaresCareersConfig as unknown as ModelConfig,
     })),
+  'ehealthwares-career-applications': () =>
+    import('@/features/ehealthwares/pages/career-applications/schema').then((m) => ({
+      default: m.ehealthwaresCareerApplicationsConfig as unknown as ModelConfig,
+    })),
   'ehealthwares-sections': () =>
     import('@/features/ehealthwares/pages/sections/schema').then((m) => ({
       default: m.ehealthwaresSectionsConfig as unknown as ModelConfig,

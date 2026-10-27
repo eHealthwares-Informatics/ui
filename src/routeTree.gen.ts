@@ -233,6 +233,7 @@ import { Route as AuthenticatedRxsoftCouponsIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
 import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
 import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
+import { Route as AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-career-applications/index'
 import { Route as AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-careers/index'
 import { Route as AuthenticatedRxsoftEhealthwaresCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-categories/index'
 import { Route as AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-contact-submissions/index'
@@ -1581,6 +1582,12 @@ const AuthenticatedRxsoftEhealthwaresArticlesIndexRoute =
     path: '/rxsoft/ehealthwares-articles/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute =
+  AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRouteImport.update({
+    id: '/rxsoft/ehealthwares-career-applications/',
+    path: '/rxsoft/ehealthwares-career-applications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftEhealthwaresCareersIndexRoute =
   AuthenticatedRxsoftEhealthwaresCareersIndexRouteImport.update({
     id: '/rxsoft/ehealthwares-careers/',
@@ -2403,6 +2410,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-career-applications/': typeof AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute
   '/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
   '/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
   '/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
@@ -2722,6 +2730,7 @@ export interface FileRoutesByTo {
   '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/rxsoft/ehealthwares-career-applications': typeof AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute
   '/rxsoft/ehealthwares-careers': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
   '/rxsoft/ehealthwares-categories': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
   '/rxsoft/ehealthwares-contact-submissions': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
@@ -3047,6 +3056,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  '/_authenticated/rxsoft/ehealthwares-career-applications/': typeof AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute
   '/_authenticated/rxsoft/ehealthwares-careers/': typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
   '/_authenticated/rxsoft/ehealthwares-categories/': typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
   '/_authenticated/rxsoft/ehealthwares-contact-submissions/': typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
@@ -3370,6 +3380,7 @@ export interface FileRouteTypes {
     | '/rxsoft/customers/'
     | '/rxsoft/drug-components/'
     | '/rxsoft/ehealthwares-articles/'
+    | '/rxsoft/ehealthwares-career-applications/'
     | '/rxsoft/ehealthwares-careers/'
     | '/rxsoft/ehealthwares-categories/'
     | '/rxsoft/ehealthwares-contact-submissions/'
@@ -3689,6 +3700,7 @@ export interface FileRouteTypes {
     | '/rxsoft/customers'
     | '/rxsoft/drug-components'
     | '/rxsoft/ehealthwares-articles'
+    | '/rxsoft/ehealthwares-career-applications'
     | '/rxsoft/ehealthwares-careers'
     | '/rxsoft/ehealthwares-categories'
     | '/rxsoft/ehealthwares-contact-submissions'
@@ -4013,6 +4025,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/customers/'
     | '/_authenticated/rxsoft/drug-components/'
     | '/_authenticated/rxsoft/ehealthwares-articles/'
+    | '/_authenticated/rxsoft/ehealthwares-career-applications/'
     | '/_authenticated/rxsoft/ehealthwares-careers/'
     | '/_authenticated/rxsoft/ehealthwares-categories/'
     | '/_authenticated/rxsoft/ehealthwares-contact-submissions/'
@@ -5741,6 +5754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/ehealthwares-career-applications/': {
+      id: '/_authenticated/rxsoft/ehealthwares-career-applications/'
+      path: '/rxsoft/ehealthwares-career-applications'
+      fullPath: '/rxsoft/ehealthwares-career-applications/'
+      preLoaderRoute: typeof AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/ehealthwares-careers/': {
       id: '/_authenticated/rxsoft/ehealthwares-careers/'
       path: '/rxsoft/ehealthwares-careers'
@@ -6692,6 +6712,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
   AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
+  AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute
   AuthenticatedRxsoftEhealthwaresCareersIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCareersIndexRoute
   AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute
   AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute: typeof AuthenticatedRxsoftEhealthwaresContactSubmissionsIndexRoute
@@ -6980,6 +7001,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftDrugComponentsIndexRoute,
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute:
     AuthenticatedRxsoftEhealthwaresArticlesIndexRoute,
+  AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute:
+    AuthenticatedRxsoftEhealthwaresCareerApplicationsIndexRoute,
   AuthenticatedRxsoftEhealthwaresCareersIndexRoute:
     AuthenticatedRxsoftEhealthwaresCareersIndexRoute,
   AuthenticatedRxsoftEhealthwaresCategoriesIndexRoute:
