@@ -36,6 +36,14 @@ const createFields: Field[] = [
   },
   { name: 'imageUrl', label: 'Image URL', col: 12, type: 'image', imageSize: 'medium' },
   { name: 'description', label: 'Description', type: 'textarea', col: 12 },
+  {
+    name: 'detailHtml',
+    label: 'Detail HTML',
+    type: 'textarea',
+    col: 12,
+    placeholder:
+      "HTML — h2/h3/p/ul sections: About this role, What you'll do, What you'll bring, What we offer, About the team, Equal opportunity, How to apply",
+  },
   { name: 'isActive', label: 'Active', type: 'switch', col: 3, defaultValue: true },
 ];
 

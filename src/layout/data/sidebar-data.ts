@@ -601,6 +601,13 @@ export const sidebarData: SidebarData = {
           modules: ['website'],
         },
         {
+          title: 'Career Applications',
+          url: '/rxsoft/ehealthwares-career-applications',
+          permission: 'rxsoft.website.content.read',
+          icon: ClipboardList,
+          modules: ['website'],
+        },
+        {
           title: 'Site Sections',
           url: '/rxsoft/ehealthwares-sections',
           permission: 'rxsoft.website.content.read',
