@@ -154,7 +154,6 @@ export function DataPageShell(props: DataPageShellProps) {
   const [pageIndex, setPageIndex] = useState(1);
   // 25 rows/page: fewer page turns per assertion in e2e, same per-request cost.
   const [pageSize, setPageSize] = useState(25);
-  const [totalItems, setTotalItems] = useState(0);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [jsonToPreview, setJsonToPreview] = useState<Record<string, unknown> | null>(null);
 
@@ -326,8 +325,6 @@ export function DataPageShell(props: DataPageShellProps) {
         moduleId === 'rxsoft' ? buildRxsoftListParams(queryParams, config) : queryParams;
       const response = await apiProvider.get(endpoint, { params });
 
-      setTotalItems(resolveListTotal(response.data));
-
       return response.data;
     },
   });
@@ -341,6 +338,10 @@ export function DataPageShell(props: DataPageShellProps) {
     : getRowsFromPayload(query.data);
 
   const rows = hasServerTotal(query.data) ? allRows : paginateRows(allRows, pageIndex, pageSize);
+
+  // Derive totalItems from the resolved query data during render rather than via
+  // setState inside queryFn (see note near the top of the component).
+  const totalItems = resolveListTotal(query.data);
 
   // Store LIS order IDs in localStorage for Prev/Next navigation on report page
   useEffect(() => {
