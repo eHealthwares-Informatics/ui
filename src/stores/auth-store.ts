@@ -96,6 +96,13 @@ export const useAuthStore = create<AuthState>()(
             set({
               modules: meResponse.data.modules,
               permissionMode: meResponse.data.permissionMode,
+              // Sync permissions from /auth/me — the JWT token may not carry
+              // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
+              // the single source of truth is the /auth/me response.
+              user: {
+                ...get().user,
+                permissions: meResponse.data.permissions ?? get().user?.permissions ?? [],
+              },
             });
           } catch {
             set({
@@ -228,6 +235,13 @@ export const useAuthStore = create<AuthState>()(
             set({
               modules: meResponse.data.modules,
               permissionMode: meResponse.data.permissionMode ?? 'org',
+              // Sync permissions from /auth/me — the JWT token may not carry
+              // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
+              // the single source of truth is the /auth/me response.
+              user: {
+                ...get().user,
+                permissions: meResponse.data.permissions ?? get().user?.permissions ?? [],
+              },
             });
           } catch {
             // Silently fail - modules will be empty until fetched
