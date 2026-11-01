@@ -27,7 +27,7 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
       default: m.branchesConfig as unknown as ModelConfig,
     })),
   roles: () =>
-    import('@/features/rxsoft/pages/roles/schema').then((m) => ({
+    import('@/features/admin/schema/roles').then((m) => ({
       default: m.rolesConfig as unknown as ModelConfig,
     })),
   settings: () =>
@@ -306,8 +306,8 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
       default: m.identityUsersConfig as unknown as ModelConfig,
     })),
   'identity-roles': () =>
-    import('@/features/identity/schema/roles').then((m) => ({
-      default: m.identityRolesConfig as unknown as ModelConfig,
+    import('@/features/admin/schema/roles').then((m) => ({
+      default: m.rolesConfig as unknown as ModelConfig,
     })),
   'identity-organizations': () =>
     import('@/features/identity/schema/organizations').then((m) => ({
