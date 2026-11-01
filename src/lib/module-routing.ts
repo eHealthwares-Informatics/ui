@@ -48,7 +48,11 @@ export function isRouteAllowedForModule(pathname: string, moduleId: ModuleId): b
 
 export function getModuleDashboard(moduleId: ModuleId): string {
   const mod = modules.find((m) => m.id === moduleId);
-  return mod?.root ?? '/';
+  // All module dashboard routes live under /_authenticated/<moduleId>/dashboard.
+  // Returning the bare root (e.g. /rxsoft/dashboard) would not match any route
+  // and caused post-login / module-switcher navigation to land on 404.
+  const root = mod?.root ?? '/';
+  return root === '/' ? root : `/_authenticated${root}`;
 }
 
 export function getModuleFromPath(pathname: string): ModuleId | null {
