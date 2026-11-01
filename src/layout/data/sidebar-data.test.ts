@@ -71,7 +71,7 @@ describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () =>
   it('every sidebar entry carries either no permission or a catalog-shaped code', () => {
     // Guard against tag drift: permissions must be dot-namespaced catalog
     // codes, never role names or free text.
-    const valid = /^(rxsoft|lis|emr|conversation|communication|coding-concept)\.[a-z0-9.*-]+$/;
+    const valid = /^(rxsoft|lis|emr|conversation|communication|coding-concept|shop)\.[a-z0-9.*-]+$/;
     const check = (entry: NavItem) => {
       const required = Array.isArray(entry.permission) ? entry.permission : [entry.permission];
       for (const code of required.filter(Boolean)) {
