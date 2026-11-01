@@ -1,7 +1,9 @@
 import { Badge, Button, Card, Group, Stack, Text } from '@mantine/core';
 import { CalendarClock, MapPin, UserRound } from 'lucide-react';
+import { dashboardToneStyle } from '@/features/components/dashboard/dashboard-surface';
 import type { Appointment } from '../../lib/emr-types';
 import { appointmentAction, appointmentStyle } from './appointment-status';
+import classes from './appointment-row.module.css';
 
 export function AppointmentRow({
   appointment,
@@ -20,7 +22,8 @@ export function AppointmentRow({
       padding="md"
       style={{ borderLeft: `4px solid ${style.borderColor}`, backgroundColor: style.cardTint }}
     >
-      <Group justify="space-between" align="center" wrap="nowrap">
+      <div className={classes.row} style={dashboardToneStyle(style.color)}>
+        <Group justify="space-between" align="center" wrap="nowrap">
         <Group gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
           <Stack gap={2} style={{ minWidth: 56 }}>
             <Text fw={700} size="md" lh={1.1}>
@@ -75,6 +78,7 @@ export function AppointmentRow({
           </Button>
         )}
       </Group>
+      </div>
     </Card>
   );
 }

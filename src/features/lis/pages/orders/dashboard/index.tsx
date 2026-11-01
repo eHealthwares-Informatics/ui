@@ -1,5 +1,4 @@
 import {
-  Card,
   Group,
   Modal,
   Pagination,
@@ -35,7 +34,12 @@ import {
   YAxis,
   CartesianGrid,
 } from 'recharts';
-import { RxPage } from '@/features/components/page/rx-page';
+import {
+  DashboardCard,
+  DashboardHero,
+  DashboardPage,
+  dashboardMetricClasses,
+} from '@/features/components/dashboard/dashboard-surface';
 import { lisApi } from '@/lib/lis-api';
 
 interface DashboardMetrics {
@@ -294,7 +298,12 @@ export function LisOrdersDashboardPage() {
   const totalPages = Math.max(1, Math.ceil(drilldownTotal / pageSize));
 
   return (
-    <RxPage title="Dashboard" description="LIS operational metrics and trends">
+    <DashboardPage testId="lis-dashboard">
+      <DashboardHero
+        eyebrow="Laboratory Information System"
+        title="Dashboard"
+        subtitle="Operational metrics and turnaround trends for today."
+      />
       <Stack gap="lg">
         {isLoading && (
           <Paper withBorder p="lg" radius="md" style={{ textAlign: 'center' }}>
@@ -309,33 +318,30 @@ export function LisOrdersDashboardPage() {
           <>
             <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="md">
               {statCards.map((card, idx) => (
-                <Card
+                <DashboardCard
                   key={idx}
-                  withBorder
+                  tone={card.color}
                   padding="md"
-                  radius="md"
                   style={card.clickable ? { cursor: 'pointer' } : undefined}
                   onClick={() => handleTileClick(card)}
+                  interactive={card.clickable}
+                  testId={`lis-metric-${card.type || 'total-orders'}`}
                 >
-                  <Group gap="sm" align="flex-start">
+                  <Group gap="sm" align="flex-start" wrap="nowrap">
                     <ThemeIcon color={card.color} variant="light" size="lg" radius="xl">
                       <card.icon size={20} />
                     </ThemeIcon>
-                    <div style={{ flex: 1 }}>
-                      <Text fw={700} size="xl">
-                        {card.value}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {card.label}
-                      </Text>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className={dashboardMetricClasses.value}>{card.value}</div>
+                      <span className={dashboardMetricClasses.label}>{card.label}</span>
                       {card.subtitle && (
-                        <Text size="xs" c="gray" mt={2}>
+                        <Text size="xs" c="dimmed" mt={2}>
                           {card.subtitle}
                         </Text>
                       )}
                     </div>
                   </Group>
-                </Card>
+                </DashboardCard>
               ))}
             </SimpleGrid>
 
@@ -393,30 +399,24 @@ export function LisOrdersDashboardPage() {
       >
         {selectedMetric?.type === 'average-turnaround' && metrics ? (
           <SimpleGrid cols={3} spacing="md">
-            <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">
-                Reception → Result
-              </Text>
-              <Text fw={700} size="xl">
+            <DashboardCard tone="teal" padding="md">
+              <span className={dashboardMetricClasses.label}>Reception → Result</span>
+              <div className={dashboardMetricClasses.value}>
                 {metrics.tatSubMetrics.receptionToResultHours}h
-              </Text>
-            </Card>
-            <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">
-                Reception → Validation
-              </Text>
-              <Text fw={700} size="xl">
+              </div>
+            </DashboardCard>
+            <DashboardCard tone="cyan" padding="md">
+              <span className={dashboardMetricClasses.label}>Reception → Validation</span>
+              <div className={dashboardMetricClasses.value}>
                 {metrics.tatSubMetrics.receptionToValidationHours}h
-              </Text>
-            </Card>
-            <Card withBorder padding="md" radius="md">
-              <Text size="sm" c="dimmed">
-                Result → Validation
-              </Text>
-              <Text fw={700} size="xl">
+              </div>
+            </DashboardCard>
+            <DashboardCard tone="grape" padding="md">
+              <span className={dashboardMetricClasses.label}>Result → Validation</span>
+              <div className={dashboardMetricClasses.value}>
                 {metrics.tatSubMetrics.resultToValidationHours}h
-              </Text>
-            </Card>
+              </div>
+            </DashboardCard>
           </SimpleGrid>
         ) : (
           <Stack gap="md">
@@ -460,7 +460,7 @@ export function LisOrdersDashboardPage() {
           </Stack>
         )}
       </Modal>
-    </RxPage>
+    </DashboardPage>
   );
 }
 

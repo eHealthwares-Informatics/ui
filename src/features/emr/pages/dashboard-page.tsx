@@ -69,35 +69,31 @@ export function EmrDashboardPage() {
       {data && !isError && (
         <Stack gap="lg">
           {/* SUMMARY METRICS */}
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }}>
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
             <MetricCard
               icon={CalendarCheck}
-              iconColor="#228be6"
-              iconBg="blue"
+              tone="blue"
               label="Today's Appointments"
               value={data.metrics.totalAppointments}
               subtitle={`${data.metrics.scheduled} still scheduled`}
             />
             <MetricCard
               icon={CheckCircle2}
-              iconColor="#12b886"
-              iconBg="teal"
+              tone="teal"
               label="Checked In"
               value={data.metrics.checkedIn}
               subtitle={`${data.metrics.completed} completed`}
             />
             <MetricCard
               icon={Stethoscope}
-              iconColor="#fd7e14"
-              iconBg="orange"
+              tone="orange"
               label="Providers on Duty"
               value={data.metrics.providersOnDuty}
               subtitle={`${data.metrics.inProgress} visits in progress`}
             />
             <MetricCard
               icon={Clock4}
-              iconColor="#7048e8"
-              iconBg="grape"
+              tone="grape"
               label="Average Wait Time"
               value={
                 data.metrics.averageWaitMinutes > 0 ? `${data.metrics.averageWaitMinutes}m` : '—'
@@ -109,7 +105,7 @@ export function EmrDashboardPage() {
           </SimpleGrid>
 
           {/* MAIN WORKSPACE */}
-          <SimpleGrid cols={{ base: 1, lg: 7 }} spacing="lg">
+          <SimpleGrid cols={{ base: 1, lg: 7 }} spacing="md">
             <Stack gap="sm" style={{ gridColumn: 'span 4' }}>
               <Group justify="space-between">
                 <Title order={4}>Today's Appointments</Title>

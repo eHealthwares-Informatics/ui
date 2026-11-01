@@ -1,6 +1,11 @@
 import { Card, Group, Stack, Text } from '@mantine/core';
+import {
+  DashboardCard,
+  DashboardCardTitle,
+} from '@/features/components/dashboard/dashboard-surface';
 import type { Appointment } from '../../lib/emr-types';
 import { appointmentStyle } from './appointment-status';
+
 
 export function UpcomingList({ appointments }: { appointments: Appointment[] }) {
   return (
@@ -8,6 +13,10 @@ export function UpcomingList({ appointments }: { appointments: Appointment[] }) 
       <Text size="sm" fw={600} mb="md">
         Upcoming Appointments
       </Text>
+    <DashboardCard tone="grape" padding="md">
+      <DashboardCardTitle hint={`${appointments.length} scheduled`}>
+        Upcoming Appointments
+      </DashboardCardTitle>
       {appointments.length === 0 ? (
         <Text size="sm" c="dimmed">
           No upcoming appointments.
@@ -45,6 +54,7 @@ export function UpcomingList({ appointments }: { appointments: Appointment[] }) 
           })}
         </Stack>
       )}
+    </DashboardCard>
     </Card>
   );
 }

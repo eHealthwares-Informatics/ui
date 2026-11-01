@@ -71,6 +71,18 @@ export const modulePlans: Record<string, string> = {
  * map still render — the grid falls back to the module's own name/description
  * and a neutral accent.
  */
+export const moduleAccentTones: Record<ModuleAccent, string> = {
+  green: 'green',
+  teal: 'teal',
+  purple: 'purple',
+  indigo: 'indigo',
+  sky: 'sky',
+  blue: 'blue',
+  red: 'red',
+  orange: 'orange',
+  slate: 'slate',
+};
+
 export const moduleCards: Record<string, ModuleCardMeta> = {
   rxsoft: {
     title: 'Formulary integrated Rx inventory',
