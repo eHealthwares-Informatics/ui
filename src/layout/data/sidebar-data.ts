@@ -658,6 +658,34 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
+      title: 'Notifications',
+      icon: MessageSquare,
+      permission: 'rxsoft.admin.template.read',
+      items: [
+        {
+          title: 'Notification Templates',
+          url: '/rxsoft/notification-templates',
+          permission: 'rxsoft.admin.template.read',
+          icon: MessageSquare,
+          modules: ['rxsoft'],
+        },
+      ],
+    },
+    {
+      title: 'Templates',
+      icon: FileText,
+      permission: 'rxsoft.admin.template.read',
+      items: [
+        {
+          title: 'Print Templates',
+          url: '/rxsoft/print-templates',
+          permission: 'rxsoft.admin.template.read',
+          icon: FileText,
+          modules: ['rxsoft'],
+        },
+      ],
+    },
+    {
       title: 'Configuration',
       icon: Settings,
       items: [
