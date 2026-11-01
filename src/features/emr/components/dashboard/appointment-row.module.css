@@ -1,0 +1,9 @@
+/* One appointment inside the dashboard's "Today's Appointments" card: a flat
+ * tinted row keyed to the appointment's status colour, not a nested card. */
+.row {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--tone) 18%, var(--app-line));
+  border-left: 3px solid color-mix(in srgb, var(--tone) 75%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--tone) 6%, var(--app-surface));
+}
