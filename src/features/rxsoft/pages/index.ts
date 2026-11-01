@@ -16,6 +16,7 @@ export * from './organizations';
 export * from './organisation-config';
 export * from './orders';
 export * from './payment-methods';
+export * from './customer-wallets';
 export * from './payments';
 export * from './payment-transactions';
 export { RxPaymentTransactionDetailPage } from './payment-transactions/detail';

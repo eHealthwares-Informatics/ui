@@ -230,6 +230,53 @@ export function useClaimPrescription(id: string) {
   });
 }
 
+// ── Wallet ───────────────────────────────────────────────────────
+
+/** Shopper wallet balance. Only runs for signed-in shoppers (the API 401s otherwise). */
+export function useWallet(enabled = true) {
+  return useQuery({
+    queryKey: ['website', 'wallet'],
+    queryFn: websiteApi.getWallet,
+    enabled,
+    retry: false,
+  });
+}
+
+export function useWalletTransactions(limit = 50) {
+  return useQuery({
+    queryKey: ['website', 'wallet', 'transactions', limit],
+    queryFn: () => websiteApi.listWalletTransactions(limit),
+    retry: false,
+  });
+}
+
+export function useWalletDeposit() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      amount: number;
+      providerId?: string;
+      returnUrl?: string;
+      callbackUrl?: string;
+    }) => websiteApi.depositToWallet(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['website', 'wallet'] });
+    },
+  });
+}
+
+/** Pays an order from the wallet balance and refreshes balance/orders. */
+export function usePayOrderFromWallet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: string) => websiteApi.payOrderFromWallet(orderId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['website', 'wallet'] });
+      qc.invalidateQueries({ queryKey: ['website', 'orders'] });
+    },
+  });
+}
+
 // ── Consultations ────────────────────────────────────────────────
 
 export function useCreateConsultation() {

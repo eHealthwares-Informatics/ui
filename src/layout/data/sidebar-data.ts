@@ -398,6 +398,12 @@ export const sidebarData: SidebarData = {
           modules: ['rxsoft'],
         },
         {
+          title: 'Customer Wallets',
+          url: '/rxsoft/customer-wallets',
+          icon: Wallet,
+          modules: ['rxsoft'],
+        },
+        {
           title: 'Payment Providers',
           url: '/rxsoft/payment-providers',
           icon: Wallet,

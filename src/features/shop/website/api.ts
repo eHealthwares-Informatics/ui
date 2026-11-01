@@ -10,6 +10,8 @@ import type {
   PrescriptionView,
   PrescriptionDetailView,
   PrescriptionOrderResult,
+  WalletView,
+  WalletTransactionView,
   ConsultationView,
   OrderView,
   BlogArticleView,
@@ -194,6 +196,34 @@ export const websiteApi = {
   claimPrescription: (id: string) =>
     api
       .post<{ id: string; claimed: boolean }>(`/website/prescriptions/${id}/claim`)
+      .then((r) => r.data),
+
+  // Wallet
+  getWallet: () => api.get<WalletView>('/website/wallet').then((r) => r.data),
+
+  listWalletTransactions: (limit = 50) =>
+    api
+      .get<WalletTransactionView[]>('/website/wallet/transactions', { params: { limit } })
+      .then((r) => r.data),
+
+  depositToWallet: (data: {
+    amount: number;
+    providerId?: string;
+    returnUrl?: string;
+    callbackUrl?: string;
+  }) =>
+    api
+      .post<{ checkoutUrl?: string | null; reference?: string }>(
+        '/website/wallet/deposit',
+        data
+      )
+      .then((r) => r.data),
+
+  payOrderFromWallet: (orderId: string) =>
+    api
+      .post<{ orderId: string; reference: string; amount: number; balance: number }>(
+        `/website/wallet/orders/${orderId}/pay`
+      )
       .then((r) => r.data),
 
   // Consultations

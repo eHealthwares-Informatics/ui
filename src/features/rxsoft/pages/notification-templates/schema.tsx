@@ -20,6 +20,13 @@ export const NOTIFICATION_SCENARIO_OPTIONS: Option[] = [
   { value: 'prescription_review', label: 'Prescription reviewed' },
   { value: 'refill_due', label: 'Refill due' },
   { value: 'promotion', label: 'Promotional campaign' },
+  { value: 'item_purchase', label: 'Item Purchase' },
+  { value: 'birthday', label: 'Birthday' },
+  { value: 'password_reset_otp', label: 'Password reset OTP' },
+  { value: 'order', label: 'Order' },
+  { value: 'prescription_order', label: 'Prescription Order' },
+  { value: 'appointment_checkin', label: 'Appointment Check-in' },
+  { value: 'appointment_checkout', label: 'Appointment Check-out' },
 ];
 
 export const NOTIFICATION_CHANNEL_OPTIONS: Option[] = [

@@ -24,8 +24,8 @@ const DASHBOARD_LINKS = [
   { label: 'Saved Medicines', icon: Heart, path: '/shop/dashboard' },
   { label: 'Consultation History', icon: Stethoscope, path: '/shop/consultations' },
   { label: 'Rewards & Points', icon: Gift, path: '/shop/rewards' },
+  { label: 'Wallet & Payments', icon: CreditCard, path: '/shop/wallet' },
   { label: 'Addresses', icon: MapPin, path: '/shop/dashboard' },
-  { label: 'Payment Methods', icon: CreditCard, path: '/shop/dashboard' },
 ];
 
 function LoggedOutView({

@@ -107,7 +107,7 @@ export function RoleRequestsPage() {
                 <Table.Td>
                   <Stack gap={0}>
                     <Text size="sm" fw={500} data-testid={`role-request-user-${req.id}`}>
-                      {req.userName || req.userId.slice(0, 8)}
+                      {req.userName ?? 'User'}
                     </Text>
                     {req.userEmail ? (
                       <Text size="xs" c="dimmed">

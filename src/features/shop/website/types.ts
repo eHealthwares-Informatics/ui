@@ -250,6 +250,26 @@ export interface PrescriptionDetailView {
   order: PrescriptionOrderRef | null;
 }
 
+// ── Wallet ───────────────────────────────────────────────────────
+
+export interface WalletView {
+  id: string;
+  balance: number;
+  currency: string;
+}
+
+export interface WalletTransactionView {
+  id: string;
+  type: 'deposit' | 'payment' | 'refund' | 'withdrawal';
+  amount: number;
+  balanceAfter: number;
+  reference: string;
+  sourceType: string | null;
+  sourceId: string | null;
+  note: string | null;
+  createdAt: string;
+}
+
 /** Result of `POST /website/prescriptions/:id/order`. */
 export interface PrescriptionOrderResult {
   orderId: string;

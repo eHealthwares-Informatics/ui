@@ -17,6 +17,19 @@ const SAMPLE_NOTIFICATION_VALUES: Record<string, string> = {
   'order.total': '₦3,510.00',
   'organization.name': 'Damorex Pharmacy',
   'pickup.location': 'Ikeja — Allen Avenue',
+  'item.name': 'Paracetamol 500mg (x10)',
+  'item.qty': '2',
+  'item.unit_price': '₦500.00',
+  'item.total': '₦1,000.00',
+  'sale.number': 'SO-2026-0001',
+  'sale.total': '₦3,510.00',
+  'appointment.date': '2026-11-05',
+  'appointment.time': '10:00 AM',
+  'appointment.new_date': '2026-11-07',
+  'appointment.new_time': '11:00 AM',
+  'otp.code': '847291',
+  'otp.expiry_minutes': '15',
+  'test.name': 'Full Blood Count',
 };
 
 function previewNotificationText(body: string): string {

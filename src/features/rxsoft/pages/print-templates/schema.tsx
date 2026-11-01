@@ -9,12 +9,25 @@ export const PRINT_TEMPLATE_KIND_OPTIONS: Option[] = [
   { value: 'pos_receipt', label: 'POS receipt' },
   { value: 'a4_receipt', label: 'A4 wholesale receipt' },
   { value: 'invoice', label: 'Invoice' },
+  { value: 'labresult', label: 'Lab result' },
+  { value: 'appointment_notification', label: 'Appointment notification' },
+  { value: 'appointment_reschedule', label: 'Appointment Reschedule' },
+  { value: 'test_result_accepted', label: 'Test Result accepted' },
+  { value: 'test_result_completed', label: 'Test result completed' },
+  { value: 'appointment_checkin', label: 'Appointment Check-in' },
+  { value: 'appointment_checkout', label: 'Appointment Check-out' },
 ];
 
 export const PRINT_PAGE_SIZE_OPTIONS: Option[] = [
   { value: 'thermal58', label: 'Thermal 58mm' },
   { value: 'thermal80', label: 'Thermal 80mm' },
   { value: 'a4', label: 'A4' },
+];
+
+export const PRINT_CHANNEL_OPTIONS: Option[] = [
+  { value: 'sms', label: 'SMS' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'email', label: 'Email' },
 ];
 
 /**
@@ -84,6 +97,11 @@ const columns: Column[] = [
     render: (row) => labelFor(PRINT_TEMPLATE_KIND_OPTIONS, row.kind),
   },
   {
+    key: 'channel',
+    label: 'Channel',
+    render: (row) => labelFor(PRINT_CHANNEL_OPTIONS, row.channel),
+  },
+  {
     key: 'pageSize',
     label: 'Page size',
     render: (row) => labelFor(PRINT_PAGE_SIZE_OPTIONS, row.pageSize),
@@ -106,6 +124,7 @@ function buildPayload(values: Record<string, unknown>): Record<string, unknown> 
     description: values.description ? String(values.description) : null,
     type: 'print',
     kind: String(values.kind ?? 'pos_receipt'),
+    channel: String(values.channel ?? 'sms'),
     pageSize: String(values.pageSize ?? 'thermal58'),
     body: String(values.body ?? ''),
     isDefault: Boolean(values.isDefault),
@@ -121,8 +140,9 @@ function buildUpdatePayload(values: Record<string, unknown>): Record<string, unk
   if (values.description !== undefined) {
     payload.description = values.description ? String(values.description) : null;
   }
-  if (values.kind !== undefined) payload.kind = String(values.kind);
-  if (values.pageSize !== undefined) payload.pageSize = String(values.pageSize);
+    if (values.kind !== undefined) payload.kind = String(values.kind);
+    if (values.channel !== undefined) payload.channel = String(values.channel);
+    if (values.pageSize !== undefined) payload.pageSize = String(values.pageSize);
   if (values.body !== undefined) payload.body = String(values.body);
   if (values.isDefault !== undefined) payload.isDefault = Boolean(values.isDefault);
   if (values.isActive !== undefined) payload.isActive = Boolean(values.isActive);

@@ -72,6 +72,7 @@ import { Route as ShopSupermarketRouteImport } from './routes/shop/supermarket'
 import { Route as ShopTermsRouteImport } from './routes/shop/terms'
 import { Route as ShopUploadPrescriptionRouteImport } from './routes/shop/upload-prescription'
 import { Route as ShopVerifyEmailRouteImport } from './routes/shop/verify-email'
+import { Route as ShopWalletRouteImport } from './routes/shop/wallet'
 import { Route as AuthenticatedModuleIdIndexRouteImport } from './routes/_authenticated/$moduleId/index'
 import { Route as AuthenticatedModuleIdDashboardRouteImport } from './routes/_authenticated/$moduleId/dashboard'
 import { Route as AuthenticatedPageIdRouteImport } from './routes/_authenticated/$page/$id'
@@ -231,6 +232,7 @@ import { Route as AuthenticatedRxsoftAuditLogsIndexRouteImport } from './routes/
 import { Route as AuthenticatedRxsoftBranchesIndexRouteImport } from './routes/_authenticated/rxsoft/branches/index'
 import { Route as AuthenticatedRxsoftCategoriesIndexRouteImport } from './routes/_authenticated/rxsoft/categories/index'
 import { Route as AuthenticatedRxsoftCouponsIndexRouteImport } from './routes/_authenticated/rxsoft/coupons/index'
+import { Route as AuthenticatedRxsoftCustomerWalletsIndexRouteImport } from './routes/_authenticated/rxsoft/customer-wallets/index'
 import { Route as AuthenticatedRxsoftCustomersIndexRouteImport } from './routes/_authenticated/rxsoft/customers/index'
 import { Route as AuthenticatedRxsoftDrugComponentsIndexRouteImport } from './routes/_authenticated/rxsoft/drug-components/index'
 import { Route as AuthenticatedRxsoftEhealthwaresArticlesIndexRouteImport } from './routes/_authenticated/rxsoft/ehealthwares-articles/index'
@@ -648,6 +650,11 @@ const ShopUploadPrescriptionRoute = ShopUploadPrescriptionRouteImport.update({
 const ShopVerifyEmailRoute = ShopVerifyEmailRouteImport.update({
   id: '/shop/verify-email',
   path: '/shop/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopWalletRoute = ShopWalletRouteImport.update({
+  id: '/shop/wallet',
+  path: '/shop/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedModuleIdIndexRoute =
@@ -1573,6 +1580,12 @@ const AuthenticatedRxsoftCouponsIndexRoute =
     path: '/rxsoft/coupons/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftCustomerWalletsIndexRoute =
+  AuthenticatedRxsoftCustomerWalletsIndexRouteImport.update({
+    id: '/rxsoft/customer-wallets/',
+    path: '/rxsoft/customer-wallets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftCustomersIndexRoute =
   AuthenticatedRxsoftCustomersIndexRouteImport.update({
     id: '/rxsoft/customers/',
@@ -2263,6 +2276,7 @@ export interface FileRoutesByFullPath {
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
   '/shop/verify-email': typeof ShopVerifyEmailRoute
+  '/shop/wallet': typeof ShopWalletRoute
   '/apm/': typeof ApmIndexRoute
   '/questionnaire/': typeof QuestionnaireIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -2436,6 +2450,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/rxsoft/coupons/': typeof AuthenticatedRxsoftCouponsIndexRoute
+  '/rxsoft/customer-wallets/': typeof AuthenticatedRxsoftCustomerWalletsIndexRoute
   '/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -2588,6 +2603,7 @@ export interface FileRoutesByTo {
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
   '/shop/verify-email': typeof ShopVerifyEmailRoute
+  '/shop/wallet': typeof ShopWalletRoute
   '/apm': typeof ApmIndexRoute
   '/questionnaire': typeof QuestionnaireIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -2760,6 +2776,7 @@ export interface FileRoutesByTo {
   '/rxsoft/branches': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/rxsoft/categories': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/rxsoft/coupons': typeof AuthenticatedRxsoftCouponsIndexRoute
+  '/rxsoft/customer-wallets': typeof AuthenticatedRxsoftCustomerWalletsIndexRoute
   '/rxsoft/customers': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/rxsoft/drug-components': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/rxsoft/ehealthwares-articles': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -2917,6 +2934,7 @@ export interface FileRoutesById {
   '/shop/terms': typeof ShopTermsRoute
   '/shop/upload-prescription': typeof ShopUploadPrescriptionRoute
   '/shop/verify-email': typeof ShopVerifyEmailRoute
+  '/shop/wallet': typeof ShopWalletRoute
   '/apm/': typeof ApmIndexRoute
   '/questionnaire/': typeof QuestionnaireIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -3090,6 +3108,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/branches/': typeof AuthenticatedRxsoftBranchesIndexRoute
   '/_authenticated/rxsoft/categories/': typeof AuthenticatedRxsoftCategoriesIndexRoute
   '/_authenticated/rxsoft/coupons/': typeof AuthenticatedRxsoftCouponsIndexRoute
+  '/_authenticated/rxsoft/customer-wallets/': typeof AuthenticatedRxsoftCustomerWalletsIndexRoute
   '/_authenticated/rxsoft/customers/': typeof AuthenticatedRxsoftCustomersIndexRoute
   '/_authenticated/rxsoft/drug-components/': typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   '/_authenticated/rxsoft/ehealthwares-articles/': typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -3245,6 +3264,7 @@ export interface FileRouteTypes {
     | '/shop/terms'
     | '/shop/upload-prescription'
     | '/shop/verify-email'
+    | '/shop/wallet'
     | '/apm/'
     | '/questionnaire/'
     | '/shop/'
@@ -3418,6 +3438,7 @@ export interface FileRouteTypes {
     | '/rxsoft/branches/'
     | '/rxsoft/categories/'
     | '/rxsoft/coupons/'
+    | '/rxsoft/customer-wallets/'
     | '/rxsoft/customers/'
     | '/rxsoft/drug-components/'
     | '/rxsoft/ehealthwares-articles/'
@@ -3570,6 +3591,7 @@ export interface FileRouteTypes {
     | '/shop/terms'
     | '/shop/upload-prescription'
     | '/shop/verify-email'
+    | '/shop/wallet'
     | '/apm'
     | '/questionnaire'
     | '/shop'
@@ -3742,6 +3764,7 @@ export interface FileRouteTypes {
     | '/rxsoft/branches'
     | '/rxsoft/categories'
     | '/rxsoft/coupons'
+    | '/rxsoft/customer-wallets'
     | '/rxsoft/customers'
     | '/rxsoft/drug-components'
     | '/rxsoft/ehealthwares-articles'
@@ -3898,6 +3921,7 @@ export interface FileRouteTypes {
     | '/shop/terms'
     | '/shop/upload-prescription'
     | '/shop/verify-email'
+    | '/shop/wallet'
     | '/apm/'
     | '/questionnaire/'
     | '/shop/'
@@ -4071,6 +4095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/branches/'
     | '/_authenticated/rxsoft/categories/'
     | '/_authenticated/rxsoft/coupons/'
+    | '/_authenticated/rxsoft/customer-wallets/'
     | '/_authenticated/rxsoft/customers/'
     | '/_authenticated/rxsoft/drug-components/'
     | '/_authenticated/rxsoft/ehealthwares-articles/'
@@ -4224,6 +4249,7 @@ export interface RootRouteChildren {
   ShopTermsRoute: typeof ShopTermsRoute
   ShopUploadPrescriptionRoute: typeof ShopUploadPrescriptionRoute
   ShopVerifyEmailRoute: typeof ShopVerifyEmailRoute
+  ShopWalletRoute: typeof ShopWalletRoute
   ApmIndexRoute: typeof ApmIndexRoute
   QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -4677,6 +4703,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/verify-email'
       fullPath: '/shop/verify-email'
       preLoaderRoute: typeof ShopVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/wallet': {
+      id: '/shop/wallet'
+      path: '/shop/wallet'
+      fullPath: '/shop/wallet'
+      preLoaderRoute: typeof ShopWalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/$moduleId/': {
@@ -5792,6 +5825,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftCouponsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/customer-wallets/': {
+      id: '/_authenticated/rxsoft/customer-wallets/'
+      path: '/rxsoft/customer-wallets'
+      fullPath: '/rxsoft/customer-wallets/'
+      preLoaderRoute: typeof AuthenticatedRxsoftCustomerWalletsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/customers/': {
       id: '/_authenticated/rxsoft/customers/'
       path: '/rxsoft/customers'
@@ -6790,6 +6830,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftBranchesIndexRoute: typeof AuthenticatedRxsoftBranchesIndexRoute
   AuthenticatedRxsoftCategoriesIndexRoute: typeof AuthenticatedRxsoftCategoriesIndexRoute
   AuthenticatedRxsoftCouponsIndexRoute: typeof AuthenticatedRxsoftCouponsIndexRoute
+  AuthenticatedRxsoftCustomerWalletsIndexRoute: typeof AuthenticatedRxsoftCustomerWalletsIndexRoute
   AuthenticatedRxsoftCustomersIndexRoute: typeof AuthenticatedRxsoftCustomersIndexRoute
   AuthenticatedRxsoftDrugComponentsIndexRoute: typeof AuthenticatedRxsoftDrugComponentsIndexRoute
   AuthenticatedRxsoftEhealthwaresArticlesIndexRoute: typeof AuthenticatedRxsoftEhealthwaresArticlesIndexRoute
@@ -7080,6 +7121,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftCategoriesIndexRoute:
     AuthenticatedRxsoftCategoriesIndexRoute,
   AuthenticatedRxsoftCouponsIndexRoute: AuthenticatedRxsoftCouponsIndexRoute,
+  AuthenticatedRxsoftCustomerWalletsIndexRoute:
+    AuthenticatedRxsoftCustomerWalletsIndexRoute,
   AuthenticatedRxsoftCustomersIndexRoute:
     AuthenticatedRxsoftCustomersIndexRoute,
   AuthenticatedRxsoftDrugComponentsIndexRoute:
@@ -7459,6 +7502,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopTermsRoute: ShopTermsRoute,
   ShopUploadPrescriptionRoute: ShopUploadPrescriptionRoute,
   ShopVerifyEmailRoute: ShopVerifyEmailRoute,
+  ShopWalletRoute: ShopWalletRoute,
   ApmIndexRoute: ApmIndexRoute,
   QuestionnaireIndexRoute: QuestionnaireIndexRoute,
   ShopIndexRoute: ShopIndexRoute,

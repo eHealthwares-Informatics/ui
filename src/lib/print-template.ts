@@ -13,7 +13,17 @@ import { rxsoftApi } from '@/lib/rxsoft-api';
  *   `{{totals_rows}}`  — pre-built totals `<tr>` rows (trusted markup)
  */
 
-export type PrintTemplateKind = 'pos_receipt' | 'a4_receipt' | 'invoice';
+export type PrintTemplateKind =
+  | 'pos_receipt'
+  | 'a4_receipt'
+  | 'invoice'
+  | 'labresult'
+  | 'appointment_notification'
+  | 'appointment_reschedule'
+  | 'test_result_accepted'
+  | 'test_result_completed'
+  | 'appointment_checkin'
+  | 'appointment_checkout';
 
 export type PrintTemplateRecord = {
   id: string;
