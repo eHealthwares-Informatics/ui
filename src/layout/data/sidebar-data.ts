@@ -207,7 +207,7 @@ export const sidebarData: SidebarData = {
         {
           title: 'POS',
           url: '/shop/pos',
-          permission: 'rxsoft.sales.sale.create',
+          permission: ['rxsoft.sales.sale.create', 'shop.pos'],
           icon: Store,
           modules: ['rxsoft'],
         },
