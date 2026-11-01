@@ -34,6 +34,9 @@ export type PosConfig = {
 export type RoleRequest = {
   id: string;
   userId: string;
+  /** Resolved by the API: "First Last", display name, else username. */
+  userName?: string | null;
+  userEmail?: string | null;
   roleCode: string;
   status: 'pending' | 'approved' | 'rejected';
   reason: string | null;

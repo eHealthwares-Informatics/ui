@@ -170,6 +170,92 @@ export interface PrescriptionFileView {
   mime: string;
   originalName: string;
   size: number | null;
+  createdAt?: string;
+}
+
+export type PrescriptionStockStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown';
+
+/** One transcribed medication line on a prescription (`GET /website/prescriptions/:id`). */
+export interface PrescriptionLineView {
+  id: string;
+  lineNumber: number;
+  itemId: string | null;
+  genericItemCode: string | null;
+  genericDrugCode: string | null;
+  freetextName: string | null;
+  sourceType: 'item' | 'generic_product' | 'generic_drug' | 'freetext';
+  name: string;
+  code: string | null;
+  imageUrl: string | null;
+  strength: string | null;
+  frequency: string | null;
+  instruction: string | null;
+  durationDays: number | null;
+  quantity: number;
+  unitPrice: number | null;
+  lineTotal: number;
+  notes: string | null;
+  stockStatus: PrescriptionStockStatus;
+  availableQuantity: number | null;
+}
+
+/** Order already created from a prescription, if any. */
+export interface PrescriptionOrderRef {
+  id: string;
+  orderNumber: string | null;
+  orderStatus: string | null;
+  totalAmount: number | null;
+  createdAt: string | null;
+}
+
+/** Full storefront prescription: files, pharmacist transcription and fulfilment steps. */
+export interface PrescriptionDetailView {
+  id: string;
+  userId: string | null;
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+  status: 'Pending' | 'Under Review' | 'Approved' | 'Rejected' | 'Fulfilled';
+  stage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  pharmacistNotes: string | null;
+  adminNotes: string | null;
+  preferredPharmacyId: string | null;
+  preferredPharmacyName: string | null;
+  pharmacy: {
+    organizationId: string;
+    name: string;
+    logoUrl: string | null;
+    address: string | null;
+    phone: string | null;
+  };
+  transcription: {
+    pharmacistName: string | null;
+    pharmacistPcn: string | null;
+    prescriberName: string | null;
+    facilityName: string | null;
+    transcribedAt: string | null;
+    verifiedAt: string | null;
+  };
+  steps: {
+    uploadedAt: string;
+    verifiedAt: string | null;
+    transcribedAt: string | null;
+    orderedAt: string | null;
+  };
+  files: PrescriptionFileView[];
+  lines: PrescriptionLineView[];
+  lineCount: number;
+  order: PrescriptionOrderRef | null;
+}
+
+/** Result of `POST /website/prescriptions/:id/order`. */
+export interface PrescriptionOrderResult {
+  orderId: string;
+  orderNumber: string | null;
+  orderStatus: string | null;
+  totalAmount: number | null;
 }
 
 export interface ConsultationView {

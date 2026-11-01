@@ -8,6 +8,8 @@ import type {
   ProductPharmaciesResponse,
   HealthConcernView,
   PrescriptionView,
+  PrescriptionDetailView,
+  PrescriptionOrderResult,
   ConsultationView,
   OrderView,
   BlogArticleView,
@@ -162,6 +164,37 @@ export const websiteApi = {
 
   listPrescriptions: () =>
     api.get<PrescriptionView[]>('/website/prescriptions').then((r) => r.data),
+
+  // Anonymous uploads carry a one-time capability token instead of a session,
+  // sent as `x-prescription-token` (see prescription-access.ts).
+  getPrescription: (id: string, token?: string | null) =>
+    api
+      .get<PrescriptionDetailView>(`/website/prescriptions/${id}`, {
+        headers: token ? { 'x-prescription-token': token } : undefined,
+      })
+      .then((r) => r.data),
+
+  orderPrescription: (
+    id: string,
+    data: {
+      lineIds?: string[];
+      paymentMethod: string;
+      origin?: 'website' | 'mobile';
+      notes?: string;
+      delivery?: Record<string, unknown>;
+    },
+    token?: string | null
+  ) =>
+    api
+      .post<PrescriptionOrderResult>(`/website/prescriptions/${id}/order`, data, {
+        headers: token ? { 'x-prescription-token': token } : undefined,
+      })
+      .then((r) => r.data),
+
+  claimPrescription: (id: string) =>
+    api
+      .post<{ id: string; claimed: boolean }>(`/website/prescriptions/${id}/claim`)
+      .then((r) => r.data),
 
   // Consultations
   createConsultation: (data: {

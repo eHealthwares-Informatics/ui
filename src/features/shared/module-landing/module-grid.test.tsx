@@ -47,7 +47,9 @@ describe('ModuleGrid', () => {
 
     expect(setSelectedModuleMock).toHaveBeenCalledWith('lis');
     expect(onSelect).toHaveBeenCalledWith('lis');
-    expect(navigateMock).toHaveBeenCalledWith({ to: '/lis/dashboard' });
+    // Full route id: module dashboards live under the pathless `_authenticated`
+    // layout, and the bare path did not resolve to a route.
+    expect(navigateMock).toHaveBeenCalledWith({ to: '/_authenticated/lis/dashboard' });
   });
 
   it('renders an empty grid when the user has no modules', () => {

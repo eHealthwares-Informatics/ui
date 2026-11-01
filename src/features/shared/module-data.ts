@@ -26,6 +26,13 @@ export type ModuleDefinition = {
   apiProvider: AxiosInstance;
   routes: string[];
   resources: string[];
+  /**
+   * Permission roots that grant this module when its API is served by a
+   * backend module that the user *does* have. Lets frontend-only consoles
+   * (`admin`, `website`) reappear under the RxSoft API after login compresses
+   * `rxsoft.website.*` to `rxsoft.*`. Defaults to `[id]`.
+   */
+  permissionRoots?: string[];
 };
 
 export const modules: ModuleDefinition[] = [
@@ -228,6 +235,7 @@ export const modules: ModuleDefinition[] = [
     apiProvider: rxsoftApi,
     routes: ['/admin/dashboard'],
     resources: [],
+    permissionRoots: ['rxsoft.admin'],
   },
   {
     id: 'website',
@@ -236,6 +244,7 @@ export const modules: ModuleDefinition[] = [
       'Website content management: eHealthwares products, services, sections and site settings.',
     root: '/website/dashboard',
     apiProvider: rxsoftApi,
+    permissionRoots: ['rxsoft.website'],
     routes: [
       '/website/dashboard',
       '/rxsoft/ehealthwares-hero-slides',

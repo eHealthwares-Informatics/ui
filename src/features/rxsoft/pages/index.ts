@@ -53,6 +53,7 @@ export * from './user-config';
 export * from './website-orders';
 export { RxWebsiteOrderDetailPage } from './website-orders/detail';
 export * from './website-prescriptions';
+export { RxWebsitePrescriptionDetailPage } from './website-prescriptions/detail';
 export * from './website-consultations';
 export * from './website-delivery-areas';
 export * from './website-reward-programs';

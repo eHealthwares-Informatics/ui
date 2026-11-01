@@ -951,6 +951,13 @@ export function WebsiteLayout({ children }: { children: React.ReactNode }) {
           .damorex-page {
             overflow-x: hidden;
           }
+          /* The storefront reads full-bleed: Mantine's default "xl" container
+             caps at 1320px, which left ~300px dead margins on 1920 screens.
+             Scoped to the storefront so admin consoles keep their measure. */
+          .damorex-page [class*='Container-root'] {
+            max-width: 1600px;
+            padding-inline: clamp(16px, 3vw, 40px);
+          }
           .damorex-page button:hover,
           .damorex-page a:hover,
           .lift-card:hover {

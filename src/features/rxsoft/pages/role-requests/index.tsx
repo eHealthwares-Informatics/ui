@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Badge,
   Button,
   Card,
@@ -8,8 +9,10 @@ import {
   Stack,
   Table,
   Text,
+  Tooltip,
   Title,
 } from '@mantine/core';
+import { Check, X } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -101,7 +104,18 @@ export function RoleRequestsPage() {
           ) : (
             requests.map((req) => (
               <Table.Tr key={req.id}>
-                <Table.Td>{req.userId.slice(0, 8)}</Table.Td>
+                <Table.Td>
+                  <Stack gap={0}>
+                    <Text size="sm" fw={500} data-testid={`role-request-user-${req.id}`}>
+                      {req.userName || req.userId.slice(0, 8)}
+                    </Text>
+                    {req.userEmail ? (
+                      <Text size="xs" c="dimmed">
+                        {req.userEmail}
+                      </Text>
+                    ) : null}
+                  </Stack>
+                </Table.Td>
                 <Table.Td>{req.roleCode}</Table.Td>
                 <Table.Td>
                   <Badge size="sm" variant="light" color={STATUS_COLOR[req.status]}>
@@ -111,27 +125,36 @@ export function RoleRequestsPage() {
                 <Table.Td>{new Date(req.createdAt).toLocaleString()}</Table.Td>
                 <Table.Td>
                   <Group gap={6} wrap="nowrap">
-                    <Button
-                      size="compact-xs"
-                      color="green"
-                      disabled={req.status !== 'pending'}
-                      onClick={() => {
-                        setDeciding(req);
-                        setOverrideRole(null);
-                      }}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      size="compact-xs"
-                      color="red"
-                      variant="light"
-                      disabled={req.status !== 'pending'}
-                      loading={decide.isPending}
-                      onClick={() => decide.mutate({ id: req.id, action: 'reject' })}
-                    >
-                      Reject
-                    </Button>
+                    <Tooltip label="Approve">
+                      <ActionIcon
+                        color="green"
+                        variant="light"
+                        size="sm"
+                        aria-label="Approve request"
+                        data-testid={`role-request-approve-${req.id}`}
+                        disabled={req.status !== 'pending'}
+                        onClick={() => {
+                          setDeciding(req);
+                          setOverrideRole(null);
+                        }}
+                      >
+                        <Check size={14} />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="Reject">
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        size="sm"
+                        aria-label="Reject request"
+                        data-testid={`role-request-reject-${req.id}`}
+                        disabled={req.status !== 'pending'}
+                        loading={decide.isPending}
+                        onClick={() => decide.mutate({ id: req.id, action: 'reject' })}
+                      >
+                        <X size={14} />
+                      </ActionIcon>
+                    </Tooltip>
                   </Group>
                 </Table.Td>
               </Table.Tr>

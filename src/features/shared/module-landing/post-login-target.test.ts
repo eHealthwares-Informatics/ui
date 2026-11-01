@@ -21,8 +21,13 @@ describe('resolvePostLoginTarget', () => {
   });
 
   it('a single module skips the chooser and lands on its dashboard', () => {
-    expect(resolvePostLoginTarget(undefined, ['lis'])).toBe('/lis/dashboard');
-    expect(resolvePostLoginTarget(undefined, ['rxsoft'])).toBe('/rxsoft/dashboard');
+    // Module dashboards are file routes under the pathless `_authenticated`
+    // layout, so the router expects the full route id — the bare
+    // `/lis/dashboard` string did not match a route and 404'd after login.
+    expect(resolvePostLoginTarget(undefined, ['lis'])).toBe('/_authenticated/lis/dashboard');
+    expect(resolvePostLoginTarget(undefined, ['rxsoft'])).toBe(
+      '/_authenticated/rxsoft/dashboard'
+    );
   });
 
   it('multiple modules land on the module chooser grid', () => {
