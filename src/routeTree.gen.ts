@@ -134,6 +134,7 @@ import { Route as ShopBranchesIdRouteImport } from './routes/shop/branches.$id'
 import { Route as ShopCategoriesSlugRouteImport } from './routes/shop/categories.$slug'
 import { Route as ShopHealthConcernsSlugRouteImport } from './routes/shop/health-concerns.$slug'
 import { Route as ShopMedicinesCodeRouteImport } from './routes/shop/medicines.$code'
+import { Route as ShopMyPrescriptionsIdRouteImport } from './routes/shop/my-prescriptions_.$id'
 import { Route as ShopOrdersIdRouteImport } from './routes/shop/orders_.$id'
 import { Route as ShopPayTokenRouteImport } from './routes/shop/pay.$token'
 import { Route as ShopPayReturnRouteImport } from './routes/shop/pay.return'
@@ -255,6 +256,7 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
 import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
+import { Route as AuthenticatedRxsoftNotificationTemplatesIndexRouteImport } from './routes/_authenticated/rxsoft/notification-templates/index'
 import { Route as AuthenticatedRxsoftOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/orders/index'
 import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
 import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index'
@@ -269,6 +271,7 @@ import { Route as AuthenticatedRxsoftPosTerminalsIndexRouteImport } from './rout
 import { Route as AuthenticatedRxsoftPriceAdjustmentsIndexRouteImport } from './routes/_authenticated/rxsoft/price-adjustments/index'
 import { Route as AuthenticatedRxsoftPriceListItemsIndexRouteImport } from './routes/_authenticated/rxsoft/price-list-items/index'
 import { Route as AuthenticatedRxsoftPriceListsIndexRouteImport } from './routes/_authenticated/rxsoft/price-lists/index'
+import { Route as AuthenticatedRxsoftPrintTemplatesIndexRouteImport } from './routes/_authenticated/rxsoft/print-templates/index'
 import { Route as AuthenticatedRxsoftProductsIndexRouteImport } from './routes/_authenticated/rxsoft/products/index'
 import { Route as AuthenticatedRxsoftPurchasesIndexRouteImport } from './routes/_authenticated/rxsoft/purchases/index'
 import { Route as AuthenticatedRxsoftReceivablesIndexRouteImport } from './routes/_authenticated/rxsoft/receivables/index'
@@ -296,6 +299,7 @@ import { Route as AuthenticatedRxsoftWebsiteDeliveryAreasIndexRouteImport } from
 import { Route as AuthenticatedRxsoftWebsiteOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/website-orders/index'
 import { Route as AuthenticatedRxsoftWebsiteOrdersOrderIdRouteImport } from './routes/_authenticated/rxsoft/website-orders/$orderId'
 import { Route as AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/index'
+import { Route as AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRouteImport } from './routes/_authenticated/rxsoft/website-prescriptions/$prescriptionId'
 import { Route as AuthenticatedRxsoftWebsiteRewardProgramsIndexRouteImport } from './routes/_authenticated/rxsoft/website-reward-programs/index'
 import { Route as ApmAdminPollingUnitsWardIdRouteImport } from './routes/apm/admin/polling-units.$wardId'
 import { Route as ApmAdminWardsLgaIdRouteImport } from './routes/apm/admin/wards.$lgaId'
@@ -992,6 +996,11 @@ const ShopMedicinesCodeRoute = ShopMedicinesCodeRouteImport.update({
   id: '/$code',
   path: '/$code',
   getParentRoute: () => ShopMedicinesRoute,
+} as any)
+const ShopMyPrescriptionsIdRoute = ShopMyPrescriptionsIdRouteImport.update({
+  id: '/shop/my-prescriptions_/$id',
+  path: '/shop/my-prescriptions/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopOrdersIdRoute = ShopOrdersIdRouteImport.update({
   id: '/shop/orders_/$id',
@@ -1714,6 +1723,12 @@ const AuthenticatedRxsoftManufacturersIndexRoute =
     path: '/rxsoft/manufacturers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftNotificationTemplatesIndexRoute =
+  AuthenticatedRxsoftNotificationTemplatesIndexRouteImport.update({
+    id: '/rxsoft/notification-templates/',
+    path: '/rxsoft/notification-templates/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftOrdersIndexRoute =
   AuthenticatedRxsoftOrdersIndexRouteImport.update({
     id: '/rxsoft/orders/',
@@ -1796,6 +1811,12 @@ const AuthenticatedRxsoftPriceListsIndexRoute =
   AuthenticatedRxsoftPriceListsIndexRouteImport.update({
     id: '/rxsoft/price-lists/',
     path: '/rxsoft/price-lists/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftPrintTemplatesIndexRoute =
+  AuthenticatedRxsoftPrintTemplatesIndexRouteImport.update({
+    id: '/rxsoft/print-templates/',
+    path: '/rxsoft/print-templates/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftProductsIndexRoute =
@@ -1958,6 +1979,12 @@ const AuthenticatedRxsoftWebsitePrescriptionsIndexRoute =
   AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport.update({
     id: '/rxsoft/website-prescriptions/',
     path: '/rxsoft/website-prescriptions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute =
+  AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRouteImport.update({
+    id: '/rxsoft/website-prescriptions/$prescriptionId',
+    path: '/rxsoft/website-prescriptions/$prescriptionId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftWebsiteRewardProgramsIndexRoute =
@@ -2295,6 +2322,7 @@ export interface FileRoutesByFullPath {
   '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
   '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
   '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/my-prescriptions/$id': typeof ShopMyPrescriptionsIdRoute
   '/shop/orders/$id': typeof ShopOrdersIdRoute
   '/shop/pay/$token': typeof ShopPayTokenRoute
   '/shop/pay/return': typeof ShopPayReturnRoute
@@ -2333,6 +2361,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
+  '/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -2431,6 +2460,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -2444,6 +2474,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/price-adjustments/': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/print-templates/': typeof AuthenticatedRxsoftPrintTemplatesIndexRoute
   '/rxsoft/products/': typeof AuthenticatedRxsoftProductsIndexRoute
   '/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
@@ -2615,6 +2646,7 @@ export interface FileRoutesByTo {
   '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
   '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
   '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/my-prescriptions/$id': typeof ShopMyPrescriptionsIdRoute
   '/shop/orders/$id': typeof ShopOrdersIdRoute
   '/shop/pay/$token': typeof ShopPayTokenRoute
   '/shop/pay/return': typeof ShopPayReturnRoute
@@ -2653,6 +2685,7 @@ export interface FileRoutesByTo {
   '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
+  '/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/coding-concept/dosage-forms': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -2751,6 +2784,7 @@ export interface FileRoutesByTo {
   '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-templates': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -2764,6 +2798,7 @@ export interface FileRoutesByTo {
   '/rxsoft/price-adjustments': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/rxsoft/price-list-items': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/rxsoft/price-lists': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/rxsoft/print-templates': typeof AuthenticatedRxsoftPrintTemplatesIndexRoute
   '/rxsoft/products': typeof AuthenticatedRxsoftProductsIndexRoute
   '/rxsoft/purchases': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/rxsoft/receivables': typeof AuthenticatedRxsoftReceivablesIndexRoute
@@ -2941,6 +2976,7 @@ export interface FileRoutesById {
   '/shop/categories/$slug': typeof ShopCategoriesSlugRoute
   '/shop/health-concerns/$slug': typeof ShopHealthConcernsSlugRoute
   '/shop/medicines/$code': typeof ShopMedicinesCodeRoute
+  '/shop/my-prescriptions_/$id': typeof ShopMyPrescriptionsIdRoute
   '/shop/orders_/$id': typeof ShopOrdersIdRoute
   '/shop/pay/$token': typeof ShopPayTokenRoute
   '/shop/pay/return': typeof ShopPayReturnRoute
@@ -2979,6 +3015,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/_authenticated/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/_authenticated/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
+  '/_authenticated/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
   '/apm/admin/polling-units/$wardId': typeof ApmAdminPollingUnitsWardIdRoute
   '/apm/admin/wards/$lgaId': typeof ApmAdminWardsLgaIdRoute
   '/_authenticated/coding-concept/dosage-forms/': typeof AuthenticatedCodingConceptDosageFormsIndexRoute
@@ -3077,6 +3114,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/_authenticated/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/_authenticated/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3090,6 +3128,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/price-adjustments/': typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   '/_authenticated/rxsoft/price-list-items/': typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   '/_authenticated/rxsoft/price-lists/': typeof AuthenticatedRxsoftPriceListsIndexRoute
+  '/_authenticated/rxsoft/print-templates/': typeof AuthenticatedRxsoftPrintTemplatesIndexRoute
   '/_authenticated/rxsoft/products/': typeof AuthenticatedRxsoftProductsIndexRoute
   '/_authenticated/rxsoft/purchases/': typeof AuthenticatedRxsoftPurchasesIndexRoute
   '/_authenticated/rxsoft/receivables/': typeof AuthenticatedRxsoftReceivablesIndexRoute
@@ -3265,6 +3304,7 @@ export interface FileRouteTypes {
     | '/shop/categories/$slug'
     | '/shop/health-concerns/$slug'
     | '/shop/medicines/$code'
+    | '/shop/my-prescriptions/$id'
     | '/shop/orders/$id'
     | '/shop/pay/$token'
     | '/shop/pay/return'
@@ -3303,6 +3343,7 @@ export interface FileRouteTypes {
     | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
     | '/rxsoft/website-orders/$orderId'
+    | '/rxsoft/website-prescriptions/$prescriptionId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/coding-concept/dosage-forms/'
@@ -3401,6 +3442,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines/'
     | '/rxsoft/journals/'
     | '/rxsoft/manufacturers/'
+    | '/rxsoft/notification-templates/'
     | '/rxsoft/orders/'
     | '/rxsoft/organisation-config/'
     | '/rxsoft/organisation-payment-providers/'
@@ -3414,6 +3456,7 @@ export interface FileRouteTypes {
     | '/rxsoft/price-adjustments/'
     | '/rxsoft/price-list-items/'
     | '/rxsoft/price-lists/'
+    | '/rxsoft/print-templates/'
     | '/rxsoft/products/'
     | '/rxsoft/purchases/'
     | '/rxsoft/receivables/'
@@ -3585,6 +3628,7 @@ export interface FileRouteTypes {
     | '/shop/categories/$slug'
     | '/shop/health-concerns/$slug'
     | '/shop/medicines/$code'
+    | '/shop/my-prescriptions/$id'
     | '/shop/orders/$id'
     | '/shop/pay/$token'
     | '/shop/pay/return'
@@ -3623,6 +3667,7 @@ export interface FileRouteTypes {
     | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
     | '/rxsoft/website-orders/$orderId'
+    | '/rxsoft/website-prescriptions/$prescriptionId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/coding-concept/dosage-forms'
@@ -3721,6 +3766,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines'
     | '/rxsoft/journals'
     | '/rxsoft/manufacturers'
+    | '/rxsoft/notification-templates'
     | '/rxsoft/orders'
     | '/rxsoft/organisation-config'
     | '/rxsoft/organisation-payment-providers'
@@ -3734,6 +3780,7 @@ export interface FileRouteTypes {
     | '/rxsoft/price-adjustments'
     | '/rxsoft/price-list-items'
     | '/rxsoft/price-lists'
+    | '/rxsoft/print-templates'
     | '/rxsoft/products'
     | '/rxsoft/purchases'
     | '/rxsoft/receivables'
@@ -3910,6 +3957,7 @@ export interface FileRouteTypes {
     | '/shop/categories/$slug'
     | '/shop/health-concerns/$slug'
     | '/shop/medicines/$code'
+    | '/shop/my-prescriptions_/$id'
     | '/shop/orders_/$id'
     | '/shop/pay/$token'
     | '/shop/pay/return'
@@ -3948,6 +3996,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/settings/notifications'
     | '/_authenticated/rxsoft/uoms/$uomId'
     | '/_authenticated/rxsoft/website-orders/$orderId'
+    | '/_authenticated/rxsoft/website-prescriptions/$prescriptionId'
     | '/apm/admin/polling-units/$wardId'
     | '/apm/admin/wards/$lgaId'
     | '/_authenticated/coding-concept/dosage-forms/'
@@ -4046,6 +4095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/journal-entry-lines/'
     | '/_authenticated/rxsoft/journals/'
     | '/_authenticated/rxsoft/manufacturers/'
+    | '/_authenticated/rxsoft/notification-templates/'
     | '/_authenticated/rxsoft/orders/'
     | '/_authenticated/rxsoft/organisation-config/'
     | '/_authenticated/rxsoft/organisation-payment-providers/'
@@ -4059,6 +4109,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/price-adjustments/'
     | '/_authenticated/rxsoft/price-list-items/'
     | '/_authenticated/rxsoft/price-lists/'
+    | '/_authenticated/rxsoft/print-templates/'
     | '/_authenticated/rxsoft/products/'
     | '/_authenticated/rxsoft/purchases/'
     | '/_authenticated/rxsoft/receivables/'
@@ -4176,6 +4227,7 @@ export interface RootRouteChildren {
   ApmIndexRoute: typeof ApmIndexRoute
   QuestionnaireIndexRoute: typeof QuestionnaireIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
+  ShopMyPrescriptionsIdRoute: typeof ShopMyPrescriptionsIdRoute
   ShopOrdersIdRoute: typeof ShopOrdersIdRoute
   ShopPayTokenRoute: typeof ShopPayTokenRoute
   ShopPayReturnRoute: typeof ShopPayReturnRoute
@@ -5061,6 +5113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopMedicinesCodeRouteImport
       parentRoute: typeof ShopMedicinesRoute
     }
+    '/shop/my-prescriptions_/$id': {
+      id: '/shop/my-prescriptions_/$id'
+      path: '/shop/my-prescriptions/$id'
+      fullPath: '/shop/my-prescriptions/$id'
+      preLoaderRoute: typeof ShopMyPrescriptionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/orders_/$id': {
       id: '/shop/orders_/$id'
       path: '/shop/orders/$id'
@@ -5908,6 +5967,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/notification-templates/': {
+      id: '/_authenticated/rxsoft/notification-templates/'
+      path: '/rxsoft/notification-templates'
+      fullPath: '/rxsoft/notification-templates/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/orders/': {
       id: '/_authenticated/rxsoft/orders/'
       path: '/rxsoft/orders'
@@ -6004,6 +6070,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/price-lists'
       fullPath: '/rxsoft/price-lists/'
       preLoaderRoute: typeof AuthenticatedRxsoftPriceListsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/print-templates/': {
+      id: '/_authenticated/rxsoft/print-templates/'
+      path: '/rxsoft/print-templates'
+      fullPath: '/rxsoft/print-templates/'
+      preLoaderRoute: typeof AuthenticatedRxsoftPrintTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/products/': {
@@ -6193,6 +6266,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/website-prescriptions'
       fullPath: '/rxsoft/website-prescriptions/'
       preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/website-prescriptions/$prescriptionId': {
+      id: '/_authenticated/rxsoft/website-prescriptions/$prescriptionId'
+      path: '/rxsoft/website-prescriptions/$prescriptionId'
+      fullPath: '/rxsoft/website-prescriptions/$prescriptionId'
+      preLoaderRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/website-reward-programs/': {
@@ -6637,6 +6717,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute: typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
   AuthenticatedRxsoftUomsUomIdRoute: typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   AuthenticatedRxsoftWebsiteOrdersOrderIdRoute: typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
+  AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute: typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
   AuthenticatedCodingConceptDosageFormsIndexRoute: typeof AuthenticatedCodingConceptDosageFormsIndexRoute
   AuthenticatedCodingConceptDrugClassificationsIndexRoute: typeof AuthenticatedCodingConceptDrugClassificationsIndexRoute
   AuthenticatedCodingConceptDrugComponentsIndexRoute: typeof AuthenticatedCodingConceptDrugComponentsIndexRoute
@@ -6733,6 +6814,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
+  AuthenticatedRxsoftNotificationTemplatesIndexRoute: typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   AuthenticatedRxsoftOrdersIndexRoute: typeof AuthenticatedRxsoftOrdersIndexRoute
   AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -6746,6 +6828,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftPriceAdjustmentsIndexRoute: typeof AuthenticatedRxsoftPriceAdjustmentsIndexRoute
   AuthenticatedRxsoftPriceListItemsIndexRoute: typeof AuthenticatedRxsoftPriceListItemsIndexRoute
   AuthenticatedRxsoftPriceListsIndexRoute: typeof AuthenticatedRxsoftPriceListsIndexRoute
+  AuthenticatedRxsoftPrintTemplatesIndexRoute: typeof AuthenticatedRxsoftPrintTemplatesIndexRoute
   AuthenticatedRxsoftProductsIndexRoute: typeof AuthenticatedRxsoftProductsIndexRoute
   AuthenticatedRxsoftPurchasesIndexRoute: typeof AuthenticatedRxsoftPurchasesIndexRoute
   AuthenticatedRxsoftReceivablesIndexRoute: typeof AuthenticatedRxsoftReceivablesIndexRoute
@@ -6884,6 +6967,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftUomsUomIdRouteWithChildren,
   AuthenticatedRxsoftWebsiteOrdersOrderIdRoute:
     AuthenticatedRxsoftWebsiteOrdersOrderIdRoute,
+  AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute:
+    AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute,
   AuthenticatedCodingConceptDosageFormsIndexRoute:
     AuthenticatedCodingConceptDosageFormsIndexRoute,
   AuthenticatedCodingConceptDrugClassificationsIndexRoute:
@@ -7041,6 +7126,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
   AuthenticatedRxsoftManufacturersIndexRoute:
     AuthenticatedRxsoftManufacturersIndexRoute,
+  AuthenticatedRxsoftNotificationTemplatesIndexRoute:
+    AuthenticatedRxsoftNotificationTemplatesIndexRoute,
   AuthenticatedRxsoftOrdersIndexRoute: AuthenticatedRxsoftOrdersIndexRoute,
   AuthenticatedRxsoftOrganisationConfigIndexRoute:
     AuthenticatedRxsoftOrganisationConfigIndexRoute,
@@ -7065,6 +7152,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRxsoftPriceListItemsIndexRoute,
   AuthenticatedRxsoftPriceListsIndexRoute:
     AuthenticatedRxsoftPriceListsIndexRoute,
+  AuthenticatedRxsoftPrintTemplatesIndexRoute:
+    AuthenticatedRxsoftPrintTemplatesIndexRoute,
   AuthenticatedRxsoftProductsIndexRoute: AuthenticatedRxsoftProductsIndexRoute,
   AuthenticatedRxsoftPurchasesIndexRoute:
     AuthenticatedRxsoftPurchasesIndexRoute,
@@ -7373,6 +7462,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApmIndexRoute: ApmIndexRoute,
   QuestionnaireIndexRoute: QuestionnaireIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
+  ShopMyPrescriptionsIdRoute: ShopMyPrescriptionsIdRoute,
   ShopOrdersIdRoute: ShopOrdersIdRoute,
   ShopPayTokenRoute: ShopPayTokenRoute,
   ShopPayReturnRoute: ShopPayReturnRoute,
