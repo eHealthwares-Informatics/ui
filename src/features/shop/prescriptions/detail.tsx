@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { resolveMediaUrl } from '@/lib/media-url';
 import { useAccountDrawerStore } from '../website/account-drawer-store';
 import { websiteApi } from '../website/api';
 import { useAuthStore } from '../website/auth-store';
@@ -79,10 +80,11 @@ function naira(value: number | null | undefined) {
 }
 
 function withMediaToken(url: string | null | undefined, token: string | null): string {
-  if (!url) return '';
-  if (!token) return url;
-  const sep = url.includes('?') ? '&' : '?';
-  return `${url}${sep}token=${encodeURIComponent(token)}`;
+  const resolved = resolveMediaUrl(url);
+  if (!resolved) return '';
+  if (!token) return resolved;
+  const sep = resolved.includes('?') ? '&' : '?';
+  return `${resolved}${sep}token=${encodeURIComponent(token)}`;
 }
 
 function dateLabel(value: string | null | undefined) {

@@ -47,6 +47,11 @@ export function GenericViewPage({ page, id }: GenericViewPageProps) {
     return <div>Loading...</div>;
   }
 
+  const isEmpty = !data || (typeof data === 'object' && Object.keys(data as object).length === 0);
+  if (detailQuery.isError || isEmpty) {
+    return <div>Record not found</div>;
+  }
+
   return <GenericViewComponent view={view as View<any>} data={data} />;
 }
 
@@ -60,8 +65,11 @@ function CodingConceptDetailView({ id }: { id: string }) {
 
   const data = detailQuery.data?.data?.data;
 
-  if (!data) {
+  if (detailQuery.isLoading) {
     return <div>Loading...</div>;
+  }
+  if (detailQuery.isError || !data) {
+    return <div>Record not found</div>;
   }
 
   return <GenericViewComponent view={view as View<any>} data={data} />;

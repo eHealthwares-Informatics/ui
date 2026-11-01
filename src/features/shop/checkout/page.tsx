@@ -786,8 +786,13 @@ export default function CheckoutPage() {
       try {
         const formData = new FormData();
         rxFiles.forEach((file) => formData.append('files', file));
+        // Prescriber name goes into its dedicated column so the admin
+        // prescription page shows it; the remaining details go into notes.
+        if (prescriberName.trim()) {
+          formData.append('prescriberName', prescriberName.trim());
+        }
         const details = [
-          prescriberName.trim() ? `Prescriber: ${prescriberName.trim()} (${prescriberType})` : '',
+          prescriberType ? `Prescriber type: ${prescriberType}` : '',
           prescriberLicense.trim() ? `License: ${prescriberLicense.trim()}` : '',
           prescriberPhone.trim() ? `Prescriber phone: ${prescriberPhone.trim()}` : '',
           prescriptionNotes.trim() ? `Notes: ${prescriptionNotes.trim()}` : '',

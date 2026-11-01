@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, within, cleanup } from '@test-utils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SettingsAccount } from './account-page';
 
 afterEach(() => cleanup());
@@ -29,9 +29,7 @@ describe('SettingsAccount', () => {
     const { container } = render(<SettingsAccount />);
 
     expect(hasText(container, 'GitHub username')).toBe(true);
-    expect(
-      within(container).getByPlaceholderText('GitHub username')
-    ).toBeInTheDocument();
+    expect(within(container).getByPlaceholderText('GitHub username')).toBeInTheDocument();
     expect(hasText(container, 'GitLab username')).toBe(true);
     expect(hasText(container, 'Google account')).toBe(true);
   });
@@ -52,5 +50,12 @@ describe('SettingsAccount', () => {
     expect(hasText(container, 'Disabled')).toBe(true);
     expect(hasText(container, 'Scan this code')).toBe(true);
     expect(within(container).getByPlaceholderText('Enter code')).toBeInTheDocument();
+  });
+
+  it('renders the Config for allowed modules section (regression: feature not lost)', () => {
+    const { container } = render(<SettingsAccount />);
+
+    expect(hasText(container, 'Config for allowed modules')).toBe(true);
+    expect(within(container).getByTestId('account-allowed-modules')).toBeInTheDocument();
   });
 });

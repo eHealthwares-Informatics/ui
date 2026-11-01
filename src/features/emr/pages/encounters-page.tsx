@@ -103,6 +103,7 @@ export function EncountersPage() {
         encounterType: String(record.encounterType ?? ''),
         providerName: (record.providerName as string | null) ?? null,
         encounterDatetime: String(record.encounterDatetime),
+        createdAt: record.createdAt ? String(record.createdAt) : null,
       };
       setActiveEncounter(next);
       window.localStorage.setItem(ACTIVE_ENCOUNTER_KEY, JSON.stringify(next));
@@ -153,7 +154,11 @@ export function EncountersPage() {
               </Stack>
 
               <Stack align="flex-end" gap={4}>
-                <EncounterTimer startIso={activeEncounter.encounterDatetime} size="xl" />
+                <EncounterTimer
+                  startIso={activeEncounter.encounterDatetime}
+                  fallbackIso={activeEncounter.createdAt}
+                  size="xl"
+                />
                 <Text size="xs" c="dimmed">
                   since {new Date(activeEncounter.encounterDatetime).toLocaleTimeString()}
                 </Text>
@@ -247,7 +252,11 @@ export function EncountersPage() {
                         <Table.Td>{started ? new Date(started).toLocaleString() : '—'}</Table.Td>
                         <Table.Td>
                           {today ? (
-                            <EncounterTimer startIso={started} size="sm" />
+                            <EncounterTimer
+                              startIso={started}
+                              fallbackIso={row.createdAt ? String(row.createdAt) : undefined}
+                              size="sm"
+                            />
                           ) : started ? (
                             <Text size="sm" c="dimmed">
                               {new Date(started).toLocaleDateString()}

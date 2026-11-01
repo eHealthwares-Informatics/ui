@@ -1,5 +1,4 @@
 import { Card, Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { useNavigate } from '@tanstack/react-router';
 import { Boxes, ChevronRight } from 'lucide-react';
 import type { ModuleId } from '@/features/shared/module-data';
 import { getModuleDashboard } from '@/lib/module-routing';
@@ -9,12 +8,13 @@ import { useAuthStore } from '@/stores/auth-store';
  * Lists the modules the signed-in account is allowed to access (identity's
  * permission-derived module list from /auth/me) and links into each module's
  * dashboard, where its configuration lives.
+ *
+ * Links are plain anchors (not the router) so the section renders in contexts
+ * without a RouterProvider (e.g. unit tests) and a module switch reloads the
+ * module shell cleanly.
  */
 export function AllowedModulesConfig() {
   const modules = useAuthStore((s) => s.modules);
-  const navigate = useNavigate();
-  const go = (path: string) =>
-    (navigate as unknown as (opts: { to: string }) => void)({ to: path });
 
   return (
     <Card withBorder radius="md" p="lg" data-testid="account-allowed-modules">
@@ -40,7 +40,8 @@ export function AllowedModulesConfig() {
             {modules.map((mod) => (
               <UnstyledButton
                 key={mod.id}
-                onClick={() => go(getModuleDashboard(mod.id as ModuleId))}
+                component="a"
+                href={getModuleDashboard(mod.id as ModuleId)}
                 data-testid={`allowed-module-${mod.id}`}
                 style={{
                   borderRadius: 10,

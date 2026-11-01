@@ -28,6 +28,7 @@ import { ArrowLeft, Check, CircleCheck, FilePlus2, Pencil, Send, Trash2, X } fro
 import { useEffect, useMemo, useState } from 'react';
 import { getAccessToken } from '@/lib/auth-tokens';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { resolveMediaUrl } from '@/lib/media-url';
 import { useHasPermission } from '@/lib/permissions';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { useAuthStore } from '@/stores/auth-store';
@@ -149,10 +150,11 @@ function naira(value: number | null | undefined) {
 }
 
 function withMediaToken(url: string | null | undefined, token: string | null): string {
-  if (!url) return '';
-  if (!token) return url;
-  const sep = url.includes('?') ? '&' : '?';
-  return `${url}${sep}token=${encodeURIComponent(token)}`;
+  const resolved = resolveMediaUrl(url);
+  if (!resolved) return '';
+  if (!token) return resolved;
+  const sep = resolved.includes('?') ? '&' : '?';
+  return `${resolved}${sep}token=${encodeURIComponent(token)}`;
 }
 
 function dateLabel(value: string | null | undefined) {
@@ -630,6 +632,19 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
                 )}
               </Stack>
             </Card>
+
+            {/* Submitted details from the checkout (prescriber type, license,
+                phone, shopper notes). */}
+            {data.adminNotes ? (
+              <Card withBorder radius="md" p="md">
+                <Stack gap="xs">
+                  <Text fw={700}>Submitted details (from checkout)</Text>
+                  <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                    {data.adminNotes}
+                  </Text>
+                </Stack>
+              </Card>
+            ) : null}
 
             {/* Transcription */}
             <Card withBorder radius="md" p="md">

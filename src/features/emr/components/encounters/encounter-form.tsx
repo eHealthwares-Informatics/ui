@@ -64,7 +64,12 @@ export function EncounterForm({
         encounterType: values.encounterType,
         providerId: provider?.id ?? undefined,
         providerName: provider?.staffName || undefined,
-        encounterDatetime: values.encounterDatetime || undefined,
+        // `datetime-local` gives a naive wall-clock string ("2025-10-30T12:41");
+        // convert in the browser's timezone to a real UTC instant so the server
+        // doesn't reinterpret it in its own zone (the GMT+1 timer bug).
+        encounterDatetime: values.encounterDatetime
+          ? new Date(values.encounterDatetime).toISOString()
+          : undefined,
         reason: values.reason || undefined,
         notes: values.notes || undefined,
       });

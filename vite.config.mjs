@@ -1,9 +1,9 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import fs from 'node:fs';
+import path from 'node:path';
 
 // ── Local dev TLS (self-signed) ─────────────────────────────────────────
 // Generated with: openssl req -x509 ... (CA) + openssl x509 -req (localhost).
@@ -24,20 +24,20 @@ const loadDevHttps = () => {
 const httpsOptions = loadDevHttps();
 
 export default defineConfig({
-   optimizeDeps: {
-    include: [
-      'react', 
-      'react/jsx-runtime', 
-      'react-dom'
-    ],
+  optimizeDeps: {
+    include: ['react', 'react/jsx-runtime', 'react-dom'],
   },
-  plugins: [tanstackRouter({
-    target: 'react',
-    autoCodeSplitting: true,
-  }), react(), sentryVitePlugin({
-    org: "ehealthwares",
-    project: "rxsoft-admin"
-  })],
+  plugins: [
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+    }),
+    react(),
+    sentryVitePlugin({
+      org: 'ehealthwares',
+      project: 'rxsoft-admin',
+    }),
+  ],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -58,13 +58,15 @@ export default defineConfig({
     // cashier's own machine or trip mixed-content blocking.
     __IDENTITY_API_URL__: JSON.stringify(process.env.VITE_IDENTITY_API_URL || '/api/identity'),
     __EMR_API_URL__: JSON.stringify(process.env.VITE_EMR_API_URL || '/api/emr'),
-    __COMMUNICATION_API_URL__: JSON.stringify(process.env.VITE_COMMUNICATION_API_URL || '/api/communication'),
+    __COMMUNICATION_API_URL__: JSON.stringify(
+      process.env.VITE_COMMUNICATION_API_URL || '/api/communication'
+    ),
     __LIS_API_URL__: JSON.stringify(process.env.VITE_LIS_API_URL || '/api/lis'),
     __RXSOFT_API_URL__: JSON.stringify(process.env.VITE_RXSOFT_API_URL || '/api'),
   },
   build: {
     minify: true,
-    sourcemap: false
+    sourcemap: false,
   },
   server: {
     port: 5173,
@@ -107,5 +109,5 @@ export default defineConfig({
         '**/playwright-report/**',
       ],
     },
-  }
+  },
 });

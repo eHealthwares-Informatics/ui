@@ -35,6 +35,7 @@ export type ActiveEncounter = {
   encounterType: string;
   providerName: string | null;
   encounterDatetime: string;
+  createdAt?: string | null;
 };
 
 export function DocumentationModal({
