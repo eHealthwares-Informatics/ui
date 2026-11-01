@@ -9,6 +9,10 @@ export interface WebsiteUser {
   email: string;
   phone: string;
   roles: string[];
+  /** Profile claims — absent for phone-only sign-ups (display falls back to the username). */
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
 }
 
 export interface WebsiteAuthStore {
@@ -52,6 +56,9 @@ function decodeToken(token: string): WebsiteUser {
     email: normaliseWebsiteEmail(payload.email, payload.sub),
     phone: payload.phone || '',
     roles: payload.roles || [],
+    firstName: payload.firstName ?? null,
+    lastName: payload.lastName ?? null,
+    displayName: payload.displayName ?? null,
   };
 }
 

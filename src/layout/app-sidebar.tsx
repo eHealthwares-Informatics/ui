@@ -7,6 +7,7 @@ import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
 import { useAuthStore } from '@/stores/auth-store';
+import { displayNameOf } from '@/lib/user-name';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
 import { NavUser } from './nav-user';
 import classes from './app-sidebar.module.css';
@@ -110,7 +111,7 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
 
         <NavUser
           user={{
-            name: user?.username ?? 'RxSoft User',
+            name: user ? displayNameOf(user, 'RxSoft User') : 'RxSoft User',
             email: user?.roles?.join(', ') ?? 'No roles assigned',
             avatar: sidebarData.user.avatar,
           }}

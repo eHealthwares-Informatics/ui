@@ -11,6 +11,7 @@ import {
   Stethoscope,
   Truck,
 } from 'lucide-react';
+import { displayNameOf, initialsOf } from '@/lib/user-name';
 import { AuthPanel } from '../auth/auth-panel';
 import { useAccountDrawerStore } from './account-drawer-store';
 import { useAuthStore } from './auth-store';
@@ -56,14 +57,7 @@ function LoggedInView({ onClose }: { onClose: () => void }) {
   const { data: prescriptions } = usePrescriptions();
   const { data: rewards } = useRewards();
 
-  const initials = user?.username
-    ? user.username
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : 'U';
+  const initials = initialsOf(user);
 
   const activeOrders =
     orders?.filter((o: any) => o.status !== 'Delivered' && o.status !== 'Cancelled').length ?? 0;
@@ -96,7 +90,7 @@ function LoggedInView({ onClose }: { onClose: () => void }) {
           </Avatar>
           <Box ta="center">
             <Text fw={900} size="lg" c={ink}>
-              {user?.username || 'User'}
+              {displayNameOf(user)}
             </Text>
             <Text size="sm" c={muted}>
               {user?.email || ''}

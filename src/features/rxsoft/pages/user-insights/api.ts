@@ -4,6 +4,13 @@ import { rxsoftApi } from '@/lib/rxsoft-api';
 export type MeProfile = {
   id: string;
   username: string;
+  /** "First Last", else the provider display name, else the username. */
+  name?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
   roles: string[];
   permissions: string[];
   modules: Array<{ code: string; name?: string }>;
