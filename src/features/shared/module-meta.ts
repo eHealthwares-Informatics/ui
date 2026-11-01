@@ -37,3 +37,18 @@ export const modulePlans: Record<string, string> = {
   website: 'Website Content',
   identity: 'Identity & Access',
 };
+
+/**
+ * Module brand assets — 3D hex icon images used in the TeamSwitcher and module
+ * landing cards. Modules without a dedicated image fall back to their lucide
+ * icon in `moduleIcons`.
+ */
+export const moduleCards: Record<string, { icon: string }> = {
+  rxsoft: { icon: '/assets/module-icons/rx-pills.png' },
+  communication: { icon: '/assets/module-icons/bars-pulse.png' },
+  conversation: { icon: '/assets/module-icons/chat.png' },
+  lis: { icon: '/assets/module-icons/labtest.png' },
+  emr: { icon: '/assets/module-icons/heart-cross.png' },
+  admin: { icon: '/assets/module-icons/lock.png' },
+  identity: { icon: '/assets/module-icons/lock.png' },
+};

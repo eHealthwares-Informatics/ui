@@ -1,23 +1,25 @@
-import { Menu, UnstyledButton, Group, Stack, Text, Box, Loader } from '@mantine/core';
+import { Menu, UnstyledButton, Stack, Text, Box, Loader } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { ChevronsUpDown, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
 import type { ModuleId } from '@/features/shared/module-data';
-import { moduleIcons, modulePlans } from '@/features/shared/module-meta';
+import { moduleIcons, modulePlans, moduleCards } from '@/features/shared/module-meta';
 import { getModuleDashboard } from '@/lib/module-routing';
 import { useAuthStore, type ModuleInfo } from '@/stores/auth-store';
+import classes from './team-switcher.module.css';
 
 function toTeams(modules: ModuleInfo[]) {
   return modules.map((mod) => ({
     name: mod.name,
+    iconSrc: moduleCards[mod.id]?.icon,
     logo: moduleIcons[mod.id] || Shield,
     plan: modulePlans[mod.id] || mod.description,
     moduleId: mod.id as ModuleId,
   }));
 }
 
-export function TeamSwitcher() {
+export function TeamSwitcher({ compact = false }: { compact?: boolean } = {}) {
   const navigate = useNavigate();
   const moduleId = useModuleId();
   const setSelectedModuleId = useSetSelectedModule();
@@ -45,68 +47,74 @@ export function TeamSwitcher() {
     );
   }
 
+  const activeLogo = activeTeam?.logo;
+  const ActiveLogo = activeLogo;
+  const activeIcon = activeTeam?.iconSrc ? (
+    <img className={classes.icon} src={activeTeam.iconSrc} alt="" aria-hidden="true" />
+  ) : activeLogo ? (
+    <span className={classes.iconFallback}>
+      <ActiveLogo size={16} />
+    </span>
+  ) : null;
+
   return (
-    <Menu opened={opened} onChange={setOpened} width={220} position="right-start" offset={6}>
+    <Menu opened={opened} onChange={setOpened} width={compact ? 230 : 220} position="bottom-start" offset={6}>
       <Menu.Target>
         <UnstyledButton
+          className={`${classes.trigger} ${compact ? classes.triggerCompact : ''}`}
           data-testid="team-switcher-trigger"
           onClick={() => setOpened((o) => !o)}
-          style={{
-            width: '100%',
-            padding: '10px',
-            borderRadius: 8,
-          }}
         >
-          <Group gap="sm">
-            <Box
-              style={{
-                width: 32,
-                height: 32,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 8,
-                background: 'var(--mantine-color-blue-6)',
-                color: 'white',
-              }}
-            >
-              {activeTeam && <activeTeam.logo size={16} />}
-            </Box>
-
-            <Stack gap={0} style={{ flex: 1 }}>
-              <Text size="sm" fw={600} truncate>
+          <span className={classes.row}>
+            {activeIcon}
+            <span className={classes.text}>
+              <span className={classes.name}>
                 {activeTeam?.name ?? 'Select Module'}
-              </Text>
-              <Text size="xs" c="dimmed" truncate>
-                {activeTeam?.plan ?? ''}
-              </Text>
-            </Stack>
-
-            <ChevronsUpDown size={16} />
-          </Group>
+              </span>
+              {!compact && <span className={classes.plan}>{activeTeam?.plan ?? ''}</span>}
+            </span>
+            <ChevronsUpDown className={classes.chevrons} size={15} />
+          </span>
         </UnstyledButton>
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Label>Teams</Menu.Label>
+        <Menu.Label>Modules</Menu.Label>
 
-        {teams.map((team, index) => (
-          <Menu.Item
-            key={team.moduleId}
-            onClick={() => {
-              setSelectedModuleId(team.moduleId);
-              navigate({ to: getModuleDashboard(team.moduleId) });
-            }}
-            leftSection={<team.logo size={14} />}
-            rightSection={
-              <Text size="xs" c="dimmed">
-                ⌘{index + 1}
-              </Text>
-            }
-          >
-            {team.name}
-          </Menu.Item>
-        ))}
+        {teams.map((team, index) => {
+          const Logo = team.logo;
+          const menuIcon = team.iconSrc ? (
+            <img className={classes.menuIcon} src={team.iconSrc} alt="" aria-hidden="true" />
+          ) : (
+            <span className={classes.menuFallback}>
+              <Logo size={14} />
+            </span>
+          );
+          return (
+            <Menu.Item
+              key={team.moduleId}
+              onClick={() => {
+                setSelectedModuleId(team.moduleId);
+                navigate({ to: getModuleDashboard(team.moduleId) });
+              }}
+              leftSection={menuIcon}
+              rightSection={
+                <Text size="xs" c="dimmed">
+                  ⌘{index + 1}
+                </Text>
+              }
+            >
+              <Stack gap={0}>
+                <Text size="sm" fw={600}>
+                  {team.name}
+                </Text>
+                <Text size="10px" c="dimmed">
+                  {team.plan}
+                </Text>
+              </Stack>
+            </Menu.Item>
+          );
+        })}
       </Menu.Dropdown>
     </Menu>
   );

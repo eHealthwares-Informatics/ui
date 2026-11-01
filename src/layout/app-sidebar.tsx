@@ -1,20 +1,19 @@
-import { AppShell, Stack, ScrollArea, Box, Divider, Badge, Group, Text } from '@mantine/core';
-import { useLocation } from '@tanstack/react-router';
-import { MapPin } from 'lucide-react';
+import { AppShell, Stack, ScrollArea, Box, Divider, Tooltip } from '@mantine/core';
+import { Link, useLocation } from '@tanstack/react-router';
+import { LayoutGrid, MapPin } from 'lucide-react';
 import { useState } from 'react';
-import { useModuleId, useModuleName } from '@/context/module-context';
+import { useModuleId } from '@/context/module-context';
 import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
 import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
 import { NavUser } from './nav-user';
-import { TeamSwitcher } from './team-switcher';
+import classes from './app-sidebar.module.css';
 
-export function AppSidebar() {
+export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) {
   const user = useAuthStore((state) => state.user);
   const moduleId = useModuleId();
-  const moduleName = useModuleName();
   const { pathname } = useLocation();
   const { data: currentLocation } = useCurrentLocation(
     moduleId === 'emr' ? (user?.locationId ?? null) : null
@@ -30,78 +29,48 @@ export function AppSidebar() {
   const resetExpandState = (index: number, expanded: boolean) => {
     setExpandState(navGroups.map((_, i) => (i === index ? !expanded : false)));
   };
+  const onModulesPage = pathname === '/modules';
+
   return (
     <AppShell.Navbar
-      p="sm"
-      w={{ base: 250 }}
-      style={{
-        borderRight: '1px solid var(--mantine-color-gray-3)',
-      }}
+      className={classes.navbar}
+      p={collapsed ? 8 : 'sm'}
+      w={{ base: collapsed ? 76 : 260 }}
     >
-      <Stack h="100%" gap="sm">
-        {/* HEADER */}
-        <Box>
-          <Stack gap="md">
-            <TeamSwitcher />
-
-            <Badge
-              variant="light"
-              radius="xl"
-              size="lg"
-              styles={{
-                root: {
-                  width: 'fit-content',
-                },
-              }}
-            >
-              <Group gap={6}>
-                <Text size="xs" fw={700}>
-                  {moduleName}
-                </Text>
-
-                <Text size="10px" c="dimmed">
-                  module
-                </Text>
-              </Group>
-            </Badge>
-
-            {moduleId === 'emr' && <PatientLookup />}
-
-            {moduleId === 'emr' && (
-              <Group gap={6} align="center">
-                <Badge
-                  variant="outline"
-                  radius="xl"
-                  styles={{
-                    root: {
-                      width: 'fit-content',
-                    },
-                  }}
-                >
-                  <Group gap={6}>
-                    <MapPin size={12} />
-                    <Text size="xs" fw={700}>
-                      {currentLocation?.code ?? 'No location'}
-                    </Text>
-                    <Text size="10px" c="dimmed">
-                      {currentLocation?.name ?? '—'}
-                    </Text>
-                  </Group>
-                </Badge>
-                {user?.organizationId && (
-                  <Badge variant="light" radius="xl" size="sm">
-                    org {user.organizationId.slice(0, 8)}
-                  </Badge>
-                )}
-              </Group>
-            )}
-          </Stack>
+      <Stack h="100%" gap="xs">
+        {/* BRAND */}
+        <Box className={`${classes.brand} ${collapsed ? classes.brandCollapsed : ''}`}>
+          <img className={classes.brandMark} src="/assets/brand-hex.png" alt="RxSoft" />
+          {!collapsed && (
+            <Box className={classes.brandText}>
+              <span className={classes.brandName}>RxSoft</span>
+              <span className={classes.brandTagline}>Electronic Health Record</span>
+            </Box>
+          )}
         </Box>
 
-        <Divider />
+        {/* MODULES */}
+        <Tooltip label="Modules" position="right" disabled={!collapsed} withArrow>
+          <Link
+            to="/modules"
+            data-testid="sidebar-modules-link"
+            aria-label="Modules"
+            className={`${classes.modulesLink} ${onModulesPage ? classes.modulesLinkActive : ''} ${
+              collapsed ? classes.modulesLinkCollapsed : ''
+            }`}
+          >
+            <span className={classes.modulesIcon}>
+              <LayoutGrid size={16} />
+            </span>
+            {!collapsed && 'Modules'}
+          </Link>
+        </Tooltip>
+
+        {/* SEARCH (EMR) — a full-width input, so it only renders expanded */}
+        {moduleId === 'emr' && !collapsed && <PatientLookup />}
 
         {/* NAVIGATION */}
-        <ScrollArea flex={1} scrollbarSize={0}>
+        <ScrollArea flex={1} scrollbarSize={0} mt={4}>
           {navGroups.map((item, i) => (
             <SidebarNavItem
               key={item.title}
@@ -110,14 +79,35 @@ export function AppSidebar() {
               resetExpandState={resetExpandState}
               expanded={expandState[i]}
               index={i}
-              collapsed={false}
+              collapsed={collapsed}
             />
           ))}
         </ScrollArea>
 
+        {/* FOOTER */}
+        {user?.organizationId && !collapsed && (
+          <Box className={classes.sectionRow}>
+            <span className={classes.sectionIcon}>
+              <MapPin size={14} />
+            </span>
+            <span className={classes.sectionText}>
+              <span className={classes.sectionLabel}>
+                {currentLocation?.code ?? 'No location'}
+              </span>
+              <span className={classes.sectionHint}>
+                {currentLocation?.name ?? '—'}
+              </span>
+            </span>
+          </Box>
+        )}
+        {user?.organizationId && !collapsed && (
+          <Box className={classes.orgChip}>
+            ORG {user.organizationId.slice(0, 8)}
+          </Box>
+        )}
+
         <Divider />
 
-        {/* FOOTER */}
         <NavUser
           user={{
             name: user?.username ?? 'RxSoft User',
