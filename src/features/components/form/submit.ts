@@ -22,7 +22,7 @@ export type BuiltSchema = {
 };
 
 /** Field types whose value is an ARRAY of options (multi-selects). */
-const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick']);
+const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick', 'permission-picker']);
 
 /**
  * A selected multi-select entry is usable when it is a non-empty string
@@ -87,6 +87,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       case 'remote-select':
       case 'multi-async-select':
       case 'multi-pick':
+      case 'permission-picker':
         typeSchema = z.any(); // object/option type
         break;
       case 'json':
@@ -153,6 +154,9 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
         field.type === 'async-select' ||
         field.type === 'select' ||
         field.type === 'remote-select' ||
+        field.type === 'multi-async-select' ||
+        field.type === 'multi-pick' ||
+        field.type === 'permission-picker' ||
         field.type === 'json'
       ) {
         typeSchema = z
