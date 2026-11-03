@@ -23,6 +23,7 @@ import { useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { AppointmentForm } from '../components/appointments/appointment-form';
+import { PatientAssistantWidget } from '../components/assistant/patient-assistant-widget';
 import { DocumentationModal } from '../components/documentation/documentation-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';
@@ -607,6 +608,13 @@ export function PatientProfilePage() {
           }
         />
       </Modal>
+
+      <PatientAssistantWidget
+        patient={{
+          patientId: patient.patientId,
+          fullName: fullName || patient.patientId,
+        }}
+      />
     </RxPage>
   );
 }
