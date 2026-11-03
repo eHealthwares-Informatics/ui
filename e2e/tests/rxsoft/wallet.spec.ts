@@ -24,7 +24,7 @@ test.describe.serial('Shopper Wallet', () => {
   test.setTimeout(120_000);
 
   let accessToken: string | null = null;
-  let userId: string = '';
+  const userId: string = '';
 
   // Resources created by this suite (teardown deletes only these).
   const createdIds: string[] = [];
