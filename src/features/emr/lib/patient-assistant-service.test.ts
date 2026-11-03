@@ -17,10 +17,7 @@ vi.mock('socket.io-client', () => ({
 }));
 
 import { conversationApi } from '@/lib/conversation-api';
-import {
-  fetchAssistantThread,
-  startPatientEnquiry,
-} from './patient-assistant-service';
+import { fetchAssistantThread, startPatientEnquiry } from './patient-assistant-service';
 
 describe('patient assistant service', () => {
   beforeEach(() => {

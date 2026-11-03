@@ -53,25 +53,16 @@ function MessageBubble({
   );
 }
 
-export function PatientAssistantWidget({
-  patient,
-}: PatientAssistantWidgetProps) {
+export function PatientAssistantWidget({ patient }: PatientAssistantWidgetProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [draft, setDraft] = useState('');
   const viewportRef = useRef<HTMLDivElement>(null);
-  const {
-    messages,
-    sending,
-    thinking,
-    connected,
-    ended,
-    error,
-    send,
-    reset,
-  } = usePatientAssistant({
-    patientMrn: patient.patientId,
-    open: opened,
-  });
+  const { messages, sending, thinking, connected, ended, error, send, reset } = usePatientAssistant(
+    {
+      patientMrn: patient.patientId,
+      open: opened,
+    }
+  );
 
   useEffect(() => {
     if (!viewportRef.current) return;
@@ -145,15 +136,12 @@ export function PatientAssistantWidget({
             </Alert>
           )}
 
-          <Box
-            ref={viewportRef}
-            style={{ flex: 1, overflowY: 'auto', paddingRight: 4 }}
-          >
+          <Box ref={viewportRef} style={{ flex: 1, overflowY: 'auto', paddingRight: 4 }}>
             <Stack gap="xs">
               {messages.length === 0 && !thinking && (
                 <Text size="sm" c="dimmed">
-                  Ask about this patient&apos;s diagnosis, vitals, biodata,
-                  medications, prescriptions or laboratory requests.
+                  Ask about this patient&apos;s diagnosis, vitals, biodata, medications,
+                  prescriptions or laboratory requests.
                 </Text>
               )}
               {messages.map((message) => (
@@ -176,11 +164,7 @@ export function PatientAssistantWidget({
           </Box>
 
           {ended && (
-            <Button
-              variant="light"
-              leftSection={<RotateCcw size={14} />}
-              onClick={reset}
-            >
+            <Button variant="light" leftSection={<RotateCcw size={14} />} onClick={reset}>
               Start new conversation
             </Button>
           )}

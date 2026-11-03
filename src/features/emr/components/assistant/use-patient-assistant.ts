@@ -31,24 +31,16 @@ function botCount(messages: AssistantMessage[]): number {
   return messages.filter((message) => message.role === 'bot').length;
 }
 
-export function usePatientAssistant({
-  patientMrn,
-  open,
-}: UsePatientAssistantInput) {
+export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInput) {
   const user = useAuthStore((state) => state.user);
   const identity: AssistantIdentity | null = useMemo(
-    () =>
-      user
-        ? { userId: user.id, email: user.email, phone: user.phone }
-        : null,
+    () => (user ? { userId: user.id, email: user.email, phone: user.phone } : null),
     [user]
   );
-  const storageKey = identity
-    ? assistantStorageKey(identity.userId, patientMrn)
-    : null;
+  const storageKey = identity ? assistantStorageKey(identity.userId, patientMrn) : null;
 
-  const [conversationId, setConversationIdState] = useState<string | null>(
-    () => (storageKey ? readStoredConversationId(storageKey) : null)
+  const [conversationId, setConversationIdState] = useState<string | null>(() =>
+    storageKey ? readStoredConversationId(storageKey) : null
   );
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [sending, setSending] = useState(false);
@@ -217,25 +209,14 @@ export function usePatientAssistant({
           pollForReply(id, previousBotCount);
         }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Unable to send your message.'
-        );
+        setError(err instanceof Error ? err.message : 'Unable to send your message.');
         setThinking(false);
-        setMessages((current) =>
-          current.filter((message) => message.id !== optimistic.id)
-        );
+        setMessages((current) => current.filter((message) => message.id !== optimistic.id));
       } finally {
         setSending(false);
       }
     },
-    [
-      identity,
-      loadThread,
-      patientMrn,
-      pollForReply,
-      setConversationId,
-      started,
-    ]
+    [identity, loadThread, patientMrn, pollForReply, setConversationId, started]
   );
 
   const reset = useCallback(() => {
@@ -265,8 +246,7 @@ export function usePatientAssistant({
         Boolean(payload.oldConversationId) &&
         payload.oldConversationId === conversationIdRef.current;
       const matchesParticipant =
-        Boolean(payload.participantId) &&
-        payload.participantId === participantIdRef.current;
+        Boolean(payload.participantId) && payload.participantId === participantIdRef.current;
       if (!matchesPending && !matchesParticipant) return;
       setConversationId(next);
       void loadThread(next);

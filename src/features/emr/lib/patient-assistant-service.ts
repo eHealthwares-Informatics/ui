@@ -98,24 +98,23 @@ export async function sendAssistantMessage(input: {
   return response.data ?? {};
 }
 
-export async function fetchAssistantThread(
-  conversationId: string
-): Promise<AssistantMessage[]> {
+export async function fetchAssistantThread(conversationId: string): Promise<AssistantMessage[]> {
   const response = await conversationApi.get<ThreadPage>('/exchanges', {
     params: { conversationId, limit: 50 },
   });
   const items = response.data?.items ?? [];
   return items
     .filter((item) => !item.text.startsWith('PATIENT_ENQUIRY='))
-    .map((item): AssistantMessage => ({
-      id: item.id,
-      role: item.direction === 'inbound' ? 'user' : 'bot',
-      text: item.text,
-      createdAt: item.createdAt,
-    }))
+    .map(
+      (item): AssistantMessage => ({
+        id: item.id,
+        role: item.direction === 'inbound' ? 'user' : 'bot',
+        text: item.text,
+        createdAt: item.createdAt,
+      })
+    )
     .sort(
-      (left, right) =>
-        new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
+      (left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime()
     );
 }
 
@@ -135,9 +134,7 @@ export async function discoverPatientEnquiryConversation(
     const match = items.find((item) => {
       const title = item.title ?? item.questionnaire?.name ?? '';
       if (!title.toLowerCase().includes('patient enquiry')) return false;
-      const last = item.lastMessageAt
-        ? new Date(item.lastMessageAt).getTime()
-        : 0;
+      const last = item.lastMessageAt ? new Date(item.lastMessageAt).getTime() : 0;
       return last >= startedAt - 10_000;
     });
     return match?.conversationId ?? null;
