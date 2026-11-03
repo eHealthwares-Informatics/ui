@@ -22,6 +22,7 @@ import { AlertCircle, CalendarPlus, FilePlus2, Pencil } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
+import { PatientAssistantWidget } from '../components/assistant/patient-assistant-widget';
 import { AppointmentForm } from '../components/appointments/appointment-form';
 import { DocumentationModal } from '../components/documentation/documentation-modal';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
@@ -607,6 +608,13 @@ export function PatientProfilePage() {
           }
         />
       </Modal>
+
+      <PatientAssistantWidget
+        patient={{
+          patientId: patient.patientId,
+          fullName: fullName || patient.patientId,
+        }}
+      />
     </RxPage>
   );
 }
