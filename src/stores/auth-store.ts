@@ -105,8 +105,7 @@ export const useAuthStore = create<AuthState>()(
                 ? {
                     user: {
                       ...currentUser,
-                      permissions:
-                        meResponse.data.permissions ?? currentUser.permissions ?? [],
+                      permissions: meResponse.data.permissions ?? currentUser.permissions ?? [],
                     },
                   }
                 : {}),
@@ -250,8 +249,7 @@ export const useAuthStore = create<AuthState>()(
                 ? {
                     user: {
                       ...currentUser,
-                      permissions:
-                        meResponse.data.permissions ?? currentUser.permissions ?? [],
+                      permissions: meResponse.data.permissions ?? currentUser.permissions ?? [],
                     },
                   }
                 : {}),

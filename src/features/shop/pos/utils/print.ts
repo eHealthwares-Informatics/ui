@@ -27,9 +27,7 @@ async function printFromTemplate(
   const template = await getEffectivePrintTemplate(kind);
   if (!template?.body) return false;
 
-  const html = withPrintHook(
-    renderTemplate(template.body, buildPrintContext(sale, options))
-  );
+  const html = withPrintHook(renderTemplate(template.body, buildPrintContext(sale, options)));
   const win = window.open('', '_blank');
   if (win) {
     win.document.write(html);

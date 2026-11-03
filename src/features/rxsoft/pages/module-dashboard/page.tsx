@@ -1,15 +1,13 @@
 import { SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { ArrowUpRight } from 'lucide-react';
 import {
   DashboardCard,
   DashboardCardTitle,
   DashboardHero,
   DashboardPage,
 } from '@/features/components/dashboard/dashboard-surface';
-import { ArrowUpRight } from 'lucide-react';
-import {
-  getModelConfig,
-} from '@/features/registry';
+import { getModelConfig } from '@/features/registry';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { modules } from '@/features/shared/module-data';
 import { moduleAccentTones, moduleCards } from '@/features/shared/module-meta';
@@ -58,7 +56,9 @@ export function ModuleDashboardPage({ moduleId }: { moduleId: string }) {
 
         {resources.length > 0 ? (
           <Stack gap="sm">
-            <DashboardCardTitle hint={`${resources.length} resources`}>Quick links</DashboardCardTitle>
+            <DashboardCardTitle hint={`${resources.length} resources`}>
+              Quick links
+            </DashboardCardTitle>
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
               {firstResources.map((r) => {
                 const label =

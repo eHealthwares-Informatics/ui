@@ -68,9 +68,7 @@ function escapeHtml(value: string): string {
 /** Replace `{{token}}` placeholders; unknown tokens render as empty (never the raw marker). */
 export function renderTemplate(body: string, context: PrintTemplateContext): string {
   return body
-    .replace(TOKEN, (match, key: string) =>
-      key in context.blocks ? context.blocks[key] : match
-    )
+    .replace(TOKEN, (match, key: string) => (key in context.blocks ? context.blocks[key] : match))
     .replace(TOKEN, (_match, key: string) => escapeHtml(context.values[key] ?? ''));
 }
 

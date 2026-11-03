@@ -32,12 +32,15 @@ export function LocationSwitcher() {
   }
 
   const Icon = scope.key === 'stock' ? Package : MapPin;
-  const label = current?.code || current?.name || (activeId ? 'Unknown location' : 'Select location');
+  const label =
+    current?.code || current?.name || (activeId ? 'Unknown location' : 'Select location');
   const hint = current?.name
     ? current.name
     : isLoading
       ? 'Loading…'
-      : (activeId ? scope.hint : 'None selected');
+      : activeId
+        ? scope.hint
+        : 'None selected';
 
   return (
     <Menu width={280} position="bottom-start" offset={6} withinPortal>

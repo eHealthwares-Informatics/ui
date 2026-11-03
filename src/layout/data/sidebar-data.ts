@@ -49,6 +49,7 @@ import {
   UserRound,
   UserCog,
   Bed,
+  BellRing,
   FileSpreadsheet,
   FilePlus2,
   Share2,
@@ -57,6 +58,7 @@ import {
   Wallet,
   Smartphone,
   Settings,
+  Send,
 } from 'lucide-react';
 import type { ModuleId } from '@/features/shared/module-data';
 import { hasPermission } from '@/lib/permissions';
@@ -84,13 +86,23 @@ export function filterNavGroupsByModule(
   };
 
   return navGroups
-    .filter(permissionAllows)
+    .filter((group) => {
+      if (!permissionAllows(group)) return false;
+      // The admin module is deliberately narrow: only groups explicitly tagged
+      // `admin` are shown. Everything else lives in its own module.
+      if (selectedModule === 'admin') {
+        return Boolean(group.modules?.includes('admin'));
+      }
+      return !group.modules || group.modules.includes(selectedModule);
+    })
     .map((group: NavItem) => ({
       ...group,
       items: (group.items || []).filter(
         (item) =>
           permissionAllows(item) &&
-          (selectedModule === 'admin' || !item.modules || item.modules.includes(selectedModule))
+          (selectedModule === 'admin'
+            ? Boolean(item.modules?.includes('admin'))
+            : !item.modules || item.modules.includes(selectedModule))
       ),
       url: undefined,
     }))
@@ -637,9 +649,66 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Administration',
-      icon: ShieldCheck,
+      title: 'Notifications',
+      icon: BellRing,
+      modules: ['admin'],
       items: [
+        {
+          title: 'Channels Config',
+          url: '/rxsoft/notification-channels',
+          permission: 'rxsoft.admin.settings.read',
+          icon: BellRing,
+          modules: ['admin'],
+        },
+        {
+          title: 'Notification Templates',
+          url: '/rxsoft/notification-templates',
+          permission: 'rxsoft.admin.template.read',
+          icon: MessageSquare,
+          modules: ['admin'],
+        },
+        {
+          title: 'Notification Events',
+          url: '/rxsoft/notification-events',
+          permission: 'rxsoft.admin.settings.read',
+          icon: CalendarDays,
+          modules: ['admin'],
+        },
+        {
+          title: 'Print Templates',
+          url: '/rxsoft/print-templates',
+          permission: 'rxsoft.admin.template.read',
+          icon: FileText,
+          modules: ['admin'],
+        },
+        {
+          title: 'Notification Delivery',
+          url: '/rxsoft/notification-delivery',
+          permission: 'rxsoft.admin.settings.read',
+          icon: Send,
+          modules: ['admin'],
+        },
+      ],
+    },
+    {
+      title: 'Configuration',
+      icon: Settings,
+      modules: ['admin'],
+      items: [
+        {
+          title: 'User Config',
+          url: '/rxsoft/user-config',
+          permission: 'rxsoft.identity.user.read',
+          icon: UserCog,
+          modules: ['admin'],
+        },
+        {
+          title: 'Organisation Config',
+          url: '/rxsoft/organisation-config',
+          permission: 'rxsoft.admin.settings.read',
+          icon: Building2,
+          modules: ['admin'],
+        },
         {
           title: 'Organizations',
           url: '/rxsoft/organizations',
@@ -664,50 +733,53 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Notifications',
-      icon: MessageSquare,
-      permission: 'rxsoft.admin.template.read',
+      title: 'LIS Configuration',
+      icon: Cog,
+      modules: ['admin'],
       items: [
         {
-          title: 'Notification Templates',
-          url: '/rxsoft/notification-templates',
-          permission: 'rxsoft.admin.template.read',
-          icon: MessageSquare,
-          modules: ['rxsoft'],
+          title: 'Statuses',
+          url: '/lis/statuses',
+          icon: Cog,
+          modules: ['admin'],
+        },
+        {
+          title: 'Attribute Definitions',
+          url: '/lis/attribute-definitions',
+          icon: Cog,
+          modules: ['admin'],
         },
       ],
     },
     {
-      title: 'Templates',
-      icon: FileText,
-      permission: 'rxsoft.admin.template.read',
+      title: 'EMR Configuration',
+      icon: Cog,
+      modules: ['admin'],
       items: [
         {
-          title: 'Print Templates',
-          url: '/rxsoft/print-templates',
-          permission: 'rxsoft.admin.template.read',
-          icon: FileText,
-          modules: ['rxsoft'],
-        },
-      ],
-    },
-    {
-      title: 'Configuration',
-      icon: Settings,
-      items: [
-        {
-          title: 'User Config',
-          url: '/rxsoft/user-config',
-          permission: 'rxsoft.identity.user.read',
+          title: 'Staff',
+          url: '/emr/staff',
           icon: UserCog,
-          modules: ['rxsoft'],
+          modules: ['admin'],
         },
         {
-          title: 'Organisation Config',
-          url: '/rxsoft/organisation-config',
-          permission: 'rxsoft.admin.settings.read',
+          title: 'Departments',
+          url: '/emr/departments',
           icon: Building2,
-          modules: ['rxsoft'],
+          modules: ['admin'],
+        },
+        {
+          title: 'Forms',
+          url: '/emr/forms',
+          permission: 'emr.form.read',
+          icon: FileSpreadsheet,
+          modules: ['admin'],
+        },
+        {
+          title: 'Tags',
+          url: '/emr/tags',
+          icon: Tags,
+          modules: ['admin'],
         },
       ],
     },
@@ -1319,19 +1391,6 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Configuration',
-      icon: Cog,
-      items: [
-        { title: 'Statuses', url: '/lis/statuses', icon: Cog, modules: ['lis'] },
-        {
-          title: 'Attribute Definitions',
-          url: '/lis/attribute-definitions',
-          icon: Cog,
-          modules: ['lis'],
-        },
-      ],
-    },
-    {
       title: 'EMR',
       icon: HeartPulse,
       items: [
@@ -1423,33 +1482,6 @@ export const sidebarData: SidebarData = {
           title: 'Bed Allocations',
           url: '/emr/wards/board',
           icon: Bed,
-          modules: ['emr'],
-        },
-      ],
-    },
-    {
-      title: 'Configuration',
-      icon: Cog,
-      items: [
-        { title: 'Staff', url: '/emr/staff', icon: UserCog, modules: ['emr'] },
-        {
-          title: 'Departments',
-          url: '/emr/departments',
-          icon: Building2,
-          modules: ['emr'],
-        },
-        {
-          title: 'Forms',
-          url: '/emr/forms',
-          permission: 'emr.form.read',
-          icon: FileSpreadsheet,
-          modules: ['emr'],
-        },
-        { title: 'Tags', url: '/emr/tags', icon: Tags, modules: ['emr'] },
-        {
-          title: 'Message Templates',
-          url: '/emr/settings/message-templates',
-          icon: MessageSquare,
           modules: ['emr'],
         },
       ],

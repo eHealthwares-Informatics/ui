@@ -112,8 +112,7 @@ const columns: Column[] = [
     key: 'updatedAt',
     label: 'Updated',
     sortable: true,
-    render: (row) =>
-      row.updatedAt ? new Date(String(row.updatedAt)).toLocaleString() : '—',
+    render: (row) => (row.updatedAt ? new Date(String(row.updatedAt)).toLocaleString() : '—'),
   },
 ];
 
@@ -140,9 +139,9 @@ function buildUpdatePayload(values: Record<string, unknown>): Record<string, unk
   if (values.description !== undefined) {
     payload.description = values.description ? String(values.description) : null;
   }
-    if (values.kind !== undefined) payload.kind = String(values.kind);
-    if (values.channel !== undefined) payload.channel = String(values.channel);
-    if (values.pageSize !== undefined) payload.pageSize = String(values.pageSize);
+  if (values.kind !== undefined) payload.kind = String(values.kind);
+  if (values.channel !== undefined) payload.channel = String(values.channel);
+  if (values.pageSize !== undefined) payload.pageSize = String(values.pageSize);
   if (values.body !== undefined) payload.body = String(values.body);
   if (values.isDefault !== undefined) payload.isDefault = Boolean(values.isDefault);
   if (values.isActive !== undefined) payload.isActive = Boolean(values.isActive);

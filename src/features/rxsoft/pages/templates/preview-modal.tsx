@@ -124,7 +124,8 @@ export function TemplatePreviewModal({
           </Stack>
 
           <Text size="xs" c="dimmed">
-            Sample values: {Object.entries(SAMPLE_NOTIFICATION_VALUES)
+            Sample values:{' '}
+            {Object.entries(SAMPLE_NOTIFICATION_VALUES)
               .map(([key, value]) => `{{${key}}} → ${value}`)
               .join(' · ')}
           </Text>

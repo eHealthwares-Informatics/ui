@@ -41,6 +41,17 @@ export const ModalDataForm = ({
   const fields = collectFields({ createFieldGroups: fieldGroups, tabGroups });
   const handleSubmit = useValidatedSubmit({ fields, formState, mutation });
 
+  // Debounced text inputs commit on blur. Blur first, then submit on the next
+  // tick so the last keystroke is part of the PATCH payload.
+  const handleSubmitClick = () => {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    window.setTimeout(() => {
+      void handleSubmit();
+    }, 0);
+  };
+
   const isWizard = Boolean(tabGroups);
 
   return (
@@ -94,9 +105,7 @@ export const ModalDataForm = ({
 
             <Button
               data-testid={editingRow ? 'form-update' : 'form-create'}
-              onClick={() => {
-                handleSubmit();
-              }}
+              onClick={handleSubmitClick}
               disabled={mutation.isPending}
               leftSection={mutation.isPending ? <Loader size={16} /> : null}
             >

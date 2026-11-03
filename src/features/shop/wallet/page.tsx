@@ -20,16 +20,12 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowDownLeft, ArrowUpRight, CreditCard, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
-import { PageLoader } from '../website/loaders';
 import { useAccountDrawerStore } from '../website/account-drawer-store';
-import { useAuthStore } from '../website/auth-store';
 import { websiteApi } from '../website/api';
-import {
-  useWallet,
-  useWalletDeposit,
-  useWalletTransactions,
-} from '../website/hooks';
+import { useAuthStore } from '../website/auth-store';
+import { useWallet, useWalletDeposit, useWalletTransactions } from '../website/hooks';
 import { WebsiteLayout, buttonStyles, green, ink, line, muted, soft } from '../website/layout';
+import { PageLoader } from '../website/loaders';
 
 const naira = (value: number) => `₦${Number(value || 0).toLocaleString()}`;
 
@@ -198,12 +194,7 @@ export default function WalletPage() {
                     return (
                       <Box key={tx.id} data-testid={`wallet-tx-${tx.id}`}>
                         {index > 0 ? <Divider color={line} /> : null}
-                        <Group
-                          justify="space-between"
-                          p="md"
-                          wrap="nowrap"
-                          align="center"
-                        >
+                        <Group justify="space-between" p="md" wrap="nowrap" align="center">
                           <Group gap="sm" wrap="nowrap">
                             <ThemeIcon
                               radius="xl"
@@ -211,11 +202,7 @@ export default function WalletPage() {
                               variant="light"
                               color={incoming ? 'green' : 'orange'}
                             >
-                              {incoming ? (
-                                <ArrowDownLeft size={18} />
-                              ) : (
-                                <ArrowUpRight size={18} />
-                              )}
+                              {incoming ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
                             </ThemeIcon>
                             <Stack gap={0}>
                               <Text fw={600} size="sm" style={{ color: ink }}>

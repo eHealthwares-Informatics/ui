@@ -1,13 +1,13 @@
 import { AppShell, Stack, ScrollArea, Box, Divider, Tooltip } from '@mantine/core';
 import { Link, useLocation } from '@tanstack/react-router';
 import { LayoutGrid, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useModuleId } from '@/context/module-context';
 import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
-import { useAuthStore } from '@/stores/auth-store';
 import { displayNameOf } from '@/lib/user-name';
+import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
 import { NavUser } from './nav-user';
 import classes from './app-sidebar.module.css';
@@ -26,6 +26,13 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
     user?.permissions ?? []
   );
   const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
+
+  // Switching modules rebuilds `navGroups`; index-keyed expansion state from the
+  // previous module would otherwise leak into the new menu and make groups look
+  // duplicated/open unexpectedly.
+  useEffect(() => {
+    setExpandState(navGroups.map(() => false));
+  }, [moduleId]);
 
   const resetExpandState = (index: number, expanded: boolean) => {
     setExpandState(navGroups.map((_, i) => (i === index ? !expanded : false)));
@@ -74,7 +81,7 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
         <ScrollArea flex={1} scrollbarSize={0} mt={4}>
           {navGroups.map((item, i) => (
             <SidebarNavItem
-              key={item.title}
+              key={`${item.title}-${i}`}
               item={item}
               pathname={pathname}
               resetExpandState={resetExpandState}
@@ -92,19 +99,13 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
               <MapPin size={14} />
             </span>
             <span className={classes.sectionText}>
-              <span className={classes.sectionLabel}>
-                {currentLocation?.code ?? 'No location'}
-              </span>
-              <span className={classes.sectionHint}>
-                {currentLocation?.name ?? '—'}
-              </span>
+              <span className={classes.sectionLabel}>{currentLocation?.code ?? 'No location'}</span>
+              <span className={classes.sectionHint}>{currentLocation?.name ?? '—'}</span>
             </span>
           </Box>
         )}
         {user?.organizationId && !collapsed && (
-          <Box className={classes.orgChip}>
-            ORG {user.organizationId.slice(0, 8)}
-          </Box>
+          <Box className={classes.orgChip}>ORG {user.organizationId.slice(0, 8)}</Box>
         )}
 
         <Divider />

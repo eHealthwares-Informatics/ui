@@ -58,7 +58,13 @@ export function TeamSwitcher({ compact = false }: { compact?: boolean } = {}) {
   ) : null;
 
   return (
-    <Menu opened={opened} onChange={setOpened} width={compact ? 230 : 220} position="bottom-start" offset={6}>
+    <Menu
+      opened={opened}
+      onChange={setOpened}
+      width={compact ? 230 : 220}
+      position="bottom-start"
+      offset={6}
+    >
       <Menu.Target>
         <UnstyledButton
           className={`${classes.trigger} ${compact ? classes.triggerCompact : ''}`}
@@ -68,9 +74,7 @@ export function TeamSwitcher({ compact = false }: { compact?: boolean } = {}) {
           <span className={classes.row}>
             {activeIcon}
             <span className={classes.text}>
-              <span className={classes.name}>
-                {activeTeam?.name ?? 'Select Module'}
-              </span>
+              <span className={classes.name}>{activeTeam?.name ?? 'Select Module'}</span>
               {!compact && <span className={classes.plan}>{activeTeam?.plan ?? ''}</span>}
             </span>
             <ChevronsUpDown className={classes.chevrons} size={15} />

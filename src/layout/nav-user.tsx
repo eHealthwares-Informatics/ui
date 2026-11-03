@@ -1,13 +1,6 @@
 import { Avatar, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import {
-  BadgeCheck,
-  Bell,
-  ChevronDown,
-  CreditCard,
-  LogOut,
-  UserRound,
-} from 'lucide-react';
+import { BadgeCheck, Bell, ChevronDown, CreditCard, LogOut, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { SignOutDialog } from '@/components/sign-out-dialog';
 import classes from './nav-user.module.css';
@@ -70,34 +63,26 @@ export function NavUser({ user, compact = false }: NavUserProps) {
                 <Text size="sm" fw={600}>
                   {user.name}
                 </Text>
-                {!compact && <Text size="xs" c="dimmed">{user.email}</Text>}
+                {!compact && (
+                  <Text size="xs" c="dimmed">
+                    {user.email}
+                  </Text>
+                )}
               </Stack>
             </Group>
           </Menu.Label>
 
           <Menu.Divider />
 
-          <Menu.Item
-            component={Link}
-            to="/settings/account"
-            leftSection={<BadgeCheck size={14} />}
-          >
+          <Menu.Item component={Link} to="/settings/account" leftSection={<BadgeCheck size={14} />}>
             Account
           </Menu.Item>
 
-          <Menu.Item
-            component={Link}
-            to="/settings"
-            leftSection={<CreditCard size={14} />}
-          >
+          <Menu.Item component={Link} to="/settings" leftSection={<CreditCard size={14} />}>
             Billing
           </Menu.Item>
 
-          <Menu.Item
-            component={Link}
-            to="/settings/notifications"
-            leftSection={<Bell size={14} />}
-          >
+          <Menu.Item component={Link} to="/settings/notifications" leftSection={<Bell size={14} />}>
             Notifications
           </Menu.Item>
 

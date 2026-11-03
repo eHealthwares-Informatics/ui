@@ -24,12 +24,8 @@ export function MetricCard({
     <DashboardCard tone={tone} padding="md">
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Stack gap={2}>
-          <span className={dashboardMetricClasses.label}>
-            {label}
-          </span>
-          <span className={dashboardMetricClasses.value}>
-            {value}
-          </span>
+          <span className={dashboardMetricClasses.label}>{label}</span>
+          <span className={dashboardMetricClasses.value}>{value}</span>
           {subtitle && (
             <Text size="xs" c="dimmed">
               {subtitle}

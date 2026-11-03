@@ -165,11 +165,10 @@ function buildFormState(row: Record<string, unknown>) {
     formState.locationId = { value: formState.locationId, label: formState.locationId };
   }
   if (typeof formState.gender === 'string' && formState.gender) {
-    formState.gender =
-      GENDER_OPTIONS.find((option) => option.value === formState.gender) ?? {
-        value: formState.gender,
-        label: formState.gender,
-      };
+    formState.gender = GENDER_OPTIONS.find((option) => option.value === formState.gender) ?? {
+      value: formState.gender,
+      label: formState.gender,
+    };
   }
   return formState;
 }

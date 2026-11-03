@@ -5,15 +5,15 @@ import {
 } from '@/features/components/dashboard/dashboard-surface';
 import type { ProviderLoadEntry } from '../../lib/emr-types';
 
-
 const AVATAR_COLORS = ['blue', 'teal', 'orange', 'grape', 'cyan', 'lime', 'pink'];
-
 
 export function ProviderLoad({ providers }: { providers: ProviderLoadEntry[] }) {
   return (
     <Card withBorder radius="md" padding="lg" shadow="sm">
       <DashboardCard tone="teal" padding="md">
-        <DashboardCardTitle hint={`${providers.length} on duty`}>Provider Workload</DashboardCardTitle>
+        <DashboardCardTitle hint={`${providers.length} on duty`}>
+          Provider Workload
+        </DashboardCardTitle>
         {providers.length === 0 ? (
           <Text size="sm" c="dimmed">
             No providers on duty right now.

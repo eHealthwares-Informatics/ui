@@ -1,14 +1,4 @@
-import {
-  Card,
-  Group,
-  Stack,
-  Text,
-  Title,
-  TextInput,
-  Badge,
-  Alert,
-  Box,
-} from '@mantine/core';
+import { Card, Group, Stack, Text, Title, TextInput, Badge, Alert, Box } from '@mantine/core';
 import { Shield } from 'lucide-react';
 
 export function TwoFactorSection() {
@@ -18,7 +8,9 @@ export function TwoFactorSection() {
         <Group align="center" gap="xs" wrap="nowrap">
           <Shield size={16} strokeWidth={1.5} />
           <Title order={3}>Two-factor authentication</Title>
-          <Badge size="xs" variant="filled" color="gray">Disabled</Badge>
+          <Badge size="xs" variant="filled" color="gray">
+            Disabled
+          </Badge>
         </Group>
 
         <Alert title="Heads up" icon={<Shield size={16} strokeWidth={1.5} />} color="blue" mb="md">
@@ -41,7 +33,9 @@ export function TwoFactorSection() {
             }}
           />
           <Stack gap="xs" style={{ minWidth: 0, flex: 1 }}>
-            <Text fw={600} size="sm">Scan this code</Text>
+            <Text fw={600} size="sm">
+              Scan this code
+            </Text>
             <Text size="xs" c="dimmed">
               Scan this code with your authenticator app to enable two-factor authentication.
             </Text>
@@ -49,8 +43,12 @@ export function TwoFactorSection() {
         </Group>
 
         <Stack gap="xs">
-          <Text fw={600} size="sm">Code</Text>
-          <Text size="xs" c="dimmed">Enter the code from your authenticator app.</Text>
+          <Text fw={600} size="sm">
+            Code
+          </Text>
+          <Text size="xs" c="dimmed">
+            Enter the code from your authenticator app.
+          </Text>
           <TextInput placeholder="Enter code" style={{ height: 36 }} />
         </Stack>
       </Stack>

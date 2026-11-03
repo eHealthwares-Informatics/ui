@@ -31,10 +31,7 @@ export function fullNameOf(user: UserNameParts | null | undefined): string | nul
  * on whether a profile was filled in. Returns `fallback` only when there is no
  * user at all (or no username either).
  */
-export function displayNameOf(
-  user: UserNameParts | null | undefined,
-  fallback = 'User'
-): string {
+export function displayNameOf(user: UserNameParts | null | undefined, fallback = 'User'): string {
   if (!user) {
     return fallback;
   }

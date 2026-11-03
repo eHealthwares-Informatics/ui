@@ -27,9 +27,7 @@ describe('deriveVisibleModules', () => {
   });
 
   it('derives the Admin Console from a concrete rxsoft.admin grant', () => {
-    const modules = deriveVisibleModules(backend(['rxsoft']), [
-      'rxsoft.admin.settings.read',
-    ]);
+    const modules = deriveVisibleModules(backend(['rxsoft']), ['rxsoft.admin.settings.read']);
     expect(modules.map((m) => m.id)).toContain('admin');
   });
 

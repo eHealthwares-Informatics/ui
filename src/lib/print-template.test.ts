@@ -66,7 +66,9 @@ describe('getEffectivePrintTemplate', () => {
   });
 
   it('returns the org template for the kind', async () => {
-    get.mockResolvedValue({ data: { id: 't1', code: 'POS', name: 'POS', kind: 'pos_receipt', body: '<p/>' } });
+    get.mockResolvedValue({
+      data: { id: 't1', code: 'POS', name: 'POS', kind: 'pos_receipt', body: '<p/>' },
+    });
     const template = await getEffectivePrintTemplate('pos_receipt');
     expect(template?.id).toBe('t1');
     expect(get).toHaveBeenCalledWith('/templates/effective', { params: { kind: 'pos_receipt' } });

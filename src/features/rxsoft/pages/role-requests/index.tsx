@@ -12,9 +12,9 @@ import {
   Tooltip,
   Title,
 } from '@mantine/core';
-import { Check, X } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import {

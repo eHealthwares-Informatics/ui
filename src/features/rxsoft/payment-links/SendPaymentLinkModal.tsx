@@ -1,27 +1,42 @@
-import { Alert, Button, Group, Modal, Radio, Select, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, Modal, Radio, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { getArrayPayload } from '@/features/components/utils';
+import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
 export type NotificationChannel = {
   id: string;
   label: string;
-  type: 'email' | 'sms' | 'whatsapp';
-  code?: string | null;
+  type: string;
 };
 
 /**
- * The organisation's configured notification channels (channel codes). Staff
- * pick one of these before a send — configured in Organisation Config.
+ * The organisation's enabled notification channels. Staff pick one of these
+ * before a send — configured in Notifications → Channels Config.
  */
 export function useNotificationChannels() {
   return useQuery({
-    queryKey: ['organisation-config', 'notification-channels'],
+    queryKey: ['notification-channels', 'payment-link-picker'],
     queryFn: async (): Promise<NotificationChannel[]> => {
-      const { data } = await rxsoftApi.get('/organisation-config');
-      return (data?.notificationChannels ?? []) as NotificationChannel[];
+      const { data } = await conversationApi.get('/notification-channels', {
+        params: { includeGlobal: true },
+      });
+      const rows = getArrayPayload(data) as Array<{
+        id: string;
+        label: string;
+        type: string;
+        enabled: boolean;
+      }>;
+      return rows
+        .filter((channel) => channel.enabled !== false)
+        .map((channel) => ({
+          id: channel.id,
+          label: channel.label,
+          type: channel.type,
+        }));
     },
     staleTime: 60_000,
   });
@@ -44,19 +59,16 @@ type Props = {
 export function SendPaymentLinkModal({ opened, onClose, token, contextLabel }: Props) {
   const { data: channels = [], isLoading, isError, error } = useNotificationChannels();
   const [channelId, setChannelId] = useState<string | null>(null);
-  const [fallbackChannelId, setFallbackChannelId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!opened) return;
     setChannelId(null);
-    setFallbackChannelId(null);
   }, [opened]);
 
   const send = useMutation({
     mutationFn: async () => {
       const { data } = await rxsoftApi.post(`/payment-links/${token}/send`, {
         channelId,
-        fallbackChannelId: fallbackChannelId || undefined,
       });
       return data as { sent: boolean; recipient: string };
     },
@@ -97,19 +109,14 @@ export function SendPaymentLinkModal({ opened, onClose, token, contextLabel }: P
           </Alert>
         ) : channels.length === 0 ? (
           <Alert color="yellow" title="No channels configured">
-            Add notification channel codes under Organisation Config, then try again.
+            Enable notification channels under Notifications → Notification Channels, then try
+            again.
           </Alert>
         ) : (
           <>
             <Radio.Group
               value={channelId}
-              onChange={(value) => {
-                setChannelId(value);
-                // A channel can't be both primary and fallback.
-                if (value && fallbackChannelId === value) {
-                  setFallbackChannelId(null);
-                }
-              }}
+              onChange={setChannelId}
               label="Send over"
               data-testid="send-payment-link-channel-group"
             >
@@ -118,25 +125,17 @@ export function SendPaymentLinkModal({ opened, onClose, token, contextLabel }: P
                   <Radio
                     key={c.id}
                     value={c.id}
-                    label={`${c.label} (${c.type})`}
+                    label={c.label}
                     data-testid={`send-channel-${c.id}`}
                   />
                 ))}
               </Stack>
             </Radio.Group>
 
-            <Select
-              label="Fallback channel (optional)"
-              description="Used if the primary channel fails to deliver."
-              placeholder="None"
-              data={channels
-                .filter((c) => c.id !== channelId)
-                .map((c) => ({ value: c.id, label: `${c.label} (${c.type})` }))}
-              value={fallbackChannelId}
-              onChange={setFallbackChannelId}
-              clearable
-              data-testid="send-payment-link-fallback-channel"
-            />
+            <Text size="xs" c="dimmed">
+              If the selected channel fails, the facility&apos;s configured fallback channel is used
+              automatically.
+            </Text>
           </>
         )}
 

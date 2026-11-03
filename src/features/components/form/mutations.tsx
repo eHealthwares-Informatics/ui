@@ -117,6 +117,11 @@ export const useUpdateMutation = ({
         throw new Error('Missing record id');
       }
       const changedValues = initialFormState ? getDirtyFields(values, initialFormState) : values;
+      // Nothing changed: don't PATCH. For notification configs a scope-only
+      // PATCH would otherwise create an empty organisation override.
+      if (initialFormState && Object.keys(changedValues).length === 0) {
+        return { data: null, recordId, unchanged: true };
+      }
       const normalized = normalizeMultiSelectIds(changedValues, fields ?? []);
       const payload = buildUpdatePayload
         ? buildUpdatePayload(normalized, editingRow as Record<string, unknown>)
@@ -127,9 +132,15 @@ export const useUpdateMutation = ({
         `${endpoint}/${String(recordId)}`,
         payload
       );
-      return { data: response.data as Record<string, unknown>, recordId };
+      return { data: response.data as Record<string, unknown>, recordId, unchanged: false };
     },
-    onSuccess: ({ recordId }) => {
+    onSuccess: ({ recordId, unchanged }) => {
+      if (unchanged) {
+        setShowModal(false);
+        setEditingRow(null);
+        notifications.show({ message: 'No changes to save' });
+        return;
+      }
       void queryClient.invalidateQueries({
         queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
       });

@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getEffectivePrintTemplate = vi.fn();
 vi.mock('@/lib/print-template', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/print-template')>(
-    '@/lib/print-template'
-  );
-  return { ...actual, getEffectivePrintTemplate: (...args: unknown[]) => getEffectivePrintTemplate(...args) };
+  const actual =
+    await vi.importActual<typeof import('@/lib/print-template')>('@/lib/print-template');
+  return {
+    ...actual,
+    getEffectivePrintTemplate: (...args: unknown[]) => getEffectivePrintTemplate(...args),
+  };
 });
 
 const sendReceipt = vi.fn();

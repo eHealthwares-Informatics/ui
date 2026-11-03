@@ -343,6 +343,11 @@ export function useValidatedSubmit({
   onError?: (errors: Record<string, string>) => void;
 }) {
   const builtSchemaRef = useRef<BuiltSchema | null>(null);
+  // The submit button can be clicked while a debounced input still owns the
+  // latest keystroke. Read the most recent form state after the blur/flush
+  // instead of the state captured when the render happened.
+  const formStateRef = useRef(formState);
+  formStateRef.current = formState;
 
   if (!builtSchemaRef.current) {
     builtSchemaRef.current = buildZodSchema(fields);
@@ -350,6 +355,7 @@ export function useValidatedSubmit({
 
   return useCallback(async () => {
     if (!builtSchemaRef.current) return;
+    const currentFormState = formStateRef.current;
     const { schema, fieldRules } = builtSchemaRef.current;
 
     let refinedSchema: z.ZodObject<any> = schema;
@@ -370,7 +376,7 @@ export function useValidatedSubmit({
     const existingSummary = document.querySelector('[data-testid="form-error-summary"]');
     if (existingSummary) existingSummary.remove();
 
-    const result = refinedSchema.safeParse(formState);
+    const result = refinedSchema.safeParse(currentFormState);
 
     if (!result.success) {
       const errors: Record<string, string> = {};
@@ -390,6 +396,6 @@ export function useValidatedSubmit({
     clearValidationErrors();
 
     // Fire mutation
-    mutation.mutate(formState);
-  }, [fields, formState, mutation, onError]);
+    mutation.mutate(currentFormState);
+  }, [fields, mutation, onError]);
 }

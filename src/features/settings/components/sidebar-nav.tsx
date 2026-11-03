@@ -5,13 +5,7 @@ import { useMemo } from 'react';
 import { NavItem } from '@/layout/types';
 import classes from './sidebar-nav.module.css';
 
-function SubMenuLinks({
-  items,
-  pathname,
-}: {
-  items: NavItem[];
-  pathname: string;
-}) {
+function SubMenuLinks({ items, pathname }: { items: NavItem[]; pathname: string }) {
   return (
     <Stack gap={2} className={classes.subList}>
       {items.map((subItem) => {
@@ -126,9 +120,7 @@ export function SidebarNavItem({
   if (collapsed) {
     return (
       <Tooltip label={item.title} position="right" withArrow>
-        <Box>
-          {item.url ? <Link to={item.url}>{button}</Link> : button}
-        </Box>
+        <Box>{item.url ? <Link to={item.url}>{button}</Link> : button}</Box>
       </Tooltip>
     );
   }

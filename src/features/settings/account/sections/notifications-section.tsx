@@ -1,14 +1,4 @@
-import {
-  Card,
-  Group,
-  Stack,
-  Text,
-  Title,
-  Switch,
-  Badge,
-  Alert,
-  Box,
-} from '@mantine/core';
+import { Card, Group, Stack, Text, Title, Switch, Badge, Alert, Box } from '@mantine/core';
 import { Info, Bell } from 'lucide-react';
 
 type ToggleProps = {
@@ -23,8 +13,12 @@ function Toggle({ label, description, checked, onChange, status }: ToggleProps) 
   return (
     <Group align="center" style={{ height: 56 }}>
       <Box>
-        <Text fw={600} size="sm">{label}</Text>
-        <Text size="xs" c="dimmed">{description}</Text>
+        <Text fw={600} size="sm">
+          {label}
+        </Text>
+        <Text size="xs" c="dimmed">
+          {description}
+        </Text>
       </Box>
       <Switch
         checked={checked}
@@ -33,7 +27,9 @@ function Toggle({ label, description, checked, onChange, status }: ToggleProps) 
         size="md"
         styles={{ track: { width: 44, height: 24 }, thumb: { width: 20, height: 20 } }}
       />
-      <Badge size="xs" variant="filled" color="red">{status}</Badge>
+      <Badge size="xs" variant="filled" color="red">
+        {status}
+      </Badge>
     </Group>
   );
 }

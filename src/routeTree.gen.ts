@@ -258,6 +258,9 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
 import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
+import { Route as AuthenticatedRxsoftNotificationChannelsIndexRouteImport } from './routes/_authenticated/rxsoft/notification-channels/index'
+import { Route as AuthenticatedRxsoftNotificationDeliveryIndexRouteImport } from './routes/_authenticated/rxsoft/notification-delivery/index'
+import { Route as AuthenticatedRxsoftNotificationEventsIndexRouteImport } from './routes/_authenticated/rxsoft/notification-events/index'
 import { Route as AuthenticatedRxsoftNotificationTemplatesIndexRouteImport } from './routes/_authenticated/rxsoft/notification-templates/index'
 import { Route as AuthenticatedRxsoftOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/orders/index'
 import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
@@ -1736,6 +1739,24 @@ const AuthenticatedRxsoftManufacturersIndexRoute =
     path: '/rxsoft/manufacturers/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRxsoftNotificationChannelsIndexRoute =
+  AuthenticatedRxsoftNotificationChannelsIndexRouteImport.update({
+    id: '/rxsoft/notification-channels/',
+    path: '/rxsoft/notification-channels/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftNotificationDeliveryIndexRoute =
+  AuthenticatedRxsoftNotificationDeliveryIndexRouteImport.update({
+    id: '/rxsoft/notification-delivery/',
+    path: '/rxsoft/notification-delivery/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftNotificationEventsIndexRoute =
+  AuthenticatedRxsoftNotificationEventsIndexRouteImport.update({
+    id: '/rxsoft/notification-events/',
+    path: '/rxsoft/notification-events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRxsoftNotificationTemplatesIndexRoute =
   AuthenticatedRxsoftNotificationTemplatesIndexRouteImport.update({
     id: '/rxsoft/notification-templates/',
@@ -2475,6 +2496,9 @@ export interface FileRoutesByFullPath {
   '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-channels/': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
+  '/rxsoft/notification-delivery/': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
+  '/rxsoft/notification-events/': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
   '/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
@@ -2801,6 +2825,9 @@ export interface FileRoutesByTo {
   '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-channels': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
+  '/rxsoft/notification-delivery': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
+  '/rxsoft/notification-events': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
   '/rxsoft/notification-templates': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
@@ -3133,6 +3160,9 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/_authenticated/rxsoft/notification-channels/': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
+  '/_authenticated/rxsoft/notification-delivery/': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
+  '/_authenticated/rxsoft/notification-events/': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
   '/_authenticated/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/_authenticated/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
@@ -3463,6 +3493,9 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines/'
     | '/rxsoft/journals/'
     | '/rxsoft/manufacturers/'
+    | '/rxsoft/notification-channels/'
+    | '/rxsoft/notification-delivery/'
+    | '/rxsoft/notification-events/'
     | '/rxsoft/notification-templates/'
     | '/rxsoft/orders/'
     | '/rxsoft/organisation-config/'
@@ -3789,6 +3822,9 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines'
     | '/rxsoft/journals'
     | '/rxsoft/manufacturers'
+    | '/rxsoft/notification-channels'
+    | '/rxsoft/notification-delivery'
+    | '/rxsoft/notification-events'
     | '/rxsoft/notification-templates'
     | '/rxsoft/orders'
     | '/rxsoft/organisation-config'
@@ -4120,6 +4156,9 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/journal-entry-lines/'
     | '/_authenticated/rxsoft/journals/'
     | '/_authenticated/rxsoft/manufacturers/'
+    | '/_authenticated/rxsoft/notification-channels/'
+    | '/_authenticated/rxsoft/notification-delivery/'
+    | '/_authenticated/rxsoft/notification-events/'
     | '/_authenticated/rxsoft/notification-templates/'
     | '/_authenticated/rxsoft/orders/'
     | '/_authenticated/rxsoft/organisation-config/'
@@ -6007,6 +6046,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rxsoft/notification-channels/': {
+      id: '/_authenticated/rxsoft/notification-channels/'
+      path: '/rxsoft/notification-channels'
+      fullPath: '/rxsoft/notification-channels/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationChannelsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/notification-delivery/': {
+      id: '/_authenticated/rxsoft/notification-delivery/'
+      path: '/rxsoft/notification-delivery'
+      fullPath: '/rxsoft/notification-delivery/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationDeliveryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/notification-events/': {
+      id: '/_authenticated/rxsoft/notification-events/'
+      path: '/rxsoft/notification-events'
+      fullPath: '/rxsoft/notification-events/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rxsoft/notification-templates/': {
       id: '/_authenticated/rxsoft/notification-templates/'
       path: '/rxsoft/notification-templates'
@@ -6855,6 +6915,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
+  AuthenticatedRxsoftNotificationChannelsIndexRoute: typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
+  AuthenticatedRxsoftNotificationDeliveryIndexRoute: typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
+  AuthenticatedRxsoftNotificationEventsIndexRoute: typeof AuthenticatedRxsoftNotificationEventsIndexRoute
   AuthenticatedRxsoftNotificationTemplatesIndexRoute: typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   AuthenticatedRxsoftOrdersIndexRoute: typeof AuthenticatedRxsoftOrdersIndexRoute
   AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
@@ -7169,6 +7232,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
   AuthenticatedRxsoftManufacturersIndexRoute:
     AuthenticatedRxsoftManufacturersIndexRoute,
+  AuthenticatedRxsoftNotificationChannelsIndexRoute:
+    AuthenticatedRxsoftNotificationChannelsIndexRoute,
+  AuthenticatedRxsoftNotificationDeliveryIndexRoute:
+    AuthenticatedRxsoftNotificationDeliveryIndexRoute,
+  AuthenticatedRxsoftNotificationEventsIndexRoute:
+    AuthenticatedRxsoftNotificationEventsIndexRoute,
   AuthenticatedRxsoftNotificationTemplatesIndexRoute:
     AuthenticatedRxsoftNotificationTemplatesIndexRoute,
   AuthenticatedRxsoftOrdersIndexRoute: AuthenticatedRxsoftOrdersIndexRoute,

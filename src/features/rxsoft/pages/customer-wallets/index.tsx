@@ -52,19 +52,20 @@ const typeColor: Record<string, string> = {
 export function RxCustomerWalletsPage() {
   const [openWallet, setOpenWallet] = useState<WalletRow | null>(null);
 
-  const { data: wallets = [], isLoading, isError } = useQuery({
+  const {
+    data: wallets = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['customer-wallets'],
-    queryFn: () =>
-      rxsoftApi.get<WalletRow[]>('/customer/wallet/admin/wallets').then((r) => r.data),
+    queryFn: () => rxsoftApi.get<WalletRow[]>('/customer/wallet/admin/wallets').then((r) => r.data),
   });
 
   const { data: transactions = [], isLoading: txLoading } = useQuery({
     queryKey: ['customer-wallets', openWallet?.id, 'transactions'],
     queryFn: () =>
       rxsoftApi
-        .get<WalletTransaction[]>(
-          `/customer/wallet/admin/wallets/${openWallet?.id}/transactions`
-        )
+        .get<WalletTransaction[]>(`/customer/wallet/admin/wallets/${openWallet?.id}/transactions`)
         .then((r) => r.data),
     enabled: !!openWallet?.id,
   });

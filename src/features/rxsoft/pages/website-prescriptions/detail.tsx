@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Alert,
   Anchor,
   Badge,
   Box,
@@ -11,6 +12,7 @@ import {
   Image,
   Modal,
   NumberInput,
+  Paper,
   Select,
   SimpleGrid,
   Stack,
@@ -33,6 +35,12 @@ import { useHasPermission } from '@/lib/permissions';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { RxPage } from '../../../components/page/rx-page';
+import {
+  mapParsedInstruction,
+  parsePrescription,
+  summariseParse,
+  type ParseSummary,
+} from './line-instruction-parser';
 
 type PrescriptionFile = {
   id: string;
@@ -190,6 +198,9 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
   const [lineModal, setLineModal] = useState(false);
   const [editingLine, setEditingLine] = useState<PrescriptionLine | null>(null);
   const [draft, setDraft] = useState<LineDraft>(emptyDraft);
+  const [instructionText, setInstructionText] = useState('');
+  const [parsedDrugText, setParsedDrugText] = useState('');
+  const [parseSummary, setParseSummary] = useState<ParseSummary | null>(null);
   const [filePreview, setFilePreview] = useState<PrescriptionFile | null>(null);
   const [itemSearch, setItemSearch] = useState('');
   const [drugSearch, setDrugSearch] = useState('');
@@ -402,6 +413,45 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
     freetext: { label: 'Free text', color: 'gray', dot: '#6B7280' },
   };
 
+  type SourceOption = { value: string; label: string; type: LineSource };
+
+  // Clickable catalogue matches derived from the parsed instruction's drug name.
+  const suggestions = useMemo<SourceOption[]>(() => {
+    const q = parsedDrugText.trim().toLowerCase();
+    if (!q) return [];
+    const pool: SourceOption[] = [
+      ...itemOptions,
+      ...genericProductOptions,
+      ...drugOptions,
+    ] as SourceOption[];
+    const seen = new Set<string>();
+    const out: SourceOption[] = [];
+    for (const option of pool) {
+      if (!option.label.toLowerCase().includes(q)) continue;
+      if (seen.has(option.value)) continue;
+      seen.add(option.value);
+      out.push(option);
+      if (out.length >= 8) break;
+    }
+    return out;
+  }, [parsedDrugText, itemOptions, genericProductOptions, drugOptions]);
+
+  const selectSuggestion = (option: SourceOption) => {
+    const [kind, ...rest] = option.value.split(':');
+    const payloadValue = rest.join(':');
+    const source = (option.type ?? kind) as LineSource;
+    setDraft((current) => ({
+      ...current,
+      source,
+      sourceKey: option.value,
+      selectedLabel: option.label,
+      itemId: source === 'item' ? payloadValue : null,
+      genericItemCode: source === 'generic_product' ? payloadValue : null,
+      genericDrugCode: source === 'generic_drug' ? payloadValue : null,
+      freetextName: source === 'freetext' ? current.freetextName : '',
+    }));
+  };
+
   const currentSourceOption =
     draft.source !== 'freetext' && draft.sourceKey
       ? {
@@ -438,6 +488,9 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
   function openAddLine() {
     setEditingLine(null);
     setDraft(emptyDraft);
+    setInstructionText('');
+    setParsedDrugText('');
+    setParseSummary(null);
     setItemSearch('');
     setDrugSearch('');
     setLineModal(true);
@@ -480,7 +533,43 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
     });
     setItemSearch('');
     setDrugSearch('');
+    setInstructionText('');
+    setParsedDrugText('');
+    setParseSummary(null);
     setLineModal(true);
+  }
+
+  /** Parse the pasted instruction and distribute it across the line fields. */
+  function handleParseInstruction() {
+    // The vendored parser is untyped (@ts-nocheck); treat its result as `any`.
+    const result = parsePrescription(instructionText) as any;
+    const mapped = mapParsedInstruction(result);
+    setParseSummary(summariseParse(result));
+    const drugText = String(result?.drug?.text ?? '').trim();
+    setParsedDrugText(drugText);
+    // Kick the catalogue/generic-drug searches so clickable suggestions appear.
+    if (drugText.length >= 2) {
+      setItemSearch(drugText);
+      setDrugSearch(drugText);
+    }
+    setDraft((current) => ({
+      ...current,
+      ...mapped,
+      // A parsed drug name only replaces the medication when no catalogue
+      // item/generic was explicitly chosen.
+      ...(mapped.freetextName &&
+      current.source !== 'item' &&
+      current.source !== 'generic_product' &&
+      current.source !== 'generic_drug'
+        ? {
+            source: 'freetext' as const,
+            sourceKey: null,
+            itemId: null,
+            genericItemCode: null,
+            genericDrugCode: null,
+          }
+        : {}),
+    }));
   }
 
   if (isLoading) {
@@ -662,33 +751,37 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
                     label="Pharmacist name"
                     value={form.pharmacistName}
                     disabled={!editable}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, pharmacistName: e.currentTarget.value }))
-                    }
+                    onChange={(e) => {
+                      const value = e.currentTarget.value;
+                      setForm((f) => ({ ...f, pharmacistName: value }));
+                    }}
                   />
                   <TextInput
                     label="PCN registration no."
                     value={form.pharmacistPcn}
                     disabled={!editable}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, pharmacistPcn: e.currentTarget.value }))
-                    }
+                    onChange={(e) => {
+                      const value = e.currentTarget.value;
+                      setForm((f) => ({ ...f, pharmacistPcn: value }));
+                    }}
                   />
                   <TextInput
                     label="Prescriber"
                     value={form.prescriberName}
                     disabled={!editable}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, prescriberName: e.currentTarget.value }))
-                    }
+                    onChange={(e) => {
+                      const value = e.currentTarget.value;
+                      setForm((f) => ({ ...f, prescriberName: value }));
+                    }}
                   />
                   <TextInput
                     label="Facility"
                     value={form.facilityName}
                     disabled={!editable}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, facilityName: e.currentTarget.value }))
-                    }
+                    onChange={(e) => {
+                      const value = e.currentTarget.value;
+                      setForm((f) => ({ ...f, facilityName: value }));
+                    }}
                   />
                 </SimpleGrid>
                 <Textarea
@@ -696,7 +789,10 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
                   minRows={3}
                   value={form.notes}
                   disabled={!editable}
-                  onChange={(e) => setForm((f) => ({ ...f, notes: e.currentTarget.value }))}
+                  onChange={(e) => {
+                    const value = e.currentTarget.value;
+                    setForm((f) => ({ ...f, notes: value }));
+                  }}
                 />
                 <Group justify="space-between">
                   <Text size="xs" c="dimmed">
@@ -902,6 +998,99 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
         centered
       >
         <Stack gap="sm">
+          {/* Free-text instruction parser: distributes a pasted instruction
+              into the line fields below (strength, frequency, duration,
+              quantity, route, name). */}
+          <Paper
+            withBorder
+            radius="md"
+            p="sm"
+            style={{ background: 'var(--mantine-color-gray-0)' }}
+          >
+            <Stack gap="xs">
+              <Text size="sm" fw={600}>
+                Paste instruction
+              </Text>
+              <Textarea
+                placeholder="e.g. Amoxicillin 500mg: take 1 capsule by mouth three times daily for 7 days"
+                minRows={2}
+                autosize
+                value={instructionText}
+                onChange={(e) => setInstructionText(e.currentTarget.value)}
+                data-testid="prescription-instruction-input"
+              />
+              <Group justify="space-between" align="center" wrap="wrap">
+                <Text size="xs" c="dimmed">
+                  Fills the medication, strength, frequency, duration, quantity and route.
+                </Text>
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  onClick={handleParseInstruction}
+                  disabled={!instructionText.trim()}
+                  data-testid="prescription-instruction-parse"
+                >
+                  Parse &amp; fill
+                </Button>
+              </Group>
+              {parseSummary ? (
+                <Alert
+                  color={parseSummary.status === 'ok' ? 'green' : 'orange'}
+                  variant="light"
+                  title={
+                    parseSummary.status === 'ok'
+                      ? 'Parsed cleanly'
+                      : `Needs review — ${parseSummary.status}`
+                  }
+                >
+                  <Stack gap={2}>
+                    {parseSummary.warnings.slice(0, 6).map((warning) => (
+                      <Text key={warning} size="xs">
+                        • {warning}
+                      </Text>
+                    ))}
+                    {parseSummary.unparsed.length ? (
+                      <Text size="xs">Unparsed: {parseSummary.unparsed.join(', ')}</Text>
+                    ) : null}
+                    {!parseSummary.warnings.length && !parseSummary.unparsed.length ? (
+                      <Text size="xs">Every component was recognised.</Text>
+                    ) : null}
+                  </Stack>
+                </Alert>
+              ) : null}
+
+              {parsedDrugText ? (
+                suggestions.length > 0 ? (
+                  <Stack gap={4}>
+                    <Text size="xs" fw={600} c="dimmed">
+                      Suggested medications — click to select
+                    </Text>
+                    <Group gap={6} wrap="wrap">
+                      {suggestions.map((option) => (
+                        <Button
+                          key={option.value}
+                          size="compact-xs"
+                          radius="xl"
+                          variant="light"
+                          color={SOURCE_META[option.type]?.color ?? 'gray'}
+                          onClick={() => selectSuggestion(option)}
+                          data-testid={`prescription-suggestion-${option.value}`}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </Group>
+                  </Stack>
+                ) : (
+                  <Text size="xs" c="dimmed">
+                    No catalogue match for “{parsedDrugText}”. You can still save it as a free-text
+                    line.
+                  </Text>
+                )
+              ) : null}
+            </Stack>
+          </Paper>
+
           <Select
             label="Medication"
             placeholder="Search catalog items, generic products or generic drugs…"
@@ -978,7 +1167,10 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
               label="Medication name"
               placeholder="e.g. Amoxicillin 500mg capsules"
               value={draft.freetextName}
-              onChange={(e) => setDraft((d) => ({ ...d, freetextName: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setDraft((d) => ({ ...d, freetextName: value }));
+              }}
             />
           ) : draft.sourceKey ? (
             <Group gap={8}>
@@ -995,13 +1187,19 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
               label="Strength"
               placeholder="500mg"
               value={draft.strength}
-              onChange={(e) => setDraft((d) => ({ ...d, strength: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setDraft((d) => ({ ...d, strength: value }));
+              }}
             />
             <TextInput
               label="Frequency"
               placeholder="3x daily"
               value={draft.frequency}
-              onChange={(e) => setDraft((d) => ({ ...d, frequency: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                setDraft((d) => ({ ...d, frequency: value }));
+              }}
             />
             <NumberInput
               label="Duration (days)"
@@ -1028,13 +1226,19 @@ export function RxWebsitePrescriptionDetailPage({ prescriptionId }: { prescripti
             label="Instruction"
             placeholder="Take after meals"
             value={draft.instruction}
-            onChange={(e) => setDraft((d) => ({ ...d, instruction: e.currentTarget.value }))}
+            onChange={(e) => {
+              const value = e.currentTarget.value;
+              setDraft((d) => ({ ...d, instruction: value }));
+            }}
           />
           <Textarea
             label="Line notes"
             minRows={2}
             value={draft.notes}
-            onChange={(e) => setDraft((d) => ({ ...d, notes: e.currentTarget.value }))}
+            onChange={(e) => {
+              const value = e.currentTarget.value;
+              setDraft((d) => ({ ...d, notes: value }));
+            }}
           />
           <Group justify="flex-end">
             <Button variant="subtle" onClick={() => setLineModal(false)}>

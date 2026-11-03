@@ -77,6 +77,8 @@ export function DataPageShell(props: DataPageShellProps) {
     renderHeaderActions,
     transformRows,
     canDelete,
+    canEditRow,
+    canDeleteRow,
     canExport,
     defaultState,
     apiProvider: configApiProvider,
@@ -322,7 +324,9 @@ export function DataPageShell(props: DataPageShellProps) {
     queryKey: [...listKeyBase, queryParams] satisfies QueryKey,
     queryFn: async () => {
       const params =
-        moduleId === 'rxsoft' ? buildRxsoftListParams(queryParams, config) : queryParams;
+        moduleId === 'rxsoft' && config.listParamStyle !== 'plain'
+          ? buildRxsoftListParams(queryParams, config)
+          : queryParams;
       const response = await apiProvider.get(endpoint, { params });
 
       return response.data;
@@ -549,6 +553,8 @@ export function DataPageShell(props: DataPageShellProps) {
                   (deletePathBuilder || canDelete) && canDeleteAction ? () => undefined : undefined,
                 deleteMutation,
                 rowActions: gatedRowActions,
+                canEditRow,
+                canDeleteRow,
               }
             : undefined
         }

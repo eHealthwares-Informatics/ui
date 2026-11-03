@@ -213,10 +213,7 @@ export const websiteApi = {
     callbackUrl?: string;
   }) =>
     api
-      .post<{ checkoutUrl?: string | null; reference?: string }>(
-        '/website/wallet/deposit',
-        data
-      )
+      .post<{ checkoutUrl?: string | null; reference?: string }>('/website/wallet/deposit', data)
       .then((r) => r.data),
 
   payOrderFromWallet: (orderId: string) =>

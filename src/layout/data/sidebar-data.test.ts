@@ -36,6 +36,13 @@ const navGroups = [
   group('rxsoft.identity.user.read', [item('Child')]),
 ];
 
+const adminOnlyGroup: NavItem = {
+  title: 'Admin Only',
+  icon: undefined,
+  modules: ['admin'],
+  items: [{ title: 'Admin Item', icon: undefined, modules: ['admin'] }],
+} as NavItem;
+
 describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () => {
   it('hides tagged items the user lacks, keeps untagged items visible', () => {
     const [g1, g2] = filterNavGroupsByModule(navGroups, 'rxsoft', [
@@ -82,5 +89,70 @@ describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () =>
       check(navGroup);
       (navGroup.items ?? []).forEach(check);
     }
+  });
+
+  it('hides an admin-scoped group outside the admin module', () => {
+    const hidden = filterNavGroupsByModule([adminOnlyGroup], 'rxsoft', ['*']);
+    expect(hidden).toHaveLength(0);
+
+    const visible = filterNavGroupsByModule([adminOnlyGroup], 'admin', ['*']);
+    expect(visible).toHaveLength(1);
+    expect(visible[0].title).toBe('Admin Only');
+  });
+});
+
+describe('sidebarData — consolidated admin menus', () => {
+  it('has no duplicate group titles', () => {
+    const titles = sidebarData.navGroups.map((group) => group.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('shows only Notifications and Configuration menus in the admin module', () => {
+    const groups = filterNavGroupsByModule(sidebarData.navGroups, 'admin', ['*']);
+
+    expect(groups.map((group) => group.title)).toEqual([
+      'Notifications',
+      'Configuration',
+      'LIS Configuration',
+      'EMR Configuration',
+    ]);
+  });
+
+  it('puts notification channels and every template page under Notifications (admin only)', () => {
+    const notifications = sidebarData.navGroups.find((group) => group.title === 'Notifications');
+    expect(notifications).toBeDefined();
+    expect(notifications?.modules).toEqual(['admin']);
+
+    const titles = (notifications?.items ?? []).map((item) => item.title);
+    expect(titles).toEqual([
+      'Channels Config',
+      'Notification Templates',
+      'Notification Events',
+      'Print Templates',
+      'Notification Delivery',
+    ]);
+  });
+
+  it('keeps Configuration, LIS Configuration and EMR Configuration as separate admin groups', () => {
+    const configurationGroups = sidebarData.navGroups.filter((group) =>
+      ['Configuration', 'LIS Configuration', 'EMR Configuration'].includes(group.title)
+    );
+
+    expect(configurationGroups.map((group) => group.title)).toEqual([
+      'Configuration',
+      'LIS Configuration',
+      'EMR Configuration',
+    ]);
+    expect(configurationGroups.every((group) => group.modules?.includes('admin'))).toBe(true);
+  });
+
+  it('does not leave template entries in the old module menus', () => {
+    const allItems = sidebarData.navGroups.flatMap((group) => group.items ?? []);
+    const templateItems = allItems.filter((item) => /templates?/i.test(item.title));
+
+    expect(templateItems.map((item) => item.title).sort()).toEqual([
+      'Notification Templates',
+      'Print Templates',
+    ]);
   });
 });

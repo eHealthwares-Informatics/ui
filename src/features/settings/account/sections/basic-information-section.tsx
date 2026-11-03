@@ -1,12 +1,4 @@
-import {
-  Card,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-  Box,
-} from '@mantine/core';
+import { Card, Group, Stack, Text, TextInput, Title, Box } from '@mantine/core';
 import { Mail, User, Link } from 'lucide-react';
 
 type FieldProps = {
@@ -22,11 +14,21 @@ function Field({ label, description, value, readOnly, icon, placeholder }: Field
   return (
     <Stack gap="xs">
       <Group align="center" gap="xs" wrap="nowrap">
-        {icon && <Box size={18} style={{ lineHeight: 1 }}>{icon}</Box>}
-        <Text fw={600} size="sm">{label}</Text>
-        <Text fw={600} size="sm">{label}</Text>
+        {icon && (
+          <Box size={18} style={{ lineHeight: 1 }}>
+            {icon}
+          </Box>
+        )}
+        <Text fw={600} size="sm">
+          {label}
+        </Text>
+        <Text fw={600} size="sm">
+          {label}
+        </Text>
       </Group>
-      <Text size="xs" c="dimmed">{description}</Text>
+      <Text size="xs" c="dimmed">
+        {description}
+      </Text>
       <TextInput
         value={value}
         readOnly={readOnly}

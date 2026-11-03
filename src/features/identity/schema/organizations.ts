@@ -41,9 +41,7 @@ function buildUpdatePayload(values: Record<string, unknown>, _row?: Record<strin
   }
   if ('domain' in values) {
     // Empty string clears the mapping (the API accepts null for that).
-    payload.domain = values.domain
-      ? String(values.domain).trim().toLowerCase()
-      : null;
+    payload.domain = values.domain ? String(values.domain).trim().toLowerCase() : null;
   }
   if ('isActive' in values) {
     payload.isActive = values.isActive;
