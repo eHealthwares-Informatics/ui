@@ -2,7 +2,7 @@ import { Badge } from '@mantine/core';
 import { Eye } from 'lucide-react';
 import { type Column, type FieldGroup, type Option } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { conversationApi } from '@/lib/conversation-api';
 import type { TemplatePreview } from '../templates/preview-modal';
 
 export const PRINT_TEMPLATE_KIND_OPTIONS: Option[] = [
@@ -219,7 +219,7 @@ export function buildPrintTemplatesConfig(
     description:
       'Receipt, invoice and wholesale layouts. The active default for a document is what the POS prints.',
     endpoint: '/templates',
-    apiProvider: rxsoftApi,
+    apiProvider: conversationApi,
     queryKeyBase: ['rxsoft', 'templates', 'print'],
     listParams: { type: 'print' },
     columns,

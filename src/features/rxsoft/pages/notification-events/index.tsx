@@ -23,7 +23,6 @@ import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { identityApi } from '@/lib/identity-api';
-import { rxsoftApi } from '@/lib/rxsoft-api';
 import { useAuthStore } from '@/stores/auth-store';
 
 type ChannelRow = {
@@ -48,6 +47,7 @@ type PrintTemplateRow = {
   code: string;
   name: string;
   kind: string;
+  type?: string;
 };
 
 type EventRow = {
@@ -60,8 +60,6 @@ type EventRow = {
   templateId: string | null;
   channelIds: string[];
   printTemplateId: string | null;
-  printTemplateCode: string | null;
-  printTemplateName: string | null;
 };
 
 /** Selects store an Option object in form state; payloads need the raw value. */
@@ -195,10 +193,13 @@ export function RxNotificationEventsPage() {
   const { data: printTemplates = [] } = useQuery({
     queryKey: ['notification-events', 'print-templates'],
     queryFn: async () => {
-      const { data } = await rxsoftApi.get('/templates', {
+      const { data } = await conversationApi.get('/templates', {
         params: { type: 'print', isActive: 'true', limit: 200 },
       });
-      return getArrayPayload(data) as PrintTemplateRow[];
+      const rows = getArrayPayload(data) as PrintTemplateRow[];
+      // Defensive: only surface print templates even if the API returns a
+      // mixed list (older builds ignored the `type` filter).
+      return rows.filter((row) => !row.type || row.type === 'print');
     },
   });
 
@@ -237,11 +238,8 @@ export function RxNotificationEventsPage() {
 
   const printTemplatePayload = (value: unknown) => {
     const id = optionValue(value);
-    const selected = id ? printTemplates.find((template) => template.id === id) : null;
     return {
-      printTemplateId: selected?.id ?? id ?? null,
-      printTemplateCode: selected?.code ?? null,
-      printTemplateName: selected?.name ?? null,
+      printTemplateId: id ?? null,
     };
   };
 
@@ -318,8 +316,7 @@ export function RxNotificationEventsPage() {
           ),
           render: (row) =>
             String(
-              row.printTemplateName ??
-                printTemplates.find((template) => template.id === row.printTemplateId)?.name ??
+              printTemplates.find((template) => template.id === row.printTemplateId)?.name ??
                 '—'
             ),
         },
@@ -398,7 +395,7 @@ export function RxNotificationEventsPage() {
               value: String(row.printTemplateId),
               label:
                 printTemplates.find((template) => template.id === row.printTemplateId)?.name ??
-                String(row.printTemplateName ?? row.printTemplateId),
+                String(row.printTemplateId),
             }
           : null,
         channelIds: Array.isArray(row.channelIds) ? row.channelIds : [],
@@ -585,13 +582,10 @@ export function RxNotificationEventsPage() {
                   }))}
                   value={event.printTemplateId}
                   onChange={(value) => {
-                    const selected = printTemplates.find((item) => item.id === value);
                     eventMutation.mutate({
                       id: event.id,
                       payload: {
                         printTemplateId: value ?? null,
-                        printTemplateCode: selected?.code ?? null,
-                        printTemplateName: selected?.name ?? null,
                       },
                     });
                   }}

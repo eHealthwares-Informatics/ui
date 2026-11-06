@@ -1,4 +1,4 @@
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { conversationApi } from '@/lib/conversation-api';
 
 /**
  * Client-side renderer for the org's print templates.
@@ -207,7 +207,7 @@ export async function getEffectivePrintTemplate(
   }
 
   try {
-    const { data } = await rxsoftApi.get('/templates/effective', { params: { kind } });
+    const { data } = await conversationApi.get('/templates/effective', { params: { kind } });
     const value = (data ?? null) as PrintTemplateRecord | null;
     cache.set(kind, { at: Date.now(), value });
     return value;

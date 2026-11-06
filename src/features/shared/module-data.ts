@@ -56,6 +56,9 @@ export const modules: ModuleDefinition[] = [
       '/conversation/channels',
       '/conversation/exchanges',
       '/conversation/invites',
+      '/conversation/notification-templates',
+      '/conversation/notification-events',
+      '/conversation/notification-delivery',
     ],
     resources: [
       'conversations',
@@ -67,6 +70,10 @@ export const modules: ModuleDefinition[] = [
       'channels',
       'exchanges',
       'invites',
+      'notification-channels',
+      'notification-templates',
+      'notification-events',
+      'notification-deliveries',
     ],
   },
   {

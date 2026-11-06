@@ -161,6 +161,9 @@ import { Route as AuthenticatedConversationChatsIndexRouteImport } from './route
 import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index'
 import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
 import { Route as AuthenticatedConversationInvitesInviteIdRouteImport } from './routes/_authenticated/conversation/invites/$inviteId'
+import { Route as AuthenticatedConversationNotificationDeliveryIndexRouteImport } from './routes/_authenticated/conversation/notification-delivery/index'
+import { Route as AuthenticatedConversationNotificationEventsIndexRouteImport } from './routes/_authenticated/conversation/notification-events/index'
+import { Route as AuthenticatedConversationNotificationTemplatesIndexRouteImport } from './routes/_authenticated/conversation/notification-templates/index'
 import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index'
 import { Route as AuthenticatedConversationParticipantsIndexRouteImport } from './routes/_authenticated/conversation/participants/index'
 import { Route as AuthenticatedConversationProjectionsIndexRouteImport } from './routes/_authenticated/conversation/projections/index'
@@ -258,10 +261,6 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
 import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
-import { Route as AuthenticatedRxsoftNotificationChannelsIndexRouteImport } from './routes/_authenticated/rxsoft/notification-channels/index'
-import { Route as AuthenticatedRxsoftNotificationDeliveryIndexRouteImport } from './routes/_authenticated/rxsoft/notification-delivery/index'
-import { Route as AuthenticatedRxsoftNotificationEventsIndexRouteImport } from './routes/_authenticated/rxsoft/notification-events/index'
-import { Route as AuthenticatedRxsoftNotificationTemplatesIndexRouteImport } from './routes/_authenticated/rxsoft/notification-templates/index'
 import { Route as AuthenticatedRxsoftOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/orders/index'
 import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
 import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index'
@@ -1157,6 +1156,24 @@ const AuthenticatedConversationInvitesInviteIdRoute =
     path: '/$inviteId',
     getParentRoute: () => AuthenticatedConversationInvitesRouteRoute,
   } as any)
+const AuthenticatedConversationNotificationDeliveryIndexRoute =
+  AuthenticatedConversationNotificationDeliveryIndexRouteImport.update({
+    id: '/conversation/notification-delivery/',
+    path: '/conversation/notification-delivery/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationNotificationEventsIndexRoute =
+  AuthenticatedConversationNotificationEventsIndexRouteImport.update({
+    id: '/conversation/notification-events/',
+    path: '/conversation/notification-events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationNotificationTemplatesIndexRoute =
+  AuthenticatedConversationNotificationTemplatesIndexRouteImport.update({
+    id: '/conversation/notification-templates/',
+    path: '/conversation/notification-templates/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationOptionListsIndexRoute =
   AuthenticatedConversationOptionListsIndexRouteImport.update({
     id: '/conversation/option-lists/',
@@ -1737,30 +1754,6 @@ const AuthenticatedRxsoftManufacturersIndexRoute =
   AuthenticatedRxsoftManufacturersIndexRouteImport.update({
     id: '/rxsoft/manufacturers/',
     path: '/rxsoft/manufacturers/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRxsoftNotificationChannelsIndexRoute =
-  AuthenticatedRxsoftNotificationChannelsIndexRouteImport.update({
-    id: '/rxsoft/notification-channels/',
-    path: '/rxsoft/notification-channels/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRxsoftNotificationDeliveryIndexRoute =
-  AuthenticatedRxsoftNotificationDeliveryIndexRouteImport.update({
-    id: '/rxsoft/notification-delivery/',
-    path: '/rxsoft/notification-delivery/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRxsoftNotificationEventsIndexRoute =
-  AuthenticatedRxsoftNotificationEventsIndexRouteImport.update({
-    id: '/rxsoft/notification-events/',
-    path: '/rxsoft/notification-events/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRxsoftNotificationTemplatesIndexRoute =
-  AuthenticatedRxsoftNotificationTemplatesIndexRouteImport.update({
-    id: '/rxsoft/notification-templates/',
-    path: '/rxsoft/notification-templates/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftOrdersIndexRoute =
@@ -2411,6 +2404,9 @@ export interface FileRoutesByFullPath {
   '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
+  '/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
   '/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
   '/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
@@ -2496,10 +2492,6 @@ export interface FileRoutesByFullPath {
   '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
-  '/rxsoft/notification-channels/': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
-  '/rxsoft/notification-delivery/': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
-  '/rxsoft/notification-events/': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
-  '/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -2740,6 +2732,9 @@ export interface FileRoutesByTo {
   '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute
+  '/conversation/notification-delivery': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-events': typeof AuthenticatedConversationNotificationEventsIndexRoute
+  '/conversation/notification-templates': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute
   '/conversation/participants': typeof AuthenticatedConversationParticipantsIndexRoute
   '/conversation/projections': typeof AuthenticatedConversationProjectionsIndexRoute
@@ -2825,10 +2820,6 @@ export interface FileRoutesByTo {
   '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
-  '/rxsoft/notification-channels': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
-  '/rxsoft/notification-delivery': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
-  '/rxsoft/notification-events': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
-  '/rxsoft/notification-templates': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/rxsoft/orders': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3075,6 +3066,9 @@ export interface FileRoutesById {
   '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
+  '/_authenticated/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/_authenticated/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
+  '/_authenticated/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
   '/_authenticated/conversation/participants/': typeof AuthenticatedConversationParticipantsIndexRoute
   '/_authenticated/conversation/projections/': typeof AuthenticatedConversationProjectionsIndexRoute
@@ -3160,10 +3154,6 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
-  '/_authenticated/rxsoft/notification-channels/': typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
-  '/_authenticated/rxsoft/notification-delivery/': typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
-  '/_authenticated/rxsoft/notification-events/': typeof AuthenticatedRxsoftNotificationEventsIndexRoute
-  '/_authenticated/rxsoft/notification-templates/': typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   '/_authenticated/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3408,6 +3398,9 @@ export interface FileRouteTypes {
     | '/conversation/channels/'
     | '/conversation/chats/'
     | '/conversation/exchanges/'
+    | '/conversation/notification-delivery/'
+    | '/conversation/notification-events/'
+    | '/conversation/notification-templates/'
     | '/conversation/option-lists/'
     | '/conversation/participants/'
     | '/conversation/projections/'
@@ -3493,10 +3486,6 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines/'
     | '/rxsoft/journals/'
     | '/rxsoft/manufacturers/'
-    | '/rxsoft/notification-channels/'
-    | '/rxsoft/notification-delivery/'
-    | '/rxsoft/notification-events/'
-    | '/rxsoft/notification-templates/'
     | '/rxsoft/orders/'
     | '/rxsoft/organisation-config/'
     | '/rxsoft/organisation-payment-providers/'
@@ -3737,6 +3726,9 @@ export interface FileRouteTypes {
     | '/conversation/channels'
     | '/conversation/chats'
     | '/conversation/exchanges'
+    | '/conversation/notification-delivery'
+    | '/conversation/notification-events'
+    | '/conversation/notification-templates'
     | '/conversation/option-lists'
     | '/conversation/participants'
     | '/conversation/projections'
@@ -3822,10 +3814,6 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines'
     | '/rxsoft/journals'
     | '/rxsoft/manufacturers'
-    | '/rxsoft/notification-channels'
-    | '/rxsoft/notification-delivery'
-    | '/rxsoft/notification-events'
-    | '/rxsoft/notification-templates'
     | '/rxsoft/orders'
     | '/rxsoft/organisation-config'
     | '/rxsoft/organisation-payment-providers'
@@ -4071,6 +4059,9 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/channels/'
     | '/_authenticated/conversation/chats/'
     | '/_authenticated/conversation/exchanges/'
+    | '/_authenticated/conversation/notification-delivery/'
+    | '/_authenticated/conversation/notification-events/'
+    | '/_authenticated/conversation/notification-templates/'
     | '/_authenticated/conversation/option-lists/'
     | '/_authenticated/conversation/participants/'
     | '/_authenticated/conversation/projections/'
@@ -4156,10 +4147,6 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/journal-entry-lines/'
     | '/_authenticated/rxsoft/journals/'
     | '/_authenticated/rxsoft/manufacturers/'
-    | '/_authenticated/rxsoft/notification-channels/'
-    | '/_authenticated/rxsoft/notification-delivery/'
-    | '/_authenticated/rxsoft/notification-events/'
-    | '/_authenticated/rxsoft/notification-templates/'
     | '/_authenticated/rxsoft/orders/'
     | '/_authenticated/rxsoft/organisation-config/'
     | '/_authenticated/rxsoft/organisation-payment-providers/'
@@ -5367,6 +5354,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationInvitesInviteIdRouteImport
       parentRoute: typeof AuthenticatedConversationInvitesRouteRoute
     }
+    '/_authenticated/conversation/notification-delivery/': {
+      id: '/_authenticated/conversation/notification-delivery/'
+      path: '/conversation/notification-delivery'
+      fullPath: '/conversation/notification-delivery/'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/notification-events/': {
+      id: '/_authenticated/conversation/notification-events/'
+      path: '/conversation/notification-events'
+      fullPath: '/conversation/notification-events/'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/notification-templates/': {
+      id: '/_authenticated/conversation/notification-templates/'
+      path: '/conversation/notification-templates'
+      fullPath: '/conversation/notification-templates/'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/option-lists/': {
       id: '/_authenticated/conversation/option-lists/'
       path: '/conversation/option-lists'
@@ -6044,34 +6052,6 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/manufacturers'
       fullPath: '/rxsoft/manufacturers/'
       preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rxsoft/notification-channels/': {
-      id: '/_authenticated/rxsoft/notification-channels/'
-      path: '/rxsoft/notification-channels'
-      fullPath: '/rxsoft/notification-channels/'
-      preLoaderRoute: typeof AuthenticatedRxsoftNotificationChannelsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rxsoft/notification-delivery/': {
-      id: '/_authenticated/rxsoft/notification-delivery/'
-      path: '/rxsoft/notification-delivery'
-      fullPath: '/rxsoft/notification-delivery/'
-      preLoaderRoute: typeof AuthenticatedRxsoftNotificationDeliveryIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rxsoft/notification-events/': {
-      id: '/_authenticated/rxsoft/notification-events/'
-      path: '/rxsoft/notification-events'
-      fullPath: '/rxsoft/notification-events/'
-      preLoaderRoute: typeof AuthenticatedRxsoftNotificationEventsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/rxsoft/notification-templates/': {
-      id: '/_authenticated/rxsoft/notification-templates/'
-      path: '/rxsoft/notification-templates'
-      fullPath: '/rxsoft/notification-templates/'
-      preLoaderRoute: typeof AuthenticatedRxsoftNotificationTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/orders/': {
@@ -6830,6 +6810,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
   AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute
   AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute
+  AuthenticatedConversationNotificationDeliveryIndexRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  AuthenticatedConversationNotificationEventsIndexRoute: typeof AuthenticatedConversationNotificationEventsIndexRoute
+  AuthenticatedConversationNotificationTemplatesIndexRoute: typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute
   AuthenticatedConversationParticipantsIndexRoute: typeof AuthenticatedConversationParticipantsIndexRoute
   AuthenticatedConversationProjectionsIndexRoute: typeof AuthenticatedConversationProjectionsIndexRoute
@@ -6915,10 +6898,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
-  AuthenticatedRxsoftNotificationChannelsIndexRoute: typeof AuthenticatedRxsoftNotificationChannelsIndexRoute
-  AuthenticatedRxsoftNotificationDeliveryIndexRoute: typeof AuthenticatedRxsoftNotificationDeliveryIndexRoute
-  AuthenticatedRxsoftNotificationEventsIndexRoute: typeof AuthenticatedRxsoftNotificationEventsIndexRoute
-  AuthenticatedRxsoftNotificationTemplatesIndexRoute: typeof AuthenticatedRxsoftNotificationTemplatesIndexRoute
   AuthenticatedRxsoftOrdersIndexRoute: typeof AuthenticatedRxsoftOrdersIndexRoute
   AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -7097,6 +7076,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationChatsIndexRoute,
   AuthenticatedConversationExchangesIndexRoute:
     AuthenticatedConversationExchangesIndexRoute,
+  AuthenticatedConversationNotificationDeliveryIndexRoute:
+    AuthenticatedConversationNotificationDeliveryIndexRoute,
+  AuthenticatedConversationNotificationEventsIndexRoute:
+    AuthenticatedConversationNotificationEventsIndexRoute,
+  AuthenticatedConversationNotificationTemplatesIndexRoute:
+    AuthenticatedConversationNotificationTemplatesIndexRoute,
   AuthenticatedConversationOptionListsIndexRoute:
     AuthenticatedConversationOptionListsIndexRoute,
   AuthenticatedConversationParticipantsIndexRoute:
@@ -7232,14 +7217,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
   AuthenticatedRxsoftManufacturersIndexRoute:
     AuthenticatedRxsoftManufacturersIndexRoute,
-  AuthenticatedRxsoftNotificationChannelsIndexRoute:
-    AuthenticatedRxsoftNotificationChannelsIndexRoute,
-  AuthenticatedRxsoftNotificationDeliveryIndexRoute:
-    AuthenticatedRxsoftNotificationDeliveryIndexRoute,
-  AuthenticatedRxsoftNotificationEventsIndexRoute:
-    AuthenticatedRxsoftNotificationEventsIndexRoute,
-  AuthenticatedRxsoftNotificationTemplatesIndexRoute:
-    AuthenticatedRxsoftNotificationTemplatesIndexRoute,
   AuthenticatedRxsoftOrdersIndexRoute: AuthenticatedRxsoftOrdersIndexRoute,
   AuthenticatedRxsoftOrganisationConfigIndexRoute:
     AuthenticatedRxsoftOrganisationConfigIndexRoute,

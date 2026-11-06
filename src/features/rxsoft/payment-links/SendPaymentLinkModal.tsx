@@ -14,8 +14,8 @@ export type NotificationChannel = {
 };
 
 /**
- * The organisation's enabled notification channels. Staff pick one of these
- * before a send — configured in Notifications → Channels Config.
+ * The available notification channels. Staff pick one of these before a send —
+ * configured in Channels.
  */
 export function useNotificationChannels() {
   return useQuery({

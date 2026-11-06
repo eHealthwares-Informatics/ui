@@ -11,7 +11,6 @@ export * from './journal-entries';
 export * from './journal-entry-lines';
 export * from './journals';
 export * from './manufacturers';
-export * from './notification-channels';
 export * from './notification-delivery';
 export * from './notification-events';
 export * from './notification-templates';

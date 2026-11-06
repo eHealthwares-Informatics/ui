@@ -118,19 +118,28 @@ describe('sidebarData — consolidated admin menus', () => {
     ]);
   });
 
-  it('puts notification channels and every template page under Notifications (admin only)', () => {
+  it('puts notification templates under Notifications', () => {
     const notifications = sidebarData.navGroups.find((group) => group.title === 'Notifications');
     expect(notifications).toBeDefined();
-    expect(notifications?.modules).toEqual(['admin']);
+    expect(notifications?.modules).toEqual(['conversation', 'admin']);
 
     const titles = (notifications?.items ?? []).map((item) => item.title);
     expect(titles).toEqual([
-      'Channels Config',
       'Notification Templates',
       'Notification Events',
       'Print Templates',
       'Notification Delivery',
     ]);
+
+    const byTitle = Object.fromEntries(
+      (notifications?.items ?? []).map((item) => [item.title, item])
+    );
+
+    expect(byTitle['Notification Templates'].url).toBe('/conversation/notification-templates');
+    expect(byTitle['Notification Events'].url).toBe('/conversation/notification-events');
+    expect(byTitle['Notification Delivery'].url).toBe('/conversation/notification-delivery');
+    expect(byTitle['Print Templates'].url).toBe('/rxsoft/print-templates');
+    expect(byTitle['Print Templates'].modules).toEqual(['admin']);
   });
 
   it('keeps Configuration, LIS Configuration and EMR Configuration as separate admin groups', () => {

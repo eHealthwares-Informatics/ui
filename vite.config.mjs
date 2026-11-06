@@ -83,6 +83,11 @@ export default defineConfig({
         changeOrigin: true,
         pathRewrite: { '^/api/identity': '' },
       },
+      '/api/conversation': {
+        target: 'http://localhost:8090',
+        changeOrigin: true,
+        pathRewrite: { '^/api/conversation': '/api' },
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
