@@ -95,7 +95,7 @@ test('notification events picker requests only print templates and surfaces just
   });
 
   const printRequests: URL[] = [];
-  await page.route('**/templates?**', async (route) => {
+  await page.route(/\/templates\?/, async (route) => {
     const url = new URL(route.request().url());
     if (!url.pathname.endsWith('/templates') || url.searchParams.get('type') !== 'print') {
       await route.continue();
