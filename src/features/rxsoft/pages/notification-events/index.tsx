@@ -524,7 +524,13 @@ export function RxNotificationEventsPage() {
           {events.map((event) => {
             const template = templates.find((item) => item.id === event.templateId);
             return (
-              <Paper key={event.id} withBorder radius="md" p="lg">
+              <Paper
+                key={event.id}
+                withBorder
+                radius="md"
+                p="lg"
+                data-testid={`notification-event-${event.key}`}
+              >
                 <Group justify="space-between" mb="sm" wrap="nowrap">
                   <Group gap="xs">
                     <CalendarDays size={18} />
@@ -574,6 +580,7 @@ export function RxNotificationEventsPage() {
                 )}
 
                 <Select
+                  data-testid={`notification-event-print-template-${event.key}`}
                   label="Print template"
                   placeholder="No printed document"
                   data={printTemplates.map((item) => ({
