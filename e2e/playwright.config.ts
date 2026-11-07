@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import { resolveOutputDir } from './output-dir';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,6 +23,11 @@ const EMR_ADMIN_STORAGE_STATE = join(E2E_DIR, '.auth', 'emr-admin.json');
  * yourself if you point it back inside the repo).
  */
 const OUTPUT_DIR = resolveOutputDir();
+
+// The Vite dev server switches to HTTPS automatically when local certs exist
+// (see vite.config.mjs). Match the e2e webServer/baseURL to the same protocol.
+const DEV_HTTPS = existsSync(join(process.cwd(), 'certs/dev/localhost.key'));
+const DEV_ORIGIN = `${DEV_HTTPS ? 'https' : 'http'}://localhost:5173`;
 
 /**
  * Playwright config.
@@ -108,17 +114,22 @@ export default defineConfig({
       testMatch: 'emr-real.spec.ts',
       use: {
         // No storageState — each test signs in with provisioned org credentials
-        baseURL: 'http://localhost:5173',
+        baseURL: DEV_ORIGIN,
       },
     },
   ],
-  webServer: {
-    command: 'yarn dev --host',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
-  },
+  // Playwright's webServer probe does not accept self-signed TLS certs, so
+  // with local HTTPS we require an already-running `npm run dev -- --host`.
+  webServer: DEV_HTTPS
+    ? undefined
+    : {
+        command: 'yarn dev --host',
+        url: DEV_ORIGIN,
+        reuseExistingServer: true,
+      },
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: DEV_ORIGIN,
+    ignoreHTTPSErrors: DEV_HTTPS,
     headless: true,
     viewport: { width: 1280, height: 800 },
     screenshot: 'only-on-failure',
