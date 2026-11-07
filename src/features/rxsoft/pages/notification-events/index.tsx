@@ -316,8 +316,7 @@ export function RxNotificationEventsPage() {
           ),
           render: (row) =>
             String(
-              printTemplates.find((template) => template.id === row.printTemplateId)?.name ??
-                '—'
+              printTemplates.find((template) => template.id === row.printTemplateId)?.name ?? '—'
             ),
         },
         {

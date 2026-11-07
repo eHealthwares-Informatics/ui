@@ -40,7 +40,7 @@ for (const entry of pages) {
       page
         .getByTestId('page-title')
         .filter({ hasText: entry.title })
-        .or(page.getByText('Select an organisation')),
+        .or(page.getByText('Select an organisation'))
     ).toBeVisible({ timeout: 30_000 });
   });
 }
@@ -60,12 +60,10 @@ test('channels page loads the unified /channels registry', async ({ page }, test
   await page.goto('/conversation/channels');
   await page.waitForLoadState('domcontentloaded');
 
-  await expect
-    .poll(() => channelRequests.length, { timeout: 30_000 })
-    .toBeGreaterThan(0);
+  await expect.poll(() => channelRequests.length, { timeout: 30_000 }).toBeGreaterThan(0);
   // The removed notification-specific endpoint must not be used anymore.
   expect(channelRequests.some((url) => url.pathname.endsWith('/notification-channels'))).toBe(
-    false,
+    false
   );
 });
 
@@ -78,7 +76,7 @@ test('the removed notification-channels page no longer renders', async ({ page }
 
   // The old page renderer is gone: no "Channels Config" heading is mounted.
   await expect(page.getByTestId('page-title').filter({ hasText: 'Channels Config' })).toHaveCount(
-    0,
+    0
   );
   await expect(page.getByText('Channels Config')).toHaveCount(0);
 });
