@@ -48,6 +48,10 @@ export function isRouteAllowedForModule(pathname: string, moduleId: ModuleId): b
 
 export function getModuleDashboard(moduleId: ModuleId): string {
   const mod = modules.find((m) => m.id === moduleId);
+  // `navigate({ to })` takes a URL path, not a route id. Module dashboards are
+  // file routes on the pathless `_authenticated` layout, so their *path* is the
+  // module root (`/admin/dashboard`). Prefixing with `/_authenticated` produced
+  // a literal URL that matched no route and bounced through `/` to `/modules`.
   return mod?.root ?? '/';
 }
 

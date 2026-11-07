@@ -109,6 +109,12 @@ export type FormFieldSchema = {
   placeholder?: string;
   defaultValue?: unknown;
   rows?: number;
+  /**
+   * Grid span (1–12) for this control when fields are laid out in a grid.
+   * Defaults to 12 (full width). Only leaf fields use it; containers
+   * (`tab`/`col`/`section`) always span the full row.
+   */
+  col?: number;
   columns?: { key: string; label: string; type: FormFieldType }[];
   /** Child fields — only used by the 'tab' container type. */
   fields?: FormFieldSchema[];
@@ -182,6 +188,8 @@ export type Encounter = {
   endedAt?: string | null;
   reason: string | null;
   notes: string | null;
+  /** DB insert instant — reliable fallback when `encounterDatetime` is skewed. */
+  createdAt?: string;
 };
 
 export type RequestItem = {

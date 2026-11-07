@@ -1,0 +1,233 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  min-height: 178px;
+  padding: 20px 22px 22px;
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 105% at 108% 118%, var(--card-blob) 0%, transparent 62%),
+    radial-gradient(70% 70% at 112% 52%, var(--card-blob-soft) 0%, transparent 68%),
+    linear-gradient(155deg, var(--card-bg) 0%, var(--card-bg-edge) 100%);
+  box-shadow: 0 1px 2px rgb(16 35 61 / 3%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--card-border-strong);
+  box-shadow: 0 18px 32px -24px rgb(16 35 61 / 45%);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--card-accent);
+  outline-offset: 2px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.icon {
+  display: block;
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgb(16 35 61 / 12%));
+}
+
+.iconFallback {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  color: var(--card-accent);
+  border-radius: 14px;
+  background: var(--card-arrow-bg);
+  box-shadow: inset 0 0 0 1px var(--card-border-strong);
+}
+
+.arrow {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: var(--card-accent);
+  border-radius: 50%;
+  background: var(--card-arrow-bg);
+  transition: transform 180ms ease;
+}
+
+.card:hover .arrow {
+  transform: translateX(2px);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  color: var(--card-title);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  max-width: 36ch;
+  color: var(--card-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/*
+ * Dark mode: the accent classes below carry a light card palette, so the card
+ * re-derives every surface from its own `--card-accent` over the theme tokens
+ * instead of switching to a flat grey panel.
+ */
+html[data-mantine-color-scheme='dark'] .card {
+  --card-bg: color-mix(in srgb, var(--card-accent) 11%, var(--app-surface));
+  --card-bg-edge: color-mix(in srgb, var(--card-accent) 5%, var(--app-surface));
+  --card-border: color-mix(in srgb, var(--card-accent) 26%, var(--app-line));
+  --card-border-strong: color-mix(in srgb, var(--card-accent) 46%, var(--app-line));
+  --card-arrow-bg: color-mix(in srgb, var(--card-accent) 20%, transparent);
+  --card-blob: color-mix(in srgb, var(--card-accent) 20%, transparent);
+  --card-blob-soft: color-mix(in srgb, var(--card-accent) 8%, transparent);
+  --card-title: var(--app-text);
+  --card-muted: var(--app-muted);
+}
+
+/* --- accents ------------------------------------------------------------- */
+
+.accentGreen {
+  --card-bg: #f2fbf4;
+  --card-bg-edge: #fbfffc;
+  --card-border: #dcf1e1;
+  --card-border-strong: #bfe6c9;
+  --card-arrow-bg: #e4f6ea;
+  --card-blob: rgb(34 197 94 / 14%);
+  --card-blob-soft: rgb(34 197 94 / 6%);
+  --card-accent: #189a4b;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentTeal {
+  --card-bg: #effbfa;
+  --card-bg-edge: #fafffe;
+  --card-border: #cfefec;
+  --card-border-strong: #aee4de;
+  --card-arrow-bg: #dff6f3;
+  --card-blob: rgb(13 148 136 / 13%);
+  --card-blob-soft: rgb(13 148 136 / 6%);
+  --card-accent: #0d8f8c;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentPurple {
+  --card-bg: #f7f3ff;
+  --card-bg-edge: #fdfbff;
+  --card-border: #e9dfff;
+  --card-border-strong: #d8c6ff;
+  --card-arrow-bg: #efe6ff;
+  --card-blob: rgb(124 58 237 / 12%);
+  --card-blob-soft: rgb(124 58 237 / 5%);
+  --card-accent: #7a3ff2;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentIndigo {
+  --card-bg: #f3f6fe;
+  --card-bg-edge: #fbfcff;
+  --card-border: #dfe6fa;
+  --card-border-strong: #c5d3f5;
+  --card-arrow-bg: #e7eefb;
+  --card-blob: rgb(52 82 200 / 12%);
+  --card-blob-soft: rgb(52 82 200 / 5%);
+  --card-accent: #3452c8;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentSky {
+  --card-bg: #f0f8ff;
+  --card-bg-edge: #fafdff;
+  --card-border: #d6e9fb;
+  --card-border-strong: #b4d6f5;
+  --card-arrow-bg: #e2f1fe;
+  --card-blob: rgb(2 132 199 / 13%);
+  --card-blob-soft: rgb(2 132 199 / 5%);
+  --card-accent: #0a84c7;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentBlue {
+  --card-bg: #f1f6ff;
+  --card-bg-edge: #fbfdff;
+  --card-border: #d9e6ff;
+  --card-border-strong: #b9d2fb;
+  --card-arrow-bg: #e3eeff;
+  --card-blob: rgb(31 107 240 / 13%);
+  --card-blob-soft: rgb(31 107 240 / 5%);
+  --card-accent: #1f6bf0;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentRed {
+  --card-bg: #fff4f5;
+  --card-bg-edge: #fffbfb;
+  --card-border: #fbdfe4;
+  --card-border-strong: #f6c2cb;
+  --card-arrow-bg: #fce4e8;
+  --card-blob: rgb(225 45 75 / 12%);
+  --card-blob-soft: rgb(225 45 75 / 5%);
+  --card-accent: #df2d4b;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentOrange {
+  --card-bg: #fff8ef;
+  --card-bg-edge: #fffdf8;
+  --card-border: #ffe7cb;
+  --card-border-strong: #ffd6a6;
+  --card-arrow-bg: #fff0da;
+  --card-blob: rgb(232 134 26 / 14%);
+  --card-blob-soft: rgb(232 134 26 / 6%);
+  --card-accent: #e8861a;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}
+
+.accentSlate {
+  --card-bg: #f5f7fb;
+  --card-bg-edge: #fcfdff;
+  --card-border: #e3e8f2;
+  --card-border-strong: #cfd8e8;
+  --card-arrow-bg: #eaeef6;
+  --card-blob: rgb(71 85 105 / 10%);
+  --card-blob-soft: rgb(71 85 105 / 4%);
+  --card-accent: #475569;
+  --card-title: #10233d;
+  --card-muted: #7b8aa3;
+}

@@ -20,6 +20,8 @@ export type ActionCellProps = {
   savingRowIndex?: string | null;
   actions?: any[];
   rowActions?: RowAction[];
+  canEditRow?: (row: Record<string, unknown>) => boolean;
+  canDeleteRow?: (row: Record<string, unknown>) => boolean;
 };
 
 export const ActionCell = ({
@@ -37,6 +39,8 @@ export const ActionCell = ({
   saveRow,
   resetRow,
   rowActions,
+  canEditRow,
+  canDeleteRow,
 }: ActionCellProps & { row: Record<string, unknown> }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const handleDelete = () => {
@@ -80,7 +84,7 @@ export const ActionCell = ({
         </ActionIcon>
       )}
 
-      {!editPathBuilder && onEdit && (
+      {!editPathBuilder && onEdit && (!canEditRow || canEditRow(row)) && (
         <ActionIcon
           variant="outline"
           onClick={() => onEdit(row, rowIndex || 0)}
@@ -96,7 +100,7 @@ export const ActionCell = ({
         </ActionIcon>
       )}
 
-      {onDelete && (
+      {onDelete && (!canDeleteRow || canDeleteRow(row)) && (
         <ActionIcon
           variant="outline"
           color="red"

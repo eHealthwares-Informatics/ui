@@ -47,11 +47,16 @@ describe('filterNavGroupsByModule', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('shows all items when module is admin', () => {
-    const result = filterNavGroupsByModule([conversationGroup, rxsoftGroup], 'admin');
-    expect(result).toHaveLength(2);
+  it('shows only admin-tagged groups when module is admin', () => {
+    const adminGroup = { ...rxsoftGroup, modules: ['admin'] as NavItem['modules'] };
+    const result = filterNavGroupsByModule([conversationGroup, adminGroup], 'admin');
+    expect(result).toHaveLength(1);
     expect(result[0].items).toHaveLength(2);
-    expect(result[1].items).toHaveLength(2);
+  });
+
+  it('hides non-admin groups from the admin module', () => {
+    const result = filterNavGroupsByModule([conversationGroup, rxsoftGroup], 'admin');
+    expect(result).toHaveLength(0);
   });
 
   it('shows items without modules array for any module', () => {

@@ -43,4 +43,8 @@ export const prescriptionsConfig: ModelConfig = {
   columns,
   canDelete: false,
   defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
+  // Row "View" opens the prescription detail page (workflow, files, lines,
+  // prescriber). Without this the list offered no route into the detail page.
+  detailPathBuilder: (row: Record<string, unknown>) =>
+    `/rxsoft/website-prescriptions/${String(row.id)}`,
 };

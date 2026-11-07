@@ -16,7 +16,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, FileText, Share2, Stethoscope } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { RxPage } from '@/features/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import {
@@ -33,6 +34,7 @@ import { CreateReferralModal } from '../components/referrals/create-referral-mod
 import { RequestForm } from '../components/requests/request-form';
 import { PatientLink } from '../components/shared/patient-link';
 import { StatusBadge } from '../components/shared/status-badge';
+import { useElapsedTimer } from '../hooks/use-elapsed-timer';
 import { usePatientByMrn } from '../hooks/use-patient-by-mrn';
 import { formatEnum } from '../lib/emr-constants';
 import type { Encounter, FormSubmission, Visit } from '../lib/emr-types';
@@ -55,44 +57,32 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 function LiveEncounterTimer({
   startedAt,
   endedAt,
+  fallbackStartedAt,
   autoEndAfterHours,
   onAutoEnd,
 }: {
   startedAt: string;
   endedAt: string | null;
+  fallbackStartedAt?: string | null;
   autoEndAfterHours: number;
   onAutoEnd?: () => void;
 }) {
-  const [now, setNow] = useState(() => Date.now());
+  const { formatted, elapsedMs, isRunning } = useElapsedTimer(startedAt, 1000, fallbackStartedAt);
+  const autoEndedRef = useRef(false);
 
   useEffect(() => {
-    if (endedAt) {
+    if (endedAt || !onAutoEnd || !isRunning) {
       return;
     }
-    const interval = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(interval);
-  }, [endedAt]);
-
-  useEffect(() => {
-    if (endedAt || !onAutoEnd) {
-      return;
-    }
-    const hours = (now - new Date(startedAt).getTime()) / 3_600_000;
-    if (hours >= autoEndAfterHours) {
+    if (elapsedMs >= autoEndAfterHours * 3_600_000 && !autoEndedRef.current) {
+      autoEndedRef.current = true;
       onAutoEnd();
     }
-  }, [now, startedAt, endedAt, autoEndAfterHours, onAutoEnd]);
+  }, [elapsedMs, endedAt, autoEndAfterHours, onAutoEnd, isRunning]);
 
   if (endedAt) {
     return null;
   }
-
-  const ms = Math.max(0, now - new Date(startedAt).getTime());
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  const pad = (n: number) => String(n).padStart(2, '0');
 
   return (
     <Card
@@ -104,7 +94,7 @@ function LiveEncounterTimer({
     >
       <Group gap="xs" justify="center">
         <Text size="sm" fw={700} ff="monospace">
-          {pad(hours)}:{pad(minutes)}:{pad(seconds)}
+          {formatted}
         </Text>
         <Text size="xs" c="dimmed">
           elapsed · auto-ends after {autoEndAfterHours}h
@@ -123,6 +113,7 @@ export function EncounterDetailPage() {
   const [referralOpened, { open: openReferral, close: closeReferral }] = useDisclosure(false);
   const [viewSubmission, setViewSubmission] = useState<FormSubmission | null>(null);
   const [amendSubmission, setAmendSubmission] = useState<FormSubmission | null>(null);
+  const [endConfirmOpen, setEndConfirmOpen] = useState(false);
 
   const encounterQuery = useQuery({
     queryKey: ['emr', 'encounters', encounterId],
@@ -265,15 +256,7 @@ export function EncounterDetailPage() {
               variant="outline"
               color="red"
               loading={endEncounterPending}
-              onClick={() => {
-                endEncounterMutation.mutate(undefined, {
-                  onSuccess: () => {
-                    void queryClient.invalidateQueries({
-                      queryKey: ['emr', 'encounters', encounterId],
-                    });
-                  },
-                });
-              }}
+              onClick={() => setEndConfirmOpen(true)}
             >
               End Encounter
             </Button>
@@ -293,6 +276,7 @@ export function EncounterDetailPage() {
       <LiveEncounterTimer
         startedAt={encounter.encounterDatetime}
         endedAt={encounter.endedAt ?? null}
+        fallbackStartedAt={encounter.createdAt ?? null}
         autoEndAfterHours={8}
         onAutoEnd={
           encounterMutationInProgress
@@ -470,6 +454,26 @@ export function EncounterDetailPage() {
         opened={Boolean(amendSubmission)}
         onClose={() => setAmendSubmission(null)}
         submission={amendSubmission}
+      />
+
+      <ConfirmDialog
+        open={endConfirmOpen}
+        onOpenChange={setEndConfirmOpen}
+        title="End encounter?"
+        description="This completes the encounter and stops the timer. Documentation and submissions remain available afterwards."
+        confirmText="End Encounter"
+        destructive
+        isLoading={endEncounterPending}
+        onConfirm={() => {
+          endEncounterMutation.mutate(undefined, {
+            onSuccess: () => {
+              void queryClient.invalidateQueries({
+                queryKey: ['emr', 'encounters', encounterId],
+              });
+              setEndConfirmOpen(false);
+            },
+          });
+        }}
       />
     </RxPage>
   );

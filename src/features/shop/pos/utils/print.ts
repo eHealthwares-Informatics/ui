@@ -1,4 +1,40 @@
+import {
+  buildPrintContext,
+  getEffectivePrintTemplate,
+  renderTemplate,
+  type PrintSale,
+  type PrintTemplateKind,
+} from '@/lib/print-template';
 import { getPrintServerUrl, sendReceipt, type AgentReceiptPayload } from './printServer';
+
+/** Templates are stored without the print hook; append it once, never twice. */
+function withPrintHook(html: string): string {
+  return html.includes('window.print()')
+    ? html
+    : `${html}<script>window.print();window.close();</script>`;
+}
+
+/**
+ * Prints an org-configured template for `kind` when one exists. Returns false
+ * (and opens nothing) so callers fall back to their built-in layout, which
+ * keeps printing working when no template is configured or the API is down.
+ */
+async function printFromTemplate(
+  kind: PrintTemplateKind,
+  sale: PrintSale,
+  options: { withCode?: boolean; withPayment?: boolean }
+): Promise<boolean> {
+  const template = await getEffectivePrintTemplate(kind);
+  if (!template?.body) return false;
+
+  const html = withPrintHook(renderTemplate(template.body, buildPrintContext(sale, options)));
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  }
+  return true;
+}
 
 export async function printPosReceiptRemote(data: {
   saleNumber: string;
@@ -70,6 +106,12 @@ export async function printPosReceipt(sale: {
   });
   if (remoteOk) return;
 
+  // The agent printed nothing usable — try the org's receipt template before
+  // the built-in layout.
+  if (await printFromTemplate('pos_receipt', sale, { withCode: false, withPayment: true })) {
+    return;
+  }
+
   const win = window.open('', '_blank');
   if (!win) {
     return;
@@ -126,7 +168,7 @@ export async function printPosReceipt(sale: {
   win.document.close();
 }
 
-export function printInvoice(sale: {
+export async function printInvoice(sale: {
   saleNumber: string;
   customerName?: string;
   items: Array<{ code: string; name: string; qty: number; price: number; total: number }>;
@@ -136,6 +178,10 @@ export function printInvoice(sale: {
   total: number;
   header?: string;
 }) {
+  if (await printFromTemplate('invoice', sale, { withCode: true, withPayment: false })) {
+    return;
+  }
+
   const linesHtml = sale.items
     .map(
       (item) => `
@@ -206,7 +252,7 @@ export function printInvoice(sale: {
   win.document.close();
 }
 
-export function printA4Receipt(sale: {
+export async function printA4Receipt(sale: {
   saleNumber: string;
   customerName?: string;
   items: Array<{ code: string; name: string; qty: number; price: number; total: number }>;
@@ -218,6 +264,10 @@ export function printA4Receipt(sale: {
   changeAmount: number;
   header?: string;
 }) {
+  if (await printFromTemplate('a4_receipt', sale, { withCode: true, withPayment: true })) {
+    return;
+  }
+
   const linesHtml = sale.items
     .map(
       (item) => `

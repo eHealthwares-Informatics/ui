@@ -67,7 +67,12 @@ import {
   useCartProductHydration,
   useCreateOrder,
   useDeliveryAreas,
+  usePayOrderFromWallet,
+  useWallet,
 } from '../website/hooks';
+
+/** Sentinel payment method: settle the order from the shopper's wallet. */
+const WALLET_METHOD = 'wallet';
 import {
   WebsiteLayout,
   green,
@@ -335,6 +340,9 @@ export default function CheckoutPage() {
   const { data: providers = [] } = useWebPaymentProviders('web');
   const initialize = useInitializeWebPayment();
   const navigate = useNavigate();
+  const { data: wallet } = useWallet(isAuthenticated);
+  const payFromWallet = usePayOrderFromWallet();
+  const walletBalance = Number(wallet?.balance ?? 0);
 
   const deliveryAreas =
     deliveryAreasData && deliveryAreasData.length > 0 ? deliveryAreasData : mockDeliveryAreas;
@@ -684,6 +692,9 @@ export default function CheckoutPage() {
           : 1500
       : 0;
   const total = Math.max(subtotal + deliveryFee - (appliedCoupon?.discountAmount ?? 0), 0);
+  // Wallet is only offered when the balance covers the whole order — the API
+  // debits the full amount and never partially pays.
+  const walletCoversTotal = walletBalance >= total && total > 0;
   const rxItems = items.filter(itemIsRx);
 
   const handleApplyCoupon = async () => {
@@ -737,6 +748,7 @@ export default function CheckoutPage() {
         // Prescription-required items need the prescriber's details.
         return rxItems.length === 0 || prescriberName.trim().length > 0;
       case 3:
+        if (paymentMethod === WALLET_METHOD) return walletCoversTotal;
         return !!paymentMethod;
       default:
         return true;
@@ -774,8 +786,13 @@ export default function CheckoutPage() {
       try {
         const formData = new FormData();
         rxFiles.forEach((file) => formData.append('files', file));
+        // Prescriber name goes into its dedicated column so the admin
+        // prescription page shows it; the remaining details go into notes.
+        if (prescriberName.trim()) {
+          formData.append('prescriberName', prescriberName.trim());
+        }
         const details = [
-          prescriberName.trim() ? `Prescriber: ${prescriberName.trim()} (${prescriberType})` : '',
+          prescriberType ? `Prescriber type: ${prescriberType}` : '',
           prescriberLicense.trim() ? `License: ${prescriberLicense.trim()}` : '',
           prescriberPhone.trim() ? `Prescriber phone: ${prescriberPhone.trim()}` : '',
           prescriptionNotes.trim() ? `Notes: ${prescriptionNotes.trim()}` : '',
@@ -809,7 +826,10 @@ export default function CheckoutPage() {
     const registryPickup = selectedPickup && !selectedPickup.isBranch ? selectedPickup : null;
     placeOrder(
       {
-        paymentMethod: providers.find((p) => p.id === providerId)?.name || 'Card',
+        paymentMethod:
+          providerId === WALLET_METHOD
+            ? 'Wallet'
+            : providers.find((p) => p.id === providerId)?.name || 'Card',
         // The typed area/pharmacy is not in the published list, so record it
         // with the order for fulfilment to confirm.
         notes:
@@ -906,6 +926,24 @@ export default function CheckoutPage() {
         onSuccess: (order) => {
           clearCart();
           setPlacedOrder(order);
+
+          // Wallet: the balance is debited server-side and the order is posted
+          // as a sale in the same call — nothing to redirect to.
+          if (providerId === WALLET_METHOD) {
+            payFromWallet.mutate(order.id, {
+              onSuccess: () => {
+                placingRef.current = false;
+                setStep(4);
+              },
+              onError: (err) => {
+                placingRef.current = false;
+                setStep(4);
+                setOrderError(getApiErrorMessage(err));
+              },
+            });
+            return;
+          }
+
           // Initialise the gateway payment. The backend marks the order
           // 'paying' as part of this call, BEFORE we navigate away.
           initialize.mutate(
@@ -1159,6 +1197,8 @@ export default function CheckoutPage() {
                 {step === 3 && (
                   <StepPayment
                     providers={providers}
+                    walletBalance={walletBalance}
+                    walletCoversTotal={walletCoversTotal}
                     paymentMethod={paymentMethod}
                     setPaymentMethod={(value) => {
                       setPaymentMethod(value);
@@ -2184,6 +2224,8 @@ function TrustIndicators() {
 
 function StepPayment({
   providers,
+  walletBalance,
+  walletCoversTotal,
   paymentMethod,
   setPaymentMethod,
   promoCode,
@@ -2199,6 +2241,8 @@ function StepPayment({
     providerType: string;
     production: boolean;
   }>;
+  walletBalance: number;
+  walletCoversTotal: boolean;
   paymentMethod: string | null;
   setPaymentMethod: (v: string | null) => void;
   promoCode: string;
@@ -2230,6 +2274,27 @@ function StepPayment({
                 No online payment providers are enabled yet.
               </Text>
             )}
+            <Paper
+              radius={16}
+              withBorder
+              p="sm"
+              data-testid="checkout-pay-wallet"
+              style={{
+                borderColor: paymentMethod === WALLET_METHOD ? green : line,
+                background: paymentMethod === WALLET_METHOD ? '#FFFFFF' : soft,
+                cursor: walletCoversTotal ? 'pointer' : 'not-allowed',
+                opacity: walletCoversTotal ? 1 : 0.6,
+              }}
+              onClick={() => walletCoversTotal && setPaymentMethod(WALLET_METHOD)}
+            >
+              <Radio
+                value={WALLET_METHOD}
+                disabled={!walletCoversTotal}
+                label={`Wallet balance (₦${walletBalance.toLocaleString()})${
+                  walletCoversTotal ? '' : ' — not enough for this order'
+                }`}
+              />
+            </Paper>
             {providers.map((p) => (
               <Paper
                 key={p.id}

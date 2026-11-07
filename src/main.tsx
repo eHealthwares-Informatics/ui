@@ -2,8 +2,8 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/charts/styles.css';
-// Styles
-// import './styles/index.css'
+// App-wide design tokens — must load after Mantine's base styles.
+import './styles/global.css';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
@@ -18,6 +18,7 @@ import { handleServerError } from '@/lib/handle-server-error';
 import { shouldRetryQuery } from '@/lib/query-retry';
 import { getDefaultRoute } from '@/lib/subdomain';
 import { useAuthStore } from '@/stores/auth-store';
+import { theme } from '@/theme';
 import { FontProvider } from './context/font-provider';
 import { ModuleProvider } from './context/module-provider';
 import { ThemeProvider } from './context/theme-provider';
@@ -80,6 +81,14 @@ const queryClient = new QueryClient({
     onError: (error) => {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
+          // Guard against re-running sign-out when the session is already cleared
+          // (e.g. a second query fails with 401 right after the user signed out).
+          // Without this, every concurrent 401 re-calls logout() and re-navigates,
+          // which can keep DataPageShell and its queries churning on sign-out.
+          const { accessToken, user } = useAuthStore.getState();
+          if (accessToken === null && user === null) {
+            return;
+          }
           notifications.show({ title: 'Session expired!', message: error.message, color: 'red' });
           useAuthStore.getState().logout();
           const redirect = router.history.location.pathname + router.history.location.search;
@@ -135,7 +144,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <ThemeProvider>
             <FontProvider>
               <ModuleProvider>

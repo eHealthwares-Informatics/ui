@@ -133,6 +133,15 @@ export function DataPageForm({
 
   const handleSubmit = useValidatedSubmit({ fields, formState, mutation });
 
+  const handleSubmitClick = () => {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    window.setTimeout(() => {
+      void handleSubmit();
+    }, 0);
+  };
+
   const handleStepSubmit = async (_stepIndex: number): Promise<Record<string, unknown> | void> => {
     try {
       if (mode === 'edit') {
@@ -212,7 +221,7 @@ export function DataPageForm({
               Cancel
             </Button>
             <Button
-              onClick={handleSubmit}
+              onClick={handleSubmitClick}
               disabled={mutation.isPending}
               leftSection={mutation.isPending ? <Loader size={16} /> : null}
             >

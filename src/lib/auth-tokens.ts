@@ -7,6 +7,13 @@ export type AuthUser = {
   phone?: string;
   organizationId: string | null;
   locationId: string | null;
+  // Profile claims. Optional so sessions issued before profiles existed still
+  // decode — display code falls back to the username (see lib/user-name).
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
 };
 
 export const ACCESS_TOKEN_KEY = 'rxsoft_admin_access_token';
@@ -80,6 +87,11 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       phone?: string;
       organizationId?: string;
       locationId?: string | null;
+      firstName?: string | null;
+      lastName?: string | null;
+      displayName?: string | null;
+      dateOfBirth?: string | null;
+      gender?: string | null;
       exp?: number;
     };
 
@@ -100,6 +112,11 @@ export function decodeUserFromAccessToken(accessToken: string): AuthUser | null 
       phone: payload.phone,
       organizationId: payload.organizationId ? payload.organizationId : null,
       locationId: payload.locationId ?? null,
+      firstName: payload.firstName ?? null,
+      lastName: payload.lastName ?? null,
+      displayName: payload.displayName ?? null,
+      dateOfBirth: payload.dateOfBirth ?? null,
+      gender: payload.gender ?? null,
     };
   } catch {
     return null;

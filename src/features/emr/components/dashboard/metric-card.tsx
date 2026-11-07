@@ -1,41 +1,41 @@
-import { Card, Group, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { type LucideIcon } from 'lucide-react';
+import {
+  DashboardCard,
+  dashboardMetricClasses,
+  type DashboardTone,
+} from '@/features/components/dashboard/dashboard-surface';
 
 export function MetricCard({
   icon: Icon,
-  iconColor,
-  iconBg,
+  tone,
   label,
   value,
   subtitle,
 }: {
   icon: LucideIcon;
-  iconColor: string;
-  iconBg: string;
+  /** Mantine palette colour; tints the card, icon tile and metric type. */
+  tone: DashboardTone;
   label: string;
   value: string | number;
   subtitle?: string;
 }) {
   return (
-    <Card withBorder radius="md" padding="lg" shadow="sm">
+    <DashboardCard tone={tone} padding="md">
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Stack gap={2}>
-          <Text size="xs" tt="uppercase" fw={600} c="dimmed" lts={1.1}>
-            {label}
-          </Text>
-          <Text size="xl" fw={700} lh={1.2}>
-            {value}
-          </Text>
+          <span className={dashboardMetricClasses.label}>{label}</span>
+          <span className={dashboardMetricClasses.value}>{value}</span>
           {subtitle && (
             <Text size="xs" c="dimmed">
               {subtitle}
             </Text>
           )}
         </Stack>
-        <ThemeIcon radius="md" size={40} variant="light" color={iconBg} c={iconColor}>
+        <ThemeIcon radius="md" size={40} variant="light" color={tone}>
           <Icon size={20} strokeWidth={2} />
         </ThemeIcon>
       </Group>
-    </Card>
+    </DashboardCard>
   );
 }

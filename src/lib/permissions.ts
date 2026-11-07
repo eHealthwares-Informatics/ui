@@ -24,16 +24,13 @@ export function permissionMatches(userPerm: string, requiredCode: string): boole
   const userParts = userPerm.split('.');
   const requiredParts = requiredCode.split('.');
 
-  for (let i = 0; i < userParts.length; i++) {
-    if (userParts[i] === '*') {
-      if (i === userParts.length - 1) return true;
-      continue;
-    }
-    if (i >= requiredParts.length) return false;
+  for (let i = 0; i < requiredParts.length; i++) {
+    if (i >= userParts.length) return false;
+    if (userParts[i] === '*') return true;
     if (userParts[i] !== requiredParts[i]) return false;
   }
 
-  // Every granted segment matched positionally, so the grant is a prefix of the
+  // Every required segment matched positionally, so the grant covers the
   // required code — a parent grant covering its subtree. (Previously this
   // required equal lengths, which is why `rxsoft.catalog` could not cover
   // `rxsoft.catalog.item.read` and only the `.*` form worked.)

@@ -1,7 +1,20 @@
 import { Box, Center, Loader, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { greetingNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { ModuleGrid } from './module-grid';
+import classes from './index.module.css';
+
+function greetingFor(date: Date) {
+  const hour = date.getHours();
+  if (hour < 12) {
+    return 'Good morning';
+  }
+  if (hour < 17) {
+    return 'Good afternoon';
+  }
+  return 'Good evening';
+}
 
 /**
  * Post-login default landing: a grid of the modules available to the signed-in
@@ -41,14 +54,15 @@ export function ModuleLandingPage() {
   return (
     <Box p="xl" maw={1100} mx="auto" w="100%" data-testid="module-landing">
       <Stack gap="lg">
-        <Stack gap={4}>
-          <Title order={3} data-testid="module-landing-title">
-            Modules
-          </Title>
-          <Text size="sm" c="dimmed" data-testid="module-landing-subtitle">
-            Welcome, {user.username}. Choose a module to get started.
-          </Text>
-        </Stack>
+        <Title order={1} className={classes.greeting} data-testid="module-landing-title">
+          {greetingFor(new Date())}, {greetingNameOf(user)}
+          <span className={classes.wave} aria-hidden="true">
+            👋
+          </span>
+        </Title>
+        <Text className={classes.subtitle} data-testid="module-landing-subtitle">
+          Welcome to RxSoft. Choose a module to get started.
+        </Text>
 
         {showEmptyState ? (
           <Center h={200}>

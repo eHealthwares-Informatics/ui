@@ -5,6 +5,7 @@ export function hasPosPermission(permissions: string[], roles: string[]): boolea
   }
   return permissions.some(
     (p) =>
+      p === 'shop' ||
       p === 'shop.pos' ||
       p === 'shop.*' ||
       p === 'rxsoft.*' ||

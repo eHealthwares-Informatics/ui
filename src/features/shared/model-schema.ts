@@ -58,6 +58,10 @@ export type ModelConfig<T = any> = {
    */
   canCreate?: boolean;
   canDelete?: boolean;
+  /** Per-row edit gate (e.g. global defaults are read-only for org admins). */
+  canEditRow?: (row: Record<string, unknown>) => boolean;
+  /** Per-row delete gate. */
+  canDeleteRow?: (row: Record<string, unknown>) => boolean;
   canArchive?: boolean;
   canExport?: boolean;
   csvEndpoint?: string;
@@ -70,6 +74,15 @@ export type ModelConfig<T = any> = {
   apiProvider?: AxiosInstance;
   minSearchLength?: number;
   debounceMs?: number;
+  /**
+   * How list params reach the backend.
+   * - `rxsoft` (default): column filters are packed into the rxsoft `search`
+   *   DSL bag by `buildRxsoftListParams`.
+   * - `plain`: send `search`, `sortBy`, `sortOrder`, `page`, `limit` and each
+   *   filter as its own query param (conversation / other services that read
+   *   the fields directly).
+   */
+  listParamStyle?: 'rxsoft' | 'plain';
   metricsEndpoint?: string;
   metricsConfig?: MetricsConfig;
   superAdminOrgFilter?: boolean;

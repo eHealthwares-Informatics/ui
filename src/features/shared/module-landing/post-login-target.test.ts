@@ -21,6 +21,8 @@ describe('resolvePostLoginTarget', () => {
   });
 
   it('a single module skips the chooser and lands on its dashboard', () => {
+    // Module dashboards are file routes on the pathless `_authenticated`
+    // layout, so the router path is the bare module root.
     expect(resolvePostLoginTarget(undefined, ['lis'])).toBe('/lis/dashboard');
     expect(resolvePostLoginTarget(undefined, ['rxsoft'])).toBe('/rxsoft/dashboard');
   });

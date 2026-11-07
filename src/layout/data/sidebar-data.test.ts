@@ -36,6 +36,13 @@ const navGroups = [
   group('rxsoft.identity.user.read', [item('Child')]),
 ];
 
+const adminOnlyGroup: NavItem = {
+  title: 'Admin Only',
+  icon: undefined,
+  modules: ['admin'],
+  items: [{ title: 'Admin Item', icon: undefined, modules: ['admin'] }],
+} as NavItem;
+
 describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () => {
   it('hides tagged items the user lacks, keeps untagged items visible', () => {
     const [g1, g2] = filterNavGroupsByModule(navGroups, 'rxsoft', [
@@ -71,7 +78,7 @@ describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () =>
   it('every sidebar entry carries either no permission or a catalog-shaped code', () => {
     // Guard against tag drift: permissions must be dot-namespaced catalog
     // codes, never role names or free text.
-    const valid = /^(rxsoft|lis|emr|conversation|communication|coding-concept)\.[a-z0-9.*-]+$/;
+    const valid = /^(rxsoft|lis|emr|conversation|communication|coding-concept|shop)\.[a-z0-9.*-]+$/;
     const check = (entry: NavItem) => {
       const required = Array.isArray(entry.permission) ? entry.permission : [entry.permission];
       for (const code of required.filter(Boolean)) {
@@ -82,5 +89,79 @@ describe('filterNavGroupsByModule — permission gating (MENU + SUBMENU)', () =>
       check(navGroup);
       (navGroup.items ?? []).forEach(check);
     }
+  });
+
+  it('hides an admin-scoped group outside the admin module', () => {
+    const hidden = filterNavGroupsByModule([adminOnlyGroup], 'rxsoft', ['*']);
+    expect(hidden).toHaveLength(0);
+
+    const visible = filterNavGroupsByModule([adminOnlyGroup], 'admin', ['*']);
+    expect(visible).toHaveLength(1);
+    expect(visible[0].title).toBe('Admin Only');
+  });
+});
+
+describe('sidebarData — consolidated admin menus', () => {
+  it('has no duplicate group titles', () => {
+    const titles = sidebarData.navGroups.map((group) => group.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it('shows only Notifications and Configuration menus in the admin module', () => {
+    const groups = filterNavGroupsByModule(sidebarData.navGroups, 'admin', ['*']);
+
+    expect(groups.map((group) => group.title)).toEqual([
+      'Notifications',
+      'Configuration',
+      'LIS Configuration',
+      'EMR Configuration',
+    ]);
+  });
+
+  it('puts notification templates under Notifications', () => {
+    const notifications = sidebarData.navGroups.find((group) => group.title === 'Notifications');
+    expect(notifications).toBeDefined();
+    expect(notifications?.modules).toEqual(['conversation', 'admin']);
+
+    const titles = (notifications?.items ?? []).map((item) => item.title);
+    expect(titles).toEqual([
+      'Notification Templates',
+      'Notification Events',
+      'Print Templates',
+      'Notification Delivery',
+    ]);
+
+    const byTitle = Object.fromEntries(
+      (notifications?.items ?? []).map((item) => [item.title, item])
+    );
+
+    expect(byTitle['Notification Templates'].url).toBe('/conversation/notification-templates');
+    expect(byTitle['Notification Events'].url).toBe('/conversation/notification-events');
+    expect(byTitle['Notification Delivery'].url).toBe('/conversation/notification-delivery');
+    expect(byTitle['Print Templates'].url).toBe('/rxsoft/print-templates');
+    expect(byTitle['Print Templates'].modules).toEqual(['admin']);
+  });
+
+  it('keeps Configuration, LIS Configuration and EMR Configuration as separate admin groups', () => {
+    const configurationGroups = sidebarData.navGroups.filter((group) =>
+      ['Configuration', 'LIS Configuration', 'EMR Configuration'].includes(group.title)
+    );
+
+    expect(configurationGroups.map((group) => group.title)).toEqual([
+      'Configuration',
+      'LIS Configuration',
+      'EMR Configuration',
+    ]);
+    expect(configurationGroups.every((group) => group.modules?.includes('admin'))).toBe(true);
+  });
+
+  it('does not leave template entries in the old module menus', () => {
+    const allItems = sidebarData.navGroups.flatMap((group) => group.items ?? []);
+    const templateItems = allItems.filter((item) => /templates?/i.test(item.title));
+
+    expect(templateItems.map((item) => item.title).sort()).toEqual([
+      'Notification Templates',
+      'Print Templates',
+    ]);
   });
 });

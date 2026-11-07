@@ -4,7 +4,8 @@ import { useEffect, useMemo } from 'react';
 import { websiteApi } from './api';
 import { resolveBranding, resolveContact } from './branding';
 import { useCartStore } from './cart-store';
-import type { NotificationPreferences } from './types';
+import { forgetPrescriptionAccess, getPrescriptionAccess } from './prescription-access';
+import type { NotificationPreferences, PrescriptionOrderResult } from './types';
 
 // ── Homepage ─────────────────────────────────────────────────────
 
@@ -180,6 +181,99 @@ export function usePrescriptions() {
   return useQuery({
     queryKey: ['website', 'prescriptions'],
     queryFn: websiteApi.listPrescriptions,
+  });
+}
+
+/** Single prescription with files, transcription and fulfilment steps. */
+export function usePrescription(id: string) {
+  return useQuery({
+    queryKey: ['website', 'prescription', id],
+    queryFn: () => websiteApi.getPrescription(id, getPrescriptionAccess(id)),
+    enabled: !!id,
+    retry: false,
+  });
+}
+
+/** Place an order from the selected transcribed lines. */
+export function useOrderPrescription(id: string) {
+  const qc = useQueryClient();
+  return useMutation<
+    PrescriptionOrderResult,
+    unknown,
+    {
+      lineIds?: string[];
+      paymentMethod: string;
+      origin?: 'website' | 'mobile';
+      notes?: string;
+      delivery?: Record<string, unknown>;
+    }
+  >({
+    mutationFn: (data) => websiteApi.orderPrescription(id, data, getPrescriptionAccess(id)),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['website', 'prescription', id] });
+      qc.invalidateQueries({ queryKey: ['website', 'orders'] });
+    },
+  });
+}
+
+/** Attach an anonymous prescription to the signed-in account. */
+export function useClaimPrescription(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => websiteApi.claimPrescription(id),
+    onSuccess: () => {
+      // The capability token is no longer needed once the account owns it.
+      forgetPrescriptionAccess(id);
+      qc.invalidateQueries({ queryKey: ['website', 'prescription', id] });
+      qc.invalidateQueries({ queryKey: ['website', 'prescriptions'] });
+    },
+  });
+}
+
+// ── Wallet ───────────────────────────────────────────────────────
+
+/** Shopper wallet balance. Only runs for signed-in shoppers (the API 401s otherwise). */
+export function useWallet(enabled = true) {
+  return useQuery({
+    queryKey: ['website', 'wallet'],
+    queryFn: websiteApi.getWallet,
+    enabled,
+    retry: false,
+  });
+}
+
+export function useWalletTransactions(limit = 50) {
+  return useQuery({
+    queryKey: ['website', 'wallet', 'transactions', limit],
+    queryFn: () => websiteApi.listWalletTransactions(limit),
+    retry: false,
+  });
+}
+
+export function useWalletDeposit() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      amount: number;
+      providerId?: string;
+      returnUrl?: string;
+      callbackUrl?: string;
+    }) => websiteApi.depositToWallet(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['website', 'wallet'] });
+    },
+  });
+}
+
+/** Pays an order from the wallet balance and refreshes balance/orders. */
+export function usePayOrderFromWallet() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: string) => websiteApi.payOrderFromWallet(orderId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['website', 'wallet'] });
+      qc.invalidateQueries({ queryKey: ['website', 'orders'] });
+    },
   });
 }
 

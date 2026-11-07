@@ -198,3 +198,30 @@ describe('required multi-async-select validation (users Roles field)', () => {
     expect(errors).toEqual({});
   });
 });
+
+describe('permission-picker validation (roles create/edit form)', () => {
+  // Mirrors features/rxsoft/pages/roles/schema.tsx.
+  const fields: Field[] = [
+    { name: 'code', label: 'Code', required: true },
+    { name: 'name', label: 'Name', required: true },
+    { name: 'permissionCodes', label: 'Permissions', type: 'permission-picker' },
+  ];
+
+  it('accepts an array of permission codes (regression: "expected string, received array")', () => {
+    const errors = validateFields(fields, {
+      code: 'manager',
+      name: 'Manager',
+      permissionCodes: ['rxsoft.identity.role.update', 'rxsoft.identity.role.read'],
+    });
+
+    expect(errors.permissionCodes).toBeUndefined();
+    expect(errors).toEqual({});
+  });
+
+  it('accepts a missing or empty permission selection (optional field)', () => {
+    expect(validateFields(fields, { code: 'manager', name: 'Manager' })).toEqual({});
+    expect(
+      validateFields(fields, { code: 'manager', name: 'Manager', permissionCodes: [] })
+    ).toEqual({});
+  });
+});

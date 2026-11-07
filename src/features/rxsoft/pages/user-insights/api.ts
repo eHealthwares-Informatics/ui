@@ -4,6 +4,13 @@ import { rxsoftApi } from '@/lib/rxsoft-api';
 export type MeProfile = {
   id: string;
   username: string;
+  /** "First Last", else the provider display name, else the username. */
+  name?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
   roles: string[];
   permissions: string[];
   modules: Array<{ code: string; name?: string }>;
@@ -27,6 +34,9 @@ export type PosConfig = {
 export type RoleRequest = {
   id: string;
   userId: string;
+  /** Resolved by the API: "First Last", display name, else username. */
+  userName?: string | null;
+  userEmail?: string | null;
   roleCode: string;
   status: 'pending' | 'approved' | 'rejected';
   reason: string | null;

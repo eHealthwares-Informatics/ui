@@ -47,6 +47,8 @@ describe('ModuleGrid', () => {
 
     expect(setSelectedModuleMock).toHaveBeenCalledWith('lis');
     expect(onSelect).toHaveBeenCalledWith('lis');
+    // Module dashboards are on the pathless `_authenticated` layout, so the
+    // navigation target is the bare module root path.
     expect(navigateMock).toHaveBeenCalledWith({ to: '/lis/dashboard' });
   });
 

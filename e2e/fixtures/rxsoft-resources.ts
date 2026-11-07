@@ -540,6 +540,35 @@ export const rxsoftResources: RxsoftCrudResource[] = [
     hasExport: false,
   },
   {
+    id: 'wallet',
+    title: 'Wallet',
+    route: '/shop/wallet',
+    endpoint: '/website/wallet',
+    nameLabel: 'Balance',
+    uniquePrefix: 'E2E Wallet',
+    createFields: [],
+    // View-only: shows shopper wallet balance and transactions; deposit flow
+    // is covered by the POS payment flow and website checkout.
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    hasExport: false,
+  },
+  {
+    id: 'customer-wallets',
+    title: 'Customer Wallets',
+    route: '/rxsoft/customer-wallets',
+    endpoint: '/customer/wallet/admin/wallets',
+    nameLabel: 'User',
+    uniquePrefix: 'E2E CustWallet',
+    createFields: [],
+    // Admin view only; transactions loaded per-wallet via ActionIcon.
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    hasExport: false,
+  },
+  {
     id: 'payment-methods',
     title: 'Payment Methods',
     route: '/rxsoft/payment-methods',

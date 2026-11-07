@@ -1,4 +1,5 @@
 import { Badge, Group, Stack, Text } from '@mantine/core';
+import { displayNameOf, type UserNameParts } from '@/lib/user-name';
 import { ResourcePopover } from './resource-popover';
 
 type UserPopoverProps = {
@@ -14,18 +15,24 @@ export function UserPopover({ userId, children, fallback }: UserPopoverProps) {
       endpoint="/users"
       fallback={fallback}
       render={(data) => {
-        const user = data as {
-          username: string;
+        const user = data as UserNameParts & {
           roles?: string[];
           email?: string;
           isActive?: boolean;
         };
+        const name = displayNameOf(user);
+        const hasRealName = Boolean(user.firstName || user.lastName || user.displayName);
         return (
           <Stack gap="xs" miw={200}>
             <Group gap="xs">
               <Text fw={600} size="sm">
-                {user.username}
+                {name}
               </Text>
+              {hasRealName && user.username && (
+                <Text size="xs" c="dimmed">
+                  @{user.username}
+                </Text>
+              )}
               {user.isActive === false && (
                 <Badge color="red" size="xs" variant="light">
                   Inactive

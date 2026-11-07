@@ -58,6 +58,17 @@ const FIELD_TYPES: FormFieldType[] = [
 
 const TABLE_COLUMN_TYPES: FormFieldType[] = ['text', 'number', 'textarea', 'date', 'checkbox'];
 
+/** Grid span choices for the per-field `col` attribute (12 = full width/unset). */
+const COL_OPTIONS = [
+  { value: '12', label: 'Full width (12)' },
+  { value: '9', label: '9 / 12' },
+  { value: '8', label: 'Two-thirds (8)' },
+  { value: '6', label: 'Half (6)' },
+  { value: '4', label: 'One-third (4)' },
+  { value: '3', label: 'Quarter (3)' },
+  { value: '2', label: '2 / 12' },
+];
+
 type BuilderColumn = { key: string; label: string; type: FormFieldType };
 type BuilderField = {
   /** Internal stable id used by drag-and-drop; stripped when the schema is exported. */
@@ -66,6 +77,8 @@ type BuilderField = {
   label: string;
   type: FormFieldType;
   required: boolean;
+  /** Grid span 1–12; 0 means unset (full width). */
+  col: number;
   optionsText: string;
   placeholder: string;
   defaultValue: string;
@@ -93,6 +106,7 @@ function emptyField(): BuilderField {
     label: '',
     type: 'text',
     required: false,
+    col: 0,
     optionsText: '',
     placeholder: '',
     defaultValue: '',
@@ -155,6 +169,7 @@ function builderFieldToSchema(field: BuilderField): Record<string, unknown> {
     label: field.label,
     type: field.type,
     ...(field.required ? { required: true } : {}),
+    ...(field.col > 0 ? { col: field.col } : {}),
     ...(field.placeholder ? { placeholder: field.placeholder } : {}),
     ...(field.defaultValue ? { defaultValue: field.defaultValue } : {}),
     ...(field.type === 'select' || field.type === 'radio' || field.type === 'checkbox-group'
@@ -207,6 +222,7 @@ function schemaToBuilder(schema: FormSchema | undefined): BuilderField[] {
     label: field.label,
     type: field.type,
     required: Boolean(field.required),
+    col: typeof field.col === 'number' ? field.col : 0,
     optionsText: (field.options ?? []).join('\n'),
     placeholder: field.placeholder ?? '',
     defaultValue: field.defaultValue == null ? '' : String(field.defaultValue),
@@ -496,6 +512,14 @@ function FieldEditor({
                 style={{ flex: 1, minWidth: 140 }}
               />
             )}
+            <Select
+              label="Grid col"
+              size="xs"
+              data={COL_OPTIONS}
+              value={String(field.col || 12)}
+              onChange={(value) => patch({ col: !value || value === '12' ? 0 : Number(value) })}
+              style={{ width: 170, flexShrink: 0 }}
+            />
           </Group>
         )}
 

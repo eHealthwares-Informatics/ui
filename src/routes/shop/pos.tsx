@@ -6,8 +6,11 @@ import { useAuthStore } from '@/stores/auth-store';
 /* ================= ROUTE ================= */
 
 export const Route = createFileRoute('/shop/pos')({
-  beforeLoad: () => {
-    useAuthStore.getState().bootstrap();
+  beforeLoad: async () => {
+    // Await bootstrap so the user's permissions (from token + /auth/me) are
+    // populated before the POS permission check runs. Without this, a fresh
+    // navigation can check a stale/empty permissions array and 403 wrongly.
+    await useAuthStore.getState().bootstrap();
     const user = useAuthStore.getState().user;
 
     // No session — or an expired one, which `bootstrap` clears — is handled by

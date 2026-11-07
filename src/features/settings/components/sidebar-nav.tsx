@@ -1,63 +1,40 @@
-import {
-  Box,
-  Collapse,
-  Group,
-  Stack,
-  Text,
-  ThemeIcon,
-  Tooltip,
-  UnstyledButton,
-} from '@mantine/core';
+import { Box, Collapse, Stack, Text, Tooltip, UnstyledButton } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { NavItem } from '@/layout/types';
+import classes from './sidebar-nav.module.css';
 
-interface SidebarNavItemProps {
-  item: NavItem;
-  pathname: string;
-  collapsed?: boolean;
-  resetExpandState: (index: number, expanded: boolean) => void;
-  expanded: boolean;
-  index: number;
-}
-
-function SubMenuLinks({
-  items,
-  pathname,
-  depth = 0,
-}: {
-  items: NavItem[];
-  pathname: string;
-  depth?: number;
-}) {
+function SubMenuLinks({ items, pathname }: { items: NavItem[]; pathname: string }) {
   return (
-    <Stack gap={2} pl={12 + depth * 14}>
+    <Stack gap={2} className={classes.subList}>
       {items.map((subItem) => {
         const subActive = pathname === subItem.url;
-        const content = (
-          <UnstyledButton
-            style={{
-              width: '100%',
-              borderRadius: 8,
-              padding: '10px 5px',
-              transition: 'all 140ms ease',
-              background: subActive ? 'var(--mantine-color-gray-1)' : 'transparent',
-            }}
-          >
-            <Group gap="sm">
-              {subItem.icon && <subItem.icon size={15} />}
-              <Text size="sm" fw={subActive ? 600 : 500}>
-                {subItem.title}
-              </Text>
-            </Group>
-          </UnstyledButton>
-        );
         return (
           <div key={subItem.title}>
-            {subItem.url ? <Link to={subItem.url}>{content}</Link> : content}
+            {subItem.url ? (
+              <Link to={subItem.url}>
+                <UnstyledButton
+                  className={`${classes.subItem} ${subActive ? classes.subItemActive : ''}`}
+                >
+                  {subItem.icon && <subItem.icon size={14} />}
+                  <Text size="xs" fw={subActive ? 600 : 500}>
+                    {subItem.title}
+                  </Text>
+                </UnstyledButton>
+              </Link>
+            ) : (
+              <UnstyledButton
+                className={`${classes.subItem} ${subActive ? classes.subItemActive : ''}`}
+              >
+                {subItem.icon && <subItem.icon size={14} />}
+                <Text size="xs" fw={subActive ? 600 : 500}>
+                  {subItem.title}
+                </Text>
+              </UnstyledButton>
+            )}
             {subItem.items?.length ? (
-              <SubMenuLinks items={subItem.items} pathname={pathname} depth={depth + 1} />
+              <SubMenuLinks items={subItem.items} pathname={pathname} />
             ) : null}
           </div>
         );
@@ -73,8 +50,16 @@ export function SidebarNavItem({
   expanded = false,
   resetExpandState,
   index,
-}: SidebarNavItemProps) {
+}: {
+  item: NavItem;
+  pathname: string;
+  collapsed?: boolean;
+  resetExpandState: (index: number, expanded: boolean) => void;
+  expanded: boolean;
+  index: number;
+}) {
   const hasChildren = Boolean(item.items?.length);
+  const sectionCount = item.items?.length ?? 0;
 
   const active = useMemo(() => {
     if (!item.url) {
@@ -95,47 +80,37 @@ export function SidebarNavItem({
 
   const button = (
     <UnstyledButton
+      className={`${classes.item} ${active ? classes.itemActive : ''}`}
       onClick={() => {
         if (hasChildren) {
           resetExpandState(index, expanded);
         }
       }}
-      style={{
-        width: '100%',
-        borderRadius: 10,
-        transition: 'all 140ms ease',
-        background: active ? 'var(--mantine-color-blue-light)' : 'transparent',
-      }}
     >
-      <Group justify="space-between" wrap="nowrap" px="sm" py={10}>
-        {/* LEFT */}
-        <Group gap="sm" wrap="nowrap">
+      <div className={classes.row}>
+        <div className={classes.left}>
           {Icon && (
-            <ThemeIcon size={34} radius="md" variant={active ? 'filled' : 'light'}>
-              <Icon size={18} />
-            </ThemeIcon>
+            <span className={classes.iconWrap}>
+              <Icon size={16} />
+            </span>
           )}
-
           {!collapsed && (
-            <Box>
-              <Text size="sm" fw={active ? 700 : 500} c={active ? 'blue' : undefined}>
-                {item.title}
-              </Text>
-
-              {item.title && (
-                <Text size="xs" c="dimmed">
-                  {item.title}
-                </Text>
+            <div className={classes.text}>
+              <span className={classes.title}>{item.title}</span>
+              {sectionCount > 0 && (
+                <span className={classes.subtitle}>
+                  {sectionCount} section{sectionCount === 1 ? '' : 's'}
+                </span>
               )}
-            </Box>
+            </div>
           )}
-        </Group>
-
-        {/* RIGHT */}
+        </div>
         {!collapsed && hasChildren && (
-          <>{opened ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</>
+          <span className={classes.chevron}>
+            {opened ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          </span>
         )}
-      </Group>
+      </div>
     </UnstyledButton>
   );
 

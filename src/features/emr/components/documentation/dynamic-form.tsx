@@ -272,6 +272,17 @@ function DynamicField({
   }
 }
 
+/** Clamp a field's grid span to 1–12; containers always span the full row. */
+function fieldSpan(field: FormFieldSchema): number {
+  if (field.type === 'tab' || field.type === 'col' || field.type === 'section') {
+    return 12;
+  }
+  if (typeof field.col !== 'number' || !Number.isFinite(field.col)) {
+    return 12;
+  }
+  return Math.min(12, Math.max(1, Math.round(field.col)));
+}
+
 function FieldStack({
   fields,
   value,
@@ -281,59 +292,71 @@ function FieldStack({
   value: FormData;
   setField: (key: string, fieldValue: unknown) => void;
 }) {
-  return (
-    <Stack gap="md">
-      {fields.map((field) => {
-        if (field.type === 'tab') {
-          const children = field.fields ?? [];
-          return (
-            <Tabs key={field.key} defaultValue={children[0]?.key} keepMounted={false}>
-              <Tabs.List mb="md">
-                {children.map((child) => (
-                  <Tabs.Tab key={child.key} value={child.key}>
-                    {child.label}
-                  </Tabs.Tab>
-                ))}
-              </Tabs.List>
-              {children.map((child) => (
-                <Tabs.Panel key={child.key} value={child.key} pt="md">
-                  <FieldStack fields={child.fields ?? []} value={value} setField={setField} />
-                </Tabs.Panel>
-              ))}
-            </Tabs>
-          );
-        }
-        if (field.type === 'col') {
-          const children = field.fields ?? [];
-          return (
-            <SimpleGrid
-              key={field.key}
-              cols={{ base: 1, sm: Math.min(children.length || 1, 4) }}
-              spacing="md"
-            >
-              {children.map((child) => (
-                <div key={child.key}>
-                  <DynamicField
-                    field={child}
-                    value={value[child.key]}
-                    onChange={(childValue) => setField(child.key, childValue)}
-                  />
-                </div>
-              ))}
-            </SimpleGrid>
-          );
-        }
-        return (
-          <DynamicField
-            key={field.key}
-            field={field}
-            value={value[field.key]}
-            onChange={(fieldValue) => setField(field.key, fieldValue)}
-          />
-        );
-      })}
-    </Stack>
-  );
+  const renderField = (field: FormFieldSchema) => {
+    if (field.type === 'tab') {
+      const children = field.fields ?? [];
+      return (
+        <Tabs key={field.key} defaultValue={children[0]?.key} keepMounted={false}>
+          <Tabs.List mb="md">
+            {children.map((child) => (
+              <Tabs.Tab key={child.key} value={child.key}>
+                {child.label}
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+          {children.map((child) => (
+            <Tabs.Panel key={child.key} value={child.key} pt="md">
+              <FieldStack fields={child.fields ?? []} value={value} setField={setField} />
+            </Tabs.Panel>
+          ))}
+        </Tabs>
+      );
+    }
+    if (field.type === 'col') {
+      const children = field.fields ?? [];
+      return (
+        <SimpleGrid
+          key={field.key}
+          cols={{ base: 1, sm: Math.min(children.length || 1, 4) }}
+          spacing="md"
+        >
+          {children.map((child) => (
+            <div key={child.key}>
+              <DynamicField
+                field={child}
+                value={value[child.key]}
+                onChange={(childValue) => setField(child.key, childValue)}
+              />
+            </div>
+          ))}
+        </SimpleGrid>
+      );
+    }
+    return (
+      <DynamicField
+        key={field.key}
+        field={field}
+        value={value[field.key]}
+        onChange={(fieldValue) => setField(field.key, fieldValue)}
+      />
+    );
+  };
+
+  // Use a 12-column grid when any control opts into a span (`col`); otherwise
+  // keep the vertical stack so existing forms render exactly as before.
+  const useGrid = fields.some((field) => fieldSpan(field) < 12);
+  if (useGrid) {
+    return (
+      <SimpleGrid cols={12} spacing="md">
+        {fields.map((field) => (
+          <div key={field.key} style={{ gridColumn: `span ${fieldSpan(field)}`, minWidth: 0 }}>
+            {renderField(field)}
+          </div>
+        ))}
+      </SimpleGrid>
+    );
+  }
+  return <Stack gap="md">{fields.map(renderField)}</Stack>;
 }
 
 export function DynamicFormFields({

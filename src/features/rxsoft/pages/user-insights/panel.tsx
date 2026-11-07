@@ -17,6 +17,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock4, HandCoins, KeyRound, ShieldCheck, UserRound, ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { displayNameOf } from '@/lib/user-name';
 import {
   createRoleRequest,
   getMe,
@@ -102,6 +103,7 @@ export function UserInsightsPanel() {
         <Title order={5}>My Account & Activity</Title>
         <Text size="xs" c="dimmed">
           {profile?.username ?? '...'}
+          {profile ? displayNameOf(profile, '...') : '...'}
         </Text>
       </Group>
 
@@ -131,7 +133,7 @@ export function UserInsightsPanel() {
             <CardHeading icon={<UserRound size={16} />} label="User" />
             <Stack gap={2}>
               <Text size="sm" fw={600}>
-                {profile?.username}
+                {profile ? displayNameOf(profile) : null}
               </Text>
               <Group gap={4}>
                 {currentRoles.map((r) => (

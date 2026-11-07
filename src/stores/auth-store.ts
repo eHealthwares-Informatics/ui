@@ -93,9 +93,22 @@ export const useAuthStore = create<AuthState>()(
           // Fetch user modules after login
           try {
             const meResponse = await identityApi.get<MeResponse>('/auth/me');
+            const currentUser = get().user;
             set({
               modules: meResponse.data.modules,
               permissionMode: meResponse.data.permissionMode,
+              // Sync permissions from /auth/me — the JWT token may not carry
+              // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
+              // the single source of truth is the /auth/me response. Spreading
+              // a possibly-null user would drop the required `id`.
+              ...(currentUser
+                ? {
+                    user: {
+                      ...currentUser,
+                      permissions: meResponse.data.permissions ?? currentUser.permissions ?? [],
+                    },
+                  }
+                : {}),
             });
           } catch {
             set({
@@ -225,9 +238,21 @@ export const useAuthStore = create<AuthState>()(
         const pending = (async () => {
           try {
             const meResponse = await identityApi.get<MeResponse>('/auth/me');
+            const currentUser = get().user;
             set({
               modules: meResponse.data.modules,
               permissionMode: meResponse.data.permissionMode ?? 'org',
+              // Sync permissions from /auth/me — the JWT token may not carry
+              // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
+              // the single source of truth is the /auth/me response.
+              ...(currentUser
+                ? {
+                    user: {
+                      ...currentUser,
+                      permissions: meResponse.data.permissions ?? currentUser.permissions ?? [],
+                    },
+                  }
+                : {}),
             });
           } catch {
             // Silently fail - modules will be empty until fetched

@@ -22,7 +22,7 @@ export type BuiltSchema = {
 };
 
 /** Field types whose value is an ARRAY of options (multi-selects). */
-const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick']);
+const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick', 'permission-picker']);
 
 /**
  * A selected multi-select entry is usable when it is a non-empty string
@@ -87,6 +87,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       case 'remote-select':
       case 'multi-async-select':
       case 'multi-pick':
+      case 'permission-picker':
         typeSchema = z.any(); // object/option type
         break;
       case 'json':
@@ -153,6 +154,9 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
         field.type === 'async-select' ||
         field.type === 'select' ||
         field.type === 'remote-select' ||
+        field.type === 'multi-async-select' ||
+        field.type === 'multi-pick' ||
+        field.type === 'permission-picker' ||
         field.type === 'json'
       ) {
         typeSchema = z
@@ -339,6 +343,11 @@ export function useValidatedSubmit({
   onError?: (errors: Record<string, string>) => void;
 }) {
   const builtSchemaRef = useRef<BuiltSchema | null>(null);
+  // The submit button can be clicked while a debounced input still owns the
+  // latest keystroke. Read the most recent form state after the blur/flush
+  // instead of the state captured when the render happened.
+  const formStateRef = useRef(formState);
+  formStateRef.current = formState;
 
   if (!builtSchemaRef.current) {
     builtSchemaRef.current = buildZodSchema(fields);
@@ -346,6 +355,7 @@ export function useValidatedSubmit({
 
   return useCallback(async () => {
     if (!builtSchemaRef.current) return;
+    const currentFormState = formStateRef.current;
     const { schema, fieldRules } = builtSchemaRef.current;
 
     let refinedSchema: z.ZodObject<any> = schema;
@@ -366,7 +376,7 @@ export function useValidatedSubmit({
     const existingSummary = document.querySelector('[data-testid="form-error-summary"]');
     if (existingSummary) existingSummary.remove();
 
-    const result = refinedSchema.safeParse(formState);
+    const result = refinedSchema.safeParse(currentFormState);
 
     if (!result.success) {
       const errors: Record<string, string> = {};
@@ -386,6 +396,6 @@ export function useValidatedSubmit({
     clearValidationErrors();
 
     // Fire mutation
-    mutation.mutate(formState);
-  }, [fields, formState, mutation, onError]);
+    mutation.mutate(currentFormState);
+  }, [fields, mutation, onError]);
 }
