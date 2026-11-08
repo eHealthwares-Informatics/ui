@@ -5,6 +5,7 @@ import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { sidebarData } from './data/sidebar-data';
 import { LocationSwitcher } from './location-switcher';
+import { OrganisationSwitcher } from './organisation-switcher';
 import type { NavState } from './nav-state';
 import { NavUser } from './nav-user';
 import { TeamSwitcher } from './team-switcher';
@@ -55,6 +56,8 @@ export function AppHeader({
           </Tooltip>
 
           <TeamSwitcher compact />
+
+          <OrganisationSwitcher />
 
           <span className={classes.divider} aria-hidden="true" />
 

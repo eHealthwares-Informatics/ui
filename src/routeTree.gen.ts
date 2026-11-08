@@ -180,6 +180,7 @@ import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
 import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index'
+import { Route as AuthenticatedEmrNotificationsIndexRouteImport } from './routes/_authenticated/emr/notifications/index'
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
 import { Route as AuthenticatedEmrReferralsIndexRouteImport } from './routes/_authenticated/emr/referrals/index'
@@ -261,6 +262,7 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
 import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
+import { Route as AuthenticatedRxsoftNotificationDispatchesIndexRouteImport } from './routes/_authenticated/rxsoft/notification-dispatches/index'
 import { Route as AuthenticatedRxsoftOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/orders/index'
 import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
 import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index'
@@ -1270,6 +1272,12 @@ const AuthenticatedEmrMedicationsIndexRoute =
     path: '/emr/medications/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrNotificationsIndexRoute =
+  AuthenticatedEmrNotificationsIndexRouteImport.update({
+    id: '/emr/notifications/',
+    path: '/emr/notifications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrPatientsIndexRoute =
   AuthenticatedEmrPatientsIndexRouteImport.update({
     id: '/emr/patients/',
@@ -1754,6 +1762,12 @@ const AuthenticatedRxsoftManufacturersIndexRoute =
   AuthenticatedRxsoftManufacturersIndexRouteImport.update({
     id: '/rxsoft/manufacturers/',
     path: '/rxsoft/manufacturers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftNotificationDispatchesIndexRoute =
+  AuthenticatedRxsoftNotificationDispatchesIndexRouteImport.update({
+    id: '/rxsoft/notification-dispatches/',
+    path: '/rxsoft/notification-dispatches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftOrdersIndexRoute =
@@ -2421,6 +2435,7 @@ export interface FileRoutesByFullPath {
   '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
@@ -2492,6 +2507,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-dispatches/': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -2749,6 +2765,7 @@ export interface FileRoutesByTo {
   '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/notifications': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
@@ -2820,6 +2837,7 @@ export interface FileRoutesByTo {
   '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-dispatches': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/rxsoft/orders': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3083,6 +3101,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/_authenticated/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
@@ -3154,6 +3173,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/_authenticated/rxsoft/notification-dispatches/': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/_authenticated/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3415,6 +3435,7 @@ export interface FileRouteTypes {
     | '/emr/encounters/'
     | '/emr/forms/'
     | '/emr/medications/'
+    | '/emr/notifications/'
     | '/emr/patients/'
     | '/emr/referrals/'
     | '/emr/requests/'
@@ -3486,6 +3507,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines/'
     | '/rxsoft/journals/'
     | '/rxsoft/manufacturers/'
+    | '/rxsoft/notification-dispatches/'
     | '/rxsoft/orders/'
     | '/rxsoft/organisation-config/'
     | '/rxsoft/organisation-payment-providers/'
@@ -3743,6 +3765,7 @@ export interface FileRouteTypes {
     | '/emr/encounters'
     | '/emr/forms'
     | '/emr/medications'
+    | '/emr/notifications'
     | '/emr/patients'
     | '/emr/referrals'
     | '/emr/requests'
@@ -3814,6 +3837,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines'
     | '/rxsoft/journals'
     | '/rxsoft/manufacturers'
+    | '/rxsoft/notification-dispatches'
     | '/rxsoft/orders'
     | '/rxsoft/organisation-config'
     | '/rxsoft/organisation-payment-providers'
@@ -4076,6 +4100,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/encounters/'
     | '/_authenticated/emr/forms/'
     | '/_authenticated/emr/medications/'
+    | '/_authenticated/emr/notifications/'
     | '/_authenticated/emr/patients/'
     | '/_authenticated/emr/referrals/'
     | '/_authenticated/emr/requests/'
@@ -4147,6 +4172,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/journal-entry-lines/'
     | '/_authenticated/rxsoft/journals/'
     | '/_authenticated/rxsoft/manufacturers/'
+    | '/_authenticated/rxsoft/notification-dispatches/'
     | '/_authenticated/rxsoft/orders/'
     | '/_authenticated/rxsoft/organisation-config/'
     | '/_authenticated/rxsoft/organisation-payment-providers/'
@@ -5487,6 +5513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/notifications/': {
+      id: '/_authenticated/emr/notifications/'
+      path: '/emr/notifications'
+      fullPath: '/emr/notifications/'
+      preLoaderRoute: typeof AuthenticatedEmrNotificationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/patients/': {
       id: '/_authenticated/emr/patients/'
       path: '/emr/patients'
@@ -6052,6 +6085,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/manufacturers'
       fullPath: '/rxsoft/manufacturers/'
       preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/notification-dispatches/': {
+      id: '/_authenticated/rxsoft/notification-dispatches/'
+      path: '/rxsoft/notification-dispatches'
+      fullPath: '/rxsoft/notification-dispatches/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationDispatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/orders/': {
@@ -6827,6 +6867,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
   AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute
+  AuthenticatedEmrNotificationsIndexRoute: typeof AuthenticatedEmrNotificationsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
   AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute
   AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
@@ -6898,6 +6939,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
+  AuthenticatedRxsoftNotificationDispatchesIndexRoute: typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   AuthenticatedRxsoftOrdersIndexRoute: typeof AuthenticatedRxsoftOrdersIndexRoute
   AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -7106,6 +7148,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
   AuthenticatedEmrMedicationsIndexRoute: AuthenticatedEmrMedicationsIndexRoute,
+  AuthenticatedEmrNotificationsIndexRoute:
+    AuthenticatedEmrNotificationsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
   AuthenticatedEmrReferralsIndexRoute: AuthenticatedEmrReferralsIndexRoute,
   AuthenticatedEmrRequestsIndexRoute: AuthenticatedEmrRequestsIndexRoute,
@@ -7217,6 +7261,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
   AuthenticatedRxsoftManufacturersIndexRoute:
     AuthenticatedRxsoftManufacturersIndexRoute,
+  AuthenticatedRxsoftNotificationDispatchesIndexRoute:
+    AuthenticatedRxsoftNotificationDispatchesIndexRoute,
   AuthenticatedRxsoftOrdersIndexRoute: AuthenticatedRxsoftOrdersIndexRoute,
   AuthenticatedRxsoftOrganisationConfigIndexRoute:
     AuthenticatedRxsoftOrganisationConfigIndexRoute,

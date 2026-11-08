@@ -1,13 +1,12 @@
-import { Badge, Box, Card, Group, Modal, Paper, Select, Stack, Text } from '@mantine/core';
+import { Badge, Box, Group, Modal, Paper, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Eye } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DataPageShell } from '@/features/components/page/data-page-shell';
 import type { Column } from '@/features/rxsoft/types';
 import { ColumnTypeFilters, EQUALS_WITH_OPTIONS, FILTERS } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
-import { identityApi } from '@/lib/identity-api';
 import { useAuthStore } from '@/stores/auth-store';
 
 type DeliveryRow = {
@@ -28,8 +27,6 @@ type DeliveryRow = {
   exchangeId: string | null;
   downstreamResponse: unknown;
 };
-
-type OrgOption = { id: string; name: string; code?: string };
 
 function statusColor(status: string) {
   switch (status) {
@@ -120,36 +117,9 @@ const columns: Column[] = [
 export function RxNotificationDeliveryPage() {
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = user?.roles?.includes('super_admin') ?? false;
+  const organizationId = useAuthStore((state) => state.selectedOrganisationId);
 
-  const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [detail, setDetail] = useState<DeliveryRow | null>(null);
-
-  const { data: organizations = [], isLoading: loadingOrganizations } = useQuery({
-    queryKey: ['notification-delivery', 'organizations'],
-    enabled: isSuperAdmin,
-    staleTime: 300_000,
-    queryFn: async () => {
-      const { data } = await identityApi.get('/organizations', { params: { limit: 200 } });
-      return (data?.data ?? data ?? []) as OrgOption[];
-    },
-  });
-
-  useEffect(() => {
-    if (isSuperAdmin && !organizationId && organizations[0]?.id) {
-      setOrganizationId(organizations[0].id);
-    }
-  }, [isSuperAdmin, organizationId, organizations]);
-
-  const canLoad = !isSuperAdmin || Boolean(organizationId);
-
-  const organizationOptions = useMemo(
-    () =>
-      organizations.map((org) => ({
-        value: org.id,
-        label: org.code ? `${org.code} - ${org.name}` : org.name,
-      })),
-    [organizations]
-  );
 
   const config: ModelConfig = useMemo(
     () => ({
@@ -178,25 +148,9 @@ export function RxNotificationDeliveryPage() {
 
   return (
     <Stack gap="lg">
-      {isSuperAdmin && (
-        <Card withBorder radius="md" padding="lg">
-          <Select
-            label="Facility (organisation)"
-            placeholder={loadingOrganizations ? 'Loading organisations…' : 'Select an organisation'}
-            data={organizationOptions}
-            value={organizationId}
-            onChange={(value) => setOrganizationId(value ?? null)}
-            searchable
-            clearable
-            disabled={loadingOrganizations}
-            nothingFoundMessage="No organisations found"
-          />
-        </Card>
-      )}
-
-      {!canLoad ? (
+      {!organizationId && isSuperAdmin ? (
         <Text c="dimmed" ta="center" py="xl">
-          Select an organisation to view its notification delivery log.
+          Select an organisation from the header to view its notification delivery log.
         </Text>
       ) : (
         <DataPageShell key={organizationId ?? 'global'} config={config} />

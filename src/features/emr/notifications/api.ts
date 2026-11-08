@@ -86,6 +86,55 @@ export async function deleteMessageTemplate(id: string): Promise<void> {
   await emrApi.delete(`/message-templates/${id}`);
 }
 
+export type NotificationDispatchRow = {
+  id: string;
+  eventKey: string;
+  source: string;
+  sourceApp: string;
+  channelType: string | null;
+  recipientAddress: string | null;
+  subject: string | null;
+  body: string | null;
+  status: string;
+  sentCount: number;
+  failedCount: number;
+  skippedCount: number;
+  error: string | null;
+  attempts: number;
+  relatedEntityType: string | null;
+  relatedEntityId: string | null;
+  sentAt: string | null;
+  createdAt: string;
+};
+
+/** List the EMR sender-app notification dispatch ledger. */
+export async function fetchNotificationDispatches(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  eventKey?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}): Promise<{ data: NotificationDispatchRow[]; total: number }> {
+  const response = await emrApi.get('/notifications/dispatches', { params });
+  const payload = response.data;
+  return {
+    data: getArrayPayload(payload) as unknown as NotificationDispatchRow[],
+    total: Number(
+      payload?.meta?.total ?? payload?.total ?? getArrayPayload(payload).length,
+    ),
+  };
+}
+
+/** Re-send a recorded dispatch (creates a new ledger row). */
+export async function retriggerNotificationDispatch(
+  id: string,
+): Promise<{ ok: boolean; sent: number; failed: number; skipped: number }> {
+  const response = await emrApi.post(`/notifications/dispatches/${id}/retrigger`);
+  return response.data;
+}
+
 export type ChannelOption = { value: string; label: string };
 
 export async function fetchChannelCodeOptions(): Promise<ChannelOption[]> {
