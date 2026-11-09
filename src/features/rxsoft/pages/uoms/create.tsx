@@ -2,12 +2,12 @@ import { Button, Card } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { FieldGroupEngine } from '@/features/components/form/field-group-engine';
-import { FormProvider, useFormContext } from '@/features/components/form/form-context';
-import { FieldGroupSpec } from '@/features/components/form/types/form-context';
+import { FieldGroupEngine } from '@/components/form/field-group-engine';
+import { FormProvider, useFormContext } from '@/components/form/form-context';
+import { FieldGroupSpec } from '@/components/form/types/form-context';
+import { RxPage } from '@/components/page/rx-page';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { RxPage } from '../../../components/page/rx-page';
 
 type UomFormState = {
   code: string;

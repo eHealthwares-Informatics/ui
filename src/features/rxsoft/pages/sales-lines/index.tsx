@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
-import { RxPage } from '@/features/components/page/rx-page';
+import { DataPageShell } from '@/components/page/data-page-shell';
+import { RxPage } from '@/components/page/rx-page';
 import { buildSalesLinesConfig } from './schema';
 
 export function RxSalesLinesPage({ saleId }: { saleId?: string }) {

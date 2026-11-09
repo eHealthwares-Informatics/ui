@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
-import { AuthLayout } from '@/features/auth/auth-layout';
+import { AuthLayout } from '@/features/identity/auth/auth-layout';
 
 const resetPasswordSchema = z.object({
   email: z.string().min(1, 'Please enter your email').email('Invalid email address'),

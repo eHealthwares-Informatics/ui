@@ -1,5 +1,5 @@
-import { FormProvider } from '@/features/components/form/form-context';
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { FormProvider } from '@/components/form/form-context';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { uomsConfig } from './schema';
 
 export function RxUomsPage() {

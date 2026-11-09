@@ -15,7 +15,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 import { useAuthStore } from '@/stores/auth-store';
 

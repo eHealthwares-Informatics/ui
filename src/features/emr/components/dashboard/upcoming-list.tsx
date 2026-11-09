@@ -1,8 +1,5 @@
 import { Card, Group, Stack, Text } from '@mantine/core';
-import {
-  DashboardCard,
-  DashboardCardTitle,
-} from '@/features/components/dashboard/dashboard-surface';
+import { DashboardCard, DashboardCardTitle } from '@/components/dashboard/dashboard-surface';
 import type { Appointment } from '../../lib/emr-types';
 import { appointmentStyle } from './appointment-status';
 

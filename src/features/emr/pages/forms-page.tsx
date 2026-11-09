@@ -16,7 +16,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MoreHorizontal, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { FormBuilderModal } from '../components/forms/form-builder-modal';
 import { StatusBadge } from '../components/shared/status-badge';

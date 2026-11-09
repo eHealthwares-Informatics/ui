@@ -1,4 +1,4 @@
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { receivablesConfig } from './schema';
 
 export function RxReceivablesPage() {

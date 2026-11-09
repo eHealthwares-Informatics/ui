@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { DataPageForm } from '@/components/page/data-page-form';
+import { RxPage } from '@/components/page/rx-page';
 import { useApiProvider } from '@/context/module-context';
-import { DataPageForm } from '@/features/components/page/data-page-form';
-import { RxPage } from '@/features/components/page/rx-page';
 import { getModelConfig } from '@/features/registry';
 import type { ModelConfig } from '@/features/shared/model-schema';
 

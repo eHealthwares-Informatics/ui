@@ -1,6 +1,6 @@
 import { Grid, Card, Stack, Text, Button, Group } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { lisResources } from '../schema/resources';
 
 export function LisPage() {

@@ -1,4 +1,4 @@
-import { FieldGroupSpec } from '@/features/components/form/types/form-context';
+import { FieldGroupSpec } from '@/components/form/types/form-context';
 import { Column, ColumnTypeFilters, Option } from '../../types';
 
 export type UomListState = {

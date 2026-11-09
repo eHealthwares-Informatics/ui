@@ -4,9 +4,9 @@ import { notifications } from '@mantine/notifications';
 import { useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import { AsyncSelectField } from '@/features/components/form/async-field';
-import { SelectField } from '@/features/components/form/select';
-import { RxPage } from '@/features/components/page/rx-page';
+import { AsyncSelectField } from '@/components/form/async-field';
+import { SelectField } from '@/components/form/select';
+import { RxPage } from '@/components/page/rx-page';
 import { communicationApi } from '@/lib/communication-api';
 import { getOption } from '../components/shared';
 

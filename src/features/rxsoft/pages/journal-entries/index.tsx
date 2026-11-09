@@ -1,9 +1,9 @@
 import { Badge, Button, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
 import { journalEntriesConfig } from './schema';
 
 const statusColors: Record<string, string> = {

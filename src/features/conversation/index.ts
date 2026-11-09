@@ -4,8 +4,12 @@
  */
 
 // Re-export conversation features
-export * from '@/features/chats';
-export * from '@/features/rxsoft/pages/conversation';
+export * from './chats';
+export * from './pages';
+export * from './questionnaire';
+
+// Conversation page schemas + shared cell renderers.
+export * from './components/participant-cell';
 
 // Module metadata
 export const conversationModuleId = 'conversation' as const;

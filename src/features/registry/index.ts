@@ -224,23 +224,17 @@ export const modelRegistry: Record<string, () => Promise<{ default: ModelConfig 
       default: resourceToModelConfig(m.getLisResourceByKey('loinc')!),
     })),
   questionnaires: () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
-      (m) => ({
-        default: m.questionnairePageSchema as unknown as ModelConfig,
-      })
-    ),
+    import('@/features/conversation/pages/questionnaires/schema').then((m) => ({
+      default: m.questionnairesConfig as unknown as ModelConfig,
+    })),
   'option-lists': () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
-      (m) => ({
-        default: m.optionListsPageSchema as unknown as ModelConfig,
-      })
-    ),
+    import('@/features/conversation/pages/option-lists/schema').then((m) => ({
+      default: m.optionListsConfig as unknown as ModelConfig,
+    })),
   workflows: () =>
-    import('@/features/rxsoft/pages/conversation/components/conversation-page-schemas').then(
-      (m) => ({
-        default: m.workflowPageSchema as unknown as ModelConfig,
-      })
-    ),
+    import('@/features/conversation/pages/workflows/schema').then((m) => ({
+      default: m.workflowsConfig as unknown as ModelConfig,
+    })),
 
   // eHealthwares website content
   'ehealthwares-products': () =>

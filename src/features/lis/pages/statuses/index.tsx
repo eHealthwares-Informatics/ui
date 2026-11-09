@@ -1,4 +1,4 @@
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { statusesConfig } from './schema';
 
 export function LisStatusesPage() {

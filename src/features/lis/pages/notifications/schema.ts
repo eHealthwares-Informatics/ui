@@ -1,3 +1,4 @@
+import { RefreshCw } from 'lucide-react';
 import type { Column } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 
@@ -49,18 +50,35 @@ function channelLabel(code: string | null | undefined): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export const notificationsConfig: ModelConfig = {
-  id: 'notifications',
-  title: 'Notification History',
-  description:
-    'Every notification the LIS dispatched through the conversations module (SMS, WhatsApp, Email), with delivery status.',
-  endpoint: '/lis/notifications/dispatches',
-  columns,
-  // Ledger is system-written: no create/edit/delete in the UI.
-  canCreate: false,
-  canDelete: false,
-  canExport: false,
-  defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
-  buildCreatePayload: (v) => v,
-  buildUpdatePayload: (v) => v,
-};
+export function buildNotificationsConfig(options: {
+  onRetrigger: (row: Record<string, unknown>) => void;
+}): ModelConfig {
+  return {
+    id: 'notifications',
+    title: 'Notification History',
+    description:
+      'Every notification the LIS dispatched through the conversations module (SMS, WhatsApp, Email), with delivery status.',
+    endpoint: '/lis/notifications/dispatches',
+    columns,
+    // Ledger is system-written: no create/edit/delete in the UI.
+    canCreate: false,
+    canDelete: false,
+    canExport: false,
+    defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
+    buildCreatePayload: (v) => v,
+    buildUpdatePayload: (v) => v,
+    rowActions: [
+      {
+        id: 'retrigger',
+        label: 'Retrigger',
+        icon: RefreshCw,
+        onClick: (row) => options.onRetrigger(row),
+      },
+    ],
+  };
+}
+
+/** Static config (retrigger disabled) — kept for callers that only list. */
+export const notificationsConfig: ModelConfig = buildNotificationsConfig({
+  onRetrigger: () => undefined,
+});

@@ -3,7 +3,7 @@ import { Card, Text, Stack, Group, Badge, Button, ScrollArea, Divider } from '@m
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import ReactFlow, { Background, Controls, MiniMap, Handle, Position } from 'reactflow';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { communicationApi } from '@/lib/communication-api';
 
 type FlowTopology = {

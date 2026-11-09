@@ -2,9 +2,9 @@ import { Badge, Button, Modal, Select, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
 import type { Column } from '../../types';
 import { PRESCRIPTION_STATUSES, prescriptionStatusColors, prescriptionsConfig } from './schema';
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { modules } from '@/features/shared/module-data';
 import {
   clearTokens,
   decodeUserFromAccessToken,
@@ -35,6 +36,22 @@ export type MeResponse = {
   permissionMode: PermissionMode;
 };
 
+/** All statically defined modules, mapped to the auth-store ModuleInfo shape. */
+const ALL_MODULES: ModuleInfo[] = modules.map((m) => ({
+  id: m.id,
+  name: m.title,
+  description: m.description,
+  root: m.root,
+}));
+
+/** Return every module when the user is a super admin; otherwise the backend-filtered list. */
+function modulesForUser(user: AuthUser | null, backendModules: ModuleInfo[]): ModuleInfo[] {
+  if (user?.roles?.includes('super_admin')) {
+    return ALL_MODULES;
+  }
+  return backendModules;
+}
+
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
@@ -43,6 +60,7 @@ type AuthState = {
   permissionMode: PermissionMode;
   loading: boolean;
   error: string | null;
+  selectedOrganisationId: string | null | undefined;
   login: (username: string, password: string, remember?: boolean) => Promise<void>;
   loginWithOAuth: (
     provider: 'google' | 'facebook',
@@ -54,6 +72,7 @@ type AuthState = {
   bootstrap: () => void;
   fetchModules: (force?: boolean) => Promise<void>;
   pendingModulesFetch: Promise<void> | null;
+  setSelectedOrganisationId: (id: string | null | undefined) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -66,6 +85,7 @@ export const useAuthStore = create<AuthState>()(
       permissionMode: 'org',
       loading: false,
       error: null,
+      selectedOrganisationId: undefined,
       pendingModulesFetch: null,
 
       login: async (username, password, remember) => {
@@ -86,6 +106,10 @@ export const useAuthStore = create<AuthState>()(
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
             user,
+            // Default the header organisation filter to the user's own
+            // organisation. "All organisations" (null) is an explicit choice
+            // the user can make afterwards.
+            selectedOrganisationId: user.organizationId ?? null,
             loading: false,
             error: null,
           });
@@ -95,7 +119,7 @@ export const useAuthStore = create<AuthState>()(
             const meResponse = await identityApi.get<MeResponse>('/auth/me');
             const currentUser = get().user;
             set({
-              modules: meResponse.data.modules,
+              modules: modulesForUser(currentUser, meResponse.data.modules),
               permissionMode: meResponse.data.permissionMode,
               // Sync permissions from /auth/me — the JWT token may not carry
               // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
@@ -112,10 +136,10 @@ export const useAuthStore = create<AuthState>()(
             });
           } catch {
             set({
-              modules: [
+              modules: modulesForUser(user, [
                 { id: 'rxsoft', name: 'RxSoft', description: 'Pharmacy Admin', root: '/items' },
                 { id: 'admin', name: 'Admin Console', description: 'Administration', root: '/' },
-              ],
+              ]),
               permissionMode: 'org',
             });
           }
@@ -169,6 +193,7 @@ export const useAuthStore = create<AuthState>()(
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
             user,
+            selectedOrganisationId: user.organizationId ?? null,
             loading: false,
             error: null,
           });
@@ -240,7 +265,7 @@ export const useAuthStore = create<AuthState>()(
             const meResponse = await identityApi.get<MeResponse>('/auth/me');
             const currentUser = get().user;
             set({
-              modules: meResponse.data.modules,
+              modules: modulesForUser(currentUser, meResponse.data.modules),
               permissionMode: meResponse.data.permissionMode ?? 'org',
               // Sync permissions from /auth/me — the JWT token may not carry
               // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
@@ -264,6 +289,8 @@ export const useAuthStore = create<AuthState>()(
         set({ pendingModulesFetch: pending });
         await pending;
       },
+
+      setSelectedOrganisationId: (id) => set({ selectedOrganisationId: id }),
     }),
     { name: 'rxsoft-admin-auth' }
   )

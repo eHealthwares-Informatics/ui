@@ -1,8 +1,8 @@
 import { Card, Select, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
-import { RxPage } from '@/features/components/page/rx-page';
+import { DataPageShell } from '@/components/page/data-page-shell';
+import { RxPage } from '@/components/page/rx-page';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 

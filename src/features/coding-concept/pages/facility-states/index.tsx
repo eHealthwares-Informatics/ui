@@ -1,4 +1,4 @@
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { facilityStatesConfig } from './schema';
 

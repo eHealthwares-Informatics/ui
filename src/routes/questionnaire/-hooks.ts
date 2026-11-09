@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getArrayPayload } from '@/features/components/utils';
+import { getArrayPayload } from '@/components/utils';
 import { conversationApi } from '@/lib/conversation-api';
 
 export function useParticipantSearch(debouncedPhone: string, session: any) {

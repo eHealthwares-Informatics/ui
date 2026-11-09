@@ -46,6 +46,12 @@ export function RoleRequestsPage() {
     queryFn: listRoleCatalog,
   });
 
+  // Dedupe by code: the catalog may repeat a role code across org/global scopes
+  // and Mantine's Select throws on duplicate option values.
+  const roleOptions = Array.from(
+    new Map(roleCatalog.map((r) => [r.code, { value: r.code, label: r.name || r.code }])).values()
+  );
+
   const decide = useMutation({
     mutationFn: ({ id, action }: { id: string; action: 'approve' | 'reject' }) =>
       action === 'approve'
@@ -175,7 +181,7 @@ export function RoleRequestsPage() {
           </Text>
           <Select
             label="Role to assign"
-            data={roleCatalog.map((r) => ({ value: r.code, label: r.name || r.code }))}
+            data={roleOptions}
             value={overrideRole ?? deciding?.roleCode ?? null}
             onChange={setOverrideRole}
             searchable

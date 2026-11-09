@@ -16,7 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { FileText, Plus, Search, TimerReset } from 'lucide-react';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import {
   DocumentationModal,

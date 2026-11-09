@@ -20,10 +20,12 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
     moduleId === 'emr' ? (user?.locationId ?? null) : null
   );
 
+  const isSuperAdmin = user?.roles?.includes('super_admin') ?? false;
   const navGroups = filterNavGroupsByModule(
     sidebarData.navGroups,
     moduleId,
-    user?.permissions ?? []
+    user?.permissions ?? [],
+    isSuperAdmin
   );
   const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
 

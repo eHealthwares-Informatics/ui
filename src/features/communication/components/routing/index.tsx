@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { createFormContext } from '@/features/components/form/form-provider';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { createFormContext } from '@/components/form/form-provider';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { TabGroup } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { RoutingFormState, defaultRoutingFormState } from '../../types/routing.model';

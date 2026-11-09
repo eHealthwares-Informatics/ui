@@ -18,7 +18,7 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, FileText, Share2, Stethoscope } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import {
   DocumentationModal,

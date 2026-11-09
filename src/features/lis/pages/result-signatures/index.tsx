@@ -1,4 +1,4 @@
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import type { Column, Field } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 

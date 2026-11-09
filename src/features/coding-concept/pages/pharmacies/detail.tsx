@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import { useQuery, type QueryKey } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 
 type LocalityRef = { id: string; code: string; name: string; type: string };

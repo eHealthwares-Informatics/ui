@@ -1,4 +1,4 @@
-import { JsonDetailCard } from '@/features/components/form/json-detail-card';
+import { JsonDetailCard } from '@/components/form/json-detail-card';
 
 export function RxItemDetailsPage({ itemId }: { itemId: string }) {
   return (

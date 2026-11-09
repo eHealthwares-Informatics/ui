@@ -1,7 +1,7 @@
 import { Badge, Card, Group, Stack, Table, Text, Timeline, Title } from '@mantine/core';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 
 type Amendment = {

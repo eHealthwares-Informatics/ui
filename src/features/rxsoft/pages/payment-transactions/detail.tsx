@@ -18,9 +18,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { CheckCircle, Mail, RefreshCw, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { RxPage } from '../../../components/page/rx-page';
 import { SendPaymentLinkModal } from '../../payment-links/SendPaymentLinkModal';
 
 type PaymentEvent = {

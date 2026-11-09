@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import type { Option } from '@/features/rxsoft/types';
 import { fetchChannelCodeOptions } from '../../../notifications/api';
 import { MESSAGE_TEMPLATES_KEY } from '../../../notifications/types';

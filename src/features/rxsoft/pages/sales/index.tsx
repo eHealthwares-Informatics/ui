@@ -4,9 +4,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Eye, Printer } from 'lucide-react';
 import { useMemo } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
 import { salesConfig } from './schema';
 
 function CompleteSaleButton({ saleId }: { saleId: string }) {

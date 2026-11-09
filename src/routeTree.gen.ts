@@ -156,12 +156,17 @@ import { Route as AuthenticatedCodingConceptGenericProductsIndexRouteImport } fr
 import { Route as AuthenticatedCodingConceptManufacturersIndexRouteImport } from './routes/_authenticated/coding-concept/manufacturers/index'
 import { Route as AuthenticatedCodingConceptPharmaceuticsIndexRouteImport } from './routes/_authenticated/coding-concept/pharmaceutics/index'
 import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
+import { Route as AuthenticatedConversationBillingChargesIndexRouteImport } from './routes/_authenticated/conversation/billing-charges/index'
+import { Route as AuthenticatedConversationBillingConfigIndexRouteImport } from './routes/_authenticated/conversation/billing-config/index'
+import { Route as AuthenticatedConversationBillingRulesIndexRouteImport } from './routes/_authenticated/conversation/billing-rules/index'
+import { Route as AuthenticatedConversationBillingWalletsIndexRouteImport } from './routes/_authenticated/conversation/billing-wallets/index'
 import { Route as AuthenticatedConversationChannelsIndexRouteImport } from './routes/_authenticated/conversation/channels/index'
 import { Route as AuthenticatedConversationChatsIndexRouteImport } from './routes/_authenticated/conversation/chats/index'
 import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index'
 import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
 import { Route as AuthenticatedConversationInvitesInviteIdRouteImport } from './routes/_authenticated/conversation/invites/$inviteId'
 import { Route as AuthenticatedConversationNotificationDeliveryIndexRouteImport } from './routes/_authenticated/conversation/notification-delivery/index'
+import { Route as AuthenticatedConversationNotificationDispatchesIndexRouteImport } from './routes/_authenticated/conversation/notification-dispatches/index'
 import { Route as AuthenticatedConversationNotificationEventsIndexRouteImport } from './routes/_authenticated/conversation/notification-events/index'
 import { Route as AuthenticatedConversationNotificationTemplatesIndexRouteImport } from './routes/_authenticated/conversation/notification-templates/index'
 import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index'
@@ -180,6 +185,7 @@ import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
 import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index'
+import { Route as AuthenticatedEmrNotificationsIndexRouteImport } from './routes/_authenticated/emr/notifications/index'
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
 import { Route as AuthenticatedEmrReferralsIndexRouteImport } from './routes/_authenticated/emr/referrals/index'
@@ -261,6 +267,7 @@ import { Route as AuthenticatedRxsoftJournalEntriesIndexRouteImport } from './ro
 import { Route as AuthenticatedRxsoftJournalEntryLinesIndexRouteImport } from './routes/_authenticated/rxsoft/journal-entry-lines/index'
 import { Route as AuthenticatedRxsoftJournalsIndexRouteImport } from './routes/_authenticated/rxsoft/journals/index'
 import { Route as AuthenticatedRxsoftManufacturersIndexRouteImport } from './routes/_authenticated/rxsoft/manufacturers/index'
+import { Route as AuthenticatedRxsoftNotificationDispatchesIndexRouteImport } from './routes/_authenticated/rxsoft/notification-dispatches/index'
 import { Route as AuthenticatedRxsoftOrdersIndexRouteImport } from './routes/_authenticated/rxsoft/orders/index'
 import { Route as AuthenticatedRxsoftOrganisationConfigIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-config/index'
 import { Route as AuthenticatedRxsoftOrganisationPaymentProvidersIndexRouteImport } from './routes/_authenticated/rxsoft/organisation-payment-providers/index'
@@ -1126,6 +1133,30 @@ const AuthenticatedConversationConversationIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthenticatedConversationConversationIdRoute,
   } as any)
+const AuthenticatedConversationBillingChargesIndexRoute =
+  AuthenticatedConversationBillingChargesIndexRouteImport.update({
+    id: '/conversation/billing-charges/',
+    path: '/conversation/billing-charges/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingConfigIndexRoute =
+  AuthenticatedConversationBillingConfigIndexRouteImport.update({
+    id: '/conversation/billing-config/',
+    path: '/conversation/billing-config/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingRulesIndexRoute =
+  AuthenticatedConversationBillingRulesIndexRouteImport.update({
+    id: '/conversation/billing-rules/',
+    path: '/conversation/billing-rules/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingWalletsIndexRoute =
+  AuthenticatedConversationBillingWalletsIndexRouteImport.update({
+    id: '/conversation/billing-wallets/',
+    path: '/conversation/billing-wallets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationChannelsIndexRoute =
   AuthenticatedConversationChannelsIndexRouteImport.update({
     id: '/conversation/channels/',
@@ -1160,6 +1191,12 @@ const AuthenticatedConversationNotificationDeliveryIndexRoute =
   AuthenticatedConversationNotificationDeliveryIndexRouteImport.update({
     id: '/conversation/notification-delivery/',
     path: '/conversation/notification-delivery/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationNotificationDispatchesIndexRoute =
+  AuthenticatedConversationNotificationDispatchesIndexRouteImport.update({
+    id: '/conversation/notification-dispatches/',
+    path: '/conversation/notification-dispatches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConversationNotificationEventsIndexRoute =
@@ -1268,6 +1305,12 @@ const AuthenticatedEmrMedicationsIndexRoute =
   AuthenticatedEmrMedicationsIndexRouteImport.update({
     id: '/emr/medications/',
     path: '/emr/medications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrNotificationsIndexRoute =
+  AuthenticatedEmrNotificationsIndexRouteImport.update({
+    id: '/emr/notifications/',
+    path: '/emr/notifications/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEmrPatientsIndexRoute =
@@ -1754,6 +1797,12 @@ const AuthenticatedRxsoftManufacturersIndexRoute =
   AuthenticatedRxsoftManufacturersIndexRouteImport.update({
     id: '/rxsoft/manufacturers/',
     path: '/rxsoft/manufacturers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRxsoftNotificationDispatchesIndexRoute =
+  AuthenticatedRxsoftNotificationDispatchesIndexRouteImport.update({
+    id: '/rxsoft/notification-dispatches/',
+    path: '/rxsoft/notification-dispatches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRxsoftOrdersIndexRoute =
@@ -2401,10 +2450,15 @@ export interface FileRoutesByFullPath {
   '/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/billing-charges/': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/conversation/billing-config/': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/conversation/billing-rules/': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/conversation/billing-wallets/': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
   '/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-dispatches/': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -2421,6 +2475,7 @@ export interface FileRoutesByFullPath {
   '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
@@ -2492,6 +2547,7 @@ export interface FileRoutesByFullPath {
   '/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-dispatches/': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -2729,10 +2785,15 @@ export interface FileRoutesByTo {
   '/coding-concept/generic-products': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/billing-charges': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/conversation/billing-config': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/conversation/billing-rules': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/conversation/billing-wallets': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute
   '/conversation/notification-delivery': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-dispatches': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/conversation/notification-events': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/conversation/notification-templates': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -2749,6 +2810,7 @@ export interface FileRoutesByTo {
   '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/notifications': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute
   '/emr/requests': typeof AuthenticatedEmrRequestsIndexRoute
@@ -2820,6 +2882,7 @@ export interface FileRoutesByTo {
   '/rxsoft/journal-entry-lines': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/rxsoft/journals': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/rxsoft/manufacturers': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/rxsoft/notification-dispatches': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/rxsoft/orders': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/rxsoft/organisation-config': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/rxsoft/organisation-payment-providers': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3063,10 +3126,15 @@ export interface FileRoutesById {
   '/_authenticated/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/_authenticated/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/_authenticated/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/_authenticated/conversation/billing-charges/': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/_authenticated/conversation/billing-config/': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/_authenticated/conversation/billing-rules/': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/_authenticated/conversation/billing-wallets/': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
   '/_authenticated/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/_authenticated/conversation/notification-dispatches/': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/_authenticated/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/_authenticated/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -3083,6 +3151,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/_authenticated/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
   '/_authenticated/emr/requests/': typeof AuthenticatedEmrRequestsIndexRoute
@@ -3154,6 +3223,7 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/journal-entry-lines/': typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   '/_authenticated/rxsoft/journals/': typeof AuthenticatedRxsoftJournalsIndexRoute
   '/_authenticated/rxsoft/manufacturers/': typeof AuthenticatedRxsoftManufacturersIndexRoute
+  '/_authenticated/rxsoft/notification-dispatches/': typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   '/_authenticated/rxsoft/orders/': typeof AuthenticatedRxsoftOrdersIndexRoute
   '/_authenticated/rxsoft/organisation-config/': typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   '/_authenticated/rxsoft/organisation-payment-providers/': typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -3395,10 +3465,15 @@ export interface FileRouteTypes {
     | '/coding-concept/generic-products/'
     | '/coding-concept/manufacturers/'
     | '/coding-concept/pharmaceutics/'
+    | '/conversation/billing-charges/'
+    | '/conversation/billing-config/'
+    | '/conversation/billing-rules/'
+    | '/conversation/billing-wallets/'
     | '/conversation/channels/'
     | '/conversation/chats/'
     | '/conversation/exchanges/'
     | '/conversation/notification-delivery/'
+    | '/conversation/notification-dispatches/'
     | '/conversation/notification-events/'
     | '/conversation/notification-templates/'
     | '/conversation/option-lists/'
@@ -3415,6 +3490,7 @@ export interface FileRouteTypes {
     | '/emr/encounters/'
     | '/emr/forms/'
     | '/emr/medications/'
+    | '/emr/notifications/'
     | '/emr/patients/'
     | '/emr/referrals/'
     | '/emr/requests/'
@@ -3486,6 +3562,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines/'
     | '/rxsoft/journals/'
     | '/rxsoft/manufacturers/'
+    | '/rxsoft/notification-dispatches/'
     | '/rxsoft/orders/'
     | '/rxsoft/organisation-config/'
     | '/rxsoft/organisation-payment-providers/'
@@ -3723,10 +3800,15 @@ export interface FileRouteTypes {
     | '/coding-concept/generic-products'
     | '/coding-concept/manufacturers'
     | '/coding-concept/pharmaceutics'
+    | '/conversation/billing-charges'
+    | '/conversation/billing-config'
+    | '/conversation/billing-rules'
+    | '/conversation/billing-wallets'
     | '/conversation/channels'
     | '/conversation/chats'
     | '/conversation/exchanges'
     | '/conversation/notification-delivery'
+    | '/conversation/notification-dispatches'
     | '/conversation/notification-events'
     | '/conversation/notification-templates'
     | '/conversation/option-lists'
@@ -3743,6 +3825,7 @@ export interface FileRouteTypes {
     | '/emr/encounters'
     | '/emr/forms'
     | '/emr/medications'
+    | '/emr/notifications'
     | '/emr/patients'
     | '/emr/referrals'
     | '/emr/requests'
@@ -3814,6 +3897,7 @@ export interface FileRouteTypes {
     | '/rxsoft/journal-entry-lines'
     | '/rxsoft/journals'
     | '/rxsoft/manufacturers'
+    | '/rxsoft/notification-dispatches'
     | '/rxsoft/orders'
     | '/rxsoft/organisation-config'
     | '/rxsoft/organisation-payment-providers'
@@ -4056,10 +4140,15 @@ export interface FileRouteTypes {
     | '/_authenticated/coding-concept/generic-products/'
     | '/_authenticated/coding-concept/manufacturers/'
     | '/_authenticated/coding-concept/pharmaceutics/'
+    | '/_authenticated/conversation/billing-charges/'
+    | '/_authenticated/conversation/billing-config/'
+    | '/_authenticated/conversation/billing-rules/'
+    | '/_authenticated/conversation/billing-wallets/'
     | '/_authenticated/conversation/channels/'
     | '/_authenticated/conversation/chats/'
     | '/_authenticated/conversation/exchanges/'
     | '/_authenticated/conversation/notification-delivery/'
+    | '/_authenticated/conversation/notification-dispatches/'
     | '/_authenticated/conversation/notification-events/'
     | '/_authenticated/conversation/notification-templates/'
     | '/_authenticated/conversation/option-lists/'
@@ -4076,6 +4165,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/encounters/'
     | '/_authenticated/emr/forms/'
     | '/_authenticated/emr/medications/'
+    | '/_authenticated/emr/notifications/'
     | '/_authenticated/emr/patients/'
     | '/_authenticated/emr/referrals/'
     | '/_authenticated/emr/requests/'
@@ -4147,6 +4237,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/journal-entry-lines/'
     | '/_authenticated/rxsoft/journals/'
     | '/_authenticated/rxsoft/manufacturers/'
+    | '/_authenticated/rxsoft/notification-dispatches/'
     | '/_authenticated/rxsoft/orders/'
     | '/_authenticated/rxsoft/organisation-config/'
     | '/_authenticated/rxsoft/organisation-payment-providers/'
@@ -5319,6 +5410,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationConversationIdEditRouteImport
       parentRoute: typeof AuthenticatedConversationConversationIdRoute
     }
+    '/_authenticated/conversation/billing-charges/': {
+      id: '/_authenticated/conversation/billing-charges/'
+      path: '/conversation/billing-charges'
+      fullPath: '/conversation/billing-charges/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingChargesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-config/': {
+      id: '/_authenticated/conversation/billing-config/'
+      path: '/conversation/billing-config'
+      fullPath: '/conversation/billing-config/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-rules/': {
+      id: '/_authenticated/conversation/billing-rules/'
+      path: '/conversation/billing-rules'
+      fullPath: '/conversation/billing-rules/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingRulesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-wallets/': {
+      id: '/_authenticated/conversation/billing-wallets/'
+      path: '/conversation/billing-wallets'
+      fullPath: '/conversation/billing-wallets/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingWalletsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/channels/': {
       id: '/_authenticated/conversation/channels/'
       path: '/conversation/channels'
@@ -5359,6 +5478,13 @@ declare module '@tanstack/react-router' {
       path: '/conversation/notification-delivery'
       fullPath: '/conversation/notification-delivery/'
       preLoaderRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/notification-dispatches/': {
+      id: '/_authenticated/conversation/notification-dispatches/'
+      path: '/conversation/notification-dispatches'
+      fullPath: '/conversation/notification-dispatches/'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationDispatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/notification-events/': {
@@ -5485,6 +5611,13 @@ declare module '@tanstack/react-router' {
       path: '/emr/medications'
       fullPath: '/emr/medications/'
       preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/notifications/': {
+      id: '/_authenticated/emr/notifications/'
+      path: '/emr/notifications'
+      fullPath: '/emr/notifications/'
+      preLoaderRoute: typeof AuthenticatedEmrNotificationsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/emr/patients/': {
@@ -6052,6 +6185,13 @@ declare module '@tanstack/react-router' {
       path: '/rxsoft/manufacturers'
       fullPath: '/rxsoft/manufacturers/'
       preLoaderRoute: typeof AuthenticatedRxsoftManufacturersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rxsoft/notification-dispatches/': {
+      id: '/_authenticated/rxsoft/notification-dispatches/'
+      path: '/rxsoft/notification-dispatches'
+      fullPath: '/rxsoft/notification-dispatches/'
+      preLoaderRoute: typeof AuthenticatedRxsoftNotificationDispatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rxsoft/orders/': {
@@ -6807,10 +6947,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCodingConceptGenericProductsIndexRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   AuthenticatedCodingConceptManufacturersIndexRoute: typeof AuthenticatedCodingConceptManufacturersIndexRoute
   AuthenticatedCodingConceptPharmaceuticsIndexRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  AuthenticatedConversationBillingChargesIndexRoute: typeof AuthenticatedConversationBillingChargesIndexRoute
+  AuthenticatedConversationBillingConfigIndexRoute: typeof AuthenticatedConversationBillingConfigIndexRoute
+  AuthenticatedConversationBillingRulesIndexRoute: typeof AuthenticatedConversationBillingRulesIndexRoute
+  AuthenticatedConversationBillingWalletsIndexRoute: typeof AuthenticatedConversationBillingWalletsIndexRoute
   AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
   AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute
   AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute
   AuthenticatedConversationNotificationDeliveryIndexRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  AuthenticatedConversationNotificationDispatchesIndexRoute: typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   AuthenticatedConversationNotificationEventsIndexRoute: typeof AuthenticatedConversationNotificationEventsIndexRoute
   AuthenticatedConversationNotificationTemplatesIndexRoute: typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute
@@ -6827,6 +6972,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
   AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute
+  AuthenticatedEmrNotificationsIndexRoute: typeof AuthenticatedEmrNotificationsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
   AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute
   AuthenticatedEmrRequestsIndexRoute: typeof AuthenticatedEmrRequestsIndexRoute
@@ -6898,6 +7044,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRxsoftJournalEntryLinesIndexRoute: typeof AuthenticatedRxsoftJournalEntryLinesIndexRoute
   AuthenticatedRxsoftJournalsIndexRoute: typeof AuthenticatedRxsoftJournalsIndexRoute
   AuthenticatedRxsoftManufacturersIndexRoute: typeof AuthenticatedRxsoftManufacturersIndexRoute
+  AuthenticatedRxsoftNotificationDispatchesIndexRoute: typeof AuthenticatedRxsoftNotificationDispatchesIndexRoute
   AuthenticatedRxsoftOrdersIndexRoute: typeof AuthenticatedRxsoftOrdersIndexRoute
   AuthenticatedRxsoftOrganisationConfigIndexRoute: typeof AuthenticatedRxsoftOrganisationConfigIndexRoute
   AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute: typeof AuthenticatedRxsoftOrganisationPaymentProvidersIndexRoute
@@ -7070,6 +7217,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptManufacturersIndexRoute,
   AuthenticatedCodingConceptPharmaceuticsIndexRoute:
     AuthenticatedCodingConceptPharmaceuticsIndexRoute,
+  AuthenticatedConversationBillingChargesIndexRoute:
+    AuthenticatedConversationBillingChargesIndexRoute,
+  AuthenticatedConversationBillingConfigIndexRoute:
+    AuthenticatedConversationBillingConfigIndexRoute,
+  AuthenticatedConversationBillingRulesIndexRoute:
+    AuthenticatedConversationBillingRulesIndexRoute,
+  AuthenticatedConversationBillingWalletsIndexRoute:
+    AuthenticatedConversationBillingWalletsIndexRoute,
   AuthenticatedConversationChannelsIndexRoute:
     AuthenticatedConversationChannelsIndexRoute,
   AuthenticatedConversationChatsIndexRoute:
@@ -7078,6 +7233,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationExchangesIndexRoute,
   AuthenticatedConversationNotificationDeliveryIndexRoute:
     AuthenticatedConversationNotificationDeliveryIndexRoute,
+  AuthenticatedConversationNotificationDispatchesIndexRoute:
+    AuthenticatedConversationNotificationDispatchesIndexRoute,
   AuthenticatedConversationNotificationEventsIndexRoute:
     AuthenticatedConversationNotificationEventsIndexRoute,
   AuthenticatedConversationNotificationTemplatesIndexRoute:
@@ -7106,6 +7263,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
   AuthenticatedEmrMedicationsIndexRoute: AuthenticatedEmrMedicationsIndexRoute,
+  AuthenticatedEmrNotificationsIndexRoute:
+    AuthenticatedEmrNotificationsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
   AuthenticatedEmrReferralsIndexRoute: AuthenticatedEmrReferralsIndexRoute,
   AuthenticatedEmrRequestsIndexRoute: AuthenticatedEmrRequestsIndexRoute,
@@ -7217,6 +7376,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRxsoftJournalsIndexRoute: AuthenticatedRxsoftJournalsIndexRoute,
   AuthenticatedRxsoftManufacturersIndexRoute:
     AuthenticatedRxsoftManufacturersIndexRoute,
+  AuthenticatedRxsoftNotificationDispatchesIndexRoute:
+    AuthenticatedRxsoftNotificationDispatchesIndexRoute,
   AuthenticatedRxsoftOrdersIndexRoute: AuthenticatedRxsoftOrdersIndexRoute,
   AuthenticatedRxsoftOrganisationConfigIndexRoute:
     AuthenticatedRxsoftOrganisationConfigIndexRoute,

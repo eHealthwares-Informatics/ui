@@ -95,7 +95,16 @@ export function UserInsightsPanel() {
 
   const profile = me.data;
   const currentRoles = profile?.roles ?? [];
-  const requestable = (roleCatalog.data ?? []).filter((r) => !currentRoles.includes(r.code));
+  // The catalog can contain the same role code across org/global scopes, so
+  // dedupe before handing it to Mantine's Select (duplicate option values throw).
+  const seenRoleCodes = new Set<string>();
+  const requestable = (roleCatalog.data ?? []).filter((r) => {
+    if (currentRoles.includes(r.code) || seenRoleCodes.has(r.code)) {
+      return false;
+    }
+    seenRoleCodes.add(r.code);
+    return true;
+  });
 
   return (
     <Card withBorder radius="md" p="md" mb="lg">

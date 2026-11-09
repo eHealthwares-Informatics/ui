@@ -32,7 +32,7 @@ import {
   User,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { lisApi } from '@/lib/lis-api';
 import { buildReportHtml, printReportHtml, type PrintReportData } from './report-print';

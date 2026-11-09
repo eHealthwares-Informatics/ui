@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Group, Stack, Text } from '@mantine/core';
 import { CalendarClock, MapPin, UserRound } from 'lucide-react';
-import { dashboardToneStyle } from '@/features/components/dashboard/dashboard-surface';
+import { dashboardToneStyle } from '@/components/dashboard/dashboard-surface';
 import type { Appointment } from '../../lib/emr-types';
 import { appointmentAction, appointmentStyle } from './appointment-status';
 import classes from './appointment-row.module.css';

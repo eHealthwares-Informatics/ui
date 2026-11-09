@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { DataPageForm } from '@/features/components/page/data-page-form';
-import { RxPage } from '@/features/components/page/rx-page';
-import { conversationPageSchema } from '@/features/rxsoft/pages/conversation/components/conversation-page-schemas';
+import { DataPageForm } from '@/components/page/data-page-form';
+import { RxPage } from '@/components/page/rx-page';
+import { conversationsConfig } from '@/features/conversation/pages/conversations/schema';
 import { conversationApi } from '@/lib/conversation-api';
 
 export const Route = createFileRoute('/_authenticated/conversation/$conversationId/edit')({
@@ -26,8 +26,8 @@ function ConversationEditPage() {
   if (detailQuery.isLoading) {
     return (
       <RxPage
-        title={conversationPageSchema.title}
-        description={conversationPageSchema.description}
+        title={conversationsConfig.title}
+        description={conversationsConfig.description}
         breadcrumbs={[{ label: 'Conversations', href: '/conversation' }, { label: conversationId }]}
         onBack={() => navigate({ to: '/conversation' })}
       >
@@ -38,13 +38,13 @@ function ConversationEditPage() {
 
   return (
     <RxPage
-      title={conversationPageSchema.title}
-      description={conversationPageSchema.description}
+      title={conversationsConfig.title}
+      description={conversationsConfig.description}
       breadcrumbs={[{ label: 'Conversations', href: '/conversation' }, { label: conversationId }]}
       onBack={() => navigate({ to: '/conversation' })}
     >
       <DataPageForm
-        config={conversationPageSchema}
+        config={conversationsConfig}
         initialData={data ? { ...data, id: data.id ?? data._id ?? conversationId } : null}
         mode="edit"
       />

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/rxsoft-api', () => ({ rxsoftApi: { get: vi.fn() } }));
+vi.mock('@/lib/conversation-api', () => ({ conversationApi: { get: vi.fn() } }));
 
-import { rxsoftApi } from '@/lib/rxsoft-api';
+import { conversationApi } from '@/lib/conversation-api';
 import {
   buildPrintContext,
   clearPrintTemplateCache,
@@ -11,7 +11,7 @@ import {
   samplePrintSale,
 } from './print-template';
 
-const get = rxsoftApi.get as unknown as ReturnType<typeof vi.fn>;
+const get = conversationApi.get as unknown as ReturnType<typeof vi.fn>;
 
 describe('renderTemplate', () => {
   it('substitutes scalar tokens and leaves the rest of the document intact', () => {

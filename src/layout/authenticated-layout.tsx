@@ -4,8 +4,8 @@ import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { LayoutProvider } from '@/context/layout-provider';
 import { useModuleId, useSetSelectedModule } from '@/context/module-context';
-import { AutoLogout } from '@/features/auth/auto-logout';
 import { NotificationSubscriptionRegistrar } from '@/features/emr/notifications/notification-subscription';
+import { AutoLogout } from '@/features/identity/auth/auto-logout';
 import { useModuleFavicon } from '@/features/shared/use-module-favicon';
 import { useModuleTitle } from '@/features/shared/use-module-title';
 import {

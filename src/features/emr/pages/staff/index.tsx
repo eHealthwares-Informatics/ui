@@ -2,7 +2,7 @@ import { Button, Group, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { StaffForm } from '../../components/staff/staff-form';
 import { StaffRowActions } from '../../components/staff/staff-row-actions';
 import { staffConfig } from './schema';

@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Select, Stack, Switch, Table, Text } from '@mantine/core';
+import { Button, Group, Modal, Stack, Switch, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Settings2 } from 'lucide-react';
@@ -33,7 +33,6 @@ const SCENARIOS = [
 /** Opens the per-facility channel x scenario notification switches. */
 export function NotificationSettingsButton() {
   const [opened, setOpened] = useState(false);
-  const [orgId, setOrgId] = useState<string | null>(null);
   const [values, setValues] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
 
@@ -58,33 +57,27 @@ export function NotificationSettingsButton() {
     [scenarioCatalog]
   );
 
-  // The switches live on the facility config now (rxsoft-qa#804). Ordinary
-  // admins only ever see their own facility — the server takes it from the
-  // token — so the picker is superadmin-only, same as every other facility
-  // switcher in the console.
+  // The switches live on the facility config now (rxsoft-qa#804). The facility
+  // is chosen with the header organisation filter — there is no per-modal
+  // picker. Ordinary admins are scoped by their token, so the header filter
+  // selection only matters for superadmins.
   const currentUser = useAuthStore((state) => state.user);
   const isSuperAdmin = currentUser?.roles?.includes('super_admin') ?? false;
-
-  const { data: organizations = [] } = useQuery({
-    queryKey: ['organizations', 'all'],
-    queryFn: async () => {
-      const { data } = await rxsoftApi.get('/organizations', { params: { limit: 200 } });
-      return data?.data ?? data ?? [];
-    },
-    enabled: isSuperAdmin,
-  });
+  // The header selection defaults to the user's own organisation at login.
+  // "All organisations" (null) → undefined, i.e. no organisation scope.
+  const organizationId = useAuthStore((state) => state.selectedOrganisationId) ?? undefined;
 
   const endpoint =
-    isSuperAdmin && orgId
-      ? `/organisation-config/by-organization/${orgId}`
+    isSuperAdmin && organizationId
+      ? `/organisation-config/by-organization/${organizationId}`
       : '/organisation-config';
 
   // Load the facility's switches whenever one is chosen; missing keys mean
   // "never configured" and default to enabled.
   useEffect(() => {
-    // A superadmin has to pick a facility first; everyone else is scoped by
-    // their token, so load straight away.
-    if (isSuperAdmin && !orgId) {
+    // A superadmin has to pick a facility in the header filter first; everyone
+    // else is scoped by their token, so load straight away.
+    if (isSuperAdmin && !organizationId) {
       return;
     }
     let cancelled = false;
@@ -124,7 +117,7 @@ export function NotificationSettingsButton() {
     return () => {
       cancelled = true;
     };
-  }, [endpoint, isSuperAdmin, orgId, scenarios]);
+  }, [endpoint, isSuperAdmin, organizationId, scenarios]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -139,18 +132,15 @@ export function NotificationSettingsButton() {
     },
   });
 
+  const needsOrganization = isSuperAdmin && !organizationId;
+
   return (
     <>
       <Button
         size="compact-xs"
         variant="light"
         leftSection={<Settings2 size={14} />}
-        onClick={() => {
-          setOpened(true);
-          if (isSuperAdmin && !orgId && organizations[0]?.id) {
-            setOrgId(organizations[0].id);
-          }
-        }}
+        onClick={() => setOpened(true)}
       >
         Notifications
       </Button>
@@ -167,19 +157,13 @@ export function NotificationSettingsButton() {
             default to on.
           </Text>
           {isSuperAdmin && (
-            <Select
-              label="Facility (organisation)"
-              placeholder="Select facility"
-              data={(Array.isArray(organizations) ? organizations : []).map((o: any) => ({
-                value: o.id,
-                label: o.name,
-              }))}
-              value={orgId}
-              onChange={setOrgId}
-              searchable
-            />
+            <Text size="xs" c="dimmed" data-testid="notification-settings-scope">
+              {organizationId
+                ? `Facility from the header organisation filter: ${organizationId}`
+                : 'Select an organisation in the header filter to configure its channels.'}
+            </Text>
           )}
-          {!isSuperAdmin || orgId ? (
+          {needsOrganization ? null : (
             <Table.ScrollContainer minWidth={720}>
               <Table withTableBorder verticalSpacing="xs" style={{ opacity: loading ? 0.5 : 1 }}>
                 <Table.Thead>
@@ -217,10 +201,6 @@ export function NotificationSettingsButton() {
                 </Table.Tbody>
               </Table>
             </Table.ScrollContainer>
-          ) : (
-            <Text size="sm" c="dimmed">
-              Select a facility to configure its channels.
-            </Text>
           )}
           <Group justify="flex-end">
             <Button variant="light" onClick={() => setOpened(false)}>
@@ -228,7 +208,7 @@ export function NotificationSettingsButton() {
             </Button>
             <Button
               loading={saveMutation.isPending}
-              disabled={(isSuperAdmin && !orgId) || loading}
+              disabled={needsOrganization || loading}
               onClick={() => saveMutation.mutate()}
             >
               Save

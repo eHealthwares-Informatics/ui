@@ -48,6 +48,7 @@ import {
   CalendarDays,
   UserRound,
   UserCog,
+  ArrowRightLeft,
   Bed,
   BellRing,
   FileSpreadsheet,
@@ -77,9 +78,14 @@ import { NavItem, type SidebarData } from '../types';
 export function filterNavGroupsByModule(
   navGroups: NavItem[],
   selectedModule: ModuleId,
-  userPermissions: string[] = []
+  userPermissions: string[] = [],
+  isSuperAdmin = false
 ): NavItem[] {
   const permissionAllows = (item: NavItem): boolean => {
+    // Super admins bypass permission gating (they see every menu entry within
+    // the selected module), but module scoping still applies below so a module
+    // only ever shows its own menus.
+    if (isSuperAdmin) return true;
     if (!item.permission) return true;
     const required = Array.isArray(item.permission) ? item.permission : [item.permission];
     return required.some((code) => hasPermission(userPermissions, code));
@@ -668,6 +674,13 @@ export const sidebarData: SidebarData = {
           modules: ['conversation'],
         },
         {
+          title: 'Notification Dispatches',
+          url: '/conversation/notification-dispatches',
+          permission: 'conversation.read',
+          icon: ArrowRightLeft,
+          modules: ['conversation'],
+        },
+        {
           title: 'Print Templates',
           url: '/rxsoft/print-templates',
           permission: 'rxsoft.admin.template.read',
@@ -679,6 +692,41 @@ export const sidebarData: SidebarData = {
           url: '/conversation/notification-delivery',
           permission: 'conversation.read',
           icon: Send,
+          modules: ['conversation'],
+        },
+      ],
+    },
+    {
+      title: 'Billing',
+      icon: HandCoins,
+      modules: ['conversation'],
+      items: [
+        {
+          title: 'Billing Rules',
+          url: '/conversation/billing-rules',
+          permission: 'conversation.read',
+          icon: FileText,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Wallets',
+          url: '/conversation/billing-wallets',
+          permission: 'conversation.read',
+          icon: Wallet,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Billing Charges',
+          url: '/conversation/billing-charges',
+          permission: 'conversation.read',
+          icon: Receipt,
+          modules: ['conversation'],
+        },
+        {
+          title: 'Billing Config',
+          url: '/conversation/billing-config',
+          permission: 'conversation.read',
+          icon: Settings,
           modules: ['conversation'],
         },
       ],

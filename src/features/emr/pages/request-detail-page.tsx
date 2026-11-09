@@ -24,7 +24,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, Check, Copy, Pill, RefreshCw, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { SubmissionAmendModal } from '../components/documentation/submission-amend-modal';
 import { SubmissionViewModal } from '../components/documentation/submission-view-modal';

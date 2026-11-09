@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { ConceptSummaryCard, MetadataPreview, codingModuleOptions } from './shared';
 

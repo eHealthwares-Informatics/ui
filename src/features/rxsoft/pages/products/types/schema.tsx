@@ -1,7 +1,7 @@
 import { Badge, Divider, HoverCard, Stack, Switch, Text } from '@mantine/core';
 import { AxiosInstance } from 'axios';
 import { useEffect } from 'react';
-import type {} from '@/features/components/page/rx-page';
+import type {} from '@/components/page/rx-page';
 import {
   EQUALS_WITH_OPTIONS,
   FieldGroup,

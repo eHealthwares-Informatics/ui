@@ -12,9 +12,9 @@ import {
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { JsonEditorField } from '@/features/components/form/json-editor-field';
-import { RxPage } from '@/features/components/page/rx-page';
-import { PaginatedDataTable } from '@/features/components/table/paginated-data-table';
+import { JsonEditorField } from '@/components/form/json-editor-field';
+import { RxPage } from '@/components/page/rx-page';
+import { PaginatedDataTable } from '@/components/table/paginated-data-table';
 import { TEMPLATE_TYPE_OPTIONS, MESSAGE_TYPE_OPTIONS } from '../types/constants';
 import {
   DialogActions,

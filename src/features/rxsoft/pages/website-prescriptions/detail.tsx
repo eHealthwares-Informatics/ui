@@ -28,13 +28,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, Check, CircleCheck, FilePlus2, Pencil, Send, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { getAccessToken } from '@/lib/auth-tokens';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { resolveMediaUrl } from '@/lib/media-url';
 import { useHasPermission } from '@/lib/permissions';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { useAuthStore } from '@/stores/auth-store';
-import { RxPage } from '../../../components/page/rx-page';
 import {
   mapParsedInstruction,
   parsePrescription,

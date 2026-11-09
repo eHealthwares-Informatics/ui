@@ -2,7 +2,7 @@ import { Alert, Button, Group, Modal, Radio, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { getArrayPayload } from '@/features/components/utils';
+import { getArrayPayload } from '@/components/utils';
 import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
@@ -21,9 +21,7 @@ export function useNotificationChannels() {
   return useQuery({
     queryKey: ['notification-channels', 'payment-link-picker'],
     queryFn: async (): Promise<NotificationChannel[]> => {
-      const { data } = await conversationApi.get('/notification-channels', {
-        params: { includeGlobal: true },
-      });
+      const { data } = await conversationApi.get('/notification-channels');
       const rows = getArrayPayload(data) as Array<{
         id: string;
         label: string;

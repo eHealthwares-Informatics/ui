@@ -4,7 +4,7 @@ import {
   DashboardCard,
   dashboardMetricClasses,
   type DashboardTone,
-} from '@/features/components/dashboard/dashboard-surface';
+} from '@/components/dashboard/dashboard-surface';
 
 export function MetricCard({
   icon: Icon,

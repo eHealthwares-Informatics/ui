@@ -1,7 +1,7 @@
 import { Stack } from '@mantine/core';
 import { useLocation } from '@tanstack/react-router';
 import { useEffect, type ReactNode } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { lisApi } from '@/lib/lis-api';
 import { BarcodeScannerBar } from './BarcodeScannerBar';
 import { useOrderContext } from './OrderContext';

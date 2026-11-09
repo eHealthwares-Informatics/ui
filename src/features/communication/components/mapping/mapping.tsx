@@ -16,7 +16,7 @@ import {
 } from '@mantine/core';
 import { ArrowDown, ArrowUp, Copy, Play, Plus, Trash } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { JsonEditorField } from '@/features/components/form/json-editor-field';
+import { JsonEditorField } from '@/components/form/json-editor-field';
 import { MessageType, ProtocolType } from '../../types/enums';
 import {
   MappingResult,

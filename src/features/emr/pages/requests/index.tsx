@@ -1,6 +1,6 @@
 import { Group, Modal } from '@mantine/core';
 import { useMemo } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { RequestForm } from '../../components/requests/request-form';
 import { RequestRowActions } from '../../components/requests/request-row-actions';
 import { requestsConfig } from './schema';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateFields } from '@/features/components/form/submit';
+import { validateFields } from '@/components/form/submit';
 import type { Field, FieldGroup, TabGroup } from '@/features/rxsoft/types';
 import { collectFields } from './payload-utils';
 
