@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { RxNotificationDispatchesPage } from '@/features/rxsoft/pages/notification-dispatches';
+import { RxsoftNotificationDispatchesPage } from '@/features/rxsoft';
 
 export const Route = createFileRoute('/_authenticated/rxsoft/notification-dispatches/')({
-  component: RxNotificationDispatchesPage,
+  component: RxsoftNotificationDispatchesPage,
 });

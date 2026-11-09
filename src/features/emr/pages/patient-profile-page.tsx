@@ -20,7 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, CalendarPlus, FilePlus2, Pencil } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { AppointmentForm } from '../components/appointments/appointment-form';
 import { PatientAssistantWidget } from '../components/assistant/patient-assistant-widget';

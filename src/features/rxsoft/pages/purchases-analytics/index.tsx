@@ -33,8 +33,8 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { downloadBlob } from '@/lib/rxsoft-api';
-import { RxPage } from '../../../components/page/rx-page';
 import { ChartDefs, GradientCursor } from '../dashboard/chart-cursors';
 import { ChartCard, EmptyChart, KpiCard } from '../dashboard/components';
 import {

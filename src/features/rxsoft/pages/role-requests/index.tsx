@@ -49,7 +49,7 @@ export function RoleRequestsPage() {
   // Dedupe by code: the catalog may repeat a role code across org/global scopes
   // and Mantine's Select throws on duplicate option values.
   const roleOptions = Array.from(
-    new Map(roleCatalog.map((r) => [r.code, { value: r.code, label: r.name || r.code }])).values(),
+    new Map(roleCatalog.map((r) => [r.code, { value: r.code, label: r.name || r.code }])).values()
   );
 
   const decide = useMutation({

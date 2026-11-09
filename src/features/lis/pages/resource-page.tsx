@@ -1,7 +1,7 @@
 import { Button, Stack, Textarea } from '@mantine/core';
 import { CheckCircle2 } from 'lucide-react';
 import { useState, useCallback } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { lisApi } from '@/lib/lis-api';
 import { flattenOptionObjects } from '../schema/flatten-payload';

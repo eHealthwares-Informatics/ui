@@ -16,7 +16,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle } from 'lucide-react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { EncounterForm } from '../components/encounters/encounter-form';
 import { RequestForm } from '../components/requests/request-form';

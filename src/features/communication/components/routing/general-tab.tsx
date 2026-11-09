@@ -1,8 +1,8 @@
 import { Stack, Button, Group } from '@mantine/core';
 import { Code, FormInput } from 'lucide-react';
 import { useState } from 'react';
-import { JsonEditorField } from '@/features/components/form/json-editor-field';
-import { RenderField } from '@/features/components/form/RenderField';
+import { JsonEditorField } from '@/components/form/json-editor-field';
+import { RenderField } from '@/components/form/RenderField';
 import { generalFieldGroups } from './tabs';
 
 export function GeneralTab({ formState, updateField }: { formState: any; updateField: any }) {

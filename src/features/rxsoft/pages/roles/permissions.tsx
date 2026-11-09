@@ -3,7 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { PermissionPicker } from '@/features/components/form/permission-picker';
+import { PermissionPicker } from '@/components/form/permission-picker';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 import { useAuthStore } from '@/stores/auth-store';
 

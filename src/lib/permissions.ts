@@ -55,9 +55,12 @@ export function hasPermission(userPermissions: string[], required: string): bool
 export const ACCESS_ENFORCEMENT_LEVELS = ['ROLE', 'MENU', 'SUBMENU', 'ACTIONS'] as const;
 export type AccessEnforcementLevel = (typeof ACCESS_ENFORCEMENT_LEVELS)[number];
 
+/** Stable empty list so store selectors keep the same snapshot reference. */
+export const NO_PERMISSIONS: string[] = [];
+
 /** React hook for ACTIONS-level gating (buttons, links) — phase 2+ pages. */
 export function useHasPermission(required: string): boolean {
-  const userPermissions = useAuthStore((state) => state.user?.permissions ?? []);
+  const userPermissions = useAuthStore((state) => state.user?.permissions ?? NO_PERMISSIONS);
   return hasPermission(userPermissions, required);
 }
 

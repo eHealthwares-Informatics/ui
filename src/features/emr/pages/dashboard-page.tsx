@@ -2,7 +2,7 @@ import { Alert, Group, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine
 import { useNavigate } from '@tanstack/react-router';
 import { CalendarCheck, CheckCircle2, Clock4, Stethoscope, AlertCircle } from 'lucide-react';
 import { useMemo } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { AppointmentRow } from '../components/dashboard/appointment-row';
 import { MetricCard } from '../components/dashboard/metric-card';
 import { ProviderLoad } from '../components/dashboard/provider-load';

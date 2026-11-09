@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { communicationApi } from '@/lib/communication-api';
 
 export function TraceExplorerPage() {

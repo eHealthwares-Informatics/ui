@@ -13,7 +13,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, MoreHorizontal, Wrench } from 'lucide-react';
 import { useMemo } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { emrApi } from '@/lib/emr-api';
 import { StatusBadge } from '../../components/shared/status-badge';
 import { getApiErrorMessage } from '../../lib/emr-errors';

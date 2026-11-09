@@ -5,9 +5,9 @@ import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { sidebarData } from './data/sidebar-data';
 import { LocationSwitcher } from './location-switcher';
-import { OrganisationSwitcher } from './organisation-switcher';
 import type { NavState } from './nav-state';
 import { NavUser } from './nav-user';
+import { OrganisationSwitcher } from './organisation-switcher';
 import { TeamSwitcher } from './team-switcher';
 import classes from './app-header.module.css';
 

@@ -1,6 +1,6 @@
 import { Button, Card, Grid, Stack, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 
 const identityResources = [
   {

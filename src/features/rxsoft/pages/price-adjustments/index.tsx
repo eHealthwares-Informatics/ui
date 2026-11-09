@@ -2,8 +2,8 @@ import { Badge, Button, Card, Group, Pagination, Select, Stack, Table, Text } fr
 import { DatePickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { RxPage } from '../../../components/page/rx-page';
 
 type PriceAdjustmentRow = {
   id: string;

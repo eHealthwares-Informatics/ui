@@ -14,8 +14,8 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { ListFilter } from 'lucide-react';
 import { useState } from 'react';
-import { SelectField } from '@/features/components/form/select';
-import { RxPage } from '@/features/components/page/rx-page';
+import { SelectField } from '@/components/form/select';
+import { RxPage } from '@/components/page/rx-page';
 import { Option } from '@/features/rxsoft/types';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { ConceptSummaryCard, MetadataPreview, codingModuleOptions } from './shared';

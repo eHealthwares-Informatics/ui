@@ -1,3 +1,4 @@
+import { UserPopover } from '@/components/popover/user-popover';
 import {
   ColumnDataType,
   EQUALS_WITH_OPTIONS,
@@ -7,7 +8,6 @@ import {
   type Option,
 } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
-import { UserPopover } from '../../../components/popover/user-popover';
 
 const movementTypeOptions: Option[] = [
   { value: 'in', label: 'In' },

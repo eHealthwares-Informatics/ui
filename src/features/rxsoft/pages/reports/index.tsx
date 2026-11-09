@@ -28,8 +28,8 @@ import {
   Warehouse,
 } from 'lucide-react';
 import { useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { downloadBlob, rxsoftApi } from '@/lib/rxsoft-api';
-import { RxPage } from '../../../components/page/rx-page';
 import type { DailySale, InventoryValuation, TopProduct } from '../../types';
 import { ReportsTable } from './components/table';
 

@@ -1,7 +1,7 @@
 import { Stack, Button, Group, Text, ActionIcon } from '@mantine/core';
 import { Plus, Trash } from 'lucide-react';
 import { useState } from 'react';
-import { RenderField } from '@/features/components/form/RenderField';
+import { RenderField } from '@/components/form/RenderField';
 
 const conditionOperators = [
   { value: 'equals', label: 'Equals' },

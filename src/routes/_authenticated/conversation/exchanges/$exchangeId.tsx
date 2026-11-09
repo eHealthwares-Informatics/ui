@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { RxExchangeDetailsPage } from '@/features/rxsoft/pages';
+import { RxExchangeDetailsPage } from '@/features/conversation';
 
 export const Route = createFileRoute('/_authenticated/conversation/exchanges/$exchangeId')({
   component: ExchangeDetailsRoute,

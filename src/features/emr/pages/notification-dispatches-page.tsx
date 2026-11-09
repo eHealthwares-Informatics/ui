@@ -3,7 +3,7 @@ import { notifications as toast } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { useMemo } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { ColumnDataType, type Column } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
@@ -32,8 +32,7 @@ const columns: Column[] = [
     key: 'createdAt',
     label: 'Time',
     dataType: ColumnDataType.DATETIME,
-    render: (row) =>
-      row.createdAt ? new Date(String(row.createdAt)).toLocaleString() : '—',
+    render: (row) => (row.createdAt ? new Date(String(row.createdAt)).toLocaleString() : '—'),
   },
   { key: 'eventKey', label: 'Event' },
   {
@@ -107,8 +106,8 @@ export function EmrNotificationDispatchesPage() {
         await queryClient.invalidateQueries({ queryKey: QUERY_KEY_BASE });
       } catch (error: unknown) {
         const message =
-          (error as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message ?? 'Failed to retrigger notification';
+          (error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+          'Failed to retrigger notification';
         toast.show({ message, color: 'red' });
       }
     };

@@ -2,9 +2,9 @@ import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle } from 'lucide-react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
 import { paymentTransactionsConfig } from './schema';
 
 function VerifyButton({ reference }: { reference: string }) {

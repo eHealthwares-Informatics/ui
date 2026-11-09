@@ -1,6 +1,6 @@
 import { Badge, Card, Group, Loader, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { identityApi } from '@/lib/identity-api';
 
 type IdentityPermission = {

@@ -2,17 +2,17 @@ import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { useDebouncedValue, getArrayPayload } from '@/features/components/utils';
+import { useDebouncedValue, getArrayPayload } from '@/components/utils';
 import {
   Questionnaire,
   type QuestionnaireQuestion,
 } from '@/features/conversation/components/questionnaire';
+import { ConversationLoader } from '@/features/conversation/questionnaire/components/ConversationLoader';
+import { CreateConversationForm } from '@/features/conversation/questionnaire/components/CreateConversationForm';
+import { EntryModeTabs } from '@/features/conversation/questionnaire/components/EntryModeTabs';
+import { ParticipantSearch } from '@/features/conversation/questionnaire/components/ParticipantSearch';
 import { Option } from '@/features/rxsoft/types';
 import { conversationApi } from '@/lib/conversation-api';
-import { ConversationLoader } from '../../features/questionnnaire/components/ConversationLoader';
-import { CreateConversationForm } from '../../features/questionnnaire/components/CreateConversationForm';
-import { EntryModeTabs } from '../../features/questionnnaire/components/EntryModeTabs';
-import { ParticipantSearch } from '../../features/questionnnaire/components/ParticipantSearch';
 import type { ConversationSession, EntryMode, AnswerValue } from './-types';
 import {
   stringifyAnswer,

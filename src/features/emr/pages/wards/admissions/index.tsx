@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { emrApi } from '@/lib/emr-api';
 import { AdmissionForm } from '../../../components/wards/admission-form';
 import { DischargeModal } from '../../../components/wards/discharge-modal';

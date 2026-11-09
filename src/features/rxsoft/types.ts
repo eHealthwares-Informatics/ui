@@ -13,7 +13,7 @@ import {
   CalendarRange,
 } from 'lucide-react';
 import { ComponentType, ReactNode, SVGProps } from 'react';
-import { ActionCellProps } from '../components/table/action-cell';
+import { ActionCellProps } from '@/components/table/action-cell';
 
 export type SearchControlType = 'autocomplete' | 'select';
 

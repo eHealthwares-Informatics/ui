@@ -1,5 +1,5 @@
 import { Stack } from '@mantine/core';
-import { RenderField } from '@/features/components/form/RenderField';
+import { RenderField } from '@/components/form/RenderField';
 
 export function AttributesTab({ formState, updateField }: { formState: any; updateField: any }) {
   return (

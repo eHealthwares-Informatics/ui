@@ -1,0 +1,219 @@
+import { notifications } from '@mantine/notifications';
+import { useMutation } from '@tanstack/react-query';
+import type { AxiosInstance } from 'axios';
+import { useApiProvider } from '@/context/module-context';
+import { Field } from '@/features/rxsoft/types';
+import { normalizeMultiSelectIds } from '@/features/shared/payload-utils';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { triggerBlobDownload } from '../export/download';
+import { getDirtyFields } from '../utils';
+
+type MutationProps = {
+  endpoint: string;
+  formState: Record<string, unknown>;
+  queryClient: any;
+  title: any;
+  apiProvider?: AxiosInstance;
+  fields?: Field[];
+  queryKeyBase?: unknown[];
+};
+
+type CreateMutationProps = MutationProps & {
+  buildCreatePayload?: (values: Record<string, unknown>) => unknown;
+  buildUpdatePayload?: (values: Record<string, unknown>, row: Record<string, unknown>) => unknown;
+  setShowModal: (value: boolean) => void;
+
+  onCreateSuccess?: (
+    created: Record<string, unknown>,
+    values: Record<string, unknown>
+  ) => Promise<void> | void;
+
+  keepModalOpenOnSuccess?: boolean;
+};
+
+type UpdateMutationProps = MutationProps & {
+  buildCreatePayload?: (values: Record<string, unknown>) => unknown;
+
+  buildUpdatePayload?: (values: Record<string, unknown>, row: Record<string, unknown>) => unknown;
+  editingRow: Record<string, unknown> | null;
+  setEditingRow: (row: Record<string, unknown> | null) => void;
+  setShowModal: (value: boolean) => void;
+  initialFormState?: Record<string, unknown>;
+};
+
+type DeteleMutationProps = MutationProps & {
+  deletePathBuilder?: (row: Record<string, unknown>) => string;
+  queryClient: any;
+};
+
+type ExportMutationProps = MutationProps & {
+  csvEndpoint?: string;
+};
+
+export const useCreateMutation = ({
+  buildCreatePayload,
+  onCreateSuccess,
+  endpoint,
+  formState,
+  queryClient,
+  setShowModal,
+  title,
+  apiProvider,
+  keepModalOpenOnSuccess = false,
+  fields,
+  queryKeyBase,
+}: CreateMutationProps) => {
+  const contextApiProvider = useApiProvider();
+  const effectiveApiProvider = apiProvider ?? contextApiProvider;
+
+  return useMutation({
+    mutationFn: async (values: Record<string, unknown>) => {
+      const normalized = normalizeMultiSelectIds(values, fields ?? []);
+      const payload = buildCreatePayload ? buildCreatePayload(normalized) : normalized;
+      const response = await effectiveApiProvider!.post(endpoint, payload);
+      return response.data as Record<string, unknown>;
+    },
+    onSuccess: async (created) => {
+      if (onCreateSuccess) {
+        await onCreateSuccess(created, formState);
+      }
+      void queryClient.invalidateQueries({
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
+      });
+      if (!keepModalOpenOnSuccess) {
+        setShowModal(false);
+      }
+      notifications.show({ message: `${title} record created` });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        color: 'red',
+        message: `Failed to create ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
+      });
+    },
+  });
+};
+
+export const useUpdateMutation = ({
+  buildCreatePayload,
+  endpoint,
+  queryClient,
+  title,
+  buildUpdatePayload,
+  setEditingRow,
+  editingRow,
+  setShowModal,
+  apiProvider,
+  initialFormState,
+  fields,
+  queryKeyBase,
+}: UpdateMutationProps) => {
+  const contextApiProvider = useApiProvider();
+  const effectiveApiProvider = apiProvider ?? contextApiProvider;
+  return useMutation({
+    mutationFn: async (values: Record<string, unknown>) => {
+      const recordId = editingRow?.id ?? editingRow?._id;
+      if (!recordId) {
+        throw new Error('Missing record id');
+      }
+      const changedValues = initialFormState ? getDirtyFields(values, initialFormState) : values;
+      // Nothing changed: don't PATCH. For notification configs a scope-only
+      // PATCH would otherwise create an empty organisation override.
+      if (initialFormState && Object.keys(changedValues).length === 0) {
+        return { data: null, recordId, unchanged: true };
+      }
+      const normalized = normalizeMultiSelectIds(changedValues, fields ?? []);
+      const payload = buildUpdatePayload
+        ? buildUpdatePayload(normalized, editingRow as Record<string, unknown>)
+        : buildCreatePayload
+          ? buildCreatePayload(normalized)
+          : normalized;
+      const response = await effectiveApiProvider!.patch(
+        `${endpoint}/${String(recordId)}`,
+        payload
+      );
+      return { data: response.data as Record<string, unknown>, recordId, unchanged: false };
+    },
+    onSuccess: ({ recordId, unchanged }) => {
+      if (unchanged) {
+        setShowModal(false);
+        setEditingRow(null);
+        notifications.show({ message: 'No changes to save' });
+        return;
+      }
+      void queryClient.invalidateQueries({
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
+      });
+      void queryClient.invalidateQueries({ queryKey: [endpoint] });
+      void queryClient.invalidateQueries({ queryKey: ['rxsoft-detail', endpoint] });
+      if (recordId) {
+        void queryClient.invalidateQueries({ queryKey: [endpoint, String(recordId)] });
+      }
+      setShowModal(false);
+      setEditingRow(null);
+      notifications.show({ message: `${title} record updated` });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        message: `Failed to update ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
+      });
+    },
+  });
+};
+
+export const useDeleteMutation = ({
+  deletePathBuilder,
+  endpoint,
+  queryClient,
+  title,
+  apiProvider,
+  queryKeyBase,
+}: DeteleMutationProps) => {
+  const contextApiProvider = useApiProvider();
+  const effectiveApiProvider = apiProvider ?? contextApiProvider;
+
+  return useMutation({
+    mutationFn: async (row: Record<string, unknown>) => {
+      const target = deletePathBuilder
+        ? deletePathBuilder(row)
+        : `${endpoint}/${String(row.id ?? row._id)}`;
+      await effectiveApiProvider.delete(target);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeyBase ?? ['rxsoft-data-page', endpoint],
+      });
+      notifications.show({ message: `${title} record deleted` });
+    },
+    onError: (error) => {
+      notifications.show({
+        color: 'red',
+        message: `Failed to delete ${title.toLowerCase()} record - ${getApiErrorMessage(error)}`,
+      });
+    },
+  });
+};
+
+export const useExportMutation = ({ csvEndpoint, title, apiProvider }: ExportMutationProps) => {
+  const contextApiProvider = useApiProvider();
+  const effectiveApiProvider = apiProvider ?? contextApiProvider;
+
+  return useMutation({
+    mutationFn: async (params?: Record<string, unknown>) => {
+      if (!csvEndpoint) {
+        return;
+      }
+      await triggerBlobDownload(
+        effectiveApiProvider!,
+        { method: 'GET', url: csvEndpoint, params },
+        `${title.toLowerCase().replace(/\s+/g, '_')}.csv`
+      );
+    },
+    onSuccess: () => notifications.show({ message: `${title} export downloaded` }),
+    onError: (error) =>
+      notifications.show({
+        color: 'red',
+        message: `Failed to export ${title.toLowerCase()} - ${getApiErrorMessage(error)}`,
+      }),
+  });
+};

@@ -1,4 +1,4 @@
-import { getArrayPayload } from '@/features/components/utils';
+import { getArrayPayload } from '@/components/utils';
 import { communicationApi } from '@/lib/communication-api';
 import { emrApi } from '@/lib/emr-api';
 import {
@@ -121,15 +121,13 @@ export async function fetchNotificationDispatches(params?: {
   const payload = response.data;
   return {
     data: getArrayPayload(payload) as unknown as NotificationDispatchRow[],
-    total: Number(
-      payload?.meta?.total ?? payload?.total ?? getArrayPayload(payload).length,
-    ),
+    total: Number(payload?.meta?.total ?? payload?.total ?? getArrayPayload(payload).length),
   };
 }
 
 /** Re-send a recorded dispatch (creates a new ledger row). */
 export async function retriggerNotificationDispatch(
-  id: string,
+  id: string
 ): Promise<{ ok: boolean; sent: number; failed: number; skipped: number }> {
   const response = await emrApi.post(`/notifications/dispatches/${id}/retrigger`);
   return response.data;

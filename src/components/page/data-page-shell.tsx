@@ -1,0 +1,647 @@
+import { ActionIcon, Box, Select, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { HelpCircle } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ModuleContext, useModuleContext } from '@/context/module-context';
+import { JsonPreviewDialog } from '@/features/conversation/components/shared';
+import { entityInfoMap } from '@/features/lis/schema/entity-info';
+import { FILTERS, type FilterValue } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
+import { collectFields } from '@/features/shared/payload-utils';
+import { gateRowActions, NO_PERMISSIONS, permits } from '@/lib/permissions';
+import { useAuthStore } from '@/stores/auth-store';
+import { triggerBlobDownload } from '../export/download';
+import { useFormContext } from '../form/form-context';
+import { ModalDataForm } from '../form/ModalDataForm';
+import {
+  useCreateMutation,
+  useDeleteMutation,
+  useExportMutation,
+  useUpdateMutation,
+} from '../form/mutations';
+import { HeaderBar } from '../table/HeaderBar';
+import { MetricsBar } from '../table/MetricsBar';
+import { Pagination } from '../table/pagination';
+import { DataTable } from '../table/table';
+import { getArrayPayload } from '../utils';
+import { buildRxsoftListParams } from './build-list-params';
+import { InfoDrawer } from './info-drawer';
+import { hasServerTotal, paginateRows } from './list-rows';
+import { resolveListTotal } from './list-total';
+import { RxPage } from './rx-page';
+
+function getRowsFromPayload(payload: unknown): Record<string, unknown>[] {
+  return getArrayPayload(payload);
+}
+
+type DataPageShellProps = {
+  config: ModelConfig;
+  formState?: Record<string, unknown>;
+  setFormState?: (state: Record<string, unknown>) => void;
+  updateField?: (name: string, value: unknown) => void;
+  embedded?: boolean;
+};
+
+export function DataPageShell(props: DataPageShellProps) {
+  const {
+    config,
+    formState: propsFormState,
+    setFormState: propsSetFormState,
+    updateField: propsUpdateField,
+    embedded = false,
+  } = props;
+
+  const navigate = useNavigate();
+
+  const {
+    title,
+    description,
+    endpoint,
+    columns,
+    modalTitle,
+    createFields,
+    createFieldGroups,
+    tabGroups,
+    buildCreatePayload,
+    buildUpdatePayload,
+    buildFormState,
+    csvEndpoint,
+    createPathBuilder,
+    detailPathBuilder,
+    editPathBuilder,
+    deletePathBuilder,
+    renderCreateExtras,
+    renderHeaderActions,
+    transformRows,
+    canDelete,
+    canEditRow,
+    canDeleteRow,
+    canExport,
+    defaultState,
+    apiProvider: configApiProvider,
+    minSearchLength,
+    debounceMs,
+    metricsEndpoint,
+    metricsConfig,
+    superAdminOrgFilter,
+    queryKeyBase,
+    defaultSort,
+    renderCreateModal,
+    canCreate,
+    permissions: actionPermissions,
+  } = config;
+  const moduleContext = useModuleContext();
+  const listKeyBase = queryKeyBase ?? ['rxsoft-data-page', endpoint];
+  const apiProvider = configApiProvider ?? moduleContext.apiProvider;
+  const moduleId = moduleContext.moduleId;
+  const shellModuleContext = configApiProvider
+    ? { ...moduleContext, apiProvider: configApiProvider }
+    : moduleContext;
+
+  // Try to use FormProvider if available, otherwise use props or local state
+  let formContext: ReturnType<typeof useFormContext> | null = null;
+  let usingFormProvider = false;
+  try {
+    formContext = useFormContext();
+    usingFormProvider = true;
+  } catch (e) {
+    // FormProvider not available
+  }
+
+  // Create local state as fallback
+  const [localFormState, setLocalFormState] = useState<Record<string, unknown>>(
+    propsFormState ?? {}
+  );
+
+  // Determine which form state management to use
+  const effectiveFormState = usingFormProvider
+    ? (formContext?.formState ?? {})
+    : (propsFormState ?? localFormState);
+
+  const effectiveSetFormState = useCallback(
+    usingFormProvider
+      ? (state: Record<string, unknown>) => {
+          formContext?.setFields(state as any);
+        }
+      : (propsSetFormState ?? setLocalFormState),
+    [usingFormProvider, formContext, propsSetFormState]
+  );
+
+  const effectiveUpdateField = useCallback(
+    usingFormProvider
+      ? (name: string, value: unknown) => {
+          formContext?.setField(name as any, value as any);
+        }
+      : (propsUpdateField ??
+          ((name: string, value: unknown) => {
+            setLocalFormState((prev) => ({
+              ...prev,
+              [name]: value,
+            }));
+          })),
+    [usingFormProvider, formContext, propsUpdateField]
+  );
+
+  const queryClient = useQueryClient();
+
+  // -----------------------------
+  // STATE
+  // -----------------------------
+  const [searchBy, setSearchBy] = useState<string[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
+  const [pageIndex, setPageIndex] = useState(1);
+  // 25 rows/page: fewer page turns per assertion in e2e, same per-request cost.
+  const [pageSize, setPageSize] = useState(25);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
+  const [jsonToPreview, setJsonToPreview] = useState<Record<string, unknown> | null>(null);
+
+  const [initialFormState, setInitialFormState] = useState<Record<string, unknown> | null>(null);
+
+  const [filtersModalOpened, setFiltersModalOpened] = useState<boolean>(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpInfo = entityInfoMap[config.id] ?? null;
+
+  const [sortBy, setSortBy] = useState<string | null>(defaultSort?.sortBy ?? null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(defaultSort?.sortOrder ?? null);
+  const handleSortChange = (key: string, order: 'asc' | 'desc' | null) => {
+    setSortBy(order ? key : null);
+    setSortOrder(order);
+    setPageIndex(1);
+  };
+
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, FilterValue | null>>(() => {
+    // Initialize filters from URL search params (e.g. ?conversationId=abc)
+    const params = new URLSearchParams(window.location.search);
+    const columnKeys = new Set(columns.map((c) => c.key));
+    const initial: Record<string, FilterValue | null> = {};
+    params.forEach((value, key) => {
+      if (
+        key === 'search' ||
+        key === 'page' ||
+        key === 'limit' ||
+        key === 'sortBy' ||
+        key === 'sortOrder'
+      ) {
+        return; // skip reserved params
+      }
+      if (columnKeys.has(key) && value) {
+        initial[key] = { filter: FILTERS.EQUALS, value };
+      }
+    });
+    return initial;
+  });
+
+  // Also initialize search from URL ?search= param
+  const [search, setSearch] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('search') ?? '';
+  });
+
+  const handleApplyFilter = (columnKey: string, filterValue: FilterValue | null) => {
+    setAppliedFilters((prev) => ({
+      ...prev,
+      [columnKey]: filterValue,
+    }));
+  };
+
+  const currentUser = useAuthStore((s) => s.user);
+  const isSuperAdmin = currentUser?.roles?.includes('super_admin') ?? false;
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
+
+  const { data: orgs = [] } = useQuery({
+    queryKey: ['organizations', 'list'],
+    queryFn: async () => {
+      const res = await apiProvider.get('/organizations', { params: { limit: 100 } });
+      return res.data?.data ?? [];
+    },
+    enabled: isSuperAdmin && !!superAdminOrgFilter,
+    staleTime: 120_000,
+  });
+
+  // Create config presence (form/modal/paths) vs. the create entry point:
+  // canCreate=false retires the header New button (e.g. admin purchases —
+  // creation lives at /shop/purchases) without touching edit/detail wiring.
+  const hasCreateConfig = Boolean(
+    tabGroups || createFields || createFieldGroups || renderCreateModal
+  );
+
+  // ACTIONS-level gating (access-control ladder, phase 2): a page's action map
+  // hides create/delete/export unless the user holds the code. An absent code
+  // leaves the action unchanged, so untagged pages behave exactly as before.
+  const userPermissions = useAuthStore((state) => state.user?.permissions ?? NO_PERMISSIONS);
+  const canCreateAction = permits(userPermissions, actionPermissions?.create);
+  const canDeleteAction = permits(userPermissions, actionPermissions?.delete);
+  const canExportAction = permits(userPermissions, actionPermissions?.export);
+  const gatedRowActions = gateRowActions(
+    config.rowActions,
+    actionPermissions?.rowActions,
+    userPermissions
+  );
+
+  const hasCreate = canCreate !== false && hasCreateConfig && canCreateAction;
+  const hasInlineEdit = hasCreateConfig && !editPathBuilder;
+  const hasFilterableColumns = columns.some((c) => c.filters && c.filters.length > 0);
+
+  const fieldGroups = createFieldGroups ?? (createFields ? [{ fields: createFields }] : []);
+  const fields = useMemo(
+    () => collectFields({ createFields, createFieldGroups, tabGroups }),
+    [createFields, createFieldGroups, tabGroups]
+  );
+
+  // -----------------------------
+  // QUERY PARAMS
+  // -----------------------------
+  const queryParams = useMemo(() => {
+    const params: Record<string, unknown> = {};
+
+    // -----------------------------
+    // FILTERS ✅ NEW
+    // -----------------------------
+    if (appliedFilters) {
+      Object.entries(appliedFilters)
+        .filter(([a, b]) => a && b)
+        .forEach(([columnKey, filterValue]) => {
+          params[columnKey] =
+            `${filterValue?.filter.type}|${filterValue?.value}|${filterValue?.valueTo}`;
+        });
+    }
+
+    if (search.trim()) {
+      params.search = search.trim();
+    }
+
+    if (sortBy) {
+      params.sortBy = sortBy;
+      params.sortOrder = sortOrder ?? 'desc';
+    }
+
+    if (isSuperAdmin && superAdminOrgFilter && selectedOrgId) {
+      params.organizationId = selectedOrgId;
+    }
+
+    params.page = pageIndex;
+    params.limit = pageSize;
+
+    // Per-config default list params (e.g. items: { includeAll: true }) stay as
+    // top-level query params on every request.
+    if (config.listParams) {
+      Object.assign(params, config.listParams);
+    }
+
+    return params;
+  }, [
+    search,
+    searchBy,
+    appliedFilters,
+    sortBy,
+    sortOrder,
+    pageIndex,
+    pageSize,
+    isSuperAdmin,
+    superAdminOrgFilter,
+    selectedOrgId,
+    config.listParams,
+  ]);
+
+  useEffect(() => {
+    setPageIndex(1);
+  }, [search]);
+
+  useEffect(() => {
+    if (!showModal) {
+      setInitialFormState(null);
+    }
+  }, [showModal]);
+
+  // -----------------------------
+  // DATA FETCH
+  // -----------------------------
+  const query = useQuery({
+    queryKey: [...listKeyBase, queryParams] satisfies QueryKey,
+    queryFn: async () => {
+      const params =
+        moduleId === 'rxsoft' && config.listParamStyle !== 'plain'
+          ? buildRxsoftListParams(queryParams, config)
+          : queryParams;
+      const response = await apiProvider.get(endpoint, { params });
+
+      return response.data;
+    },
+  });
+
+  // Some backends (e.g. conversation `/channels`) answer list endpoints with a
+  // bare array and ignore page/limit. When the payload carries no server-side
+  // total, paginate client-side so the page controls and page-size select work
+  // instead of re-rendering every row on each page change.
+  const allRows = transformRows
+    ? transformRows(getRowsFromPayload(query.data))
+    : getRowsFromPayload(query.data);
+
+  const rows = hasServerTotal(query.data) ? allRows : paginateRows(allRows, pageIndex, pageSize);
+
+  // Derive totalItems from the resolved query data during render rather than via
+  // setState inside queryFn (see note near the top of the component).
+  const totalItems = resolveListTotal(query.data);
+
+  // Store LIS order IDs in localStorage for Prev/Next navigation on report page
+  useEffect(() => {
+    if (endpoint === '/lis/orders' && rows.length > 0) {
+      const ids = rows.map((r) => String(r.id)).filter(Boolean);
+      localStorage.setItem('lis_orders_ids', JSON.stringify(ids));
+    }
+  }, [endpoint, rows]);
+
+  // -----------------------------
+  // MUTATIONS
+  // -----------------------------
+  const createMutation = useCreateMutation({
+    buildCreatePayload,
+    endpoint,
+    formState: effectiveFormState,
+    queryClient,
+    setShowModal,
+    title,
+    apiProvider,
+    fields,
+    queryKeyBase: listKeyBase,
+    onCreateSuccess: config.onCreateSuccess,
+  });
+
+  const updateMutation = useUpdateMutation({
+    buildUpdatePayload,
+    endpoint,
+    formState: effectiveFormState,
+    queryClient,
+    setShowModal,
+    title,
+    setEditingRow,
+    editingRow,
+    apiProvider,
+    initialFormState: initialFormState ?? undefined,
+    fields,
+    queryKeyBase: listKeyBase,
+  });
+
+  const deleteMutation = useDeleteMutation({
+    endpoint,
+    formState: effectiveFormState,
+    queryClient,
+    title,
+    deletePathBuilder,
+    apiProvider,
+    queryKeyBase: listKeyBase,
+  });
+
+  const exportMutation = useExportMutation({
+    endpoint,
+    formState: effectiveFormState,
+    queryClient,
+    title,
+    csvEndpoint,
+    apiProvider,
+  });
+
+  // Export strips pagination — backends force a large limit so every row that
+  // matches the current search/filters is downloaded (CSV and PDF alike).
+  const exportParams = useMemo(() => {
+    const rest = { ...queryParams };
+    delete rest.page;
+    delete rest.limit;
+    return rest;
+  }, [queryParams]);
+
+  const pdfEndpoint = csvEndpoint ? `${csvEndpoint}/pdf` : undefined;
+
+  const downloadPdf = async () => {
+    if (!pdfEndpoint) {
+      return;
+    }
+    try {
+      await triggerBlobDownload(
+        apiProvider!,
+        { method: 'GET', url: pdfEndpoint, params: exportParams },
+        `${title.toLowerCase().replace(/\s+/g, '_')}.pdf`
+      );
+      notifications.show({ message: `${title} export downloaded` });
+    } catch {
+      notifications.show({ color: 'red', message: `Failed to export ${title.toLowerCase()}` });
+    }
+  };
+
+  function openModal(row: Record<string, unknown> | null = null) {
+    setEditingRow(row);
+    const initialState = buildFormState && row ? buildFormState(row) : row || defaultState || {};
+    effectiveSetFormState(initialState);
+    setInitialFormState(initialState);
+    setShowModal(true);
+  }
+
+  function handleDelete() {}
+
+  const content = (
+    <>
+      {isSuperAdmin && superAdminOrgFilter && (
+        <Select
+          placeholder="Filter by organization"
+          data={(Array.isArray(orgs) ? orgs : []).map((o: any) => ({
+            value: o.id,
+            label: `${o.code} - ${o.name}`,
+          }))}
+          value={selectedOrgId}
+          onChange={setSelectedOrgId}
+          clearable
+          searchable
+          size="xs"
+          mb="xs"
+        />
+      )}
+      {metricsConfig && (
+        <MetricsBar
+          metricsConfig={metricsConfig}
+          params={(() => {
+            const p: Record<string, string> = {};
+            const hasFilters = Object.keys(appliedFilters).length > 0;
+            if (hasFilters) {
+              const filterParams: Record<string, string> = {};
+              Object.entries(appliedFilters)
+                .filter(([, v]) => v)
+                .forEach(([key, val]) => {
+                  filterParams[key] =
+                    `${val!.filter.type}|${val!.value ?? ''}|${val!.valueTo ?? ''}`;
+                });
+              const filtStr = JSON.stringify(filterParams);
+              if (filtStr !== '{}') {
+                p.search = filtStr;
+              }
+            } else if (search) {
+              p.search = search;
+            }
+            return p;
+          })()}
+        />
+      )}
+      {/* Stable toolbar container so e2e can scope search/sort queries to one
+          node and detect remounts (ehealthwares/ui#84). */}
+      <Box data-testid={config.id ? `${config.id}-toolbar` : 'page-toolbar'}>
+        <HeaderBar
+          open={filtersModalOpened}
+          setOpen={setFiltersModalOpened}
+          appliedFilters={appliedFilters}
+          updateFilters={handleApplyFilter}
+          columns={columns}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          refresh={() => {
+            query.refetch();
+          }}
+          search={search}
+          onSearchChange={setSearch}
+          customActions={renderHeaderActions?.({
+            rows,
+            refresh: () => {
+              query.refetch();
+            },
+          })}
+          onExportCsv={
+            canExport && canExportAction && csvEndpoint
+              ? () => exportMutation.mutate(exportParams)
+              : undefined
+          }
+          onExportPdf={
+            canExport && canExportAction && pdfEndpoint ? () => void downloadPdf() : undefined
+          }
+          onDelete={
+            (canDelete || deletePathBuilder) && canDeleteAction
+              ? () => setIsDeleteOpen(true)
+              : undefined
+          }
+          hasFilterableColumns={hasFilterableColumns}
+          minSearchLength={minSearchLength}
+          debounceMs={debounceMs}
+          onCreate={
+            hasCreate
+              ? () => {
+                  createPathBuilder ? navigate({ to: createPathBuilder() }) : openModal();
+                }
+              : undefined
+          }
+        />
+      </Box>
+
+      <DataTable
+        columns={columns}
+        rows={rows}
+        isLoading={query.isLoading}
+        errorLoading={query.isError}
+        actionCellProps={
+          detailPathBuilder ||
+          editPathBuilder ||
+          buildUpdatePayload ||
+          deletePathBuilder ||
+          canDelete ||
+          config.rowActions
+            ? {
+                detailPathBuilder,
+                editPathBuilder,
+                onEdit: buildUpdatePayload && openModal,
+                onDelete:
+                  (deletePathBuilder || canDelete) && canDeleteAction ? () => undefined : undefined,
+                deleteMutation,
+                rowActions: gatedRowActions,
+                canEditRow,
+                canDeleteRow,
+              }
+            : undefined
+        }
+        appliedFilters={appliedFilters}
+        applyColumnFilter={handleApplyFilter}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
+      />
+      <Pagination
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        onPageChange={setPageIndex}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPageIndex(1);
+        }}
+      />
+      {renderCreateModal && showModal && !editingRow ? (
+        renderCreateModal({
+          onClose: () => setShowModal(false),
+          refresh: () => {
+            query.refetch();
+          },
+        })
+      ) : (
+        <ModalDataForm
+          editingRow={editingRow}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          title={title}
+          tabGroups={tabGroups}
+          fieldGroups={fieldGroups}
+          formState={effectiveFormState}
+          setFormState={effectiveSetFormState}
+          updateField={effectiveUpdateField}
+          mutation={editingRow ? updateMutation : createMutation}
+          modalTitle={modalTitle}
+          renderCreateExtras={renderCreateExtras}
+        />
+      )}
+
+      <ConfirmDialog
+        title={`Delete ${title}`}
+        description={`Are you sure you want to delete this ${title}? This action cannot be undone.`}
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={handleDelete}
+        confirmText="Delete"
+        isLoading={deleteMutation.isPending}
+      />
+
+      <JsonPreviewDialog
+        value={jsonToPreview}
+        title={`${title}: ${jsonToPreview?.name}`}
+        open={jsonToPreview !== null}
+        onOpenChange={(open) => setJsonToPreview(!open ? null : jsonToPreview)}
+      />
+
+      <InfoDrawer opened={helpOpen} onClose={() => setHelpOpen(false)} info={helpInfo} />
+    </>
+  );
+
+  return (
+    <ModuleContext.Provider value={shellModuleContext}>
+      {embedded ? (
+        content
+      ) : (
+        <RxPage
+          title={title}
+          description={description}
+          actions={
+            helpInfo
+              ? [
+                  <Tooltip label={`About ${title}`} key="help">
+                    <ActionIcon variant="subtle" size="sm" onClick={() => setHelpOpen(true)}>
+                      <HelpCircle size={18} />
+                    </ActionIcon>
+                  </Tooltip>,
+                ]
+              : undefined
+          }
+        >
+          {content}
+        </RxPage>
+      )}
+    </ModuleContext.Provider>
+  );
+}

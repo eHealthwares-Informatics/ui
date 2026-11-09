@@ -1,8 +1,8 @@
 import { Alert, Stack, Button, Group, Grid } from '@mantine/core';
 import { AlertCircle, Code, FormInput } from 'lucide-react';
 import { useState } from 'react';
-import { JsonEditorField } from '@/features/components/form/json-editor-field';
-import { RenderField } from '@/features/components/form/RenderField';
+import { JsonEditorField } from '@/components/form/json-editor-field';
+import { RenderField } from '@/components/form/RenderField';
 import { useForm } from '.';
 import { outboundFieldGroups } from './tabs';
 import { ProtocolConfig } from './types';

@@ -1,4 +1,4 @@
-import { getArrayPayload } from '@/features/components/utils';
+import { getArrayPayload } from '@/components/utils';
 import { conversationApi } from '@/lib/conversation-api';
 import type {
   ConversationInboxResponse,

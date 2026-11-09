@@ -1,4 +1,4 @@
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { glAccountsConfig } from './schema';
 
 export function RxGlAccountsPage() {

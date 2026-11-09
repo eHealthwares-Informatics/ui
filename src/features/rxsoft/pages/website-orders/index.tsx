@@ -31,11 +31,11 @@ import {
   Send,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
+import { RxPage } from '@/components/page/rx-page';
 import { SendPaymentLinkModal } from '@/features/rxsoft/payment-links/SendPaymentLinkModal';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
-import { RxPage } from '../../../components/page/rx-page';
 import { CancelReasonModal } from './components/cancel-reason-modal';
 import { CascadeCancelModal } from './components/cascade-cancel-modal';
 import { NotificationSettingsButton } from './notification-settings';

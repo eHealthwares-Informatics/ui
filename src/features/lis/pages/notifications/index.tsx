@@ -3,7 +3,7 @@ import { notifications as toast } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { lisApi } from '@/lib/lis-api';
 import { buildNotificationsConfig } from './schema';
 
@@ -22,9 +22,7 @@ export function LisNotificationsPage() {
       }
       setRetriggeringId(id);
       try {
-        const { data } = await lisApi.post(
-          `/lis/notifications/dispatches/${id}/retrigger`,
-        );
+        const { data } = await lisApi.post(`/lis/notifications/dispatches/${id}/retrigger`);
         toast.show({
           message: data?.ok
             ? 'Notification re-sent'
@@ -34,22 +32,17 @@ export function LisNotificationsPage() {
         await queryClient.invalidateQueries({ queryKey: QUERY_KEY_BASE });
       } catch (error: any) {
         toast.show({
-          message:
-            error?.response?.data?.message ??
-            'Failed to retrigger notification',
+          message: error?.response?.data?.message ?? 'Failed to retrigger notification',
           color: 'red',
         });
       } finally {
         setRetriggeringId(null);
       }
     },
-    [queryClient],
+    [queryClient]
   );
 
-  const config = useMemo(
-    () => buildNotificationsConfig({ onRetrigger: retrigger }),
-    [retrigger],
-  );
+  const config = useMemo(() => buildNotificationsConfig({ onRetrigger: retrigger }), [retrigger]);
 
   async function syncDeliveryStatus() {
     setSyncing(true);

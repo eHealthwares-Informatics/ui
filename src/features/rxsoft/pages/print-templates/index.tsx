@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { TemplatePreviewModal, type TemplatePreview } from '../templates/preview-modal';
 import { buildPrintTemplatesConfig } from './schema';
 

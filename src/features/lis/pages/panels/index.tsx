@@ -1,4 +1,4 @@
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { panelsConfig } from './schema';
 
 export function LisPanelsPage() {

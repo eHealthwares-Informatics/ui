@@ -1,4 +1,4 @@
-import type { EntityInfo } from '@/features/components/page/info-drawer';
+import type { EntityInfo } from '@/components/page/info-drawer';
 
 export const entityInfoMap: Record<string, EntityInfo> = {
   'test-definitions': {

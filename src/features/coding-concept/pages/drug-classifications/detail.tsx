@@ -3,7 +3,7 @@ import { Button } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 
 type Relations = {

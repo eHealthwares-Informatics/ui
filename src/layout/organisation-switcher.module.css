@@ -56,3 +56,22 @@
   color: var(--app-blue);
   font-weight: 700;
 }
+
+.option {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-align: left;
+  transition: background 120ms ease;
+}
+
+.option:hover {
+  background: var(--app-hover);
+}
+
+.optionActive {
+  background: var(--app-hover);
+}

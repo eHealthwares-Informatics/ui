@@ -14,7 +14,7 @@ import { notifications } from '@mantine/notifications';
 import { useMutation } from '@tanstack/react-query';
 import { FileUp, Upload } from 'lucide-react';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { codingConceptApi } from '@/lib/coding-concept-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 

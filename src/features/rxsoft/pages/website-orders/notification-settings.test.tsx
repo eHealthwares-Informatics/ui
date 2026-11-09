@@ -4,27 +4,30 @@ import { vi } from 'vitest';
 import { NotificationSettingsButton } from './notification-settings';
 
 /**
- * rxsoft-qa#804 — the notification switches live on the facility config now.
- *
- * An ordinary admin's facility comes from their token, so the console must not
- * ask them for one; a superadmin picks a facility and the request targets that
- * facility explicitly. Both read/write `notificationSettings` on the config.
+ * rxsoft-qa#804 + header organisation filter — the notification switches live
+ * on the facility config. The facility comes from the header organisation
+ * filter for superadmins and from the token for ordinary admins, so the modal
+ * must not render its own facility picker. Both read/write
+ * `notificationSettings` on the config.
  */
 // `vi.mock` factories are hoisted above the module body, so the spies they
 // close over have to be hoisted too.
 const { get, patch, auth } = vi.hoisted(() => ({
   get: vi.fn(),
   patch: vi.fn(),
-  auth: { roles: ['admin'] as string[] },
+  auth: {
+    roles: ['admin'] as string[],
+    organizationId: null as string | null,
+    userOrganizationId: 'org1' as string | null,
+  },
 }));
 
-// Stable references, like react-query's cached `data` — a fresh array per
+// Stable reference, like react-query's cached `data` — a fresh array per
 // render would re-trigger the load effect forever.
 const SCENARIO_CATALOG = [
   { scenario: 'refill_due', label: 'Refill due' },
   { scenario: 'promotion', label: 'Promotional campaign' },
 ];
-const ORGANIZATIONS = [{ id: 'org_other', name: 'Other facility' }];
 
 vi.mock('@/lib/rxsoft-api', () => ({
   rxsoftApi: { get, patch },
@@ -32,7 +35,10 @@ vi.mock('@/lib/rxsoft-api', () => ({
 
 vi.mock('@/stores/auth-store', () => ({
   useAuthStore: (selector: (state: unknown) => unknown) =>
-    selector({ user: { roles: auth.roles, organizationId: 'org1' } }),
+    selector({
+      user: { roles: auth.roles, organizationId: auth.userOrganizationId },
+      selectedOrganisationId: auth.organizationId,
+    }),
 }));
 
 vi.mock('@mantine/notifications', () => ({
@@ -43,12 +49,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual: Record<string, unknown> = await importOriginal();
   return {
     ...actual,
-    useQuery: ({ queryKey }: { queryKey: unknown[] }) => {
-      if (queryKey[1] === 'notification-scenarios') {
-        return { data: SCENARIO_CATALOG, isLoading: false };
-      }
-      return { data: ORGANIZATIONS, isLoading: false };
-    },
+    useQuery: () => ({ data: SCENARIO_CATALOG, isLoading: false }),
     useMutation: (options: { mutationFn: () => Promise<unknown> }) => ({
       mutate: () => options.mutationFn(),
       isPending: false,
@@ -65,6 +66,8 @@ describe('NotificationSettingsButton — org-config surface (rxsoft-qa#804)', ()
   beforeEach(() => {
     vi.clearAllMocks();
     auth.roles = ['admin'];
+    auth.organizationId = null;
+    auth.userOrganizationId = 'org1';
     get.mockResolvedValue({
       data: { data: { notificationSettings: { 'email:promotion': false } } },
     });
@@ -109,13 +112,29 @@ describe('NotificationSettingsButton — org-config surface (rxsoft-qa#804)', ()
     });
   });
 
-  it('targets the picked facility explicitly for a superadmin', async () => {
+  it('scopes a superadmin to the organisation selected in the header filter', async () => {
     auth.roles = ['super_admin'];
+    auth.organizationId = 'org_other';
     render(<NotificationSettingsButton />);
     await openModal();
 
     await waitFor(() =>
       expect(get).toHaveBeenCalledWith('/organisation-config/by-organization/org_other')
+    );
+    // The facility is chosen in the header, never inside the modal.
+    expect(screen.queryByLabelText(/Facility/i)).not.toBeInTheDocument();
+  });
+
+  it('prompts a superadmin to pick a facility in the header filter', async () => {
+    auth.roles = ['super_admin'];
+    auth.organizationId = null;
+    render(<NotificationSettingsButton />);
+    await openModal();
+
+    expect(screen.getByText(/Select an organisation in the header filter/i)).toBeInTheDocument();
+    expect(get).not.toHaveBeenCalledWith('/organisation-config');
+    expect(get).not.toHaveBeenCalledWith(
+      expect.stringContaining('/organisation-config/by-organization/')
     );
   });
 });

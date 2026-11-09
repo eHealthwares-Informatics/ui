@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DataPageShell } from '@/features/components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { ColumnTypeFilters } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { codingConceptEndpoint } from '@/lib/coding-concept-api';

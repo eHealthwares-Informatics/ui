@@ -1,4 +1,4 @@
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { auditLogsConfig } from './schema';
 
 export function RxAuditLogsPage() {

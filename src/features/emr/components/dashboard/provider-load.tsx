@@ -1,8 +1,5 @@
 import { Avatar, Badge, Card, Group, Stack, Text } from '@mantine/core';
-import {
-  DashboardCard,
-  DashboardCardTitle,
-} from '@/features/components/dashboard/dashboard-surface';
+import { DashboardCard, DashboardCardTitle } from '@/components/dashboard/dashboard-surface';
 import type { ProviderLoadEntry } from '../../lib/emr-types';
 
 const AVATAR_COLORS = ['blue', 'teal', 'orange', 'grape', 'cyan', 'lime', 'pink'];

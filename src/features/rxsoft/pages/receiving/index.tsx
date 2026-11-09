@@ -2,9 +2,9 @@ import { Anchor } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
 import { ReceiptDetailModal } from './detail-modal';
 import { receivingConfig } from './schema';
 

@@ -156,12 +156,17 @@ import { Route as AuthenticatedCodingConceptGenericProductsIndexRouteImport } fr
 import { Route as AuthenticatedCodingConceptManufacturersIndexRouteImport } from './routes/_authenticated/coding-concept/manufacturers/index'
 import { Route as AuthenticatedCodingConceptPharmaceuticsIndexRouteImport } from './routes/_authenticated/coding-concept/pharmaceutics/index'
 import { Route as AuthenticatedConversationConversationIdEditRouteImport } from './routes/_authenticated/conversation/$conversationId/edit'
+import { Route as AuthenticatedConversationBillingChargesIndexRouteImport } from './routes/_authenticated/conversation/billing-charges/index'
+import { Route as AuthenticatedConversationBillingConfigIndexRouteImport } from './routes/_authenticated/conversation/billing-config/index'
+import { Route as AuthenticatedConversationBillingRulesIndexRouteImport } from './routes/_authenticated/conversation/billing-rules/index'
+import { Route as AuthenticatedConversationBillingWalletsIndexRouteImport } from './routes/_authenticated/conversation/billing-wallets/index'
 import { Route as AuthenticatedConversationChannelsIndexRouteImport } from './routes/_authenticated/conversation/channels/index'
 import { Route as AuthenticatedConversationChatsIndexRouteImport } from './routes/_authenticated/conversation/chats/index'
 import { Route as AuthenticatedConversationExchangesIndexRouteImport } from './routes/_authenticated/conversation/exchanges/index'
 import { Route as AuthenticatedConversationExchangesExchangeIdRouteImport } from './routes/_authenticated/conversation/exchanges/$exchangeId'
 import { Route as AuthenticatedConversationInvitesInviteIdRouteImport } from './routes/_authenticated/conversation/invites/$inviteId'
 import { Route as AuthenticatedConversationNotificationDeliveryIndexRouteImport } from './routes/_authenticated/conversation/notification-delivery/index'
+import { Route as AuthenticatedConversationNotificationDispatchesIndexRouteImport } from './routes/_authenticated/conversation/notification-dispatches/index'
 import { Route as AuthenticatedConversationNotificationEventsIndexRouteImport } from './routes/_authenticated/conversation/notification-events/index'
 import { Route as AuthenticatedConversationNotificationTemplatesIndexRouteImport } from './routes/_authenticated/conversation/notification-templates/index'
 import { Route as AuthenticatedConversationOptionListsIndexRouteImport } from './routes/_authenticated/conversation/option-lists/index'
@@ -1128,6 +1133,30 @@ const AuthenticatedConversationConversationIdEditRoute =
     path: '/edit',
     getParentRoute: () => AuthenticatedConversationConversationIdRoute,
   } as any)
+const AuthenticatedConversationBillingChargesIndexRoute =
+  AuthenticatedConversationBillingChargesIndexRouteImport.update({
+    id: '/conversation/billing-charges/',
+    path: '/conversation/billing-charges/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingConfigIndexRoute =
+  AuthenticatedConversationBillingConfigIndexRouteImport.update({
+    id: '/conversation/billing-config/',
+    path: '/conversation/billing-config/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingRulesIndexRoute =
+  AuthenticatedConversationBillingRulesIndexRouteImport.update({
+    id: '/conversation/billing-rules/',
+    path: '/conversation/billing-rules/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationBillingWalletsIndexRoute =
+  AuthenticatedConversationBillingWalletsIndexRouteImport.update({
+    id: '/conversation/billing-wallets/',
+    path: '/conversation/billing-wallets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConversationChannelsIndexRoute =
   AuthenticatedConversationChannelsIndexRouteImport.update({
     id: '/conversation/channels/',
@@ -1162,6 +1191,12 @@ const AuthenticatedConversationNotificationDeliveryIndexRoute =
   AuthenticatedConversationNotificationDeliveryIndexRouteImport.update({
     id: '/conversation/notification-delivery/',
     path: '/conversation/notification-delivery/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConversationNotificationDispatchesIndexRoute =
+  AuthenticatedConversationNotificationDispatchesIndexRouteImport.update({
+    id: '/conversation/notification-dispatches/',
+    path: '/conversation/notification-dispatches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConversationNotificationEventsIndexRoute =
@@ -2415,10 +2450,15 @@ export interface FileRoutesByFullPath {
   '/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/billing-charges/': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/conversation/billing-config/': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/conversation/billing-rules/': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/conversation/billing-wallets/': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
   '/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-dispatches/': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -2745,10 +2785,15 @@ export interface FileRoutesByTo {
   '/coding-concept/generic-products': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/coding-concept/manufacturers': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/coding-concept/pharmaceutics': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/conversation/billing-charges': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/conversation/billing-config': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/conversation/billing-rules': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/conversation/billing-wallets': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/conversation/channels': typeof AuthenticatedConversationChannelsIndexRoute
   '/conversation/chats': typeof AuthenticatedConversationChatsIndexRoute
   '/conversation/exchanges': typeof AuthenticatedConversationExchangesIndexRoute
   '/conversation/notification-delivery': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/conversation/notification-dispatches': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/conversation/notification-events': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/conversation/notification-templates': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/conversation/option-lists': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -3081,10 +3126,15 @@ export interface FileRoutesById {
   '/_authenticated/coding-concept/generic-products/': typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   '/_authenticated/coding-concept/manufacturers/': typeof AuthenticatedCodingConceptManufacturersIndexRoute
   '/_authenticated/coding-concept/pharmaceutics/': typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  '/_authenticated/conversation/billing-charges/': typeof AuthenticatedConversationBillingChargesIndexRoute
+  '/_authenticated/conversation/billing-config/': typeof AuthenticatedConversationBillingConfigIndexRoute
+  '/_authenticated/conversation/billing-rules/': typeof AuthenticatedConversationBillingRulesIndexRoute
+  '/_authenticated/conversation/billing-wallets/': typeof AuthenticatedConversationBillingWalletsIndexRoute
   '/_authenticated/conversation/channels/': typeof AuthenticatedConversationChannelsIndexRoute
   '/_authenticated/conversation/chats/': typeof AuthenticatedConversationChatsIndexRoute
   '/_authenticated/conversation/exchanges/': typeof AuthenticatedConversationExchangesIndexRoute
   '/_authenticated/conversation/notification-delivery/': typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  '/_authenticated/conversation/notification-dispatches/': typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   '/_authenticated/conversation/notification-events/': typeof AuthenticatedConversationNotificationEventsIndexRoute
   '/_authenticated/conversation/notification-templates/': typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   '/_authenticated/conversation/option-lists/': typeof AuthenticatedConversationOptionListsIndexRoute
@@ -3415,10 +3465,15 @@ export interface FileRouteTypes {
     | '/coding-concept/generic-products/'
     | '/coding-concept/manufacturers/'
     | '/coding-concept/pharmaceutics/'
+    | '/conversation/billing-charges/'
+    | '/conversation/billing-config/'
+    | '/conversation/billing-rules/'
+    | '/conversation/billing-wallets/'
     | '/conversation/channels/'
     | '/conversation/chats/'
     | '/conversation/exchanges/'
     | '/conversation/notification-delivery/'
+    | '/conversation/notification-dispatches/'
     | '/conversation/notification-events/'
     | '/conversation/notification-templates/'
     | '/conversation/option-lists/'
@@ -3745,10 +3800,15 @@ export interface FileRouteTypes {
     | '/coding-concept/generic-products'
     | '/coding-concept/manufacturers'
     | '/coding-concept/pharmaceutics'
+    | '/conversation/billing-charges'
+    | '/conversation/billing-config'
+    | '/conversation/billing-rules'
+    | '/conversation/billing-wallets'
     | '/conversation/channels'
     | '/conversation/chats'
     | '/conversation/exchanges'
     | '/conversation/notification-delivery'
+    | '/conversation/notification-dispatches'
     | '/conversation/notification-events'
     | '/conversation/notification-templates'
     | '/conversation/option-lists'
@@ -4080,10 +4140,15 @@ export interface FileRouteTypes {
     | '/_authenticated/coding-concept/generic-products/'
     | '/_authenticated/coding-concept/manufacturers/'
     | '/_authenticated/coding-concept/pharmaceutics/'
+    | '/_authenticated/conversation/billing-charges/'
+    | '/_authenticated/conversation/billing-config/'
+    | '/_authenticated/conversation/billing-rules/'
+    | '/_authenticated/conversation/billing-wallets/'
     | '/_authenticated/conversation/channels/'
     | '/_authenticated/conversation/chats/'
     | '/_authenticated/conversation/exchanges/'
     | '/_authenticated/conversation/notification-delivery/'
+    | '/_authenticated/conversation/notification-dispatches/'
     | '/_authenticated/conversation/notification-events/'
     | '/_authenticated/conversation/notification-templates/'
     | '/_authenticated/conversation/option-lists/'
@@ -5345,6 +5410,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationConversationIdEditRouteImport
       parentRoute: typeof AuthenticatedConversationConversationIdRoute
     }
+    '/_authenticated/conversation/billing-charges/': {
+      id: '/_authenticated/conversation/billing-charges/'
+      path: '/conversation/billing-charges'
+      fullPath: '/conversation/billing-charges/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingChargesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-config/': {
+      id: '/_authenticated/conversation/billing-config/'
+      path: '/conversation/billing-config'
+      fullPath: '/conversation/billing-config/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-rules/': {
+      id: '/_authenticated/conversation/billing-rules/'
+      path: '/conversation/billing-rules'
+      fullPath: '/conversation/billing-rules/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingRulesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/billing-wallets/': {
+      id: '/_authenticated/conversation/billing-wallets/'
+      path: '/conversation/billing-wallets'
+      fullPath: '/conversation/billing-wallets/'
+      preLoaderRoute: typeof AuthenticatedConversationBillingWalletsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/conversation/channels/': {
       id: '/_authenticated/conversation/channels/'
       path: '/conversation/channels'
@@ -5385,6 +5478,13 @@ declare module '@tanstack/react-router' {
       path: '/conversation/notification-delivery'
       fullPath: '/conversation/notification-delivery/'
       preLoaderRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conversation/notification-dispatches/': {
+      id: '/_authenticated/conversation/notification-dispatches/'
+      path: '/conversation/notification-dispatches'
+      fullPath: '/conversation/notification-dispatches/'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationDispatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/conversation/notification-events/': {
@@ -6847,10 +6947,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCodingConceptGenericProductsIndexRoute: typeof AuthenticatedCodingConceptGenericProductsIndexRoute
   AuthenticatedCodingConceptManufacturersIndexRoute: typeof AuthenticatedCodingConceptManufacturersIndexRoute
   AuthenticatedCodingConceptPharmaceuticsIndexRoute: typeof AuthenticatedCodingConceptPharmaceuticsIndexRoute
+  AuthenticatedConversationBillingChargesIndexRoute: typeof AuthenticatedConversationBillingChargesIndexRoute
+  AuthenticatedConversationBillingConfigIndexRoute: typeof AuthenticatedConversationBillingConfigIndexRoute
+  AuthenticatedConversationBillingRulesIndexRoute: typeof AuthenticatedConversationBillingRulesIndexRoute
+  AuthenticatedConversationBillingWalletsIndexRoute: typeof AuthenticatedConversationBillingWalletsIndexRoute
   AuthenticatedConversationChannelsIndexRoute: typeof AuthenticatedConversationChannelsIndexRoute
   AuthenticatedConversationChatsIndexRoute: typeof AuthenticatedConversationChatsIndexRoute
   AuthenticatedConversationExchangesIndexRoute: typeof AuthenticatedConversationExchangesIndexRoute
   AuthenticatedConversationNotificationDeliveryIndexRoute: typeof AuthenticatedConversationNotificationDeliveryIndexRoute
+  AuthenticatedConversationNotificationDispatchesIndexRoute: typeof AuthenticatedConversationNotificationDispatchesIndexRoute
   AuthenticatedConversationNotificationEventsIndexRoute: typeof AuthenticatedConversationNotificationEventsIndexRoute
   AuthenticatedConversationNotificationTemplatesIndexRoute: typeof AuthenticatedConversationNotificationTemplatesIndexRoute
   AuthenticatedConversationOptionListsIndexRoute: typeof AuthenticatedConversationOptionListsIndexRoute
@@ -7112,6 +7217,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptManufacturersIndexRoute,
   AuthenticatedCodingConceptPharmaceuticsIndexRoute:
     AuthenticatedCodingConceptPharmaceuticsIndexRoute,
+  AuthenticatedConversationBillingChargesIndexRoute:
+    AuthenticatedConversationBillingChargesIndexRoute,
+  AuthenticatedConversationBillingConfigIndexRoute:
+    AuthenticatedConversationBillingConfigIndexRoute,
+  AuthenticatedConversationBillingRulesIndexRoute:
+    AuthenticatedConversationBillingRulesIndexRoute,
+  AuthenticatedConversationBillingWalletsIndexRoute:
+    AuthenticatedConversationBillingWalletsIndexRoute,
   AuthenticatedConversationChannelsIndexRoute:
     AuthenticatedConversationChannelsIndexRoute,
   AuthenticatedConversationChatsIndexRoute:
@@ -7120,6 +7233,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationExchangesIndexRoute,
   AuthenticatedConversationNotificationDeliveryIndexRoute:
     AuthenticatedConversationNotificationDeliveryIndexRoute,
+  AuthenticatedConversationNotificationDispatchesIndexRoute:
+    AuthenticatedConversationNotificationDispatchesIndexRoute,
   AuthenticatedConversationNotificationEventsIndexRoute:
     AuthenticatedConversationNotificationEventsIndexRoute,
   AuthenticatedConversationNotificationTemplatesIndexRoute:

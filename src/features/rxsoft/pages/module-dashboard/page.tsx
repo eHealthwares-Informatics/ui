@@ -6,7 +6,7 @@ import {
   DashboardCardTitle,
   DashboardHero,
   DashboardPage,
-} from '@/features/components/dashboard/dashboard-surface';
+} from '@/components/dashboard/dashboard-surface';
 import { getModelConfig } from '@/features/registry';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { modules } from '@/features/shared/module-data';

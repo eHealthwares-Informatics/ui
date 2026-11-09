@@ -1,9 +1,9 @@
 import { Badge } from '@mantine/core';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { SelectField } from '@/features/components/form/select';
-import { RxPage } from '@/features/components/page/rx-page';
-import { PaginatedDataTable } from '@/features/components/table/paginated-data-table';
+import { SelectField } from '@/components/form/select';
+import { RxPage } from '@/components/page/rx-page';
+import { PaginatedDataTable } from '@/components/table/paginated-data-table';
 import { Option } from '@/features/rxsoft/types';
 import { MESSAGE_STATUS_OPTIONS, MESSAGE_TYPE_OPTIONS } from '../types/constants';
 import {

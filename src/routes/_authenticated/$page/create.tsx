@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { DataPageForm } from '@/features/components/page/data-page-form';
+import { DataPageForm } from '@/components/page/data-page-form';
 import { getModelConfig } from '@/features/registry';
 import type { ModelConfig } from '@/features/shared/model-schema';
 

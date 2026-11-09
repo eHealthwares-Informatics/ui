@@ -39,7 +39,7 @@ import {
   DashboardHero,
   DashboardPage,
   dashboardMetricClasses,
-} from '@/features/components/dashboard/dashboard-surface';
+} from '@/components/dashboard/dashboard-surface';
 import { lisApi } from '@/lib/lis-api';
 
 interface DashboardMetrics {

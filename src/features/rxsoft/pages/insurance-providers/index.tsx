@@ -1,4 +1,4 @@
-import { DataPageShell } from '../../../components/page/data-page-shell';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { insuranceProvidersConfig } from './schema';
 
 export function RxInsuranceProvidersPage() {

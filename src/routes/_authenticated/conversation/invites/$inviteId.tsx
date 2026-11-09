@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { RxInviteDetailsPage } from '@/features/rxsoft/pages';
+import { RxInviteDetailsPage } from '@/features/conversation';
 
 export const Route = createFileRoute('/_authenticated/conversation/invites/$inviteId')({
   component: InviteDetailsRoute,

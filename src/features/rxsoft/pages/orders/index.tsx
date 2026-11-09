@@ -2,10 +2,10 @@ import { Tabs } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
+import { RxPage } from '@/components/page/rx-page';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
-import { DataPageShell } from '../../../components/page/data-page-shell';
-import { RxPage } from '../../../components/page/rx-page';
 import type { ModelConfig, RowAction } from '../../../shared/model-schema';
 import {
   ORDER_LISTING_TABS,

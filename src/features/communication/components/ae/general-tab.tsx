@@ -1,8 +1,8 @@
 import { Badge, Grid, Group, Stack, Button, ActionIcon } from '@mantine/core';
 import { Code, FormInput } from 'lucide-react';
 import { useState } from 'react';
-import { JsonEditorField } from '@/features/components/form/json-editor-field';
-import { RenderField } from '@/features/components/form/RenderField';
+import { JsonEditorField } from '@/components/form/json-editor-field';
+import { RenderField } from '@/components/form/RenderField';
 import { PROTOCOL_TYPE_OPTIONS } from '../../types/constants';
 import { LabelField } from '../shared';
 import { generalFieldGroups } from './tabs';

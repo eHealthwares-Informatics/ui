@@ -13,7 +13,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { AsyncSelectField } from '@/features/components/form/async-field';
+import { AsyncSelectField } from '@/components/form/async-field';
 import type { Option } from '@/features/rxsoft/types';
 import {
   addProjection,

@@ -3,7 +3,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { rxsoftApi, downloadBlob } from '@/lib/rxsoft-api';
 
 const typeColors: Record<string, string> = {

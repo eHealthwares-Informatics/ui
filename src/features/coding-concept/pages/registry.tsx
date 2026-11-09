@@ -1,6 +1,6 @@
 import { Tabs } from '@mantine/core';
 import { useState } from 'react';
-import { RxPage } from '@/features/components/page/rx-page';
+import { RxPage } from '@/components/page/rx-page';
 import { Concepts } from './components/concepts';
 import { Mapping } from './components/mappings';
 import { Values } from './components/values';
