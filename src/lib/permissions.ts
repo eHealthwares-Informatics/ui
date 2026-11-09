@@ -24,16 +24,22 @@ export function permissionMatches(userPerm: string, requiredCode: string): boole
   const userParts = userPerm.split('.');
   const requiredParts = requiredCode.split('.');
 
-  for (let i = 0; i < requiredParts.length; i++) {
-    if (i >= userParts.length) return false;
-    if (userParts[i] === '*') return true;
-    if (userParts[i] !== requiredParts[i]) return false;
+  for (let i = 0; i < userParts.length; i++) {
+    const part = userParts[i];
+    if (part === '*') {
+      // A trailing wildcard covers the whole subtree; an explicit wildcard in
+      // the middle matches exactly one segment and the remaining segments
+      // must still line up.
+      if (i === userParts.length - 1) return true;
+      if (i >= requiredParts.length) return false;
+      continue;
+    }
+    // A user grant longer than the required code never matches.
+    if (i >= requiredParts.length) return false;
+    if (part !== requiredParts[i]) return false;
   }
 
-  // Every required segment matched positionally, so the grant covers the
-  // required code — a parent grant covering its subtree. (Previously this
-  // required equal lengths, which is why `rxsoft.catalog` could not cover
-  // `rxsoft.catalog.item.read` and only the `.*` form worked.)
+  // User segments exhausted: a parent grant covers its whole subtree.
   return true;
 }
 

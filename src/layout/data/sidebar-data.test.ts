@@ -127,6 +127,7 @@ describe('sidebarData — consolidated admin menus', () => {
     expect(titles).toEqual([
       'Notification Templates',
       'Notification Events',
+      'Notification Dispatches',
       'Print Templates',
       'Notification Delivery',
     ]);
