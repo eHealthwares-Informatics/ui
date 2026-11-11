@@ -236,6 +236,7 @@ export type Field = {
     | 'async-select'
     | 'multi-async-select'
     | 'select'
+    | 'autocomplete'
     | 'number'
     | 'email'
     | 'hidden'
@@ -267,6 +268,8 @@ export type Field = {
   defaultValue?: unknown;
   value?: string | { formKey: string; paramKey: string }; // value to be passed back during submission
   options?: Option[];
+  /** Render the select as a type-ahead/autocomplete combobox. */
+  searchable?: boolean;
   toOptions?: (value: any) => Option[];
   validate?: (value: unknown) => boolean | string;
   updateField?: (row: Record<string, unknown>, name: string, value: unknown) => void;

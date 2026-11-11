@@ -163,7 +163,13 @@ export function buildNotificationDispatchesConfig(args: {
       },
     ],
     createFieldGroups: buildFields([
-      selectField('eventId', 'Event', eventOptions, 12),
+      {
+        name: 'eventId',
+        label: 'Event',
+        type: 'autocomplete',
+        options: eventOptions,
+        col: 12,
+      },
       selectField('templateId', 'Template', templateOptions, 12),
       selectField('channelId', 'Channel', channelOptions, 12),
       selectField('fallbackChannelId', 'Fallback channel', channelOptions, 12),
