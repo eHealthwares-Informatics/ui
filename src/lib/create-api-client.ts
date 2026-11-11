@@ -17,6 +17,46 @@ export type CreateAuthApiClientOptions = {
   onForbidden?: SessionExpiredHandler;
 };
 
+let refreshInFlight: Promise<{
+  accessToken: string;
+  refreshToken: string;
+}> | null = null;
+
+/**
+ * Exchange the stored refresh token for a new pair.
+ *
+ * Shared by the 401 interceptor and the session bootstrap so two callers can
+ * never rotate the same refresh token concurrently — the backend revokes the
+ * old token when it is used, so a second concurrent refresh would 401 and
+ * destroy a perfectly valid session.
+ */
+export async function refreshTokenPair(): Promise<{
+  accessToken: string;
+  refreshToken: string;
+}> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    throw new Error('No refresh token');
+  }
+
+  if (!refreshInFlight) {
+    refreshInFlight = axios
+      .post<{ accessToken: string; refreshToken: string }>(
+        `${IDENTITY_API_BASE_URL}/auth/refresh-token`,
+        { refreshToken }
+      )
+      .then((response) => {
+        persistTokens(response.data.accessToken, response.data.refreshToken);
+        return response.data;
+      })
+      .finally(() => {
+        refreshInFlight = null;
+      });
+  }
+
+  return refreshInFlight;
+}
+
 let isRefreshing = false;
 let queue: Array<{
   resolve: (token: string) => void;
@@ -89,16 +129,12 @@ export function createAuthApiClient(options: CreateAuthApiClientOptions): AxiosI
           isRefreshing = true;
 
           try {
-            const refreshResponse = await axios.post<{
-              accessToken: string;
-              refreshToken: string;
-            }>(`${IDENTITY_API_BASE_URL}/auth/refresh-token`, { refreshToken });
+            const pair = await refreshTokenPair();
 
-            persistTokens(refreshResponse.data.accessToken, refreshResponse.data.refreshToken);
-            queue.forEach((entry) => entry.resolve(refreshResponse.data.accessToken));
+            queue.forEach((entry) => entry.resolve(pair.accessToken));
             queue = [];
 
-            originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.accessToken}`;
+            originalRequest.headers.Authorization = `Bearer ${pair.accessToken}`;
             return client(originalRequest);
           } catch (refreshError) {
             queue.forEach((entry) => entry.reject(refreshError));

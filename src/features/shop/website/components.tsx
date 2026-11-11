@@ -223,6 +223,7 @@ export function PrimaryButton({
 }) {
   return (
     <Button
+      data-testid="shop-primary-button"
       size="md"
       radius="xl"
       leftSection={leftSection}

@@ -4,8 +4,8 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export const Route = createFileRoute('/_authenticated')({
   component: AuthenticatedLayout,
-  beforeLoad: ({ location }) => {
-    useAuthStore.getState().bootstrap();
+  beforeLoad: async ({ location }) => {
+    await useAuthStore.getState().bootstrap();
     if (!useAuthStore.getState().user) {
       // NOTE: `location.search` here is the PARSED search object (no prototype,
       // not stringifiable) — string-concatting it throws

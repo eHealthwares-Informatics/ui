@@ -2,8 +2,8 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const Route = createFileRoute('/')({
-  beforeLoad: () => {
-    useAuthStore.getState().bootstrap();
+  beforeLoad: async () => {
+    await useAuthStore.getState().bootstrap();
     const { user, modules: userModules } = useAuthStore.getState();
     if (!user) {
       throw redirect({ to: '/sign-in' });

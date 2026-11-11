@@ -326,6 +326,7 @@ export function ComparePricesModal({
         {/* Footer */}
         {pharmacies.length > topOffers.length ? (
           <Button
+            data-testid="compare-prices-toggle-all"
             fullWidth
             mt="md"
             radius="lg"
