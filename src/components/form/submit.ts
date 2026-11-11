@@ -83,6 +83,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
         typeSchema = z.boolean();
         break;
       case 'async-select':
+      case 'autocomplete':
       case 'select':
       case 'remote-select':
       case 'multi-async-select':
@@ -152,6 +153,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
         }, `${field.label} is required`);
       } else if (
         field.type === 'async-select' ||
+        field.type === 'autocomplete' ||
         field.type === 'select' ||
         field.type === 'remote-select' ||
         field.type === 'multi-async-select' ||
@@ -179,6 +181,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       // Optional fields can be null/undefined
       if (
         field.type === 'async-select' ||
+        field.type === 'autocomplete' ||
         field.type === 'select' ||
         field.type === 'remote-select' ||
         field.type === 'multi-async-select' ||

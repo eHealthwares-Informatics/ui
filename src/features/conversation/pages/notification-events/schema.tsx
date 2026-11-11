@@ -75,6 +75,12 @@ export function buildNotificationEventsConfig(args: {
     },
     columns: [
       {
+        key: 'id',
+        label: 'ID',
+        sortable: true,
+        filters: [FILTERS.CONTAINS, FILTERS.EQUALS],
+      },
+      {
         key: 'key',
         label: 'Key',
         sortable: true,

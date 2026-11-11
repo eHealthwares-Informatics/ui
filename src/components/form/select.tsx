@@ -19,6 +19,8 @@ type SelectFieldProps = {
    * unknown props the way Mantine inputs do — so static selects had no testid.
    */
   testId?: string;
+  /** Type-ahead filtering (autocomplete behaviour). */
+  searchable?: boolean;
 };
 
 export function SelectField({
@@ -33,6 +35,7 @@ export function SelectField({
   onBlur,
   onFocus,
   testId,
+  searchable = false,
 }: SelectFieldProps) {
   return (
     <Select
@@ -47,7 +50,7 @@ export function SelectField({
       placeholder={placeholder}
       disabled={disabled}
       clearable
-      searchable={false}
+      searchable={searchable}
       error={error}
       onBlur={onBlur}
       onFocus={onFocus}

@@ -196,7 +196,7 @@ function RenderFieldComponent({
     );
   }
 
-  if (field.type === 'select') {
+  if (field.type === 'select' || field.type === 'autocomplete') {
     return (
       <LabelField label={field.label} required={field.required}>
         <SelectField
@@ -214,6 +214,7 @@ function RenderFieldComponent({
           onFocus={onFocus}
           placeholder={field.placeholder}
           options={field.options ?? []}
+          searchable={field.type === 'autocomplete' || field.searchable === true}
           error={fieldError}
         />
         <span
@@ -268,6 +269,7 @@ function RenderFieldComponent({
           onFocus={onFocus}
           placeholder={field.placeholder}
           options={field.options ?? []}
+          searchable={field.searchable === true}
           error={fieldError}
         />
         <Group gap="xs">
