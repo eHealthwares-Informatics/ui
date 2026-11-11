@@ -34,12 +34,14 @@ export type TemplateRow = {
 type ParamSpec = {
   source: 'attribute' | 'array';
   key: string;
+  /** Meta named-template placeholder, e.g. customer_name (named format only). */
+  parameterName?: string;
   itemKey?: string;
   mode?: 'expand' | 'join';
   joinWith?: string;
   mediaType?: string;
   format?: string;
-  sampleValue?: string;
+  sampleOrFallback?: string;
 };
 
 type ComponentSpec = {
@@ -59,6 +61,7 @@ export type TemplateForm = {
   whatsappTemplateName: string;
   whatsappTemplateLanguage: string;
   whatsappTemplateBody: string;
+  parameterFormat: 'positional' | 'named';
   components: ComponentSpec[];
   smsBody: string;
   emailSubject: string;
@@ -75,6 +78,7 @@ const EMPTY_FORM: TemplateForm = {
   whatsappTemplateName: '',
   whatsappTemplateLanguage: 'en',
   whatsappTemplateBody: '',
+  parameterFormat: 'positional',
   components: [],
   smsBody: '',
   emailSubject: '',
@@ -87,6 +91,7 @@ const BODY_KEYS: Array<keyof TemplateForm> = [
   'whatsappTemplateName',
   'whatsappTemplateLanguage',
   'whatsappTemplateBody',
+  'parameterFormat',
   'components',
   'smsBody',
   'emailSubject',
@@ -107,10 +112,21 @@ function fromRow(row: TemplateRow | Record<string, unknown>): TemplateForm {
     whatsappTemplateName: String(template.name ?? ''),
     whatsappTemplateLanguage: String(template.language ?? 'en'),
     whatsappTemplateBody: String(template.body ?? ''),
+    parameterFormat: template.parameterFormat === 'named' ? 'named' : 'positional',
     components: Array.isArray(template.components)
       ? template.components.map((component: any) => ({
           ...component,
-          parameters: Array.isArray(component?.parameters) ? component.parameters : [],
+          parameters: (Array.isArray(component?.parameters) ? component.parameters : []).map(
+            (parameter: any) => {
+              // Normalise legacy/Meta field names into the editor's canonical shape.
+              const { sampleValue, sample_or_fallback, parameter_name, ...rest } = parameter ?? {};
+              return {
+                ...rest,
+                parameterName: parameter?.parameterName ?? parameter_name,
+                sampleOrFallback: parameter?.sampleOrFallback ?? sample_or_fallback ?? sampleValue,
+              };
+            }
+          ),
         }))
       : [],
     smsBody: String(bodies.sms?.body ?? ''),
@@ -127,6 +143,7 @@ function toBodies(form: TemplateForm) {
       name: form.whatsappTemplateName || 'notification_generic',
       language: form.whatsappTemplateLanguage || 'en',
       body: form.whatsappTemplateBody || form.whatsappBody,
+      parameterFormat: form.parameterFormat,
       components: form.components,
     },
     sms: { body: form.smsBody },
@@ -354,6 +371,19 @@ function TemplateBodiesEditor({
               value={form.whatsappTemplateLanguage}
               onChange={(event) => setForm({ whatsappTemplateLanguage: event.currentTarget.value })}
             />
+            <Select
+              label="Parameter format"
+              data={[
+                { value: 'positional', label: 'Positional ({{1}})' },
+                { value: 'named', label: 'Named ({{name}})' },
+              ]}
+              value={form.parameterFormat}
+              onChange={(value) =>
+                setForm({
+                  parameterFormat: (value as TemplateForm['parameterFormat']) ?? 'positional',
+                })
+              }
+            />
           </Group>
           <Textarea
             label="Fallback text"
@@ -473,16 +503,28 @@ function TemplateBodiesEditor({
                         updateParameter(ci, pi, { key: event.currentTarget.value })
                       }
                     />
+                    {form.parameterFormat === 'named' && (
+                      <TextInput
+                        label="Parameter name"
+                        placeholder="customer_name"
+                        value={parameter.parameterName ?? ''}
+                        onChange={(event) =>
+                          updateParameter(ci, pi, {
+                            parameterName: event.currentTarget.value,
+                          })
+                        }
+                      />
+                    )}
+                    <TextInput
+                      label={parameter.source === 'array' ? 'Item key' : 'Field key'}
+                      placeholder={parameter.source === 'array' ? 'name' : '(optional)'}
+                      value={parameter.itemKey ?? ''}
+                      onChange={(event) =>
+                        updateParameter(ci, pi, { itemKey: event.currentTarget.value })
+                      }
+                    />
                     {parameter.source === 'array' && (
                       <>
-                        <TextInput
-                          label="Item key"
-                          placeholder="name"
-                          value={parameter.itemKey ?? ''}
-                          onChange={(event) =>
-                            updateParameter(ci, pi, { itemKey: event.currentTarget.value })
-                          }
-                        />
                         <Select
                           label="Mode"
                           data={[
@@ -507,9 +549,11 @@ function TemplateBodiesEditor({
                     )}
                     <TextInput
                       label="Sample"
-                      value={parameter.sampleValue ?? ''}
+                      value={parameter.sampleOrFallback ?? ''}
                       onChange={(event) =>
-                        updateParameter(ci, pi, { sampleValue: event.currentTarget.value })
+                        updateParameter(ci, pi, {
+                          sampleOrFallback: event.currentTarget.value,
+                        })
                       }
                     />
                     <ActionIcon
@@ -533,8 +577,12 @@ function TemplateBodiesEditor({
           ))}
 
           <Text size="xs" c="dimmed">
-            Attribute sends one value. Array with Expand sends consecutive parameters; Join sends
-            one joined parameter. Header media needs an image/video/document URL in the context key.
+            Attribute sends one value; Array with Expand sends consecutive parameters, Join sends
+            one joined parameter. Field key optionally plucks a property from an object (works for
+            both Attribute and Array items). For Named templates, set the Meta parameter name on
+            each parameter — Named requires one value per parameter, so use Attribute or Array +
+            Join (Array + Expand is positional-only). Header media needs an image/video/document URL
+            in the context key.
           </Text>
         </Stack>
       </Tabs.Panel>
