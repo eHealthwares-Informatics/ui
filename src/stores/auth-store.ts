@@ -52,6 +52,9 @@ function modulesForUser(user: AuthUser | null, backendModules: ModuleInfo[]): Mo
   return backendModules;
 }
 
+/** Deduplicates concurrent bootstrap calls during one navigation. */
+let bootstrapInFlight: Promise<void> | null = null;
+
 type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
@@ -69,7 +72,7 @@ type AuthState = {
   ) => Promise<void>;
   logout: () => void;
   logoutAll: () => Promise<void>;
-  bootstrap: () => void;
+  bootstrap: () => Promise<void>;
   fetchModules: (force?: boolean) => Promise<void>;
   pendingModulesFetch: Promise<void> | null;
   setSelectedOrganisationId: (id: string | null | undefined) => void;
@@ -229,30 +232,74 @@ export const useAuthStore = create<AuthState>()(
       },
 
       bootstrap: () => {
-        const accessToken = getAccessToken();
-        const refreshToken = getRefreshToken();
+        if (bootstrapInFlight) return bootstrapInFlight;
 
-        if (!accessToken || !refreshToken) {
-          return;
-        }
+        bootstrapInFlight = (async () => {
+          const initialAccessToken = getAccessToken();
+          let refreshToken = getRefreshToken();
 
-        const user = decodeUserFromAccessToken(accessToken);
-        if (!user) {
-          clearTokens();
-          set({ accessToken: null, refreshToken: null, user: null });
-          return;
-        }
+          if (!initialAccessToken && !refreshToken) {
+            return;
+          }
 
-        set({ accessToken, refreshToken, user, loading: false, error: null });
+          let accessToken = initialAccessToken;
+          let user = accessToken ? decodeUserFromAccessToken(accessToken) : null;
 
-        // Refresh modules in the background, but only if they haven't been loaded
-        // yet. Force-fetching on every navigation caused unnecessary re-renders
-        // that collapsed sidebar submenus. The non-force call also dedupes
-        // concurrent fetches via `pendingModulesFetch`, which prevents a
-        // fetch/remount feedback loop (see ehealthwares/ui#84).
-        if (user && get().modules.length === 0) {
-          get().fetchModules();
-        }
+          // The access token is short-lived (15 min by default) while the
+          // refresh token lasts up to 7 days. When the access token has expired
+          // (or is malformed) but a refresh token is still present, rotate the
+          // pair instead of destroying the session. Previously this branch
+          // called clearTokens(), so a returning user was logged out even
+          // though their refresh token was perfectly valid.
+          if (!user && refreshToken) {
+            try {
+              const response = await identityApi.post<{
+                accessToken: string;
+                refreshToken: string;
+              }>('/auth/refresh-token', { refreshToken });
+              persistTokens(response.data.accessToken, response.data.refreshToken);
+              accessToken = response.data.accessToken;
+              refreshToken = response.data.refreshToken;
+              user = decodeUserFromAccessToken(accessToken);
+            } catch {
+              // The refresh token itself is invalid/expired/revoked — the
+              // session is genuinely over.
+              clearTokens();
+              set({
+                accessToken: null,
+                refreshToken: null,
+                user: null,
+                modules: [],
+                permissionMode: 'org',
+                loading: false,
+                error: null,
+                pendingModulesFetch: null,
+              });
+              return;
+            }
+          }
+
+          if (!accessToken || !user) {
+            clearTokens();
+            set({ accessToken: null, refreshToken: null, user: null });
+            return;
+          }
+
+          set({ accessToken, refreshToken, user, loading: false, error: null });
+
+          // Refresh modules in the background, but only if they haven't been
+          // loaded yet. Force-fetching on every navigation caused unnecessary
+          // re-renders that collapsed sidebar submenus. The non-force call also
+          // dedupes concurrent fetches via `pendingModulesFetch`, which prevents
+          // a fetch/remount feedback loop (see ehealthwares/ui#84).
+          if (user && get().modules.length === 0) {
+            get().fetchModules();
+          }
+        })().finally(() => {
+          bootstrapInFlight = null;
+        });
+
+        return bootstrapInFlight;
       },
 
       fetchModules: async (force = false) => {
