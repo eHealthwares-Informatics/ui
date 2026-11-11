@@ -9,6 +9,7 @@ import {
   persistTokens,
   type AuthUser,
 } from '@/lib/auth-tokens';
+import { refreshTokenPair } from '@/lib/create-api-client';
 import { identityApi } from '@/lib/identity-api';
 
 export type ModuleInfo = {
@@ -253,13 +254,11 @@ export const useAuthStore = create<AuthState>()(
           // though their refresh token was perfectly valid.
           if (!user && refreshToken) {
             try {
-              const response = await identityApi.post<{
-                accessToken: string;
-                refreshToken: string;
-              }>('/auth/refresh-token', { refreshToken });
-              persistTokens(response.data.accessToken, response.data.refreshToken);
-              accessToken = response.data.accessToken;
-              refreshToken = response.data.refreshToken;
+              // Shared with the 401 interceptor, so bootstrap and an in-flight
+              // request can never rotate the same refresh token concurrently.
+              const pair = await refreshTokenPair();
+              accessToken = pair.accessToken;
+              refreshToken = pair.refreshToken;
               user = decodeUserFromAccessToken(accessToken);
             } catch {
               // The refresh token itself is invalid/expired/revoked — the
