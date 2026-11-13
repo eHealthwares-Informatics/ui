@@ -88,6 +88,37 @@ export const textField = (name: string, label: string, col = 6): Field => ({
   col,
 });
 
+/**
+ * Searchable select that stores the selected option value. `optionsFor` makes
+ * the option list follow another field (dependent selects); the control clears
+ * itself when the stored value is no longer in that list.
+ */
+export const autocompleteField = (
+  name: string,
+  label: string,
+  options: Option[],
+  col = 6,
+  optionsFor?: (formState: Record<string, unknown>) => Option[]
+): Field => ({
+  name,
+  label,
+  type: 'autocomplete',
+  options,
+  optionsFor,
+  col,
+});
+
+/** Dedupe options by value, keeping the first label (global + org overlaps). */
+export const uniqueOptions = (options: Option[]): Option[] => {
+  const seen = new Map<string, Option>();
+  options.forEach((option) => {
+    if (!seen.has(option.value)) {
+      seen.set(option.value, option);
+    }
+  });
+  return [...seen.values()];
+};
+
 export const jsonField = (name: string, label: string): Field => ({
   name,
   label,

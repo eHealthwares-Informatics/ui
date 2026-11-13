@@ -80,6 +80,7 @@ export function DataPageShell(props: DataPageShellProps) {
     canEditRow,
     canDeleteRow,
     canExport,
+    copyRowIdOnSn,
     defaultState,
     apiProvider: configApiProvider,
     minSearchLength,
@@ -563,6 +564,7 @@ export function DataPageShell(props: DataPageShellProps) {
         sortBy={sortBy}
         sortOrder={sortOrder}
         onSortChange={handleSortChange}
+        copyRowIdOnSn={copyRowIdOnSn}
       />
       <Pagination
         pageIndex={pageIndex}

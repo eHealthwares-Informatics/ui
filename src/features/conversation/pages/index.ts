@@ -16,6 +16,7 @@ export * from './conversations';
 export * from './exchanges';
 export * from './invites';
 export * from './notification-delivery';
+export * from './notification-detail';
 export * from './notification-dispatches';
 export * from './notification-events';
 export * from './notification-templates';

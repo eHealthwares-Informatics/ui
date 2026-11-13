@@ -84,6 +84,7 @@ function MessageAttachments({
         return src ? (
           <Button
             key={i}
+            data-testid={`chatbot-attachment-download-${i}`}
             component="a"
             href={src}
             target="_blank"
@@ -316,6 +317,7 @@ export function ChatbotWidget() {
           />
           {changingNumber && identity && (
             <Button
+              data-testid="chatbot-keep-phone"
               variant="subtle"
               color="gray"
               size="xs"
@@ -366,6 +368,7 @@ export function ChatbotWidget() {
                         {choice.options.map((opt) => (
                           <Button
                             key={opt.value}
+                            data-testid={`chatbot-choice-${opt.value}`}
                             variant="outline"
                             size="sm"
                             radius="md"
@@ -467,6 +470,7 @@ export function ChatbotWidget() {
               )}
             </FileButton>
             <TextInput
+              data-testid="chatbot-message-input"
               placeholder="Type a message..."
               value={draft}
               onChange={(e) => setDraft(e.currentTarget.value)}

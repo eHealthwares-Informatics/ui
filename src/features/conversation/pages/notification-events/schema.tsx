@@ -1,7 +1,8 @@
-import { Group, Switch, Text } from '@mantine/core';
+import { Anchor, Group, Switch, Text } from '@mantine/core';
 import { EQUALS_WITH_OPTIONS, FILTERS } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
+import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type PrintTemplateRow = {
   id: string;
@@ -79,6 +80,18 @@ export function buildNotificationEventsConfig(args: {
         label: 'ID',
         sortable: true,
         filters: [FILTERS.CONTAINS, FILTERS.EQUALS],
+        render: (row) => (
+          <Anchor
+            href={notificationDetailHref('notification-events', row)}
+            target="_blank"
+            rel="noreferrer"
+            size="xs"
+            ff="monospace"
+            title={String(row.id ?? '')}
+          >
+            {shortId(row.id)}
+          </Anchor>
+        ),
       },
       {
         key: 'key',
@@ -233,6 +246,7 @@ export function buildNotificationEventsConfig(args: {
     },
     defaultSort: { sortBy: 'key', sortOrder: 'asc' },
     canDelete: true,
+    copyRowIdOnSn: true,
     canDeleteRow: (row) => isSuperAdmin || row.organizationId != null,
     deletePathBuilder: (row) =>
       `/notification-events/${row.id}${

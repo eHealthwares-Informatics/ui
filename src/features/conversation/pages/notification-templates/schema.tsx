@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Anchor,
   Badge,
   Button,
   Group,
@@ -19,6 +20,7 @@ import { EQUALS_WITH_OPTIONS, FILTERS, type Column, type Field } from '@/feature
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type TemplateRow = {
   id: string;
@@ -27,6 +29,8 @@ export type TemplateRow = {
   name: string;
   description: string | null;
   enabled: boolean;
+  /** Send this template as the WhatsApp 24h-window consent fallback. */
+  sendConsentTemplate?: boolean;
   bodies: Record<string, any>;
   updatedAt?: string;
 };
@@ -62,11 +66,14 @@ export type TemplateForm = {
   whatsappTemplateLanguage: string;
   whatsappTemplateBody: string;
   parameterFormat: 'positional' | 'named';
+  sendConsentTemplate: boolean;
   components: ComponentSpec[];
   smsBody: string;
   emailSubject: string;
   emailBody: string;
   emailHtml: string;
+  a4PrintBody: string;
+  posPrintBody: string;
 };
 
 const EMPTY_FORM: TemplateForm = {
@@ -79,11 +86,14 @@ const EMPTY_FORM: TemplateForm = {
   whatsappTemplateLanguage: 'en',
   whatsappTemplateBody: '',
   parameterFormat: 'positional',
+  sendConsentTemplate: false,
   components: [],
   smsBody: '',
   emailSubject: '',
   emailBody: '',
   emailHtml: '',
+  a4PrintBody: '',
+  posPrintBody: '',
 };
 
 const BODY_KEYS: Array<keyof TemplateForm> = [
@@ -97,6 +107,8 @@ const BODY_KEYS: Array<keyof TemplateForm> = [
   'emailSubject',
   'emailBody',
   'emailHtml',
+  'a4PrintBody',
+  'posPrintBody',
 ];
 
 function fromRow(row: TemplateRow | Record<string, unknown>): TemplateForm {
@@ -113,6 +125,7 @@ function fromRow(row: TemplateRow | Record<string, unknown>): TemplateForm {
     whatsappTemplateLanguage: String(template.language ?? 'en'),
     whatsappTemplateBody: String(template.body ?? ''),
     parameterFormat: template.parameterFormat === 'named' ? 'named' : 'positional',
+    sendConsentTemplate: source.sendConsentTemplate === true,
     components: Array.isArray(template.components)
       ? template.components.map((component: any) => ({
           ...component,
@@ -120,9 +133,13 @@ function fromRow(row: TemplateRow | Record<string, unknown>): TemplateForm {
             (parameter: any) => {
               // Normalise legacy/Meta field names into the editor's canonical shape.
               const { sampleValue, sample_or_fallback, parameter_name, ...rest } = parameter ?? {};
+              const parameterName = parameter?.parameterName ?? parameter_name;
               return {
                 ...rest,
-                parameterName: parameter?.parameterName ?? parameter_name,
+                // Named templates send the field key as parameter_name; surface a
+                // legacy per-parameter name there so older rows remain editable.
+                itemKey: rest.itemKey ?? parameterName,
+                parameterName,
                 sampleOrFallback: parameter?.sampleOrFallback ?? sample_or_fallback ?? sampleValue,
               };
             }
@@ -133,6 +150,8 @@ function fromRow(row: TemplateRow | Record<string, unknown>): TemplateForm {
     emailSubject: String(bodies.email?.subject ?? ''),
     emailBody: String(bodies.email?.body ?? ''),
     emailHtml: String(bodies.email?.html ?? ''),
+    a4PrintBody: String(bodies.a4_print?.body ?? ''),
+    posPrintBody: String(bodies.pos_print?.body ?? ''),
   };
 }
 
@@ -153,6 +172,8 @@ function toBodies(form: TemplateForm) {
       body: form.emailBody,
       ...(form.emailHtml ? { html: form.emailHtml } : {}),
     },
+    a4_print: { body: form.a4PrintBody },
+    pos_print: { body: form.posPrintBody },
   };
 }
 
@@ -206,6 +227,22 @@ function TemplateEnabledSwitch({
 
 function buildColumns(canManageGlobal: boolean): Column[] {
   return [
+    {
+      key: 'id',
+      label: 'ID',
+      render: (row) => (
+        <Anchor
+          href={notificationDetailHref('notification-templates', row)}
+          target="_blank"
+          rel="noreferrer"
+          size="xs"
+          ff="monospace"
+          title={String(row.id ?? '')}
+        >
+          {shortId(row.id)}
+        </Anchor>
+      ),
+    },
     { key: 'code', label: 'Code', sortable: true, filters: [FILTERS.CONTAINS, FILTERS.EQUALS] },
     {
       key: 'name',
@@ -346,6 +383,8 @@ function TemplateBodiesEditor({
         <Tabs.Tab value="whatsapp_template">WhatsApp Template</Tabs.Tab>
         <Tabs.Tab value="sms">SMS</Tabs.Tab>
         <Tabs.Tab value="email">Email</Tabs.Tab>
+        <Tabs.Tab value="a4_print">A4 Print</Tabs.Tab>
+        <Tabs.Tab value="pos_print">POS Print</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="whatsapp" pt="md">
@@ -373,6 +412,7 @@ function TemplateBodiesEditor({
             />
             <Select
               label="Parameter format"
+              description="Named sends each parameter's field key as its Meta parameter_name."
               data={[
                 { value: 'positional', label: 'Positional ({{1}})' },
                 { value: 'named', label: 'Named ({{name}})' },
@@ -390,6 +430,13 @@ function TemplateBodiesEditor({
             minRows={3}
             value={form.whatsappTemplateBody}
             onChange={(event) => setForm({ whatsappTemplateBody: event.currentTarget.value })}
+          />
+
+          <Switch
+            label="Use as WhatsApp consent template"
+            description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
+            checked={form.sendConsentTemplate}
+            onChange={(event) => setForm({ sendConsentTemplate: event.currentTarget.checked })}
           />
 
           <Group justify="space-between">
@@ -503,21 +550,27 @@ function TemplateBodiesEditor({
                         updateParameter(ci, pi, { key: event.currentTarget.value })
                       }
                     />
-                    {form.parameterFormat === 'named' && (
-                      <TextInput
-                        label="Parameter name"
-                        placeholder="customer_name"
-                        value={parameter.parameterName ?? ''}
-                        onChange={(event) =>
-                          updateParameter(ci, pi, {
-                            parameterName: event.currentTarget.value,
-                          })
-                        }
-                      />
-                    )}
                     <TextInput
-                      label={parameter.source === 'array' ? 'Item key' : 'Field key'}
-                      placeholder={parameter.source === 'array' ? 'name' : '(optional)'}
+                      label={
+                        form.parameterFormat === 'named'
+                          ? 'Parameter name'
+                          : parameter.source === 'array'
+                            ? 'Item key'
+                            : 'Field key'
+                      }
+                      placeholder={
+                        form.parameterFormat === 'named'
+                          ? 'customer_name'
+                          : parameter.source === 'array'
+                            ? 'name'
+                            : '(optional)'
+                      }
+                      description={
+                        form.parameterFormat === 'named'
+                          ? 'Sent as Meta parameter_name (and plucks this field from object values).'
+                          : undefined
+                      }
+                      required={form.parameterFormat === 'named'}
                       value={parameter.itemKey ?? ''}
                       onChange={(event) =>
                         updateParameter(ci, pi, { itemKey: event.currentTarget.value })
@@ -579,10 +632,10 @@ function TemplateBodiesEditor({
           <Text size="xs" c="dimmed">
             Attribute sends one value; Array with Expand sends consecutive parameters, Join sends
             one joined parameter. Field key optionally plucks a property from an object (works for
-            both Attribute and Array items). For Named templates, set the Meta parameter name on
-            each parameter — Named requires one value per parameter, so use Attribute or Array +
-            Join (Array + Expand is positional-only). Header media needs an image/video/document URL
-            in the context key.
+            both Attribute and Array items). For Named templates, the field key is sent as the Meta
+            parameter_name — one value per parameter, so use Attribute or Array + Join (Array +
+            Expand is positional-only). Header media needs an image/video/document URL in the
+            context key.
           </Text>
         </Stack>
       </Tabs.Panel>
@@ -612,6 +665,41 @@ function TemplateBodiesEditor({
           />
         </Stack>
       </Tabs.Panel>
+
+      <Tabs.Panel value="a4_print" pt="md">
+        <Stack>
+          <Text size="sm" c="dimmed">
+            HTML layout rendered to an A4 PDF when this template is dispatched. Use the same{' '}
+            <code>{'{{tokens}}'}</code> as the message bodies.
+          </Text>
+          <Textarea
+            label="A4 print HTML"
+            minRows={12}
+            autosize
+            value={form.a4PrintBody}
+            onChange={(event) => setForm({ a4PrintBody: event.currentTarget.value })}
+            placeholder="<html><body><h1>Invoice {{invoiceNo}}</h1></body></html>"
+          />
+        </Stack>
+      </Tabs.Panel>
+
+      <Tabs.Panel value="pos_print" pt="md">
+        <Stack>
+          <Text size="sm" c="dimmed">
+            HTML layout rendered to a POS/thermal PDF when this template is dispatched. Define{' '}
+            <code>@page {'{ size: 80mm auto; margin: 0; }'}</code> in the document styles for a
+            continuous receipt.
+          </Text>
+          <Textarea
+            label="POS print HTML"
+            minRows={12}
+            autosize
+            value={form.posPrintBody}
+            onChange={(event) => setForm({ posPrintBody: event.currentTarget.value })}
+            placeholder="<html><head><style>@page { size: 80mm auto; margin: 0; }</style></head><body>…</body></html>"
+          />
+        </Stack>
+      </Tabs.Panel>
     </Tabs>
   );
 }
@@ -637,6 +725,7 @@ export function buildNotificationTemplatesConfig(args: {
       name: String(form.name ?? '').trim(),
       description: String(form.description ?? '').trim() || null,
       enabled: form.enabled !== false,
+      sendConsentTemplate: form.sendConsentTemplate === true,
       bodies: toBodies(form),
     };
   };
@@ -666,6 +755,9 @@ export function buildNotificationTemplatesConfig(args: {
       payload.description = String(values.description).trim() || null;
     }
     if (values.enabled !== undefined) payload.enabled = values.enabled !== false;
+    if (values.sendConsentTemplate !== undefined) {
+      payload.sendConsentTemplate = values.sendConsentTemplate === true;
+    }
     if (BODY_KEYS.some((key) => values[key] !== undefined)) {
       payload.bodies = toBodies(merged);
     }
@@ -706,6 +798,7 @@ export function buildNotificationTemplatesConfig(args: {
     ),
     defaultSort: { sortBy: 'updatedAt', sortOrder: 'desc' },
     canDelete: true,
+    copyRowIdOnSn: true,
     canDeleteRow: (row) => canManageGlobal || row.organizationId != null,
     deletePathBuilder: (row) =>
       `/notification-templates/${row.id}${

@@ -151,6 +151,7 @@ function PharmacyCard({
           </Group>
 
           <Button
+            data-testid={`compare-prices-select-${pharmacy.organizationId}`}
             radius="xl"
             size="sm"
             disabled={outOfStock}
@@ -244,6 +245,7 @@ export function ComparePricesModal({
             </Box>
           </Group>
           <Button
+            data-testid="compare-prices-close"
             variant="subtle"
             color="gray"
             p={6}
@@ -271,6 +273,7 @@ export function ComparePricesModal({
             return (
               <Button
                 key={option.id}
+                data-testid={`compare-prices-tab-${option.id}`}
                 radius="xl"
                 size="xs"
                 px="md"

@@ -1,4 +1,5 @@
-import { Badge, Text } from '@mantine/core';
+import { Anchor, Badge, Text } from '@mantine/core';
+import { Play } from 'lucide-react';
 import type { Option } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import {
@@ -12,9 +13,15 @@ import {
   textField,
   withDefaultActions,
 } from '../../schemas/helpers';
+import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type DispatchEventRow = { id: string; key: string; label: string };
-export type DispatchTemplateRow = { id: string; code: string; name: string };
+export type DispatchTemplateRow = {
+  id: string;
+  code: string;
+  name: string;
+  organizationId?: string | null;
+};
 export type DispatchChannelRow = {
   id: string;
   label: string;
@@ -36,6 +43,7 @@ export function buildNotificationDispatchesConfig(args: {
   events?: DispatchEventRow[];
   templates?: DispatchTemplateRow[];
   channels?: DispatchChannelRow[];
+  onTest?: (row: Record<string, unknown>) => void;
 }): ModelConfig {
   const {
     organizationId,
@@ -44,6 +52,7 @@ export function buildNotificationDispatchesConfig(args: {
     events = [],
     templates = [],
     channels = [],
+    onTest,
   } = args;
 
   const eventById = new Map(events.map((row) => [String(row.id), row]));
@@ -91,6 +100,22 @@ export function buildNotificationDispatchesConfig(args: {
     },
     columns: [
       {
+        key: 'id',
+        label: 'ID',
+        render: (row) => (
+          <Anchor
+            href={notificationDetailHref('notification-dispatches', row)}
+            target="_blank"
+            rel="noreferrer"
+            size="xs"
+            ff="monospace"
+            title={String(row.id ?? '')}
+          >
+            {shortId(row.id)}
+          </Anchor>
+        ),
+      },
+      {
         key: 'eventId',
         label: 'Event',
         render: (row) => {
@@ -103,10 +128,28 @@ export function buildNotificationDispatchesConfig(args: {
         label: 'Template',
         render: (row) => {
           const template = templateById.get(String(row.templateId ?? ''));
+          if (!row.templateId) {
+            return (
+              <Text size="sm" c="dimmed">
+                —
+              </Text>
+            );
+          }
+          const href = notificationDetailHref('notification-templates', {
+            id: row.templateId,
+            organizationId: template?.organizationId ?? row.organizationId,
+          });
           return (
-            <Text size="sm" ff="monospace">
+            <Anchor
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              size="sm"
+              ff="monospace"
+              title={template ? `${template.name} (${template.code})` : String(row.templateId)}
+            >
               {template ? template.code : shortText(row.templateId)}
-            </Text>
+            </Anchor>
           );
         },
       },
@@ -226,5 +269,16 @@ export function buildNotificationDispatchesConfig(args: {
       description: '',
     },
     defaultSort: { sortBy: 'priority', sortOrder: 'asc' },
+    copyRowIdOnSn: true,
+    rowActions: onTest
+      ? [
+          {
+            id: 'test',
+            label: 'Test',
+            icon: Play,
+            onClick: (row) => onTest(row),
+          },
+        ]
+      : undefined,
   });
 }

@@ -126,6 +126,40 @@ describe('notification template submit payloads', () => {
     });
   });
 
+  it('persists the WhatsApp consent-template flag on create and update', () => {
+    const create = config.buildCreatePayload?.({
+      organizationId: null,
+      code: 'consent',
+      name: 'Consent',
+      description: '',
+      enabled: true,
+      whatsappBody: 'WA',
+      whatsappTemplateName: 'consent_tpl',
+      whatsappTemplateLanguage: 'en',
+      whatsappTemplateBody: 'Hi',
+      sendConsentTemplate: true,
+      components: [],
+      smsBody: 'SMS',
+      emailSubject: 'S',
+      emailBody: 'E',
+    }) as Record<string, any>;
+    expect(create.sendConsentTemplate).toBe(true);
+    // The flag is a top-level template field, not part of bodies.
+    expect(create.bodies.sendConsentTemplate).toBeUndefined();
+
+    const update = config.buildUpdatePayload?.({ sendConsentTemplate: true }, ROW) as Record<
+      string,
+      any
+    >;
+    expect(update).toEqual({ organizationId: null, sendConsentTemplate: true });
+
+    const form = config.buildFormState?.({
+      ...ROW,
+      sendConsentTemplate: true,
+    }) as Record<string, any>;
+    expect(form.sendConsentTemplate).toBe(true);
+  });
+
   it('normalises legacy sampleValue and parameter_name when loading a row', () => {
     const form = config.buildFormState?.({
       ...ROW,

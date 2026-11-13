@@ -214,6 +214,8 @@ function RenderFieldComponent({
           onFocus={onFocus}
           placeholder={field.placeholder}
           options={field.options ?? []}
+          optionsFor={field.optionsFor}
+          formState={formState}
           searchable={field.type === 'autocomplete' || field.searchable === true}
           error={fieldError}
         />

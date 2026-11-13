@@ -115,6 +115,7 @@ export function ChatPhoneGate(props: {
             radius="md"
           />
           <Button
+            data-testid="chat-phone-gate-send-code"
             radius="xl"
             loading={busy}
             onClick={() => void handleRequestOtp()}
@@ -142,6 +143,7 @@ export function ChatPhoneGate(props: {
             )}
           </Stack>
           <Button
+            data-testid="chat-phone-gate-verify"
             radius="xl"
             loading={busy}
             onClick={() => void handleVerify()}
