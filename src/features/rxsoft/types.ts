@@ -268,6 +268,12 @@ export type Field = {
   defaultValue?: unknown;
   value?: string | { formKey: string; paramKey: string }; // value to be passed back during submission
   options?: Option[];
+  /**
+   * Options derived from the live form state (dependent selects, e.g. an
+   * owner autocomplete that follows the selected owner type). Takes
+   * precedence over `options` when provided.
+   */
+  optionsFor?: (formState: Record<string, unknown>) => Option[];
   /** Render the select as a type-ahead/autocomplete combobox. */
   searchable?: boolean;
   toOptions?: (value: any) => Option[];

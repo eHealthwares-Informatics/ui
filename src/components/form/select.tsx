@@ -1,9 +1,17 @@
 import { Select } from '@mantine/core';
+import { useEffect } from 'react';
 import { Option } from '@/features/rxsoft/types';
 
 type SelectFieldProps = {
   value: Option | null;
-  options: Option[];
+  options?: Option[];
+  /**
+   * Options derived from the live form state (dependent selects). Takes
+   * precedence over `options`; when set, a value that is no longer in the
+   * list is cleared so a stale selection can't be submitted.
+   */
+  optionsFor?: (formState: Record<string, unknown>) => Option[];
+  formState?: Record<string, unknown>;
   onChange: (option: Option | null) => void;
   placeholder?: string;
   label?: string;
@@ -24,8 +32,10 @@ type SelectFieldProps = {
 };
 
 export function SelectField({
-  value,
+  value: selectedValue,
   options,
+  optionsFor,
+  formState,
   onChange,
   placeholder,
   label,
@@ -37,16 +47,28 @@ export function SelectField({
   testId,
   searchable = false,
 }: SelectFieldProps) {
+  const resolvedOptions = optionsFor ? optionsFor(formState ?? {}) : (options ?? []);
+  const selectionValid =
+    !selectedValue || resolvedOptions.some((option) => option.value === selectedValue.value);
+
+  useEffect(() => {
+    // Only clear when the dependent list is actually populated; while the
+    // reference data is still loading, keep the stored selection.
+    if (optionsFor && resolvedOptions.length > 0 && selectedValue && !selectionValid) {
+      onChange(null);
+    }
+  }, [optionsFor, resolvedOptions.length, selectedValue, selectionValid, onChange]);
+
   return (
     <Select
       data-testid={testId}
       label={label}
       className={className}
-      value={value?.value as string}
+      value={optionsFor && !selectionValid ? null : ((selectedValue?.value as string) ?? null)}
       onChange={(value, option) => {
         onChange(option);
       }}
-      data={options}
+      data={resolvedOptions}
       placeholder={placeholder}
       disabled={disabled}
       clearable

@@ -1,4 +1,5 @@
-import { Table, Text, Loader, Center } from '@mantine/core';
+import { Table, Text, Loader, Center, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { Column, FilterValue } from '@/features/rxsoft/types';
 import { ActionCell, ActionCellProps } from './action-cell';
 import { TableHeader, SortOrder } from './table-header';
@@ -15,7 +16,26 @@ type DataTableProps = {
   sortBy?: string | null;
   sortOrder?: SortOrder;
   onSortChange?: (key: string, order: SortOrder) => void;
+  /** Clicking the SN cell copies the row id and shows a toast. */
+  copyRowIdOnSn?: boolean;
 };
+
+async function copyRowId(id: string) {
+  try {
+    await navigator.clipboard.writeText(id);
+    notifications.show({
+      color: 'green',
+      title: 'ID copied',
+      message: id,
+    });
+  } catch {
+    notifications.show({
+      color: 'red',
+      title: 'Copy failed',
+      message: 'Clipboard is unavailable',
+    });
+  }
+}
 
 export const DataTable = ({
   columns,
@@ -28,6 +48,7 @@ export const DataTable = ({
   sortBy,
   sortOrder,
   onSortChange,
+  copyRowIdOnSn = false,
 }: DataTableProps) => {
   const colSpan = columns.length + (actionCellProps ? 1 : 0);
 
@@ -88,7 +109,28 @@ export const DataTable = ({
 
         {rows.map((row: any, index: number) => (
           <Table.Tr key={String(row.id ?? index)} data-testid="data-table-row">
-            <Table.Td key={index}>{index + 1}</Table.Td>
+            <Table.Td key={index}>
+              {copyRowIdOnSn ? (
+                <Tooltip label="Copy ID" withArrow>
+                  <Text
+                    component="button"
+                    type="button"
+                    size="sm"
+                    onClick={() => void copyRowId(String(row.id ?? ''))}
+                    style={{
+                      cursor: 'pointer',
+                      background: 'none',
+                      border: 0,
+                      padding: 0,
+                    }}
+                  >
+                    {index + 1}
+                  </Text>
+                </Tooltip>
+              ) : (
+                index + 1
+              )}
+            </Table.Td>
             {columns.map((column) => (
               <Table.Td key={column.key}>
                 {column.render ? column.render(row, actionCellProps) : renderCell(row, column)}

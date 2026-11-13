@@ -1,12 +1,19 @@
-import { Badge, Button, Modal, NumberInput, Stack, Text, Textarea } from '@mantine/core';
+import { Button, Modal, NumberInput, Stack, Text, Textarea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 import { DataPageShell } from '@/components/page/data-page-shell';
+import { getArrayPayload } from '@/components/utils';
 import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import { identityApi } from '@/lib/identity-api';
 import { useAuthStore } from '@/stores/auth-store';
-import { buildBillingWalletsConfig } from './schema';
+import {
+  buildBillingWalletsConfig,
+  type BillingChannelRef,
+  type BillingOrganizationRef,
+  type BillingParticipantRef,
+} from './schema';
 
 export function RxBillingWalletsPage() {
   const queryClient = useQueryClient();
@@ -15,6 +22,36 @@ export function RxBillingWalletsPage() {
   const selectedOrganisationId = useAuthStore((state) => state.selectedOrganisationId);
   const organizationId = selectedOrganisationId ?? null;
 
+  const { data: channels = [] } = useQuery({
+    queryKey: ['billing-wallets', 'channels'],
+    queryFn: async () => {
+      const { data } = await conversationApi.get('/channels', {
+        params: { limit: 1000 },
+      });
+      return getArrayPayload(data) as BillingChannelRef[];
+    },
+  });
+
+  const { data: organizations = [] } = useQuery({
+    queryKey: ['billing-wallets', 'organizations'],
+    queryFn: async () => {
+      const { data } = await identityApi.get('/organizations', {
+        params: { limit: 200 },
+      });
+      return getArrayPayload(data) as BillingOrganizationRef[];
+    },
+  });
+
+  const { data: participants = [] } = useQuery({
+    queryKey: ['billing-wallets', 'participants'],
+    queryFn: async () => {
+      const { data } = await conversationApi.get('/participants', {
+        params: { limit: 200 },
+      });
+      return getArrayPayload(data) as BillingParticipantRef[];
+    },
+  });
+
   const config = useMemo(
     () =>
       buildBillingWalletsConfig({
@@ -22,8 +59,11 @@ export function RxBillingWalletsPage() {
         isSuperAdmin,
         onCredit: (row) => setCreditTarget(row),
         onEditWallet: (row) => setEditTarget(row),
+        channels,
+        organizations,
+        participants,
       }),
-    [organizationId, isSuperAdmin],
+    [organizationId, isSuperAdmin, channels, organizations, participants]
   );
 
   // ── Credit modal ──────────────────────────────────────────
@@ -88,10 +128,11 @@ export function RxBillingWalletsPage() {
         {creditTarget ? (
           <Stack gap="md">
             <Stack gap={2}>
-              <Text size="xs" c="dimmed">Wallet</Text>
+              <Text size="xs" c="dimmed">
+                Wallet
+              </Text>
               <Text size="sm" ff="monospace">
-                {String(creditTarget.ownerType ?? '')} ·
-                {String(creditTarget.ownerId ?? '')}
+                {String(creditTarget.ownerType ?? '')} ·{String(creditTarget.ownerId ?? '')}
               </Text>
               <Text size="xs" c="dimmed">
                 Current balance: {Number(creditTarget.balanceCoins ?? 0)} coins
@@ -137,10 +178,11 @@ export function RxBillingWalletsPage() {
         {editTarget ? (
           <Stack gap="md">
             <Stack gap={2}>
-              <Text size="xs" c="dimmed">Wallet</Text>
+              <Text size="xs" c="dimmed">
+                Wallet
+              </Text>
               <Text size="sm" ff="monospace">
-                {String(editTarget.ownerType ?? '')} ·
-                {String(editTarget.ownerId ?? '')}
+                {String(editTarget.ownerType ?? '')} ·{String(editTarget.ownerId ?? '')}
               </Text>
               <Text size="xs" c="dimmed">
                 Current balance: {Number(editTarget.balanceCoins ?? 0)} coins

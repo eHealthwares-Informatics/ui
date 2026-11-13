@@ -1,5 +1,5 @@
-import { Badge, Group, Select, Switch, Text } from '@mantine/core';
-import { Eye } from 'lucide-react';
+import { Anchor, Badge, Group, Select, Switch, Text } from '@mantine/core';
+import { Eye, RefreshCw } from 'lucide-react';
 import {
   ColumnTypeFilters,
   EQUALS_WITH_OPTIONS,
@@ -8,6 +8,7 @@ import {
 } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
+import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type DeliveryRow = {
   id: string;
@@ -27,6 +28,11 @@ export type DeliveryRow = {
   sentAt: string | null;
   providerMessageId: string | null;
   exchangeId: string | null;
+  /** Generated print artifacts: { a4?: url, pos?: url }. */
+  prints?: Record<string, string> | null;
+  cloudinaryUrl: string | null;
+  awsUrl: string | null;
+  localUrl: string | null;
   downstreamResponse: unknown;
 };
 
@@ -67,15 +73,23 @@ const testFilter = EQUALS_WITH_OPTIONS([
   { value: 'false', label: 'Event' },
 ]);
 
-const shortId = (value: unknown) => {
-  const id = String(value ?? '');
-  if (!id) {
-    return '—';
-  }
-  return id.length > 12 ? `${id.slice(0, 6)}…${id.slice(-4)}` : id;
-};
-
 const columns: Column[] = [
+  {
+    key: 'id',
+    label: 'ID',
+    render: (row) => (
+      <Anchor
+        href={notificationDetailHref('notification-delivery', row)}
+        target="_blank"
+        rel="noreferrer"
+        size="xs"
+        ff="monospace"
+        title={String(row.id ?? '')}
+      >
+        {shortId(row.id)}
+      </Anchor>
+    ),
+  },
   {
     key: 'createdAt',
     label: 'Time',
@@ -192,6 +206,72 @@ const columns: Column[] = [
     ),
   },
   {
+    key: 'prints',
+    label: 'Prints',
+    render: (row) => {
+      const prints = (row.prints ?? {}) as Record<string, string>;
+      const entries = Object.entries(prints).filter(([, url]) => Boolean(url));
+      if (entries.length === 0) {
+        return (
+          <Text size="xs" c="dimmed">
+            —
+          </Text>
+        );
+      }
+      return (
+        <Group gap={4} wrap="nowrap">
+          {entries.map(([format, url]) => (
+            <Anchor key={format} href={url} target="_blank" rel="noreferrer" size="xs">
+              {format.toUpperCase()}
+            </Anchor>
+          ))}
+        </Group>
+      );
+    },
+  },
+  {
+    key: 'cloudinaryUrl',
+    label: 'Cloudinary',
+    render: (row) =>
+      row.cloudinaryUrl ? (
+        <Anchor href={String(row.cloudinaryUrl)} target="_blank" rel="noreferrer" size="xs">
+          Open
+        </Anchor>
+      ) : (
+        <Text size="xs" c="dimmed">
+          —
+        </Text>
+      ),
+  },
+  {
+    key: 'awsUrl',
+    label: 'AWS',
+    render: (row) =>
+      row.awsUrl ? (
+        <Anchor href={String(row.awsUrl)} target="_blank" rel="noreferrer" size="xs">
+          Open
+        </Anchor>
+      ) : (
+        <Text size="xs" c="dimmed">
+          —
+        </Text>
+      ),
+  },
+  {
+    key: 'localUrl',
+    label: 'Local',
+    render: (row) =>
+      row.localUrl ? (
+        <Text size="xs" ff="monospace" lineClamp={1} maw={180} title={String(row.localUrl)}>
+          {String(row.localUrl)}
+        </Text>
+      ) : (
+        <Text size="xs" c="dimmed">
+          —
+        </Text>
+      ),
+  },
+  {
     key: 'attempts',
     label: 'Attempts',
     render: (row) => Number(row.attempts ?? 0),
@@ -247,6 +327,7 @@ export function buildNotificationDeliveryConfig(args: {
   onTestsOnlyChange: (value: boolean) => void;
   onExchangeStateChange: (value: ExchangeState) => void;
   onViewDetails: (row: DeliveryRow) => void;
+  onRetrigger?: (row: DeliveryRow) => void;
 }): ModelConfig {
   const {
     organizationId,
@@ -259,6 +340,7 @@ export function buildNotificationDeliveryConfig(args: {
     onTestsOnlyChange,
     onExchangeStateChange,
     onViewDetails,
+    onRetrigger,
   } = args;
 
   return {
@@ -280,6 +362,7 @@ export function buildNotificationDeliveryConfig(args: {
     defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
     canCreate: false,
     canDelete: false,
+    copyRowIdOnSn: true,
     renderHeaderActions: () => (
       <Group gap="md" wrap="nowrap">
         <Switch
@@ -313,6 +396,16 @@ export function buildNotificationDeliveryConfig(args: {
         icon: Eye,
         onClick: (row) => onViewDetails(row as DeliveryRow),
       },
+      ...(onRetrigger
+        ? [
+            {
+              id: 'retrigger',
+              label: 'Retrigger',
+              icon: RefreshCw,
+              onClick: (row: Record<string, unknown>) => onRetrigger(row as DeliveryRow),
+            },
+          ]
+        : []),
     ],
   };
 }

@@ -119,12 +119,10 @@ export function RxBillingConfigPage() {
             <Switch
               data-testid="billing-config-enforcement"
               checked={form.enforcementEnabled === true}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  enforcementEnabled: event.currentTarget.checked,
-                }))
-              }
+              onChange={(event) => {
+                const checked = event.currentTarget.checked;
+                setForm((prev) => ({ ...prev, enforcementEnabled: checked }));
+              }}
             />
           </Group>
 
@@ -135,12 +133,10 @@ export function RxBillingConfigPage() {
             <Switch
               data-testid="billing-config-shadow"
               checked={form.shadowMode === true}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  shadowMode: event.currentTarget.checked,
-                }))
-              }
+              onChange={(event) => {
+                const checked = event.currentTarget.checked;
+                setForm((prev) => ({ ...prev, shadowMode: checked }));
+              }}
             />
           </Group>
 
@@ -208,12 +204,13 @@ export function RxBillingConfigPage() {
             <Switch
               data-testid="billing-config-include-exempt"
               checked={form.includeDefaultExemptWords !== false}
-              onChange={(event) =>
+              onChange={(event) => {
+                const checked = event.currentTarget.checked;
                 setForm((prev) => ({
                   ...prev,
-                  includeDefaultExemptWords: event.currentTarget.checked,
-                }))
-              }
+                  includeDefaultExemptWords: checked,
+                }));
+              }}
             />
           </Group>
 

@@ -64,6 +64,11 @@ export type ModelConfig<T = any> = {
   canDeleteRow?: (row: Record<string, unknown>) => boolean;
   canArchive?: boolean;
   canExport?: boolean;
+  /**
+   * When true, clicking the table SN cell copies the row id and shows a toast.
+   * Used by the notification entities so support can grab an id quickly.
+   */
+  copyRowIdOnSn?: boolean;
   csvEndpoint?: string;
   createPathBuilder?: () => string;
   detailPathBuilder?: (row: T) => string;

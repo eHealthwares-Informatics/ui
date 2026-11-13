@@ -334,6 +334,7 @@ import { Route as AuthenticatedConversationAiModelsIndexRouteImport } from './ro
 import { Route as AuthenticatedConversationAiProcessorsIndexRouteImport } from './routes/_authenticated/conversation/ai/processors/index'
 import { Route as AuthenticatedConversationAiProvidersIndexRouteImport } from './routes/_authenticated/conversation/ai/providers/index'
 import { Route as AuthenticatedConversationAiRequestLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/request-logs/index'
+import { Route as AuthenticatedConversationNotificationDetailResourceIdRouteImport } from './routes/_authenticated/conversation/notification-detail/$resource/$id'
 import { Route as AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport } from './routes/_authenticated/emr/settings/message-templates/index'
 import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
 import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect'
@@ -2202,6 +2203,12 @@ const AuthenticatedConversationAiRequestLogsIndexRoute =
     path: '/conversation/ai/request-logs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConversationNotificationDetailResourceIdRoute =
+  AuthenticatedConversationNotificationDetailResourceIdRouteImport.update({
+    id: '/conversation/notification-detail/$resource/$id',
+    path: '/conversation/notification-detail/$resource/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrSettingsMessageTemplatesIndexRoute =
   AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport.update({
     id: '/emr/settings/message-templates/',
@@ -2588,6 +2595,7 @@ export interface FileRoutesByFullPath {
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/conversation/notification-detail/$resource/$id': typeof AuthenticatedConversationNotificationDetailResourceIdRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
   '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
   '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
@@ -2923,6 +2931,7 @@ export interface FileRoutesByTo {
   '/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/conversation/notification-detail/$resource/$id': typeof AuthenticatedConversationNotificationDetailResourceIdRoute
   '/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
   '/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
   '/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
@@ -3264,6 +3273,7 @@ export interface FileRoutesById {
   '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId': typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId': typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   '/_authenticated/conversation/$page/$id/edit': typeof AuthenticatedConversationPageIdEditRoute
+  '/_authenticated/conversation/notification-detail/$resource/$id': typeof AuthenticatedConversationNotificationDetailResourceIdRoute
   '/_authenticated/lis/orders/$orderId/report': typeof AuthenticatedLisOrdersOrderIdReportRoute
   '/_authenticated/lis/orders/workflow/collect': typeof AuthenticatedLisOrdersWorkflowCollectRoute
   '/_authenticated/lis/orders/workflow/enter': typeof AuthenticatedLisOrdersWorkflowEnterRoute
@@ -3603,6 +3613,7 @@ export interface FileRouteTypes {
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/conversation/$page/$id/edit'
+    | '/conversation/notification-detail/$resource/$id'
     | '/lis/orders/$orderId/report'
     | '/lis/orders/workflow/collect'
     | '/lis/orders/workflow/enter'
@@ -3938,6 +3949,7 @@ export interface FileRouteTypes {
     | '/coding-concept/facilities/laboratories/$laboratoryId'
     | '/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/conversation/$page/$id/edit'
+    | '/conversation/notification-detail/$resource/$id'
     | '/lis/orders/$orderId/report'
     | '/lis/orders/workflow/collect'
     | '/lis/orders/workflow/enter'
@@ -4278,6 +4290,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coding-concept/facilities/laboratories/$laboratoryId'
     | '/_authenticated/coding-concept/facilities/pharmacies/$pharmacyId'
     | '/_authenticated/conversation/$page/$id/edit'
+    | '/_authenticated/conversation/notification-detail/$resource/$id'
     | '/_authenticated/lis/orders/$orderId/report'
     | '/_authenticated/lis/orders/workflow/collect'
     | '/_authenticated/lis/orders/workflow/enter'
@@ -6656,6 +6669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationAiRequestLogsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/conversation/notification-detail/$resource/$id': {
+      id: '/_authenticated/conversation/notification-detail/$resource/$id'
+      path: '/conversation/notification-detail/$resource/$id'
+      fullPath: '/conversation/notification-detail/$resource/$id'
+      preLoaderRoute: typeof AuthenticatedConversationNotificationDetailResourceIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/settings/message-templates/': {
       id: '/_authenticated/emr/settings/message-templates/'
       path: '/emr/settings/message-templates'
@@ -7084,6 +7104,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesLaboratoryIdRoute
   AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute: typeof AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute
   AuthenticatedConversationPageIdEditRoute: typeof AuthenticatedConversationPageIdEditRoute
+  AuthenticatedConversationNotificationDetailResourceIdRoute: typeof AuthenticatedConversationNotificationDetailResourceIdRoute
   AuthenticatedLisOrdersOrderIdReportRoute: typeof AuthenticatedLisOrdersOrderIdReportRoute
   AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute: typeof AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute
   AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute: typeof AuthenticatedCodingConceptFacilitiesLaboratoriesIndexRoute
@@ -7448,6 +7469,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedCodingConceptFacilitiesPharmaciesPharmacyIdRoute,
   AuthenticatedConversationPageIdEditRoute:
     AuthenticatedConversationPageIdEditRoute,
+  AuthenticatedConversationNotificationDetailResourceIdRoute:
+    AuthenticatedConversationNotificationDetailResourceIdRoute,
   AuthenticatedLisOrdersOrderIdReportRoute:
     AuthenticatedLisOrdersOrderIdReportRoute,
   AuthenticatedCodingConceptFacilitiesHospitalsIndexRoute:
