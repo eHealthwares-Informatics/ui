@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
+import { useAuthStore } from '@/stores/auth-store';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import type { Feature, FeatureSession } from '../../lib/emr-types';
 import {
@@ -34,6 +35,7 @@ export function FeatureSubmissionModal({
   onSubmitted?: () => void;
 }) {
   const queryClient = useQueryClient();
+  const authUser = useAuthStore((state) => state.user);
   const [patient, setPatient] = useState<PatientOption | null>(null);
   const [session, setSession] = useState<FeatureSession | null>(null);
   const [sessionError, setSessionError] = useState<string | null>(null);
@@ -54,7 +56,22 @@ export function FeatureSubmissionModal({
     setSessionError(null);
     setPatientError(null);
     setFormError(null);
-    setData(form ? buildInitialFormData(form.schemaJson) : {});
+    setData(
+      form
+        ? buildInitialFormData(form.schemaJson, {
+            patient: patient
+              ? {
+                  patientId: patient.patientId,
+                  patientName: patient.patientName,
+                }
+              : null,
+            formDefinitionId: form.id,
+            organizationId: authUser?.organizationId ?? null,
+            locationId: authUser?.locationId ?? null,
+            userId: authUser?.id ?? null,
+          })
+        : {}
+    );
   }, [opened, form]);
 
   const startSession = useMutation({
@@ -70,7 +87,20 @@ export function FeatureSubmissionModal({
       setSessionError(null);
       setPatientError(null);
       if (form) {
-        setData(buildInitialFormData(form.schemaJson));
+        setData(
+          buildInitialFormData(form.schemaJson, {
+            patient: patient
+              ? {
+                  patientId: patient.patientId,
+                  patientName: patient.patientName,
+                }
+              : null,
+            formDefinitionId: form.id,
+            organizationId: authUser?.organizationId ?? null,
+            locationId: authUser?.locationId ?? null,
+            userId: authUser?.id ?? null,
+          })
+        );
       }
     },
     onError: (error) => {
@@ -249,7 +279,23 @@ export function FeatureSubmissionModal({
           )}
 
           <div style={{ opacity: session ? 1 : 0.55, pointerEvents: session ? 'auto' : 'none' }}>
-            <DynamicFormFields schema={form.schemaJson} value={data} onChange={setData} />
+            <DynamicFormFields
+              schema={form.schemaJson}
+              value={data}
+              onChange={setData}
+              runtime={{
+                patient: patient
+                  ? {
+                      patientId: patient.patientId,
+                      patientName: patient.patientName,
+                    }
+                  : null,
+                formDefinitionId: feature.formDefinitionId,
+                organizationId: authUser?.organizationId ?? null,
+                locationId: authUser?.locationId ?? null,
+                userId: authUser?.id ?? null,
+              }}
+            />
           </div>
 
           <Group justify="flex-end">

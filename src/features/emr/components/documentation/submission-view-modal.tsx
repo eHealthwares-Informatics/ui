@@ -4,9 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
 import { emrApi } from '@/lib/emr-api';
 import { useFormDefinition } from '../../hooks/use-form-definition';
+import { usePatientByMrn } from '../../hooks/use-patient-by-mrn';
 import type { FormFieldSchema, FormSubmission } from '../../lib/emr-types';
 import { printSubmission } from '../../lib/print-submission';
 import { formatAnnotateValue } from '../forms/annotate/format-annotate';
+import { FormQrCode } from '../shared/form-qr-code';
+import { PrintSendActions } from '../shared/print-send-actions';
+import { SendFormCard } from '../shared/send-form-card';
 import { StatusBadge } from '../shared/status-badge';
 import { SchemaOutdatedBadge } from './schema-outdated-badge';
 
@@ -23,6 +27,20 @@ function findField(fields: FormFieldSchema[] | undefined, key: string): FormFiel
     }
   }
   return null;
+}
+
+function flattenFields(fields: FormFieldSchema[] | undefined): FormFieldSchema[] {
+  const out: FormFieldSchema[] = [];
+  const walk = (list: FormFieldSchema[] | undefined) => {
+    for (const field of list ?? []) {
+      out.push(field);
+      if (field.fields?.length) {
+        walk(field.fields);
+      }
+    }
+  };
+  walk(fields);
+  return out;
 }
 
 function renderValue(value: unknown): string {
@@ -59,6 +77,14 @@ export function SubmissionViewModal({
   onJump?: (submission: FormSubmission) => void;
 }) {
   const { data: form, isLoading } = useFormDefinition(submission?.formDefinitionId);
+  const { data: patient } = usePatientByMrn(submission?.patientId ?? undefined);
+  const printField = flattenFields(form?.schemaJson?.fields).find(
+    (field) => field.type === 'print'
+  );
+  const qrField = flattenFields(form?.schemaJson?.fields).find((field) => field.type === 'qr-code');
+  const sendField = flattenFields(form?.schemaJson?.fields).find(
+    (field) => field.type === 'send-form'
+  );
 
   const chainQuery = useQuery({
     queryKey: ['emr', 'form-submissions', submission?.id, 'chain'],
@@ -131,6 +157,16 @@ export function SubmissionViewModal({
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             {Object.entries(submission.dataJson ?? {}).map(([key, value]) => {
               const field = findField(form?.schemaJson?.fields, key);
+              if (
+                field &&
+                (field.type === 'hidden' ||
+                  field.type === 'html' ||
+                  field.type === 'print' ||
+                  field.type === 'send-form' ||
+                  field.type === 'qr-code')
+              ) {
+                return null;
+              }
               const label = field?.label ?? key;
               return (
                 <Stack key={key} gap={2}>
@@ -147,23 +183,61 @@ export function SubmissionViewModal({
             })}
           </SimpleGrid>
 
+          {qrField && (
+            <Stack gap="xs" align="center">
+              <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+                Scan to reopen this form
+              </Text>
+              <FormQrCode
+                formDefinitionId={submission.formDefinitionId}
+                submissionId={submission.id}
+                patientId={submission.patientId ?? undefined}
+                mode={qrField.qrMode ?? 'auto'}
+                size={qrField.qrSize ?? 180}
+                caption={qrField.caption}
+              />
+            </Stack>
+          )}
+
+          {sendField && (
+            <SendFormCard
+              formDefinitionId={submission.formDefinitionId}
+              submissionId={submission.id}
+              patientId={submission.patientId ?? undefined}
+              phone={patient?.phone}
+              email={patient?.email}
+              label={sendField.label}
+              channels={sendField.channels}
+            />
+          )}
+
           <Group justify="flex-end" mt="md">
-            <Button
-              variant="light"
-              leftSection={<Printer size={14} />}
-              onClick={() => {
-                void printSubmission(submission).then((ok) => {
-                  if (!ok) {
-                    notifications.show({
-                      color: 'red',
-                      message: 'Could not generate the PDF — check your connection and try again.',
-                    });
-                  }
-                });
-              }}
-            >
-              Print / PDF
-            </Button>
+            {printField ? (
+              <PrintSendActions
+                submissionId={submission.id}
+                printFormat={printField.printFormat ?? 'a4_print'}
+                phone={patient?.phone}
+                email={patient?.email}
+              />
+            ) : (
+              <Button
+                variant="light"
+                leftSection={<Printer size={14} />}
+                onClick={() => {
+                  void printSubmission(submission).then((ok) => {
+                    if (!ok) {
+                      notifications.show({
+                        color: 'red',
+                        message:
+                          'Could not generate the PDF — check your connection and try again.',
+                      });
+                    }
+                  });
+                }}
+              >
+                Print / PDF
+              </Button>
+            )}
             <Button variant="light" onClick={onClose}>
               Close
             </Button>

@@ -23,7 +23,7 @@ export type RequestItemDraft = {
   durationUnit?: string;
   quantity?: number;
   instructions?: string;
-  itemKind?: 'STOCK_ITEM' | 'GENERIC_PRODUCT' | 'GENERIC_DRUG' | 'LOINC_TEST';
+  itemKind?: 'STOCK_ITEM' | 'GENERIC_PRODUCT' | 'GENERIC_DRUG' | 'LOINC_TEST' | 'DICOM_TEST';
   referenceCode?: string;
   testDefinitionId?: string;
   sampleType?: string;
@@ -43,6 +43,7 @@ const PICKER_TYPES = new Set<FormFieldType>([
   'generic-product',
   'generic-drug',
   'loinc-test',
+  'dicom-test',
 ]);
 
 /** Row fields copied verbatim onto the request item when present. */
@@ -102,23 +103,37 @@ function asLoincTest(value: unknown): LoincTest | undefined {
     : undefined;
 }
 
+function asDicomTest(value: unknown): { code?: string; name: string } | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  const candidate = value as { code?: string; name?: string };
+  return typeof candidate.name === 'string'
+    ? { code: candidate.code, name: candidate.name }
+    : undefined;
+}
+
 function rowToItem(
   row: Record<string, unknown>,
   columns: Array<{ key: string; label?: string; type: FormFieldType }>
 ): RequestItemDraft | null {
   const pickerColumn = columns.find(
-    (column) => PICKER_TYPES.has(column.type) && column.type !== 'loinc-test'
+    (column) =>
+      PICKER_TYPES.has(column.type) && column.type !== 'loinc-test' && column.type !== 'dicom-test'
   );
   const loincColumn = columns.find((column) => column.type === 'loinc-test');
+  const dicomColumn = columns.find((column) => column.type === 'dicom-test');
 
   const item = pickerColumn ? asItem(row[pickerColumn.key]) : undefined;
   const test = loincColumn ? asLoincTest(row[loincColumn.key]) : undefined;
+  const dicom = dicomColumn ? asDicomTest(row[dicomColumn.key]) : undefined;
 
-  const code = asText(row.code) ?? item?.code ?? item?.id ?? test?.code;
+  const code = asText(row.code) ?? item?.code ?? item?.id ?? test?.code ?? dicom?.code;
   const name =
     asText(row.name) ??
     (item ? buildItemName(item.label, item.code ?? item.id) : undefined) ??
-    (test ? `${test.name} — ${test.code}` : undefined);
+    (test ? `${test.name} — ${test.code}` : undefined) ??
+    dicom?.name;
 
   if (!name && !code) {
     return null;
@@ -128,11 +143,12 @@ function rowToItem(
     name: name ?? (code as string),
     code,
     quantity: asNumber(row.quantity),
-    itemKind: item?.kind ?? (test ? 'LOINC_TEST' : undefined),
+    itemKind: item?.kind ?? (test ? 'LOINC_TEST' : dicom ? 'DICOM_TEST' : undefined),
     referenceCode:
       item?.referenceCode ??
       (item ? buildReferenceCode(item) : undefined) ??
-      (test ? `LOINC_TEST:${test.code}` : undefined),
+      (test ? `LOINC_TEST:${test.code}` : undefined) ??
+      (dicom ? `DICOM_TEST:${dicom.code ?? dicom.name}` : undefined),
     testDefinitionId: test?.code,
   };
 

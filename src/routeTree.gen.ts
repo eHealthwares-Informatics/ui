@@ -38,6 +38,7 @@ import { Route as ApmNewsRouteImport } from './routes/apm/news'
 import { Route as ApmVolunteerRouteImport } from './routes/apm/volunteer'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
+import { Route as FTokenRouteImport } from './routes/f/$token'
 import { Route as QuestionnaireIndexRouteImport } from './routes/questionnaire/index'
 import { Route as ShopIndexRouteImport } from './routes/shop/index'
 import { Route as ShopAboutRouteImport } from './routes/shop/about'
@@ -495,6 +496,11 @@ const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
 const ClerkAuthenticatedRouteRoute = ClerkAuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => ClerkRouteRoute,
+} as any)
+const FTokenRoute = FTokenRouteImport.update({
+  id: '/f/$token',
+  path: '/f/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QuestionnaireIndexRoute = QuestionnaireIndexRouteImport.update({
   id: '/questionnaire/',
@@ -2342,6 +2348,7 @@ export interface FileRoutesByFullPath {
   '/apm/meet': typeof ApmMeetRoute
   '/apm/news': typeof ApmNewsRouteWithChildren
   '/apm/volunteer': typeof ApmVolunteerRoute
+  '/f/$token': typeof FTokenRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/blog': typeof ShopBlogRouteWithChildren
   '/shop/branches': typeof ShopBranchesRouteWithChildren
@@ -2683,6 +2690,7 @@ export interface FileRoutesByTo {
   '/apm/meet': typeof ApmMeetRoute
   '/apm/news': typeof ApmNewsRouteWithChildren
   '/apm/volunteer': typeof ApmVolunteerRoute
+  '/f/$token': typeof FTokenRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/blog': typeof ShopBlogRouteWithChildren
   '/shop/branches': typeof ShopBranchesRouteWithChildren
@@ -3028,6 +3036,7 @@ export interface FileRoutesById {
   '/apm/meet': typeof ApmMeetRoute
   '/apm/news': typeof ApmNewsRouteWithChildren
   '/apm/volunteer': typeof ApmVolunteerRoute
+  '/f/$token': typeof FTokenRoute
   '/shop/about': typeof ShopAboutRoute
   '/shop/blog': typeof ShopBlogRouteWithChildren
   '/shop/branches': typeof ShopBranchesRouteWithChildren
@@ -3372,6 +3381,7 @@ export interface FileRouteTypes {
     | '/apm/meet'
     | '/apm/news'
     | '/apm/volunteer'
+    | '/f/$token'
     | '/shop/about'
     | '/shop/blog'
     | '/shop/branches'
@@ -3713,6 +3723,7 @@ export interface FileRouteTypes {
     | '/apm/meet'
     | '/apm/news'
     | '/apm/volunteer'
+    | '/f/$token'
     | '/shop/about'
     | '/shop/blog'
     | '/shop/branches'
@@ -4057,6 +4068,7 @@ export interface FileRouteTypes {
     | '/apm/meet'
     | '/apm/news'
     | '/apm/volunteer'
+    | '/f/$token'
     | '/shop/about'
     | '/shop/blog'
     | '/shop/branches'
@@ -4399,6 +4411,7 @@ export interface RootRouteChildren {
   ApmMeetRoute: typeof ApmMeetRoute
   ApmNewsRoute: typeof ApmNewsRouteWithChildren
   ApmVolunteerRoute: typeof ApmVolunteerRoute
+  FTokenRoute: typeof FTokenRoute
   ShopAboutRoute: typeof ShopAboutRoute
   ShopBlogRoute: typeof ShopBlogRouteWithChildren
   ShopBranchesRoute: typeof ShopBranchesRouteWithChildren
@@ -4648,6 +4661,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/clerk'
       preLoaderRoute: typeof ClerkAuthenticatedRouteRouteImport
       parentRoute: typeof ClerkRouteRoute
+    }
+    '/f/$token': {
+      id: '/f/$token'
+      path: '/f/$token'
+      fullPath: '/f/$token'
+      preLoaderRoute: typeof FTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/questionnaire/': {
       id: '/questionnaire/'
@@ -7789,6 +7809,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApmMeetRoute: ApmMeetRoute,
   ApmNewsRoute: ApmNewsRouteWithChildren,
   ApmVolunteerRoute: ApmVolunteerRoute,
+  FTokenRoute: FTokenRoute,
   ShopAboutRoute: ShopAboutRoute,
   ShopBlogRoute: ShopBlogRouteWithChildren,
   ShopBranchesRoute: ShopBranchesRouteWithChildren,

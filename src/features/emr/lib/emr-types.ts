@@ -86,6 +86,14 @@ export type FormFieldType =
   | 'generic-product'
   | 'generic-drug'
   | 'loinc-test'
+  | 'dicom-test'
+  | 'patient'
+  | 'auth-patient'
+  | 'html'
+  | 'hidden'
+  | 'print'
+  | 'send-form'
+  | 'qr-code'
   | 'annotate';
 
 export type AnnotateTarget = 'body' | 'dermatome' | 'organ';
@@ -124,10 +132,41 @@ export type FormFieldSchema = {
   fields?: FormFieldSchema[];
   /** Configuration for the `annotate` field type. */
   annotate?: AnnotateConfig;
+  /** Readonly HTML content (`html` field type). */
+  html?: string;
+  /** Hidden value template (`hidden` field type), e.g. `{{patient.mrn}}`. */
+  valueTemplate?: string;
+  valueType?: 'string' | 'number' | 'boolean';
+  /** Preferred print body for the `print` action control. */
+  printFormat?: 'a4_print' | 'pos_print';
+  /** Channels offered by `send-form`. */
+  channels?: Array<'email' | 'sms'>;
+  /** Link target for `qr-code`. */
+  qrMode?: 'auto' | 'template' | 'instance';
+  qrSize?: number;
+  caption?: string;
 };
 
 export type FormSchema = {
   fields: FormFieldSchema[];
+};
+
+export type FormRuntimeContext = {
+  publicToken?: string;
+  formDefinitionId?: string;
+  formEventKey?: string | null;
+  submissionId?: string | null;
+  /** Hide print/send/QR action controls (builder preview, amend modal). */
+  hideActions?: boolean;
+  organizationId?: string | null;
+  locationId?: string | null;
+  userId?: string | null;
+  patient?: {
+    patientId: string;
+    patientName?: string;
+    phone?: string | null;
+    email?: string | null;
+  } | null;
 };
 
 export type FormDefinition = {
@@ -139,6 +178,8 @@ export type FormDefinition = {
   category: string;
   /** REQUEST forms only: the request type they capture. */
   requestType?: string | null;
+  /** Notification event used by print/send controls. */
+  eventKey?: string | null;
   schemaJson: FormSchema;
   isPublished: boolean;
   publishedVersion: number | null;
@@ -151,7 +192,7 @@ export type FormSubmission = {
   formDefinitionId: string;
   formName: string;
   formVersion: number;
-  patientId: string;
+  patientId: string | null;
   visitId: string | null;
   encounterId: string | null;
   dataJson: Record<string, unknown>;
@@ -167,6 +208,45 @@ export type FormSubmission = {
   schemaOutdated?: boolean;
   /** Published schema version of the form definition right now. */
   schemaCurrentVersion?: number | null;
+};
+
+export type FormShareLink = {
+  id: string;
+  token: string;
+  url: string;
+  mode: 'template' | 'instance';
+  formDefinitionId: string;
+  patientId: string | null;
+  submissionId: string | null;
+  expiresAt: string;
+};
+
+export type PublicFormPayload = {
+  link: {
+    id: string;
+    mode: 'template' | 'instance';
+    expiresAt: string;
+  };
+  form: {
+    id: string;
+    code: string;
+    name: string;
+    description: string | null;
+    eventKey: string | null;
+    schemaJson: FormSchema;
+  };
+  patient: {
+    patientId: string;
+    name: string;
+  } | null;
+  submission: {
+    id: string;
+    submissionNumber: string;
+    status: 'DRAFT' | 'SUBMITTED' | 'AMENDED';
+    formVersion: number;
+    dataJson: Record<string, unknown>;
+    amendedFromId: string | null;
+  } | null;
 };
 
 export type Visit = {

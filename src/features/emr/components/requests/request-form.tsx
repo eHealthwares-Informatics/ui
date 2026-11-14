@@ -256,6 +256,7 @@ export function RequestForm({
               schema={requestForm.schemaJson}
               value={formData}
               onChange={setFormData}
+              runtime={{ formDefinitionId: requestForm.id, hideActions: true }}
             />
           </div>
         )}
