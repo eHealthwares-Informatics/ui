@@ -27,6 +27,8 @@ const KIND_LABEL: Record<MasterItemKind, string> = {
   GENERIC_DRUG: 'NDF',
 };
 
+const DEFAULT_KINDS: MasterItemKind[] = ['STOCK_ITEM', 'GENERIC_PRODUCT', 'GENERIC_DRUG'];
+
 const KIND_COLOR: Record<MasterItemKind, string> = {
   STOCK_ITEM: 'blue',
   GENERIC_PRODUCT: 'grape',
@@ -44,13 +46,14 @@ function referenceCodeFor(item: MasterItem): string {
 /** Searchable flat list of stock items + generic products + generic drugs, tagged by source. */
 export function MasterItemSearch({
   label,
-  placeholder = 'Search items or drugs…',
+  placeholder,
   value,
   onChange,
   required = false,
   error,
   disabled = false,
   limit = 20,
+  kinds = DEFAULT_KINDS,
 }: {
   label?: string;
   placeholder?: string;
@@ -60,6 +63,8 @@ export function MasterItemSearch({
   error?: React.ReactNode;
   disabled?: boolean;
   limit?: number;
+  /** Restrict the searchable catalogues (defaults to all three). */
+  kinds?: MasterItemKind[];
 }) {
   const combobox = useCombobox();
   const [query, setQuery] = useState('');
@@ -70,21 +75,29 @@ export function MasterItemSearch({
     return () => window.clearTimeout(timer);
   }, [query]);
 
+  const searchableKinds = kinds.length > 0 ? kinds : DEFAULT_KINDS;
+  const kindsKey = searchableKinds.join(',');
+
   const { data = [], isLoading } = useQuery({
-    queryKey: ['emr', 'master-items', debounced, limit],
+    queryKey: ['emr', 'master-items', debounced, limit, kindsKey],
     queryFn: async () => {
+      const params = { search: debounced || undefined, limit, page: 1 };
       const [itemsRes, productsRes, drugsRes] = await Promise.all([
-        rxsoftApi.get<{ data: Array<Record<string, unknown>> }>('/items', {
-          params: { search: debounced || undefined, limit, page: 1 },
-        }),
-        codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-products', {
-          params: { search: debounced || undefined, limit, page: 1 },
-        }),
-        codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-drugs', {
-          params: { search: debounced || undefined, limit, page: 1 },
-        }),
+        searchableKinds.includes('STOCK_ITEM')
+          ? rxsoftApi.get<{ data: Array<Record<string, unknown>> }>('/items', { params })
+          : null,
+        searchableKinds.includes('GENERIC_PRODUCT')
+          ? codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-products', {
+              params,
+            })
+          : null,
+        searchableKinds.includes('GENERIC_DRUG')
+          ? codingConceptApi.get<{ data: Array<Record<string, unknown>> }>('/generic-drugs', {
+              params,
+            })
+          : null,
       ]);
-      const items: MasterItem[] = ((itemsRes.data?.data ?? []) as Array<Record<string, unknown>>)
+      const items: MasterItem[] = ((itemsRes?.data?.data ?? []) as Array<Record<string, unknown>>)
         .map((row) => ({
           id: String(row.id),
           label: String(row.name ?? ''),
@@ -93,7 +106,7 @@ export function MasterItemSearch({
         }))
         .filter((item) => item.label);
       const products: MasterItem[] = (
-        (productsRes.data?.data ?? []) as Array<Record<string, unknown>>
+        (productsRes?.data?.data ?? []) as Array<Record<string, unknown>>
       )
         .map((row) => ({
           id: String(row.id),
@@ -102,7 +115,7 @@ export function MasterItemSearch({
           kind: 'GENERIC_PRODUCT' as const,
         }))
         .filter((item) => item.label);
-      const drugs: MasterItem[] = ((drugsRes.data?.data ?? []) as Array<Record<string, unknown>>)
+      const drugs: MasterItem[] = ((drugsRes?.data?.data ?? []) as Array<Record<string, unknown>>)
         .map((row) => ({
           id: String(row.id),
           label: String(row.name ?? ''),
@@ -115,6 +128,15 @@ export function MasterItemSearch({
     enabled: Boolean(debounced),
     staleTime: 60_000,
   });
+
+  const emptyHint =
+    searchableKinds.length === 1
+      ? `No ${KIND_LABEL[searchableKinds[0]].toLowerCase()} entries found`
+      : 'No items or drugs found';
+  const idleHint =
+    searchableKinds.length === 1
+      ? `Type to search ${KIND_LABEL[searchableKinds[0]].toLowerCase()}`
+      : 'Type to search items or drugs';
 
   const isSelected = (item: MasterItem) => value?.kind === item.kind && value.id === item.id;
 
@@ -134,7 +156,12 @@ export function MasterItemSearch({
           required={required}
           error={error}
           disabled={disabled}
-          placeholder={placeholder}
+          placeholder={
+            placeholder ??
+            (searchableKinds.length === 1
+              ? `Search ${KIND_LABEL[searchableKinds[0]].toLowerCase()}…`
+              : 'Search items or drugs…')
+          }
           rightSection={isLoading ? <Loader size={16} /> : <Combobox.Chevron />}
           rightSectionPointerEvents="none"
           value={value ? displayFor(value) : query}
@@ -161,13 +188,13 @@ export function MasterItemSearch({
           ) : debounced && data.length === 0 ? (
             <Combobox.Empty>
               <Text size="sm" c="dimmed">
-                No items or drugs found
+                {emptyHint}
               </Text>
             </Combobox.Empty>
           ) : !debounced ? (
             <Combobox.Empty>
               <Text size="sm" c="dimmed">
-                Type to search items or drugs
+                {idleHint}
               </Text>
             </Combobox.Empty>
           ) : (

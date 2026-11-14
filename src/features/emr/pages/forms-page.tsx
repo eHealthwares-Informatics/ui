@@ -49,6 +49,7 @@ export function FormsPage() {
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['emr', 'form-definitions'] });
     queryClient.invalidateQueries({ queryKey: ['emr', 'forms'] });
+    queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
   };
 
   const publishMutation = useMutation({

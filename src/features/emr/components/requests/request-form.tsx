@@ -1,9 +1,9 @@
 import {
-  ActionIcon,
+  Alert,
   Button,
   Divider,
   Group,
-  NumberInput,
+  Loader,
   Select,
   SimpleGrid,
   Stack,
@@ -13,45 +13,29 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Trash2 } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
 import { PRIORITIES, REQUEST_TYPES, toSelectData } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
-import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
-import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
+import type { FormDefinition } from '../../lib/emr-types';
+import { formDataToRequestItems } from '../../lib/request-form-items';
+import {
+  DynamicFormFields,
+  buildInitialFormData,
+  validateFormData,
+  type FormData,
+} from '../documentation/dynamic-form';
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { StaffPicker, type StaffOption } from '../shared/staff-picker';
 
-type RequestItem = {
-  name: string;
-  code: string;
-  dose: string;
-  doseUnit: string;
-  frequency: string;
-  route: string;
-  quantity: number | '';
-  instructions: string;
-  /** Which catalogue the line was picked from. */
-  itemKind?: 'STOCK_ITEM' | 'GENERIC_PRODUCT' | 'GENERIC_DRUG' | 'LOINC_TEST';
-  /** Stable cross-system reference for the line (rxsoft + LIS). */
-  referenceCode?: string;
-  /** LOINC code when the line came from the lab test picker. */
-  testDefinitionId?: string;
-};
-
-const EMPTY_ITEM: RequestItem = {
-  name: '',
-  code: '',
-  dose: '',
-  doseUnit: '',
-  frequency: '',
-  route: '',
-  quantity: '',
-  instructions: '',
-};
-
+/**
+ * Request capture is form-driven: each request type has a published REQUEST
+ * form (seeded as REQUEST_PRESCRIPTION / REQUEST_LAB / REQUEST_RADIOLOGY /
+ * REQUEST_OTHER_TEST) whose item table mirrors the old inline editor. There is
+ * no hardcoded fallback — a type without a published form cannot be submitted.
+ */
 export function RequestForm({
   onCreated,
   onClose,
@@ -72,8 +56,8 @@ export function RequestForm({
   const [patient, setPatient] = useState<PatientOption | null>(initialPatient ?? null);
   const [patientError, setPatientError] = useState<string | null>(null);
   const [orderingProvider, setOrderingProvider] = useState<StaffOption | null>(null);
-  const [itemRefs, setItemRefs] = useState<(MasterItem | null)[]>([null]);
-  const [testRefs, setTestRefs] = useState<(LoincTest | null)[]>([null]);
+  const [formData, setFormData] = useState<FormData>({});
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   const form = useForm({
     initialValues: {
@@ -82,15 +66,39 @@ export function RequestForm({
       diagnosis: '',
       clinicalNotes: '',
       requestedAt: '',
-      items: [EMPTY_ITEM],
+      pharmacySyncTarget: 'prescription',
     },
     validate: {
       requestType: (value) => (value ? null : 'Request type is required'),
-      items: {
-        name: (value) => (value?.trim() ? null : 'Item name is required'),
-      },
     },
   });
+
+  const requestType = form.values.requestType;
+
+  const formQuery = useQuery({
+    queryKey: ['emr', 'request-form', requestType],
+    queryFn: async () => {
+      const { data } = await emrApi.get<{ data: FormDefinition[] }>('/form-definitions', {
+        params: { category: 'REQUEST', requestType, published: 'true', limit: 1 },
+      });
+      return data?.data?.[0] ?? null;
+    },
+    enabled: Boolean(requestType),
+    staleTime: 60_000,
+  });
+
+  const requestForm = formQuery.data ?? null;
+
+  // Switching type swaps the schema: seed the new form's defaults during render
+  // (the "adjust state when props change" pattern) so the first paint already
+  // shows the right controls.
+  const [initialisedFor, setInitialisedFor] = useState<string | null>(null);
+  const requestFormId = requestForm?.id ?? null;
+  if (requestForm && initialisedFor !== requestFormId) {
+    setInitialisedFor(requestFormId);
+    setFormData(buildInitialFormData(requestForm.schemaJson));
+    setFormErrors([]);
+  }
 
   const mutation = useMutation({
     mutationFn: async (values: typeof form.values) => {
@@ -98,22 +106,25 @@ export function RequestForm({
         setPatientError('Select a patient');
         throw new Error('Patient is required');
       }
-      const items = values.items
-        .filter((item) => item.name.trim())
-        .map((item) => ({
-          name: item.name,
-          code: item.code || undefined,
-          dose: item.dose || undefined,
-          doseUnit: item.doseUnit || undefined,
-          frequency: item.frequency || undefined,
-          route: item.route || undefined,
-          quantity:
-            item.quantity === '' || item.quantity == null ? undefined : Number(item.quantity),
-          instructions: item.instructions || undefined,
-          itemKind: item.itemKind || undefined,
-          referenceCode: item.referenceCode || undefined,
-          testDefinitionId: item.testDefinitionId || undefined,
-        }));
+      if (!requestForm) {
+        const message = requestFormId
+          ? 'No request form is published for this request type'
+          : 'Select a request type';
+        setFormErrors([message]);
+        throw new Error(message);
+      }
+
+      const errors = validateFormData(requestForm.schemaJson, formData);
+      const items = formDataToRequestItems(requestForm.schemaJson, formData);
+      if (items.length === 0) {
+        errors.push('Add at least one item');
+      }
+      if (errors.length > 0) {
+        setFormErrors(errors);
+        throw new Error(errors[0]);
+      }
+      setFormErrors([]);
+
       const { data } = await emrApi.post(submitUrl ?? '/requests', {
         patientId: patient.patientId,
         patientName: patient.patientName || undefined,
@@ -125,6 +136,13 @@ export function RequestForm({
         diagnosis: values.diagnosis || undefined,
         clinicalNotes: values.clinicalNotes || undefined,
         requestedAt: values.requestedAt || undefined,
+        // Only prescriptions have a pharmacy destination; lab/imaging ignore it.
+        pharmacySyncTarget:
+          values.requestType === 'PRESCRIPTION'
+            ? values.pharmacySyncTarget || undefined
+            : undefined,
+        formDefinitionId: requestForm.id,
+        formData,
         items,
       });
       return data;
@@ -160,7 +178,16 @@ export function RequestForm({
             required
             placeholder="Select type"
             data={toSelectData(REQUEST_TYPES)}
-            {...form.getInputProps('requestType')}
+            data-testid="request-form-type"
+            value={form.values.requestType}
+            onChange={(value) => {
+              form.setFieldValue('requestType', value ?? '');
+              // A new type means a new form: drop the previous answers so they
+              // are neither validated nor stored against this request.
+              setInitialisedFor(null);
+              setFormData({});
+              setFormErrors([]);
+            }}
           />
           <Select
             label="Priority"
@@ -181,6 +208,18 @@ export function RequestForm({
             {...form.getInputProps('requestedAt')}
           />
         </SimpleGrid>
+        {form.values.requestType === 'PRESCRIPTION' && (
+          <Select
+            label="Send to pharmacy as"
+            description="Prescription lands in the pharmacist transcription queue; order goes straight to the dispense queue."
+            data={[
+              { value: 'prescription', label: 'Prescription (transcribe & verify)' },
+              { value: 'order', label: 'Pharmacy order (dispense queue)' },
+            ]}
+            data-testid="request-pharmacy-sync-target"
+            {...form.getInputProps('pharmacySyncTarget')}
+          />
+        )}
         <TextInput
           label="Diagnosis"
           placeholder="Working diagnosis"
@@ -192,145 +231,57 @@ export function RequestForm({
           minRows={2}
           {...form.getInputProps('clinicalNotes')}
         />
-        <Divider label={`Items (${form.values.items.length})`} labelPosition="left" />
-        {form.values.items.map((_, index) => (
-          <Stack
-            key={index}
-            gap="xs"
-            p="sm"
-            style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 8 }}
-          >
-            <Group justify="space-between">
-              <Text size="sm" fw={500}>
-                Item {index + 1}
-              </Text>
-              {form.values.items.length > 1 && (
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  onClick={() => {
-                    form.removeListItem('items', index);
-                    setItemRefs((prev) => prev.filter((_, i) => i !== index));
-                    setTestRefs((prev) => prev.filter((_, i) => i !== index));
-                  }}
-                  aria-label="Remove item"
-                >
-                  <Trash2 size={15} />
-                </ActionIcon>
-              )}
-            </Group>
-            {form.values.requestType === 'LAB' ? (
-              <LoincTestSearch
-                label="Lab test (LOINC)"
-                placeholder="Search LOINC tests…"
-                value={testRefs[index] ?? null}
-                onChange={(next) => {
-                  setTestRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
-                  form.setFieldValue(`items.${index}.itemKind`, next ? 'LOINC_TEST' : undefined);
-                  form.setFieldValue(`items.${index}.testDefinitionId`, next?.code ?? undefined);
-                  form.setFieldValue(
-                    `items.${index}.name`,
-                    next ? `${next.name} (${next.code})` : form.values.items[index].name
-                  );
-                  form.setFieldValue(`items.${index}.code`, next?.code ?? '');
-                  form.setFieldValue(
-                    `items.${index}.referenceCode`,
-                    next ? `LOINC_TEST:${next.code}` : undefined
-                  );
-                }}
-              />
-            ) : (
-              <MasterItemSearch
-                label="Item / Drug"
-                placeholder="Search Stock, NDF or EMDEx catalogue…"
-                value={itemRefs[index] ?? null}
-                onChange={(next) => {
-                  setItemRefs((prev) => prev.map((ref, i) => (i === index ? next : ref)));
-                  setTestRefs((prev) => prev.map((ref, i) => (i === index ? null : ref)));
-                  const referenceCode = next?.referenceCode;
-                  form.setFieldValue(`items.${index}.itemKind`, next?.kind);
-                  form.setFieldValue(`items.${index}.referenceCode`, referenceCode);
-                  // Name + code concatenation: e.g. "Paracetamol 500mg — PMC-0001".
-                  form.setFieldValue(
-                    `items.${index}.name`,
-                    next ? `${next.label} — ${next.code ?? next.id}` : form.values.items[index].name
-                  );
-                  form.setFieldValue(`items.${index}.code`, next?.code ?? '');
-                }}
-              />
-            )}{' '}
-            <TextInput
-              label="Name"
-              required
-              placeholder="Item / test / medication name"
-              description="Filled from the picker as name + code"
-              {...form.getInputProps(`items.${index}.name`)}
-            />
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                label="Code"
-                placeholder="Item or LOINC code"
-                {...form.getInputProps(`items.${index}.code`)}
-              />
-              <NumberInput
-                label="Quantity"
-                min={0}
-                placeholder="0"
-                {...form.getInputProps(`items.${index}.quantity`)}
-              />
-            </SimpleGrid>
-            <SimpleGrid cols={{ base: 1, sm: 3 }}>
-              <TextInput
-                label="Dose"
-                placeholder="e.g. 500"
-                {...form.getInputProps(`items.${index}.dose`)}
-              />
-              <TextInput
-                label="Dose unit"
-                placeholder="e.g. mg"
-                {...form.getInputProps(`items.${index}.doseUnit`)}
-              />
-              <TextInput
-                label="Frequency"
-                placeholder="e.g. TDS"
-                {...form.getInputProps(`items.${index}.frequency`)}
-              />
-            </SimpleGrid>
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                label="Route"
-                placeholder="e.g. Oral"
-                {...form.getInputProps(`items.${index}.route`)}
-              />
-              <TextInput
-                label="Instructions"
-                placeholder="Special instructions"
-                {...form.getInputProps(`items.${index}.instructions`)}
-              />
-            </SimpleGrid>
-          </Stack>
-        ))}{' '}
-        <Button
-          variant="light"
-          leftSection={<Plus size={15} />}
-          onClick={() => {
-            form.insertListItem('items', { ...EMPTY_ITEM });
-            setItemRefs((prev) => [...prev, null]);
-            setTestRefs((prev) => [...prev, null]);
-          }}
-        >
-          Add item
-        </Button>
-        {patient && (
-          <Text size="xs" c="dimmed">
-            Ordering for {patient.patientId} — {patient.patientName}
+
+        <Divider label="Items" labelPosition="left" />
+
+        {!requestType ? (
+          <Text size="sm" c="dimmed">
+            Select a request type to load its form.
           </Text>
+        ) : formQuery.isLoading ? (
+          <Group gap="xs">
+            <Loader size="sm" />
+            <Text size="sm" c="dimmed">
+              Loading the {requestType.toLowerCase()} request form…
+            </Text>
+          </Group>
+        ) : !requestForm ? (
+          <Alert color="red" icon={<AlertCircle size={16} />} data-testid="request-form-missing">
+            No request form is published for {requestType.toLowerCase()}. Ask an administrator to
+            publish one under Forms → Requests.
+          </Alert>
+        ) : (
+          <div data-testid="request-form-fields">
+            <DynamicFormFields
+              schema={requestForm.schemaJson}
+              value={formData}
+              onChange={setFormData}
+            />
+          </div>
         )}
+
+        {formErrors.length > 0 && (
+          <Alert color="red" icon={<AlertCircle size={16} />} data-testid="request-form-errors">
+            <Stack gap={2}>
+              {formErrors.map((error) => (
+                <Text key={error} size="sm">
+                  {error}
+                </Text>
+              ))}
+            </Stack>
+          </Alert>
+        )}
+
         <Group justify="flex-end" mt="md">
           <Button variant="light" onClick={onClose} disabled={mutation.isPending}>
             Cancel
           </Button>
-          <Button type="submit" loading={mutation.isPending}>
+          <Button
+            type="submit"
+            loading={mutation.isPending}
+            disabled={Boolean(requestType) && (formQuery.isLoading || !requestForm)}
+            data-testid="request-form-submit"
+          >
             Create Request
           </Button>
         </Group>

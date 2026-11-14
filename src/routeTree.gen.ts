@@ -183,8 +183,10 @@ import { Route as AuthenticatedEmrAppointmentsIndexRouteImport } from './routes/
 import { Route as AuthenticatedEmrDepartmentsIndexRouteImport } from './routes/_authenticated/emr/departments/index'
 import { Route as AuthenticatedEmrEncountersIndexRouteImport } from './routes/_authenticated/emr/encounters/index'
 import { Route as AuthenticatedEmrEncountersEncounterIdRouteImport } from './routes/_authenticated/emr/encounters/$encounterId'
+import { Route as AuthenticatedEmrFeaturesIndexRouteImport } from './routes/_authenticated/emr/features/index'
 import { Route as AuthenticatedEmrFormsIndexRouteImport } from './routes/_authenticated/emr/forms/index'
 import { Route as AuthenticatedEmrMedicationsIndexRouteImport } from './routes/_authenticated/emr/medications/index'
+import { Route as AuthenticatedEmrModulesIndexRouteImport } from './routes/_authenticated/emr/modules/index'
 import { Route as AuthenticatedEmrNotificationsIndexRouteImport } from './routes/_authenticated/emr/notifications/index'
 import { Route as AuthenticatedEmrPatientsIndexRouteImport } from './routes/_authenticated/emr/patients/index'
 import { Route as AuthenticatedEmrPatientsPatientIdRouteImport } from './routes/_authenticated/emr/patients/$patientId'
@@ -335,6 +337,8 @@ import { Route as AuthenticatedConversationAiProcessorsIndexRouteImport } from '
 import { Route as AuthenticatedConversationAiProvidersIndexRouteImport } from './routes/_authenticated/conversation/ai/providers/index'
 import { Route as AuthenticatedConversationAiRequestLogsIndexRouteImport } from './routes/_authenticated/conversation/ai/request-logs/index'
 import { Route as AuthenticatedConversationNotificationDetailResourceIdRouteImport } from './routes/_authenticated/conversation/notification-detail/$resource/$id'
+import { Route as AuthenticatedEmrFeaturesFeatureIdIndexRouteImport } from './routes/_authenticated/emr/features/$featureId/index'
+import { Route as AuthenticatedEmrModulesIdIndexRouteImport } from './routes/_authenticated/emr/modules/$id/index'
 import { Route as AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport } from './routes/_authenticated/emr/settings/message-templates/index'
 import { Route as AuthenticatedLisOrdersOrderIdReportRouteImport } from './routes/_authenticated/lis/orders/$orderId/report'
 import { Route as AuthenticatedLisOrdersWorkflowCollectRouteImport } from './routes/_authenticated/lis/orders/workflow/collect'
@@ -1296,6 +1300,12 @@ const AuthenticatedEmrEncountersEncounterIdRoute =
     path: '/emr/encounters/$encounterId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrFeaturesIndexRoute =
+  AuthenticatedEmrFeaturesIndexRouteImport.update({
+    id: '/emr/features/',
+    path: '/emr/features/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrFormsIndexRoute =
   AuthenticatedEmrFormsIndexRouteImport.update({
     id: '/emr/forms/',
@@ -1306,6 +1316,12 @@ const AuthenticatedEmrMedicationsIndexRoute =
   AuthenticatedEmrMedicationsIndexRouteImport.update({
     id: '/emr/medications/',
     path: '/emr/medications/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrModulesIndexRoute =
+  AuthenticatedEmrModulesIndexRouteImport.update({
+    id: '/emr/modules/',
+    path: '/emr/modules/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedEmrNotificationsIndexRoute =
@@ -2209,6 +2225,18 @@ const AuthenticatedConversationNotificationDetailResourceIdRoute =
     path: '/conversation/notification-detail/$resource/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEmrFeaturesFeatureIdIndexRoute =
+  AuthenticatedEmrFeaturesFeatureIdIndexRouteImport.update({
+    id: '/emr/features/$featureId/',
+    path: '/emr/features/$featureId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEmrModulesIdIndexRoute =
+  AuthenticatedEmrModulesIdIndexRouteImport.update({
+    id: '/emr/modules/$id/',
+    path: '/emr/modules/$id/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEmrSettingsMessageTemplatesIndexRoute =
   AuthenticatedEmrSettingsMessageTemplatesIndexRouteImport.update({
     id: '/emr/settings/message-templates/',
@@ -2480,8 +2508,10 @@ export interface FileRoutesByFullPath {
   '/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
   '/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/features/': typeof AuthenticatedEmrFeaturesIndexRoute
   '/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/modules/': typeof AuthenticatedEmrModulesIndexRoute
   '/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
@@ -2619,6 +2649,8 @@ export interface FileRoutesByFullPath {
   '/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/emr/features/$featureId/': typeof AuthenticatedEmrFeaturesFeatureIdIndexRoute
+  '/emr/modules/$id/': typeof AuthenticatedEmrModulesIdIndexRoute
   '/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/lis/result-amendments/$id/': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
@@ -2816,8 +2848,10 @@ export interface FileRoutesByTo {
   '/emr/appointments': typeof AuthenticatedEmrAppointmentsIndexRoute
   '/emr/departments': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/emr/encounters': typeof AuthenticatedEmrEncountersIndexRoute
+  '/emr/features': typeof AuthenticatedEmrFeaturesIndexRoute
   '/emr/forms': typeof AuthenticatedEmrFormsIndexRoute
   '/emr/medications': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/emr/modules': typeof AuthenticatedEmrModulesIndexRoute
   '/emr/notifications': typeof AuthenticatedEmrNotificationsIndexRoute
   '/emr/patients': typeof AuthenticatedEmrPatientsIndexRoute
   '/emr/referrals': typeof AuthenticatedEmrReferralsIndexRoute
@@ -2955,6 +2989,8 @@ export interface FileRoutesByTo {
   '/conversation/ai/processors': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/conversation/ai/providers': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/conversation/ai/request-logs': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/emr/features/$featureId': typeof AuthenticatedEmrFeaturesFeatureIdIndexRoute
+  '/emr/modules/$id': typeof AuthenticatedEmrModulesIdIndexRoute
   '/emr/settings/message-templates': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/lis/result-amendments/$id': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/rxsoft/reports/balance-sheet': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
@@ -3158,8 +3194,10 @@ export interface FileRoutesById {
   '/_authenticated/emr/appointments/': typeof AuthenticatedEmrAppointmentsIndexRoute
   '/_authenticated/emr/departments/': typeof AuthenticatedEmrDepartmentsIndexRoute
   '/_authenticated/emr/encounters/': typeof AuthenticatedEmrEncountersIndexRoute
+  '/_authenticated/emr/features/': typeof AuthenticatedEmrFeaturesIndexRoute
   '/_authenticated/emr/forms/': typeof AuthenticatedEmrFormsIndexRoute
   '/_authenticated/emr/medications/': typeof AuthenticatedEmrMedicationsIndexRoute
+  '/_authenticated/emr/modules/': typeof AuthenticatedEmrModulesIndexRoute
   '/_authenticated/emr/notifications/': typeof AuthenticatedEmrNotificationsIndexRoute
   '/_authenticated/emr/patients/': typeof AuthenticatedEmrPatientsIndexRoute
   '/_authenticated/emr/referrals/': typeof AuthenticatedEmrReferralsIndexRoute
@@ -3297,6 +3335,8 @@ export interface FileRoutesById {
   '/_authenticated/conversation/ai/processors/': typeof AuthenticatedConversationAiProcessorsIndexRoute
   '/_authenticated/conversation/ai/providers/': typeof AuthenticatedConversationAiProvidersIndexRoute
   '/_authenticated/conversation/ai/request-logs/': typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  '/_authenticated/emr/features/$featureId/': typeof AuthenticatedEmrFeaturesFeatureIdIndexRoute
+  '/_authenticated/emr/modules/$id/': typeof AuthenticatedEmrModulesIdIndexRoute
   '/_authenticated/emr/settings/message-templates/': typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   '/_authenticated/lis/result-amendments/$id/': typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   '/_authenticated/rxsoft/reports/balance-sheet/': typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
@@ -3498,8 +3538,10 @@ export interface FileRouteTypes {
     | '/emr/appointments/'
     | '/emr/departments/'
     | '/emr/encounters/'
+    | '/emr/features/'
     | '/emr/forms/'
     | '/emr/medications/'
+    | '/emr/modules/'
     | '/emr/notifications/'
     | '/emr/patients/'
     | '/emr/referrals/'
@@ -3637,6 +3679,8 @@ export interface FileRouteTypes {
     | '/conversation/ai/processors/'
     | '/conversation/ai/providers/'
     | '/conversation/ai/request-logs/'
+    | '/emr/features/$featureId/'
+    | '/emr/modules/$id/'
     | '/emr/settings/message-templates/'
     | '/lis/result-amendments/$id/'
     | '/rxsoft/reports/balance-sheet/'
@@ -3834,8 +3878,10 @@ export interface FileRouteTypes {
     | '/emr/appointments'
     | '/emr/departments'
     | '/emr/encounters'
+    | '/emr/features'
     | '/emr/forms'
     | '/emr/medications'
+    | '/emr/modules'
     | '/emr/notifications'
     | '/emr/patients'
     | '/emr/referrals'
@@ -3973,6 +4019,8 @@ export interface FileRouteTypes {
     | '/conversation/ai/processors'
     | '/conversation/ai/providers'
     | '/conversation/ai/request-logs'
+    | '/emr/features/$featureId'
+    | '/emr/modules/$id'
     | '/emr/settings/message-templates'
     | '/lis/result-amendments/$id'
     | '/rxsoft/reports/balance-sheet'
@@ -4175,8 +4223,10 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/appointments/'
     | '/_authenticated/emr/departments/'
     | '/_authenticated/emr/encounters/'
+    | '/_authenticated/emr/features/'
     | '/_authenticated/emr/forms/'
     | '/_authenticated/emr/medications/'
+    | '/_authenticated/emr/modules/'
     | '/_authenticated/emr/notifications/'
     | '/_authenticated/emr/patients/'
     | '/_authenticated/emr/referrals/'
@@ -4314,6 +4364,8 @@ export interface FileRouteTypes {
     | '/_authenticated/conversation/ai/processors/'
     | '/_authenticated/conversation/ai/providers/'
     | '/_authenticated/conversation/ai/request-logs/'
+    | '/_authenticated/emr/features/$featureId/'
+    | '/_authenticated/emr/modules/$id/'
     | '/_authenticated/emr/settings/message-templates/'
     | '/_authenticated/lis/result-amendments/$id/'
     | '/_authenticated/rxsoft/reports/balance-sheet/'
@@ -5612,6 +5664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmrEncountersEncounterIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/features/': {
+      id: '/_authenticated/emr/features/'
+      path: '/emr/features'
+      fullPath: '/emr/features/'
+      preLoaderRoute: typeof AuthenticatedEmrFeaturesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/forms/': {
       id: '/_authenticated/emr/forms/'
       path: '/emr/forms'
@@ -5624,6 +5683,13 @@ declare module '@tanstack/react-router' {
       path: '/emr/medications'
       fullPath: '/emr/medications/'
       preLoaderRoute: typeof AuthenticatedEmrMedicationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/modules/': {
+      id: '/_authenticated/emr/modules/'
+      path: '/emr/modules'
+      fullPath: '/emr/modules/'
+      preLoaderRoute: typeof AuthenticatedEmrModulesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/emr/notifications/': {
@@ -6676,6 +6742,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationNotificationDetailResourceIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/emr/features/$featureId/': {
+      id: '/_authenticated/emr/features/$featureId/'
+      path: '/emr/features/$featureId'
+      fullPath: '/emr/features/$featureId/'
+      preLoaderRoute: typeof AuthenticatedEmrFeaturesFeatureIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/emr/modules/$id/': {
+      id: '/_authenticated/emr/modules/$id/'
+      path: '/emr/modules/$id'
+      fullPath: '/emr/modules/$id/'
+      preLoaderRoute: typeof AuthenticatedEmrModulesIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emr/settings/message-templates/': {
       id: '/_authenticated/emr/settings/message-templates/'
       path: '/emr/settings/message-templates'
@@ -6990,8 +7070,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmrAppointmentsIndexRoute: typeof AuthenticatedEmrAppointmentsIndexRoute
   AuthenticatedEmrDepartmentsIndexRoute: typeof AuthenticatedEmrDepartmentsIndexRoute
   AuthenticatedEmrEncountersIndexRoute: typeof AuthenticatedEmrEncountersIndexRoute
+  AuthenticatedEmrFeaturesIndexRoute: typeof AuthenticatedEmrFeaturesIndexRoute
   AuthenticatedEmrFormsIndexRoute: typeof AuthenticatedEmrFormsIndexRoute
   AuthenticatedEmrMedicationsIndexRoute: typeof AuthenticatedEmrMedicationsIndexRoute
+  AuthenticatedEmrModulesIndexRoute: typeof AuthenticatedEmrModulesIndexRoute
   AuthenticatedEmrNotificationsIndexRoute: typeof AuthenticatedEmrNotificationsIndexRoute
   AuthenticatedEmrPatientsIndexRoute: typeof AuthenticatedEmrPatientsIndexRoute
   AuthenticatedEmrReferralsIndexRoute: typeof AuthenticatedEmrReferralsIndexRoute
@@ -7122,6 +7204,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConversationAiProcessorsIndexRoute: typeof AuthenticatedConversationAiProcessorsIndexRoute
   AuthenticatedConversationAiProvidersIndexRoute: typeof AuthenticatedConversationAiProvidersIndexRoute
   AuthenticatedConversationAiRequestLogsIndexRoute: typeof AuthenticatedConversationAiRequestLogsIndexRoute
+  AuthenticatedEmrFeaturesFeatureIdIndexRoute: typeof AuthenticatedEmrFeaturesFeatureIdIndexRoute
+  AuthenticatedEmrModulesIdIndexRoute: typeof AuthenticatedEmrModulesIdIndexRoute
   AuthenticatedEmrSettingsMessageTemplatesIndexRoute: typeof AuthenticatedEmrSettingsMessageTemplatesIndexRoute
   AuthenticatedLisResultAmendmentsIdIndexRoute: typeof AuthenticatedLisResultAmendmentsIdIndexRoute
   AuthenticatedRxsoftReportsBalanceSheetIndexRoute: typeof AuthenticatedRxsoftReportsBalanceSheetIndexRoute
@@ -7282,8 +7366,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedEmrAppointmentsIndexRoute,
   AuthenticatedEmrDepartmentsIndexRoute: AuthenticatedEmrDepartmentsIndexRoute,
   AuthenticatedEmrEncountersIndexRoute: AuthenticatedEmrEncountersIndexRoute,
+  AuthenticatedEmrFeaturesIndexRoute: AuthenticatedEmrFeaturesIndexRoute,
   AuthenticatedEmrFormsIndexRoute: AuthenticatedEmrFormsIndexRoute,
   AuthenticatedEmrMedicationsIndexRoute: AuthenticatedEmrMedicationsIndexRoute,
+  AuthenticatedEmrModulesIndexRoute: AuthenticatedEmrModulesIndexRoute,
   AuthenticatedEmrNotificationsIndexRoute:
     AuthenticatedEmrNotificationsIndexRoute,
   AuthenticatedEmrPatientsIndexRoute: AuthenticatedEmrPatientsIndexRoute,
@@ -7505,6 +7591,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationAiProvidersIndexRoute,
   AuthenticatedConversationAiRequestLogsIndexRoute:
     AuthenticatedConversationAiRequestLogsIndexRoute,
+  AuthenticatedEmrFeaturesFeatureIdIndexRoute:
+    AuthenticatedEmrFeaturesFeatureIdIndexRoute,
+  AuthenticatedEmrModulesIdIndexRoute: AuthenticatedEmrModulesIdIndexRoute,
   AuthenticatedEmrSettingsMessageTemplatesIndexRoute:
     AuthenticatedEmrSettingsMessageTemplatesIndexRoute,
   AuthenticatedLisResultAmendmentsIdIndexRoute:
