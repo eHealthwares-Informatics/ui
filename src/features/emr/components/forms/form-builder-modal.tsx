@@ -53,10 +53,40 @@ const FIELD_TYPES: FormFieldType[] = [
   'tab',
   'col',
   'item',
+  'inventory-item',
+  'generic-product',
+  'generic-drug',
+  'loinc-test',
   'annotate',
 ];
 
-const TABLE_COLUMN_TYPES: FormFieldType[] = ['text', 'number', 'textarea', 'date', 'checkbox'];
+/** Clearer labels than the enum formatter gives hyphenated control types. */
+const FIELD_TYPE_LABELS: Partial<Record<FormFieldType, string>> = {
+  item: 'Catalogue item (stock + generics)',
+  'inventory-item': 'Inventory item (stock only)',
+  'generic-product': 'Generic product (EMDEx)',
+  'generic-drug': 'Generic drug (NDF)',
+  'loinc-test': 'Lab test (LOINC)',
+  annotate: 'Annotate (body map)',
+};
+
+const FIELD_TYPE_OPTIONS = FIELD_TYPES.map((value) => ({
+  value,
+  label: FIELD_TYPE_LABELS[value] ?? toSelectData([value])[0].label,
+}));
+
+const TABLE_COLUMN_TYPES: FormFieldType[] = [
+  'text',
+  'number',
+  'textarea',
+  'date',
+  'checkbox',
+  'item',
+  'inventory-item',
+  'generic-product',
+  'generic-drug',
+  'loinc-test',
+];
 
 /** Grid span choices for the per-field `col` attribute (12 = full width/unset). */
 const COL_OPTIONS = [
@@ -91,7 +121,17 @@ type BuilderField = {
   annotateOrgan: string;
 };
 
-const CATEGORIES = ['CLINICAL_NOTE', 'VITALS', 'ASSESSMENT', 'SCREENING', 'PROCEDURE', 'OTHER'];
+const CATEGORIES = [
+  'CLINICAL_NOTE',
+  'VITALS',
+  'ASSESSMENT',
+  'SCREENING',
+  'PROCEDURE',
+  'REQUEST',
+  'OTHER',
+];
+
+const REQUEST_TYPES = ['PRESCRIPTION', 'LAB', 'RADIOLOGY', 'OTHER_TEST'];
 
 let uidCounter = 0;
 function nextUid(): string {
@@ -245,7 +285,13 @@ function schemaToBuilder(schema: FormSchema | undefined): BuilderField[] {
   return (schema?.fields ?? []).map(mapField);
 }
 
-function validate(fields: BuilderField[], name: string, code: string, category: string): string[] {
+function validate(
+  fields: BuilderField[],
+  name: string,
+  code: string,
+  category: string,
+  requestType: string
+): string[] {
   const errors: string[] = [];
   if (!name.trim()) {
     errors.push('Form name is required');
@@ -255,6 +301,9 @@ function validate(fields: BuilderField[], name: string, code: string, category: 
   }
   if (!category) {
     errors.push('Category is required');
+  }
+  if (category === 'REQUEST' && !requestType) {
+    errors.push('Request type is required for request forms');
   }
 
   const keys = new Set<string>();
@@ -432,7 +481,7 @@ function FieldEditor({
           </ActionIcon>
           <Select
             label="Type"
-            data={toSelectData(FIELD_TYPES)}
+            data={FIELD_TYPE_OPTIONS}
             value={field.type}
             onChange={(value) => patch({ type: (value as FormFieldType) ?? 'text' })}
             style={{ width: 150, flexShrink: 0 }}
@@ -736,6 +785,7 @@ export function FormBuilderModal({
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
+  const [requestType, setRequestType] = useState('');
   const [fields, setFields] = useState<BuilderField[]>([]);
   const [previewData, setPreviewData] = useState<FormData>({});
   const [jsonDraft, setJsonDraft] = useState('');
@@ -750,6 +800,7 @@ export function FormBuilderModal({
     setCode(initial?.code ?? '');
     setDescription(initial?.description ?? '');
     setCategory(initial?.category ?? '');
+    setRequestType(initial?.requestType ?? '');
     setFields(schemaToBuilder(initial?.schemaJson));
     setPreviewData({});
     setJsonDraft('');
@@ -787,7 +838,7 @@ export function FormBuilderModal({
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const errors = validate(fields, name, code, category);
+      const errors = validate(fields, name, code, category, requestType);
       if (errors.length > 0) {
         throw new Error(errors.join('; '));
       }
@@ -795,6 +846,8 @@ export function FormBuilderModal({
         name: name.trim(),
         description: description.trim() || undefined,
         category,
+        // Only request forms need a request type; clear it for other categories.
+        requestType: category === 'REQUEST' ? requestType : undefined,
         schemaJson: builderToSchema(fields),
       };
       if (isEdit && initial) {
@@ -857,6 +910,17 @@ export function FormBuilderModal({
               onChange={(value) => setCategory(value ?? '')}
               style={{ flex: 1, minWidth: 160 }}
             />
+            {category === 'REQUEST' && (
+              <Select
+                label="Request type"
+                required
+                placeholder="Select request type"
+                data={toSelectData(REQUEST_TYPES)}
+                value={requestType}
+                onChange={(value) => setRequestType(value ?? '')}
+                style={{ flex: 1, minWidth: 160 }}
+              />
+            )}
             <TextInput
               label="Description"
               placeholder="Short description"

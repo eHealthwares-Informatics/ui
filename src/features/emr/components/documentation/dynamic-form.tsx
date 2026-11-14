@@ -17,11 +17,36 @@ import {
 } from '@mantine/core';
 import { Plus, Trash2 } from 'lucide-react';
 import { formatEnum } from '../../lib/emr-constants';
-import type { FormFieldSchema, FormSchema } from '../../lib/emr-types';
+import type { FormFieldSchema, FormFieldType, FormSchema } from '../../lib/emr-types';
 import { AnnotateField } from '../forms/annotate';
-import { MasterItemSearch, type MasterItem } from '../shared/master-item-search';
+import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
+import {
+  MasterItemSearch,
+  type MasterItem,
+  type MasterItemKind,
+} from '../shared/master-item-search';
 
 export type FormData = Record<string, unknown>;
+
+/** Restrict the catalogue picker for the field's control type. */
+function pickerKinds(type: FormFieldType): MasterItemKind[] | undefined {
+  switch (type) {
+    case 'inventory-item':
+      return ['STOCK_ITEM'];
+    case 'generic-product':
+      return ['GENERIC_PRODUCT'];
+    case 'generic-drug':
+      return ['GENERIC_DRUG'];
+    default:
+      return undefined;
+  }
+}
+
+function isLoincTest(value: unknown): value is LoincTest {
+  return (
+    typeof value === 'object' && value !== null && typeof (value as LoincTest).code === 'string'
+  );
+}
 
 function optionsFor(field: FormFieldSchema) {
   return (field.options ?? []).map((option) => ({ value: option, label: formatEnum(option) }));
@@ -43,6 +68,26 @@ function TableCell({
           size="xs"
           value={typeof value === 'number' ? value : ''}
           onChange={(next) => onChange(next === '' ? undefined : Number(next))}
+        />
+      );
+    case 'item':
+    case 'inventory-item':
+    case 'generic-product':
+    case 'generic-drug':
+      return (
+        <MasterItemSearch
+          value={typeof value === 'object' && value !== null ? (value as MasterItem) : null}
+          onChange={(next) => onChange(next ?? undefined)}
+          kinds={pickerKinds(column.type)}
+          limit={10}
+        />
+      );
+    case 'loinc-test':
+      return (
+        <LoincTestSearch
+          value={isLoincTest(value) ? value : null}
+          onChange={(next) => onChange(next ?? undefined)}
+          limit={10}
         />
       );
     case 'select':
@@ -246,12 +291,26 @@ function DynamicField({
         </CheckboxGroup>
       );
     case 'item':
+    case 'inventory-item':
+    case 'generic-product':
+    case 'generic-drug':
       return (
         <MasterItemSearch
           label={field.label}
           required={field.required}
-          placeholder={field.placeholder ?? 'Search items or drugs…'}
+          placeholder={field.placeholder}
+          kinds={pickerKinds(field.type)}
           value={typeof value === 'object' && value !== null ? (value as MasterItem) : null}
+          onChange={(next) => onChange(next ?? undefined)}
+        />
+      );
+    case 'loinc-test':
+      return (
+        <LoincTestSearch
+          label={field.label}
+          required={field.required}
+          placeholder={field.placeholder}
+          value={isLoincTest(value) ? value : null}
           onChange={(next) => onChange(next ?? undefined)}
         />
       );

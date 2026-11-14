@@ -33,6 +33,7 @@ export const ENCOUNTER_TYPES = [
   'DISCHARGE',
   'PROCEDURE',
   'ADMISSION',
+  'ANTENATAL',
   'OTHER',
 ] as const;
 
@@ -153,7 +154,7 @@ export function formatEnum(value: string | null | undefined): string {
   }
   return value
     .toLowerCase()
-    .split(/[_\s]+/)
+    .split(/[_\s-]+/)
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useModuleId } from '@/context/module-context';
 import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
+import { useSubModuleNav } from '@/features/emr/hooks/use-sub-module-nav';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
 import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
@@ -21,20 +22,24 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
   );
 
   const isSuperAdmin = user?.roles?.includes('super_admin') ?? false;
-  const navGroups = filterNavGroupsByModule(
+  const staticGroups = filterNavGroupsByModule(
     sidebarData.navGroups,
     moduleId,
     user?.permissions ?? [],
     isSuperAdmin
   );
+  const subModuleGroups = useSubModuleNav(moduleId);
+  const navGroups = [...staticGroups, ...subModuleGroups];
+  const navGroupsKey = navGroups.map((group) => group.title).join('|');
   const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
 
-  // Switching modules rebuilds `navGroups`; index-keyed expansion state from the
-  // previous module would otherwise leak into the new menu and make groups look
-  // duplicated/open unexpectedly.
+  // Switching modules (or loading runtime SubModule groups) rebuilds
+  // `navGroups`; index-keyed expansion state from the previous menu would
+  // otherwise leak into the new one.
   useEffect(() => {
     setExpandState(navGroups.map(() => false));
-  }, [moduleId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moduleId, navGroupsKey]);
 
   const resetExpandState = (index: number, expanded: boolean) => {
     setExpandState(navGroups.map((_, i) => (i === index ? !expanded : false)));

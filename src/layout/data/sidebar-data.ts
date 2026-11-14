@@ -771,6 +771,27 @@ export const sidebarData: SidebarData = {
           icon: Building2,
           modules: ['admin'],
         },
+        {
+          title: 'Modules',
+          url: '/emr/modules',
+          permission: 'emr.form.read',
+          icon: Layers3,
+          modules: ['admin'],
+        },
+        {
+          title: 'Features',
+          url: '/emr/features',
+          permission: 'emr.form.read',
+          icon: ClipboardList,
+          modules: ['admin'],
+        },
+        {
+          title: 'Forms',
+          url: '/emr/forms',
+          permission: 'emr.form.read',
+          icon: FileSpreadsheet,
+          modules: ['admin'],
+        },
       ],
     },
     {
@@ -807,13 +828,6 @@ export const sidebarData: SidebarData = {
           title: 'Departments',
           url: '/emr/departments',
           icon: Building2,
-          modules: ['admin'],
-        },
-        {
-          title: 'Forms',
-          url: '/emr/forms',
-          permission: 'emr.form.read',
-          icon: FileSpreadsheet,
           modules: ['admin'],
         },
         {
@@ -1468,6 +1482,13 @@ export const sidebarData: SidebarData = {
           url: '/emr/encounters',
           permission: 'emr.encounter.read',
           icon: Stethoscope,
+          modules: ['emr'],
+        },
+        {
+          title: 'Forms',
+          url: '/emr/forms',
+          permission: 'emr.form.read',
+          icon: FileSpreadsheet,
           modules: ['emr'],
         },
         {

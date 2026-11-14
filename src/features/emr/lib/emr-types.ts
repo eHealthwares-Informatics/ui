@@ -82,6 +82,10 @@ export type FormFieldType =
   | 'tab'
   | 'col'
   | 'item'
+  | 'inventory-item'
+  | 'generic-product'
+  | 'generic-drug'
+  | 'loinc-test'
   | 'annotate';
 
 export type AnnotateTarget = 'body' | 'dermatome' | 'organ';
@@ -133,6 +137,8 @@ export type FormDefinition = {
   description: string | null;
   version: number;
   category: string;
+  /** REQUEST forms only: the request type they capture. */
+  requestType?: string | null;
   schemaJson: FormSchema;
   isPublished: boolean;
   publishedVersion: number | null;
@@ -154,6 +160,9 @@ export type FormSubmission = {
   submittedByName: string | null;
   submittedAt: string | null;
   amendedFromId: string | null;
+  /** Organisation and site of the user who recorded (or amended) the entry. */
+  organizationId: string | null;
+  locationId: string | null;
   /** True when the submission was filled against an older published schema. */
   schemaOutdated?: boolean;
   /** Published schema version of the form definition right now. */
@@ -190,6 +199,80 @@ export type Encounter = {
   notes: string | null;
   /** DB insert instant — reliable fallback when `encounterDatetime` is skewed. */
   createdAt?: string;
+};
+
+export type EMRSubModule = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  featureCount?: number;
+  features?: Feature[];
+};
+
+/**
+ * A Feature is a form definition plus its runtime configuration. The form is
+ * the feature's CRUD surface (its submissions list).
+ */
+export type Feature = {
+  id: string;
+  subModuleId: string;
+  formDefinitionId: string;
+  encounterType: string;
+  roleCodes: string[];
+  sortOrder: number;
+  isActive: boolean;
+  form?: FormDefinition;
+  subModule?: { id: string; code: string; name: string; icon: string | null };
+};
+
+/** One feature in the sidebar navigation payload. */
+export type FeatureNavigation = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  formDefinitionId: string;
+  encounterType: string;
+  roleCodes: string[];
+  sortOrder: number;
+};
+
+export type SubModuleNavigation = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  sortOrder: number;
+  features: FeatureNavigation[];
+};
+
+/** Result of starting a feature session (same-day appointment/visit/encounter). */
+export type FeatureSession = {
+  encounter: Encounter;
+  visit: {
+    id: string;
+    visitNumber: string;
+    patientId: string;
+    patientName: string;
+    status: string;
+    startDatetime: string;
+  };
+  appointment: {
+    id: string;
+    appointmentNumber: string;
+    date: string;
+    status: string;
+  } | null;
+  admission: {
+    id: string;
+    admissionNumber: string;
+    visitId: string | null;
+  } | null;
 };
 
 export type RequestItem = {
