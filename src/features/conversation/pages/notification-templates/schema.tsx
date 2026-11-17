@@ -5,6 +5,7 @@ import {
   Button,
   Group,
   Paper,
+  SegmentedControl,
   Select,
   Stack,
   Switch,
@@ -16,6 +17,8 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { JsonEditorField } from '@/components/form/json-editor-field';
 import { EQUALS_WITH_OPTIONS, FILTERS, type Column, type Field } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
@@ -325,6 +328,41 @@ function TemplateBodiesEditor({
     }
   };
 
+  // JSON mode edits the whole WhatsApp template (`bodies.whatsapp_template`) so
+  // a template can be copied/pasted between environments.
+  const [templateMode, setTemplateMode] = useState<'form' | 'json'>('form');
+
+  const whatsappTemplateJson = useMemo(
+    () => ({
+      name: form.whatsappTemplateName,
+      language: form.whatsappTemplateLanguage || 'en',
+      parameterFormat: form.parameterFormat,
+      body: form.whatsappTemplateBody,
+      components: form.components,
+    }),
+    [
+      form.whatsappTemplateName,
+      form.whatsappTemplateLanguage,
+      form.parameterFormat,
+      form.whatsappTemplateBody,
+      form.components,
+    ]
+  );
+
+  const applyWhatsappTemplateJson = (value: unknown) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return;
+    }
+    const template = value as Record<string, any>;
+    setForm({
+      whatsappTemplateName: String(template.name ?? ''),
+      whatsappTemplateLanguage: String(template.language ?? 'en'),
+      whatsappTemplateBody: String(template.body ?? ''),
+      parameterFormat: template.parameterFormat === 'named' ? 'named' : 'positional',
+      components: Array.isArray(template.components) ? template.components : [],
+    });
+  };
+
   const updateComponent = (index: number, patch: Partial<ComponentSpec>) => {
     setForm({
       components: form.components.map((component, i) =>
@@ -399,244 +437,276 @@ function TemplateBodiesEditor({
 
       <Tabs.Panel value="whatsapp_template" pt="md">
         <Stack>
-          <Group grow>
-            <TextInput
-              label="Template name"
-              value={form.whatsappTemplateName}
-              onChange={(event) => setForm({ whatsappTemplateName: event.currentTarget.value })}
-            />
-            <TextInput
-              label="Language"
-              value={form.whatsappTemplateLanguage}
-              onChange={(event) => setForm({ whatsappTemplateLanguage: event.currentTarget.value })}
-            />
-            <Select
-              label="Parameter format"
-              description="Named sends each parameter's field key as its Meta parameter_name."
-              data={[
-                { value: 'positional', label: 'Positional ({{1}})' },
-                { value: 'named', label: 'Named ({{name}})' },
-              ]}
-              value={form.parameterFormat}
-              onChange={(value) =>
-                setForm({
-                  parameterFormat: (value as TemplateForm['parameterFormat']) ?? 'positional',
-                })
-              }
-            />
-          </Group>
-          <Textarea
-            label="Fallback text"
-            minRows={3}
-            value={form.whatsappTemplateBody}
-            onChange={(event) => setForm({ whatsappTemplateBody: event.currentTarget.value })}
+          <SegmentedControl
+            data-testid="notification-template-whatsapp-mode"
+            data={[
+              { value: 'form', label: 'Form' },
+              { value: 'json', label: 'JSON' },
+            ]}
+            value={templateMode}
+            onChange={(value) => setTemplateMode(value as 'form' | 'json')}
           />
-
-          <Switch
-            label="Use as WhatsApp consent template"
-            description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
-            checked={form.sendConsentTemplate}
-            onChange={(event) => setForm({ sendConsentTemplate: event.currentTarget.checked })}
-          />
-
-          <Group justify="space-between">
-            <Text size="sm" fw={600}>
-              Components
-            </Text>
-            <Group gap="xs">
-              <Button size="compact-xs" variant="light" onClick={() => addComponent('header')}>
-                + Header
-              </Button>
-              <Button size="compact-xs" variant="light" onClick={() => addComponent('body')}>
-                + Body
-              </Button>
-              <Button size="compact-xs" variant="light" onClick={() => addComponent('button')}>
-                + Button
-              </Button>
-            </Group>
-          </Group>
-
-          {form.components.map((component, ci) => (
-            <Paper key={`${component.type}-${ci}`} withBorder p="sm" radius="sm">
-              <Group justify="space-between" mb="xs">
-                <Group grow>
-                  <Select
-                    label="Component"
-                    data={[
-                      { value: 'header', label: 'Header' },
-                      { value: 'body', label: 'Body' },
-                      { value: 'button', label: 'Button' },
-                    ]}
-                    value={component.type}
-                    onChange={(value) =>
-                      updateComponent(ci, { type: (value as ComponentSpec['type']) ?? 'body' })
-                    }
-                  />
-                  {component.type === 'header' && (
-                    <Select
-                      label="Header type"
-                      data={['text', 'image', 'video', 'document'].map((value) => ({
-                        value,
-                        label: value,
-                      }))}
-                      value={component.headerType ?? 'text'}
-                      onChange={(value) =>
-                        updateComponent(ci, {
-                          headerType: (value as ComponentSpec['headerType']) ?? 'text',
-                        })
-                      }
-                    />
-                  )}
-                  {component.type === 'button' && (
-                    <>
-                      <Select
-                        label="Button type"
-                        data={[
-                          { value: 'url', label: 'URL' },
-                          { value: 'quick_reply', label: 'Quick reply' },
-                          { value: 'copy_code', label: 'Copy code' },
-                        ]}
-                        value={component.subType ?? 'url'}
-                        onChange={(value) =>
-                          updateComponent(ci, {
-                            subType: (value as ComponentSpec['subType']) ?? 'url',
-                          })
-                        }
-                      />
-                      <TextInput
-                        label="Index"
-                        value={component.index ?? '0'}
-                        onChange={(event) =>
-                          updateComponent(ci, { index: event.currentTarget.value })
-                        }
-                      />
-                    </>
-                  )}
-                </Group>
-                <ActionIcon
-                  color="red"
-                  variant="subtle"
-                  onClick={() =>
+          {templateMode === 'json' ? (
+            <>
+              <JsonEditorField
+                label="WhatsApp template (JSON)"
+                data-testid="notification-template-whatsapp-json"
+                helpText="Copy/paste the whole template: name, language, parameterFormat, body, components."
+                value={whatsappTemplateJson}
+                onChange={applyWhatsappTemplateJson}
+                minRows={16}
+              />
+              <Switch
+                label="Use as WhatsApp consent template"
+                description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
+                checked={form.sendConsentTemplate}
+                onChange={(event) => setForm({ sendConsentTemplate: event.currentTarget.checked })}
+              />
+            </>
+          ) : (
+            <>
+              <Group grow>
+                <TextInput
+                  label="Template name"
+                  value={form.whatsappTemplateName}
+                  onChange={(event) => setForm({ whatsappTemplateName: event.currentTarget.value })}
+                />
+                <TextInput
+                  label="Language"
+                  value={form.whatsappTemplateLanguage}
+                  onChange={(event) =>
+                    setForm({ whatsappTemplateLanguage: event.currentTarget.value })
+                  }
+                />
+                <Select
+                  label="Parameter format"
+                  description="Named sends each parameter's field key as its Meta parameter_name."
+                  data={[
+                    { value: 'positional', label: 'Positional ({{1}})' },
+                    { value: 'named', label: 'Named ({{name}})' },
+                  ]}
+                  value={form.parameterFormat}
+                  onChange={(value) =>
                     setForm({
-                      components: form.components.filter((_, index) => index !== ci),
+                      parameterFormat: (value as TemplateForm['parameterFormat']) ?? 'positional',
                     })
                   }
-                >
-                  <Trash2 size={14} />
-                </ActionIcon>
+                />
+              </Group>
+              <Textarea
+                label="Fallback text"
+                minRows={3}
+                value={form.whatsappTemplateBody}
+                onChange={(event) => setForm({ whatsappTemplateBody: event.currentTarget.value })}
+              />
+
+              <Switch
+                label="Use as WhatsApp consent template"
+                description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
+                checked={form.sendConsentTemplate}
+                onChange={(event) => setForm({ sendConsentTemplate: event.currentTarget.checked })}
+              />
+
+              <Group justify="space-between">
+                <Text size="sm" fw={600}>
+                  Components
+                </Text>
+                <Group gap="xs">
+                  <Button size="compact-xs" variant="light" onClick={() => addComponent('header')}>
+                    + Header
+                  </Button>
+                  <Button size="compact-xs" variant="light" onClick={() => addComponent('body')}>
+                    + Body
+                  </Button>
+                  <Button size="compact-xs" variant="light" onClick={() => addComponent('button')}>
+                    + Button
+                  </Button>
+                </Group>
               </Group>
 
-              <Stack gap="xs">
-                {component.parameters.map((parameter, pi) => (
-                  <Group key={pi} align="flex-end" gap="xs" wrap="nowrap">
-                    <Select
-                      label="Source"
-                      data={[
-                        { value: 'attribute', label: 'Attribute' },
-                        { value: 'array', label: 'Array' },
-                      ]}
-                      value={parameter.source}
-                      onChange={(value) =>
-                        updateParameter(ci, pi, {
-                          source: (value as ParamSpec['source']) ?? 'attribute',
-                        })
-                      }
-                    />
-                    <TextInput
-                      label="Context key"
-                      placeholder="customer.name"
-                      value={parameter.key}
-                      onChange={(event) =>
-                        updateParameter(ci, pi, { key: event.currentTarget.value })
-                      }
-                    />
-                    <TextInput
-                      label={
-                        form.parameterFormat === 'named'
-                          ? 'Parameter name'
-                          : parameter.source === 'array'
-                            ? 'Item key'
-                            : 'Field key'
-                      }
-                      placeholder={
-                        form.parameterFormat === 'named'
-                          ? 'customer_name'
-                          : parameter.source === 'array'
-                            ? 'name'
-                            : '(optional)'
-                      }
-                      description={
-                        form.parameterFormat === 'named'
-                          ? 'Sent as Meta parameter_name (and plucks this field from object values).'
-                          : undefined
-                      }
-                      required={form.parameterFormat === 'named'}
-                      value={parameter.itemKey ?? ''}
-                      onChange={(event) =>
-                        updateParameter(ci, pi, { itemKey: event.currentTarget.value })
-                      }
-                    />
-                    {parameter.source === 'array' && (
-                      <>
+              {form.components.map((component, ci) => (
+                <Paper key={`${component.type}-${ci}`} withBorder p="sm" radius="sm">
+                  <Group justify="space-between" mb="xs">
+                    <Group grow>
+                      <Select
+                        label="Component"
+                        data={[
+                          { value: 'header', label: 'Header' },
+                          { value: 'body', label: 'Body' },
+                          { value: 'button', label: 'Button' },
+                        ]}
+                        value={component.type}
+                        onChange={(value) =>
+                          updateComponent(ci, { type: (value as ComponentSpec['type']) ?? 'body' })
+                        }
+                      />
+                      {component.type === 'header' && (
                         <Select
-                          label="Mode"
-                          data={[
-                            { value: 'expand', label: 'Expand' },
-                            { value: 'join', label: 'Join' },
-                          ]}
-                          value={parameter.mode ?? 'expand'}
+                          label="Header type"
+                          data={['text', 'image', 'video', 'document'].map((value) => ({
+                            value,
+                            label: value,
+                          }))}
+                          value={component.headerType ?? 'text'}
                           onChange={(value) =>
-                            updateParameter(ci, pi, {
-                              mode: (value as ParamSpec['mode']) ?? 'expand',
+                            updateComponent(ci, {
+                              headerType: (value as ComponentSpec['headerType']) ?? 'text',
                             })
                           }
                         />
-                        <TextInput
-                          label="Join with"
-                          value={parameter.joinWith ?? ', '}
-                          onChange={(event) =>
-                            updateParameter(ci, pi, { joinWith: event.currentTarget.value })
-                          }
-                        />
-                      </>
-                    )}
-                    <TextInput
-                      label="Sample"
-                      value={parameter.sampleOrFallback ?? ''}
-                      onChange={(event) =>
-                        updateParameter(ci, pi, {
-                          sampleOrFallback: event.currentTarget.value,
-                        })
-                      }
-                    />
+                      )}
+                      {component.type === 'button' && (
+                        <>
+                          <Select
+                            label="Button type"
+                            data={[
+                              { value: 'url', label: 'URL' },
+                              { value: 'quick_reply', label: 'Quick reply' },
+                              { value: 'copy_code', label: 'Copy code' },
+                            ]}
+                            value={component.subType ?? 'url'}
+                            onChange={(value) =>
+                              updateComponent(ci, {
+                                subType: (value as ComponentSpec['subType']) ?? 'url',
+                              })
+                            }
+                          />
+                          <TextInput
+                            label="Index"
+                            value={component.index ?? '0'}
+                            onChange={(event) =>
+                              updateComponent(ci, { index: event.currentTarget.value })
+                            }
+                          />
+                        </>
+                      )}
+                    </Group>
                     <ActionIcon
                       color="red"
                       variant="subtle"
                       onClick={() =>
-                        updateComponent(ci, {
-                          parameters: component.parameters.filter((_, index) => index !== pi),
+                        setForm({
+                          components: form.components.filter((_, index) => index !== ci),
                         })
                       }
                     >
                       <Trash2 size={14} />
                     </ActionIcon>
                   </Group>
-                ))}
-                <Button size="compact-xs" variant="subtle" onClick={() => addParameter(ci)}>
-                  + Parameter
-                </Button>
-              </Stack>
-            </Paper>
-          ))}
 
-          <Text size="xs" c="dimmed">
-            Attribute sends one value; Array with Expand sends consecutive parameters, Join sends
-            one joined parameter. Field key optionally plucks a property from an object (works for
-            both Attribute and Array items). For Named templates, the field key is sent as the Meta
-            parameter_name — one value per parameter, so use Attribute or Array + Join (Array +
-            Expand is positional-only). Header media needs an image/video/document URL in the
-            context key.
-          </Text>
+                  <Stack gap="xs">
+                    {component.parameters.map((parameter, pi) => (
+                      <Group key={pi} align="flex-end" gap="xs" wrap="nowrap">
+                        <Select
+                          label="Source"
+                          data={[
+                            { value: 'attribute', label: 'Attribute' },
+                            { value: 'array', label: 'Array' },
+                          ]}
+                          value={parameter.source}
+                          onChange={(value) =>
+                            updateParameter(ci, pi, {
+                              source: (value as ParamSpec['source']) ?? 'attribute',
+                            })
+                          }
+                        />
+                        <TextInput
+                          label="Context key"
+                          placeholder="customer.name"
+                          value={parameter.key}
+                          onChange={(event) =>
+                            updateParameter(ci, pi, { key: event.currentTarget.value })
+                          }
+                        />
+                        <TextInput
+                          label={
+                            form.parameterFormat === 'named'
+                              ? 'Parameter name'
+                              : parameter.source === 'array'
+                                ? 'Item key'
+                                : 'Field key'
+                          }
+                          placeholder={
+                            form.parameterFormat === 'named'
+                              ? 'customer_name'
+                              : parameter.source === 'array'
+                                ? 'name'
+                                : '(optional)'
+                          }
+                          description={
+                            form.parameterFormat === 'named'
+                              ? 'Sent as Meta parameter_name (and plucks this field from object values).'
+                              : undefined
+                          }
+                          required={form.parameterFormat === 'named'}
+                          value={parameter.itemKey ?? ''}
+                          onChange={(event) =>
+                            updateParameter(ci, pi, { itemKey: event.currentTarget.value })
+                          }
+                        />
+                        {parameter.source === 'array' && (
+                          <>
+                            <Select
+                              label="Mode"
+                              data={[
+                                { value: 'expand', label: 'Expand' },
+                                { value: 'join', label: 'Join' },
+                              ]}
+                              value={parameter.mode ?? 'expand'}
+                              onChange={(value) =>
+                                updateParameter(ci, pi, {
+                                  mode: (value as ParamSpec['mode']) ?? 'expand',
+                                })
+                              }
+                            />
+                            <TextInput
+                              label="Join with"
+                              value={parameter.joinWith ?? ', '}
+                              onChange={(event) =>
+                                updateParameter(ci, pi, { joinWith: event.currentTarget.value })
+                              }
+                            />
+                          </>
+                        )}
+                        <TextInput
+                          label="Sample"
+                          value={parameter.sampleOrFallback ?? ''}
+                          onChange={(event) =>
+                            updateParameter(ci, pi, {
+                              sampleOrFallback: event.currentTarget.value,
+                            })
+                          }
+                        />
+                        <ActionIcon
+                          color="red"
+                          variant="subtle"
+                          onClick={() =>
+                            updateComponent(ci, {
+                              parameters: component.parameters.filter((_, index) => index !== pi),
+                            })
+                          }
+                        >
+                          <Trash2 size={14} />
+                        </ActionIcon>
+                      </Group>
+                    ))}
+                    <Button size="compact-xs" variant="subtle" onClick={() => addParameter(ci)}>
+                      + Parameter
+                    </Button>
+                  </Stack>
+                </Paper>
+              ))}
+
+              <Text size="xs" c="dimmed">
+                Attribute sends one value; Array with Expand sends consecutive parameters, Join
+                sends one joined parameter. Field key optionally plucks a property from an object
+                (works for both Attribute and Array items). For Named templates, the field key is
+                sent as the Meta parameter_name — one value per parameter, so use Attribute or Array
+                + Join (Array + Expand is positional-only). Header media needs an
+                image/video/document URL in the context key.
+              </Text>
+            </>
+          )}
         </Stack>
       </Tabs.Panel>
 
