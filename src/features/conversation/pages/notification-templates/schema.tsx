@@ -457,6 +457,7 @@ function TemplateBodiesEditor({
                 minRows={16}
               />
               <Switch
+                data-testid="notification-template-consent"
                 label="Use as WhatsApp consent template"
                 description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
                 checked={form.sendConsentTemplate}
@@ -501,6 +502,7 @@ function TemplateBodiesEditor({
               />
 
               <Switch
+                data-testid="notification-template-consent"
                 label="Use as WhatsApp consent template"
                 description="Outside the 24-hour window, send this template (its name + parameters) to open the window. When off, the channel's CONSENT_TEMPLATE is used as the final fallback."
                 checked={form.sendConsentTemplate}
