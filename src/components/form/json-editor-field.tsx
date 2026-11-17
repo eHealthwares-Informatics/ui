@@ -9,6 +9,7 @@ type JsonEditorFieldProps = {
   placeholder?: string;
   minRows?: number;
   error?: string;
+  'data-testid'?: string;
 };
 
 function formatJson(value: unknown) {
@@ -33,10 +34,16 @@ export function JsonEditorField({
   placeholder = '{\n  "key": "value"\n}',
   minRows = 8,
   error,
+  'data-testid': testId,
 }: JsonEditorFieldProps) {
   const [text, setText] = useState(() => formatJson(value));
+  const [focused, setFocused] = useState(false);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const theme = useMantineTheme();
+
+  const inputTestId = testId ? `${testId}-input` : 'json-editor-input';
+  const formatTestId = testId ? `${testId}-format` : 'json-editor-format';
+  const errorTestId = testId ? `${testId}-error` : 'json-editor-error';
 
   const handleScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
     if (lineNumbersRef.current) {
@@ -50,15 +57,16 @@ export function JsonEditorField({
 
   const parseState = useMemo(() => {
     if (!text.trim()) {
-      return { valid: true, message: 'Empty JSON' };
+      return { valid: true, message: 'Empty JSON', data: undefined as unknown };
     }
     try {
       const parsed = JSON.parse(text);
-      return { valid: true, message: 'Valid JSON', data: parsed };
-    } catch (error) {
+      return { valid: true, message: 'Valid JSON', data: parsed as unknown };
+    } catch (parseError) {
       return {
         valid: false,
-        message: error instanceof Error ? error.message : 'Invalid JSON',
+        message: parseError instanceof Error ? parseError.message : 'Invalid JSON',
+        data: undefined as unknown,
       };
     }
   }, [text]);
@@ -76,27 +84,28 @@ export function JsonEditorField({
     try {
       onChange(JSON.parse(val));
     } catch {
-      // Logic for partial typing
+      // Keep the previous value while the user is mid-type; the red badge and
+      // submit-time validation surface the problem.
     }
   };
 
   const lines = text.split('\n');
 
-  // Shared typography constants for perfect alignment
+  // Shared typography constants for perfect alignment.
   const lineHeight = 1.6;
   const fontSize = theme.fontSizes.sm;
   const paddingVertical = theme.spacing.xs;
 
   const sharedStyles: React.CSSProperties = {
     fontFamily: theme.fontFamilyMonospace,
-    fontSize: fontSize,
-    lineHeight: lineHeight,
+    fontSize,
+    lineHeight,
     paddingTop: paddingVertical,
     paddingBottom: paddingVertical,
   };
 
   return (
-    <Box>
+    <Box data-testid={testId}>
       {label && (
         <Text size="sm" fw={500} mb={4}>
           {label}
@@ -105,19 +114,22 @@ export function JsonEditorField({
 
       <Flex
         direction="row"
+        onFocusCapture={() => setFocused(true)}
+        onBlurCapture={() => setFocused(false)}
         style={{
-          border: `${rem(1)} solid var(--mantine-color-gray-3)`,
+          border: `${rem(1)} solid ${
+            focused ? 'var(--mantine-color-blue-filled)' : 'var(--mantine-color-gray-3)'
+          }`,
           borderRadius: theme.radius.sm,
           overflow: 'hidden',
           backgroundColor: 'var(--mantine-color-white)',
-          '&:focus-within': {
-            borderColor: 'var(--mantine-color-blue-filled)',
-          },
+          transition: 'border-color 120ms ease',
         }}
       >
         {/* Line Numbers */}
         <Box
           ref={lineNumbersRef}
+          aria-hidden
           style={{
             ...sharedStyles,
             backgroundColor: 'var(--mantine-color-gray-0)',
@@ -140,10 +152,12 @@ export function JsonEditorField({
 
         {/* Editor Area */}
         <Textarea
+          data-testid={inputTestId}
           value={text}
           onChange={(e) => handleChange(e.currentTarget.value)}
           onScroll={handleScroll}
           placeholder={placeholder}
+          aria-label={label ?? 'JSON editor'}
           variant="unstyled"
           autosize
           minRows={minRows}
@@ -159,18 +173,29 @@ export function JsonEditorField({
               resize: 'none',
             },
           }}
-          error
         />
       </Flex>
 
-      <Flex align="center" justify="space-between" mt="xs">
+      <Flex align="center" justify="space-between" mt="xs" gap="sm">
         <Badge color={parseState.valid ? 'green' : 'red'} variant="dot" size="sm" tt="none">
           {parseState.message}
         </Badge>
-        <Button size="xs" variant="light" onClick={handleFormat} disabled={!parseState.valid}>
+        <Button
+          data-testid={formatTestId}
+          size="xs"
+          variant="light"
+          onClick={handleFormat}
+          disabled={!parseState.valid || !parseState.data}
+        >
           Format JSON
         </Button>
       </Flex>
+
+      {error && (
+        <Text size="xs" c="red" mt={4} data-testid={errorTestId}>
+          {error}
+        </Text>
+      )}
 
       {helpText && (
         <Text size="xs" c="dimmed" mt={4}>
