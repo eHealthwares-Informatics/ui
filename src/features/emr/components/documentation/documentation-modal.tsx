@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FileText, AlertCircle, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { emrApi } from '@/lib/emr-api';
+import { useAuthStore } from '@/stores/auth-store';
 import { formatEnum } from '../../lib/emr-constants';
 import { getApiErrorMessage } from '../../lib/emr-errors';
 import type { FormDefinition } from '../../lib/emr-types';
@@ -52,6 +53,7 @@ export function DocumentationModal({
   onSubmitted?: () => void;
 }) {
   const queryClient = useQueryClient();
+  const authUser = useAuthStore((state) => state.user);
 
   const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
   const [formFilter, setFormFilter] = useState('');
@@ -123,7 +125,22 @@ export function DocumentationModal({
 
   // Build field values from schema defaults when the selected form changes.
   useEffect(() => {
-    setData(selectedForm ? buildInitialFormData(selectedForm.schemaJson) : {});
+    setData(
+      selectedForm
+        ? buildInitialFormData(selectedForm.schemaJson, {
+            patient: patient
+              ? {
+                  patientId: patient.patientId,
+                  patientName: patient.patientName,
+                }
+              : null,
+            formDefinitionId: selectedForm.id,
+            organizationId: authUser?.organizationId ?? null,
+            locationId: authUser?.locationId ?? null,
+            userId: authUser?.id ?? null,
+          })
+        : {}
+    );
   }, [selectedFormId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const mutation = useMutation({
@@ -273,6 +290,18 @@ export function DocumentationModal({
                   schema={selectedForm.schemaJson}
                   value={data}
                   onChange={setData}
+                  runtime={{
+                    patient: patient
+                      ? {
+                          patientId: patient.patientId,
+                          patientName: patient.patientName,
+                        }
+                      : null,
+                    formDefinitionId: selectedForm.id,
+                    organizationId: authUser?.organizationId ?? null,
+                    locationId: authUser?.locationId ?? null,
+                    userId: authUser?.id ?? null,
+                  }}
                 />
 
                 <Group justify="flex-end">

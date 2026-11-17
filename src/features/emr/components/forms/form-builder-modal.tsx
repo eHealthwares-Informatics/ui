@@ -20,6 +20,7 @@ import {
   Checkbox,
   Group,
   Modal,
+  NumberInput,
   Select,
   Stack,
   Tabs,
@@ -57,6 +58,14 @@ const FIELD_TYPES: FormFieldType[] = [
   'generic-product',
   'generic-drug',
   'loinc-test',
+  'dicom-test',
+  'patient',
+  'auth-patient',
+  'html',
+  'hidden',
+  'print',
+  'send-form',
+  'qr-code',
   'annotate',
 ];
 
@@ -66,7 +75,15 @@ const FIELD_TYPE_LABELS: Partial<Record<FormFieldType, string>> = {
   'inventory-item': 'Inventory item (stock only)',
   'generic-product': 'Generic product (EMDEx)',
   'generic-drug': 'Generic drug (NDF)',
-  'loinc-test': 'Lab test (LOINC)',
+  'loinc-test': 'LOINC test (concepts)',
+  'dicom-test': 'DICOM test (concepts)',
+  patient: 'Patient picker',
+  'auth-patient': 'Verified patient (OTP)',
+  html: 'Readonly HTML',
+  hidden: 'Hidden value',
+  print: 'Print / Send',
+  'send-form': 'Send form link',
+  'qr-code': 'Form QR code',
   annotate: 'Annotate (body map)',
 };
 
@@ -86,6 +103,7 @@ const TABLE_COLUMN_TYPES: FormFieldType[] = [
   'generic-product',
   'generic-drug',
   'loinc-test',
+  'dicom-test',
 ];
 
 /** Grid span choices for the per-field `col` attribute (12 = full width/unset). */
@@ -119,6 +137,14 @@ type BuilderField = {
   annotateMultiple: boolean;
   annotateShowLabels: boolean;
   annotateOrgan: string;
+  html: string;
+  valueTemplate: string;
+  valueType: 'string' | 'number' | 'boolean';
+  printFormat: 'a4_print' | 'pos_print';
+  channels: Array<'email' | 'sms'>;
+  qrMode: 'auto' | 'template' | 'instance';
+  qrSize: number;
+  caption: string;
 };
 
 const CATEGORIES = [
@@ -157,6 +183,14 @@ function emptyField(): BuilderField {
     annotateMultiple: true,
     annotateShowLabels: true,
     annotateOrgan: 'heart',
+    html: '',
+    valueTemplate: '',
+    valueType: 'string',
+    printFormat: 'a4_print',
+    channels: ['email', 'sms'],
+    qrMode: 'auto',
+    qrSize: 180,
+    caption: '',
   };
 }
 
@@ -246,6 +280,24 @@ function builderFieldToSchema(field: BuilderField): Record<string, unknown> {
                 : { target: 'body', views: field.annotateViews, multiple: field.annotateMultiple },
         }
       : {}),
+    ...(field.type === 'html' ? { html: field.html } : {}),
+    ...(field.type === 'hidden'
+      ? {
+          valueTemplate: field.valueTemplate,
+          valueType: field.valueType,
+        }
+      : {}),
+    ...(field.type === 'print' ? { printFormat: field.printFormat } : {}),
+    ...(field.type === 'send-form'
+      ? { channels: field.channels.length ? field.channels : ['email', 'sms'] }
+      : {}),
+    ...(field.type === 'qr-code'
+      ? {
+          qrMode: field.qrMode,
+          qrSize: field.qrSize,
+          caption: field.caption || undefined,
+        }
+      : {}),
   };
 }
 
@@ -281,6 +333,14 @@ function schemaToBuilder(schema: FormSchema | undefined): BuilderField[] {
     annotateMultiple: field.annotate?.multiple !== false,
     annotateShowLabels: field.annotate?.showLabels !== false,
     annotateOrgan: field.annotate?.organ ?? 'heart',
+    html: field.html ?? '',
+    valueTemplate: field.valueTemplate ?? '',
+    valueType: field.valueType ?? 'string',
+    printFormat: field.printFormat ?? 'a4_print',
+    channels: field.channels ?? ['email', 'sms'],
+    qrMode: field.qrMode ?? 'auto',
+    qrSize: field.qrSize ?? 180,
+    caption: field.caption ?? '',
   });
   return (schema?.fields ?? []).map(mapField);
 }
@@ -335,6 +395,12 @@ function validate(
         field.columns.filter((c) => c.key.trim() && c.label.trim()).length === 0
       ) {
         errors.push(`${field.label || where} requires at least one column`);
+      }
+      if (field.type === 'html' && !field.html.trim()) {
+        errors.push(`${field.label || where} requires HTML content`);
+      }
+      if (field.type === 'hidden' && !field.valueTemplate.trim()) {
+        errors.push(`${field.label || where} requires a value template`);
       }
       if (field.type === 'tab' || field.type === 'col') {
         const kind = field.type === 'tab' ? 'Tab' : 'Column';
@@ -711,6 +777,109 @@ function FieldEditor({
           </Stack>
         )}
 
+        {field.type === 'html' && (
+          <Textarea
+            label="HTML content"
+            size="xs"
+            autosize
+            minRows={3}
+            placeholder="<p>Consent text…</p>"
+            value={field.html}
+            onChange={(e) => patch({ html: e.currentTarget.value })}
+          />
+        )}
+
+        {field.type === 'hidden' && (
+          <Group gap="xs" wrap="wrap">
+            <TextInput
+              label="Value template"
+              size="xs"
+              placeholder="{{patient.mrn}} or a constant"
+              value={field.valueTemplate}
+              onChange={(e) => patch({ valueTemplate: e.currentTarget.value })}
+              style={{ flex: 3, minWidth: 240 }}
+            />
+            <Select
+              label="Value type"
+              size="xs"
+              data={[
+                { value: 'string', label: 'String' },
+                { value: 'number', label: 'Number' },
+                { value: 'boolean', label: 'Boolean' },
+              ]}
+              value={field.valueType}
+              onChange={(value) =>
+                patch({ valueType: (value as 'string' | 'number' | 'boolean') ?? 'string' })
+              }
+              style={{ width: 130 }}
+            />
+          </Group>
+        )}
+
+        {field.type === 'print' && (
+          <Select
+            label="Print format"
+            size="xs"
+            data={[
+              { value: 'a4_print', label: 'A4 print' },
+              { value: 'pos_print', label: 'POS print' },
+            ]}
+            value={field.printFormat}
+            onChange={(value) =>
+              patch({ printFormat: (value as 'a4_print' | 'pos_print') ?? 'a4_print' })
+            }
+          />
+        )}
+
+        {field.type === 'send-form' && (
+          <Checkbox.Group
+            label="Channels"
+            size="xs"
+            value={field.channels}
+            onChange={(value) => patch({ channels: value as Array<'email' | 'sms'> })}
+          >
+            <Group gap="md" mt={4}>
+              <Checkbox value="email" label="Email" />
+              <Checkbox value="sms" label="SMS" />
+            </Group>
+          </Checkbox.Group>
+        )}
+
+        {field.type === 'qr-code' && (
+          <Group gap="xs" wrap="wrap">
+            <Select
+              label="Link mode"
+              size="xs"
+              data={[
+                { value: 'auto', label: 'Auto (instance → template)' },
+                { value: 'instance', label: 'Instance (current patient/submission)' },
+                { value: 'template', label: 'Template (unassigned patient)' },
+              ]}
+              value={field.qrMode}
+              onChange={(value) =>
+                patch({ qrMode: (value as 'auto' | 'template' | 'instance') ?? 'auto' })
+              }
+              style={{ flex: 2, minWidth: 220 }}
+            />
+            <NumberInput
+              label="Size (px)"
+              size="xs"
+              min={80}
+              max={400}
+              value={field.qrSize}
+              onChange={(value) => patch({ qrSize: Number(value) || 180 })}
+              style={{ width: 110 }}
+            />
+            <TextInput
+              label="Caption"
+              size="xs"
+              value={field.caption}
+              onChange={(e) => patch({ caption: e.currentTarget.value })}
+              style={{ flex: 2, minWidth: 160 }}
+            />
+          </Group>
+        )}
+
         {(field.type === 'tab' || field.type === 'col') && (
           <Stack gap="sm" pl="md" style={{ borderLeft: '3px solid var(--mantine-color-gray-3)' }}>
             <Group gap={6}>
@@ -786,6 +955,7 @@ export function FormBuilderModal({
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [requestType, setRequestType] = useState('');
+  const [eventKey, setEventKey] = useState('');
   const [fields, setFields] = useState<BuilderField[]>([]);
   const [previewData, setPreviewData] = useState<FormData>({});
   const [jsonDraft, setJsonDraft] = useState('');
@@ -801,6 +971,7 @@ export function FormBuilderModal({
     setDescription(initial?.description ?? '');
     setCategory(initial?.category ?? '');
     setRequestType(initial?.requestType ?? '');
+    setEventKey(initial?.eventKey ?? '');
     setFields(schemaToBuilder(initial?.schemaJson));
     setPreviewData({});
     setJsonDraft('');
@@ -848,6 +1019,7 @@ export function FormBuilderModal({
         category,
         // Only request forms need a request type; clear it for other categories.
         requestType: category === 'REQUEST' ? requestType : undefined,
+        eventKey: eventKey.trim() || undefined,
         schemaJson: builderToSchema(fields),
       };
       if (isEdit && initial) {
@@ -928,6 +1100,14 @@ export function FormBuilderModal({
               onChange={(e) => setDescription(e.currentTarget.value)}
               style={{ flex: 3, minWidth: 240 }}
             />
+            <TextInput
+              label="Notification event key"
+              placeholder="e.g. document_creation"
+              description="Used by Print / Send controls"
+              value={eventKey}
+              onChange={(e) => setEventKey(e.currentTarget.value)}
+              style={{ flex: 1, minWidth: 200 }}
+            />
           </Group>
         </Card>
 
@@ -987,7 +1167,12 @@ export function FormBuilderModal({
                 : 'Live preview — sections render as dividers, tabs as tabbed sections, columns side-by-side, and every control matches the final form.'}
             </Text>
             {previewSchemaFieldsCount > 0 && (
-              <DynamicFormFields schema={schema} value={previewData} onChange={setPreviewData} />
+              <DynamicFormFields
+                schema={schema}
+                value={previewData}
+                onChange={setPreviewData}
+                runtime={{ hideActions: true }}
+              />
             )}
           </Tabs.Panel>
 

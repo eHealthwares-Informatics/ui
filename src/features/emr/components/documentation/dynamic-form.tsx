@@ -17,14 +17,26 @@ import {
 } from '@mantine/core';
 import { Plus, Trash2 } from 'lucide-react';
 import { formatEnum } from '../../lib/emr-constants';
-import type { FormFieldSchema, FormFieldType, FormSchema } from '../../lib/emr-types';
+import type {
+  FormFieldSchema,
+  FormFieldType,
+  FormRuntimeContext,
+  FormSchema,
+} from '../../lib/emr-types';
 import { AnnotateField } from '../forms/annotate';
+import { AuthPatientPicker, type AuthPatientValue } from '../shared/auth-patient-picker';
+import { DicomTestSearch, type DicomTest } from '../shared/dicom-test-search';
+import { FormQrCode } from '../shared/form-qr-code';
+import { HtmlField } from '../shared/html-field';
 import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
 import {
   MasterItemSearch,
   type MasterItem,
   type MasterItemKind,
 } from '../shared/master-item-search';
+import { PatientPicker, type PatientOption } from '../shared/patient-picker';
+import { PrintSendActions } from '../shared/print-send-actions';
+import { SendFormCard } from '../shared/send-form-card';
 
 export type FormData = Record<string, unknown>;
 
@@ -86,6 +98,14 @@ function TableCell({
       return (
         <LoincTestSearch
           value={isLoincTest(value) ? value : null}
+          onChange={(next) => onChange(next ?? undefined)}
+          limit={10}
+        />
+      );
+    case 'dicom-test':
+      return (
+        <DicomTestSearch
+          value={typeof value === 'object' && value !== null ? (value as DicomTest) : null}
           onChange={(next) => onChange(next ?? undefined)}
           limit={10}
         />
@@ -200,10 +220,12 @@ function DynamicField({
   field,
   value,
   onChange,
+  runtime,
 }: {
   field: FormFieldSchema;
   value: unknown;
   onChange: (value: unknown) => void;
+  runtime?: FormRuntimeContext;
 }) {
   const common = {
     label: field.label,
@@ -212,6 +234,81 @@ function DynamicField({
   };
 
   switch (field.type) {
+    case 'html':
+      return <HtmlField html={field.html} />;
+    case 'hidden':
+      return null;
+    case 'patient':
+      return (
+        <PatientPicker
+          label={field.label}
+          required={field.required}
+          value={
+            value && typeof value === 'object'
+              ? (value as PatientOption)
+              : runtime?.patient
+                ? {
+                    id: runtime.patient.patientId,
+                    patientId: runtime.patient.patientId,
+                    patientName: runtime.patient.patientName ?? '',
+                  }
+                : null
+          }
+          onChange={(next) => onChange(next ?? undefined)}
+        />
+      );
+    case 'auth-patient':
+      return (
+        <AuthPatientPicker
+          label={field.label}
+          required={field.required}
+          publicToken={runtime?.publicToken}
+          value={value && typeof value === 'object' ? (value as AuthPatientValue) : null}
+          onChange={(next) => onChange(next ?? undefined)}
+        />
+      );
+    case 'dicom-test':
+      return (
+        <DicomTestSearch
+          label={field.label}
+          required={field.required}
+          placeholder={field.placeholder}
+          value={value && typeof value === 'object' ? (value as DicomTest) : null}
+          onChange={(next) => onChange(next ?? undefined)}
+        />
+      );
+    case 'print':
+      return runtime?.hideActions ? null : (
+        <PrintSendActions
+          submissionId={runtime?.submissionId}
+          printFormat={field.printFormat ?? 'a4_print'}
+          phone={runtime?.patient?.phone}
+          email={runtime?.patient?.email}
+        />
+      );
+    case 'send-form':
+      return runtime?.hideActions ? null : runtime?.formDefinitionId ? (
+        <SendFormCard
+          formDefinitionId={runtime.formDefinitionId}
+          submissionId={runtime.submissionId}
+          patientId={runtime.patient?.patientId}
+          phone={runtime.patient?.phone}
+          email={runtime.patient?.email}
+          label={field.label}
+          channels={field.channels}
+        />
+      ) : null;
+    case 'qr-code':
+      return runtime?.hideActions ? null : runtime?.formDefinitionId ? (
+        <FormQrCode
+          formDefinitionId={runtime.formDefinitionId}
+          submissionId={runtime.submissionId}
+          patientId={runtime.patient?.patientId}
+          mode={field.qrMode ?? 'auto'}
+          size={field.qrSize ?? 180}
+          caption={field.caption}
+        />
+      ) : null;
     case 'textarea':
       return (
         <Textarea
@@ -346,10 +443,12 @@ function FieldStack({
   fields,
   value,
   setField,
+  runtime,
 }: {
   fields: FormFieldSchema[];
   value: FormData;
   setField: (key: string, fieldValue: unknown) => void;
+  runtime?: FormRuntimeContext;
 }) {
   const renderField = (field: FormFieldSchema) => {
     if (field.type === 'tab') {
@@ -385,6 +484,7 @@ function FieldStack({
                 field={child}
                 value={value[child.key]}
                 onChange={(childValue) => setField(child.key, childValue)}
+                runtime={runtime}
               />
             </div>
           ))}
@@ -397,6 +497,7 @@ function FieldStack({
         field={field}
         value={value[field.key]}
         onChange={(fieldValue) => setField(field.key, fieldValue)}
+        runtime={runtime}
       />
     );
   };
@@ -422,24 +523,60 @@ export function DynamicFormFields({
   schema,
   value,
   onChange,
+  runtime,
 }: {
   schema: FormSchema;
   value: FormData;
   onChange: (value: FormData) => void;
+  runtime?: FormRuntimeContext;
 }) {
   const setField = (key: string, fieldValue: unknown) => {
     onChange({ ...value, [key]: fieldValue });
   };
 
-  return <FieldStack fields={schema.fields} value={value} setField={setField} />;
+  return <FieldStack fields={schema.fields} value={value} setField={setField} runtime={runtime} />;
+}
+
+/** Resolve `{{patient.mrn}}`-style tokens for hidden values. */
+function resolveValueTemplate(template: string, runtime?: FormRuntimeContext): string {
+  return template.replace(/\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g, (_match, token: string) => {
+    switch (token) {
+      case 'patient.id':
+      case 'patient.patientId':
+      case 'patient.mrn':
+        return runtime?.patient?.patientId ?? '';
+      case 'patient.name':
+        return runtime?.patient?.patientName ?? '';
+      case 'patient.phone':
+        return runtime?.patient?.phone ?? '';
+      case 'patient.email':
+        return runtime?.patient?.email ?? '';
+      case 'organization.id':
+        return runtime?.organizationId ?? '';
+      case 'location.id':
+        return runtime?.locationId ?? '';
+      case 'user.id':
+        return runtime?.userId ?? '';
+      case 'today':
+        return new Date().toISOString().slice(0, 10);
+      default:
+        return '';
+    }
+  });
 }
 
 /** Build initial form data from schema defaults (recursing into tabs). */
-export function buildInitialFormData(schema: FormSchema): FormData {
+export function buildInitialFormData(schema: FormSchema, runtime?: FormRuntimeContext): FormData {
   const data: FormData = {};
   const walk = (fields: FormFieldSchema[]): void => {
     for (const field of fields) {
-      if (field.type === 'section') {
+      if (
+        field.type === 'section' ||
+        field.type === 'html' ||
+        field.type === 'print' ||
+        field.type === 'send-form' ||
+        field.type === 'qr-code'
+      ) {
         continue;
       }
       if (field.type === 'tab' || field.type === 'col') {
@@ -457,6 +594,27 @@ export function buildInitialFormData(schema: FormSchema): FormData {
             : field.annotate?.target === 'dermatome'
               ? undefined
               : [];
+        continue;
+      }
+      if (field.type === 'hidden' && field.valueTemplate) {
+        const value = resolveValueTemplate(field.valueTemplate, runtime);
+        if (field.valueType === 'number') {
+          data[field.key] = Number(value);
+        } else if (field.valueType === 'boolean') {
+          data[field.key] = value === 'true' || value === '1';
+        } else {
+          data[field.key] = value;
+        }
+        continue;
+      }
+      if ((field.type === 'patient' || field.type === 'auth-patient') && runtime?.patient) {
+        data[field.key] = {
+          id: runtime.patient.patientId,
+          patientId: runtime.patient.patientId,
+          patientName: runtime.patient.patientName ?? '',
+          name: runtime.patient.patientName ?? '',
+          phone: runtime.patient.phone ?? null,
+        };
         continue;
       }
       if (field.defaultValue !== undefined) {
@@ -483,6 +641,14 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       return;
     }
     if (field.type === 'table') {
+      return;
+    }
+    if (
+      field.type === 'html' ||
+      field.type === 'print' ||
+      field.type === 'send-form' ||
+      field.type === 'qr-code'
+    ) {
       return;
     }
     if (field.type === 'annotate') {
@@ -546,6 +712,39 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       (!Array.isArray(fieldValue) || fieldValue.some((v) => !field.options?.includes(String(v))))
     ) {
       errors.push(`${field.label} must be a valid selection`);
+    }
+    if (
+      (field.type === 'patient' || field.type === 'auth-patient') &&
+      (typeof fieldValue !== 'object' ||
+        Array.isArray(fieldValue) ||
+        !(fieldValue as Record<string, unknown>).patientId)
+    ) {
+      errors.push(`${field.label} must be a selected patient`);
+    }
+    if (
+      field.type === 'dicom-test' &&
+      (typeof fieldValue !== 'object' ||
+        Array.isArray(fieldValue) ||
+        !(
+          (fieldValue as Record<string, unknown>).name ||
+          (fieldValue as Record<string, unknown>).code
+        ))
+    ) {
+      errors.push(`${field.label} must be a selected or typed test`);
+    }
+    if (
+      field.type === 'hidden' &&
+      field.valueType === 'number' &&
+      (typeof fieldValue !== 'number' || Number.isNaN(fieldValue))
+    ) {
+      errors.push(`${field.label} must be a number`);
+    }
+    if (
+      field.type === 'hidden' &&
+      field.valueType === 'boolean' &&
+      typeof fieldValue !== 'boolean'
+    ) {
+      errors.push(`${field.label} must be a boolean`);
     }
   };
 

@@ -79,7 +79,16 @@ export function SubmissionAmendModal({
               Amending creates a new submission version while preserving this one.
             </Text>
 
-            <DynamicFormFields schema={form.schemaJson} value={data} onChange={setData} />
+            <DynamicFormFields
+              schema={form.schemaJson}
+              value={data}
+              onChange={setData}
+              runtime={{
+                formDefinitionId: form.id,
+                submissionId: submission?.id,
+                hideActions: true,
+              }}
+            />
 
             <Group justify="flex-end">
               <Button variant="light" onClick={onClose} disabled={mutation.isPending}>
