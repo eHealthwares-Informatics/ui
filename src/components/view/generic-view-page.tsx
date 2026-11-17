@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { RxPage } from '@/components/page/rx-page';
 import { GenericViewComponent } from '@/components/view';
 import { deriveView } from '@/components/view/derive-view';
 import { useEnhancedCodingConceptView } from '@/components/view/ehannced-view';
@@ -17,6 +19,7 @@ type GenericViewPageProps = {
 
 export function GenericViewPage({ page, id }: GenericViewPageProps) {
   const [modelConfig, setModelConfig] = useState<ModelConfig | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getModelConfig(page).then(setModelConfig);
@@ -52,10 +55,19 @@ export function GenericViewPage({ page, id }: GenericViewPageProps) {
     return <div>Record not found</div>;
   }
 
-  return <GenericViewComponent view={view as View<any>} data={data} />;
+  return (
+    <RxPage
+      title={view.title ?? modelConfig?.title ?? page}
+      breadcrumbs={[{ label: modelConfig?.title ?? page }, { label: view.title ?? id }]}
+      onBack={() => navigate({ to: '..' })}
+    >
+      <GenericViewComponent view={view as View<any>} data={data} />
+    </RxPage>
+  );
 }
 
 function CodingConceptDetailView({ id }: { id: string }) {
+  const navigate = useNavigate();
   const view = useEnhancedCodingConceptView(codingConceptView, 'LOINC');
   const detailQuery = useQuery({
     queryKey: ['coding-concepts', id],
@@ -72,5 +84,13 @@ function CodingConceptDetailView({ id }: { id: string }) {
     return <div>Record not found</div>;
   }
 
-  return <GenericViewComponent view={view as View<any>} data={data} />;
+  return (
+    <RxPage
+      title={view?.title ?? 'Coding Concept Details'}
+      breadcrumbs={[{ label: 'Coding Concepts' }, { label: view?.title ?? id }]}
+      onBack={() => navigate({ to: '/coding-concept' })}
+    >
+      <GenericViewComponent view={view as View<any>} data={data} />
+    </RxPage>
+  );
 }

@@ -59,7 +59,10 @@ async function openOrderDetail(
   const search = page.getByTestId('header-search').first();
   await expect(search).toBeVisible();
   await search.fill(order.orderNumber);
-  const row = page.getByTestId('data-table-row').filter({ hasText: order.orderNumber }).first();
+  const row = page
+    .locator('[data-testid^="data-table-row-"]')
+    .filter({ hasText: order.orderNumber })
+    .first();
   await expect(row).toBeVisible({ timeout: 20_000 });
   await row.getByTestId('row-view-order').click();
   await expect(page).toHaveURL(new RegExp(`/rxsoft/website-orders/${order.id}`));
