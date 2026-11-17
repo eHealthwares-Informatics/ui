@@ -5,6 +5,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { HelpCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { ViewModal } from '@/components/view/view-modal';
 import { ModuleContext, useModuleContext } from '@/context/module-context';
 import { JsonPreviewDialog } from '@/features/conversation/components/shared';
 import { entityInfoMap } from '@/features/lis/schema/entity-info';
@@ -154,6 +155,7 @@ export function DataPageShell(props: DataPageShellProps) {
   const [searchBy, setSearchBy] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
+  const [viewRow, setViewRow] = useState<Record<string, unknown> | null>(null);
   const [pageIndex, setPageIndex] = useState(1);
   // 25 rows/page: fewer page turns per assertion in e2e, same per-request cost.
   const [pageSize, setPageSize] = useState(25);
@@ -441,6 +443,16 @@ export function DataPageShell(props: DataPageShellProps) {
     setShowModal(true);
   }
 
+  /** Double-click on a row navigates to the view page when a detail path builder exists. */
+  const handleRowDoubleClick = useCallback(
+    (row: Record<string, unknown>) => {
+      if (detailPathBuilder) {
+        navigate({ to: detailPathBuilder(row) });
+      }
+    },
+    [detailPathBuilder, navigate]
+  );
+
   function handleDelete() {}
 
   const content = (
@@ -565,6 +577,8 @@ export function DataPageShell(props: DataPageShellProps) {
         sortOrder={sortOrder}
         onSortChange={handleSortChange}
         copyRowIdOnSn={copyRowIdOnSn}
+        onRowClick={(row) => setViewRow(row)}
+        onRowDoubleClick={handleRowDoubleClick}
       />
       <Pagination
         pageIndex={pageIndex}
@@ -618,6 +632,8 @@ export function DataPageShell(props: DataPageShellProps) {
       />
 
       <InfoDrawer opened={helpOpen} onClose={() => setHelpOpen(false)} info={helpInfo} />
+
+      {viewRow && <ViewModal config={config} row={viewRow} open onClose={() => setViewRow(null)} />}
     </>
   );
 
