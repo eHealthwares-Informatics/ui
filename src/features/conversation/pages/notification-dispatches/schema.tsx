@@ -4,6 +4,7 @@ import type { Option } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import {
   buildFields,
+  jsonField,
   option,
   optionValue,
   pickUpdatePayload,
@@ -14,6 +15,7 @@ import {
   withDefaultActions,
 } from '../../schemas/helpers';
 import { notificationDetailHref, shortId } from '../notification-detail/link';
+import { compactMatcher, normalizeMatcher, validateMatcher } from './matcher';
 
 export type DispatchEventRow = { id: string; key: string; label: string };
 export type DispatchTemplateRow = {
@@ -184,6 +186,31 @@ export function buildNotificationDispatchesConfig(args: {
           );
         },
       },
+      {
+        key: 'matcher',
+        label: 'Matcher',
+        render: (row) => {
+          const summary = compactMatcher(row.matcher);
+          if (!summary) {
+            return (
+              <Text size="xs" c="dimmed">
+                —
+              </Text>
+            );
+          }
+          return (
+            <Text
+              size="xs"
+              ff="monospace"
+              lineClamp={2}
+              maw={280}
+              title={JSON.stringify(row.matcher)}
+            >
+              {summary}
+            </Text>
+          );
+        },
+      },
       { key: 'priority', label: 'Priority', sortable: true },
       {
         key: 'enabled',
@@ -226,6 +253,12 @@ export function buildNotificationDispatchesConfig(args: {
       },
       switchField('enabled', 'Enabled'),
       textField('description', 'Description', 12),
+      {
+        ...jsonField('matcher', 'Matcher (JSON)'),
+        placeholder:
+          '{\n  "path": "context.channel",\n  "operator": "eq",\n  "value": "WHATSAPP"\n}',
+        validate: validateMatcher,
+      },
     ]),
     modalTitle: 'Notification dispatch',
     buildCreatePayload: (values) => ({
@@ -234,6 +267,7 @@ export function buildNotificationDispatchesConfig(args: {
       templateId: optionValue(values.templateId),
       channelId: optionValue(values.channelId),
       fallbackChannelId: optionValue(values.fallbackChannelId) ?? null,
+      matcher: normalizeMatcher(values.matcher),
       priority: Number(values.priority ?? 0),
       description: String(values.description ?? '').trim() || null,
       enabled: values.enabled !== false,
@@ -244,6 +278,7 @@ export function buildNotificationDispatchesConfig(args: {
         templateId: optionValue,
         channelId: optionValue,
         fallbackChannelId: (value) => optionValue(value) ?? null,
+        matcher: (value) => normalizeMatcher(value),
         priority: (value) => Number(value ?? 0),
         description: (value) => String(value ?? '').trim() || null,
         enabled: (value) => value !== false,
@@ -254,6 +289,7 @@ export function buildNotificationDispatchesConfig(args: {
       templateId: templateOption(row.templateId),
       channelId: channelOption(row.channelId),
       fallbackChannelId: channelOption(row.fallbackChannelId),
+      matcher: normalizeMatcher(row.matcher),
       priority: Number(row.priority ?? 0),
       enabled: row.enabled !== false,
       description: text(row.description),
@@ -264,6 +300,7 @@ export function buildNotificationDispatchesConfig(args: {
       templateId: null,
       channelId: null,
       fallbackChannelId: null,
+      matcher: null,
       priority: 0,
       enabled: true,
       description: '',
