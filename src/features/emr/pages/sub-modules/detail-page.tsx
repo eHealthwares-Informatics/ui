@@ -179,11 +179,14 @@ export function SubModuleDetailPage() {
           feature={null}
           forms={formsQuery.data ?? []}
           roles={rolesQuery.data ?? []}
-          onSaved={refreshList}
+          onSaved={() => {
+            refreshList();
+            refresh();
+          }}
         />
       ),
     };
-  }, [deleteMutation, formsQuery.data, id, rolesQuery.data, subModule]);
+  }, [deleteMutation, formsQuery.data, id, refresh, rolesQuery.data, subModule]);
 
   return (
     <RxPage

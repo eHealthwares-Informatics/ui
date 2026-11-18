@@ -190,11 +190,14 @@ export function FeaturesAdminPage() {
           feature={null}
           forms={formsQuery.data ?? []}
           roles={rolesQuery.data ?? []}
-          onSaved={refreshList}
+          onSaved={() => {
+            refreshList();
+            refresh();
+          }}
         />
       ),
     };
-  }, [deleteMutation, formsQuery.data, modulesQuery.data, rolesQuery.data]);
+  }, [deleteMutation, formsQuery.data, modulesQuery.data, refresh, rolesQuery.data]);
 
   return (
     <RxPage
