@@ -1,5 +1,6 @@
 import { Table, Text, Loader, Center, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useRef } from 'react';
 import { Column, FilterValue } from '@/features/rxsoft/types';
 import { ActionCell, ActionCellProps } from './action-cell';
 import { TableHeader, SortOrder } from './table-header';
@@ -18,6 +19,10 @@ type DataTableProps = {
   onSortChange?: (key: string, order: SortOrder) => void;
   /** Clicking the SN cell copies the row id and shows a toast. */
   copyRowIdOnSn?: boolean;
+  /** Single-click on a row opens the view modal. */
+  onRowClick?: (row: Record<string, unknown>) => void;
+  /** Double-click on a row navigates to the view page. */
+  onRowDoubleClick?: (row: Record<string, unknown>) => void;
 };
 
 async function copyRowId(id: string) {
@@ -49,8 +54,37 @@ export const DataTable = ({
   sortOrder,
   onSortChange,
   copyRowIdOnSn = false,
+  onRowClick,
+  onRowDoubleClick,
 }: DataTableProps) => {
   const colSpan = columns.length + (actionCellProps ? 1 : 0);
+
+  // Single click is debounced so a double-click only triggers navigation,
+  // not both open-modal and navigate.
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleRowClick = (e: React.MouseEvent, row: Record<string, unknown>) => {
+    // Never open the modal when the click came from an interactive element
+    // (copy-id button, view/edit/delete action icons, links).
+    if ((e.target as Element).closest('button, a, [role="button"]')) {
+      return;
+    }
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+    clickTimeoutRef.current = setTimeout(() => {
+      clickTimeoutRef.current = null;
+      onRowClick?.(row);
+    }, 250);
+  };
+
+  const handleRowDoubleClick = (e: React.MouseEvent, row: Record<string, unknown>) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    onRowDoubleClick?.(row);
+  };
 
   return (
     <Table striped highlightOnHover withTableBorder>
@@ -108,7 +142,13 @@ export const DataTable = ({
         )}
 
         {rows.map((row: any, index: number) => (
-          <Table.Tr key={String(row.id ?? index)} data-testid="data-table-row">
+          <Table.Tr
+            key={String(row.id ?? index)}
+            data-testid={`data-table-row-${row.id ?? index}`}
+            style={{ cursor: 'pointer' }}
+            onClick={(e) => handleRowClick(e, row)}
+            onDoubleClick={(e) => handleRowDoubleClick(e, row)}
+          >
             <Table.Td key={index}>
               {copyRowIdOnSn ? (
                 <Tooltip label="Copy ID" withArrow>
