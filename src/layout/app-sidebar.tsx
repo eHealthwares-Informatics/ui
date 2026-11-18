@@ -1,4 +1,4 @@
-import { AppShell, Stack, ScrollArea, Box, Divider, Tooltip } from '@mantine/core';
+import { AppShell, Stack, ScrollArea, Box, Divider, Text, Tooltip } from '@mantine/core';
 import { Link, useLocation } from '@tanstack/react-router';
 import { LayoutGrid, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
 import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
+import { filterNavGroupsBySearch, MenuSearch } from './menu-search';
 import { NavUser } from './nav-user';
 import classes from './app-sidebar.module.css';
 
@@ -31,18 +32,20 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
   const subModuleGroups = useSubModuleNav(moduleId);
   const navGroups = [...staticGroups, ...subModuleGroups];
   const navGroupsKey = navGroups.map((group) => group.title).join('|');
-  const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
+  const [menuQuery, setMenuQuery] = useState('');
+  const visibleGroups = filterNavGroupsBySearch(navGroups, menuQuery);
+  const [expandState, setExpandState] = useState<boolean[]>(visibleGroups.map(() => false));
 
-  // Switching modules (or loading runtime SubModule groups) rebuilds
-  // `navGroups`; index-keyed expansion state from the previous menu would
-  // otherwise leak into the new one.
+  // Switching modules, loading runtime SubModule groups, or changing the menu
+  // search rebuilds the visible groups; index-keyed expansion state from the
+  // previous list would otherwise leak into the new one.
   useEffect(() => {
-    setExpandState(navGroups.map(() => false));
+    setExpandState(visibleGroups.map(() => false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleId, navGroupsKey]);
+  }, [moduleId, navGroupsKey, menuQuery]);
 
   const resetExpandState = (index: number, expanded: boolean) => {
-    setExpandState(navGroups.map((_, i) => (i === index ? !expanded : false)));
+    setExpandState(visibleGroups.map((_, i) => (i === index ? !expanded : false)));
   };
   const onModulesPage = pathname === '/modules';
 
@@ -84,19 +87,28 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
         {/* SEARCH (EMR) — a full-width input, so it only renders expanded */}
         {moduleId === 'emr' && !collapsed && <PatientLookup />}
 
+        {/* MENU SEARCH — filters the role/module-scoped menu list */}
+        {!collapsed && <MenuSearch value={menuQuery} onChange={setMenuQuery} />}
+
         {/* NAVIGATION */}
         <ScrollArea flex={1} scrollbarSize={0} mt={4}>
-          {navGroups.map((item, i) => (
-            <SidebarNavItem
-              key={`${item.title}-${i}`}
-              item={item}
-              pathname={pathname}
-              resetExpandState={resetExpandState}
-              expanded={expandState[i]}
-              index={i}
-              collapsed={collapsed}
-            />
-          ))}
+          {visibleGroups.length === 0 ? (
+            <Text size="xs" c="dimmed" px="xs" py="sm">
+              No menus match “{menuQuery.trim()}”.
+            </Text>
+          ) : (
+            visibleGroups.map((item, i) => (
+              <SidebarNavItem
+                key={`${item.title}-${i}`}
+                item={item}
+                pathname={pathname}
+                resetExpandState={resetExpandState}
+                expanded={menuQuery.trim() ? true : expandState[i]}
+                index={i}
+                collapsed={collapsed}
+              />
+            ))
+          )}
         </ScrollArea>
 
         {/* FOOTER */}
