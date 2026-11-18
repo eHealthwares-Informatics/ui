@@ -1,12 +1,12 @@
-import { AppShell, Stack, ScrollArea, Box, Divider, Text, Tooltip } from '@mantine/core';
-import { Link, useLocation } from '@tanstack/react-router';
-import { LayoutGrid, MapPin } from 'lucide-react';
+import { AppShell, Stack, ScrollArea, Box, Divider, Text } from '@mantine/core';
+import { useLocation } from '@tanstack/react-router';
+import { MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleId } from '@/context/module-context';
-import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { useSubModuleNav } from '@/features/emr/hooks/use-sub-module-nav';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
+import { moduleMap, type ModuleId } from '@/features/shared/module-data';
 import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
@@ -53,7 +53,6 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
   const resetExpandState = (index: number, expanded: boolean) => {
     setExpandState(visibleGroups.map((_, i) => (i === index ? !expanded : false)));
   };
-  const onModulesPage = pathname === '/modules';
 
   return (
     <AppShell.Navbar
@@ -68,30 +67,12 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
           {!collapsed && (
             <Box className={classes.brandText}>
               <span className={classes.brandName}>eHealthwares </span>
-              <span className={classes.brandTagline}>Electronic Health Record</span>
+              <span className={classes.brandTagline}>
+                {moduleMap[moduleId as ModuleId]?.title ?? 'RxSoft'}
+              </span>
             </Box>
           )}
         </Box>
-
-        {/* MODULES */}
-        <Tooltip label="Modules" position="right" disabled={!collapsed} withArrow>
-          <Link
-            to="/modules"
-            data-testid="sidebar-modules-link"
-            aria-label="Modules"
-            className={`${classes.modulesLink} ${onModulesPage ? classes.modulesLinkActive : ''} ${
-              collapsed ? classes.modulesLinkCollapsed : ''
-            }`}
-          >
-            <span className={classes.modulesIcon}>
-              <LayoutGrid size={16} />
-            </span>
-            {!collapsed && 'Modules'}
-          </Link>
-        </Tooltip>
-
-        {/* SEARCH (EMR) — a full-width input, so it only renders expanded */}
-        {moduleId === 'emr' && !collapsed && <PatientLookup />}
 
         {/* MENU SEARCH — filters the role/module-scoped menu list */}
         {!collapsed && <MenuSearch value={menuQuery} onChange={setMenuQuery} />}
