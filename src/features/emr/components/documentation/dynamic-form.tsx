@@ -26,6 +26,7 @@ import type {
 import { AnnotateField } from '../forms/annotate';
 import { AuthPatientPicker, type AuthPatientValue } from '../shared/auth-patient-picker';
 import { DicomTestSearch, type DicomTest } from '../shared/dicom-test-search';
+import { FileUploadField } from '../shared/file-upload-field';
 import { FormQrCode } from '../shared/form-qr-code';
 import { HtmlField } from '../shared/html-field';
 import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
@@ -275,6 +276,19 @@ function DynamicField({
           placeholder={field.placeholder}
           value={value && typeof value === 'object' ? (value as DicomTest) : null}
           onChange={(next) => onChange(next ?? undefined)}
+        />
+      );
+    case 'file':
+      return (
+        <FileUploadField
+          label={field.label}
+          required={field.required}
+          value={value}
+          onChange={onChange}
+          publicToken={runtime?.publicToken}
+          accept={field.accept}
+          multiple={field.multiple}
+          maxSizeMb={field.maxSizeMb}
         />
       );
     case 'print':
@@ -745,6 +759,18 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       typeof fieldValue !== 'boolean'
     ) {
       errors.push(`${field.label} must be a boolean`);
+    }
+    if (field.type === 'file') {
+      const values = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
+      const valid = values.every(
+        (entry) =>
+          typeof entry === 'object' &&
+          entry !== null &&
+          typeof (entry as Record<string, unknown>).url === 'string'
+      );
+      if (!valid) {
+        errors.push(`${field.label} must contain uploaded file URLs`);
+      }
     }
   };
 
