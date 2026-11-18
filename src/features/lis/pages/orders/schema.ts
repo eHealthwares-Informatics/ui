@@ -91,6 +91,9 @@ export const ordersConfig: ModelConfig = {
   buildUpdatePayload: toApiPayload,
   buildFormState,
   canDelete: true,
+  // The "New" header action opens the LIS order workflow instead of the
+  // built-in create modal.
+  createPathBuilder: () => '/lis/orders/workflow/enter',
   detailPathBuilder: (row) => `/lis/orders/${row.id}/report`,
 };
 

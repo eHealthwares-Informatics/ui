@@ -1341,13 +1341,6 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
           modules: ['lis'],
         },
-        {
-          title: 'Workflow',
-          url: '/lis/orders/workflow/enter',
-          permission: 'lis.order.read',
-          icon: FileText,
-          modules: ['lis'],
-        },
         { title: 'Patients', url: '/lis/patients', icon: FileText, modules: ['lis'] },
         { title: 'Priorities', url: '/lis/priorities', icon: FileText, modules: ['lis'] },
         { title: 'Programs', url: '/lis/programs', icon: FileText, modules: ['lis'] },

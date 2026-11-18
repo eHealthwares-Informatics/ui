@@ -1,15 +1,16 @@
-import { AppShell, Stack, ScrollArea, Box, Divider, Tooltip } from '@mantine/core';
-import { Link, useLocation } from '@tanstack/react-router';
-import { LayoutGrid, MapPin } from 'lucide-react';
+import { AppShell, Stack, ScrollArea, Box, Divider, Text } from '@mantine/core';
+import { useLocation } from '@tanstack/react-router';
+import { MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useModuleId } from '@/context/module-context';
-import { PatientLookup } from '@/features/emr/components/shared/patient-lookup';
 import { useCurrentLocation } from '@/features/emr/hooks/use-current-location';
 import { useSubModuleNav } from '@/features/emr/hooks/use-sub-module-nav';
 import { SidebarNavItem } from '@/features/settings/components/sidebar-nav';
+import { moduleMap, type ModuleId } from '@/features/shared/module-data';
 import { displayNameOf } from '@/lib/user-name';
 import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
+import { filterNavGroupsBySearch, MenuSearch } from './menu-search';
 import { NavUser } from './nav-user';
 import classes from './app-sidebar.module.css';
 
@@ -31,20 +32,27 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
   const subModuleGroups = useSubModuleNav(moduleId);
   const navGroups = [...staticGroups, ...subModuleGroups];
   const navGroupsKey = navGroups.map((group) => group.title).join('|');
-  const [expandState, setExpandState] = useState<boolean[]>(navGroups.map(() => false));
+  const [menuQuery, setMenuQuery] = useState('');
+  const visibleGroups = filterNavGroupsBySearch(navGroups, menuQuery);
+  const [expandState, setExpandState] = useState<boolean[]>(visibleGroups.map(() => false));
 
-  // Switching modules (or loading runtime SubModule groups) rebuilds
-  // `navGroups`; index-keyed expansion state from the previous menu would
-  // otherwise leak into the new one.
+  // Switching modules, loading runtime SubModule groups, or changing the menu
+  // search rebuilds the visible groups; index-keyed expansion state from the
+  // previous list would otherwise leak into the new one.
   useEffect(() => {
-    setExpandState(navGroups.map(() => false));
+    setExpandState(visibleGroups.map(() => false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moduleId, navGroupsKey]);
+  }, [moduleId, navGroupsKey, menuQuery]);
+
+  // The menu query is scoped to the selected module; clear it when the user
+  // switches modules so a search from EMR cannot hide another module's menus.
+  useEffect(() => {
+    setMenuQuery('');
+  }, [moduleId]);
 
   const resetExpandState = (index: number, expanded: boolean) => {
-    setExpandState(navGroups.map((_, i) => (i === index ? !expanded : false)));
+    setExpandState(visibleGroups.map((_, i) => (i === index ? !expanded : false)));
   };
-  const onModulesPage = pathname === '/modules';
 
   return (
     <AppShell.Navbar
@@ -58,45 +66,36 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
           <img className={classes.brandMark} src="/assets/brand-hex.png" alt="RxSoft" />
           {!collapsed && (
             <Box className={classes.brandText}>
-              <span className={classes.brandName}>RxSoft</span>
-              <span className={classes.brandTagline}>Electronic Health Record</span>
+              <span className={classes.brandName}>eHealthwares </span>
+              <span className={classes.brandTagline}>
+                {moduleMap[moduleId as ModuleId]?.title ?? 'RxSoft'}
+              </span>
             </Box>
           )}
         </Box>
 
-        {/* MODULES */}
-        <Tooltip label="Modules" position="right" disabled={!collapsed} withArrow>
-          <Link
-            to="/modules"
-            data-testid="sidebar-modules-link"
-            aria-label="Modules"
-            className={`${classes.modulesLink} ${onModulesPage ? classes.modulesLinkActive : ''} ${
-              collapsed ? classes.modulesLinkCollapsed : ''
-            }`}
-          >
-            <span className={classes.modulesIcon}>
-              <LayoutGrid size={16} />
-            </span>
-            {!collapsed && 'Modules'}
-          </Link>
-        </Tooltip>
-
-        {/* SEARCH (EMR) — a full-width input, so it only renders expanded */}
-        {moduleId === 'emr' && !collapsed && <PatientLookup />}
+        {/* MENU SEARCH — filters the role/module-scoped menu list */}
+        {!collapsed && <MenuSearch value={menuQuery} onChange={setMenuQuery} />}
 
         {/* NAVIGATION */}
         <ScrollArea flex={1} scrollbarSize={0} mt={4}>
-          {navGroups.map((item, i) => (
-            <SidebarNavItem
-              key={`${item.title}-${i}`}
-              item={item}
-              pathname={pathname}
-              resetExpandState={resetExpandState}
-              expanded={expandState[i]}
-              index={i}
-              collapsed={collapsed}
-            />
-          ))}
+          {visibleGroups.length === 0 ? (
+            <Text size="xs" c="dimmed" px="xs" py="sm">
+              No menus match “{menuQuery.trim()}”.
+            </Text>
+          ) : (
+            visibleGroups.map((item, i) => (
+              <SidebarNavItem
+                key={`${item.title}-${i}`}
+                item={item}
+                pathname={pathname}
+                resetExpandState={resetExpandState}
+                expanded={menuQuery.trim() ? true : expandState[i]}
+                index={i}
+                collapsed={collapsed}
+              />
+            ))
+          )}
         </ScrollArea>
 
         {/* FOOTER */}
