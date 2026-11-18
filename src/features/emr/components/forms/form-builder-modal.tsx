@@ -77,6 +77,7 @@ const FIELD_TYPE_LABELS: Partial<Record<FormFieldType, string>> = {
   'generic-drug': 'Generic drug (NDF)',
   'loinc-test': 'LOINC test (concepts)',
   'dicom-test': 'DICOM test (concepts)',
+  file: 'File upload (S3 / Cloudinary)',
   patient: 'Patient picker',
   'auth-patient': 'Verified patient (OTP)',
   html: 'Readonly HTML',
@@ -104,6 +105,7 @@ const TABLE_COLUMN_TYPES: FormFieldType[] = [
   'generic-drug',
   'loinc-test',
   'dicom-test',
+  'file',
 ];
 
 /** Grid span choices for the per-field `col` attribute (12 = full width/unset). */
@@ -145,6 +147,9 @@ type BuilderField = {
   qrMode: 'auto' | 'template' | 'instance';
   qrSize: number;
   caption: string;
+  accept: string;
+  multiple: boolean;
+  maxSizeMb: number;
 };
 
 const CATEGORIES = [
@@ -191,6 +196,9 @@ function emptyField(): BuilderField {
     qrMode: 'auto',
     qrSize: 180,
     caption: '',
+    accept: '',
+    multiple: false,
+    maxSizeMb: 10,
   };
 }
 
@@ -298,6 +306,13 @@ function builderFieldToSchema(field: BuilderField): Record<string, unknown> {
           caption: field.caption || undefined,
         }
       : {}),
+    ...(field.type === 'file'
+      ? {
+          accept: field.accept || undefined,
+          multiple: field.multiple,
+          maxSizeMb: field.maxSizeMb,
+        }
+      : {}),
   };
 }
 
@@ -341,6 +356,9 @@ function schemaToBuilder(schema: FormSchema | undefined): BuilderField[] {
     qrMode: field.qrMode ?? 'auto',
     qrSize: field.qrSize ?? 180,
     caption: field.caption ?? '',
+    accept: field.accept ?? '',
+    multiple: Boolean(field.multiple),
+    maxSizeMb: field.maxSizeMb ?? 10,
   });
   return (schema?.fields ?? []).map(mapField);
 }
@@ -876,6 +894,37 @@ function FieldEditor({
               value={field.caption}
               onChange={(e) => patch({ caption: e.currentTarget.value })}
               style={{ flex: 2, minWidth: 160 }}
+            />
+          </Group>
+        )}
+
+        {field.type === 'file' && (
+          <Group gap="xs" wrap="wrap">
+            <TextInput
+              label="Accepted types"
+              size="xs"
+              placeholder=".pdf,.docx,image/*"
+              value={field.accept}
+              onChange={(e) => patch({ accept: e.currentTarget.value })}
+              data-testid="file-accept-input"
+              style={{ flex: 2, minWidth: 220 }}
+            />
+            <Checkbox
+              label="Allow multiple files"
+              checked={field.multiple}
+              onChange={(event) => patch({ multiple: event.currentTarget.checked })}
+              mt="lg"
+              data-testid="file-multiple-checkbox"
+            />
+            <NumberInput
+              label="Max size (MB)"
+              size="xs"
+              min={1}
+              max={50}
+              value={field.maxSizeMb}
+              onChange={(value) => patch({ maxSizeMb: Number(value) || 10 })}
+              data-testid="file-max-size"
+              style={{ width: 130 }}
             />
           </Group>
         )}
