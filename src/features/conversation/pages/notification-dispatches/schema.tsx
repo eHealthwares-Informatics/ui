@@ -1,7 +1,12 @@
-import { Anchor, Badge, Text } from '@mantine/core';
+import { Anchor, Badge, Group, Switch, Text } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Play } from 'lucide-react';
+import { CopyIdCell } from '@/components/table/sn-cell';
 import type { Option } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
+import { conversationApi } from '@/lib/conversation-api';
+import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import {
   buildFields,
   jsonField,
@@ -14,7 +19,7 @@ import {
   textField,
   withDefaultActions,
 } from '../../schemas/helpers';
-import { notificationDetailHref, shortId } from '../notification-detail/link';
+import { notificationDetailHref } from '../notification-detail/link';
 import { compactMatcher, normalizeMatcher, validateMatcher } from './matcher';
 
 export type DispatchEventRow = { id: string; key: string; label: string };
@@ -32,6 +37,42 @@ export type DispatchChannelRow = {
 };
 
 const shortText = (value: unknown, fallback = '—') => (value ? String(value) : fallback);
+
+function DispatchEnabledSwitch({ row }: { row: Record<string, unknown> }) {
+  const queryClient = useQueryClient();
+  const enabled = row.enabled !== false;
+  const organizationId = (row.organizationId as string | null | undefined) ?? null;
+
+  const mutation = useMutation({
+    mutationFn: async (next: boolean) => {
+      await conversationApi.patch(
+        `/notification-dispatches/${String(row.id)}`,
+        { enabled: next, organizationId },
+        organizationId ? { params: { organizationId } } : undefined
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notification-dispatches'] });
+    },
+    onError: (error) => notifications.show({ color: 'red', message: getApiErrorMessage(error) }),
+  });
+
+  return (
+    <Group gap="xs" wrap="nowrap">
+      <Switch
+        size="sm"
+        aria-label="Toggle dispatch"
+        data-testid={`dispatch-enabled-${row.id}`}
+        checked={enabled}
+        disabled={mutation.isPending}
+        onChange={(event) => mutation.mutate(event.currentTarget.checked)}
+      />
+      <Text size="xs" c="dimmed">
+        {enabled ? 'Enabled' : 'Disabled'}
+      </Text>
+    </Group>
+  );
+}
 
 /**
  * Dispatch rules: the join of an event, its template and the channel that
@@ -104,18 +145,7 @@ export function buildNotificationDispatchesConfig(args: {
       {
         key: 'id',
         label: 'ID',
-        render: (row) => (
-          <Anchor
-            href={notificationDetailHref('notification-dispatches', row)}
-            target="_blank"
-            rel="noreferrer"
-            size="xs"
-            ff="monospace"
-            title={String(row.id ?? '')}
-          >
-            {shortId(row.id)}
-          </Anchor>
-        ),
+        render: (row) => <CopyIdCell value={row.id} testId={`dispatch-id-${row.id}`} />,
       },
       {
         key: 'eventId',
@@ -216,11 +246,7 @@ export function buildNotificationDispatchesConfig(args: {
         key: 'enabled',
         label: 'Enabled',
         sortable: true,
-        render: (row) => (
-          <Badge size="xs" color={row.enabled === false ? 'gray' : 'green'} variant="light">
-            {row.enabled === false ? 'Disabled' : 'Enabled'}
-          </Badge>
-        ),
+        render: (row) => <DispatchEnabledSwitch row={row} />,
       },
       {
         key: 'description',
@@ -307,6 +333,8 @@ export function buildNotificationDispatchesConfig(args: {
     },
     defaultSort: { sortBy: 'priority', sortOrder: 'asc' },
     copyRowIdOnSn: true,
+    canDelete: false,
+    rowActionsInline: true,
     rowActions: onTest
       ? [
           {

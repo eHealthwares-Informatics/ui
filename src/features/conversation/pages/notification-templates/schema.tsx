@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Anchor,
   Badge,
   Button,
   Group,
@@ -19,11 +18,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { JsonEditorField } from '@/components/form/json-editor-field';
+import { CopyIdCell } from '@/components/table/sn-cell';
 import { EQUALS_WITH_OPTIONS, FILTERS, type Column, type Field } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
-import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type TemplateRow = {
   id: string;
@@ -233,18 +232,7 @@ function buildColumns(canManageGlobal: boolean): Column[] {
     {
       key: 'id',
       label: 'ID',
-      render: (row) => (
-        <Anchor
-          href={notificationDetailHref('notification-templates', row)}
-          target="_blank"
-          rel="noreferrer"
-          size="xs"
-          ff="monospace"
-          title={String(row.id ?? '')}
-        >
-          {shortId(row.id)}
-        </Anchor>
-      ),
+      render: (row) => <CopyIdCell value={row.id} testId={`template-id-${row.id}`} />,
     },
     { key: 'code', label: 'Code', sortable: true, filters: [FILTERS.CONTAINS, FILTERS.EQUALS] },
     {

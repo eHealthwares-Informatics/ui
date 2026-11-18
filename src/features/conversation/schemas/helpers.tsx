@@ -135,7 +135,9 @@ export const switchField = (name: string, label: string, col = 6): Field => ({
 
 export const buildFields = (fields: Field[]): FieldGroup[] => [{ fields }];
 
-export const withDefaultActions = (config: Omit<ModelConfig, 'canDelete'>): ModelConfig => ({
+export const withDefaultActions = (
+  config: Omit<ModelConfig, 'canDelete'> & { canDelete?: boolean }
+): ModelConfig => ({
   canDelete: true,
   apiProvider: conversationApi,
   ...config,

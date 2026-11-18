@@ -1,8 +1,8 @@
-import { Table, Text, Loader, Center, Tooltip } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
+import { Table, Text, Loader, Center } from '@mantine/core';
 import { useRef } from 'react';
 import { Column, FilterValue } from '@/features/rxsoft/types';
 import { ActionCell, ActionCellProps } from './action-cell';
+import { SnCell } from './sn-cell';
 import { TableHeader, SortOrder } from './table-header';
 import { renderCell } from './utils';
 
@@ -24,23 +24,6 @@ type DataTableProps = {
   /** Double-click on a row navigates to the view page. */
   onRowDoubleClick?: (row: Record<string, unknown>) => void;
 };
-
-async function copyRowId(id: string) {
-  try {
-    await navigator.clipboard.writeText(id);
-    notifications.show({
-      color: 'green',
-      title: 'ID copied',
-      message: id,
-    });
-  } catch {
-    notifications.show({
-      color: 'red',
-      title: 'Copy failed',
-      message: 'Clipboard is unavailable',
-    });
-  }
-}
 
 export const DataTable = ({
   columns,
@@ -79,6 +62,9 @@ export const DataTable = ({
   };
 
   const handleRowDoubleClick = (e: React.MouseEvent, row: Record<string, unknown>) => {
+    if ((e.target as Element).closest('button, a, [role="button"]')) {
+      return;
+    }
     if (clickTimeoutRef.current) {
       clearTimeout(clickTimeoutRef.current);
       clickTimeoutRef.current = null;
@@ -151,22 +137,7 @@ export const DataTable = ({
           >
             <Table.Td key={index}>
               {copyRowIdOnSn ? (
-                <Tooltip label="Copy ID" withArrow>
-                  <Text
-                    component="button"
-                    type="button"
-                    size="sm"
-                    onClick={() => void copyRowId(String(row.id ?? ''))}
-                    style={{
-                      cursor: 'pointer',
-                      background: 'none',
-                      border: 0,
-                      padding: 0,
-                    }}
-                  >
-                    {index + 1}
-                  </Text>
-                </Tooltip>
+                <SnCell index={index} id={row.id} testId={`sn-copy-${row.id ?? index}`} />
               ) : (
                 index + 1
               )}

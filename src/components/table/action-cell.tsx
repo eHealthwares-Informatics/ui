@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Menu } from '@mantine/core';
+import { ActionIcon, Group, Menu, Tooltip } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { Eye, MoreHorizontal, Pencil, RotateCcw, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -20,6 +20,8 @@ export type ActionCellProps = {
   savingRowIndex?: string | null;
   actions?: any[];
   rowActions?: RowAction[];
+  /** Render row actions as inline icon buttons instead of a kebab menu. */
+  inlineRowActions?: boolean;
   canEditRow?: (row: Record<string, unknown>) => boolean;
   canDeleteRow?: (row: Record<string, unknown>) => boolean;
 };
@@ -39,6 +41,7 @@ export const ActionCell = ({
   saveRow,
   resetRow,
   rowActions,
+  inlineRowActions,
   canEditRow,
   canDeleteRow,
 }: ActionCellProps & { row: Record<string, unknown> }) => {
@@ -139,38 +142,70 @@ export const ActionCell = ({
         </ActionIcon>
       )}
 
-      {rowActions && rowActions.length > 0 && (
-        <Menu shadow="md" width={200}>
-          <Menu.Target>
-            <ActionIcon variant="outline">
-              <MoreHorizontal size={16} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            {rowActions.map((action) => {
-              const Icon = action.icon;
-              return action.onClick ? (
-                <Menu.Item
-                  key={action.label}
-                  onClick={() => action.onClick && action.onClick(row)}
-                  leftSection={Icon ? <Icon size={14} /> : undefined}
+      {rowActions &&
+        rowActions.length > 0 &&
+        (inlineRowActions ? (
+          rowActions.map((action) => {
+            const Icon = action.icon;
+            const label = action.label;
+            const testId = `row-action-${action.id ?? label}`;
+            return action.onClick ? (
+              <Tooltip key={label} label={label} withArrow>
+                <ActionIcon
+                  variant="outline"
+                  aria-label={label}
+                  data-testid={testId}
+                  onClick={() => action.onClick?.(row)}
                 >
-                  {action.label}
-                </Menu.Item>
-              ) : (
-                <Menu.Item
-                  key={action.label}
+                  {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
+                </ActionIcon>
+              </Tooltip>
+            ) : (
+              <Tooltip key={label} label={label} withArrow>
+                <ActionIcon
+                  variant="outline"
                   component={Link}
                   to={action.href!(row)}
-                  leftSection={Icon ? <Icon size={14} /> : undefined}
+                  aria-label={label}
+                  data-testid={testId}
                 >
-                  {action.label}
-                </Menu.Item>
-              );
-            })}
-          </Menu.Dropdown>
-        </Menu>
-      )}
+                  {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
+                </ActionIcon>
+              </Tooltip>
+            );
+          })
+        ) : (
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <ActionIcon variant="outline">
+                <MoreHorizontal size={16} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {rowActions.map((action) => {
+                const Icon = action.icon;
+                return action.onClick ? (
+                  <Menu.Item
+                    key={action.label}
+                    onClick={() => action.onClick && action.onClick(row)}
+                    leftSection={Icon ? <Icon size={14} /> : undefined}
+                  >
+                    {action.label}
+                  </Menu.Item>
+                ) : (
+                  <Menu.Item
+                    key={action.label}
+                    component={Link}
+                    to={action.href!(row)}
+                    leftSection={Icon ? <Icon size={14} /> : undefined}
+                  >
+                    {action.label}
+                  </Menu.Item>
+                );
+              })}
+            </Menu.Dropdown>
+          </Menu>
+        ))}
 
       {/* DELETE CONFIRMATION DIALOG */}
       <ConfirmDialog

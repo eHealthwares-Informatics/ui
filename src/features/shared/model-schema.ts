@@ -95,6 +95,8 @@ export type ModelConfig<T = any> = {
   /** Sort applied until the user picks a column sort from a header. */
   defaultSort?: { sortBy: string; sortOrder: 'asc' | 'desc' };
   rowActions?: RowAction[];
+  /** Render `rowActions` as inline icon buttons instead of a kebab menu. */
+  rowActionsInline?: boolean;
   /** Query-key prefix used by the data page. Defaults to ['rxsoft-data-page', endpoint]. */
   queryKeyBase?: unknown[];
   /**
