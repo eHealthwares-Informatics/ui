@@ -38,6 +38,7 @@ import {
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { PrintSendActions } from '../shared/print-send-actions';
 import { SendFormCard } from '../shared/send-form-card';
+import { StaffPicker, type StaffOption } from '../shared/staff-picker';
 
 export type FormData = Record<string, unknown>;
 
@@ -58,6 +59,12 @@ function pickerKinds(type: FormFieldType): MasterItemKind[] | undefined {
 function isLoincTest(value: unknown): value is LoincTest {
   return (
     typeof value === 'object' && value !== null && typeof (value as LoincTest).code === 'string'
+  );
+}
+
+function isStaffOption(value: unknown): value is StaffOption {
+  return (
+    typeof value === 'object' && value !== null && typeof (value as StaffOption).id === 'string'
   );
 }
 
@@ -289,6 +296,15 @@ function DynamicField({
           accept={field.accept}
           multiple={field.multiple}
           maxSizeMb={field.maxSizeMb}
+        />
+      );
+    case 'practitioner':
+      return (
+        <StaffPicker
+          label={field.label}
+          required={field.required}
+          value={isStaffOption(value) ? value : null}
+          onChange={(next) => onChange(next ?? undefined)}
         />
       );
     case 'print':
@@ -771,6 +787,17 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       if (!valid) {
         errors.push(`${field.label} must contain uploaded file URLs`);
       }
+    }
+    if (
+      field.type === 'practitioner' &&
+      (typeof fieldValue !== 'object' ||
+        Array.isArray(fieldValue) ||
+        !(
+          (fieldValue as Record<string, unknown>).id ||
+          (fieldValue as Record<string, unknown>).staffId
+        ))
+    ) {
+      errors.push(`${field.label} must be a selected practitioner`);
     }
   };
 

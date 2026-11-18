@@ -78,6 +78,7 @@ const FIELD_TYPE_LABELS: Partial<Record<FormFieldType, string>> = {
   'loinc-test': 'LOINC test (concepts)',
   'dicom-test': 'DICOM test (concepts)',
   file: 'File upload (S3 / Cloudinary)',
+  practitioner: 'Practitioner (staff)',
   patient: 'Patient picker',
   'auth-patient': 'Verified patient (OTP)',
   html: 'Readonly HTML',
@@ -106,6 +107,7 @@ const TABLE_COLUMN_TYPES: FormFieldType[] = [
   'loinc-test',
   'dicom-test',
   'file',
+  'practitioner',
 ];
 
 /** Grid span choices for the per-field `col` attribute (12 = full width/unset). */
