@@ -142,7 +142,8 @@ export const ActionCell = ({
         </ActionIcon>
       )}
 
-      {rowActions && rowActions.length > 0 &&
+      {rowActions &&
+        rowActions.length > 0 &&
         (inlineRowActions ? (
           rowActions
             .filter((action) => !action.validate || action.validate(row))
