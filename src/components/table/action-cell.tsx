@@ -142,38 +142,39 @@ export const ActionCell = ({
         </ActionIcon>
       )}
 
-      {rowActions &&
-        rowActions.length > 0 &&
+      {rowActions && rowActions.length > 0 &&
         (inlineRowActions ? (
-          rowActions.map((action) => {
-            const Icon = action.icon;
-            const label = action.label;
-            const testId = `row-action-${action.id ?? label}`;
-            return action.onClick ? (
-              <Tooltip key={label} label={label} withArrow>
-                <ActionIcon
-                  variant="outline"
-                  aria-label={label}
-                  data-testid={testId}
-                  onClick={() => action.onClick?.(row)}
-                >
-                  {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
-                </ActionIcon>
-              </Tooltip>
-            ) : (
-              <Tooltip key={label} label={label} withArrow>
-                <ActionIcon
-                  variant="outline"
-                  component={Link}
-                  to={action.href!(row)}
-                  aria-label={label}
-                  data-testid={testId}
-                >
-                  {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
-                </ActionIcon>
-              </Tooltip>
-            );
-          })
+          rowActions
+            .filter((action) => !action.validate || action.validate(row))
+            .map((action) => {
+              const Icon = action.icon;
+              const label = action.label;
+              const testId = `row-action-${action.id ?? label}`;
+              return action.onClick ? (
+                <Tooltip key={label} label={label} withArrow>
+                  <ActionIcon
+                    variant="outline"
+                    aria-label={label}
+                    data-testid={testId}
+                    onClick={() => action.onClick?.(row)}
+                  >
+                    {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
+                  </ActionIcon>
+                </Tooltip>
+              ) : (
+                <Tooltip key={label} label={label} withArrow>
+                  <ActionIcon
+                    variant="outline"
+                    component={Link}
+                    to={action.href!(row)}
+                    aria-label={label}
+                    data-testid={testId}
+                  >
+                    {Icon ? <Icon size={16} /> : <MoreHorizontal size={16} />}
+                  </ActionIcon>
+                </Tooltip>
+              );
+            })
         ) : (
           <Menu shadow="md" width={200}>
             <Menu.Target>
@@ -182,27 +183,29 @@ export const ActionCell = ({
               </ActionIcon>
             </Menu.Target>
             <Menu.Dropdown>
-              {rowActions.map((action) => {
-                const Icon = action.icon;
-                return action.onClick ? (
-                  <Menu.Item
-                    key={action.label}
-                    onClick={() => action.onClick && action.onClick(row)}
-                    leftSection={Icon ? <Icon size={14} /> : undefined}
-                  >
-                    {action.label}
-                  </Menu.Item>
-                ) : (
-                  <Menu.Item
-                    key={action.label}
-                    component={Link}
-                    to={action.href!(row)}
-                    leftSection={Icon ? <Icon size={14} /> : undefined}
-                  >
-                    {action.label}
-                  </Menu.Item>
-                );
-              })}
+              {rowActions
+                .filter((action) => !action.validate || action.validate(row))
+                .map((action) => {
+                  const Icon = action.icon;
+                  return action.onClick ? (
+                    <Menu.Item
+                      key={action.label}
+                      onClick={() => action.onClick && action.onClick(row)}
+                      leftSection={Icon ? <Icon size={14} /> : undefined}
+                    >
+                      {action.label}
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item
+                      key={action.label}
+                      component={Link}
+                      to={action.href!(row)}
+                      leftSection={Icon ? <Icon size={14} /> : undefined}
+                    >
+                      {action.label}
+                    </Menu.Item>
+                  );
+                })}
             </Menu.Dropdown>
           </Menu>
         ))}

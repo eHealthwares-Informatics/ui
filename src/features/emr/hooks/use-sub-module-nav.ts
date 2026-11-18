@@ -3,11 +3,18 @@ import {
   Activity,
   Baby,
   Bed,
+  ClipboardCheck,
   ClipboardList,
   FileText,
   HeartPulse,
   Layers3,
+  Microscope,
+  Pill,
+  Receipt,
+  ScanLine,
   Stethoscope,
+  Syringe,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -20,11 +27,18 @@ const ICONS: Record<string, LucideIcon> = {
   Activity,
   Baby,
   Bed,
+  ClipboardCheck,
   ClipboardList,
   FileText,
   HeartPulse,
   Layers3,
+  Microscope,
+  Pill,
+  Receipt,
+  ScanLine,
   Stethoscope,
+  Syringe,
+  Users,
 };
 
 /** Resolve a stored lucide icon name, falling back to a neutral group icon. */

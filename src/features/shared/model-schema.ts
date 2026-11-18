@@ -131,4 +131,6 @@ export type RowAction = {
   href?: (row: Record<string, unknown>) => string;
   /** Run a handler (e.g. a mutation + modal) when selected. */
   onClick?: (row: Record<string, unknown>) => void;
+  /** Hide this action for rows that do not pass the predicate. */
+  validate?: (row: Record<string, unknown>) => boolean;
 };
