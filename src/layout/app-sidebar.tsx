@@ -44,6 +44,12 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId, navGroupsKey, menuQuery]);
 
+  // The menu query is scoped to the selected module; clear it when the user
+  // switches modules so a search from EMR cannot hide another module's menus.
+  useEffect(() => {
+    setMenuQuery('');
+  }, [moduleId]);
+
   const resetExpandState = (index: number, expanded: boolean) => {
     setExpandState(visibleGroups.map((_, i) => (i === index ? !expanded : false)));
   };
@@ -61,7 +67,7 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
           <img className={classes.brandMark} src="/assets/brand-hex.png" alt="RxSoft" />
           {!collapsed && (
             <Box className={classes.brandText}>
-              <span className={classes.brandName}>RxSoft</span>
+              <span className={classes.brandName}>eHealthwares </span>
               <span className={classes.brandTagline}>Electronic Health Record</span>
             </Box>
           )}
