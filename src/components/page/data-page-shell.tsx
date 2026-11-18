@@ -566,6 +566,7 @@ export function DataPageShell(props: DataPageShellProps) {
                   (deletePathBuilder || canDelete) && canDeleteAction ? () => undefined : undefined,
                 deleteMutation,
                 rowActions: gatedRowActions,
+                inlineRowActions: config.rowActionsInline,
                 canEditRow,
                 canDeleteRow,
               }

@@ -1,5 +1,6 @@
-import { Anchor, Badge, Group, Select, Switch, Text } from '@mantine/core';
+import { Badge, Group, Select, Switch, Text } from '@mantine/core';
 import { Eye, RefreshCw } from 'lucide-react';
+import { CopyIdCell } from '@/components/table/sn-cell';
 import {
   ColumnTypeFilters,
   EQUALS_WITH_OPTIONS,
@@ -8,7 +9,6 @@ import {
 } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
-import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type DeliveryRow = {
   id: string;
@@ -77,25 +77,7 @@ const columns: Column[] = [
   {
     key: 'id',
     label: 'ID',
-    render: (row) => (
-      <Anchor
-        href={notificationDetailHref('notification-delivery', row)}
-        target="_blank"
-        rel="noreferrer"
-        size="xs"
-        ff="monospace"
-        title={String(row.id ?? '')}
-      >
-        {shortId(row.id)}
-      </Anchor>
-    ),
-  },
-  {
-    key: 'createdAt',
-    label: 'Time',
-    sortable: true,
-    filters: ColumnTypeFilters.DATE,
-    render: (row) => (row.createdAt ? new Date(String(row.createdAt)).toLocaleString() : '—'),
+    render: (row) => <CopyIdCell value={row.id} testId={`delivery-id-${row.id}`} />,
   },
   { key: 'eventKey', label: 'Event', sortable: true, filters: [FILTERS.CONTAINS] },
   {
@@ -114,11 +96,7 @@ const columns: Column[] = [
     label: 'Channel ID',
     sortable: true,
     filters: [FILTERS.CONTAINS],
-    render: (row) => (
-      <Text size="xs" ff="monospace" title={String(row.channelId ?? '')}>
-        {shortId(row.channelId)}
-      </Text>
-    ),
+    render: (row) => <CopyIdCell value={row.channelId} testId={`delivery-channel-${row.id}`} />,
   },
   {
     key: 'recipient',
@@ -126,15 +104,6 @@ const columns: Column[] = [
     sortable: true,
     filters: [FILTERS.CONTAINS],
     render: (row) => String(row.recipient ?? '—'),
-  },
-  {
-    key: 'subject',
-    label: 'Subject',
-    render: (row) => (
-      <Text size="xs" lineClamp={1} title={String(row.subject ?? row.body ?? '')} maw={240}>
-        {String(row.subject ?? row.body ?? '—')}
-      </Text>
-    ),
   },
   {
     key: 'status',
@@ -172,129 +141,12 @@ const columns: Column[] = [
     label: 'Template',
     sortable: true,
     filters: [FILTERS.CONTAINS],
-    render: (row) => (
-      <Text size="xs" ff="monospace" title={String(row.templateId ?? '')}>
-        {shortId(row.templateId)}
-      </Text>
-    ),
-  },
-  {
-    key: 'exchangeId',
-    label: 'Exchange',
-    sortable: true,
-    filters: [FILTERS.CONTAINS],
-    render: (row) => (
-      <Group gap="xs" wrap="nowrap">
-        <Badge color={row.exchangeId ? 'green' : 'gray'} variant="light" size="xs">
-          {row.exchangeId ? 'Linked' : 'No exchange'}
-        </Badge>
-        <Text size="xs" ff="monospace" title={String(row.exchangeId ?? '')}>
-          {shortId(row.exchangeId)}
-        </Text>
-      </Group>
-    ),
-  },
-  {
-    key: 'providerMessageId',
-    label: 'Provider message',
-    sortable: true,
-    filters: [FILTERS.CONTAINS],
-    render: (row) => (
-      <Text size="xs" ff="monospace" title={String(row.providerMessageId ?? '')}>
-        {shortId(row.providerMessageId)}
-      </Text>
-    ),
-  },
-  {
-    key: 'prints',
-    label: 'Prints',
-    render: (row) => {
-      const prints = (row.prints ?? {}) as Record<string, string>;
-      const entries = Object.entries(prints).filter(([, url]) => Boolean(url));
-      if (entries.length === 0) {
-        return (
-          <Text size="xs" c="dimmed">
-            —
-          </Text>
-        );
-      }
-      return (
-        <Group gap={4} wrap="nowrap">
-          {entries.map(([format, url]) => (
-            <Anchor key={format} href={url} target="_blank" rel="noreferrer" size="xs">
-              {format.toUpperCase()}
-            </Anchor>
-          ))}
-        </Group>
-      );
-    },
-  },
-  {
-    key: 'cloudinaryUrl',
-    label: 'Cloudinary',
-    render: (row) =>
-      row.cloudinaryUrl ? (
-        <Anchor href={String(row.cloudinaryUrl)} target="_blank" rel="noreferrer" size="xs">
-          Open
-        </Anchor>
-      ) : (
-        <Text size="xs" c="dimmed">
-          —
-        </Text>
-      ),
-  },
-  {
-    key: 'awsUrl',
-    label: 'AWS',
-    render: (row) =>
-      row.awsUrl ? (
-        <Anchor href={String(row.awsUrl)} target="_blank" rel="noreferrer" size="xs">
-          Open
-        </Anchor>
-      ) : (
-        <Text size="xs" c="dimmed">
-          —
-        </Text>
-      ),
-  },
-  {
-    key: 'localUrl',
-    label: 'Local',
-    render: (row) =>
-      row.localUrl ? (
-        <Text size="xs" ff="monospace" lineClamp={1} maw={180} title={String(row.localUrl)}>
-          {String(row.localUrl)}
-        </Text>
-      ) : (
-        <Text size="xs" c="dimmed">
-          —
-        </Text>
-      ),
+    render: (row) => <CopyIdCell value={row.templateId} testId={`delivery-template-${row.id}`} />,
   },
   {
     key: 'attempts',
     label: 'Attempts',
     render: (row) => Number(row.attempts ?? 0),
-  },
-  {
-    key: 'requestPayload',
-    label: 'Request',
-    render: (row) => {
-      const payload = row.requestPayload as Record<string, unknown> | null | undefined;
-      const text = payload && Object.keys(payload).length > 0 ? JSON.stringify(payload) : '—';
-      return (
-        <Text size="xs" ff="monospace" lineClamp={1} maw={220} title={text}>
-          {text.length > 60 ? `${text.slice(0, 60)}…` : text}
-        </Text>
-      );
-    },
-  },
-  {
-    key: 'sentAt',
-    label: 'Sent At',
-    sortable: true,
-    filters: ColumnTypeFilters.DATE,
-    render: (row) => (row.sentAt ? new Date(String(row.sentAt)).toLocaleString() : '—'),
   },
   {
     key: 'error',
@@ -313,6 +165,13 @@ const columns: Column[] = [
         </Text>
       );
     },
+  },
+  {
+    key: 'createdAt',
+    label: 'Time',
+    sortable: true,
+    filters: ColumnTypeFilters.DATE,
+    render: (row) => (row.createdAt ? new Date(String(row.createdAt)).toLocaleString() : '—'),
   },
 ];
 
@@ -390,6 +249,7 @@ export function buildNotificationDeliveryConfig(args: {
         />
       </Group>
     ),
+    rowActionsInline: true,
     rowActions: [
       {
         label: 'View details',

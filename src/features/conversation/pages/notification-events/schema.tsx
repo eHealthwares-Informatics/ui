@@ -1,8 +1,8 @@
-import { Anchor, Group, Switch, Text } from '@mantine/core';
+import { Group, Switch, Text } from '@mantine/core';
+import { CopyIdCell } from '@/components/table/sn-cell';
 import { EQUALS_WITH_OPTIONS, FILTERS } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { conversationApi } from '@/lib/conversation-api';
-import { notificationDetailHref, shortId } from '../notification-detail/link';
 
 export type PrintTemplateRow = {
   id: string;
@@ -80,18 +80,7 @@ export function buildNotificationEventsConfig(args: {
         label: 'ID',
         sortable: true,
         filters: [FILTERS.CONTAINS, FILTERS.EQUALS],
-        render: (row) => (
-          <Anchor
-            href={notificationDetailHref('notification-events', row)}
-            target="_blank"
-            rel="noreferrer"
-            size="xs"
-            ff="monospace"
-            title={String(row.id ?? '')}
-          >
-            {shortId(row.id)}
-          </Anchor>
-        ),
+        render: (row) => <CopyIdCell value={row.id} testId={`event-id-${row.id}`} />,
       },
       {
         key: 'key',
