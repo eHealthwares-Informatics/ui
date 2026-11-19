@@ -34,10 +34,10 @@ export function toStaffOption(staff: Staff): StaffOption {
 
 /**
  * Resolve the staff record linked to an identity user (`staff.userId`). Used to
- * default practitioner fields to the signed-in practitioner.
+ * default practitioner and department fields to the signed-in practitioner.
  */
-export function useStaffByUserId(userId?: string | null): Staff | null {
-  const { data } = useQuery({
+export function useStaffByUserIdQuery(userId?: string | null) {
+  return useQuery({
     queryKey: ['emr', 'staff', 'by-user', userId],
     queryFn: async () => {
       const res = await emrApi.get<{ data: Staff[] }>('/staff', {
@@ -48,7 +48,10 @@ export function useStaffByUserId(userId?: string | null): Staff | null {
     enabled: Boolean(userId),
     staleTime: 5 * 60_000,
   });
-  return data ?? null;
+}
+
+export function useStaffByUserId(userId?: string | null): Staff | null {
+  return useStaffByUserIdQuery(userId).data ?? null;
 }
 
 export function StaffPicker({

@@ -27,6 +27,12 @@ import type {
 } from '../../lib/emr-types';
 import { AnnotateField } from '../forms/annotate';
 import { AuthPatientPicker, type AuthPatientValue } from '../shared/auth-patient-picker';
+import {
+  DepartmentSelect,
+  toDepartmentOption,
+  useDepartmentsForLocation,
+  type DepartmentOption,
+} from '../shared/department-select';
 import { DicomTestSearch, type DicomTest } from '../shared/dicom-test-search';
 import { FileUploadField } from '../shared/file-upload-field';
 import { FormQrCode } from '../shared/form-qr-code';
@@ -45,6 +51,7 @@ import {
   type StaffOption,
   toStaffOption,
   useStaffByUserId,
+  useStaffByUserIdQuery,
 } from '../shared/staff-picker';
 
 export type FormData = Record<string, unknown>;
@@ -72,6 +79,14 @@ function isLoincTest(value: unknown): value is LoincTest {
 function isStaffOption(value: unknown): value is StaffOption {
   return (
     typeof value === 'object' && value !== null && typeof (value as StaffOption).id === 'string'
+  );
+}
+
+function isDepartmentOption(value: unknown): value is DepartmentOption {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as DepartmentOption).id === 'string'
   );
 }
 
@@ -278,6 +293,80 @@ export function PractitionerField({
   );
 }
 
+/**
+ * Department control. Options are the departments of the signed-in user's site
+ * (`department.locationId`); an empty field defaults to the current staff
+ * member's department, or to the site's only department when the staff record
+ * has none.
+ */
+export function DepartmentField({
+  field,
+  value,
+  onChange,
+  runtime,
+}: {
+  field: FormFieldSchema;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  runtime?: FormRuntimeContext;
+}) {
+  const authUser = useAuthStore((state) => state.user);
+  const locationId = runtime?.locationId ?? authUser?.locationId ?? null;
+  // Public (token) forms are filled by patients, not staff.
+  const userId = runtime?.publicToken ? null : (runtime?.userId ?? authUser?.id ?? null);
+  const staffQuery = useStaffByUserIdQuery(userId);
+  const { departments, isLoading: departmentsLoading } = useDepartmentsForLocation(locationId);
+  const initialised = useRef(value !== undefined && value !== null);
+
+  useEffect(() => {
+    if (initialised.current) {
+      return;
+    }
+    if (userId && staffQuery.isLoading) {
+      return;
+    }
+    const staff = staffQuery.data ?? null;
+    if (staff?.departmentId) {
+      if (departmentsLoading) {
+        return;
+      }
+      const current = departments.find((department) => department.id === staff.departmentId);
+      initialised.current = true;
+      if (current) {
+        onChange(toDepartmentOption(current));
+      }
+      return;
+    }
+    if (departmentsLoading) {
+      return;
+    }
+    initialised.current = true;
+    // Users without a staff record (e.g. an administrator) fall back to the
+    // site's single department when there is exactly one.
+    if (departments.length === 1 && locationId) {
+      onChange(toDepartmentOption(departments[0]));
+    }
+  }, [
+    departments,
+    departmentsLoading,
+    locationId,
+    onChange,
+    staffQuery.data,
+    staffQuery.isLoading,
+    userId,
+  ]);
+
+  return (
+    <DepartmentSelect
+      label={field.label}
+      required={field.required}
+      value={isDepartmentOption(value) ? value : null}
+      departments={departments}
+      onChange={(next) => onChange(next ?? undefined)}
+    />
+  );
+}
+
 function DynamicField({
   field,
   value,
@@ -356,6 +445,8 @@ function DynamicField({
       return (
         <PractitionerField field={field} value={value} onChange={onChange} runtime={runtime} />
       );
+    case 'department':
+      return <DepartmentField field={field} value={value} onChange={onChange} runtime={runtime} />;
     case 'print':
       return runtime?.hideActions ? null : (
         <PrintSendActions
