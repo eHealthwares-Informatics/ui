@@ -18,6 +18,7 @@ import { Clock4, HandCoins, KeyRound, ShieldCheck, UserRound, ScrollText } from 
 import { useState } from 'react';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { displayNameOf } from '@/lib/user-name';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   createRoleRequest,
   getMe,
@@ -71,9 +72,21 @@ export function UserInsightsPanel() {
   const [pendingRole, setPendingRole] = useState<string | null>(null);
   const [reason, setReason] = useState('');
 
+  const roles = useAuthStore((state) => state.user?.roles ?? []);
+  // GET /user-pos-config/me is role-gated (admin|super_admin|cashier|website_user).
+  // The generic module dashboard renders this panel for every module, so a
+  // module-scoped demo user (emr/lis/…) would otherwise issue a guaranteed 403.
+  const canReadPosConfig = roles.some((role) =>
+    ['admin', 'super_admin', 'cashier', 'website_user'].includes(role)
+  );
+
   const me = useQuery({ queryKey: ['me-profile'], queryFn: getMe });
   const activity = useQuery({ queryKey: ['me-activity'], queryFn: getMeActivity });
-  const config = useQuery({ queryKey: ['me-pos-config'], queryFn: getMyPosConfig });
+  const config = useQuery({
+    queryKey: ['me-pos-config'],
+    queryFn: getMyPosConfig,
+    enabled: canReadPosConfig,
+  });
   const audit = useQuery({ queryKey: ['me-audit'], queryFn: () => getMyAudit(6) });
   const roleCatalog = useQuery({ queryKey: ['role-catalog'], queryFn: listRoleCatalog });
   const myRequests = useQuery({ queryKey: ['role-requests-mine'], queryFn: listMyRoleRequests });
@@ -168,25 +181,27 @@ export function UserInsightsPanel() {
           </Box>
         </Grid.Col>
 
-        <Grid.Col span={{ base: 12, md: 3 }}>
-          <Box>
-            <CardHeading icon={<HandCoins size={16} />} label="Config" />
-            <Stack gap={2}>
-              <Text size="sm">
-                POS access: <b>{config.data?.allowPos ? 'Yes' : 'No'}</b>
-              </Text>
-              <Text size="sm">
-                A4 print: <b>{config.data?.allowA4Print ? 'Yes' : 'No'}</b>
-              </Text>
-              <Text size="sm">
-                Store: <b>{config.data?.storeId || 'default'}</b>
-              </Text>
-              <Text size="sm">
-                Location: <b>{config.data?.stockLocation?.name ?? '—'}</b>
-              </Text>
-            </Stack>
-          </Box>
-        </Grid.Col>
+        {canReadPosConfig && (
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            <Box>
+              <CardHeading icon={<HandCoins size={16} />} label="Config" />
+              <Stack gap={2}>
+                <Text size="sm">
+                  POS access: <b>{config.data?.allowPos ? 'Yes' : 'No'}</b>
+                </Text>
+                <Text size="sm">
+                  A4 print: <b>{config.data?.allowA4Print ? 'Yes' : 'No'}</b>
+                </Text>
+                <Text size="sm">
+                  Store: <b>{config.data?.storeId || 'default'}</b>
+                </Text>
+                <Text size="sm">
+                  Location: <b>{config.data?.stockLocation?.name ?? '—'}</b>
+                </Text>
+              </Stack>
+            </Box>
+          </Grid.Col>
+        )}
       </Grid>
 
       <Divider my="sm" />

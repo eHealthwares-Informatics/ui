@@ -109,7 +109,15 @@ const queryClient = new QueryClient({
           });
         }
         if (error.response?.status === 403) {
-          router.navigate({ to: '/403', replace: true });
+          // Background queries must not blow the page away: a role can be
+          // denied one optional endpoint (header widgets, a secondary panel)
+          // while the rest of the module is usable. Route-level guards still
+          // redirect to /403 when the whole page is forbidden.
+          notifications.show({
+            title: 'Forbidden',
+            message: getApiErrorMessage(error),
+            color: 'red',
+          });
         }
       }
     },
