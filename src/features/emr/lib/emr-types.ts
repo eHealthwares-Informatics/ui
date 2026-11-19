@@ -96,6 +96,7 @@ export type FormFieldType =
   | 'qr-code'
   | 'file'
   | 'practitioner'
+  | 'department'
   | 'annotate';
 
 export type AnnotateTarget = 'body' | 'dermatome' | 'organ';

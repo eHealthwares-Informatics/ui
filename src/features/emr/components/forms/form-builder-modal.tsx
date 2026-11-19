@@ -66,6 +66,9 @@ const FIELD_TYPES: FormFieldType[] = [
   'print',
   'send-form',
   'qr-code',
+  'file',
+  'practitioner',
+  'department',
   'annotate',
 ];
 
@@ -79,6 +82,7 @@ const FIELD_TYPE_LABELS: Partial<Record<FormFieldType, string>> = {
   'dicom-test': 'DICOM test (concepts)',
   file: 'File upload (S3 / Cloudinary)',
   practitioner: 'Practitioner (staff)',
+  department: 'Department (site)',
   patient: 'Patient picker',
   'auth-patient': 'Verified patient (OTP)',
   html: 'Readonly HTML',

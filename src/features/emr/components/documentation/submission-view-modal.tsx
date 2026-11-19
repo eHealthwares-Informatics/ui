@@ -95,6 +95,21 @@ function renderPractitionerValue(value: unknown) {
   );
 }
 
+function renderDepartmentValue(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return <Text size="sm">—</Text>;
+  }
+  const department = value as { name?: string; code?: string };
+  if (!department.name && !department.code) {
+    return <Text size="sm">—</Text>;
+  }
+  return (
+    <Text size="sm">
+      {[department.name, department.code ? `(${department.code})` : null].filter(Boolean).join(' ')}
+    </Text>
+  );
+}
+
 function renderValue(value: unknown): string {
   if (value === null || value === undefined || value === '') {
     return '—';
@@ -230,9 +245,11 @@ export function SubmissionViewModal({
                       ? renderFileValue(value)
                       : field?.type === 'practitioner'
                         ? renderPractitionerValue(value)
-                        : field?.type === 'annotate'
-                          ? formatAnnotateValue(value, field.annotate)
-                          : renderValue(value)}
+                        : field?.type === 'department'
+                          ? renderDepartmentValue(value)
+                          : field?.type === 'annotate'
+                            ? formatAnnotateValue(value, field.annotate)
+                            : renderValue(value)}
                   </Text>
                 </Stack>
               );
