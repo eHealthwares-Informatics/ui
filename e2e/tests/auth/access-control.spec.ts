@@ -42,6 +42,15 @@ function cashierCreds(): OrgUser {
 async function signInAsCashier(page: Page): Promise<void> {
   const signIn = new SignInPage(page);
   const creds = cashierCreds();
+  // This project runs with an admin storageState. An authenticated session now
+  // auto-redirects away from /sign-in (so a second tab resumes the session), so
+  // drop the primed admin session before showing the cashier form.
+  await signIn.goto();
+  await page.evaluate(() => {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+  });
+  await page.context().clearCookies();
   await signIn.goto();
   await signIn.fillUsername(creds.username);
   await signIn.fillPassword(creds.password);

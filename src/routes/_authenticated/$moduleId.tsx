@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { modules, type ModuleId } from '@/features/shared/module-data';
-
-const MODULE_STORAGE_KEY = 'rxsoft_admin_selected_module';
+import { writeSelectedModuleId } from '@/lib/module-storage';
 
 export const Route = createFileRoute('/_authenticated/$moduleId')({
   beforeLoad: ({ params, location }) => {
@@ -20,7 +19,7 @@ export const Route = createFileRoute('/_authenticated/$moduleId')({
     if (location.pathname === `/${moduleId}`) {
       const mod = modules.find((m) => m.id === moduleId)!;
 
-      localStorage.setItem(MODULE_STORAGE_KEY, moduleId);
+      writeSelectedModuleId(moduleId);
 
       throw redirect({
         to: mod.root,

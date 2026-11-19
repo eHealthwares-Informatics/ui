@@ -9,6 +9,7 @@ import {
   setRememberMe,
   ACCESS_TOKEN_KEY,
   REFRESH_TOKEN_KEY,
+  SESSION_COOKIE_KEY,
 } from './auth-tokens';
 
 function makeJwt(claims: Record<string, unknown>): string {
@@ -77,30 +78,60 @@ describe('auth-tokens storage', () => {
     expect(getAccessToken()).toBe('at-2');
   });
 
-  it('stores tokens in sessionStorage when not remembered (session-only)', () => {
+  it('mirrors session-only tokens into localStorage so another tab can auto-login', () => {
     persistTokens('at-3', 'rt-3', false);
+    // Shared storage (new tab) + per-tab fallback.
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-3');
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBe('rt-3');
     expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-3');
     expect(sessionStorage.getItem(REFRESH_TOKEN_KEY)).toBe('rt-3');
-    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
-    // Reads find the token whichever storage holds it.
+    // The browser-session cookie gates access.
+    expect(document.cookie).toContain(`${SESSION_COOKIE_KEY}=1`);
     expect(getAccessToken()).toBe('at-3');
     expect(getRefreshToken()).toBe('rt-3');
   });
 
-  it('moves tokens between storages when the preference flips', () => {
-    persistTokens('at-4', 'rt-4', true);
-    persistTokens('at-5', 'rt-5', false);
-    // The remembered copy is removed so a stale persistent token can't linger.
+  it('discards session-only tokens once the browser session cookie is gone', () => {
+    persistTokens('at-4', 'rt-4', false);
+    expect(getAccessToken()).toBe('at-4');
+
+    // A new browser session: the session cookie is gone, the leftover
+    // localStorage tokens must not resurrect the login.
+    document.cookie = `${SESSION_COOKIE_KEY}=; path=/; Max-Age=0`;
+    expect(getAccessToken()).toBeNull();
     expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
-    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-5');
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
   });
 
-  it('clearTokens clears both storages', () => {
+  it('does not require the session cookie when remembered', () => {
+    persistTokens('at-5', 'rt-5', true);
+    document.cookie = `${SESSION_COOKIE_KEY}=; path=/; Max-Age=0`;
+    expect(getAccessToken()).toBe('at-5');
+    expect(getRefreshToken()).toBe('rt-5');
+  });
+
+  it('flipping the preference keeps the shared copy and updates the gate', () => {
     persistTokens('at-6', 'rt-6', true);
-    persistTokens('at-6', 'rt-6', false);
+    expect(document.cookie).not.toContain(`${SESSION_COOKIE_KEY}=1`);
+
+    persistTokens('at-7', 'rt-7', false);
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-7');
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-7');
+    expect(document.cookie).toContain(`${SESSION_COOKIE_KEY}=1`);
+
+    persistTokens('at-8', 'rt-8', true);
+    expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBe('at-8');
+    expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(document.cookie).not.toContain(`${SESSION_COOKIE_KEY}=1`);
+  });
+
+  it('clearTokens clears both storages and the session cookie', () => {
+    persistTokens('at-9', 'rt-9', false);
     clearTokens();
     expect(localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     expect(sessionStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
+    expect(document.cookie).not.toContain(`${SESSION_COOKIE_KEY}=1`);
     expect(getAccessToken()).toBeNull();
   });
 });

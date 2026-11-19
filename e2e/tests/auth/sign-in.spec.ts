@@ -17,8 +17,9 @@ test.describe('sign-in page', () => {
     await expect(signInPage.usernameInput).toBeVisible();
     await expect(signInPage.passwordInput).toBeVisible();
     await expect(signInPage.submitButton).toBeVisible();
-    // App shell title is static (index.html); not page-specific.
-    await expect(page).toHaveTitle(/Welcome/);
+    // App shell title is static (index.html); not page-specific. Accept the
+    // current brand title as well as the older "Welcome" copy.
+    await expect(page).toHaveTitle(/Welcome|eHealthWares/i);
   });
 
   // TC-AUTH-03 — Empty validation: submit empty form → per-field validation

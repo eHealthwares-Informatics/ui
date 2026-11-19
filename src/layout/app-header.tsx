@@ -22,10 +22,13 @@ export function AppHeader({
   navState,
   isMobile,
   onToggleNav,
+  showNavToggle = true,
 }: {
   navState: NavState;
   isMobile: boolean;
   onToggleNav: () => void;
+  /** False on the module chooser, where there is no sidebar to toggle. */
+  showNavToggle?: boolean;
 }) {
   const user = useAuthStore((state) => state.user);
   const navHidden = !isMobile && navState === 'hidden';
@@ -43,29 +46,35 @@ export function AppHeader({
       <TenantHeaderSync />
       <div className={classes.inner}>
         <div className={classes.left}>
-          <Tooltip label={toggleLabel} withArrow>
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size="lg"
-              radius="xl"
-              aria-label={toggleLabel}
-              data-testid="header-nav-toggle"
-              onClick={onToggleNav}
-            >
-              <ToggleIcon size={18} />
-            </ActionIcon>
-          </Tooltip>
+          {showNavToggle && (
+            <Tooltip label={toggleLabel} withArrow>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size="lg"
+                radius="xl"
+                aria-label={toggleLabel}
+                data-testid="header-nav-toggle"
+                onClick={onToggleNav}
+              >
+                <ToggleIcon size={18} />
+              </ActionIcon>
+            </Tooltip>
+          )}
 
-          <TeamSwitcher compact />
+          {showNavToggle && <TeamSwitcher compact />}
 
           <OrganisationSwitcher />
 
-          <span className={classes.divider} aria-hidden="true" />
+          {showNavToggle && (
+            <>
+              <span className={classes.divider} aria-hidden="true" />
 
-          <span className={classes.locationSlot}>
-            <LocationSwitcher />
-          </span>
+              <span className={classes.locationSlot}>
+                <LocationSwitcher />
+              </span>
+            </>
+          )}
         </div>
 
         <div className={classes.right}>

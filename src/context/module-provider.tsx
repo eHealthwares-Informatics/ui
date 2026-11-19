@@ -1,9 +1,8 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ModuleContext, type ModuleContextType } from '@/context/module-context';
 import { modules, type ModuleId, moduleMap } from '@/features/shared/module-data';
+import { readSelectedModuleId, writeSelectedModuleId } from '@/lib/module-storage';
 import { useAuthStore } from '@/stores/auth-store';
-
-const MODULE_STORAGE_KEY = 'rxsoft_admin_selected_module';
 
 /**
  * Picks the best initial module:
@@ -16,7 +15,7 @@ const getInitialModule = (userModules: { id: string }[]): ModuleId => {
     return (userModules[0]?.id as ModuleId) || 'rxsoft';
   }
 
-  const stored = window.localStorage.getItem(MODULE_STORAGE_KEY);
+  const stored = readSelectedModuleId();
   if (stored && userModules.some((m) => m.id === stored)) {
     return stored as ModuleId;
   }
@@ -66,16 +65,14 @@ export function ModuleProvider({ children, defaultModule }: ModuleProviderProps)
       const firstAvailable = storeModules[0]?.id as ModuleId | undefined;
       if (firstAvailable && moduleMap[firstAvailable]) {
         setSelectedModuleState(firstAvailable);
-        window.localStorage.setItem(MODULE_STORAGE_KEY, firstAvailable);
+        writeSelectedModuleId(firstAvailable);
       }
     }
   }, [storeModules, selectedModule]);
 
   const setSelectedModule = useCallback((moduleId: ModuleId) => {
     setSelectedModuleState(moduleId);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(MODULE_STORAGE_KEY, moduleId);
-    }
+    writeSelectedModuleId(moduleId);
   }, []);
 
   // Fallback to first module if somehow we don't have a definition.

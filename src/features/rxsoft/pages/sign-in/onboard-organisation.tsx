@@ -11,6 +11,8 @@ import {
 } from '@mantine/core';
 import { Building2, User, Lock, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import z from 'zod';
+import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { identityApi } from '@/lib/identity-api';
 import { useAuthStore } from '@/stores/auth-store';
@@ -21,6 +23,28 @@ type OnboardPayload = {
   password: string;
   ownerEmail: string;
 };
+
+type FieldName = 'name' | 'code' | 'email' | 'password';
+
+const onboardSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please enter your organisation name')
+    .max(120, 'Organisation name must be 120 characters or fewer'),
+  code: z
+    .string()
+    .trim()
+    .min(2, 'Organisation code must be at least 2 characters')
+    .max(40, 'Organisation code must be 40 characters or fewer')
+    .regex(/^[A-Za-z0-9_-]+$/, 'Use letters, digits, underscore or dash only'),
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Please enter an admin email')
+    .email('Please enter a valid admin email address'),
+  password: z.string().min(1, 'Please choose an admin password').max(128, 'Password is too long'),
+});
 
 // Provisioning whitelists the whole catalogue, builds the price list, stock
 // and EMR data in one call — allow up to 2 minutes for this request alone
@@ -49,13 +73,24 @@ const inputStyle = {
   },
 } as const;
 
+function fieldError(message?: string, testId?: string) {
+  if (!message) {
+    return null;
+  }
+  return (
+    <Text size="xs" style={{ color: '#DC2626' }} mt={4} data-testid={testId}>
+      {message}
+    </Text>
+  );
+}
+
 /**
  * "Onboard your Organisation" — self-serve tenant setup on the login page.
  *
  * Calls identity's @Public() POST /auth/onboard-organization, which natively
  * provisions the full tenant (identity roles/users, rxsoft catalogue, price
- * list, stock, parties, POS configs and EMR departments), then automatically
- * signs the new organisation owner in and redirects to the app.
+ * list, stock, parties, POS configs and EMR departments/wards), then
+ * automatically signs the new organisation owner in and redirects to the app.
  *
  * Provisioning can take a while, so the request uses a 120s timeout while a
  * staged progress panel shows what is being provisioned. When the
@@ -69,6 +104,8 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
   const [ownerEmail, setOwnerEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, string>>>({});
+  const [summary, setSummary] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [stage, setStage] = useState(0);
   const [alreadyProvisioned, setAlreadyProvisioned] = useState(false);
@@ -86,22 +123,29 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    setSummary(null);
+    setFieldErrors({});
     setAlreadyProvisioned(false);
 
-    const email = ownerEmail.trim().toLowerCase();
-    if (!code.trim() || !name.trim() || !password) {
-      setError('Organisation code, name, email and password are required.');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid admin email address.');
+    const parsed = onboardSchema.safeParse({ name, code, email: ownerEmail, password });
+    if (!parsed.success) {
+      const next: Partial<Record<FieldName, string>> = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as FieldName | undefined;
+        if (key && !next[key]) {
+          next[key] = issue.message;
+        }
+      }
+      setFieldErrors(next);
+      setSummary('Please fix the highlighted fields and try again.');
       return;
     }
 
+    const email = parsed.data.email.toLowerCase();
     const payload: OnboardPayload = {
-      code: code.trim(),
-      name: name.trim(),
-      password,
+      code: parsed.data.code.toUpperCase(),
+      name: parsed.data.name,
+      password: parsed.data.password,
       ownerEmail: email,
     };
 
@@ -118,9 +162,15 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         return;
       }
       const authState = useAuthStore.getState();
-      const firstModule = authState.modules[0];
-      const targetUrl = firstModule?.root || '/';
-      window.location.href = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+      // Same post-login landing rule as the sign-in form: a single module goes
+      // straight to its dashboard, otherwise the module chooser. Module `root`
+      // values from /auth/me are frontend paths (identity and the frontend are
+      // kept in sync by scripts/check-provision-drift.mjs).
+      const targetUrl = resolvePostLoginTarget(
+        undefined,
+        authState.modules.map((m) => m.id)
+      );
+      window.location.href = targetUrl;
     } catch (err: any) {
       if (err?.response?.status === 409) {
         // Organisation code (or owner email) already provisioned — move to the
@@ -136,7 +186,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
 
   if (alreadyProvisioned) {
     return (
-      <Stack gap="md">
+      <Stack gap="md" data-testid="onboard-org-already">
         <Group gap="xs">
           <CheckCircle2 size={22} color="#10B981" />
           <Text fw={600} size="lg" style={{ color: '#0F172A' }}>
@@ -150,6 +200,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         <Button
           fullWidth
           size="lg"
+          data-testid="onboard-org-already-back"
           onClick={() => onBack(ownerEmail.trim().toLowerCase())}
           leftSection={<ArrowLeft size={16} />}
           style={{
@@ -167,7 +218,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} noValidate data-testid="onboard-organisation-form">
       <Stack gap="md">
         <Group gap="xs">
           <Building2 size={18} color="#10B981" />
@@ -186,13 +237,16 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             Organisation name
           </Text>
           <TextInput
+            data-testid="onboard-org-name"
             placeholder="e.g. My Pharmacy"
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
             leftSection={<Building2 size={18} color="#9CA3AF" />}
             styles={inputStyle}
             disabled={running}
+            aria-invalid={Boolean(fieldErrors.name)}
           />
+          {fieldError(fieldErrors.name, 'onboard-org-name-error')}
         </Box>
 
         <Box>
@@ -200,16 +254,19 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             Organisation code
           </Text>
           <TextInput
+            data-testid="onboard-org-code"
             placeholder="e.g. MYPHARM"
             value={code}
             onChange={(e) => setCode(e.currentTarget.value.toUpperCase())}
             leftSection={<Sparkles size={18} color="#9CA3AF" />}
             styles={inputStyle}
             disabled={running}
+            aria-invalid={Boolean(fieldErrors.code)}
           />
           <Text size="xs" style={{ color: '#9CA3AF' }} mt={4}>
             Letters, digits, underscore and dash. Used to prefix your roles and users.
           </Text>
+          {fieldError(fieldErrors.code, 'onboard-org-code-error')}
         </Box>
 
         <Box>
@@ -217,6 +274,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             Admin email
           </Text>
           <TextInput
+            data-testid="onboard-org-email"
             type="email"
             placeholder="e.g. admin@mypharm.com"
             value={ownerEmail}
@@ -224,10 +282,12 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             leftSection={<User size={18} color="#9CA3AF" />}
             styles={inputStyle}
             disabled={running}
+            aria-invalid={Boolean(fieldErrors.email)}
           />
           <Text size="xs" style={{ color: '#9CA3AF' }} mt={4}>
             Your login email. Must be unique across the platform.
           </Text>
+          {fieldError(fieldErrors.email, 'onboard-org-email-error')}
         </Box>
 
         <Box>
@@ -235,17 +295,26 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             Password
           </Text>
           <PasswordInput
+            data-testid="onboard-org-password"
             placeholder="Choose an admin password"
             value={password}
             onChange={(e) => setPassword(e.currentTarget.value)}
             leftSection={<Lock size={18} color="#9CA3AF" />}
             styles={inputStyle}
             disabled={running}
+            aria-invalid={Boolean(fieldErrors.password)}
           />
+          {fieldError(fieldErrors.password, 'onboard-org-password-error')}
         </Box>
 
+        {summary && (
+          <Text size="sm" style={{ color: '#DC2626' }} data-testid="onboard-org-error-summary">
+            {summary}
+          </Text>
+        )}
+
         {error && (
-          <Text size="sm" style={{ color: '#DC2626' }}>
+          <Text size="sm" style={{ color: '#DC2626' }} data-testid="onboard-org-error">
             {error}
           </Text>
         )}
@@ -253,6 +322,7 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         <Button
           type="submit"
           loading={running}
+          data-testid="onboard-org-submit"
           leftSection={running ? undefined : <Building2 size={18} />}
           fullWidth
           size="lg"
@@ -268,10 +338,10 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         </Button>
 
         {running && (
-          <Stack gap="xs">
+          <Stack gap="xs" data-testid="onboard-org-progress">
             <Group gap="xs">
               <Loader size="xs" color="#10B981" />
-              <Text size="sm" fw={500} style={{ color: '#0F172A' }}>
+              <Text size="sm" fw={500} style={{ color: '#0F172A' }} data-testid="onboard-org-stage">
                 {PROVISIONING_STAGES[stage]}
               </Text>
             </Group>
@@ -293,8 +363,11 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
         <Button
           variant="subtle"
           fullWidth
+          data-testid="onboard-org-back"
           onClick={() => {
             setError(null);
+            setSummary(null);
+            setFieldErrors({});
             onBack();
           }}
           leftSection={<ArrowLeft size={16} />}

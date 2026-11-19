@@ -20,16 +20,69 @@ export const ACCESS_TOKEN_KEY = 'rxsoft_admin_access_token';
 export const REFRESH_TOKEN_KEY = 'rxsoft_admin_refresh_token';
 /** Where the tokens should live — see `persistTokens` / "Remember me". */
 export const REMEMBER_ME_KEY = 'rxsoft_admin_remember_me';
+/**
+ * Session-only marker. `sessionStorage` is per-tab, so it cannot be used to
+ * share a "Remember me off" session with a newly opened tab. A session cookie
+ * (no Max-Age) is shared by every tab and cleared when the browser closes,
+ * which is exactly the lifetime we need. It carries no secret — only "this
+ * browser session owns the tokens in localStorage".
+ */
+export const SESSION_COOKIE_KEY = 'rxsoft_admin_session';
+
+function hasSessionCookie(): boolean {
+  if (typeof document === 'undefined' || !document.cookie) {
+    return false;
+  }
+  return document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .some((part) => part === `${SESSION_COOKIE_KEY}=1`);
+}
+
+function writeSessionCookie(remember: boolean): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  if (remember) {
+    document.cookie = `${SESSION_COOKIE_KEY}=; path=/; Max-Age=0; SameSite=Lax`;
+    return;
+  }
+  document.cookie = `${SESSION_COOKIE_KEY}=1; path=/; SameSite=Lax`;
+}
+
+function removeSessionCookie(): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  document.cookie = `${SESSION_COOKIE_KEY}=; path=/; Max-Age=0; SameSite=Lax`;
+}
 
 /**
- * "Remember me" storage policy: tokens live in `localStorage` when on (they
- * survive a browser restart) and `sessionStorage` when off (cleared when the
- * tab closes). Reads check BOTH storages so flipping the preference mid-session
- * never orphans an already-issued token.
+ * Tokens are always mirrored into `localStorage` so a newly opened tab can
+ * pick up the session immediately (the browser storage event is also what
+ * live-syncs tabs). With "Remember me" off, a per-browser-session cookie gates
+ * access: closing the browser clears the cookie, and the next read discards
+ * the leftover tokens. `sessionStorage` is filled too as a per-tab fallback
+ * when localStorage is unavailable.
  */
+function sessionAllowed(): boolean {
+  return getRememberMe() || hasSessionCookie();
+}
+
 function readToken(key: string): string | null {
   try {
-    return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+    const value = localStorage.getItem(key) ?? sessionStorage.getItem(key);
+    if (!value) {
+      return null;
+    }
+    if (!sessionAllowed()) {
+      // Session-only tokens left over from a previous browser session.
+      removeToken(ACCESS_TOKEN_KEY);
+      removeToken(REFRESH_TOKEN_KEY);
+      removeSessionCookie();
+      return null;
+    }
+    return value;
   } catch {
     return null;
   }
@@ -37,10 +90,12 @@ function readToken(key: string): string | null {
 
 function writeToken(key: string, value: string, remember: boolean): void {
   try {
-    const target = remember ? localStorage : sessionStorage;
-    const other = remember ? sessionStorage : localStorage;
-    other.removeItem(key);
-    target.setItem(key, value);
+    localStorage.setItem(key, value);
+    if (remember) {
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, value);
+    }
   } catch {
     /* storage unavailable (private mode / quota) — best effort */
   }
@@ -156,9 +211,11 @@ export function persistTokens(
   setRememberMe(remember);
   writeToken(ACCESS_TOKEN_KEY, accessToken, remember);
   writeToken(REFRESH_TOKEN_KEY, refreshToken, remember);
+  writeSessionCookie(remember);
 }
 
 export function clearTokens(): void {
   removeToken(ACCESS_TOKEN_KEY);
   removeToken(REFRESH_TOKEN_KEY);
+  removeSessionCookie();
 }
