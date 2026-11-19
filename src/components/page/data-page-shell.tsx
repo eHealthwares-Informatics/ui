@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Select, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -13,6 +13,7 @@ import { FILTERS, type FilterValue } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields } from '@/features/shared/payload-utils';
 import { gateRowActions, NO_PERMISSIONS, permits } from '@/lib/permissions';
+import { useIsSuperAdmin } from '@/lib/use-is-super-admin';
 import { useAuthStore } from '@/stores/auth-store';
 import { triggerBlobDownload } from '../export/download';
 import { useFormContext } from '../form/form-context';
@@ -211,19 +212,10 @@ export function DataPageShell(props: DataPageShellProps) {
     }));
   };
 
-  const currentUser = useAuthStore((s) => s.user);
-  const isSuperAdmin = currentUser?.roles?.includes('super_admin') ?? false;
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
-
-  const { data: orgs = [] } = useQuery({
-    queryKey: ['organizations', 'list'],
-    queryFn: async () => {
-      const res = await apiProvider.get('/organizations', { params: { limit: 100 } });
-      return res.data?.data ?? [];
-    },
-    enabled: isSuperAdmin && !!superAdminOrgFilter,
-    staleTime: 120_000,
-  });
+  // The organisation filter lives in the app header now; pages only read the
+  // shared selection (undefined = all, null = global, id = that organisation).
+  const isSuperAdmin = useIsSuperAdmin();
+  const selectedOrgId = useAuthStore((s) => s.selectedOrganisationId);
 
   // Create config presence (form/modal/paths) vs. the create entry point:
   // canCreate=false retires the header New button (e.g. admin purchases —
@@ -457,21 +449,6 @@ export function DataPageShell(props: DataPageShellProps) {
 
   const content = (
     <>
-      {isSuperAdmin && superAdminOrgFilter && (
-        <Select
-          placeholder="Filter by organization"
-          data={(Array.isArray(orgs) ? orgs : []).map((o: any) => ({
-            value: o.id,
-            label: `${o.code} - ${o.name}`,
-          }))}
-          value={selectedOrgId}
-          onChange={setSelectedOrgId}
-          clearable
-          searchable
-          size="xs"
-          mb="xs"
-        />
-      )}
       {metricsConfig && (
         <MetricsBar
           metricsConfig={metricsConfig}

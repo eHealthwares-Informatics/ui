@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import { clearTokens, getAccessToken, getRefreshToken, persistTokens } from '@/lib/auth-tokens';
+import { getTenantHeaders } from '@/lib/tenant-headers';
 
 export const IDENTITY_API_BASE_URL =
   (import.meta.env.VITE_IDENTITY_API_URL as string | undefined) ?? '/api/identity';
@@ -85,6 +86,14 @@ export function createAuthApiClient(options: CreateAuthApiClientOptions): AxiosI
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Tenant context from the header selectors (see <TenantHeaderSync/>).
+    const tenant = getTenantHeaders();
+    if (tenant.organizationId) {
+      config.headers['X-Organization-Id'] = tenant.organizationId;
+    }
+    if (tenant.locationId) {
+      config.headers['X-Location-Id'] = tenant.locationId;
     }
     return config;
   });
