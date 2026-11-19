@@ -77,7 +77,12 @@ export function createAuthApiClient(options: CreateAuthApiClientOptions): AxiosI
     timeout = 15000,
     enableRefresh = true,
     onSessionExpired = 'redirect',
-    onForbidden = 'redirect',
+    // A 403 is usually a single endpoint the current role cannot read (e.g. an
+    // optional header/list query). Hard-navigating to /403 destroyed otherwise
+    // usable pages — notably the module-scoped demo accounts. Surface it as an
+    // error in the page/notification instead; route-level access control still
+    // redirects to /403 explicitly.
+    onForbidden = 'ignore',
   } = options;
 
   const client = axios.create({ baseURL, timeout });

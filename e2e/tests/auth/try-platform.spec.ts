@@ -90,6 +90,62 @@ test.describe('try our platform', () => {
     expect(me.permissions, 'rxsoft admin grant is present').toContain('rxsoft');
   });
 
+  test('clicking Prognocare EMR opens the EMR demo without a 403 redirect', async ({ page }) => {
+    test.skip(!identityUp, 'identity service is not running');
+
+    await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+    await page.getByTestId('sign-in-try-platform').click();
+    await page.getByTestId('try-platform-module-emr').click();
+
+    await page.waitForURL(/\/emr\/dashboard$/, { timeout: 45_000 });
+    await expect(page).not.toHaveURL(/\/403/);
+    // The organisation switcher is super-admin-only and must not fetch
+    // /organizations for a module-scoped demo user (that 403 bounced the page
+    // to /403 before the guard was added).
+    await expect(page.getByTestId('header-organisation-trigger')).toHaveCount(0);
+  });
+
+  test('no demo module lands on /403 after the header settles', async ({ page, context }) => {
+    test.skip(!identityUp, 'identity service is not running');
+
+    let forbidden: string[] = [];
+    page.on('response', (response) => {
+      if (response.status() === 403) {
+        forbidden.push(`${response.request().method()} ${response.url()}`);
+      }
+    });
+
+    for (const moduleId of Object.keys(DEMO_USERS)) {
+      forbidden = [];
+      // Drop the previous demo session so each module starts from /sign-in.
+      await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+      await page.evaluate(() => {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      });
+      await context.clearCookies();
+      await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+
+      await page.getByTestId('sign-in-try-platform').click();
+      await page.getByTestId(`try-platform-module-${moduleId}`).click();
+      await page.waitForURL((url) => url.pathname === `/${moduleId}/dashboard`, {
+        timeout: 45_000,
+      });
+
+      // Header widgets (organisations/locations) fetch asynchronously; give a
+      // role-gated 403 time to surface so this catches the redirect regression.
+      await page.waitForTimeout(2_000);
+      expect(
+        page.url(),
+        `${moduleId} demo must not redirect to /403 (403s: ${forbidden.join(' | ')})`
+      ).not.toContain('/403');
+      expect(
+        forbidden,
+        `${moduleId} demo must not hit forbidden endpoints: ${forbidden.join(' | ')}`
+      ).toEqual([]);
+    }
+  });
+
   test('every module demo account signs in with its module-admin role', async () => {
     test.skip(!identityUp, 'identity service is not running');
 

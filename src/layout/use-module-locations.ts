@@ -118,11 +118,42 @@ function fetcherFor(moduleId: ModuleId): (() => Promise<ScopeLocation[]>) | null
   }
 }
 
+/**
+ * The location endpoints are role-gated, not permission-gated:
+ *  - rxsoft `/stock-locations`: admin | super_admin | pharmacist | cashier | inventory_clerk
+ *  - identity `/locations`:     admin | super_admin
+ *  - emr `/locations`:          unguarded (identity proxy)
+ *
+ * Demo/module-scoped roles (`rxsoft_admin`, `website_admin`, `identity_admin`, …)
+ * do NOT satisfy those role guards, so rendering the control for them caused a
+ * background 403 → global /403 redirect. Hide it unless the signed-in user can
+ * actually read the list.
+ */
+function canUseLocationScope(moduleId: ModuleId, roles: string[]): boolean {
+  if (roles.includes('super_admin')) {
+    return true;
+  }
+  if (moduleId === 'emr') {
+    return true;
+  }
+  if (moduleId === 'rxsoft' || moduleId === 'website') {
+    return ['admin', 'pharmacist', 'cashier', 'inventory_clerk'].some((role) =>
+      roles.includes(role)
+    );
+  }
+  if (moduleId === 'admin' || moduleId === 'identity') {
+    return roles.includes('admin');
+  }
+  return false;
+}
+
 /** Locations available to the active module, already normalised for the switcher. */
 export function useModuleLocations() {
   const moduleId = useModuleId();
-  const scope = locationScopeForModule(moduleId);
-  const fetcher = fetcherFor(moduleId);
+  const roles = useAuthStore((state) => state.user?.roles ?? []);
+  const allowed = canUseLocationScope(moduleId, roles);
+  const scope = allowed ? locationScopeForModule(moduleId) : null;
+  const fetcher = allowed ? fetcherFor(moduleId) : null;
   const accountLocationId = useAuthStore((state) => state.user?.locationId ?? null);
 
   const query = useQuery({

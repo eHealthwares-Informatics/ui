@@ -38,6 +38,13 @@ export function OrganisationSwitcher() {
   const [manualId, setManualId] = useState('');
 
   useEffect(() => {
+    // The control is super-admin-only, and GET /organizations is role-gated
+    // (admin|super_admin). Returning null below happens after hooks, so without
+    // this guard every non-super-admin (e.g. the demo_emr account with only the
+    // `emr` grant) still fetched the list, got a 403 and was bounced to /403.
+    if (!isSuperAdmin) {
+      return undefined;
+    }
     let cancelled = false;
     (async () => {
       setIsLoading(true);
@@ -62,7 +69,7 @@ export function OrganisationSwitcher() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isSuperAdmin]);
 
   const current = useMemo(
     () => organizations.find((org) => org.id === selectedId) ?? null,
