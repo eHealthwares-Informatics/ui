@@ -13,6 +13,7 @@ import {
 import { Building2, ChevronsUpDown } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { identityApi } from '@/lib/identity-api';
+import { useIsSuperAdmin } from '@/lib/use-is-super-admin';
 import { useAuthStore } from '@/stores/auth-store';
 import classes from './organisation-switcher.module.css';
 
@@ -27,7 +28,7 @@ type OrgOption = { id: string; name: string; code?: string };
  * organisation id can be entered manually (e.g. when it is not in the list).
  */
 export function OrganisationSwitcher() {
-  const user = useAuthStore((state) => state.user);
+  const isSuperAdmin = useIsSuperAdmin();
   const selectedId = useAuthStore((state) => state.selectedOrganisationId);
   const setSelectedId = useAuthStore((state) => state.setSelectedOrganisationId);
 
@@ -62,8 +63,6 @@ export function OrganisationSwitcher() {
       cancelled = true;
     };
   }, []);
-
-  const isSuperAdmin = user?.roles?.includes('super_admin') ?? false;
 
   const current = useMemo(
     () => organizations.find((org) => org.id === selectedId) ?? null,

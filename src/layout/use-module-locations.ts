@@ -4,12 +4,15 @@ import type { ModuleId } from '@/features/shared/module-data';
 import { emrApi } from '@/lib/emr-api';
 import { identityApi } from '@/lib/identity-api';
 import { rxsoftApi } from '@/lib/rxsoft-api';
+import { useAuthStore } from '@/stores/auth-store';
 
 /** A location as the header switcher needs it: an id plus the two display lines. */
 export type ScopeLocation = {
   id: string;
   code: string | null;
   name: string;
+  /** Identity location id this record maps to (stock locations only). */
+  identityLocationId?: string | null;
 };
 
 export type LocationScope = {
@@ -32,6 +35,7 @@ type StockLocationRow = {
   name: string;
   locationType?: string | null;
   isActive?: boolean;
+  locationId?: string | null;
 };
 
 async function fetchStockLocations(): Promise<ScopeLocation[]> {
@@ -40,7 +44,12 @@ async function fetchStockLocations(): Promise<ScopeLocation[]> {
   });
   return (res.data?.data ?? [])
     .filter((row) => !row.locationType || !NON_SITE_TYPES.has(row.locationType))
-    .map((row) => ({ id: row.id, code: row.code ?? null, name: row.name }));
+    .map((row) => ({
+      id: row.id,
+      code: row.code ?? null,
+      name: row.name,
+      identityLocationId: row.locationId ?? null,
+    }));
 }
 
 async function fetchEmrLocations(): Promise<ScopeLocation[]> {
@@ -114,6 +123,7 @@ export function useModuleLocations() {
   const moduleId = useModuleId();
   const scope = locationScopeForModule(moduleId);
   const fetcher = fetcherFor(moduleId);
+  const accountLocationId = useAuthStore((state) => state.user?.locationId ?? null);
 
   const query = useQuery({
     queryKey: ['header', 'locations', scope?.key ?? 'none', moduleId],
@@ -123,9 +133,24 @@ export function useModuleLocations() {
     retry: false,
   });
 
+  const locations = query.data ?? [];
+
+  // Default the working location to the signed-in user's location. For site
+  // scopes the ids match directly; for stock locations we resolve the one whose
+  // identity location is the user's location.
+  const defaultLocationId = scope?.followsAccountLocation
+    ? accountLocationId
+    : scope?.key === 'stock'
+      ? (locations.find(
+          (location) =>
+            location.identityLocationId && location.identityLocationId === accountLocationId
+        )?.id ?? null)
+      : null;
+
   return {
     scope,
-    locations: query.data ?? [],
+    locations,
     isLoading: query.isLoading,
+    defaultLocationId,
   };
 }

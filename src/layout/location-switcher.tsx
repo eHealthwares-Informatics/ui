@@ -1,7 +1,6 @@
 import { Loader, Menu, ScrollArea, Text, UnstyledButton } from '@mantine/core';
 import { Check, ChevronsUpDown, MapPin, Package } from 'lucide-react';
 import { useMemo } from 'react';
-import { useAuthStore } from '@/stores/auth-store';
 import { useActiveLocationId, useLocationStore } from './location-store';
 import { useModuleLocations } from './use-module-locations';
 import classes from './location-switcher.module.css';
@@ -13,12 +12,11 @@ import classes from './location-switcher.module.css';
  * no switcher at all — the header simply omits it.
  */
 export function LocationSwitcher() {
-  const user = useAuthStore((state) => state.user);
-  const { scope, locations, isLoading } = useModuleLocations();
+  const { scope, locations, isLoading, defaultLocationId } = useModuleLocations();
 
   const scopeKey = scope?.key ?? 'none';
-  const accountLocationId = scope?.followsAccountLocation ? (user?.locationId ?? null) : null;
-  const activeId = useActiveLocationId(scopeKey, accountLocationId);
+  // Defaults to the signed-in user's location until a location is picked.
+  const activeId = useActiveLocationId(scopeKey, defaultLocationId);
   const pickedId = useLocationStore((state) => state.byScope[scopeKey]);
   const setLocation = useLocationStore((state) => state.setLocation);
 
@@ -91,7 +89,7 @@ export function LocationSwitcher() {
           </ScrollArea.Autosize>
         )}
 
-        {pickedId && accountLocationId && (
+        {pickedId && defaultLocationId && (
           <>
             <Menu.Divider />
             <Menu.Item onClick={() => setLocation(scopeKey, null)}>
@@ -99,7 +97,7 @@ export function LocationSwitcher() {
             </Menu.Item>
           </>
         )}
-        {pickedId && !accountLocationId && (
+        {pickedId && !defaultLocationId && (
           <>
             <Menu.Divider />
             <Menu.Item onClick={() => setLocation(scopeKey, null)}>Clear selection</Menu.Item>

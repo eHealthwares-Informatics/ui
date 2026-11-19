@@ -111,9 +111,11 @@ export const useAuthStore = create<AuthState>()(
             refreshToken: response.data.refreshToken,
             user,
             // Default the header organisation filter to the user's own
-            // organisation. "All organisations" (null) is an explicit choice
-            // the user can make afterwards.
-            selectedOrganisationId: user.organizationId ?? null,
+            // organisation. A super admin defaults to "All organisations"
+            // (undefined) and may narrow it afterwards.
+            selectedOrganisationId: user.roles?.includes('super_admin')
+              ? undefined
+              : (user.organizationId ?? null),
             loading: false,
             error: null,
           });
@@ -197,7 +199,9 @@ export const useAuthStore = create<AuthState>()(
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
             user,
-            selectedOrganisationId: user.organizationId ?? null,
+            selectedOrganisationId: user.roles?.includes('super_admin')
+              ? undefined
+              : (user.organizationId ?? null),
             loading: false,
             error: null,
           });

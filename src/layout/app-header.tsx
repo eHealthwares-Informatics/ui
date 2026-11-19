@@ -9,6 +9,7 @@ import type { NavState } from './nav-state';
 import { NavUser } from './nav-user';
 import { OrganisationSwitcher } from './organisation-switcher';
 import { TeamSwitcher } from './team-switcher';
+import { TenantHeaderSync } from './tenant-header-sync';
 import classes from './app-header.module.css';
 
 /**
@@ -39,6 +40,7 @@ export function AppHeader({
 
   return (
     <AppShell.Header className={classes.header}>
+      <TenantHeaderSync />
       <div className={classes.inner}>
         <div className={classes.left}>
           <Tooltip label={toggleLabel} withArrow>
