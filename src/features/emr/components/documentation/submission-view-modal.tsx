@@ -1,4 +1,14 @@
-import { Badge, Button, Group, Loader, Modal, SimpleGrid, Stack, Text } from '@mantine/core';
+import {
+  Badge,
+  Button,
+  Group,
+  Loader,
+  Modal,
+  SimpleGrid,
+  Stack,
+  Text,
+  Anchor,
+} from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { Printer } from 'lucide-react';
@@ -41,6 +51,63 @@ function flattenFields(fields: FormFieldSchema[] | undefined): FormFieldSchema[]
   };
   walk(fields);
   return out;
+}
+
+function renderFileValue(value: unknown) {
+  const entries = (Array.isArray(value) ? value : [value]).filter(
+    (entry): entry is { url: string; name?: string } =>
+      Boolean(entry) &&
+      typeof entry === 'object' &&
+      typeof (entry as { url?: unknown }).url === 'string'
+  );
+  if (!entries.length) {
+    return <Text size="sm">—</Text>;
+  }
+  return (
+    <Stack gap={2}>
+      {entries.map((entry) => (
+        <Anchor
+          key={entry.url}
+          href={entry.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          size="sm"
+        >
+          {entry.name ?? entry.url}
+        </Anchor>
+      ))}
+    </Stack>
+  );
+}
+
+function renderPractitionerValue(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return <Text size="sm">—</Text>;
+  }
+  const staff = value as { staffName?: string; staffId?: string };
+  if (!staff.staffName && !staff.staffId) {
+    return <Text size="sm">—</Text>;
+  }
+  return (
+    <Text size="sm">
+      {[staff.staffName, staff.staffId ? `(${staff.staffId})` : null].filter(Boolean).join(' ')}
+    </Text>
+  );
+}
+
+function renderDepartmentValue(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return <Text size="sm">—</Text>;
+  }
+  const department = value as { name?: string; code?: string };
+  if (!department.name && !department.code) {
+    return <Text size="sm">—</Text>;
+  }
+  return (
+    <Text size="sm">
+      {[department.name, department.code ? `(${department.code})` : null].filter(Boolean).join(' ')}
+    </Text>
+  );
 }
 
 function renderValue(value: unknown): string {
@@ -174,9 +241,15 @@ export function SubmissionViewModal({
                     {label}
                   </Text>
                   <Text size="sm">
-                    {field?.type === 'annotate'
-                      ? formatAnnotateValue(value, field.annotate)
-                      : renderValue(value)}
+                    {field?.type === 'file'
+                      ? renderFileValue(value)
+                      : field?.type === 'practitioner'
+                        ? renderPractitionerValue(value)
+                        : field?.type === 'department'
+                          ? renderDepartmentValue(value)
+                          : field?.type === 'annotate'
+                            ? formatAnnotateValue(value, field.annotate)
+                            : renderValue(value)}
                   </Text>
                 </Stack>
               );

@@ -1,11 +1,14 @@
-import { Alert, Badge, Button, Card, Group, Loader, Stack, Table, Text } from '@mantine/core';
+import { Alert, Badge, Group, Loader, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useParams } from '@tanstack/react-router';
-import { AlertCircle, ExternalLink, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useParams } from '@tanstack/react-router';
+import { ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { RxPage } from '@/components/page/rx-page';
+import type { Column } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { StatusBadge } from '../../components/shared/status-badge';
 import { formatEnum } from '../../lib/emr-constants';
@@ -31,9 +34,9 @@ export function SubModuleDetailPage() {
   const formsQuery = useQuery({
     queryKey: ['emr', 'form-definitions', 'all'],
     queryFn: async () => {
-      const { data } = await emrApi.get<{
-        data: FormDefinition[];
-      }>('/form-definitions', { params: { limit: 1000 } });
+      const { data } = await emrApi.get<{ data: FormDefinition[] }>('/form-definitions', {
+        params: { limit: 1000 },
+      });
       return data.data;
     },
   });
@@ -47,38 +50,143 @@ export function SubModuleDetailPage() {
     staleTime: 60_000,
   });
 
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'features'] });
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules'] });
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
+  };
+
   const deleteMutation = useMutation({
     mutationFn: async (featureId: string) => {
       await emrApi.delete(`/features/${featureId}`);
     },
     onSuccess: () => {
       notifications.show({ message: 'Feature removed', color: 'teal' });
-      void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules'] });
-      void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
+      refresh();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });
     },
   });
 
-  const subModule = subModuleQuery.data;
-  const features = subModule?.features ?? [];
-
-  const refresh = () => {
-    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', id] });
-    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules'] });
-    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
-  };
-
-  const openCreate = () => {
-    setEditing(null);
-    openModal();
-  };
-
   const openEdit = (feature: Feature) => {
     setEditing(feature);
     openModal();
   };
+
+  const subModule = subModuleQuery.data;
+  const featureCount = subModule?.features?.length ?? 0;
+
+  const config = useMemo<ModelConfig>(() => {
+    const columns: Column[] = [
+      {
+        key: 'form',
+        label: 'Form / Feature',
+        render: (row) => {
+          const form = row.form as FormDefinition | undefined;
+          return (
+            <Stack gap={2}>
+              <Text size="sm" fw={600}>
+                {form?.name ?? 'Form missing'}
+              </Text>
+              <Group gap={4}>
+                <Text size="xs" c="dimmed">
+                  {form?.code ?? String(row.formDefinitionId ?? '—')}
+                </Text>
+                {form && (
+                  <Badge size="xs" variant="light" color={form.isPublished ? 'teal' : 'gray'}>
+                    {form.isPublished ? 'Published' : 'Draft'}
+                  </Badge>
+                )}
+              </Group>
+            </Stack>
+          );
+        },
+      },
+      {
+        key: 'encounterType',
+        label: 'Encounter type',
+        render: (row) => formatEnum(String(row.encounterType ?? '')),
+      },
+      {
+        key: 'roleCodes',
+        label: 'Roles',
+        render: (row) => {
+          const roles = row.roleCodes as string[] | undefined;
+          return roles?.length ? (
+            <Group gap={4} wrap="wrap">
+              {roles.map((code) => (
+                <Badge key={code} size="xs" variant="light">
+                  {code}
+                </Badge>
+              ))}
+            </Group>
+          ) : (
+            <Text size="xs" c="dimmed">
+              Everyone
+            </Text>
+          );
+        },
+      },
+      {
+        key: 'sortOrder',
+        label: 'Order',
+        render: (row) => String(row.sortOrder ?? 0),
+      },
+      {
+        key: 'isActive',
+        label: 'Status',
+        render: (row) => <StatusBadge value={row.isActive} kind="active" />,
+      },
+    ];
+
+    return {
+      id: 'emr-submodule-features',
+      title: subModule?.name ?? 'Module',
+      description:
+        subModule?.description ??
+        'Features are forms with role-based menu access and their own submissions CRUD.',
+      endpoint: '/features',
+      apiProvider: emrApi,
+      queryKeyBase: ['emr', 'features', 'submodule', id],
+      listParamStyle: 'plain',
+      listParams: { subModuleId: id },
+      columns,
+      defaultSort: { sortBy: 'sortOrder', sortOrder: 'asc' },
+      rowActions: [
+        {
+          label: 'Open',
+          icon: ExternalLink,
+          href: (row) => `/emr/features/${String(row.id)}`,
+        },
+        {
+          label: 'Edit',
+          icon: Pencil,
+          onClick: (row) => openEdit(row as unknown as Feature),
+        },
+        {
+          label: 'Remove',
+          icon: Trash2,
+          onClick: (row) => deleteMutation.mutate(String(row.id)),
+        },
+      ],
+      canDelete: false,
+      renderCreateModal: ({ onClose, refresh: refreshList }) => (
+        <FeatureModal
+          opened
+          onClose={onClose}
+          subModuleId={id}
+          feature={null}
+          forms={formsQuery.data ?? []}
+          roles={rolesQuery.data ?? []}
+          onSaved={() => {
+            refreshList();
+            refresh();
+          }}
+        />
+      ),
+    };
+  }, [deleteMutation, formsQuery.data, id, refresh, rolesQuery.data, subModule]);
 
   return (
     <RxPage
@@ -92,138 +200,23 @@ export function SubModuleDetailPage() {
         subModule?.description ??
         'Features are forms with role-based menu access and their own submissions CRUD.'
       }
-      actions={
-        <Button
-          leftSection={<Plus size={16} />}
-          onClick={openCreate}
-          data-testid="submodule-new-feature-button"
-        >
-          New Feature
-        </Button>
-      }
     >
       {subModuleQuery.isLoading ? (
         <Group justify="center" py="xl">
           <Loader size="sm" />
         </Group>
       ) : subModuleQuery.isError || !subModule ? (
-        <Alert color="red" icon={<AlertCircle size={16} />}>
-          {getApiErrorMessage(subModuleQuery.error) || 'Module not found.'}
-        </Alert>
+        <Alert color="red">{getApiErrorMessage(subModuleQuery.error) || 'Module not found.'}</Alert>
       ) : (
         <Stack gap="md">
           <Group gap="xs">
             <Badge variant="light">{subModule.code}</Badge>
             <StatusBadge value={subModule.isActive} kind="active" />
             <Text size="xs" c="dimmed">
-              {features.length} feature{features.length === 1 ? '' : 's'}
+              {featureCount} feature{featureCount === 1 ? '' : 's'}
             </Text>
           </Group>
-
-          <Card withBorder radius="md" padding={0}>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Form / Feature</Table.Th>
-                  <Table.Th>Encounter type</Table.Th>
-                  <Table.Th>Roles</Table.Th>
-                  <Table.Th>Order</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th style={{ width: 220 }} />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {features.length === 0 ? (
-                  <Table.Tr>
-                    <Table.Td colSpan={6}>No features yet. Create one to add a menu item.</Table.Td>
-                  </Table.Tr>
-                ) : (
-                  features
-                    .slice()
-                    .sort((a, b) => a.sortOrder - b.sortOrder)
-                    .map((feature) => (
-                      <Table.Tr key={feature.id}>
-                        <Table.Td>
-                          <Stack gap={2}>
-                            <Text size="sm" fw={600}>
-                              {feature.form?.name ?? 'Form missing'}
-                            </Text>
-                            <Group gap={4}>
-                              <Text size="xs" c="dimmed">
-                                {feature.form?.code ?? feature.formDefinitionId}
-                              </Text>
-                              {feature.form && (
-                                <Badge
-                                  size="xs"
-                                  variant="light"
-                                  color={feature.form.isPublished ? 'teal' : 'gray'}
-                                >
-                                  {feature.form.isPublished ? 'Published' : 'Draft'}
-                                </Badge>
-                              )}
-                            </Group>
-                          </Stack>
-                        </Table.Td>
-                        <Table.Td>{formatEnum(feature.encounterType)}</Table.Td>
-                        <Table.Td>
-                          <Group gap={4} wrap="wrap">
-                            {feature.roleCodes?.length ? (
-                              feature.roleCodes.map((code) => (
-                                <Badge key={code} size="xs" variant="light">
-                                  {code}
-                                </Badge>
-                              ))
-                            ) : (
-                              <Text size="xs" c="dimmed">
-                                Everyone
-                              </Text>
-                            )}
-                          </Group>
-                        </Table.Td>
-                        <Table.Td>{feature.sortOrder}</Table.Td>
-                        <Table.Td>
-                          <StatusBadge value={feature.isActive} kind="active" />
-                        </Table.Td>
-                        <Table.Td>
-                          <Group gap="xs" wrap="nowrap">
-                            <Link to="/emr/features/$featureId" params={{ featureId: feature.id }}>
-                              <Button
-                                size="compact-xs"
-                                variant="light"
-                                rightSection={<ExternalLink size={12} />}
-                                data-testid={`feature-open-${feature.id}`}
-                              >
-                                Open
-                              </Button>
-                            </Link>
-                            <Button
-                              size="compact-xs"
-                              variant="subtle"
-                              onClick={() => openEdit(feature)}
-                              data-testid={`feature-edit-${feature.id}`}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="compact-xs"
-                              variant="subtle"
-                              color="red"
-                              data-testid={`feature-remove-${feature.id}`}
-                              loading={
-                                deleteMutation.isPending && deleteMutation.variables === feature.id
-                              }
-                              onClick={() => deleteMutation.mutate(feature.id)}
-                            >
-                              Remove
-                            </Button>
-                          </Group>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))
-                )}
-              </Table.Tbody>
-            </Table>
-          </Card>
+          <DataPageShell config={config} embedded />
         </Stack>
       )}
 

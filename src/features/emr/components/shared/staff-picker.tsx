@@ -22,6 +22,38 @@ function displayFor(staff: {
   return staff.roleType ? `${base} (${staff.roleType})` : base;
 }
 
+/** Map an EMR staff record to the value stored in a practitioner field. */
+export function toStaffOption(staff: Staff): StaffOption {
+  return {
+    id: staff.id,
+    staffId: staff.staffNumber,
+    staffName: [staff.firstName, staff.lastName].filter(Boolean).join(' ').trim(),
+    roleType: staff.roleType,
+  };
+}
+
+/**
+ * Resolve the staff record linked to an identity user (`staff.userId`). Used to
+ * default practitioner and department fields to the signed-in practitioner.
+ */
+export function useStaffByUserIdQuery(userId?: string | null) {
+  return useQuery({
+    queryKey: ['emr', 'staff', 'by-user', userId],
+    queryFn: async () => {
+      const res = await emrApi.get<{ data: Staff[] }>('/staff', {
+        params: { userId, limit: 1, isActive: 'true' },
+      });
+      return res.data.data[0] ?? null;
+    },
+    enabled: Boolean(userId),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useStaffByUserId(userId?: string | null): Staff | null {
+  return useStaffByUserIdQuery(userId).data ?? null;
+}
+
 export function StaffPicker({
   value,
   onChange,
@@ -88,12 +120,7 @@ export function StaffPicker({
         const staff = (data ?? []).find((s) => displayFor(s) === selected);
         if (staff) {
           selectedDisplayRef.current = selected;
-          onChange({
-            id: staff.id,
-            staffId: staff.staffNumber,
-            staffName: [staff.firstName, staff.lastName].filter(Boolean).join(' ').trim(),
-            roleType: staff.roleType,
-          });
+          onChange(toStaffOption(staff));
           setQuery(selected);
         }
       }}

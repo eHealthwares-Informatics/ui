@@ -34,6 +34,9 @@ export const ENCOUNTER_TYPES = [
   'PROCEDURE',
   'ADMISSION',
   'ANTENATAL',
+  'ADMINISTRATIVE',
+  'FINANCE',
+  'PHARMACY',
   'OTHER',
 ] as const;
 

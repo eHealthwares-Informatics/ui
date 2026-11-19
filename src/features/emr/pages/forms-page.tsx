@@ -1,22 +1,13 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Card,
-  Group,
-  Menu,
-  Pagination,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Badge, Group, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Ban, Pencil, Upload } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { DataPageShell } from '@/components/page/data-page-shell';
 import { RxPage } from '@/components/page/rx-page';
+import type { Column } from '@/features/rxsoft/types';
+import type { ModelConfig } from '@/features/shared/model-schema';
 import { emrApi } from '@/lib/emr-api';
 import { FormBuilderModal } from '../components/forms/form-builder-modal';
 import { StatusBadge } from '../components/shared/status-badge';
@@ -26,30 +17,13 @@ import type { FormDefinition } from '../lib/emr-types';
 
 export function FormsPage() {
   const queryClient = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
   const [builderOpened, { open: openBuilder, close: closeBuilder }] = useDisclosure(false);
   const [editing, setEditing] = useState<FormDefinition | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['emr', 'form-definitions', page, search],
-    queryFn: async () => {
-      const res = await emrApi.get<{
-        data: FormDefinition[];
-        meta: { page: number; limit: number; total: number };
-      }>('/form-definitions', { params: { page, limit: 20, search: search || undefined } });
-      return res.data;
-    },
-  });
-
-  const rows = data?.data ?? [];
-  const total = data?.meta.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / 20));
-
-  const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['emr', 'form-definitions'] });
-    queryClient.invalidateQueries({ queryKey: ['emr', 'forms'] });
-    queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'form-definitions'] });
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'forms'] });
+    void queryClient.invalidateQueries({ queryKey: ['emr', 'sub-modules', 'navigation'] });
   };
 
   const publishMutation = useMutation({
@@ -59,7 +33,7 @@ export function FormsPage() {
     },
     onSuccess: () => {
       notifications.show({ message: 'Form published', color: 'teal' });
-      invalidate();
+      refresh();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });
@@ -73,132 +47,116 @@ export function FormsPage() {
     },
     onSuccess: () => {
       notifications.show({ message: 'Form unpublished' });
-      invalidate();
+      refresh();
     },
     onError: (error) => {
       notifications.show({ color: 'red', message: getApiErrorMessage(error) });
     },
   });
 
-  const openCreate = () => {
-    setEditing(null);
-    openBuilder();
-  };
-
   const openEdit = (form: FormDefinition) => {
     setEditing(form);
     openBuilder();
   };
 
+  const config = useMemo<ModelConfig>(() => {
+    const columns: Column[] = [
+      {
+        key: 'code',
+        label: 'Code',
+        render: (row) => <Badge variant="light">{String(row.code ?? '—')}</Badge>,
+      },
+      {
+        key: 'name',
+        label: 'Name',
+        render: (row) => (
+          <Stack gap={0}>
+            <Text size="sm" fw={600}>
+              {String(row.name ?? '—')}
+            </Text>
+            {row.description ? (
+              <Text size="xs" c="dimmed" lineClamp={1}>
+                {String(row.description)}
+              </Text>
+            ) : null}
+          </Stack>
+        ),
+      },
+      {
+        key: 'version',
+        label: 'Version',
+        render: (row) => `v${String(row.version ?? '—')}`,
+      },
+      {
+        key: 'category',
+        label: 'Category',
+        render: (row) => formatEnum(String(row.category ?? '')),
+      },
+      {
+        key: 'fields',
+        label: 'Fields',
+        render: (row) => {
+          const form = row as unknown as FormDefinition;
+          return String(form.schemaJson?.fields?.length ?? 0);
+        },
+      },
+      {
+        key: 'isPublished',
+        label: 'Status',
+        render: (row) => <StatusBadge value={Boolean(row.isPublished)} kind="active" />,
+      },
+    ];
+
+    return {
+      id: 'emr-forms',
+      title: 'Form Definitions',
+      description: 'Build and publish dynamic clinical forms used by the Documentation feature.',
+      endpoint: '/form-definitions',
+      apiProvider: emrApi,
+      queryKeyBase: ['emr', 'form-definitions', 'page'],
+      listParamStyle: 'plain',
+      columns,
+      defaultSort: { sortBy: 'createdAt', sortOrder: 'desc' },
+      rowActions: [
+        {
+          label: 'Edit',
+          icon: Pencil,
+          onClick: (row) => openEdit(row as unknown as FormDefinition),
+        },
+        {
+          label: 'Publish',
+          icon: Upload,
+          validate: (row) => !row.isPublished,
+          onClick: (row) => publishMutation.mutate(row as unknown as FormDefinition),
+        },
+        {
+          label: 'Unpublish',
+          icon: Ban,
+          validate: (row) => Boolean(row.isPublished),
+          onClick: (row) => unpublishMutation.mutate(row as unknown as FormDefinition),
+        },
+      ],
+      canDelete: false,
+      renderCreateModal: ({ onClose, refresh: refreshList }) => (
+        <FormBuilderModal opened onClose={onClose} onSaved={refreshList} />
+      ),
+    };
+  }, [publishMutation, unpublishMutation]);
+
   return (
     <RxPage
-      breadcrumbs={[{ label: 'EMR' }, { label: 'Forms' }]}
+      breadcrumbs={[{ label: 'Configuration' }, { label: 'Forms' }]}
       title="Form Definitions"
       description="Build and publish dynamic clinical forms used by the Documentation feature."
-      actions={
-        <Button leftSection={<Plus size={16} />} onClick={openCreate}>
-          New Form
-        </Button>
-      }
     >
-      <Stack gap="md">
-        <Group justify="space-between">
-          <TextInput
-            placeholder="Search forms…"
-            leftSection={<Search size={15} />}
-            value={search}
-            onChange={(e) => {
-              setSearch(e.currentTarget.value);
-              setPage(1);
-            }}
-            style={{ maxWidth: 320 }}
-          />
-          <Text size="xs" c="dimmed">
-            {total} forms
-          </Text>
-        </Group>
+      <DataPageShell config={config} embedded />
 
-        <Card withBorder radius="md" padding={0}>
-          <Table striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Code</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Version</Table.Th>
-                <Table.Th>Category</Table.Th>
-                <Table.Th>Fields</Table.Th>
-                <Table.Th>Status</Table.Th>
-                <Table.Th style={{ width: 48 }} />
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {isLoading ? (
-                <Table.Tr>
-                  <Table.Td colSpan={7}>Loading…</Table.Td>
-                </Table.Tr>
-              ) : rows.length === 0 ? (
-                <Table.Tr>
-                  <Table.Td colSpan={7}>No form definitions found.</Table.Td>
-                </Table.Tr>
-              ) : (
-                rows.map((form) => (
-                  <Table.Tr key={form.id}>
-                    <Table.Td>
-                      <Badge variant="light">{form.code}</Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm" fw={500}>
-                        {form.name}
-                      </Text>
-                    </Table.Td>
-                    <Table.Td>v{form.version}</Table.Td>
-                    <Table.Td>{formatEnum(form.category)}</Table.Td>
-                    <Table.Td>{form.schemaJson?.fields?.length ?? 0}</Table.Td>
-                    <Table.Td>
-                      <StatusBadge value={form.isPublished} kind="active" />
-                    </Table.Td>
-                    <Table.Td>
-                      <Menu position="bottom-end" withinPortal>
-                        <Menu.Target>
-                          <ActionIcon variant="subtle" aria-label="Form actions">
-                            <MoreHorizontal size={16} />
-                          </ActionIcon>
-                        </Menu.Target>
-                        <Menu.Dropdown>
-                          <Menu.Item onClick={() => openEdit(form)}>Edit</Menu.Item>
-                          {form.isPublished ? (
-                            <Menu.Item
-                              color="red"
-                              disabled={unpublishMutation.isPending}
-                              onClick={() => unpublishMutation.mutate(form)}
-                            >
-                              Unpublish
-                            </Menu.Item>
-                          ) : (
-                            <Menu.Item
-                              disabled={publishMutation.isPending}
-                              onClick={() => publishMutation.mutate(form)}
-                            >
-                              Publish
-                            </Menu.Item>
-                          )}
-                        </Menu.Dropdown>
-                      </Menu>
-                    </Table.Td>
-                  </Table.Tr>
-                ))
-              )}
-            </Table.Tbody>
-          </Table>
-          {totalPages > 1 && (
-            <Group justify="flex-end" p="md">
-              <Pagination value={page} onChange={setPage} total={totalPages} size="sm" />
-            </Group>
-          )}
-        </Card>
-      </Stack>
-
-      <FormBuilderModal opened={builderOpened} onClose={closeBuilder} initial={editing} />
+      <FormBuilderModal
+        opened={builderOpened}
+        onClose={closeBuilder}
+        initial={editing}
+        onSaved={refresh}
+      />
     </RxPage>
   );
 }

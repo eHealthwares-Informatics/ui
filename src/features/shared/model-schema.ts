@@ -95,6 +95,8 @@ export type ModelConfig<T = any> = {
   /** Sort applied until the user picks a column sort from a header. */
   defaultSort?: { sortBy: string; sortOrder: 'asc' | 'desc' };
   rowActions?: RowAction[];
+  /** Render `rowActions` as inline icon buttons instead of a kebab menu. */
+  rowActionsInline?: boolean;
   /** Query-key prefix used by the data page. Defaults to ['rxsoft-data-page', endpoint]. */
   queryKeyBase?: unknown[];
   /**
@@ -129,4 +131,6 @@ export type RowAction = {
   href?: (row: Record<string, unknown>) => string;
   /** Run a handler (e.g. a mutation + modal) when selected. */
   onClick?: (row: Record<string, unknown>) => void;
+  /** Hide this action for rows that do not pass the predicate. */
+  validate?: (row: Record<string, unknown>) => boolean;
 };

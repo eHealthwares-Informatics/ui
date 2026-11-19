@@ -54,6 +54,9 @@ const COLOR_MAPS: Record<StatusKind, Record<string, string>> = {
     PROCEDURE: 'indigo',
     ADMISSION: 'red',
     ANTENATAL: 'pink',
+    ADMINISTRATIVE: 'gray',
+    FINANCE: 'teal',
+    PHARMACY: 'green',
     OTHER: 'gray',
   },
   priority: {

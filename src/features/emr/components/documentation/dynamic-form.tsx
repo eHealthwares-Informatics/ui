@@ -16,6 +16,8 @@ import {
   TextInput,
 } from '@mantine/core';
 import { Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useAuthStore } from '@/stores/auth-store';
 import { formatEnum } from '../../lib/emr-constants';
 import type {
   FormFieldSchema,
@@ -25,7 +27,14 @@ import type {
 } from '../../lib/emr-types';
 import { AnnotateField } from '../forms/annotate';
 import { AuthPatientPicker, type AuthPatientValue } from '../shared/auth-patient-picker';
+import {
+  DepartmentSelect,
+  toDepartmentOption,
+  useDepartmentsForLocation,
+  type DepartmentOption,
+} from '../shared/department-select';
 import { DicomTestSearch, type DicomTest } from '../shared/dicom-test-search';
+import { FileUploadField } from '../shared/file-upload-field';
 import { FormQrCode } from '../shared/form-qr-code';
 import { HtmlField } from '../shared/html-field';
 import { LoincTestSearch, type LoincTest } from '../shared/loinc-test-search';
@@ -37,6 +46,13 @@ import {
 import { PatientPicker, type PatientOption } from '../shared/patient-picker';
 import { PrintSendActions } from '../shared/print-send-actions';
 import { SendFormCard } from '../shared/send-form-card';
+import {
+  StaffPicker,
+  type StaffOption,
+  toStaffOption,
+  useStaffByUserId,
+  useStaffByUserIdQuery,
+} from '../shared/staff-picker';
 
 export type FormData = Record<string, unknown>;
 
@@ -57,6 +73,20 @@ function pickerKinds(type: FormFieldType): MasterItemKind[] | undefined {
 function isLoincTest(value: unknown): value is LoincTest {
   return (
     typeof value === 'object' && value !== null && typeof (value as LoincTest).code === 'string'
+  );
+}
+
+function isStaffOption(value: unknown): value is StaffOption {
+  return (
+    typeof value === 'object' && value !== null && typeof (value as StaffOption).id === 'string'
+  );
+}
+
+function isDepartmentOption(value: unknown): value is DepartmentOption {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as DepartmentOption).id === 'string'
   );
 }
 
@@ -216,6 +246,127 @@ function TableField({
   );
 }
 
+/**
+ * Practitioner control. When the field is empty it defaults to the staff record
+ * linked to the signed-in identity user (`staff.userId`), so the practitioner
+ * capturing the form does not have to pick themselves. Clearing the field after
+ * that does not re-apply the default.
+ */
+export function PractitionerField({
+  field,
+  value,
+  onChange,
+  runtime,
+}: {
+  field: FormFieldSchema;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  runtime?: FormRuntimeContext;
+}) {
+  const authUser = useAuthStore((state) => state.user);
+  // Public (token) forms are filled by patients, not staff.
+  const userId = runtime?.publicToken ? null : (runtime?.userId ?? authUser?.id ?? null);
+  const currentStaff = useStaffByUserId(userId);
+  const initialised = useRef(value !== undefined && value !== null);
+
+  useEffect(() => {
+    if (initialised.current) {
+      return;
+    }
+    if (currentStaff) {
+      initialised.current = true;
+      onChange(toStaffOption(currentStaff));
+      return;
+    }
+    if (value !== undefined && value !== null) {
+      initialised.current = true;
+    }
+  }, [currentStaff, onChange, value]);
+
+  return (
+    <StaffPicker
+      label={field.label}
+      required={field.required}
+      value={isStaffOption(value) ? value : null}
+      onChange={(next) => onChange(next ?? undefined)}
+    />
+  );
+}
+
+/**
+ * Department control. Options are the departments of the signed-in user's site
+ * (`department.locationId`); an empty field defaults to the current staff
+ * member's department, or to the site's only department when the staff record
+ * has none.
+ */
+export function DepartmentField({
+  field,
+  value,
+  onChange,
+  runtime,
+}: {
+  field: FormFieldSchema;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  runtime?: FormRuntimeContext;
+}) {
+  const authUser = useAuthStore((state) => state.user);
+  const locationId = runtime?.locationId ?? authUser?.locationId ?? null;
+  // Public (token) forms are filled by patients, not staff.
+  const userId = runtime?.publicToken ? null : (runtime?.userId ?? authUser?.id ?? null);
+  const staffQuery = useStaffByUserIdQuery(userId);
+  const { departments, isLoading: departmentsLoading } = useDepartmentsForLocation(locationId);
+  const initialised = useRef(value !== undefined && value !== null);
+
+  useEffect(() => {
+    if (initialised.current) {
+      return;
+    }
+    if (userId && staffQuery.isLoading) {
+      return;
+    }
+    const staff = staffQuery.data ?? null;
+    if (staff?.departmentId) {
+      if (departmentsLoading) {
+        return;
+      }
+      const current = departments.find((department) => department.id === staff.departmentId);
+      initialised.current = true;
+      if (current) {
+        onChange(toDepartmentOption(current));
+      }
+      return;
+    }
+    if (departmentsLoading) {
+      return;
+    }
+    initialised.current = true;
+    // Users without a staff record (e.g. an administrator) fall back to the
+    // site's single department when there is exactly one.
+    if (departments.length === 1 && locationId) {
+      onChange(toDepartmentOption(departments[0]));
+    }
+  }, [
+    departments,
+    departmentsLoading,
+    locationId,
+    onChange,
+    staffQuery.data,
+    staffQuery.isLoading,
+    userId,
+  ]);
+
+  return (
+    <DepartmentSelect
+      label={field.label}
+      required={field.required}
+      value={isDepartmentOption(value) ? value : null}
+      departments={departments}
+      onChange={(next) => onChange(next ?? undefined)}
+    />
+  );
+}
+
 function DynamicField({
   field,
   value,
@@ -277,6 +428,25 @@ function DynamicField({
           onChange={(next) => onChange(next ?? undefined)}
         />
       );
+    case 'file':
+      return (
+        <FileUploadField
+          label={field.label}
+          required={field.required}
+          value={value}
+          onChange={onChange}
+          publicToken={runtime?.publicToken}
+          accept={field.accept}
+          multiple={field.multiple}
+          maxSizeMb={field.maxSizeMb}
+        />
+      );
+    case 'practitioner':
+      return (
+        <PractitionerField field={field} value={value} onChange={onChange} runtime={runtime} />
+      );
+    case 'department':
+      return <DepartmentField field={field} value={value} onChange={onChange} runtime={runtime} />;
     case 'print':
       return runtime?.hideActions ? null : (
         <PrintSendActions
@@ -745,6 +915,29 @@ export function validateFormData(schema: FormSchema, data: FormData): string[] {
       typeof fieldValue !== 'boolean'
     ) {
       errors.push(`${field.label} must be a boolean`);
+    }
+    if (field.type === 'file') {
+      const values = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
+      const valid = values.every(
+        (entry) =>
+          typeof entry === 'object' &&
+          entry !== null &&
+          typeof (entry as Record<string, unknown>).url === 'string'
+      );
+      if (!valid) {
+        errors.push(`${field.label} must contain uploaded file URLs`);
+      }
+    }
+    if (
+      field.type === 'practitioner' &&
+      (typeof fieldValue !== 'object' ||
+        Array.isArray(fieldValue) ||
+        !(
+          (fieldValue as Record<string, unknown>).id ||
+          (fieldValue as Record<string, unknown>).staffId
+        ))
+    ) {
+      errors.push(`${field.label} must be a selected practitioner`);
     }
   };
 

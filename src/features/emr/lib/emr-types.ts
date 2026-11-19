@@ -94,6 +94,9 @@ export type FormFieldType =
   | 'print'
   | 'send-form'
   | 'qr-code'
+  | 'file'
+  | 'practitioner'
+  | 'department'
   | 'annotate';
 
 export type AnnotateTarget = 'body' | 'dermatome' | 'organ';
@@ -145,6 +148,10 @@ export type FormFieldSchema = {
   qrMode?: 'auto' | 'template' | 'instance';
   qrSize?: number;
   caption?: string;
+  /** File upload config (`file` field type). */
+  accept?: string;
+  multiple?: boolean;
+  maxSizeMb?: number;
 };
 
 export type FormSchema = {
