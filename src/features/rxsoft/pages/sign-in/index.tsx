@@ -9,6 +9,11 @@ import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-lo
 import { getRememberMe } from '@/lib/auth-tokens';
 import { useAuthStore } from '@/stores/auth-store';
 import { OnboardOrganisation } from './onboard-organisation';
+import { TryPlatformModal } from './try-platform-modal';
+
+// "or try our platform" is on by default; set VITE_ENABLE_DEMO_LOGIN=false to
+// hide it in deployments that do not want the shared demo accounts exposed.
+const DEMO_LOGIN_ENABLED = import.meta.env.VITE_ENABLE_DEMO_LOGIN !== 'false';
 
 const signInSchema = z.object({
   username: z.string().min(1, 'Please enter your email or username'),
@@ -45,6 +50,7 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isSmallMobile = useMediaQuery('(max-width: 480px)');
   const [mode, setMode] = useState<'signin' | 'onboard'>('signin');
+  const [demoOpen, setDemoOpen] = useState(false);
   // "Remember me" — persisted preference; controls whether tokens survive a
   // browser restart (localStorage) or are session-only (sessionStorage).
   const [remember, setRemember] = useState(getRememberMe);
@@ -87,18 +93,10 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
       }
       const authState = useAuthStore.getState();
       if (authState.user) {
-        const firstModule = authState.modules[0];
-        let targetUrl = redirectTo || firstModule?.root || '/';
-        try {
-          if (targetUrl.startsWith('http')) {
-            const parsed = new URL(targetUrl);
-            targetUrl = parsed.pathname + parsed.search;
-          }
-        } catch {
-          /* not a valid URL, use as-is */
-        }
-        const finalUrl = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
-        window.location.href = finalUrl;
+        window.location.href = resolvePostLoginTarget(
+          redirectTo,
+          authState.modules.map((module) => module.id)
+        );
       }
     } catch (err) {
       console.error(`${provider} sign-in error:`, err);
@@ -500,10 +498,11 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                   </Text>
                 </Group>
 
-                {/* Onboard toggle */}
+                {/* Onboard toggle + demo platform */}
                 <Group justify="center" mt={4}>
                   <Text
                     size="sm"
+                    data-testid="sign-in-onboard-link"
                     style={{ color: '#10B981', cursor: 'pointer', fontWeight: 600 }}
                     onClick={() => setMode('onboard')}
                   >
@@ -511,6 +510,23 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
                     New here? Onboard your Organisation
                   </Text>
                 </Group>
+                {DEMO_LOGIN_ENABLED && (
+                  <Group justify="center" mt={0}>
+                    <Text
+                      size="xs"
+                      data-testid="sign-in-try-platform"
+                      style={{
+                        color: '#64748B',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 2,
+                      }}
+                      onClick={() => setDemoOpen(true)}
+                    >
+                      or try our platform
+                    </Text>
+                  </Group>
+                )}
               </Stack>
             </form>
           ) : (
@@ -525,6 +541,10 @@ export function RxSignIn({ redirectTo }: { redirectTo?: string }) {
           )}
         </Box>
       </Box>
+
+      {DEMO_LOGIN_ENABLED && (
+        <TryPlatformModal opened={demoOpen} onClose={() => setDemoOpen(false)} />
+      )}
 
       <Footer isMobile={isMobile} />
     </Box>

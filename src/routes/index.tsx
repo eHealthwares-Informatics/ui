@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
 import { useAuthStore } from '@/stores/auth-store';
 
 export const Route = createFileRoute('/')({
@@ -9,11 +10,13 @@ export const Route = createFileRoute('/')({
       throw redirect({ to: '/sign-in' });
     }
 
-    // Single module: go straight to its dashboard. Multiple modules: the
-    // module landing grid (default page after login — the user chooses).
-    if (userModules.length === 1) {
-      throw redirect({ href: `/${userModules[0].id}` });
-    }
-    throw redirect({ to: '/modules' });
+    // Remembered module → its dashboard; single module → its dashboard;
+    // otherwise the module chooser grid. Same rule as a fresh sign-in.
+    throw redirect({
+      href: resolvePostLoginTarget(
+        undefined,
+        userModules.map((module) => module.id)
+      ),
+    });
   },
 });

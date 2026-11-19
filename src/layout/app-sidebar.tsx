@@ -59,6 +59,7 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
       className={classes.navbar}
       p={collapsed ? 8 : 'sm'}
       w={{ base: collapsed ? 76 : 260 }}
+      data-testid="app-sidebar"
     >
       <Stack h="100%" gap="xs">
         {/* BRAND */}

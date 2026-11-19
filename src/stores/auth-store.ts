@@ -244,6 +244,17 @@ export const useAuthStore = create<AuthState>()(
           let refreshToken = getRefreshToken();
 
           if (!initialAccessToken && !refreshToken) {
+            // Clear any user/modules left over from Zustand rehydration. A
+            // session-only login whose browser session has ended deliberately
+            // has no tokens — it must not look signed in from persisted state.
+            set({
+              accessToken: null,
+              refreshToken: null,
+              user: null,
+              modules: [],
+              permissionMode: 'org',
+              pendingModulesFetch: null,
+            });
             return;
           }
 
@@ -284,7 +295,14 @@ export const useAuthStore = create<AuthState>()(
 
           if (!accessToken || !user) {
             clearTokens();
-            set({ accessToken: null, refreshToken: null, user: null });
+            set({
+              accessToken: null,
+              refreshToken: null,
+              user: null,
+              modules: [],
+              permissionMode: 'org',
+              pendingModulesFetch: null,
+            });
             return;
           }
 
@@ -296,7 +314,9 @@ export const useAuthStore = create<AuthState>()(
           // dedupes concurrent fetches via `pendingModulesFetch`, which prevents
           // a fetch/remount feedback loop (see ehealthwares/ui#84).
           if (user && get().modules.length === 0) {
-            get().fetchModules();
+            // Await so the post-login / remembered-module resolver sees the
+            // real module list instead of falling back to the chooser.
+            await get().fetchModules();
           }
         })().finally(() => {
           bootstrapInFlight = null;
@@ -342,6 +362,18 @@ export const useAuthStore = create<AuthState>()(
 
       setSelectedOrganisationId: (id) => set({ selectedOrganisationId: id }),
     }),
-    { name: 'rxsoft-admin-auth' }
+    {
+      name: 'rxsoft-admin-auth',
+      // Tokens live in the dedicated auth-token storage (see lib/auth-tokens),
+      // so the persisted store must not duplicate them. Persisting the profile
+      // and module context keeps the first paint warm; `bootstrap()` still
+      // validates/refreshes the session and clears this when it is over.
+      partialize: (state) => ({
+        user: state.user,
+        modules: state.modules,
+        permissionMode: state.permissionMode,
+        selectedOrganisationId: state.selectedOrganisationId,
+      }),
+    }
   )
 );

@@ -13,6 +13,8 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import axios, { AxiosError } from 'axios';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
+import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, getAccessToken } from '@/lib/auth-tokens';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { handleServerError } from '@/lib/handle-server-error';
 import { shouldRetryQuery } from '@/lib/query-retry';
@@ -135,6 +137,55 @@ declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
+}
+
+/**
+ * Cross-tab session sync. Tokens always live in localStorage (see
+ * lib/auth-tokens), so the `storage` event fires in every other tab:
+ *  - login/refresh in one tab → adopt the session here (bootstrap), and if this
+ *    tab is sitting on /sign-in, continue to the remembered module;
+ *  - logout in one tab → drop the local session and bounce to /sign-in.
+ * Ignore all other storage keys (notably the persisted auth store).
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
+    if (event.key !== ACCESS_TOKEN_KEY && event.key !== REFRESH_TOKEN_KEY) {
+      return;
+    }
+
+    if (!getAccessToken()) {
+      useAuthStore.setState({
+        accessToken: null,
+        refreshToken: null,
+        user: null,
+        modules: [],
+        permissionMode: 'org',
+        loading: false,
+        error: null,
+        pendingModulesFetch: null,
+      });
+      if (!window.location.pathname.includes('/sign-in')) {
+        const redirect = window.location.pathname + window.location.search;
+        window.location.assign(`/sign-in?redirect=${encodeURIComponent(redirect)}`);
+      }
+      return;
+    }
+
+    const state = useAuthStore.getState();
+    if (!state.user) {
+      void state.bootstrap().then(() => {
+        const next = useAuthStore.getState();
+        if (next.user && window.location.pathname.includes('/sign-in')) {
+          window.location.assign(
+            resolvePostLoginTarget(
+              undefined,
+              next.modules.map((module) => module.id)
+            )
+          );
+        }
+      });
+    }
+  });
 }
 
 // Render the app

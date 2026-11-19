@@ -26,6 +26,10 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const navigate = useNavigate();
   const moduleId = useModuleId();
   const setSelectedModule = useSetSelectedModule();
+  // The module chooser is a pre-module screen: showing the previously selected
+  // module's menu before the user picks one is misleading. Hide the whole
+  // navbar (and the now-useless rail toggle / module switcher) here.
+  const isModuleChooser = pathname === '/modules';
   useModuleFavicon(moduleId);
   useModuleTitle(moduleId);
 
@@ -84,15 +88,24 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
         <NotificationSubscriptionRegistrar />
         <AppShell
           header={{ height: 56 }}
-          navbar={{
-            width: navState === 'rail' ? 76 : 260,
-            breakpoint: 'sm',
-            collapsed: { mobile: !mobileOpened, desktop: navState === 'hidden' },
-          }}
+          navbar={
+            isModuleChooser
+              ? undefined
+              : {
+                  width: navState === 'rail' ? 76 : 260,
+                  breakpoint: 'sm',
+                  collapsed: { mobile: !mobileOpened, desktop: navState === 'hidden' },
+                }
+          }
           padding="md"
         >
-          <AppHeader navState={navState} isMobile={isMobile} onToggleNav={toggleNav} />
-          <AppSidebar collapsed={!isMobile && navState === 'rail'} />
+          <AppHeader
+            navState={navState}
+            isMobile={isMobile}
+            onToggleNav={toggleNav}
+            showNavToggle={!isModuleChooser}
+          />
+          {!isModuleChooser && <AppSidebar collapsed={!isMobile && navState === 'rail'} />}
           <AppShell.Main>{children ?? <Outlet />}</AppShell.Main>
         </AppShell>
       </LayoutProvider>

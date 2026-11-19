@@ -81,12 +81,14 @@ export default defineConfig({
       '/api/identity': {
         target: 'http://localhost:8092',
         changeOrigin: true,
-        pathRewrite: { '^/api/identity': '' },
+        // Vite uses http-proxy's `rewrite`; webpack's `pathRewrite` is ignored,
+        // which left the `/api/identity` prefix on identity routes (404s).
+        rewrite: (path) => path.replace(/^\/api\/identity/, ''),
       },
       '/api/conversation': {
         target: 'http://localhost:8090',
         changeOrigin: true,
-        pathRewrite: { '^/api/conversation': '/api' },
+        rewrite: (path) => path.replace(/^\/api\/conversation/, '/api'),
       },
       '/api': {
         target: 'http://localhost:8080',
