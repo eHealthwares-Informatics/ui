@@ -2,30 +2,24 @@ import { Box, Divider, Group, Stack, Text, Title } from '@mantine/core';
 import { Outlet, useRouterState } from '@tanstack/react-router';
 import { Bell, Palette, Settings2, UserCog, Monitor } from 'lucide-react';
 import { useMemo } from 'react';
-import { useModuleContext } from '@/context/module-context';
 import { Main } from '@/layout/main';
 import { SidebarNavItem } from '../components/sidebar-nav';
 
 export function Settings() {
-  // Settings pages live under the active module's root (e.g. /rxsoft/settings).
-  // The links must be module-scoped or they fall through to the generic
-  // /$page/$id detail route, which renders a loader forever for an unknown
-  // record (the "/settings/account loading indefinitely" bug).
-  const { moduleRoot } = useModuleContext();
+  // Settings are global (not module-scoped) and live at /settings/*. Keeping the
+  // links static avoids falling through to the generic /$page/$id detail route,
+  // which renders "record not found" for an unknown record.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // `moduleRoot` is the dashboard path (/rxsoft/dashboard); settings sit at the
-  // module's first path segment (/rxsoft/settings).
-  const moduleBase = `/${moduleRoot.split('/').filter(Boolean)[0] ?? 'rxsoft'}`;
 
   const sidebarNavItems = useMemo(
     () => [
-      { title: 'Profile', url: `${moduleBase}/settings`, icon: UserCog },
-      { title: 'Account', url: `${moduleBase}/settings/account`, icon: Settings2 },
-      { title: 'Appearance', url: `${moduleBase}/settings/appearance`, icon: Palette },
-      { title: 'Notifications', url: `${moduleBase}/settings/notifications`, icon: Bell },
-      { title: 'Display', url: `${moduleBase}/settings/display`, icon: Monitor },
+      { title: 'Profile', url: '/settings', icon: UserCog },
+      { title: 'Account', url: '/settings/account', icon: Settings2 },
+      { title: 'Appearance', url: '/settings/appearance', icon: Palette },
+      { title: 'Notifications', url: '/settings/notifications', icon: Bell },
+      { title: 'Display', url: '/settings/display', icon: Monitor },
     ],
-    [moduleBase]
+    []
   );
 
   return (

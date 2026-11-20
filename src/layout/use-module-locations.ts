@@ -147,10 +147,13 @@ function canUseLocationScope(moduleId: ModuleId, roles: string[]): boolean {
   return false;
 }
 
+/** Stable empty array so Zustand selectors don't return a fresh reference each render. */
+const EMPTY_ROLES: string[] = [];
+
 /** Locations available to the active module, already normalised for the switcher. */
 export function useModuleLocations() {
   const moduleId = useModuleId();
-  const roles = useAuthStore((state) => state.user?.roles ?? []);
+  const roles = useAuthStore((state) => state.user?.roles) ?? EMPTY_ROLES;
   const allowed = canUseLocationScope(moduleId, roles);
   const scope = allowed ? locationScopeForModule(moduleId) : null;
   const fetcher = allowed ? fetcherFor(moduleId) : null;

@@ -25,6 +25,7 @@ import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errorsServiceUnavailableRouteImport } from './routes/(errors)/service-unavailable'
 import { Route as AuthenticatedModuleIdRouteImport } from './routes/_authenticated/$moduleId'
 import { Route as AuthenticatedModulesRouteImport } from './routes/_authenticated/modules'
+import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as ApmIndexRouteImport } from './routes/apm/index'
 import { Route as ApmAchievementsRouteImport } from './routes/apm/achievements'
 import { Route as ApmAdminRouteRouteImport } from './routes/apm/admin/route'
@@ -112,7 +113,12 @@ import { Route as AuthenticatedIdentityDashboardRouteImport } from './routes/_au
 import { Route as AuthenticatedLisIndexRouteImport } from './routes/_authenticated/lis/index'
 import { Route as AuthenticatedLisDashboardRouteImport } from './routes/_authenticated/lis/dashboard'
 import { Route as AuthenticatedRxsoftDashboardRouteImport } from './routes/_authenticated/rxsoft/dashboard'
-import { Route as AuthenticatedRxsoftSettingsRouteRouteImport } from './routes/_authenticated/rxsoft/settings/route'
+import { Route as AuthenticatedRxsoftSettingsRouteImport } from './routes/_authenticated/rxsoft/settings'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
+import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
+import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedWebsiteDashboardRouteImport } from './routes/_authenticated/website/dashboard'
 import { Route as ApmAdminAgentsRouteImport } from './routes/apm/admin/agents'
 import { Route as ApmAdminCanvassingRouteImport } from './routes/apm/admin/canvassing'
@@ -295,11 +301,6 @@ import { Route as AuthenticatedRxsoftRoleRequestsIndexRouteImport } from './rout
 import { Route as AuthenticatedRxsoftRolesIndexRouteImport } from './routes/_authenticated/rxsoft/roles/index'
 import { Route as AuthenticatedRxsoftSalesLinesIndexRouteImport } from './routes/_authenticated/rxsoft/sales-lines/index'
 import { Route as AuthenticatedRxsoftSalesIndexRouteImport } from './routes/_authenticated/rxsoft/sales/index'
-import { Route as AuthenticatedRxsoftSettingsIndexRouteImport } from './routes/_authenticated/rxsoft/settings/index'
-import { Route as AuthenticatedRxsoftSettingsAccountRouteImport } from './routes/_authenticated/rxsoft/settings/account'
-import { Route as AuthenticatedRxsoftSettingsAppearanceRouteImport } from './routes/_authenticated/rxsoft/settings/appearance'
-import { Route as AuthenticatedRxsoftSettingsDisplayRouteImport } from './routes/_authenticated/rxsoft/settings/display'
-import { Route as AuthenticatedRxsoftSettingsNotificationsRouteImport } from './routes/_authenticated/rxsoft/settings/notifications'
 import { Route as AuthenticatedRxsoftStockLocationsIndexRouteImport } from './routes/_authenticated/rxsoft/stock-locations/index'
 import { Route as AuthenticatedRxsoftSuppliersIndexRouteImport } from './routes/_authenticated/rxsoft/suppliers/index'
 import { Route as AuthenticatedRxsoftUomCategoryIndexRouteImport } from './routes/_authenticated/rxsoft/uom-category/index'
@@ -434,6 +435,12 @@ const AuthenticatedModulesRoute = AuthenticatedModulesRouteImport.update({
   path: '/modules',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRouteRoute =
+  AuthenticatedSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApmIndexRoute = ApmIndexRouteImport.update({
   id: '/apm/',
   path: '/apm/',
@@ -901,11 +908,41 @@ const AuthenticatedRxsoftDashboardRoute =
     path: '/rxsoft/dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedRxsoftSettingsRouteRoute =
-  AuthenticatedRxsoftSettingsRouteRouteImport.update({
+const AuthenticatedRxsoftSettingsRoute =
+  AuthenticatedRxsoftSettingsRouteImport.update({
     id: '/rxsoft/settings',
     path: '/rxsoft/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsAppearanceRoute =
+  AuthenticatedSettingsAppearanceRouteImport.update({
+    id: '/appearance',
+    path: '/appearance',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsDisplayRoute =
+  AuthenticatedSettingsDisplayRouteImport.update({
+    id: '/display',
+    path: '/display',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedSettingsNotificationsRoute =
+  AuthenticatedSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
 const AuthenticatedWebsiteDashboardRoute =
   AuthenticatedWebsiteDashboardRouteImport.update({
@@ -1972,36 +2009,6 @@ const AuthenticatedRxsoftSalesIndexRoute =
     path: '/rxsoft/sales/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedRxsoftSettingsIndexRoute =
-  AuthenticatedRxsoftSettingsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any)
-const AuthenticatedRxsoftSettingsAccountRoute =
-  AuthenticatedRxsoftSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
-    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any)
-const AuthenticatedRxsoftSettingsAppearanceRoute =
-  AuthenticatedRxsoftSettingsAppearanceRouteImport.update({
-    id: '/appearance',
-    path: '/appearance',
-    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any)
-const AuthenticatedRxsoftSettingsDisplayRoute =
-  AuthenticatedRxsoftSettingsDisplayRouteImport.update({
-    id: '/display',
-    path: '/display',
-    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any)
-const AuthenticatedRxsoftSettingsNotificationsRoute =
-  AuthenticatedRxsoftSettingsNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedRxsoftSettingsRouteRoute,
-  } as any)
 const AuthenticatedRxsoftStockLocationsIndexRoute =
   AuthenticatedRxsoftStockLocationsIndexRouteImport.update({
     id: '/rxsoft/stock-locations/',
@@ -2325,6 +2332,7 @@ const AuthenticatedRxsoftRolesIdPermissionsIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clerk': typeof ClerkauthRouteRoute
+  '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/apm/admin': typeof ApmAdminRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
@@ -2396,7 +2404,6 @@ export interface FileRoutesByFullPath {
   '/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute
   '/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute
   '/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren
-  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
   '/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute
   '/$page/$id': typeof AuthenticatedPageIdRouteWithChildren
   '/$page/create': typeof AuthenticatedPageCreateRoute
@@ -2418,6 +2425,11 @@ export interface FileRoutesByFullPath {
   '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
   '/lis/dashboard': typeof AuthenticatedLisDashboardRoute
   '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
@@ -2453,6 +2465,7 @@ export interface FileRoutesByFullPath {
   '/emr/': typeof AuthenticatedEmrIndexRoute
   '/identity/': typeof AuthenticatedIdentityIndexRoute
   '/lis/': typeof AuthenticatedLisIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shop/purchases/': typeof ShopPurchasesIndexRoute
   '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
@@ -2474,10 +2487,6 @@ export interface FileRoutesByFullPath {
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
-  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
-  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
-  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
-  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
@@ -2615,7 +2624,6 @@ export interface FileRoutesByFullPath {
   '/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
   '/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
-  '/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
   '/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute
   '/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute
@@ -2759,6 +2767,11 @@ export interface FileRoutesByTo {
   '/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
   '/lis/dashboard': typeof AuthenticatedLisDashboardRoute
   '/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
@@ -2794,6 +2807,7 @@ export interface FileRoutesByTo {
   '/emr': typeof AuthenticatedEmrIndexRoute
   '/identity': typeof AuthenticatedIdentityIndexRoute
   '/lis': typeof AuthenticatedLisIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shop/purchases': typeof ShopPurchasesIndexRoute
   '/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
@@ -2815,10 +2829,6 @@ export interface FileRoutesByTo {
   '/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
-  '/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
-  '/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
-  '/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
-  '/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
@@ -2956,7 +2966,6 @@ export interface FileRoutesByTo {
   '/rxsoft/roles': typeof AuthenticatedRxsoftRolesIndexRoute
   '/rxsoft/sales-lines': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/rxsoft/sales': typeof AuthenticatedRxsoftSalesIndexRoute
-  '/rxsoft/settings': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/rxsoft/stock-locations': typeof AuthenticatedRxsoftStockLocationsIndexRoute
   '/rxsoft/suppliers': typeof AuthenticatedRxsoftSuppliersIndexRoute
   '/rxsoft/uom-category': typeof AuthenticatedRxsoftUomCategoryIndexRoute
@@ -3011,6 +3020,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/apm/admin': typeof ApmAdminRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRoute
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -3084,7 +3094,6 @@ export interface FileRoutesById {
   '/_authenticated/communication/routing': typeof AuthenticatedCommunicationRoutingRouteRoute
   '/_authenticated/conversation/broadcasts': typeof AuthenticatedConversationBroadcastsRouteRoute
   '/_authenticated/conversation/invites': typeof AuthenticatedConversationInvitesRouteRouteWithChildren
-  '/_authenticated/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
   '/_authenticated/$moduleId/dashboard': typeof AuthenticatedModuleIdDashboardRoute
   '/_authenticated/$page/$id': typeof AuthenticatedPageIdRouteWithChildren
   '/_authenticated/$page/create': typeof AuthenticatedPageCreateRoute
@@ -3106,6 +3115,11 @@ export interface FileRoutesById {
   '/_authenticated/identity/dashboard': typeof AuthenticatedIdentityDashboardRoute
   '/_authenticated/lis/dashboard': typeof AuthenticatedLisDashboardRoute
   '/_authenticated/rxsoft/dashboard': typeof AuthenticatedRxsoftDashboardRoute
+  '/_authenticated/rxsoft/settings': typeof AuthenticatedRxsoftSettingsRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
+  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/website/dashboard': typeof AuthenticatedWebsiteDashboardRoute
   '/apm/admin/agents': typeof ApmAdminAgentsRoute
   '/apm/admin/canvassing': typeof ApmAdminCanvassingRoute
@@ -3141,6 +3155,7 @@ export interface FileRoutesById {
   '/_authenticated/emr/': typeof AuthenticatedEmrIndexRoute
   '/_authenticated/identity/': typeof AuthenticatedIdentityIndexRoute
   '/_authenticated/lis/': typeof AuthenticatedLisIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shop/purchases/': typeof ShopPurchasesIndexRoute
   '/_authenticated/lis/orders/workflow': typeof AuthenticatedLisOrdersWorkflowRouteRouteWithChildren
   '/_authenticated/$moduleId/$page/$id': typeof AuthenticatedModuleIdPageIdRoute
@@ -3162,10 +3177,6 @@ export interface FileRoutesById {
   '/_authenticated/lis/orders/dashboard': typeof AuthenticatedLisOrdersDashboardRoute
   '/_authenticated/rxsoft/items/create': typeof AuthenticatedRxsoftItemsCreateRoute
   '/_authenticated/rxsoft/payment-transactions/$transactionId': typeof AuthenticatedRxsoftPaymentTransactionsTransactionIdRoute
-  '/_authenticated/rxsoft/settings/account': typeof AuthenticatedRxsoftSettingsAccountRoute
-  '/_authenticated/rxsoft/settings/appearance': typeof AuthenticatedRxsoftSettingsAppearanceRoute
-  '/_authenticated/rxsoft/settings/display': typeof AuthenticatedRxsoftSettingsDisplayRoute
-  '/_authenticated/rxsoft/settings/notifications': typeof AuthenticatedRxsoftSettingsNotificationsRoute
   '/_authenticated/rxsoft/uoms/$uomId': typeof AuthenticatedRxsoftUomsUomIdRouteWithChildren
   '/_authenticated/rxsoft/website-orders/$orderId': typeof AuthenticatedRxsoftWebsiteOrdersOrderIdRoute
   '/_authenticated/rxsoft/website-prescriptions/$prescriptionId': typeof AuthenticatedRxsoftWebsitePrescriptionsPrescriptionIdRoute
@@ -3303,7 +3314,6 @@ export interface FileRoutesById {
   '/_authenticated/rxsoft/roles/': typeof AuthenticatedRxsoftRolesIndexRoute
   '/_authenticated/rxsoft/sales-lines/': typeof AuthenticatedRxsoftSalesLinesIndexRoute
   '/_authenticated/rxsoft/sales/': typeof AuthenticatedRxsoftSalesIndexRoute
-  '/_authenticated/rxsoft/settings/': typeof AuthenticatedRxsoftSettingsIndexRoute
   '/_authenticated/rxsoft/stock-locations/': typeof AuthenticatedRxsoftStockLocationsIndexRoute
   '/_authenticated/rxsoft/suppliers/': typeof AuthenticatedRxsoftSuppliersIndexRoute
   '/_authenticated/rxsoft/uom-category/': typeof AuthenticatedRxsoftUomCategoryIndexRoute
@@ -3358,6 +3368,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/clerk'
+    | '/settings'
     | '/apm/admin'
     | '/forgot-password'
     | '/otp'
@@ -3429,7 +3440,6 @@ export interface FileRouteTypes {
     | '/communication/routing'
     | '/conversation/broadcasts'
     | '/conversation/invites'
-    | '/rxsoft/settings'
     | '/$moduleId/dashboard'
     | '/$page/$id'
     | '/$page/create'
@@ -3451,6 +3461,11 @@ export interface FileRouteTypes {
     | '/identity/dashboard'
     | '/lis/dashboard'
     | '/rxsoft/dashboard'
+    | '/rxsoft/settings'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/display'
+    | '/settings/notifications'
     | '/website/dashboard'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
@@ -3486,6 +3501,7 @@ export interface FileRouteTypes {
     | '/emr/'
     | '/identity/'
     | '/lis/'
+    | '/settings/'
     | '/shop/purchases/'
     | '/lis/orders/workflow'
     | '/$moduleId/$page/$id'
@@ -3507,10 +3523,6 @@ export interface FileRouteTypes {
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/payment-transactions/$transactionId'
-    | '/rxsoft/settings/account'
-    | '/rxsoft/settings/appearance'
-    | '/rxsoft/settings/display'
-    | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
     | '/rxsoft/website-orders/$orderId'
     | '/rxsoft/website-prescriptions/$prescriptionId'
@@ -3648,7 +3660,6 @@ export interface FileRouteTypes {
     | '/rxsoft/roles/'
     | '/rxsoft/sales-lines/'
     | '/rxsoft/sales/'
-    | '/rxsoft/settings/'
     | '/rxsoft/stock-locations/'
     | '/rxsoft/suppliers/'
     | '/rxsoft/uom-category/'
@@ -3792,6 +3803,11 @@ export interface FileRouteTypes {
     | '/identity/dashboard'
     | '/lis/dashboard'
     | '/rxsoft/dashboard'
+    | '/rxsoft/settings'
+    | '/settings/account'
+    | '/settings/appearance'
+    | '/settings/display'
+    | '/settings/notifications'
     | '/website/dashboard'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
@@ -3827,6 +3843,7 @@ export interface FileRouteTypes {
     | '/emr'
     | '/identity'
     | '/lis'
+    | '/settings'
     | '/shop/purchases'
     | '/lis/orders/workflow'
     | '/$moduleId/$page/$id'
@@ -3848,10 +3865,6 @@ export interface FileRouteTypes {
     | '/lis/orders/dashboard'
     | '/rxsoft/items/create'
     | '/rxsoft/payment-transactions/$transactionId'
-    | '/rxsoft/settings/account'
-    | '/rxsoft/settings/appearance'
-    | '/rxsoft/settings/display'
-    | '/rxsoft/settings/notifications'
     | '/rxsoft/uoms/$uomId'
     | '/rxsoft/website-orders/$orderId'
     | '/rxsoft/website-prescriptions/$prescriptionId'
@@ -3989,7 +4002,6 @@ export interface FileRouteTypes {
     | '/rxsoft/roles'
     | '/rxsoft/sales-lines'
     | '/rxsoft/sales'
-    | '/rxsoft/settings'
     | '/rxsoft/stock-locations'
     | '/rxsoft/suppliers'
     | '/rxsoft/uom-category'
@@ -4043,6 +4055,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/clerk'
+    | '/_authenticated/settings'
     | '/apm/admin'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
@@ -4116,7 +4129,6 @@ export interface FileRouteTypes {
     | '/_authenticated/communication/routing'
     | '/_authenticated/conversation/broadcasts'
     | '/_authenticated/conversation/invites'
-    | '/_authenticated/rxsoft/settings'
     | '/_authenticated/$moduleId/dashboard'
     | '/_authenticated/$page/$id'
     | '/_authenticated/$page/create'
@@ -4138,6 +4150,11 @@ export interface FileRouteTypes {
     | '/_authenticated/identity/dashboard'
     | '/_authenticated/lis/dashboard'
     | '/_authenticated/rxsoft/dashboard'
+    | '/_authenticated/rxsoft/settings'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/appearance'
+    | '/_authenticated/settings/display'
+    | '/_authenticated/settings/notifications'
     | '/_authenticated/website/dashboard'
     | '/apm/admin/agents'
     | '/apm/admin/canvassing'
@@ -4173,6 +4190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/emr/'
     | '/_authenticated/identity/'
     | '/_authenticated/lis/'
+    | '/_authenticated/settings/'
     | '/shop/purchases/'
     | '/_authenticated/lis/orders/workflow'
     | '/_authenticated/$moduleId/$page/$id'
@@ -4194,10 +4212,6 @@ export interface FileRouteTypes {
     | '/_authenticated/lis/orders/dashboard'
     | '/_authenticated/rxsoft/items/create'
     | '/_authenticated/rxsoft/payment-transactions/$transactionId'
-    | '/_authenticated/rxsoft/settings/account'
-    | '/_authenticated/rxsoft/settings/appearance'
-    | '/_authenticated/rxsoft/settings/display'
-    | '/_authenticated/rxsoft/settings/notifications'
     | '/_authenticated/rxsoft/uoms/$uomId'
     | '/_authenticated/rxsoft/website-orders/$orderId'
     | '/_authenticated/rxsoft/website-prescriptions/$prescriptionId'
@@ -4335,7 +4349,6 @@ export interface FileRouteTypes {
     | '/_authenticated/rxsoft/roles/'
     | '/_authenticated/rxsoft/sales-lines/'
     | '/_authenticated/rxsoft/sales/'
-    | '/_authenticated/rxsoft/settings/'
     | '/_authenticated/rxsoft/stock-locations/'
     | '/_authenticated/rxsoft/suppliers/'
     | '/_authenticated/rxsoft/uom-category/'
@@ -4569,6 +4582,13 @@ declare module '@tanstack/react-router' {
       path: '/modules'
       fullPath: '/modules'
       preLoaderRoute: typeof AuthenticatedModulesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/apm/': {
@@ -5184,8 +5204,43 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/rxsoft/settings'
       path: '/rxsoft/settings'
       fullPath: '/rxsoft/settings'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsRouteRouteImport
+      preLoaderRoute: typeof AuthenticatedRxsoftSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/appearance': {
+      id: '/_authenticated/settings/appearance'
+      path: '/appearance'
+      fullPath: '/settings/appearance'
+      preLoaderRoute: typeof AuthenticatedSettingsAppearanceRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/display': {
+      id: '/_authenticated/settings/display'
+      path: '/display'
+      fullPath: '/settings/display'
+      preLoaderRoute: typeof AuthenticatedSettingsDisplayRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/settings/notifications': {
+      id: '/_authenticated/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
     '/_authenticated/website/dashboard': {
       id: '/_authenticated/website/dashboard'
@@ -6461,41 +6516,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRxsoftSalesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/rxsoft/settings/': {
-      id: '/_authenticated/rxsoft/settings/'
-      path: '/'
-      fullPath: '/rxsoft/settings/'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
-    }
-    '/_authenticated/rxsoft/settings/account': {
-      id: '/_authenticated/rxsoft/settings/account'
-      path: '/account'
-      fullPath: '/rxsoft/settings/account'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAccountRouteImport
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
-    }
-    '/_authenticated/rxsoft/settings/appearance': {
-      id: '/_authenticated/rxsoft/settings/appearance'
-      path: '/appearance'
-      fullPath: '/rxsoft/settings/appearance'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsAppearanceRouteImport
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
-    }
-    '/_authenticated/rxsoft/settings/display': {
-      id: '/_authenticated/rxsoft/settings/display'
-      path: '/display'
-      fullPath: '/rxsoft/settings/display'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsDisplayRouteImport
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
-    }
-    '/_authenticated/rxsoft/settings/notifications': {
-      id: '/_authenticated/rxsoft/settings/notifications'
-      path: '/notifications'
-      fullPath: '/rxsoft/settings/notifications'
-      preLoaderRoute: typeof AuthenticatedRxsoftSettingsNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRxsoftSettingsRouteRoute
-    }
     '/_authenticated/rxsoft/stock-locations/': {
       id: '/_authenticated/rxsoft/stock-locations/'
       path: '/rxsoft/stock-locations'
@@ -6870,6 +6890,29 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSettingsRouteRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
+  AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
+  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+}
+
+const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
+  {
+    AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+    AuthenticatedSettingsAppearanceRoute: AuthenticatedSettingsAppearanceRoute,
+    AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
+    AuthenticatedSettingsNotificationsRoute:
+      AuthenticatedSettingsNotificationsRoute,
+    AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+  }
+
+const AuthenticatedSettingsRouteRouteWithChildren =
+  AuthenticatedSettingsRouteRoute._addFileChildren(
+    AuthenticatedSettingsRouteRouteChildren,
+  )
+
 interface AuthenticatedModuleIdRouteChildren {
   AuthenticatedModuleIdDashboardRoute: typeof AuthenticatedModuleIdDashboardRoute
   AuthenticatedModuleIdIndexRoute: typeof AuthenticatedModuleIdIndexRoute
@@ -6902,33 +6945,6 @@ const AuthenticatedConversationInvitesRouteRouteChildren: AuthenticatedConversat
 const AuthenticatedConversationInvitesRouteRouteWithChildren =
   AuthenticatedConversationInvitesRouteRoute._addFileChildren(
     AuthenticatedConversationInvitesRouteRouteChildren,
-  )
-
-interface AuthenticatedRxsoftSettingsRouteRouteChildren {
-  AuthenticatedRxsoftSettingsAccountRoute: typeof AuthenticatedRxsoftSettingsAccountRoute
-  AuthenticatedRxsoftSettingsAppearanceRoute: typeof AuthenticatedRxsoftSettingsAppearanceRoute
-  AuthenticatedRxsoftSettingsDisplayRoute: typeof AuthenticatedRxsoftSettingsDisplayRoute
-  AuthenticatedRxsoftSettingsNotificationsRoute: typeof AuthenticatedRxsoftSettingsNotificationsRoute
-  AuthenticatedRxsoftSettingsIndexRoute: typeof AuthenticatedRxsoftSettingsIndexRoute
-}
-
-const AuthenticatedRxsoftSettingsRouteRouteChildren: AuthenticatedRxsoftSettingsRouteRouteChildren =
-  {
-    AuthenticatedRxsoftSettingsAccountRoute:
-      AuthenticatedRxsoftSettingsAccountRoute,
-    AuthenticatedRxsoftSettingsAppearanceRoute:
-      AuthenticatedRxsoftSettingsAppearanceRoute,
-    AuthenticatedRxsoftSettingsDisplayRoute:
-      AuthenticatedRxsoftSettingsDisplayRoute,
-    AuthenticatedRxsoftSettingsNotificationsRoute:
-      AuthenticatedRxsoftSettingsNotificationsRoute,
-    AuthenticatedRxsoftSettingsIndexRoute:
-      AuthenticatedRxsoftSettingsIndexRoute,
-  }
-
-const AuthenticatedRxsoftSettingsRouteRouteWithChildren =
-  AuthenticatedRxsoftSettingsRouteRoute._addFileChildren(
-    AuthenticatedRxsoftSettingsRouteRouteChildren,
   )
 
 interface AuthenticatedPageIdRouteChildren {
@@ -7000,6 +7016,7 @@ const AuthenticatedRxsoftUomsUomIdRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedModuleIdRoute: typeof AuthenticatedModuleIdRouteWithChildren
   AuthenticatedModulesRoute: typeof AuthenticatedModulesRoute
   AuthenticatedCommunicationAesRouteRoute: typeof AuthenticatedCommunicationAesRouteRoute
@@ -7013,7 +7030,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunicationRoutingRouteRoute: typeof AuthenticatedCommunicationRoutingRouteRoute
   AuthenticatedConversationBroadcastsRouteRoute: typeof AuthenticatedConversationBroadcastsRouteRoute
   AuthenticatedConversationInvitesRouteRoute: typeof AuthenticatedConversationInvitesRouteRouteWithChildren
-  AuthenticatedRxsoftSettingsRouteRoute: typeof AuthenticatedRxsoftSettingsRouteRouteWithChildren
   AuthenticatedPageIdRoute: typeof AuthenticatedPageIdRouteWithChildren
   AuthenticatedPageCreateRoute: typeof AuthenticatedPageCreateRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
@@ -7034,6 +7050,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIdentityDashboardRoute: typeof AuthenticatedIdentityDashboardRoute
   AuthenticatedLisDashboardRoute: typeof AuthenticatedLisDashboardRoute
   AuthenticatedRxsoftDashboardRoute: typeof AuthenticatedRxsoftDashboardRoute
+  AuthenticatedRxsoftSettingsRoute: typeof AuthenticatedRxsoftSettingsRoute
   AuthenticatedWebsiteDashboardRoute: typeof AuthenticatedWebsiteDashboardRoute
   AuthenticatedCodingConceptIndexRoute: typeof AuthenticatedCodingConceptIndexRoute
   AuthenticatedConversationIndexRoute: typeof AuthenticatedConversationIndexRoute
@@ -7235,6 +7252,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedModuleIdRoute: AuthenticatedModuleIdRouteWithChildren,
   AuthenticatedModulesRoute: AuthenticatedModulesRoute,
   AuthenticatedCommunicationAesRouteRoute:
@@ -7259,8 +7277,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedConversationBroadcastsRouteRoute,
   AuthenticatedConversationInvitesRouteRoute:
     AuthenticatedConversationInvitesRouteRouteWithChildren,
-  AuthenticatedRxsoftSettingsRouteRoute:
-    AuthenticatedRxsoftSettingsRouteRouteWithChildren,
   AuthenticatedPageIdRoute: AuthenticatedPageIdRouteWithChildren,
   AuthenticatedPageCreateRoute: AuthenticatedPageCreateRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
@@ -7289,6 +7305,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIdentityDashboardRoute: AuthenticatedIdentityDashboardRoute,
   AuthenticatedLisDashboardRoute: AuthenticatedLisDashboardRoute,
   AuthenticatedRxsoftDashboardRoute: AuthenticatedRxsoftDashboardRoute,
+  AuthenticatedRxsoftSettingsRoute: AuthenticatedRxsoftSettingsRoute,
   AuthenticatedWebsiteDashboardRoute: AuthenticatedWebsiteDashboardRoute,
   AuthenticatedCodingConceptIndexRoute: AuthenticatedCodingConceptIndexRoute,
   AuthenticatedConversationIndexRoute: AuthenticatedConversationIndexRoute,

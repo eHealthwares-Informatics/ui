@@ -1,6 +1,6 @@
 import { Avatar, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import { BadgeCheck, Bell, ChevronDown, CreditCard, LogOut, UserRound } from 'lucide-react';
+import { BadgeCheck, Bell, ChevronDown, LogOut, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { SignOutDialog } from '@/components/sign-out-dialog';
 import classes from './nav-user.module.css';
@@ -78,8 +78,8 @@ export function NavUser({ user, compact = false }: NavUserProps) {
             Account
           </Menu.Item>
 
-          <Menu.Item component={Link} to="/settings" leftSection={<CreditCard size={14} />}>
-            Billing
+          <Menu.Item component={Link} to="/settings" leftSection={<UserRound size={14} />}>
+            Profile
           </Menu.Item>
 
           <Menu.Item component={Link} to="/settings/notifications" leftSection={<Bell size={14} />}>
