@@ -76,7 +76,17 @@ type AuthState = {
   bootstrap: () => Promise<void>;
   fetchModules: (force?: boolean) => Promise<void>;
   pendingModulesFetch: Promise<void> | null;
+  /**
+   * True once a `/auth/me` module fetch has completed this session (success OR
+   * failure). Guards against re-fetching on every navigation when the response
+   * is empty or errors — which previously caused a repeated `/identity/auth/me`
+   * call loop right after login. Reset on login/logout; `fetchModules(true)`
+   * bypasses it.
+   */
+  modulesFetched: boolean;
   setSelectedOrganisationId: (id: string | null | undefined) => void;
+  /** Merge updated profile fields into the cached current user. */
+  updateUser: (patch: Partial<AuthUser>) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -91,6 +101,7 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       selectedOrganisationId: undefined,
       pendingModulesFetch: null,
+      modulesFetched: false,
 
       login: async (username, password, remember) => {
         set({ loading: true, error: null });
@@ -127,6 +138,8 @@ export const useAuthStore = create<AuthState>()(
             set({
               modules: modulesForUser(currentUser, meResponse.data.modules),
               permissionMode: meResponse.data.permissionMode,
+              // Login already hit /auth/me — don't let bootstrap re-fetch it.
+              modulesFetched: true,
               // Sync permissions from /auth/me — the JWT token may not carry
               // the full grant (e.g. shop.pos, shop.pos.dispense, shop), so
               // the single source of truth is the /auth/me response. Spreading
@@ -147,6 +160,7 @@ export const useAuthStore = create<AuthState>()(
                 { id: 'admin', name: 'Admin Console', description: 'Administration', root: '/' },
               ]),
               permissionMode: 'org',
+              modulesFetched: true,
             });
           }
         } catch {
@@ -172,6 +186,7 @@ export const useAuthStore = create<AuthState>()(
           loading: false,
           error: null,
           pendingModulesFetch: null,
+          modulesFetched: false,
         });
       },
 
@@ -233,6 +248,7 @@ export const useAuthStore = create<AuthState>()(
           loading: false,
           error: null,
           pendingModulesFetch: null,
+          modulesFetched: false,
         });
       },
 
@@ -254,6 +270,7 @@ export const useAuthStore = create<AuthState>()(
               modules: [],
               permissionMode: 'org',
               pendingModulesFetch: null,
+              modulesFetched: false,
             });
             return;
           }
@@ -288,6 +305,7 @@ export const useAuthStore = create<AuthState>()(
                 loading: false,
                 error: null,
                 pendingModulesFetch: null,
+                modulesFetched: false,
               });
               return;
             }
@@ -302,6 +320,7 @@ export const useAuthStore = create<AuthState>()(
               modules: [],
               permissionMode: 'org',
               pendingModulesFetch: null,
+              modulesFetched: false,
             });
             return;
           }
@@ -326,7 +345,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       fetchModules: async (force = false) => {
-        if (!force && (get().modules.length > 0 || get().pendingModulesFetch)) {
+        if (
+          !force &&
+          (get().modules.length > 0 || get().pendingModulesFetch || get().modulesFetched)
+        ) {
           return get().pendingModulesFetch ?? Promise.resolve();
         }
 
@@ -350,9 +372,13 @@ export const useAuthStore = create<AuthState>()(
                 : {}),
             });
           } catch {
-            // Silently fail - modules will be empty until fetched
+            // Silently fail - modules will be empty until fetched. The
+            // `modulesFetched` latch (set below) prevents a retry storm.
           } finally {
-            set({ pendingModulesFetch: null });
+            // Mark the attempt as settled even on failure so callers
+            // (bootstrap, team switcher, module landing) do not re-request
+            // `/auth/me` on every navigation.
+            set({ pendingModulesFetch: null, modulesFetched: true });
           }
         })();
 
@@ -361,6 +387,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setSelectedOrganisationId: (id) => set({ selectedOrganisationId: id }),
+
+      updateUser: (patch) =>
+        set((state) => ({ user: state.user ? { ...state.user, ...patch } : state.user })),
     }),
     {
       name: 'rxsoft-admin-auth',
