@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { filterNavGroupsByModule, sidebarData } from './data/sidebar-data';
 import { filterNavGroupsBySearch, MenuSearch } from './menu-search';
 import { NavUser } from './nav-user';
+import { ProvisioningMarker } from './provisioning-marker';
 import classes from './app-sidebar.module.css';
 
 export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) {
@@ -74,6 +75,9 @@ export function AppSidebar({ collapsed = false }: { collapsed?: boolean } = {}) 
             </Box>
           )}
         </Box>
+
+        {/* PROVISIONING — only while the async tenant job is still running */}
+        <ProvisioningMarker collapsed={collapsed} />
 
         {/* MENU SEARCH — filters the role/module-scoped menu list */}
         {!collapsed && <MenuSearch value={menuQuery} onChange={setMenuQuery} />}

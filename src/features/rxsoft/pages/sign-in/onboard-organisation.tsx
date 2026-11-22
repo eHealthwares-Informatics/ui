@@ -10,7 +10,7 @@ import {
   Loader,
 } from '@mantine/core';
 import { Building2, User, Lock, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import z from 'zod';
 import { resolvePostLoginTarget } from '@/features/shared/module-landing/post-login-target';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
@@ -46,24 +46,51 @@ const onboardSchema = z.object({
   password: z.string().min(1, 'Please choose an admin password').max(128, 'Password is too long'),
 });
 
-// Provisioning whitelists the whole catalogue, builds the price list, stock
-// and EMR data in one call — allow up to 2 minutes for this request alone
-// (the identity client's global 10s timeout still applies everywhere else).
-const ONBOARD_TIMEOUT_MS = 120_000;
-const STAGE_ADVANCE_MS = 3_000;
+// Provisioning is asynchronous (202 + poll). The backend stage names mirror
+// identity's `PROVISION_STAGE_NAMES`; keep this list in the same order.
+const PROVISION_STAGES = [
+  'identity',
+  'emr',
+  'identity-access',
+  'backend-items',
+  'backend-config',
+  'backend-pricelist',
+  'backend-stock-locations',
+  'backend-lots',
+  'backend-balances',
+  'backend-parties',
+  'backend-pos',
+] as const;
 
-// Mirrors the actual provisioning order in identity's provision service:
-// identity org/locations → EMR departments → roles/users → rxsoft catalogue,
-// pricing, stock, parties & POS configs.
-const PROVISIONING_STAGES = [
-  'Creating your organisation & locations (identity)…',
-  'Provisioning default EMR departments…',
-  'Setting up roles, permissions & users (identity)…',
-  'Whitelisting catalogue items & building the retail price list (rxsoft)…',
-  'Preparing warehouses, stock locations & opening balances (rxsoft)…',
-  'Creating demo parties & POS configurations (rxsoft)…',
-  'Finalising your organisation…',
-];
+const STAGE_LABELS: Record<string, string> = {
+  identity: 'Creating your organisation & locations (identity)…',
+  emr: 'Provisioning EMR departments, wards & demo patients…',
+  'identity-access': 'Setting up roles, permissions & users (identity)…',
+  'backend-items': 'Whitelisting catalogue items (rxsoft)…',
+  'backend-config': 'Applying organisation configuration (rxsoft)…',
+  'backend-pricelist': 'Building the retail price list (rxsoft)…',
+  'backend-stock-locations': 'Preparing warehouses & stock locations (rxsoft)…',
+  'backend-lots': 'Creating stock lots (rxsoft)…',
+  'backend-balances': 'Preparing opening stock balances (rxsoft)…',
+  'backend-parties': 'Creating demo parties (rxsoft)…',
+  'backend-pos': 'Creating POS configurations (rxsoft)…',
+};
+
+const POLL_INTERVAL_MS = 2_000;
+const POLL_TIMEOUT_MS = 15 * 60_000;
+
+type ProvisionStatus = {
+  exists: boolean;
+  status?: 'pending' | 'running' | 'completed' | 'failed' | 'not_found';
+  stage?: string | null;
+  stages?: Array<{ name: string; status: string; count: number; error?: string }>;
+  error?: string | null;
+};
+
+type ProvisionJob = {
+  organizationCode: string;
+  status?: string;
+};
 
 const inputStyle = {
   input: {
@@ -107,18 +134,81 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [summary, setSummary] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
-  const [stage, setStage] = useState(0);
+  const [stageName, setStageName] = useState<string>('identity');
+  const [activeCode, setActiveCode] = useState<string | null>(null);
   const [alreadyProvisioned, setAlreadyProvisioned] = useState(false);
 
-  useEffect(() => {
-    if (!running) {
-      return undefined;
+  const sleep = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+  /**
+   * Poll the durable provisioning job until it completes/fails. The backend
+   * runs the heavy catalogue writes in the background with per-stage cursors,
+   * so this request is short and safe behind the gateway timeout.
+   */
+  const waitForProvisioning = async (orgCode: string): Promise<boolean> => {
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+      try {
+        const { data } = await identityApi.get<ProvisionStatus>(
+          `/provision/status/${encodeURIComponent(orgCode)}`
+        );
+        if (data.stage) {
+          setStageName(data.stage);
+        }
+        if (data.status === 'completed') {
+          return true;
+        }
+        if (data.status === 'failed' || data.status === 'not_found') {
+          setError(data.error || 'Organisation provisioning failed. Please retry.');
+          return false;
+        }
+      } catch {
+        // Transient poll failure — keep trying until the deadline.
+      }
+      await sleep(POLL_INTERVAL_MS);
     }
-    const timer = window.setInterval(() => {
-      setStage((current) => Math.min(current + 1, PROVISIONING_STAGES.length - 1));
-    }, STAGE_ADVANCE_MS);
-    return () => window.clearInterval(timer);
-  }, [running]);
+    setError(
+      'Provisioning is taking longer than expected. You can retry without re-entering your details.'
+    );
+    return false;
+  };
+
+  const finishAndRedirect = async (email: string, pwd: string) => {
+    await login(email, pwd);
+    if (!useAuthStore.getState().user) {
+      setError('Organisation created — please sign in with your new credentials.');
+      onBack(email);
+      return;
+    }
+    const authState = useAuthStore.getState();
+    // Same post-login landing rule as the sign-in form: a single module goes
+    // straight to its dashboard, otherwise the module chooser.
+    window.location.href = resolvePostLoginTarget(
+      undefined,
+      authState.modules.map((m) => m.id)
+    );
+  };
+
+  const retryProvisioning = async () => {
+    if (!activeCode) {
+      return;
+    }
+    setRunning(true);
+    setError(null);
+    setSummary(null);
+    try {
+      await identityApi.post(`/provision/${encodeURIComponent(activeCode)}/resume`);
+      const completed = await waitForProvisioning(activeCode);
+      if (!completed) {
+        return;
+      }
+      await finishAndRedirect(ownerEmail.trim().toLowerCase(), password);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setRunning(false);
+    }
+  };
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -149,32 +239,23 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
       ownerEmail: email,
     };
 
-    setStage(0);
+    setStageName('identity');
+    setActiveCode(null);
     setRunning(true);
     try {
-      await identityApi.post('/auth/onboard-organization', payload, {
-        timeout: ONBOARD_TIMEOUT_MS,
-      });
-      await login(email, password);
-      if (!useAuthStore.getState().user) {
-        setError('Organisation created — please sign in with your new credentials.');
-        onBack(email);
+      const { data } = await identityApi.post<ProvisionJob>('/auth/onboard-organization', payload);
+      const orgCode = data.organizationCode ?? payload.code;
+      setActiveCode(orgCode);
+
+      const completed = await waitForProvisioning(orgCode);
+      if (!completed) {
         return;
       }
-      const authState = useAuthStore.getState();
-      // Same post-login landing rule as the sign-in form: a single module goes
-      // straight to its dashboard, otherwise the module chooser. Module `root`
-      // values from /auth/me are frontend paths (identity and the frontend are
-      // kept in sync by scripts/check-provision-drift.mjs).
-      const targetUrl = resolvePostLoginTarget(
-        undefined,
-        authState.modules.map((m) => m.id)
-      );
-      window.location.href = targetUrl;
+      await finishAndRedirect(email, password);
     } catch (err: any) {
       if (err?.response?.status === 409) {
-        // Organisation code (or owner email) already provisioned — move to the
-        // sign-in step instead of surfacing an error.
+        // Organisation already fully provisioned — move to the sign-in step
+        // instead of surfacing an error.
         setAlreadyProvisioned(true);
         return;
       }
@@ -183,6 +264,10 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
       setRunning(false);
     }
   };
+
+  const stageIndex = Math.max(0, PROVISION_STAGES.indexOf(stageName as never));
+  const stageLabel = STAGE_LABELS[stageName] ?? 'Provisioning your organisation…';
+  const progressValue = ((stageIndex + 1) / PROVISION_STAGES.length) * 100;
 
   if (alreadyProvisioned) {
     return (
@@ -319,6 +404,18 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
           </Text>
         )}
 
+        {error && activeCode && !running && (
+          <Button
+            variant="light"
+            color="teal"
+            fullWidth
+            data-testid="onboard-org-retry"
+            onClick={() => void retryProvisioning()}
+          >
+            Retry provisioning
+          </Button>
+        )}
+
         <Button
           type="submit"
           loading={running}
@@ -342,11 +439,11 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
             <Group gap="xs">
               <Loader size="xs" color="#10B981" />
               <Text size="sm" fw={500} style={{ color: '#0F172A' }} data-testid="onboard-org-stage">
-                {PROVISIONING_STAGES[stage]}
+                {stageLabel}
               </Text>
             </Group>
             <Progress
-              value={((stage + 1) / PROVISIONING_STAGES.length) * 100}
+              value={progressValue}
               animated
               striped
               color="#10B981"
@@ -354,8 +451,8 @@ export function OnboardOrganisation({ onBack }: { onBack: (prefillUsername?: str
               radius="sm"
             />
             <Text size="xs" style={{ color: '#9CA3AF' }}>
-              Provisioning runs across the identity, rxsoft and EMR backends. This can take up to 2
-              minutes — please keep this tab open.
+              Provisioning runs in the background across the identity, rxsoft and EMR backends. You
+              can safely leave this tab — progress is saved and can be resumed.
             </Text>
           </Stack>
         )}
