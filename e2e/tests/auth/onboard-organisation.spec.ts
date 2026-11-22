@@ -154,6 +154,9 @@ test.describe('onboard organisation', () => {
     expect(statusRes.ok, 'provision status should be readable').toBe(true);
     const status = (await statusRes.json()) as {
       exists: boolean;
+      status?: 'pending' | 'running' | 'completed' | 'failed';
+      stage?: string | null;
+      stages?: Array<{ name: string; status: string }>;
       counts?: {
         identity: Record<string, number>;
         backend: Record<string, number>;
@@ -161,6 +164,10 @@ test.describe('onboard organisation', () => {
       };
     };
     expect(status.exists).toBe(true);
+    // Async contract: the UI only redirects after the job reports completed.
+    expect(status.status).toBe('completed');
+    expect(Array.isArray(status.stages) && status.stages.length > 0).toBe(true);
+    expect(status.stages?.every((stage) => stage.status === 'completed')).toBe(true);
     const counts = status.counts!;
     expect(counts, 'status must include provisioned row counts').toBeTruthy();
 
