@@ -114,6 +114,24 @@ export function useChatSocket(input: {
       queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
       onConversationCreatedRef.current?.(payload.newConversationId);
     };
+    // The exchange layer backfilled a pending-<participantId> thread into the
+    // real conversation and notified this participant directly (the webhook
+    // only ever echoed the pending id). Same outcome as conversation.created:
+    // drop pending orphans, refresh the inbox and select the real id.
+    const onAdopted = (payload: { pendingConversationId?: string; conversationId?: string }) => {
+      const newId = payload?.conversationId;
+      if (!newId || newId.startsWith('pending-')) {
+        return;
+      }
+      setPendingMessages([]);
+      if (payload?.pendingConversationId) {
+        queryClient.invalidateQueries({
+          queryKey: chatKeys.pending(payload.pendingConversationId),
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ['conversation-inbox'] });
+      onConversationCreatedRef.current?.(newId);
+    };
     const onUpdated = (payload?: { conversationId?: string }) => {
       if (payload?.conversationId?.startsWith('pending-')) {
         // No real conversation exists yet; keep the compose thread fresh by
@@ -155,6 +173,7 @@ export function useChatSocket(input: {
     socket.on('conversation.message.created', onMessage);
     socket.on('conversation.message.orphan', onOrphan);
     socket.on('conversation.created', onCreated);
+    socket.on('conversation.adopted', onAdopted);
     socket.on('conversation.updated', onUpdated);
     socket.on('conversation.read', onRead);
     socket.on('typing.started', onTypingStarted);
@@ -168,6 +187,7 @@ export function useChatSocket(input: {
       socket.off('conversation.message.created', onMessage);
       socket.off('conversation.message.orphan', onOrphan);
       socket.off('conversation.created', onCreated);
+      socket.off('conversation.adopted', onAdopted);
       socket.off('conversation.updated', onUpdated);
       socket.off('conversation.read', onRead);
       socket.off('typing.started', onTypingStarted);

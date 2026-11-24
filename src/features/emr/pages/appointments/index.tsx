@@ -2,6 +2,7 @@ import { Group, Modal } from '@mantine/core';
 import { useMemo } from 'react';
 import { DataPageShell } from '@/components/page/data-page-shell';
 import { AppointmentRowActions } from '../../components/appointments/appointment-actions';
+import { AppointmentCallButton } from '../../components/appointments/appointment-call-button';
 import { AppointmentForm } from '../../components/appointments/appointment-form';
 import { BeginVisitButton } from '../../components/appointments/begin-visit-button';
 import { PrintAppointmentButton } from '../../components/appointments/print-appointment';
@@ -23,6 +24,12 @@ export function AppointmentsPage() {
           label: '',
           render: (row: Record<string, unknown>) => (
             <Group gap={4} wrap="nowrap">
+              {(row.status === 'SCHEDULED' || row.status === 'CHECKED_IN') && (
+                <AppointmentCallButton
+                  patientMrn={String(row.patientId ?? '')}
+                  conversationId={(row as { conversationId?: string | null }).conversationId}
+                />
+              )}
               {row.status === 'SCHEDULED' && <BeginVisitButton appointmentId={String(row.id)} />}
               <PrintAppointmentButton appointmentId={String(row.id)} />
               <AppointmentRowActions row={row} />

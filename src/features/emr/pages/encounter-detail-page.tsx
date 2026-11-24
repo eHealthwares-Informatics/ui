@@ -16,9 +16,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { AlertCircle, FileText, Share2, Stethoscope } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { RxPage } from '@/components/page/rx-page';
+import { CallPanel } from '@/components/rtc/call-panel';
 import { emrApi } from '@/lib/emr-api';
 import {
   DocumentationModal,
@@ -125,6 +126,35 @@ export function EncounterDetailPage() {
 
   const encounter = encounterQuery.data;
   const patientQuery = usePatientByMrn(encounter?.patientId);
+
+  // Resolve the teleconsultation room for this encounter. The room id is the
+  // appointment's conversation id (the room the patient joins from chat), with
+  // a phone-derived fallback for appointments booked before that link existed.
+  const appointmentsQuery = useQuery({
+    queryKey: ['emr', 'appointments', 'patient', encounter?.patientId],
+    queryFn: async () => {
+      const { data } = await emrApi.get<{ data: Array<Record<string, unknown>> }>('/appointments', {
+        params: { patientId: encounter!.patientId, limit: 50 },
+      });
+      return data.data ?? [];
+    },
+    enabled: Boolean(encounter?.patientId),
+  });
+
+  const callRoomId = useMemo(() => {
+    const withConversation = (appointmentsQuery.data ?? []).filter((row) =>
+      Boolean(row.conversationId)
+    );
+    const matched = encounter?.visitId
+      ? withConversation.find((row) => String(row.visitId ?? '') === String(encounter.visitId))
+      : undefined;
+    const conversationId = (matched ?? withConversation[0])?.conversationId;
+    if (typeof conversationId === 'string' && conversationId) {
+      return conversationId;
+    }
+    const digits = (patientQuery.data?.phone ?? '').replace(/\D/g, '');
+    return digits.length >= 7 ? `appt-${digits}` : null;
+  }, [appointmentsQuery.data, encounter?.visitId, patientQuery.data?.phone]);
 
   const visitQuery = useQuery({
     queryKey: ['emr', 'visits', encounter?.visitId],
@@ -301,6 +331,7 @@ export function EncounterDetailPage() {
             {(submissionsQuery.data?.length ?? 0) + (patientVitalsQuery.data?.length ?? 0)})
           </Tabs.Tab>
           <Tabs.Tab value="requests">Requests ({requestsQuery.data?.length ?? 0})</Tabs.Tab>
+          <Tabs.Tab value="video">Video</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="details">
@@ -396,6 +427,13 @@ export function EncounterDetailPage() {
               isLoading={requestsQuery.isLoading}
             />
           </Card>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="video">
+          <CallPanel
+            callId={callRoomId}
+            description="Join the consultation room for this encounter to see and hear the patient."
+          />
         </Tabs.Panel>
       </Tabs>
 

@@ -9,6 +9,7 @@ import {
   fetchAssistantThread,
   readStoredConversationId,
   sendAssistantMessage,
+  sendCallControl,
   startPatientEnquiry,
   storeConversationId,
   type AssistantIdentity,
@@ -44,6 +45,7 @@ export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInp
   );
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [sending, setSending] = useState(false);
+  const [calling, setCalling] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [connected, setConnected] = useState(false);
   const [started, setStarted] = useState(false);
@@ -219,6 +221,22 @@ export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInp
     [identity, loadThread, patientMrn, pollForReply, setConversationId, started]
   );
 
+  // Clinician trigger for the `call.connect` control on the open conversation.
+  const startCall = useCallback(async () => {
+    const id = conversationIdRef.current;
+    if (!id || id.startsWith('pending-')) return;
+    setError(null);
+    setCalling(true);
+    try {
+      await sendCallControl(id);
+      await loadThread(id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to start the call.');
+    } finally {
+      setCalling(false);
+    }
+  }, [loadThread]);
+
   const reset = useCallback(() => {
     stopPolling();
     setConversationId(null);
@@ -259,6 +277,20 @@ export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInp
       });
     });
     socket.on('conversation.ended', () => setEnded(true));
+    // Exchange-layer adoption: the pending thread was backfilled into a real
+    // conversation and this participant was told directly (the webhook only
+    // echoed the pending id). Follow the real id and reload its thread.
+    socket.on(
+      'conversation.adopted',
+      (payload: { pendingConversationId?: string; conversationId?: string }) => {
+        const next = payload?.conversationId;
+        if (!next || next.startsWith('pending-')) return;
+        const pending = payload?.pendingConversationId;
+        if (!pending || pending !== conversationIdRef.current) return;
+        setConversationId(next);
+        void loadThread(next);
+      }
+    );
 
     return () => {
       socket.removeAllListeners();
@@ -314,7 +346,9 @@ export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInp
     error,
     started,
     conversationId,
+    calling,
     send,
+    startCall,
     start,
     reset,
   };

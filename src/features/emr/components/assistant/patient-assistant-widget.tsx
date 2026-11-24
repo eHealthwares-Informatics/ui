@@ -12,8 +12,10 @@ import {
   Textarea,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { AlertCircle, Bot, MessageSquare, RotateCcw, Send } from 'lucide-react';
+import { AlertCircle, Bot, MessageSquare, RotateCcw, Send, Video } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { CallControlButton } from '@/components/rtc/call-button';
+import type { ChatControl } from '@/lib/rtc/call-client';
 import { usePatientAssistant } from './use-patient-assistant';
 
 type PatientAssistantWidgetProps = {
@@ -27,10 +29,12 @@ function MessageBubble({
   role,
   text,
   optimistic,
+  control,
 }: {
   role: 'user' | 'bot';
   text: string;
   optimistic?: boolean;
+  control?: ChatControl;
 }) {
   const isUser = role === 'user';
   return (
@@ -48,6 +52,7 @@ function MessageBubble({
         <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
           {text}
         </Text>
+        {control && <CallControlButton control={control} />}
       </Box>
     </Group>
   );
@@ -57,12 +62,22 @@ export function PatientAssistantWidget({ patient }: PatientAssistantWidgetProps)
   const [opened, { open, close }] = useDisclosure(false);
   const [draft, setDraft] = useState('');
   const viewportRef = useRef<HTMLDivElement>(null);
-  const { messages, sending, thinking, connected, ended, error, send, reset } = usePatientAssistant(
-    {
-      patientMrn: patient.patientId,
-      open: opened,
-    }
-  );
+  const {
+    messages,
+    sending,
+    thinking,
+    connected,
+    ended,
+    error,
+    conversationId,
+    calling,
+    send,
+    startCall,
+    reset,
+  } = usePatientAssistant({
+    patientMrn: patient.patientId,
+    open: opened,
+  });
 
   useEffect(() => {
     if (!viewportRef.current) return;
@@ -115,10 +130,20 @@ export function PatientAssistantWidget({ patient }: PatientAssistantWidgetProps)
             <Text size="sm" fw={600}>
               {patient.fullName}
             </Text>
-            <Group gap={6}>
+            <Group gap={6} wrap="nowrap">
               <Text size="xs" c="dimmed">
                 {connected ? 'Online' : 'Connecting…'}
               </Text>
+              <Button
+                size="compact-xs"
+                variant="light"
+                leftSection={<Video size={13} />}
+                loading={calling}
+                disabled={!conversationId || conversationId.startsWith('pending-')}
+                onClick={() => void startCall()}
+              >
+                Video call
+              </Button>
               <ActionIcon
                 size="sm"
                 variant="subtle"
@@ -150,6 +175,7 @@ export function PatientAssistantWidget({ patient }: PatientAssistantWidgetProps)
                   role={message.role}
                   text={message.text}
                   optimistic={message.optimistic}
+                  control={message.control}
                 />
               ))}
               {thinking && (

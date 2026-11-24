@@ -93,6 +93,9 @@ export function AccordionArrayField({
       ) : (
         <Accordion>
           {items.map((item, itemIndex) => {
+            // A relation that failed to resolve arrives as `null`. Skip it so a
+            // single dangling reference cannot blank the whole form.
+            if (!item) return null;
             const label = field.itemRender
               ? field.itemRender(item)
               : (item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex));
@@ -255,6 +258,9 @@ export function JsonAccordionArrayField({ field, items, onChange }: AccordionArr
       ) : (
         <Accordion>
           {items.map((item, itemIndex) => {
+            // A relation that failed to resolve arrives as `null`. Skip it so a
+            // single dangling reference cannot blank the whole form.
+            if (!item) return null;
             const label = field.itemRender
               ? field.itemRender(item)
               : (item[field.itemLabelKey ?? 'name'] ?? String(item.id ?? itemIndex));
