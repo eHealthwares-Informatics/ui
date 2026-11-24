@@ -618,6 +618,22 @@ export function useShopChatThread(input: {
     socket.on('conversation.message.orphan', handleMessage);
     socket.on('conversation.message.created', handleMessage);
     socket.on('conversation.created', handleCreated);
+    // Exchange-layer adoption: the pending thread was backfilled into a real
+    // conversation and this participant was told directly. Normalise it into
+    // the same handler so the widget follows the real id.
+    const handleAdopted = (payload: {
+      pendingConversationId?: string;
+      conversationId?: string;
+    }) => {
+      const newConversationId = payload?.conversationId;
+      if (!newConversationId || newConversationId.startsWith('pending-')) return;
+      handleCreated({
+        oldConversationId: payload?.pendingConversationId,
+        newConversationId,
+        participantId: participantId ?? undefined,
+      });
+    };
+    socket.on('conversation.adopted', handleAdopted);
     socket.on('conversation.ended', handleEnded);
 
     setConnected(socket.connected);
@@ -628,6 +644,7 @@ export function useShopChatThread(input: {
       socket.off('conversation.message.orphan', handleMessage);
       socket.off('conversation.message.created', handleMessage);
       socket.off('conversation.created', handleCreated);
+      socket.off('conversation.adopted', handleAdopted);
       socket.off('conversation.ended', handleEnded);
     };
   }, [enabled, senderPhone, guest, participantId, queryClient, openConversation]);

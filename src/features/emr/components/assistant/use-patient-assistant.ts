@@ -277,6 +277,20 @@ export function usePatientAssistant({ patientMrn, open }: UsePatientAssistantInp
       });
     });
     socket.on('conversation.ended', () => setEnded(true));
+    // Exchange-layer adoption: the pending thread was backfilled into a real
+    // conversation and this participant was told directly (the webhook only
+    // echoed the pending id). Follow the real id and reload its thread.
+    socket.on(
+      'conversation.adopted',
+      (payload: { pendingConversationId?: string; conversationId?: string }) => {
+        const next = payload?.conversationId;
+        if (!next || next.startsWith('pending-')) return;
+        const pending = payload?.pendingConversationId;
+        if (!pending || pending !== conversationIdRef.current) return;
+        setConversationId(next);
+        void loadThread(next);
+      }
+    );
 
     return () => {
       socket.removeAllListeners();
