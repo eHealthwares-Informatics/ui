@@ -79,3 +79,23 @@ h6 {
 :focus-visible {
   outline-color: var(--app-blue);
 }
+
+/* Validation highlight — applied by components/form/submit.ts to the invalid
+   field wrapper and its inner control after a failed submit. */
+.rx-field-invalid {
+  outline: 2px solid var(--mantine-color-red-5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.rx-field-invalid input,
+.rx-field-invalid textarea,
+.rx-field-invalid select,
+.rx-field-invalid [role='combobox'],
+input.rx-field-invalid,
+textarea.rx-field-invalid,
+select.rx-field-invalid,
+[role='combobox'].rx-field-invalid {
+  border-color: var(--mantine-color-red-6) !important;
+  box-shadow: 0 0 0 1px var(--mantine-color-red-6);
+}

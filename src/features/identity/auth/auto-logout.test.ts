@@ -15,17 +15,18 @@ describe('computeSessionDelay', () => {
     expect(computeSessionDelay(expiry, now)).toBe(15 * 60 * 1000);
   });
 
-  it('logs out at the shorter of the inactivity window and long token TTLs', () => {
-    // A long per-user timeout still respects the inactivity cap.
+  // The per-user "Login Timeout" in identity is authoritative. Clamping it to a
+  // 30-minute inactivity window is what made a long timeout look ignored.
+  it('honours a long per-user timeout instead of clamping it to 30 minutes', () => {
     const now = 1_000_000_000;
     const expiry = now + 480 * 60 * 1000;
-    expect(computeSessionDelay(expiry, now)).toBe(FALLBACK_INACTIVITY_TIMEOUT);
+    expect(computeSessionDelay(expiry, now)).toBe(480 * 60 * 1000);
   });
 
-  it('prefers the token expiry when it is shorter than the inactivity window', () => {
+  it('honours a multi-day session', () => {
     const now = 1_000_000_000;
-    const expiry = now + 10 * 60 * 1000;
-    expect(computeSessionDelay(expiry, now)).toBe(10 * 60 * 1000);
+    const expiry = now + 7 * 24 * 60 * 60 * 1000;
+    expect(computeSessionDelay(expiry, now)).toBe(7 * 24 * 60 * 60 * 1000);
   });
 
   it('never schedules a logout sooner than the minimum grace period', () => {

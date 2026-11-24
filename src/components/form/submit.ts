@@ -25,6 +25,47 @@ export type BuiltSchema = {
 const MULTI_SELECT_TYPES = new Set(['multi-async-select', 'multi-pick', 'permission-picker']);
 
 /**
+ * Field types whose value is a structured object/array rather than a primitive.
+ * These must validate as `z.any()` — falling through to the string branch made
+ * Zod reject perfectly valid values ("expected string, received array/object"),
+ * e.g. a questionnaire's `questions` (accordion-array) and `workflowId`
+ * (accordion object) on the edit form.
+ */
+const STRUCTURED_TYPES = new Set([
+  'async-select',
+  'autocomplete',
+  'select',
+  'remote-select',
+  'multi-async-select',
+  'multi-pick',
+  'permission-picker',
+  'json',
+  'accordion',
+  'accordion-array',
+  'json-accordion-array',
+  'daterange',
+  'multi-check',
+  'multi-image',
+  'image',
+]);
+
+/**
+ * Structured types whose value is an ARRAY of arbitrary entries (not option
+ * objects). Required means "at least one entry" — the object `value` check used
+ * for selects cannot pass for arrays.
+ */
+const ARRAY_VALUE_TYPES = new Set([
+  'multi-async-select',
+  'multi-pick',
+  'permission-picker',
+  'accordion-array',
+  'json-accordion-array',
+  'daterange',
+  'multi-check',
+  'multi-image',
+]);
+
+/**
  * A selected multi-select entry is usable when it is a non-empty string
  * (role/category code) or an option object carrying a value/id/code —
  * mirroring extractOptionId in payload-utils.
@@ -37,6 +78,38 @@ function hasUsableOptionValue(entry: unknown): boolean {
     return value !== undefined && value !== null && String(value).length > 0;
   }
   return false;
+}
+
+/** Field name → human label, for turning raw Zod messages into readable ones. */
+function labelMapFor(fields: Field[]): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const field of fields) {
+    map.set(field.name, field.label);
+  }
+  return map;
+}
+
+type ValidationIssue = { path: (string | number)[]; message: string; code?: string };
+
+/**
+ * Message shown to the user for one Zod issue. Raw type errors
+ * ("Invalid input: expected string, received array") are replaced with the
+ * field label; custom messages that already name the field are kept as-is.
+ */
+function messageForIssue(issue: ValidationIssue, labels: Map<string, string>): string {
+  const root = String(issue.path[0] ?? '');
+  const label = labels.get(root) ?? root;
+  if (issue.code === 'invalid_type') {
+    return label ? `${label} is invalid` : 'Invalid value';
+  }
+  const message = (issue.message ?? '').trim();
+  if (!message) {
+    return label ? `${label} is invalid` : 'Invalid value';
+  }
+  if (label && !message.toLowerCase().includes(label.toLowerCase())) {
+    return `${label}: ${message}`;
+  }
+  return message;
 }
 
 /**
@@ -89,10 +162,15 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       case 'multi-async-select':
       case 'multi-pick':
       case 'permission-picker':
-        typeSchema = z.any(); // object/option type
-        break;
       case 'json':
-        typeSchema = z.any();
+      case 'accordion':
+      case 'accordion-array':
+      case 'json-accordion-array':
+      case 'daterange':
+      case 'multi-check':
+      case 'multi-image':
+      case 'image':
+        typeSchema = z.any(); // object/option/array type
         break;
       case 'email': {
         const emailSchema = z.string().email('Invalid email address');
@@ -152,15 +230,17 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
           return entries.length > 0 && entries.every(hasUsableOptionValue);
         }, `${field.label} is required`);
       } else if (
-        field.type === 'async-select' ||
-        field.type === 'autocomplete' ||
-        field.type === 'select' ||
-        field.type === 'remote-select' ||
-        field.type === 'multi-async-select' ||
-        field.type === 'multi-pick' ||
-        field.type === 'permission-picker' ||
-        field.type === 'json'
+        field.type &&
+        ARRAY_VALUE_TYPES.has(field.type) &&
+        !MULTI_SELECT_TYPES.has(field.type)
       ) {
+        // Array-valued fields hold arbitrary entries (e.g. question objects),
+        // so "required" means at least one entry — not a selectable option.
+        typeSchema = z.any().refine((v) => {
+          if (Array.isArray(v)) return v.length > 0;
+          return v !== null && v !== undefined && v !== '';
+        }, `${field.label} is required`);
+      } else if (field.type && STRUCTURED_TYPES.has(field.type)) {
         typeSchema = z
           .any()
           .refine(
@@ -179,15 +259,7 @@ export function buildZodSchema(fields: Field[]): BuiltSchema {
       // number / string / email already carry a friendly required refine.
     } else {
       // Optional fields can be null/undefined
-      if (
-        field.type === 'async-select' ||
-        field.type === 'autocomplete' ||
-        field.type === 'select' ||
-        field.type === 'remote-select' ||
-        field.type === 'multi-async-select' ||
-        field.type === 'multi-pick' ||
-        field.type === 'json'
-      ) {
+      if (field.type && STRUCTURED_TYPES.has(field.type)) {
         typeSchema = z.any().nullable().optional();
       } else if (field.type === 'number') {
         typeSchema = (typeSchema as z.ZodNumber).optional().nullable();
@@ -226,6 +298,7 @@ export function validateFields(
   data: Record<string, unknown>
 ): Record<string, string> {
   const { schema, fieldRules } = buildZodSchema(fields);
+  const labels = labelMapFor(fields);
   const errors: Record<string, string> = {};
 
   const result = schema.safeParse(data);
@@ -233,7 +306,7 @@ export function validateFields(
     for (const issue of result.error.issues) {
       const path = issue.path.join('.');
       if (!errors[path]) {
-        errors[path] = issue.message;
+        errors[path] = messageForIssue(issue as ValidationIssue, labels);
       }
     }
   }
@@ -248,8 +321,26 @@ export function validateFields(
   return errors;
 }
 
+/** Escape text used inside the summary's innerHTML. */
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      default:
+        return '&#39;';
+    }
+  });
+}
+
 /**
- * Clear all rendered validation error markers (per-field + summary + aria-invalid).
+ * Clear all rendered validation error markers (per-field + summary + highlight).
  */
 export function clearValidationErrors(): void {
   const existingSummary = document.querySelector('[data-testid="form-error-summary"]');
@@ -257,6 +348,11 @@ export function clearValidationErrors(): void {
   document.querySelectorAll('[data-testid^="field-error-"]').forEach((el) => {
     el.textContent = '';
     (el as HTMLElement).style.display = 'none';
+  });
+  // Error spans we created for field types that don't render their own.
+  document.querySelectorAll('[data-validation-error="true"]').forEach((el) => el.remove());
+  document.querySelectorAll('.rx-field-invalid').forEach((el) => {
+    el.classList.remove('rx-field-invalid');
   });
   // aria-invalid may sit on field-<name> (text inputs) or async-select-<name>
   // (async-selects carry their testid on the Mantine InputBase input itself).
@@ -270,29 +366,54 @@ export function clearValidationErrors(): void {
 /**
  * Render a field->message error map into the DOM:
  * per-field `field-error-<name>` spans, a `form-error-summary` alert,
- * aria-invalid on fields, focus on the first invalid field.
+ * aria-invalid + `rx-field-invalid` highlight on the invalid field, focus on
+ * the first invalid field. Nested paths (e.g. `questions.3.text`) are applied
+ * to their root field (`questions`) so the message/highlight is always visible.
  */
 export function renderValidationErrors(errors: Record<string, string>): void {
   clearValidationErrors();
 
+  const formEl = document.querySelector('[data-testid="modal-form"], .rx-page-form');
+
   for (const [name, message] of Object.entries(errors)) {
-    const errorEl = document.querySelector(`[data-testid="field-error-${name}"]`);
-    if (errorEl) {
-      errorEl.textContent = message;
-      (errorEl as HTMLElement).style.display = 'block';
+    const root = name.split('.')[0];
+
+    // Error text: reuse the field's own span, or create one for field types
+    // (accordion/accordion-array/json-accordion-array…) that render none.
+    let errorEl = document.querySelector(
+      `[data-testid="field-error-${root}"]`
+    ) as HTMLElement | null;
+    if (!errorEl) {
+      errorEl = document.createElement('span');
+      errorEl.setAttribute('data-testid', `field-error-${root}`);
+      errorEl.setAttribute('data-validation-error', 'true');
+      errorEl.setAttribute('role', 'alert');
+      errorEl.style.cssText =
+        'color: var(--mantine-color-red-6); font-size: var(--mantine-font-size-xs); display:block; margin-top:4px;';
+      const host = document.querySelector(`[data-testid="field-${root}"]`) as HTMLElement | null;
+      (host?.parentElement ?? host ?? formEl)?.appendChild(errorEl);
     }
-    // Text inputs: testid field-<name> sits on the <input> itself.
-    // Async-selects: LabelField drops data-testid, so the control's testid
-    // is async-select-<name> (Mantine InputBase → the <input> element).
-    const fieldEl =
-      document.querySelector(`[data-testid="field-${name}"]`) ??
-      document.querySelector(`[data-testid="async-select-${name}"]`);
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+
+    // Highlight the field wrapper AND its inner control (border turns red via
+    // the .rx-field-invalid class in global.css).
+    const fieldEl = document.querySelector(
+      `[data-testid="field-${root}"], [data-testid="async-select-${root}"]`
+    ) as HTMLElement | null;
     if (fieldEl) {
       fieldEl.setAttribute('aria-invalid', 'true');
+      fieldEl.classList.add('rx-field-invalid');
+      const control = fieldEl.querySelector(
+        'input, textarea, select, [role="combobox"], button'
+      ) as HTMLElement | null;
+      if (control) {
+        control.setAttribute('aria-invalid', 'true');
+        control.classList.add('rx-field-invalid');
+      }
     }
   }
 
-  const formEl = document.querySelector('[data-testid="modal-form"], .rx-page-form');
   if (formEl) {
     const summary = document.createElement('div');
     summary.setAttribute('data-testid', 'form-error-summary');
@@ -303,19 +424,20 @@ export function renderValidationErrors(errors: Record<string, string>): void {
       errors
     )
       .slice(0, 5)
-      .map(([name, msg]) => `<li>${msg}</li>`)
+      .map(([, msg]) => `<li>${escapeHtml(msg)}</li>`)
       .join('')}</ul>`;
     formEl.prepend(summary);
   }
 
-  const firstErrorField = Object.keys(errors)[0];
-  if (firstErrorField) {
+  const firstErrorRoot = Object.keys(errors)[0]?.split('.')[0];
+  if (firstErrorRoot) {
     const firstField = document.querySelector(
-      `[data-testid="field-${firstErrorField}"], [data-testid="async-select-${firstErrorField}"]`
+      `[data-testid="field-${firstErrorRoot}"], [data-testid="async-select-${firstErrorRoot}"]`
     ) as HTMLElement | null;
-    if (firstField) {
-      firstField.focus();
-    }
+    const control = firstField?.querySelector(
+      'input, textarea, select, [role="combobox"], button'
+    ) as HTMLElement | null;
+    (control ?? firstField)?.focus?.();
   }
 }
 
@@ -382,12 +504,13 @@ export function useValidatedSubmit({
     const result = refinedSchema.safeParse(currentFormState);
 
     if (!result.success) {
+      const labels = labelMapFor(fields);
       const errors: Record<string, string> = {};
       for (const issue of result.error.issues) {
         const path = issue.path.join('.');
         // Only store the first error per field
         if (!errors[path]) {
-          errors[path] = issue.message;
+          errors[path] = messageForIssue(issue as ValidationIssue, labels);
         }
       }
       renderValidationErrors(errors);

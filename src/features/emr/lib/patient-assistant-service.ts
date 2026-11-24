@@ -1,6 +1,7 @@
 import { io, type Socket } from 'socket.io-client';
 import { getAccessToken } from '@/lib/auth-tokens';
 import { conversationApi, CONVERSATION_API_BASE_URL } from '@/lib/conversation-api';
+import type { ChatControl } from '@/lib/rtc/call-client';
 
 export const EMR_ASSISTANT_CHANNEL_CODE = 'EMR_WEBCHAT';
 
@@ -16,6 +17,8 @@ export type AssistantMessage = {
   text: string;
   createdAt: string;
   optimistic?: boolean;
+  /** Actionable control (e.g. `call.connect`) carried by this message. */
+  control?: ChatControl;
 };
 
 type RawExchange = {
@@ -23,6 +26,7 @@ type RawExchange = {
   direction: 'inbound' | 'outbound';
   text: string;
   createdAt: string;
+  control?: ChatControl;
 };
 
 type ThreadPage = { items: RawExchange[]; nextCursor?: string };
@@ -98,6 +102,16 @@ export async function sendAssistantMessage(input: {
   return response.data ?? {};
 }
 
+/**
+ * Sends a `call.connect` control to the conversation: the patient sees a
+ * "Connect call" button for the room `call:<conversationId>`.
+ */
+export async function sendCallControl(conversationId: string): Promise<void> {
+  await conversationApi.post(`/conversations/${conversationId}/controls`, {
+    type: 'call.connect',
+  });
+}
+
 export async function fetchAssistantThread(conversationId: string): Promise<AssistantMessage[]> {
   const response = await conversationApi.get<ThreadPage>('/exchanges', {
     params: { conversationId, limit: 50 },
@@ -111,6 +125,7 @@ export async function fetchAssistantThread(conversationId: string): Promise<Assi
         role: item.direction === 'inbound' ? 'user' : 'bot',
         text: item.text,
         createdAt: item.createdAt,
+        ...(item.control ? { control: item.control } : {}),
       })
     )
     .sort(

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Healthcare Harnesses Will Matter — eHealthwares</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#f5f2ed;
+  --bg-warm:#ede8e0;
+  --bg-card:#ffffff;
+  --accent:#0d5c4a;
+  --accent-light:#1a8a6e;
+  --accent-glow:rgba(13,92,74,0.06);
+  --coral:#d4644a;
+  --coral-soft:rgba(212,100,74,0.08);
+  --text-primary:#1a1f1d;
+  --text-secondary:#4a5a55;
+  --text-muted:#8a9a95;
+  --border:#d5cfc6;
+  --border-light:#e5e0d8;
+  --serif:'Instrument Serif',serif;
+  --sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--bg);color:var(--text-primary);
+  font-family:var(--sans);line-height:1.78;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(13,92,74,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 90%, rgba(212,100,74,0.03) 0%, transparent 50%);
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.15rem 3rem;
+  background:rgba(245,242,237,0.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border-light);
+}
+.nav-logo{
+  font-family:var(--serif);font-size:1.25rem;
+  color:var(--accent);text-decoration:none;letter-spacing:-0.01em;
+}
+.nav-logo span{color:var(--text-muted);font-family:var(--sans);font-size:0.85rem;font-weight:400;}
+.nav-links{display:flex;gap:2.25rem;list-style:none;}
+.nav-links a{
+  color:var(--text-secondary);text-decoration:none;font-size:0.82rem;
+  letter-spacing:0.07em;text-transform:uppercase;font-weight:500;
+  transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--accent);}
+.nav-cta{
+  padding:0.6rem 1.5rem;background:var(--accent);color:#fff;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  border:none;cursor:pointer;text-decoration:none;
+  transition:all 0.3s ease;
+}
+.nav-cta:hover{background:var(--text-primary);letter-spacing:0.14em;}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  min-height:95vh;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;
+  align-items:center;
+  padding:9rem 3rem 5rem;
+  max-width:1300px;margin:0 auto;
+}
+.hero-left{position:relative;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.5rem 1.15rem;
+  background:var(--accent-glow);
+  border:1px solid rgba(13,92,74,0.12);
+  font-size:0.72rem;font-weight:600;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:2.5rem;
+  opacity:0;animation:fadeUp 0.7s ease forwards;
+}
+.hero-tag::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--coral);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;} 50%{opacity:0.4;}
+}
+.hero h1{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.6rem,5.5vw,4.8rem);
+  line-height:1.04;letter-spacing:-0.025em;
+  color:var(--text-primary);
+  opacity:0;animation:fadeUp 0.7s ease 0.1s forwards;
+}
+.hero h1 em{
+  color:var(--accent);font-style:italic;
+}
+.hero-sub{
+  margin-top:2rem;max-width:480px;
+  font-size:1.12rem;line-height:1.85;color:var(--text-secondary);
+  font-weight:300;
+  opacity:0;animation:fadeUp 0.7s ease 0.2s forwards;
+}
+.hero-actions{
+  margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;
+  opacity:0;animation:fadeUp 0.7s ease 0.35s forwards;
+}
+
+/* Hero visual side */
+.hero-right{
+  position:relative;
+  display:flex;flex-direction:column;gap:1.25rem;
+  opacity:0;animation:fadeUp 0.8s ease 0.4s forwards;
+}
+.role-card{
+  padding:1.75rem 2rem;
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  position:relative;
+  transition:transform 0.35s ease,box-shadow 0.35s ease;
+}
+.role-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(26,31,29,0.08);
+}
+.role-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:100%;
+}
+.role-card:nth-child(1)::before{background:var(--accent);}
+.role-card:nth-child(2)::before{background:var(--coral);}
+.role-card:nth-child(3)::before{background:#7c6bb5;}
+.role-card-label{
+  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);font-weight:600;margin-bottom:0.5rem;
+}
+.role-card-title{
+  font-family:var(--serif);font-size:1.35rem;
+  color:var(--text-primary);margin-bottom:0.4rem;
+}
+.role-card-desc{
+  font-size:0.9rem;line-height:1.7;color:var(--text-secondary);margin:0;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── REFERENCE ── */
+.ref-section{
+  position:relative;z-index:1;
+  max-width:1300px;margin:0 auto;
+  padding:2.5rem 3rem;
+  border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);
+  display:flex;align-items:flex-start;gap:2rem;
+}
+.ref-number{
+  font-family:var(--serif);font-size:3.5rem;line-height:1;
+  color:var(--accent);flex-shrink:0;
+}
+.ref-text{max-width:680px;}
+.ref-text .ref-label{
+  font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--coral);font-weight:600;margin-bottom:0.5rem;display:block;
+}
+.ref-text p{font-size:0.95rem;line-height:1.85;color:var(--text-secondary);}
+.ref-text a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;}
+
+/* ── ARTICLE ── */
+.article{
+  position:relative;z-index:1;
+  max-width:800px;margin:0 auto;
+  padding:5rem 3rem;
+}
+.article p{
+  font-size:1.08rem;line-height:1.95;margin-bottom:1.85rem;
+  color:var(--text-primary);font-weight:300;
+}
+.article p strong{font-weight:600;}
+.article h2{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.9rem,4vw,2.8rem);
+  line-height:1.12;letter-spacing:-0.02em;
+  margin:5rem 0 1.8rem;
+}
+.article h2 em{color:var(--accent);font-style:italic;}
+.article h3{
+  font-family:var(--serif);font-weight:400;font-size:1.55rem;
+  margin:3.5rem 0 1.25rem;color:var(--accent);
+}
+.article blockquote{
+  border-left:3px solid var(--coral);
+  padding:1.8rem 2.2rem;margin:2.5rem 0;
+  background:var(--coral-soft);
+  font-family:var(--serif);font-style:italic;
+  font-size:1.35rem;line-height:1.55;
+}
+.article ul{margin:1.5rem 0 2rem 1.5rem;}
+.article li{
+  font-size:1.05rem;line-height:1.8;margin-bottom:0.85rem;
+  color:var(--text-primary);font-weight:300;
+}
+.article li strong{color:var(--accent);font-weight:600;}
+
+/* ── ROLE DEEP-DIVE CARDS ── */
+.role-deep{
+  margin:3.5rem 0;
+  background:var(--bg-card);
+  border:1px solid var(--border-light);
+  overflow:hidden;
+}
+.role-deep-header{
+  padding:2.25rem 2.5rem 1.5rem;
+  display:flex;align-items:center;gap:1.5rem;
+}
+.role-badge{
+  width:3.5rem;height:3.5rem;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+}
+.role-badge.green{background:rgba(13,92,74,0.1);color:var(--accent);}
+.role-badge.coral{background:var(--coral-soft);color:var(--coral);}
+.role-badge.violet{background:rgba(124,107,181,0.1);color:#7c6bb5;}
+.role-deep-header h3{
+  font-family:var(--serif);font-size:1.75rem;font-weight:400;
+  color:var(--text-primary);margin:0;
+}
+.role-deep-body{padding:0 2.5rem 2.25rem;}
+.role-deep-body p{
+  font-size:1.02rem;line-height:1.85;color:var(--text-secondary);
+  margin-bottom:1.25rem;font-weight:300;
+}
+.role-deep-body p:last-child{margin-bottom:0;}
+
+/* ── COMPARISON TABLE ── */
+.comp-table{
+  width:100%;margin:2.5rem 0;
+  border-collapse:collapse;
+}
+.comp-table th{
+  text-align:left;padding:1rem 1.25rem;
+  font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--text-muted);font-weight:600;
+  border-bottom:2px solid var(--border);
+}
+.comp-table td{
+  padding:1rem 1.25rem;
+  font-size:0.93rem;line-height:1.65;
+  color:var(--text-secondary);font-weight:300;
+  border-bottom:1px solid var(--border-light);
+}
+.comp-table td:first-child{color:var(--text-primary);font-weight:500;}
+.comp-table tr:last-child td{border-bottom:none;}
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.architecture{
+  margin:3.5rem 0;padding:3rem 2.5rem;
+  background:var(--bg-warm);
+  border:1px solid var(--border-light);
+  text-align:center;
+}
+.architecture h4{
+  font-family:var(--serif);font-size:1.35rem;
+  color:var(--text-primary);margin-bottom:2.5rem;font-weight:400;
+}
+.arch-flow{
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:0.75rem;
+}
+.arch-node{
+  padding:0.75rem 1.35rem;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  font-size:0.82rem;font-weight:500;
+  color:var(--text-primary);
+}
+.arch-node.accent{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+}
+.arch-node.coral{
+  background:var(--coral);color:#fff;border-color:var(--coral);
+}
+.arch-arrow{
+  color:var(--text-muted);font-size:1.25rem;
+}
+
+/* ── MALPRACTICE LAYERS ── */
+.layers{
+  margin:3rem 0;
+}
+.layer-item{
+  display:flex;align-items:flex-start;gap:1.5rem;
+  padding:1.5rem 0;
+  border-bottom:1px solid var(--border-light);
+}
+.layer-item:last-child{border-bottom:none;}
+.layer-num{
+  font-family:var(--serif);font-size:2.25rem;
+  color:var(--accent);line-height:1;flex-shrink:0;
+  min-width:2.5rem;
+}
+.layer-content h4{
+  font-family:var(--serif);font-size:1.25rem;
+  color:var(--text-primary);margin-bottom:0.35rem;font-weight:400;
+}
+.layer-content p{
+  font-size:0.95rem;line-height:1.75;color:var(--text-secondary);margin:0;
+}
+
+/* ── CTA ── */
+.cta{
+  position:relative;z-index:1;
+  padding:6rem 3rem;
+  background:var(--accent);
+  color:#fff;
+}
+.cta-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;
+  align-items:center;
+}
+.cta-left h2{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.2rem,4.5vw,3.5rem);
+  line-height:1.08;letter-spacing:-0.02em;
+}
+.cta-left h2 em{color:rgba(255,255,255,0.6);font-style:italic;}
+.cta-left p{
+  margin-top:1.5rem;font-size:1.12rem;line-height:1.85;
+  color:rgba(255,255,255,0.78);font-weight:300;max-width:480px;
+}
+.cta-actions{margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:0.65rem;
+  padding:1rem 2.25rem;font-family:var(--sans);
+  font-size:0.82rem;font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;
+  transition:all 0.35s ease;
+}
+.btn-white{background:#fff;color:var(--accent);}
+.btn-white:hover{background:var(--text-primary);color:#fff;letter-spacing:0.18em;}
+.btn-ghost{
+  background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.35);
+}
+.btn-ghost:hover{border-color:#fff;letter-spacing:0.18em;}
+.cta-right{
+  display:flex;flex-direction:column;gap:1.25rem;
+}
+.cta-stat{
+  padding:1.5rem;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.12);
+}
+.cta-stat-num{
+  font-family:var(--serif);font-size:2.25rem;line-height:1.1;
+}
+.cta-stat-label{
+  font-size:0.88rem;color:rgba(255,255,255,0.65);margin-top:0.25rem;
+}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  padding:3rem;text-align:center;
+  border-top:1px solid var(--border-light);
+}
+footer p{font-size:0.82rem;color:var(--text-muted);}
+footer a{color:var(--accent);text-decoration:none;}
+
+/* ── SCROLL REVEAL ── */
+.reveal{
+  opacity:0;transform:translateY(22px);
+  transition:opacity 0.65s ease,transform 0.65s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:3rem;min-height:auto;}
+  .hero-right{order:-1;}
+  .ref-section{flex-direction:column;gap:1rem;}
+}
+@media(max-width:768px){
+  nav{padding:1rem 1.25rem;}
+  .nav-links{display:none;}
+  .hero{padding:7rem 1.25rem 3.5rem;}
+  .hero h1{font-size:clamp(2.2rem,8vw,3.2rem);}
+  .ref-section{padding:2rem 1.25rem;}
+  .article{padding:3.5rem 1.25rem;}
+  .role-deep-header{flex-direction:column;align-items:flex-start;}
+  .role-deep-header,.role-deep-body{padding-left:1.5rem;padding-right:1.5rem;}
+  .architecture{padding:2rem 1.25rem;}
+  .cta-inner{grid-template-columns:1fr;gap:2.5rem;}
+  .cta{padding:4rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://ehealthwares.com" class="nav-logo">eHealthwares <span>· Insights</span></a>
+  <ul class="nav-links">
+    <li><a href="#">Insights</a></li>
+    <li><a href="https://ehealthwares.com/careers">Careers</a></li>
+    <li><a href="https://ehealthwares.com/about">About</a></li>
+  </ul>
+  <a href="https://ehealthwares.com" class="nav-cta">Explore MyAIha</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Healthcare Insight · Series 2</div>
+    <h1>The Future of Healthcare Will Be <em>Redefined</em></h1>
+    <p class="hero-sub">
+      Healthcare Harnesses will matter. New job roles are forming around AI-augmented encounters — and the professionals who master them will define the next era of medicine.
+    </p>
+    <div class="hero-actions">
+      <a href="#article" class="btn btn-primary" style="background:var(--accent);color:#fff;">Read the Article →</a>
+      <a href="https://ehealthwares.com/careers" class="btn" style="background:transparent;color:var(--accent);border:1px solid var(--accent);">View Open Roles</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="role-card">
+      <div class="role-card-label">New Role · Clinical</div>
+      <div class="role-card-title">AI Response Evaluator</div>
+      <p class="role-card-desc">Licensed doctors reviewing, certifying, and overriding AI-generated clinical responses before they reach patients.</p>
+    </div>
+    <div class="role-card">
+      <div class="role-card-label">New Role · Health Information</div>
+      <div class="role-card-title">Health Information AI Validator</div>
+      <p class="role-card-desc">HIM professionals and coders validating, auditing, and overseeing AI-managed health records for accuracy and compliance.</p>
+    </div>
+    <div class="role-card">
+      <div class="role-card-label">New Role · Nursing</div>
+      <div class="role-card-title">Personal Care Nurse</div>
+      <p class="role-card-desc">Nurses providing personal oversight of vitals, medications, and health trajectories after every AI-augmented encounter.</p>
+    </div>
+  </div>
+</header>
+
+<!-- REFERENCE -->
+<div class="ref-section">
+  <div class="ref-number">47.6%</div>
+  <div class="ref-text">
+    <span class="ref-label">Reference · CDC Data</span>
+    <p>
+      Nearly half of all office-based physician visits include a physical examination or screening ordered or provided.
+      <a href="https://www.cdc.gov/nchs/data/nhsr/nhsr184.pdf" target="_blank">Source: CDC National Health Statistics Report</a>.
+      The question isn't whether healthcare will change. It's who will be standing in the new roles when it does.
+    </p>
+  </div>
+</div>
+
+<!-- ARTICLE -->
+<article class="article" id="article">
+
+  <h2>The Word Nobody's Using Yet: <em>Healthcare Harnesses</em></h2>
+  <p>Every major technology wave produces a moment where the tool arrives before the language.</p>
+  <p>The internet arrived — and "webmaster" became a job. Smartphones arrived — and "app developer" became an industry. Cloud computing arrived — and "DevOps engineer" became a career path.</p>
+  <p>AI in healthcare is having that moment right now. The tool is here. The language isn't.</p>
+  <p>So let me offer one: <strong>Healthcare Harnesses.</strong></p>
+  <p>A Healthcare Harness is the new discipline of working <em>with</em> AI-augmented medical systems — not as a coder, not as a clinician, but as the professional layer that makes the system <strong>trustworthy, accurate, human-supervised, and accountable.</strong> It's the interface between raw algorithmic output and real clinical decisions.</p>
+
+  <h2>The Fear Is Wrong</h2>
+  <blockquote>"AI is going to replace doctors."</blockquote>
+  <p>No. AI is going to <strong>restructure what doctors do</strong> — and create entirely new roles around them. The stethoscope didn't replace doctors. It changed what they could detect. AI won't replace clinicians. It will change <strong>what they can see, remember, compare, and catch.</strong></p>
+  <p>The question isn't "will there be doctors?" Of course there will. The question is: <strong>what will doctors actually do all day — and who else needs to be on the team?</strong></p>
+
+  <!-- ROLE 1 -->
+  <div class="role-deep reveal">
+    <div class="role-deep-header">
+      <div class="role-badge green">🩺</div>
+      <h3>Role 1: The AI Response Evaluator</h3>
+    </div>
+    <div class="role-deep-body">
+      <p><strong>Who:</strong> Licensed, practicing doctors.<br>
+      <strong>What they do:</strong> Review, validate, approve, or override AI-generated clinical responses before they reach the patient.</p>
+      <p>AI can draft a differential diagnosis. It can flag drug interactions. It can summarize a patient's history in seconds. But <strong>who signs off?</strong> Who says "this is clinically sound" or "this misses a critical red flag"?</p>
+      <p>A doctor. A real one. Licensed. Experienced. Accountable. But this isn't the doctor behind a desk for 8 hours seeing 40 patients. This is a doctor whose primary work is evaluating the AI's output — using clinical judgement to vet, correct, and certify what the algorithm produces.</p>
+    </div>
+  </div>
+
+  <table class="comp-table">
+    <thead>
+      <tr><th>Traditional Doctor</th><th>AI Response Evaluator</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Sees patients one by one</td><td>Reviews AI outputs at scale</td></tr>
+      <tr><td>Diagnostic reasoning under time pressure</td><td>Diagnostic reasoning with full context</td></tr>
+      <tr><td>Bounded by appointment slots</td><td>Bounded by cases needing judgement</td></tr>
+      <tr><td>Works inside a building</td><td>Works inside a network</td></tr>
+      <tr><td>Burnout from volume</td><td>Focus from precision</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ROLE 2 -->
+  <div class="role-deep reveal">
+    <div class="role-deep-header">
+      <div class="role-badge coral">🗂️</div>
+      <h3>Role 2: The Health Information Validator</h3>
+    </div>
+    <div class="role-deep-body">
+      <p><strong>Who:</strong> Health Information Management (HIM) professionals, medical coders, clinical data analysts.<br>
+      <strong>What they do:</strong> Validate, audit, and oversee the AI-managed health records — ensuring every entry is accurate, coded correctly, compliant, and clinically meaningful.</p>
+      <p>AI generates records fast. <em>Very</em> fast. But <strong>who ensures those records are right?</strong> The HIM professional reimagined: auditing machine-generated records at scale, flagging anomalies, preventing errors from propagating, and overseeing the integrity of your entire portfolio across providers.</p>
+      <p>Think of them as <strong>the editors of your medical autobiography.</strong> The AI writes the first draft. The HIM professional ensures it's true.</p>
+    </div>
+  </div>
+
+  <!-- ROLE 3 -->
+  <div class="role-deep reveal">
+    <div class="role-deep-header">
+      <div class="role-badge violet">💉</div>
+      <h3>Role 3: The AI-Augmented Personal Care Nurse</h3>
+    </div>
+    <div class="role-deep-body">
+      <p><strong>Who:</strong> Registered nurses, nurse practitioners.<br>
+      <strong>What they do:</strong> Provide deeply personal, hands-on oversight of a patient's vitals, medications, and health trajectory <em>after</em> AI-augmented encounters.</p>
+      <p>AI can triage. AI can summarize. AI can flag. But who watches the patient between encounters? Who notices that blood pressure trending slightly upward over three weeks isn't "within normal range" — it's <em>changing</em>?</p>
+      <p>A nurse. With a portfolio. And your trajectory in view. <strong>Present. Not reactive.</strong></p>
+    </div>
+  </div>
+
+  <h2>The New Care Architecture</h2>
+  <p>Put it all together and you get a completely restructured care system — where every AI output is human-validated, every record is human-overseen, and every patient has a human watching their trajectory.</p>
+
+  <div class="architecture reveal">
+    <h4>The Patient-Centered AI-Augmented Care Model</h4>
+    <div class="arch-flow">
+      <div class="arch-node">You (Patient)</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node accent">AI Triage</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Doctor Evaluator</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">HIM Validator</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node coral">Nurse Oversight</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Pharmacy & Lab</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">Home Visits</div>
+    </div>
+  </div>
+
+  <h2>Malpractice, Structurally Ruled Out</h2>
+  <p>In a traditional visit, it's one doctor, one moment, one memory. If they miss something, there's no second layer.</p>
+  <p>In the harness model, multiple professionals create multiple checks:</p>
+
+  <div class="layers reveal">
+    <div class="layer-item">
+      <div class="layer-num">01</div>
+      <div class="layer-content">
+        <h4>AI Flags Red Flags</h4>
+        <p>Indications, contraindications, and warning signs surfaced from the full portfolio.</p>
+      </div>
+    </div>
+    <div class="layer-item">
+      <div class="layer-num">02</div>
+      <div class="layer-content">
+        <h4>Doctor Certifies the Response</h4>
+        <p>Licensed clinical judgement reviews and signs off before anything reaches the patient.</p>
+      </div>
+    </div>
+    <div class="layer-item">
+      <div class="layer-num">03</div>
+      <div class="layer-content">
+        <h4>HIM Validates the Record</h4>
+        <p>Coded accurately, compliantly, and meaningfully — for this encounter and every future one.</p>
+      </div>
+    </div>
+    <div class="layer-item">
+      <div class="layer-num">04</div>
+      <div class="layer-content">
+        <h4>Nurse Monitors Outcomes</h4>
+        <p>Catches drift, medication gaps, and trajectory changes between encounters.</p>
+      </div>
+    </div>
+    <div class="layer-item">
+      <div class="layer-num">05</div>
+      <div class="layer-content">
+        <h4>Pharmacist Validates Safety</h4>
+        <p>Drug interactions, dosing, alternatives, and adherence — checked continuously.</p>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Multiple professionals. Multiple checks. One patient. Zero blind spots.</strong> That's not just better care. That's defensible care.</p>
+
+  <h2>"Healthcare Harnesses" Will Be a Discipline</h2>
+  <p>Just like "DevOps" became the discipline of bridging development and operations, <strong>Healthcare Harnessing</strong> becomes the discipline of bridging AI output and clinical trust.</p>
+  <p>It will require professionals who understand:</p>
+  <ul>
+    <li><strong>Clinical medicine</strong> — enough to evaluate what AI produces</li>
+    <li><strong>Health informatics</strong> — enough to manage and validate records at scale</li>
+    <li><strong>AI systems</strong> — enough to know what the model can and can't do</li>
+    <li><strong>Ethics and compliance</strong> — enough to ensure malpractice is structurally ruled out</li>
+    <li><strong>Patient relationship management</strong> — enough to translate data back into care</li>
+  </ul>
+  <p>Medical schools will teach it. Hospitals will hire for it. Health systems will compete on it. And professionals who master these harnesses early — <strong>they won't just have jobs. They'll have leverage.</strong></p>
+
+  <h2>What This Means for You</h2>
+  <p>If you're a <strong>doctor</strong>: your judgement is about to become more valuable, not less. The question is whether you'll be reviewing AI outputs at scale — or still fighting a queueing system.</p>
+  <p>If you're an <strong>HIM professional or coder</strong>: your role is transforming from data entry to <strong>data sovereignty.</strong> Get ahead of this.</p>
+  <p>If you're a <strong>nurse</strong>: the future of your profession isn't ward shifts. It's personal, portfolio-based, continuous patient oversight.</p>
+  <p>If you're a <strong>hospital owner or investor</strong>: the workforce of the future isn't bigger. It's restructured. Fewer people doing paperwork. More people doing judgement, validation, and oversight.</p>
+
+  <h2>The Takeaway</h2>
+  <p>The future of healthcare won't be defined by better buildings or faster elevators. It will be defined by <strong>new job roles built around AI-augmented encounters</strong> — roles where licensed doctors evaluate AI responses, HIM professionals validate records, nurses oversee patient trajectories, and pharmacists manage medication in real time.</p>
+  <p>These are <strong>Healthcare Harnesses</strong> — the professional layer that makes AI trustworthy.</p>
+  <p>And they're not coming someday. <strong>They're hiring now.</strong></p>
+
+</article>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <h2>The future of healthcare is hiring. <em>Take your place.</em></h2>
+      <p>MyAIha is building the omnichannel, decentralized hospital AI assistant — augmented by real professionals who evaluate, validate, oversee, visit your home, and schedule physical exams when they're needed.</p>
+      <div class="cta-actions">
+        <a href="https://ehealthwares.com/careers" class="btn btn-white">View Open Roles →</a>
+        <a href="https://ehealthwares.com" class="btn btn-ghost">Explore MyAIha</a>
+      </div>
+    </div>
+    <div class="cta-right">
+      <div class="cta-stat">
+        <div class="cta-stat-num">3+</div>
+        <div class="cta-stat-label">New clinical role categories emerging</div>
+      </div>
+      <div class="cta-stat">
+        <div class="cta-stat-num">5</div>
+        <div class="cta-stat-label">Harness skills that define the discipline</div>
+      </div>
+      <div class="cta-stat">
+        <div class="cta-stat-num">0</div>
+        <div class="cta-stat-label">Blind spots when layers work together</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <a href="https://ehealthwares.com">eHealthWares Informatics Limited</a> · Building Connected Healthcare Technology Ecosystems</p>
+</footer>
+
+<script>
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+},{threshold:0.1});
+document.querySelectorAll('.reveal, .article h2, .article p, .article blockquote, .article ul, .article table, .architecture, .layers, .role-deep').forEach(el=>{
+  el.classList.add('reveal'); obs.observe(el);
+});
+</script>
+</body>
+</html>

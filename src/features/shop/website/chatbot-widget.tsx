@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { MessageSquare, X, Send, Bot, Pencil, Paperclip, FileText } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { CallControlButton } from '@/components/rtc/call-button';
 import { TypingBubble } from '@/components/typing-dots';
 import { useAuthStore } from './auth-store';
 import { ChatPhoneGate } from './chat-phone-gate';
@@ -420,6 +421,13 @@ export function ChatbotWidget() {
                     <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                       {msg.text}
                     </Text>
+                    {msg.control && (
+                      <CallControlButton
+                        control={msg.control}
+                        phone={identity?.phone}
+                        guest={identity?.guest}
+                      />
+                    )}
                     <Text size="xs" c={isUser ? 'rgba(255,255,255,0.6)' : muted} ta="right" mt={4}>
                       {new Date(msg.createdAt).toLocaleTimeString([], {
                         hour: '2-digit',

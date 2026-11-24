@@ -5,6 +5,7 @@ import { io, type Socket } from 'socket.io-client';
 import { getAccessToken } from '@/lib/auth-tokens';
 import { conversationApi, CONVERSATION_API_BASE_URL } from '@/lib/conversation-api';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
+import type { ChatControl } from '@/lib/rtc/call-client';
 import { useReplyingAnimation } from '@/lib/use-replying-animation';
 
 const ANON_PHONE_KEY = 'damorex-chatbot-phone';
@@ -27,6 +28,8 @@ export interface ChatMessage {
   orphan?: boolean;
   optimistic?: boolean;
   attachments?: ChatMessageAttachment[];
+  /** Actionable control (e.g. `call.connect`) carried by this message. */
+  control?: ChatControl;
 }
 
 export interface RawExchangeMessage {
@@ -39,6 +42,7 @@ export interface RawExchangeMessage {
   questionId?: string;
   attribute?: string;
   attachments?: ChatMessageAttachment[];
+  control?: ChatControl;
   createdAt: string;
   status?: string;
   orphan?: boolean;
@@ -255,6 +259,7 @@ function toChatMessage(raw: RawExchangeMessage): ChatMessage {
     createdAt: raw.createdAt,
     orphan: raw.orphan,
     attachments: raw.attachments,
+    control: raw.control,
   };
 }
 
