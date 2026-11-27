@@ -1,3 +1,4 @@
+import { Play } from 'lucide-react';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { buildNotificationDeliveryConfig } from './notification-delivery/schema';
 import { notificationDetailHref, shortId } from './notification-detail/link';
@@ -56,6 +57,22 @@ describe('notification entity tables', () => {
     expect(notificationDetailHref('notification-events', { id: 'evt-1' })).toBe(
       '/conversation/notification-detail/notification-events/evt-1'
     );
+  });
+
+  it('exposes the Test (Play) row action for dispatches when a handler is provided', () => {
+    const config = buildNotificationDispatchesConfig({
+      organizationId: null,
+      onTest: () => undefined,
+    });
+
+    expect(config.rowActionsInline).toBe(true);
+    expect(config.rowActions).toHaveLength(1);
+    expect(config.rowActions?.[0]).toMatchObject({ id: 'test', label: 'Test', icon: Play });
+  });
+
+  it('hides the Test row action when no handler is provided', () => {
+    const config = buildNotificationDispatchesConfig({ organizationId: null });
+    expect(config.rowActions).toBeUndefined();
   });
 
   it('shortens long ids for the table label', () => {
