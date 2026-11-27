@@ -3,6 +3,7 @@ import {
   getAccessToken,
   getAccessTokenExpiry,
   getRefreshToken,
+  getRefreshTokenExpiry,
   getRememberMe,
   persistTokens,
   clearTokens,
@@ -16,6 +17,15 @@ function makeJwt(claims: Record<string, unknown>): string {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = btoa(JSON.stringify(claims));
   return `${header}.${payload}.fake-signature`;
+}
+
+/** Same token, but with a `base64url` payload segment (`-`/`_` instead of `+`/`/`). */
+function makeBase64UrlJwt(claims: Record<string, unknown>): string {
+  const payload = btoa(JSON.stringify(claims))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return `${btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))}.${payload}.fake-signature`;
 }
 
 beforeEach(() => {
@@ -48,6 +58,32 @@ describe('getAccessTokenExpiry', () => {
     const exp = Math.floor(Date.now() / 1000) + 300;
     persistTokens(makeJwt({ exp }), 'rt');
     expect(getAccessTokenExpiry()).toBe(exp * 1000);
+  });
+
+  it('decodes a base64url payload segment', () => {
+    const exp = Math.floor(Date.now() / 1000) + 600;
+    // `exp` + a filler claim long enough that standard base64 produces `+`/`/`.
+    const claims = { sub: 'u1', exp, overflow: '\u00ff\u00fe\u00fd'.repeat(8) };
+    expect(getAccessTokenExpiry(makeBase64UrlJwt(claims))).toBe(exp * 1000);
+  });
+});
+
+describe('getRefreshTokenExpiry', () => {
+  it('returns the refresh token exp claim in epoch milliseconds', () => {
+    const exp = Math.floor(Date.now() / 1000) + 604800;
+    const token = makeJwt({ sub: 'u1', exp });
+    expect(getRefreshTokenExpiry(token)).toBe(exp * 1000);
+  });
+
+  it('reads the stored refresh token when no argument is given', () => {
+    const exp = Math.floor(Date.now() / 1000) + 604800;
+    persistTokens(makeJwt({ exp }), makeJwt({ sub: 'u1', exp }));
+    expect(getRefreshTokenExpiry()).toBe(exp * 1000);
+  });
+
+  it('returns null with no stored refresh token', () => {
+    clearTokens();
+    expect(getRefreshTokenExpiry()).toBeNull();
   });
 });
 

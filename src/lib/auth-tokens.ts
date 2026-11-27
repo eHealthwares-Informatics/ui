@@ -130,52 +130,66 @@ export function setRememberMe(remember: boolean): void {
   }
 }
 
-export function decodeUserFromAccessToken(accessToken: string): AuthUser | null {
+/**
+ * Decodes a JWT payload segment. Tokens are `base64url` encoded, while `atob`
+ * only understands the standard alphabet — a payload containing `-` or `_`
+ * would otherwise throw and make a perfectly valid session look corrupt.
+ */
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
-    const payloadRaw = accessToken.split('.')[1] ?? '';
-    const payload = JSON.parse(atob(payloadRaw)) as {
-      sub?: string;
-      username?: string;
-      email?: string;
-      roles?: string[];
-      permissions?: string[];
-      phone?: string;
-      organizationId?: string;
-      locationId?: string | null;
-      firstName?: string | null;
-      lastName?: string | null;
-      displayName?: string | null;
-      dateOfBirth?: string | null;
-      gender?: string | null;
-      exp?: number;
-    };
-
-    if (!payload.sub || !payload.username) {
+    const segment = token.split('.')[1] ?? '';
+    if (!segment) {
       return null;
     }
-
-    if (payload.exp && payload.exp * 1000 <= Date.now()) {
-      return null;
-    }
-
-    return {
-      id: payload.sub,
-      username: payload.username,
-      email: payload.email,
-      roles: payload.roles ?? [],
-      permissions: payload.permissions ?? [],
-      phone: payload.phone,
-      organizationId: payload.organizationId ? payload.organizationId : null,
-      locationId: payload.locationId ?? null,
-      firstName: payload.firstName ?? null,
-      lastName: payload.lastName ?? null,
-      displayName: payload.displayName ?? null,
-      dateOfBirth: payload.dateOfBirth ?? null,
-      gender: payload.gender ?? null,
-    };
+    const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+    return JSON.parse(atob(padded)) as Record<string, unknown>;
   } catch {
     return null;
   }
+}
+
+export function decodeUserFromAccessToken(accessToken: string): AuthUser | null {
+  const payload = decodeJwtPayload(accessToken) as {
+    sub?: string;
+    username?: string;
+    email?: string;
+    roles?: string[];
+    permissions?: string[];
+    phone?: string;
+    organizationId?: string;
+    locationId?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    displayName?: string | null;
+    dateOfBirth?: string | null;
+    gender?: string | null;
+    exp?: number;
+  } | null;
+
+  if (!payload?.sub || !payload.username) {
+    return null;
+  }
+
+  if (payload.exp && payload.exp * 1000 <= Date.now()) {
+    return null;
+  }
+
+  return {
+    id: payload.sub,
+    username: payload.username,
+    email: payload.email,
+    roles: payload.roles ?? [],
+    permissions: payload.permissions ?? [],
+    phone: payload.phone,
+    organizationId: payload.organizationId ? payload.organizationId : null,
+    locationId: payload.locationId ?? null,
+    firstName: payload.firstName ?? null,
+    lastName: payload.lastName ?? null,
+    displayName: payload.displayName ?? null,
+    dateOfBirth: payload.dateOfBirth ?? null,
+    gender: payload.gender ?? null,
+  };
 }
 
 export function getAccessToken(): string | null {
@@ -183,24 +197,33 @@ export function getAccessToken(): string | null {
 }
 
 /**
- * Returns the access token's absolute expiry timestamp in ms, or null when the
- * token carries no `exp` claim (e.g. missing/corrupt payload).
+ * Returns a token's absolute expiry timestamp in ms, or null when the token
+ * carries no `exp` claim (e.g. missing/corrupt payload).
  */
+export function getTokenExpiry(token: string | null): number | null {
+  if (!token) {
+    return null;
+  }
+  const exp = decodeJwtPayload(token)?.exp;
+  return typeof exp === 'number' ? exp * 1000 : null;
+}
+
 export function getAccessTokenExpiry(accessToken: string | null = getAccessToken()): number | null {
-  if (!accessToken) {
-    return null;
-  }
-  try {
-    const payloadRaw = accessToken.split('.')[1] ?? '';
-    const payload = JSON.parse(atob(payloadRaw)) as { exp?: number };
-    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
-  } catch {
-    return null;
-  }
+  return getTokenExpiry(accessToken);
 }
 
 export function getRefreshToken(): string | null {
   return readToken(REFRESH_TOKEN_KEY);
+}
+
+/**
+ * When the refresh token itself expires — the point past which no rotation can
+ * keep the session alive.
+ */
+export function getRefreshTokenExpiry(
+  refreshToken: string | null = getRefreshToken()
+): number | null {
+  return getTokenExpiry(refreshToken);
 }
 
 export function persistTokens(
