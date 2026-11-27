@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, within, cleanup } from '@test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModuleProvider } from '@/context/module-provider';
+import { clearTokens, persistTokens } from '@/lib/auth-tokens';
 import { SettingsAccount } from './account-page';
 
 vi.mock('@/features/rxsoft/pages/user-insights/api', () => ({
@@ -37,6 +38,7 @@ function hasText(container: HTMLElement, text: string) {
 describe('SettingsAccount', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearTokens();
   });
 
   it('renders the editable Basic information section', () => {
@@ -59,6 +61,21 @@ describe('SettingsAccount', () => {
 
     expect(within(container).getByTestId('account-module-settings')).toBeInTheDocument();
     expect(within(container).getByTestId('account-module-badge')).toBeInTheDocument();
+  });
+
+  it('renders the session timing lines for the current session', () => {
+    const exp = Math.floor(Date.now() / 1000) + 3600;
+    const token = (claims: Record<string, unknown>) => `x.${btoa(JSON.stringify(claims))}.y`;
+    persistTokens(token({ sub: 'u1', exp }), token({ sub: 'u1', exp: exp + 86400 }));
+
+    const { container } = renderAccount();
+
+    expect(hasText(container, 'You will be auto logged out at')).toBe(true);
+    expect(hasText(container, 'Your session will be auto refreshed at')).toBe(true);
+    expect(within(container).getByTestId('account-session')).toBeInTheDocument();
+    expect(within(container).getByTestId('account-session-auto-logout-at')).toBeInTheDocument();
+    expect(within(container).getByTestId('account-session-auto-refresh-at')).toBeInTheDocument();
+    cleanup();
   });
 
   it('renders the Notifications section with subscribed toggles', () => {

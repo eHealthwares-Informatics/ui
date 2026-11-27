@@ -15,6 +15,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { SessionTimeline } from '@/features/identity/components/session-timeline';
 import { getApiErrorMessage } from '@/lib/get-api-error-message';
 import { rxsoftApi } from '@/lib/rxsoft-api';
 
@@ -290,6 +291,11 @@ export function RxUserConfigPage() {
                 onChange={(value) => setDraft((d) => ({ ...d, loginTimeoutMinutes: value }))}
                 min={1}
                 allowDecimal={false}
+                data-testid="user-config-login-timeout"
+              />
+              <SessionTimeline
+                loginTimeoutMinutes={draft.loginTimeoutMinutes}
+                testIdPrefix="user-config-session"
               />
               <Switch
                 label="Allow POS"

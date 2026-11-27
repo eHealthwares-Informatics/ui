@@ -1,3 +1,5 @@
+import { deriveView } from '@/components/view/derive-view';
+import { SessionTimelineLine } from '@/features/identity/components/session-timeline';
 import type { Column, Field, Option } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { identityApi } from '@/lib/identity-api';
@@ -173,7 +175,7 @@ function buildFormState(row: Record<string, unknown>) {
   return formState;
 }
 
-export const identityUsersConfig: ModelConfig = {
+const baseConfig: ModelConfig = {
   id: 'identity-users',
   title: 'Users',
   description:
@@ -186,4 +188,54 @@ export const identityUsersConfig: ModelConfig = {
   buildFormState,
   canDelete: true,
   apiProvider: identityApi,
+};
+
+/**
+ * The row-detail modal is generated from the form fields, so the session
+ * timeline is appended as a derived group: both instants are computed from the
+ * user's `loginTimeoutMinutes` plus identity's published token policy.
+ */
+function loginTimeoutOf(data: unknown): number | null | undefined {
+  return (data as { loginTimeoutMinutes?: number | null } | null)?.loginTimeoutMinutes;
+}
+
+const baseView = deriveView(baseConfig);
+
+export const identityUsersConfig: ModelConfig = {
+  ...baseConfig,
+  view: {
+    ...baseView,
+    fieldGroups: [
+      ...(baseView.fieldGroups ?? []),
+      {
+        title: 'Session timing',
+        fields: [
+          {
+            key: 'sessionAutoLogoutAt',
+            label: 'You will be auto logged out at',
+            col: 6,
+            render: (_value: unknown, data: unknown) => (
+              <SessionTimelineLine
+                kind="logout"
+                loginTimeoutMinutes={loginTimeoutOf(data)}
+                testId="user-detail-session-auto-logout-at"
+              />
+            ),
+          },
+          {
+            key: 'sessionAutoRefreshAt',
+            label: 'Your session will be auto refreshed at',
+            col: 6,
+            render: (_value: unknown, data: unknown) => (
+              <SessionTimelineLine
+                kind="refresh"
+                loginTimeoutMinutes={loginTimeoutOf(data)}
+                testId="user-detail-session-auto-refresh-at"
+              />
+            ),
+          },
+        ],
+      },
+    ],
+  },
 };

@@ -27,7 +27,7 @@ describe('DataTable — row click / double-click', () => {
     fireEvent.click(screen.getByTestId('data-table-row-r1'));
     expect(onRowClick).not.toHaveBeenCalled(); // not yet, debounced
 
-    vi.advanceTimersByTime(250);
+    vi.advanceTimersByTime(300);
     expect(onRowClick).toHaveBeenCalledTimes(1);
     expect(onRowClick).toHaveBeenCalledWith(rows[0]);
 

@@ -9,6 +9,7 @@ import { ViewModal } from '@/components/view/view-modal';
 import { ModuleContext, useModuleContext } from '@/context/module-context';
 import { JsonPreviewDialog } from '@/features/conversation/components/shared';
 import { entityInfoMap } from '@/features/lis/schema/entity-info';
+import { modelRegistry } from '@/features/registry';
 import { FILTERS, type FilterValue } from '@/features/rxsoft/types';
 import type { ModelConfig } from '@/features/shared/model-schema';
 import { collectFields } from '@/features/shared/payload-utils';
@@ -435,14 +436,22 @@ export function DataPageShell(props: DataPageShellProps) {
     setShowModal(true);
   }
 
-  /** Double-click on a row navigates to the view page when a detail path builder exists. */
+  /** Double-click on a row opens the view page (explicit path or registry fallback). */
   const handleRowDoubleClick = useCallback(
     (row: Record<string, unknown>) => {
       if (detailPathBuilder) {
         navigate({ to: detailPathBuilder(row) });
+        return;
+      }
+      // Schemas without an explicit builder still have a generic detail route:
+      // /<config-id>/<row-id> resolves through getModelConfig(config-id). Skip
+      // resources the registry does not know rather than opening a blank page.
+      const id = row.id ?? row._id;
+      if (id != null && id !== '' && modelRegistry[config.id]) {
+        navigate({ to: `/${config.id}/${String(id)}` });
       }
     },
-    [detailPathBuilder, navigate]
+    [detailPathBuilder, navigate, config.id]
   );
 
   function handleDelete() {}

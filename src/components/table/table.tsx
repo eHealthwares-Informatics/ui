@@ -1,5 +1,5 @@
 import { Table, Text, Loader, Center } from '@mantine/core';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Column, FilterValue } from '@/features/rxsoft/types';
 import { ActionCell, ActionCellProps } from './action-cell';
 import { SnCell } from './sn-cell';
@@ -46,29 +46,49 @@ export const DataTable = ({
   // not both open-modal and navigate.
   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const clearPendingClick = () => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+  };
+
+  // Drop a pending single-click when the table unmounts (avoids a stray modal
+  // opening after navigating away).
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   const handleRowClick = (e: React.MouseEvent, row: Record<string, unknown>) => {
     // Never open the modal when the click came from an interactive element
     // (copy-id button, view/edit/delete action icons, links).
     if ((e.target as Element).closest('button, a, [role="button"]')) {
       return;
     }
-    if (clickTimeoutRef.current) {
-      clearTimeout(clickTimeoutRef.current);
+    // The second click of a double-click must not re-arm the single-click
+    // timer; `onDoubleClick` owns that gesture.
+    if (e.detail > 1) {
+      return;
     }
+    clearPendingClick();
     clickTimeoutRef.current = setTimeout(() => {
       clickTimeoutRef.current = null;
       onRowClick?.(row);
-    }, 250);
+    }, 300);
   };
 
   const handleRowDoubleClick = (e: React.MouseEvent, row: Record<string, unknown>) => {
     if ((e.target as Element).closest('button, a, [role="button"]')) {
       return;
     }
-    if (clickTimeoutRef.current) {
-      clearTimeout(clickTimeoutRef.current);
-      clickTimeoutRef.current = null;
-    }
+    // Cancel the single-click modal and navigate instead.
+    clearPendingClick();
+    e.preventDefault();
     onRowDoubleClick?.(row);
   };
 

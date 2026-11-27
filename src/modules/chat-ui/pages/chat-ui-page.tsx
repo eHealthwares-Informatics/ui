@@ -68,6 +68,7 @@ import {
   listProjections,
   sendWebhookMessage,
 } from '../services/chat-api';
+import { uploadAttachment } from '../services/chat-api';
 import type {
   ChatMode,
   ConversationInboxItem,
@@ -974,6 +975,34 @@ function ConversationThread(props: {
     setDraft('');
   };
 
+  /**
+   * Upload a file and send it as the answer. The URL is the message text (that
+   * is what a document/audio question validates) and the attachment carries the
+   * metadata.
+   */
+  const attachFile = async (file: File) => {
+    if (!conversation.conversationId || !senderId) return;
+    try {
+      const stored = await uploadAttachment(file);
+      sendMessage.mutate({
+        conversationId: conversation.conversationId,
+        channelId: conversation.channelId,
+        senderPhone: props.userPhone ?? '',
+        text: stored.url,
+        attachments: [
+          {
+            url: stored.url,
+            mimeType: stored.mimeType ?? file.type,
+            fileName: stored.fileName ?? file.name,
+          },
+        ],
+      });
+    } catch (error) {
+      // Surface it rather than swallowing: a silent failure looks like a lost file.
+      console.error('[chat] attachment upload failed', error);
+    }
+  };
+
   const fetchOlderMessages = async () => {
     const viewport = viewportRef.current;
     const previousHeight = viewport?.scrollHeight ?? 0;
@@ -1163,6 +1192,23 @@ function ConversationThread(props: {
             value={draft}
           />
           <Button
+            component="label"
+            disabled={!senderId || inputDisabled}
+            leftSection={<Paperclip size={16} />}
+            variant="light"
+          >
+            Attach
+            <input
+              hidden
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0];
+                if (file) void attachFile(file);
+                event.currentTarget.value = '';
+              }}
+              type="file"
+            />
+          </Button>
+          <Button
             disabled={!draft.trim() || !senderId || inputDisabled}
             leftSection={<Send size={16} />}
             loading={sendMessage.isPending}
@@ -1187,6 +1233,96 @@ function MessageBubble({
 }) {
   const isOwnMessage = message.direction === 'inbound';
   const parsed = !isOwnMessage ? parseQuestionOptions(message.text) : null;
+  // Non-option controls: a date field, a numeric field, a location button, or the
+  // engine's "Join the call" link for call questions.
+  const mode = ((message.renderMode ?? message.questionType) || '').toLowerCase();
+  const qtype = (message.questionType ?? '').toLowerCase();
+  const callUrl = !isOwnMessage
+    ? /Join the call:\s*(https?:\/\/\S+)/i.exec(message.text || '')
+    : null;
+  // Only the controls this bubble knows how to draw; everything else keeps the
+  // plain-text bubble and the composer.
+  const isQuestion =
+    !isOwnMessage &&
+    (!!callUrl ||
+      ['date', 'datetime', 'number', 'location'].includes(mode) ||
+      ['date', 'datetime', 'number', 'location'].includes(qtype));
+
+  if (isQuestion) {
+    const emit = (value: string) => value && onOptionSelect?.(value);
+    return (
+      <Box
+        bg="white"
+        maw="min(72%, 560px)"
+        px="sm"
+        py={8}
+        style={{
+          alignSelf: 'flex-start',
+          border: '1px solid var(--mantine-color-gray-3)',
+          borderRadius: 8,
+        }}
+      >
+        <Text mb="xs" size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+          {(callUrl ? message.text?.replace(callUrl[0], '') : message.text) ?? ''}
+        </Text>
+
+        {(mode === 'date' || mode === 'datetime' || qtype === 'date' || qtype === 'datetime') && (
+          <TextInput
+            disabled={disabled}
+            onChange={(event) => emit(event.currentTarget.value)}
+            type="date"
+            value=""
+          />
+        )}
+
+        {(mode === 'number' || qtype === 'number') && (
+          <TextInput
+            disabled={disabled}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') emit(event.currentTarget.value);
+            }}
+            placeholder="Enter a number"
+            type="number"
+          />
+        )}
+
+        {(mode === 'location' || qtype === 'location') && (
+          <Button
+            disabled={disabled || typeof navigator === 'undefined' || !navigator.geolocation}
+            onClick={() => {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => emit(`${pos.coords.latitude},${pos.coords.longitude}`),
+                () => emit(''),
+                { enableHighAccuracy: true, timeout: 10000 }
+              );
+            }}
+            size="sm"
+            variant="outline"
+          >
+            Share my location
+          </Button>
+        )}
+
+        {callUrl && (
+          <Button
+            component="a"
+            href={callUrl[1]}
+            rel="noopener noreferrer"
+            size="sm"
+            target="_blank"
+          >
+            Join the call
+          </Button>
+        )}
+
+        <Group gap={4} justify="flex-end" mt={4}>
+          <Text c="dimmed" size="xs">
+            {dayjs(message.createdAt).format('h:mm A')}
+          </Text>
+        </Group>
+      </Box>
+    );
+  }
 
   if (parsed) {
     return (

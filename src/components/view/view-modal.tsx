@@ -1,6 +1,5 @@
-import { Modal, Text, Title, Group, ActionIcon } from '@mantine/core';
+import { Modal, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
 import { useMemo } from 'react';
 import { GenericViewComponent } from '@/components/view';
 import { deriveView } from '@/components/view/derive-view';
@@ -49,13 +48,16 @@ export function ViewModal<T = any>({ config, row, open, onClose }: ViewModalProp
   const renderData = data ?? row;
 
   return (
-    <Modal opened={open} onClose={onClose} size="xl" withCloseButton>
-      <Group justify="space-between" align="center" pb="md">
-        <Title order={2}>{view?.title ?? config.title}</Title>
-        <ActionIcon variant="subtle" size="sm" onClick={onClose}>
-          <X size={16} />
-        </ActionIcon>
-      </Group>
+    <Modal
+      opened={open}
+      onClose={onClose}
+      size="xl"
+      withCloseButton
+      data-testid="view-modal"
+      styles={{ body: { paddingTop: 8 } }}
+    >
+      {/* The record title is rendered once by GenericViewComponent; adding a
+          Modal title here duplicated it (and the close button). */}
       {endpoint && isLoading ? (
         <Text c="dimmed" ta="center" py="xl">
           Loading…
