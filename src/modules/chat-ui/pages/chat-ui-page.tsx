@@ -68,6 +68,7 @@ import {
   listProjections,
   sendWebhookMessage,
 } from '../services/chat-api';
+import { uploadAttachment } from '../services/chat-api';
 import type {
   ChatMode,
   ConversationInboxItem,
@@ -78,7 +79,6 @@ import type {
   InboxStatus,
 } from '../types';
 import { parseQuestionOptions } from '../utils/parse-options';
-import { uploadAttachment } from '../services/chat-api';
 import { getParticipantInitials, getParticipantName } from '../utils/participants';
 
 dayjs.extend(relativeTime);
