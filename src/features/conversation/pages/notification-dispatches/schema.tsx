@@ -28,6 +28,10 @@ export type DispatchTemplateRow = {
   code: string;
   name: string;
   organizationId?: string | null;
+  /** Authored token list (HealthStack templates) used to build the test sample. */
+  metadata?: { options?: string[] } & Record<string, unknown>;
+  /** Channel bodies — their `{{tokens}}` complete the sample context. */
+  bodies?: Record<string, { body?: string; subject?: string; html?: string } | undefined>;
 };
 export type DispatchChannelRow = {
   id: string;
