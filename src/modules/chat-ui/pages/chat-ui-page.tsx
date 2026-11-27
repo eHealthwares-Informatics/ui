@@ -78,6 +78,7 @@ import type {
   InboxStatus,
 } from '../types';
 import { parseQuestionOptions } from '../utils/parse-options';
+import { uploadAttachment } from '../services/chat-api';
 import { getParticipantInitials, getParticipantName } from '../utils/participants';
 
 dayjs.extend(relativeTime);
@@ -974,6 +975,34 @@ function ConversationThread(props: {
     setDraft('');
   };
 
+  /**
+   * Upload a file and send it as the answer. The URL is the message text (that
+   * is what a document/audio question validates) and the attachment carries the
+   * metadata.
+   */
+  const attachFile = async (file: File) => {
+    if (!conversation.conversationId || !senderId) return;
+    try {
+      const stored = await uploadAttachment(file);
+      sendMessage.mutate({
+        conversationId: conversation.conversationId,
+        channelId: conversation.channelId,
+        senderPhone: props.userPhone ?? '',
+        text: stored.url,
+        attachments: [
+          {
+            url: stored.url,
+            mimeType: stored.mimeType ?? file.type,
+            fileName: stored.fileName ?? file.name,
+          },
+        ],
+      });
+    } catch (error) {
+      // Surface it rather than swallowing: a silent failure looks like a lost file.
+      console.error('[chat] attachment upload failed', error);
+    }
+  };
+
   const fetchOlderMessages = async () => {
     const viewport = viewportRef.current;
     const previousHeight = viewport?.scrollHeight ?? 0;
@@ -1162,6 +1191,23 @@ function ConversationThread(props: {
             style={{ flex: 1 }}
             value={draft}
           />
+          <Button
+            component="label"
+            disabled={!senderId || inputDisabled}
+            leftSection={<Paperclip size={16} />}
+            variant="light"
+          >
+            Attach
+            <input
+              hidden
+              onChange={(event) => {
+                const file = event.currentTarget.files?.[0];
+                if (file) void attachFile(file);
+                event.currentTarget.value = '';
+              }}
+              type="file"
+            />
+          </Button>
           <Button
             disabled={!draft.trim() || !senderId || inputDisabled}
             leftSection={<Send size={16} />}

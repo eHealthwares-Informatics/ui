@@ -68,12 +68,14 @@ export async function sendConversationMessage(input: {
   channelId: string;
   senderPhone: string;
   text: string;
+  attachments?: Array<{ url: string; mimeType?: string; fileName?: string }>;
 }) {
   await conversationApi.post('/webhooks/web', {
     channelId: input.channelId,
     senderPhone: input.senderPhone,
     text: input.text,
     conversationId: input.conversationId,
+    ...(input.attachments?.length ? { attachments: input.attachments } : {}),
   });
 }
 
@@ -83,6 +85,7 @@ export async function sendWebhookMessage(input: {
   text: string;
   conversationId?: string;
   questionnaireCode?: string;
+  attachments?: Array<{ url: string; mimeType?: string; fileName?: string }>;
 }) {
   await conversationApi.post('/webhooks/web', {
     channelId: input.channelId,
@@ -90,7 +93,30 @@ export async function sendWebhookMessage(input: {
     text: input.text,
     ...(input.conversationId ? { conversationId: input.conversationId } : {}),
     ...(input.questionnaireCode ? { questionnaireCode: input.questionnaireCode } : {}),
+    ...(input.attachments?.length ? { attachments: input.attachments } : {}),
   });
+}
+
+/**
+ * Upload an attachment (file / audio / document).
+ *
+ * The bytes go to the engine's storage chain (Cloudinary → S3 → local) and the
+ * returned URL is what a document/audio question validates — so callers send it
+ * as the message text with the attachment alongside.
+ */
+export async function uploadAttachment(file: File) {
+  const form = new FormData();
+  form.append('file', file, file.name);
+  const response = await conversationApi.post('/uploads', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data as {
+    url: string;
+    storage?: string;
+    mimeType?: string;
+    fileName?: string;
+    size?: number;
+  };
 }
 
 export async function markConversationRead(input: {
