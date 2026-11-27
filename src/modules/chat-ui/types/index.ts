@@ -52,6 +52,9 @@ export type ExchangeMessage = {
   text: string;
   questionId?: string;
   attribute?: string;
+  /** Engine classification of the question this message asks. */
+  renderMode?: string;
+  questionType?: string;
   createdAt: string;
   status?: 'sent' | 'delivered' | 'read' | 'failed';
   optimistic?: boolean;
