@@ -18,6 +18,13 @@ export function Pagination({
   const totalPages = totalItems > 0 ? Math.ceil(totalItems / pageSize) : 0;
   const activePage = Math.min(Math.max(pageIndex, 1), Math.max(totalPages, 1));
 
+  // Always include the active page size: a size that is not in the preset list
+  // leaves the Select with no matching option, so it renders empty (this is
+  // what happened when the default was 25).
+  const pageSizeOptions = Array.from(new Set([5, 10, 20, 25, 30, 50, 100, pageSize]))
+    .sort((a, b) => a - b)
+    .map((size) => ({ value: String(size), label: `${size} / page` }));
+
   return (
     <Group justify="space-between" align="center" wrap="wrap">
       {/* LEFT: count */}
@@ -46,10 +53,7 @@ export function Pagination({
             data-testid="pagination-page-size"
             value={String(pageSize)}
             onChange={(val) => val && onPageSizeChange(Number(val))}
-            data={[5, 10, 20, 30, 50, 100].map((size) => ({
-              value: String(size),
-              label: `${size} / page`,
-            }))}
+            data={pageSizeOptions}
             w={120}
           />
         </Group>
